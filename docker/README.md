@@ -14,7 +14,7 @@ To install the container you just need to make :
 $ docker-compose up 
 ```
 
-You'll see three differents containers for Nginx, PHP-FPM and PostgreSQL. 
+You'll see three differents containers for Apache, PHP-FPM and PostgreSQL. 
 
 ## Configuration with Maarch 
 
