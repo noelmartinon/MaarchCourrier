@@ -8,12 +8,25 @@ maarch-postgres:
   ports: 
     - "5432:5432"
 
+#maarch-webserver:
+#  image: phpdockerio/nginx:latest
+#  container_name: maarch-webserver
+#  volumes:
+#      - ..:/var/www/maarch
+#      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+#  ports:
+#   - "80:80"
+#  links:
+#   - maarch-php-fpm
+
+
 maarch-webserver:
-  image: phpdockerio/nginx:latest
+  build: .
+  dockerfile: apache/Dockerfile
   container_name: maarch-webserver
   volumes:
       - ..:/var/www/maarch
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./apache/apache.conf:/etc/apache2/sites-available/000-default.conf
   ports:
    - "80:80"
   links:
