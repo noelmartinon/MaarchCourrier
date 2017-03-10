@@ -2,7 +2,7 @@
 
 namespace CMIS\Models;
 
-class CMISObject
+class CMISObject extends \SplObjectStorage
 {
     private $_objectId,
         $_path,

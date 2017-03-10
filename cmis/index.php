@@ -15,7 +15,10 @@ require '../vendor/autoload.php';
 
 
 
+\Folder\Models\FoldersModel::getFolderTree();
 
+
+die();
 //create session if NO SESSION
 if (empty($_SESSION['user'])) {
     require_once('../core/class/class_functions.php');
@@ -144,5 +147,3 @@ if ($match && is_callable($match['target'])) {
 } else {
     header($_SERVER["SERVER_PROTOCOL"] . ' 404 Not Found');
 }
-
-//Utils::log(Utils::webroot($_SERVER, true), $_SERVER, $_GET, $_POST, $_FILES);

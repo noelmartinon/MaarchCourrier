@@ -5,6 +5,7 @@
       "Apps\\": "apps/maarch_entreprise/",
       "Attachments\\": "modules/attachments/",
       "Entities\\": "modules/entities/",
+      "Folder\\": "modules/folder/",
       "Visa\\": "modules/visa/",
       "CMIS\\": "cmis/"
     }

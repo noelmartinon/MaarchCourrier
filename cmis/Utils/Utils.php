@@ -34,13 +34,13 @@ class Utils
     public static function renderXML($pathToXML)
     {
         header("Content-type: text/xml");
-        echo file_get_contents($pathToXML);
+        echo file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . $pathToXML);
     }
 
     public static function renderJSON($pathToJSON)
     {
         header('Content-Type: application/json');
-        echo file_get_contents($pathToJSON);
+        echo file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR .$pathToJSON);
     }
 
     public static function outputFactory($output)
