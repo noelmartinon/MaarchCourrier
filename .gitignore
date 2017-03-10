@@ -186,3 +186,9 @@ docker
 custom
 cs_*
 svnupdateall.sh
+maarch
+installed.lck
+fonctionnel.log
+technique.log
+composer.lock
+apps/maarch_entreprise/xml/config.xml

@@ -1,15 +1,16 @@
 {
-    "autoload": {
-    	"psr-4": {
-    		"Core\\": "core/",
-    		"Apps\\": "apps/maarch_entreprise/",
-                "Attachments\\": "modules/attachments/",
-            "Entities\\": "modules/entities/",
-    		"Visa\\": "modules/visa/"
-    	}
-    },
-    "require": {
-        "slim/slim": "^3.7",
-        "respect/validation": "^1.1"
+  "autoload": {
+    "psr-4": {
+      "Core\\": "core/",
+      "Apps\\": "apps/maarch_entreprise/",
+      "Attachments\\": "modules/attachments/",
+      "Entities\\": "modules/entities/",
+      "Visa\\": "modules/visa/",
+      "CMIS\\": "cmis/"
     }
+  },
+  "require": {
+    "slim/slim": "^3.7",
+    "respect/validation": "^1.1"
+  }
 }
