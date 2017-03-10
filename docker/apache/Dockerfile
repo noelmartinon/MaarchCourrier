@@ -2,8 +2,7 @@ FROM debian:jessie
 
 RUN apt-get update -y
 RUN apt-get install -y apache2
-RUN a2enmod proxy proxy_fcgi proxy_http
-RUN a2enmod rewrite
+RUN a2enmod cgi setenvif proxy proxy_fcgi proxy_http rewrite
 RUN service apache2 restart
 
 ENV APACHE_RUN_USER www-data
