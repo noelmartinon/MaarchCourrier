@@ -2,6 +2,9 @@
 
 namespace CMIS\Models;
 
+use CMIS\Utils\Utils;
+use Folder\Models\FoldersModel;
+
 class CMISObject extends \SplObjectStorage
 {
     private $_objectId,
@@ -384,44 +387,57 @@ class CMISObject extends \SplObjectStorage
     }
 
 
-    public static function getAllObjects($objectId = '')
+    public static function getAllObjects($objectId = null)
     {
         $array = [];
+        $id = self::getUniqid($objectId);
+        if (preg_match('/^document/', hex2bin($objectId))) {
+            $document = Document::getById($id);
+            $array[] = new self($id, $document->getPath(), 'cmis:document', '', $document->getTypist(), 'cmis:document'
+                , $document->getFolderUniqueId(), null, null, $document->getFilename());
 
-        if (!empty($objectId)) {
-            $parentId = $objectId;
-            $dir = Utils::readObjectId($objectId);
-            $total_dir = 'workspace' . $dir;
         } else {
-            $parentId = Utils::createObjectId('/');
-            $dir = '/';
-            $total_dir = 'workspace/';
-        }
+
+            //TODO Test the amount of memory used for those two operations
+            $folders = FoldersModel::getFolderTree($id);
+            $documents = Document::getList();
 
 
-        if (file_exists($total_dir) && filetype($total_dir) == 'dir') {
+            //TODO add the documents at the root of the folder
+            /**
+             * @var $folder FoldersModel
+             */
 
-            if ($handle = opendir($total_dir)) {
-                while (false !== ($entry = readdir($handle))) {
-                    if ($entry != "." && $entry != ".." && $entry != ".empty") {
-
-                        if (filetype($total_dir . $entry) == 'dir') {
-                            $objectTypeId = 'cmis:folder';
-                            $baseTypeId = 'cmis:folder';
-                            $id = Utils::createObjectId($dir . $entry . '/');
-                        } else {
-                            $objectTypeId = 'cmis:document';
-                            $id = Utils::createObjectId($dir . $entry );
-                            $baseTypeId = 'cmis:document';
-                        }
-
-                        $array[] = new CMISObject($id, $total_dir . $entry, $objectTypeId, '', 'System', $baseTypeId, $parentId, null,null, $entry);
+            foreach ($folders as $folder) {
+                if (!empty($documents[$folder->getFoldersSystemId()])) {
+                    foreach ($documents[$folder->getFoldersSystemId()] as $document) {
+                        $folder->attach($document);
                     }
                 }
-                closedir($handle);
+
+                foreach ($folder as $child) {
+                    if (!empty($documents[$child->getFoldersSystemId()]) && method_exists($child, 'attach')) {
+                        foreach ($documents[$child->getFoldersSystemId()] as $document) {
+                            $child->attach($document);
+                        }
+                    }
+                }
             }
+
+            //TODO Transform $folders into CMISObject 
+
+            die();
         }
-        return $array;
+    }
+
+    private function linkFolderWithDoc()
+    {
+
+    }
+
+    private static function getUniqid($id)
+    {
+        str_replace(['folder_', 'document_'], '', hex2bin($id));
     }
 
 }

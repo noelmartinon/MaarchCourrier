@@ -9,13 +9,15 @@
 namespace Folder\Models;
 
 
+use CMIS\Utils\Utils;
+
 require_once('../core/class/class_functions.php');
 require_once('../core/class/class_db_pdo.php');
 
 abstract class FoldersModelAbstract extends \SplObjectStorage
 {
     private $_folders_system_id, $_folder_id, $_foldertype_id, $_parent_id, $_folder_name, $_subject, $_description
-    , $_author, $_typist, $_status, $_folder_level, $_creation_date, $_last_modified_date;
+    , $_author, $_typist, $_status, $_folder_level, $_creation_date, $_last_modified_date, $_uniqid;
 
     /**
      * FoldersModelAbstract constructor.
@@ -50,8 +52,8 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
         $this->_folder_level = $_folder_level;
         $this->_creation_date = $_creation_date;
         $this->_last_modified_date = $_last_modified_date;
+        $this->_uniqid = bin2hex('folder_' . $_folders_system_id);
     }
-
 
 
     public function attach($obj, $inf = null)
@@ -297,4 +299,25 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
         $this->_last_modified_date = $last_modified_date;
         return $this;
     }
+
+    /**
+     * @param bool $raw
+     * @return mixed|string
+     */
+    public function getUniqid($raw = true)
+    {
+        return ($raw) ? $this->_uniqid : str_replace('folder_', '', hex2bin($this->_uniqid));
+    }
+
+    /**
+     * @param string $uniqid
+     * @return $this
+     */
+    public function setUniqid($uniqid)
+    {
+        $this->_uniqid = bin2hex('folder_' . $uniqid);
+        return $this;
+    }
+
+
 }

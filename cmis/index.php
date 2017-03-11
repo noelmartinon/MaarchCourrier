@@ -13,12 +13,9 @@ use CMIS\Utils\Utils;
 session_start();
 require '../vendor/autoload.php';
 
-
-
-\Folder\Models\FoldersModel::getFolderTree();
-
-
+\CMIS\Models\CMISObject::getAllObjects();
 die();
+
 //create session if NO SESSION
 if (empty($_SESSION['user'])) {
     require_once('../core/class/class_functions.php');
