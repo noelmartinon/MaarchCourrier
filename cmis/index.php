@@ -13,8 +13,6 @@ use CMIS\Utils\Utils;
 session_start();
 require '../vendor/autoload.php';
 
-\CMIS\Models\CMISObject::getAllObjects();
-die();
 
 //create session if NO SESSION
 if (empty($_SESSION['user'])) {
@@ -83,6 +81,10 @@ if ($_SESSION['error']) {
 
 $router = new Router();
 $router->setBasePath('/cmis');
+
+
+Utils::dump(\CMIS\Models\CMISObject::getAllObjects());
+die();
 
 $router->map('GET', '/', function () {
     header('Location:atom');

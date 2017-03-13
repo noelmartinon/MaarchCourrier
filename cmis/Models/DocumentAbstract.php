@@ -305,4 +305,9 @@ abstract class DocumentAbstract
         return bin2hex('folder_' . $this->_folders_system_id);
     }
 
+    public function getType()
+    {
+        return 'document';
+    }
+
 }

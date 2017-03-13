@@ -320,4 +320,15 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
     }
 
 
+    public function getParentUniqid()
+    {
+        return  bin2hex('folder_' . $this->_parent_id);
+    }
+
+    public function getType()
+    {
+        return 'folder';
+    }
+
+
 }

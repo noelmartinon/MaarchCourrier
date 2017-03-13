@@ -397,47 +397,61 @@ class CMISObject extends \SplObjectStorage
                 , $document->getFolderUniqueId(), null, null, $document->getFilename());
 
         } else {
+            $folders = Document::getListWithFolders($id);
 
-            //TODO Test the amount of memory used for those two operations
-            $folders = FoldersModel::getFolderTree($id);
-            $documents = Document::getList();
+            //TODO Need to refactor
+            //TODO add correct path
 
-
-            //TODO add the documents at the root of the folder
-            /**
-             * @var $folder FoldersModel
-             */
-
+            /** @var $folder FoldersModel */
             foreach ($folders as $folder) {
-                if (!empty($documents[$folder->getFoldersSystemId()])) {
-                    foreach ($documents[$folder->getFoldersSystemId()] as $document) {
-                        $folder->attach($document);
-                    }
-                }
+                $array[] = $CMISObject = new CMISObject($folder->getUniqid(), '/', 'cmis:folder', ''
+                    , $folder->getTypist(), 'cmis:folder', $folder->getParentUniqid(), $folder->getCreationDate()
+                    , null, $folder->getFolderName(), $folder->getLastModifiedDate(), $folder->getTypist());
 
-                foreach ($folder as $child) {
-                    if (!empty($documents[$child->getFoldersSystemId()]) && method_exists($child, 'attach')) {
-                        foreach ($documents[$child->getFoldersSystemId()] as $document) {
-                            $child->attach($document);
+                if ($folder->count() > 0) {
+                    foreach ($folder as $first_level) {
+
+                        if ($first_level->getType() == 'folder') {
+                            /** @var  $first_level FoldersModel */
+                            $CMISObject2 = new CMISObject($first_level->getUniqid(), '/', 'cmis:folder', ''
+                                , $first_level->getTypist(), 'cmis:folder', $first_level->getParentUniqid()
+                                , $first_level->getCreationDate(), null, $first_level->getFolderName()
+                                , $first_level->getLastModifiedDate(), $first_level->getTypist());
+
+                            if ($folder->count() > 0) {
+                                foreach ($first_level as $second_level) {
+                                    /** @var $first_level Document */
+                                    $CMISObject3 = new CMISObject($id, $second_level->getPath(), 'cmis:document', ''
+                                        , $second_level->getTypist(), 'cmis:document', $second_level->getFolderUniqueId(), null, null
+                                        , $second_level->getFilename());
+
+                                    $CMISObject2->attach($CMISObject3);
+                                }
+                            }
+
+                        } else {
+                            /** @var $first_level Document */
+                            $CMISObject2 = new CMISObject($id, $first_level->getPath(), 'cmis:document', ''
+                                , $first_level->getTypist(), 'cmis:document', $first_level->getFolderUniqueId(), null, null
+                                , $first_level->getFilename());
                         }
+
+                        $CMISObject->attach($CMISObject2);
                     }
                 }
+
             }
-
-            //TODO Transform $folders into CMISObject 
-
-            die();
         }
+
+
+        return $array;
     }
 
-    private function linkFolderWithDoc()
-    {
-
-    }
 
     private static function getUniqid($id)
     {
         str_replace(['folder_', 'document_'], '', hex2bin($id));
     }
+
 
 }

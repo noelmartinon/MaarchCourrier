@@ -8,6 +8,7 @@
 
 namespace Folder\Models;
 
+use CMIS\Models\CMISObject;
 use CMIS\Utils\Utils;
 
 class FoldersModel extends FoldersModelAbstract
@@ -113,4 +114,53 @@ class FoldersModel extends FoldersModelAbstract
 
         return $array;
     }
+
+
+    /**
+     * @param integer $id
+     * @return array
+     */
+    public static function getFolderTreeAsCMISObject($id = null)
+    {
+        $database = new \Database();
+        $array = [];
+
+        if ($id) {
+            $stmt = $database->query('
+            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
+            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            FROM folders 
+            WHERE folders_system_id = :id 
+            OR parent_id = :id 
+            ORDER BY folder_level', [':id' => $id]);
+        } else {
+            $stmt = $database->query('
+            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
+            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            FROM folders 
+            ORDER BY folder_level');
+        }
+
+
+        $result = $stmt->fetchAll();
+
+        foreach ($result as $value) {
+
+
+            $CMISObject = new CMISObject(bin2hex('folder_' . $value['folders_system_id']), '/', 'cmis:folder', ''
+                , $value['typist'], 'cmis:folder', bin2hex('folder_' . $value['parent_id']), $value['creation_date']
+                , null, $value['folder_name'], $value['last_modified_date'],$value['typist']);
+
+
+            if ($value['folder_level'] == 1) {
+                $array[$value['folders_system_id']] = $CMISObject;
+            } else {
+                $array[$value['parent_id']]->attach($CMISObject);
+            }
+        }
+
+        return $array;
+    }
+
+
 }

@@ -10,6 +10,7 @@ namespace CMIS\Models;
 
 
 use CMIS\Utils\Utils;
+use Folder\Models\FoldersModel;
 
 class Document extends DocumentAbstract
 {
@@ -79,6 +80,35 @@ class Document extends DocumentAbstract
 
         return $document;
 
+    }
+
+    public static function getListWithFolders($folder_id)
+    {
+        $folders = FoldersModel::getFolderTree($folder_id);
+        $documents = self::getList();
+
+
+        //TODO add the documents at the root of the folder
+        /**
+         * @var $folder FoldersModel
+         */
+
+        foreach ($folders as $folder) {
+            if (!empty($documents[$folder->getFoldersSystemId()])) {
+                foreach ($documents[$folder->getFoldersSystemId()] as $document) {
+                    $folder->attach($document);
+                }
+            }
+
+            foreach ($folder as $child) {
+                if (!empty($documents[$child->getFoldersSystemId()]) && method_exists($child, 'attach')) {
+                    foreach ($documents[$child->getFoldersSystemId()] as $document) {
+                        $child->attach($document);
+                    }
+                }
+            }
+        }
+        return $folders;
     }
 
 }
