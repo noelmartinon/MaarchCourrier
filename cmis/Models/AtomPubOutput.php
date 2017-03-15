@@ -195,76 +195,12 @@ class AtomPubOutput implements OutputStrategyInterface
     }
 
 
-    public function descendants($id, $node = '')
+    public function descendants($id)
     {
         //set_time_limit(0);
+        $objects = CMISObject::getAllObjects($id);
+        $this->createAtomEntry(null, $objects);
 
-        //Utils::dump($node);
-
-        $atom_feed = $this->_xml->createElement("atom:feed");
-
-        $atom_feed_node = (!empty($node)) ? $node->appendChild($atom_feed) : $this->_xml->appendChild($atom_feed);
-        $atom_feed_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
-        $atom_feed_node->setAttribute("xmlns:cmis", "http://docs.oasis-open.org/ns/cmis/core/200908/");
-        $atom_feed_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
-        $atom_feed_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
-
-        $atom_author = $this->_xml->createElement("atom:author");
-        $atom_feed_node->appendChild($atom_author);
-
-        $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
-
-        $atom_feed_node->appendChild($this->_xml->createElement("atom:id", $id));
-        $atom_feed_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
-        $atom_feed_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
-        $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
-
-        $children = CMISObject::getAllObjects($id);
-
-        /**
-         * @var $child CMISObject
-         */
-        foreach ($children as $child) {
-            $atom_entry = $this->_xml->createElement("atom:entry");
-            $atom_entry_node = $atom_feed_node->appendChild($atom_entry);
-            $atom_entry_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
-            $atom_entry_node->setAttribute("xmlns:cmis", "http://docs.oasis-open.org/ns/cmis/core/200908/");
-            $atom_entry_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
-            $atom_entry_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
-
-            $atom_author = $this->_xml->createElement("atom:author");
-            $atom_entry_node->appendChild($atom_author);
-            $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
-
-            $atom_entry_node->appendChild($this->_xml->createElement("atom:id", $child->getObjectId()['value']));
-            $atom_entry_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
-            $atom_entry_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
-            $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
-
-            $atom_link = $this->_xml->createElement("atom:link");
-            $atom_link_node = $atom_entry->appendChild($atom_link);
-            $atom_link_node->setAttribute("rel", "down");
-            $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "?id=" . $child->getObjectId()['value']);
-            $atom_link_node->setAttribute("type", "application/cmistree+xml");
-
-            $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
-
-            $atom_object_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:object"));
-            $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
-            foreach ($child->toArray() as $property) {
-                $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
-                $atom_property->setAttribute('propertyDefinitionId', $property['id']);
-                $atom_property->setAttribute('displayName', $property['displayName']);
-                $atom_property->setAttribute('localName', $property['localName']);
-                $atom_property->setAttribute('queryName', $property['queryName']);
-                $atom_property_node = $atom_properties_node->appendChild($atom_property);
-                $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
-            }
-
-            $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
-
-            $this->descendants($child->getObjectId()['value'], $atom_children_node);
-        }
         return $this;
     }
 
@@ -362,6 +298,75 @@ class AtomPubOutput implements OutputStrategyInterface
     public function query()
     {
         // TODO: Implement query() method.
+    }
+
+    private function createAtomEntry($node, $obj)
+    {
+
+        $atom_feed = $this->_xml->createElement("atom:feed");
+
+        $atom_feed_node = (!empty($node)) ? $node->appendChild($atom_feed) : $this->_xml->appendChild($atom_feed);
+        $atom_feed_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
+        $atom_feed_node->setAttribute("xmlns:cmis", "http://docs.oasis-open.org/ns/cmis/core/200908/");
+        $atom_feed_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
+        $atom_feed_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
+
+        $atom_author = $this->_xml->createElement("atom:author");
+        $atom_feed_node->appendChild($atom_author);
+
+        $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
+
+        /** @var $obj CMISObject */
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:id", $obj->getObjectId()['value']));
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
+
+
+        /**
+         * @var $child CMISObject
+         */
+        foreach ($obj as $child) {
+            $atom_entry = $this->_xml->createElement("atom:entry");
+            $atom_entry_node = $atom_feed_node->appendChild($atom_entry);
+            $atom_entry_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
+            $atom_entry_node->setAttribute("xmlns:cmis", "http://docs.oasis-open.org/ns/cmis/core/200908/");
+            $atom_entry_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
+            $atom_entry_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
+
+            $atom_author = $this->_xml->createElement("atom:author");
+            $atom_entry_node->appendChild($atom_author);
+            $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
+
+            $atom_entry_node->appendChild($this->_xml->createElement("atom:id", $child->getObjectId()['value']));
+            $atom_entry_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
+            $atom_entry_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
+            $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
+
+            $atom_link = $this->_xml->createElement("atom:link");
+            $atom_link_node = $atom_entry->appendChild($atom_link);
+            $atom_link_node->setAttribute("rel", "down");
+            $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "?id=" . $child->getObjectId()['value']);
+            $atom_link_node->setAttribute("type", "application/cmistree+xml");
+
+            $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
+
+            $atom_object_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:object"));
+            $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
+            foreach ($child->toArray() as $property) {
+                $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
+                $atom_property->setAttribute('propertyDefinitionId', $property['id']);
+                $atom_property->setAttribute('displayName', $property['displayName']);
+                $atom_property->setAttribute('localName', $property['localName']);
+                $atom_property->setAttribute('queryName', $property['queryName']);
+                $atom_property_node = $atom_properties_node->appendChild($atom_property);
+                $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
+            }
+
+            $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
+
+            //$this->descendants($child->getObjectId()['value'], $atom_children_node);
+        }
     }
 
 }

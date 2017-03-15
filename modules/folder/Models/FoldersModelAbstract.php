@@ -81,6 +81,7 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
     public function setFoldersSystemId($folders_system_id)
     {
         $this->_folders_system_id = $folders_system_id;
+        $this->_uniqid = bin2hex('folder_' . $folders_system_id);
         return $this;
     }
 

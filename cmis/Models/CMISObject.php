@@ -18,7 +18,8 @@ class CMISObject extends \SplObjectStorage
         $_changeToken,
         $_name,
         $_lastModificationDate,
-        $_lastModifiedBy;
+        $_lastModifiedBy,
+        $_conf;
 
     /**
      * CMISObject constructor.
@@ -39,6 +40,7 @@ class CMISObject extends \SplObjectStorage
                                 $_createdBy = 'System', $_baseTypeId = 'cmis:folder', $_parentId = null, $_creationDate = null,
                                 $_changeToken = null, $_name = '', $_lastModificationDate = null, $_lastModifiedBy = 'System')
     {
+
 
         $_lastModificationDate = ($_lastModificationDate) ? $_lastModificationDate : date(DATE_ATOM);
         $_creationDate = ($_creationDate) ? $_creationDate : date(DATE_ATOM);
@@ -389,8 +391,13 @@ class CMISObject extends \SplObjectStorage
 
     public static function getAllObjects($objectId = null)
     {
-        $array = [];
+        $conf = parse_ini_file('conf/conf.ini', true);
+        $isRootFolder = ($objectId == Utils::createObjectId($conf['CMIS']['rootFolder']));
+        $root = null;
+        $CMISObject = null;
+
         $id = self::getUniqid($objectId);
+
         if (preg_match('/^document/', hex2bin($objectId))) {
             $document = Document::getById($id);
             $array[] = new self($id, $document->getPath(), 'cmis:document', '', $document->getTypist(), 'cmis:document'
@@ -400,20 +407,27 @@ class CMISObject extends \SplObjectStorage
             $folders = Document::getListWithFolders($id);
 
             //TODO Need to refactor
-            //TODO add correct path
+            //TODO add correct path to folders
+
+
+            if($isRootFolder){
+                $root = new self($objectId, '/','cmis:folder', 'Espace Racine' );
+
+            }
 
             /** @var $folder FoldersModel */
             foreach ($folders as $folder) {
-                $array[] = $CMISObject = new CMISObject($folder->getUniqid(), '/', 'cmis:folder', ''
+                $CMISObject = new self($folder->getUniqid(), '/', 'cmis:folder', ''
                     , $folder->getTypist(), 'cmis:folder', $folder->getParentUniqid(), $folder->getCreationDate()
                     , null, $folder->getFolderName(), $folder->getLastModifiedDate(), $folder->getTypist());
+
 
                 if ($folder->count() > 0) {
                     foreach ($folder as $first_level) {
 
                         if ($first_level->getType() == 'folder') {
                             /** @var  $first_level FoldersModel */
-                            $CMISObject2 = new CMISObject($first_level->getUniqid(), '/', 'cmis:folder', ''
+                            $CMISObject2 = new self($first_level->getUniqid(), '/', 'cmis:folder', ''
                                 , $first_level->getTypist(), 'cmis:folder', $first_level->getParentUniqid()
                                 , $first_level->getCreationDate(), null, $first_level->getFolderName()
                                 , $first_level->getLastModifiedDate(), $first_level->getTypist());
@@ -421,7 +435,7 @@ class CMISObject extends \SplObjectStorage
                             if ($folder->count() > 0) {
                                 foreach ($first_level as $second_level) {
                                     /** @var $first_level Document */
-                                    $CMISObject3 = new CMISObject($id, $second_level->getPath(), 'cmis:document', ''
+                                    $CMISObject3 = new self($id, $second_level->getPath(), 'cmis:document', ''
                                         , $second_level->getTypist(), 'cmis:document', $second_level->getFolderUniqueId(), null, null
                                         , $second_level->getFilename());
 
@@ -431,7 +445,7 @@ class CMISObject extends \SplObjectStorage
 
                         } else {
                             /** @var $first_level Document */
-                            $CMISObject2 = new CMISObject($id, $first_level->getPath(), 'cmis:document', ''
+                            $CMISObject2 = new self($id, $first_level->getPath(), 'cmis:document', ''
                                 , $first_level->getTypist(), 'cmis:document', $first_level->getFolderUniqueId(), null, null
                                 , $first_level->getFilename());
                         }
@@ -440,11 +454,13 @@ class CMISObject extends \SplObjectStorage
                     }
                 }
 
+                if($isRootFolder){
+                    $root->attach($CMISObject);
+                }
             }
         }
 
-
-        return $array;
+        return ($isRootFolder) ? $root : $CMISObject;
     }
 
 
