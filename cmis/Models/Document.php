@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: nidextc
- * Date: 10/03/2017
- * Time: 23:08
+ * Copyright Maarch since 2008 under licence GPLv3.
+ * See LICENCE.txt file at the root folder for more details.
+ * This file is part of Maarch software.
  */
 
 namespace CMIS\Models;

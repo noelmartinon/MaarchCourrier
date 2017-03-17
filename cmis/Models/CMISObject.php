@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Copyright Maarch since 2008 under licence GPLv3.
+ * See LICENCE.txt file at the root folder for more details.
+ * This file is part of Maarch software.
+ */
 namespace CMIS\Models;
 
 use CMIS\Utils\Utils;
@@ -391,7 +395,7 @@ class CMISObject extends \SplObjectStorage
 
     public static function getAllObjects($objectId = null)
     {
-        $conf = parse_ini_file('conf/conf.ini', true);
+        $conf =parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);
         $isRootFolder = ($objectId == Utils::createObjectId($conf['CMIS']['rootFolder']));
         $root = null;
         $CMISObject = null;

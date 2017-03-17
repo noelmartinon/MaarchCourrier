@@ -11,8 +11,7 @@ namespace Folder\Models;
 
 use CMIS\Utils\Utils;
 
-require_once('../core/class/class_functions.php');
-require_once('../core/class/class_db_pdo.php');
+
 
 abstract class FoldersModelAbstract extends \SplObjectStorage
 {

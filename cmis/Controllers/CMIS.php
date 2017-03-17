@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Copyright Maarch since 2008 under licence GPLv3.
+ * See LICENCE.txt file at the root folder for more details.
+ * This file is part of Maarch software.
+ */
 namespace CMIS\Controllers;
 
 use CMIS\Models\CMISObject;
@@ -66,7 +70,7 @@ class CMIS
 
     public function __construct(OutputStrategyInterface $output)
     {
-        $this->_conf = parse_ini_file('conf/conf.ini', true);
+        $this->_conf = parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);
         $this->output = $output;
 
         $this->_conf['CMIS']['rootFolderId'] = Utils::createObjectId($this->_conf['CMIS']['rootFolder']);
