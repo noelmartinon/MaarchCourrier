@@ -9,6 +9,7 @@ namespace CMIS\Controllers;
 use CMIS\Models\CMISObject;
 use CMIS\Models\OutputStrategyInterface;
 use CMIS\Utils\Utils;
+use Folder\Models\FoldersModel;
 
 class CMIS
 {
@@ -113,10 +114,23 @@ class CMIS
 
     public function createFolder($objectId = '', $name = '')
     {
-        $dir = str_replace('//', '/', 'workspace/' . Utils::readObjectId($objectId) . $name);
-        error_log($dir);
-        if (!file_exists($dir)) {
-            mkdir($dir);
+        $foldertype_id = 5;
+        $db = new \Database();
+
+        $creation_date = $db->current_datetime();
+
+        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date ) values ( '"
+            .pg_escape_string($objectId)."' , '"
+            .pg_escape_string($foldertype_id)."' , '"
+            .pg_escape_string($name)."' , "
+            .pg_escape_string($creation_date)." ) ";
+
+        $result = $db->query($statement);
+
+        //TODO gerer les cas d erreurs
+        if($result === false){
+            //TODO throw storageException
+            echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
         }
     }
 

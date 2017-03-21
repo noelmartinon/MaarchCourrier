@@ -19,12 +19,12 @@ class Utils
     }
 
     // Access logs (for CMIS Workbench)
-    public static function log($webroot = '', $server = [], $get = [], $post = [], $files = [])
+    public static function log($webroot = '')
     {
-        file_put_contents('logs/access.log', $server['REQUEST_METHOD'] . ' ' . http_response_code() . ' - ' . $webroot . ' - [' . date('d/m/Y H:i:s') . ']' . PHP_EOL, FILE_APPEND);
-        if (!empty($get)) file_put_contents('logs/access.log', 'GET : ' . print_r($get, true) . PHP_EOL, FILE_APPEND);
-        if (!empty($post)) file_put_contents('logs/access.log', 'POST : ' . print_r($post, true), FILE_APPEND);
-        if (!empty($files)) file_put_contents('logs/access.log', 'FILES : ' . print_r($files, true), FILE_APPEND);
+        file_put_contents('logs/access.log', $_SERVER['REQUEST_METHOD'] . ' ' . http_response_code() . ' - ' . $webroot . ' - [' . date('d/m/Y H:i:s') . ']' . PHP_EOL, FILE_APPEND);
+        if (!empty($_GET)) file_put_contents('logs/access.log', 'GET : ' . print_r($_GET, true) . PHP_EOL, FILE_APPEND);
+        if (!empty($_POST)) file_put_contents('logs/access.log', 'POST : ' . print_r($_POST, true), FILE_APPEND);
+        if (!empty($_FILES)) file_put_contents('logs/access.log', 'FILES : ' . print_r($_FILES, true), FILE_APPEND);
         file_put_contents('logs/access.log', ' --------------------- ' . PHP_EOL, FILE_APPEND);
     }
 

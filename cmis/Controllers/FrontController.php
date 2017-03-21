@@ -9,8 +9,6 @@ namespace CMIS\Controllers;
 
 use CMIS\Utils\Utils;
 
-
-
 class FrontController
 {
     public static function initSession()
