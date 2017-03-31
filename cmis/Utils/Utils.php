@@ -19,12 +19,13 @@ class Utils
     }
 
     // Access logs (for CMIS Workbench)
-    public static function log($webroot = '')
+    public static function log()
     {
-        file_put_contents('logs/access.log', $_SERVER['REQUEST_METHOD'] . ' ' . http_response_code() . ' - ' . $webroot . ' - [' . date('d/m/Y H:i:s') . ']' . PHP_EOL, FILE_APPEND);
+        file_put_contents('logs/access.log', $_SERVER['REQUEST_METHOD'] . ' ' . http_response_code() . ' - ' . $_SERVER['REQUEST_URI'] . ' - [' . date('d/m/Y H:i:s') . ']' . PHP_EOL, FILE_APPEND);
         if (!empty($_GET)) file_put_contents('logs/access.log', 'GET : ' . print_r($_GET, true) . PHP_EOL, FILE_APPEND);
         if (!empty($_POST)) file_put_contents('logs/access.log', 'POST : ' . print_r($_POST, true), FILE_APPEND);
         if (!empty($_FILES)) file_put_contents('logs/access.log', 'FILES : ' . print_r($_FILES, true), FILE_APPEND);
+        file_put_contents('logs/access.log', 'RAW : ' . print_r(file_get_contents('php://input'), true), FILE_APPEND);
         file_put_contents('logs/access.log', ' --------------------- ' . PHP_EOL, FILE_APPEND);
     }
 

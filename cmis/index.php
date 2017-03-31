@@ -67,6 +67,8 @@ $router->map('GET', '/[a:output]/type/?', function ($output) {
     FrontController::type($output);
 }, 'type');
 
+//TODO Remove in production
+Utils::log();
 
 $match = $router->match();
 

@@ -105,6 +105,7 @@ class FrontController
                 $cmis->createFolder($_REQUEST['objectId'], $property['cmis:name']);
                 break;
         }
+        $cmis->descendants($_REQUEST['objectId']);
     }
 
     public static function type($output)

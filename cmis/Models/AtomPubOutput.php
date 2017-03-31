@@ -327,6 +327,7 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
 
+
         /**
          * @var $child CMISObject
          */
@@ -357,6 +358,7 @@ class AtomPubOutput implements OutputStrategyInterface
 
             $atom_object_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:object"));
             $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
+
             foreach ($child->toArray() as $property) {
                 $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
                 $atom_property->setAttribute('propertyDefinitionId', $property['id']);
@@ -369,7 +371,9 @@ class AtomPubOutput implements OutputStrategyInterface
 
             $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
 
-            //$this->descendants($child->getObjectId()['value'], $atom_children_node);
+            foreach ($child as $value){
+                $this->createAtomEntry($atom_children_node, $child);
+            }
         }
     }
 
