@@ -22,14 +22,18 @@ interface OutputStrategyInterface
     /**
      * @param [CMISObject] $objects
      * @param $succinct
+     * @param $selector
      * @return mixed
+     *
      */
     public function id($objects, $succinct, $selector);
 
     /**
+     * @param $parent
+     * @param $name
      * @return mixed
      */
-    public function createFolder();
+    public function createFolder($parent, $name);
 
     /**
      * @return mixed

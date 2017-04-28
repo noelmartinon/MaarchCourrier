@@ -96,16 +96,39 @@ class FrontController
     public static function create($output)
     {
         $cmis = new CMIS(Utils::outputFactory($output));
-        switch ($_REQUEST['cmisaction']) {
-            case 'createDocument':
-                $cmis->createDocument($_REQUEST['objectId'], $_FILES['content']);
-                break;
-            case 'createFolder':
-                $property = array_combine($_REQUEST['propertyId'], $_REQUEST['propertyValue']);
-                $cmis->createFolder($_REQUEST['objectId'], $property['cmis:name']);
-                break;
+
+        $dom = new \DOMDocument();
+
+        // Stream handler
+        if ($dom->loadXML(file_get_contents('php://input'))) {
+
+            $type = $dom->getElementsByTagName('propertyId')[0]->nodeValue;
+
+            switch ($type) {
+                case 'cmis:document':
+                    $cmis->output->createDocument($_REQUEST['objectId'], $_FILES['content']);
+
+                    break;
+                case 'cmis:folder':
+
+                    $cmis
+                        ->output
+                        ->createFolder(Utils::readObjectId($_GET['id']),$dom->getElementsByTagName('propertyString')[0]->nodeValue);
+                    break;
+            }
+
+        } else {
+            switch ($_REQUEST['cmisaction']) {
+                case 'createDocument':
+                    $cmis->output->createDocument($_REQUEST['objectId'], $_FILES['content']);
+
+                    break;
+                case 'createFolder':
+                    $cmis->output->createFolder(null, null);
+                    break;
+            }
         }
-        $cmis->descendants($_REQUEST['objectId']);
+
     }
 
     public static function type($output)

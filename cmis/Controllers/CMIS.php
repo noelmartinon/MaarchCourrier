@@ -7,6 +7,7 @@
 namespace CMIS\Controllers;
 
 use CMIS\Models\CMISObject;
+use CMIS\Models\DocumentModel;
 use CMIS\Models\OutputStrategyInterface;
 use CMIS\Utils\Utils;
 use Folder\Models\FoldersModel;
@@ -112,31 +113,10 @@ class CMIS
         $this->output->createDocument();
     }
 
-    public function createFolder($objectId = '', $name = '')
-    {
-        $foldertype_id = 5;
-        $db = new \Database();
-
-        $creation_date = $db->current_datetime();
-
-        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date ) values ( '"
-            .pg_escape_string($objectId)."' , '"
-            .pg_escape_string($foldertype_id)."' , '"
-            .pg_escape_string($name)."' , "
-            .pg_escape_string($creation_date)." ) ";
-
-        $result = $db->query($statement);
-
-        //TODO gerer les cas d erreurs
-        if($result === false){
-            //TODO throw storageException
-            echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
-        }
-    }
 
     public function id($id, $succinct, $selector)
     {
-        $object = new CMISObject($id);
+        $object = CMISObject::getById($id);
 
         $this->output->id([$object], $succinct, $selector);
         return $this;

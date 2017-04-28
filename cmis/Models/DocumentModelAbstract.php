@@ -4,11 +4,13 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
+
 namespace CMIS\Models;
 
 
+use CMIS\Utils\Utils;
 
-abstract class DocumentAbstract
+abstract class DocumentModelAbstract
 {
     private $_res_id, $_title, $_subject, $_description, $_type_id, $_format, $_typist, $_creation_date, $_modification_date
     , $_folders_system_id, $_path, $_filename, $_filesize, $_uniqid;
@@ -46,7 +48,7 @@ abstract class DocumentAbstract
         $this->_path = $_path;
         $this->_filename = $_filename;
         $this->_filesize = $_filesize;
-        $this->_uniqid = bin2hex('document_' . $_folders_system_id);
+        $this->_uniqid = Utils::createObjectId($_folders_system_id, 'document');
     }
 
 
@@ -290,8 +292,9 @@ abstract class DocumentAbstract
      */
     public function getUniqid($raw = true)
     {
-        return ($raw) ? $this->_uniqid : str_replace('document_', '', hex2bin($this->_uniqid));
+        return ($raw) ? $this->_uniqid :  Utils::readObjectId($this->_uniqid, 'document');
     }
+
 
     /**
      * @param string $id
@@ -299,7 +302,7 @@ abstract class DocumentAbstract
      */
     public function setUniqid($id)
     {
-        $this->_uniqid = bin2hex('document_' . $id);
+        $this->_uniqid = Utils::createObjectId($id, 'document');
         return $this;
     }
 

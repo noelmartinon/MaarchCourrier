@@ -51,7 +51,7 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
         $this->_folder_level = $_folder_level;
         $this->_creation_date = $_creation_date;
         $this->_last_modified_date = $_last_modified_date;
-        $this->_uniqid = bin2hex('folder_' . $_folders_system_id);
+        $this->_uniqid = Utils::createObjectId($_folders_system_id, 'folder');
     }
 
 
@@ -306,7 +306,7 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
      */
     public function getUniqid($raw = true)
     {
-        return ($raw) ? $this->_uniqid : str_replace('folder_', '', hex2bin($this->_uniqid));
+        return ($raw) ? $this->_uniqid : Utils::readObjectId($this->_uniqid, 'folder');
     }
 
     /**
@@ -315,14 +315,14 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
      */
     public function setUniqid($uniqid)
     {
-        $this->_uniqid = bin2hex('folder_' . $uniqid);
+        $this->_uniqid =  Utils::createObjectId($uniqid, 'folder');
         return $this;
     }
 
 
-    public function getParentUniqid()
+    public function getParentUniqid($raw = true)
     {
-        return  bin2hex('folder_' . $this->_parent_id);
+        return($raw) ? $this->_parent_id: Utils::readObjectId($this->_parent_id, 'folder');
     }
 
     public function getType()

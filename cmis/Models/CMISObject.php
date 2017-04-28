@@ -4,9 +4,11 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
+
 namespace CMIS\Models;
 
 use CMIS\Utils\Utils;
+use Couchbase\Document;
 use Folder\Models\FoldersModel;
 
 class CMISObject extends \SplObjectStorage
@@ -392,36 +394,54 @@ class CMISObject extends \SplObjectStorage
         return $this;
     }
 
+    public static function getById($id)
+    {
+        $type = Utils::getObjectType($id);
+
+        if ($type == 'document') {
+            return self::documentToCMISObjetct(DocumentModel::getById(Utils::readObjectId($id, 'document')));
+        } else if ($type == 'folder') {
+            return self::folderToCMISObject(FoldersModel::getById(Utils::readObjectId($id, 'folder')));
+        } else if ($type == 'workspace') {
+            return self::folderToCMISObject(FoldersModel::getById(null));
+        } else {
+            return new \Exception("Invalid type of object");
+        }
+
+    }
+
 
     public static function getAllObjects($objectId = null)
     {
-        $conf =parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);
+        $conf = parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);
         $isRootFolder = ($objectId == Utils::createObjectId($conf['CMIS']['rootFolder']));
         $root = null;
         $CMISObject = null;
 
+
         $id = self::getUniqid($objectId);
 
+
         if (preg_match('/^document/', hex2bin($objectId))) {
-            $document = Document::getById($id);
+            $document = DocumentModel::getById($id);
             $array[] = new self($id, $document->getPath(), 'cmis:document', '', $document->getTypist(), 'cmis:document'
                 , $document->getFolderUniqueId(), null, null, $document->getFilename());
 
         } else {
-            $folders = Document::getListWithFolders($id);
+            $folders = DocumentModel::getListWithFolders($id);
 
             //TODO Need to refactor
             //TODO add correct path to folders
 
 
-            if($isRootFolder){
-                $root = new self($objectId, '/','cmis:folder', 'Espace Racine' );
+            if ($isRootFolder) {
+                $root = new self($objectId, '/', 'cmis:folder', 'Espace Racine');
 
             }
 
             /** @var $folder FoldersModel */
             foreach ($folders as $folder) {
-                $CMISObject = new self($folder->getUniqid(), '/', 'cmis:folder', ''
+                $CMISObject = new self($folder->getUniqid(), '/' . $folder->getFolderName(), 'cmis:folder', ''
                     , $folder->getTypist(), 'cmis:folder', $folder->getParentUniqid(), $folder->getCreationDate()
                     , null, $folder->getFolderName(), $folder->getLastModifiedDate(), $folder->getTypist());
 
@@ -431,14 +451,14 @@ class CMISObject extends \SplObjectStorage
 
                         if ($first_level->getType() == 'folder') {
                             /** @var  $first_level FoldersModel */
-                            $CMISObject2 = new self($first_level->getUniqid(), '/', 'cmis:folder', ''
+                            $CMISObject2 = new self($first_level->getUniqid(), '/' . $folder->getFolderName() . '/' . $first_level->getFolderName(), 'cmis:folder', ''
                                 , $first_level->getTypist(), 'cmis:folder', $first_level->getParentUniqid()
                                 , $first_level->getCreationDate(), null, $first_level->getFolderName()
                                 , $first_level->getLastModifiedDate(), $first_level->getTypist());
 
                             if ($folder->count() > 0) {
                                 foreach ($first_level as $second_level) {
-                                    /** @var $first_level Document */
+                                    /** @var $first_level DocumentModel */
                                     $CMISObject3 = new self($id, $second_level->getPath(), 'cmis:document', ''
                                         , $second_level->getTypist(), 'cmis:document', $second_level->getFolderUniqueId(), null, null
                                         , $second_level->getFilename());
@@ -448,7 +468,7 @@ class CMISObject extends \SplObjectStorage
                             }
 
                         } else {
-                            /** @var $first_level Document */
+                            /** @var $first_level DocumentModel */
                             $CMISObject2 = new self($id, $first_level->getPath(), 'cmis:document', ''
                                 , $first_level->getTypist(), 'cmis:document', $first_level->getFolderUniqueId(), null, null
                                 , $first_level->getFilename());
@@ -458,7 +478,7 @@ class CMISObject extends \SplObjectStorage
                     }
                 }
 
-                if($isRootFolder){
+                if ($isRootFolder) {
                     $root->attach($CMISObject);
                 }
             }
@@ -468,10 +488,32 @@ class CMISObject extends \SplObjectStorage
     }
 
 
+   /* private static function getUniqid($id)
+    {
+        return Utils::readObjectId($id);
+    }*/
+
+
     private static function getUniqid($id)
     {
         str_replace(['folder_', 'document_'], '', hex2bin($id));
     }
 
+
+    public static function documentToCMISObjetct(DocumentModel $document)
+    {
+        // Check uniqid if it is res_id of something else
+        /*
+        return new CMISObject($document->getUniqid(), $document->getPath(), 'cmis:document', '', $document->getTypist(), 'cmis:document'
+            , $document->getFolderUniqueId(), null, null, $document->getFilename());
+        */
+    }
+
+    public static function folderToCMISObject(FoldersModel $folder)
+    {
+        return new CMISObject($folder->getUniqid(), '/' . $folder->getFolderName(), 'cmis:folder', ''
+            , $folder->getTypist(), 'cmis:folder', $folder->getParentUniqid(), $folder->getCreationDate()
+            , null, $folder->getFolderName(), $folder->getLastModifiedDate(), $folder->getTypist());
+    }
 
 }

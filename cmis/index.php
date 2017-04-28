@@ -36,18 +36,23 @@ FrontController::fakeAuth();
 FrontController::login();
 
 $router = new Router();
-$router->setBasePath('/cmis');
+$router->setBasePath('/MaarchCourrier/cmis');
 
 $router->map('GET', '/', function () {
     header('Location:atom');
 });
+
+
+$router->map('POST', '/[a:output]/[*:route]', function ($output) {
+    FrontController::create($output);
+}, 'create');
 
 /** @param $output string atom or browser */
 $router->map('GET', '/[a:output]/?', function ($output) {
     FrontController::repository($output);
 }, 'catalog');
 
-$router->map('GET', '/atom/types/?', function () {
+$router->map('GET', '/atom/types', function () {
     Utils::renderXML('assets/atom/types.xml');
 }, 'types');
 
@@ -59,9 +64,6 @@ $router->map('GET', '/[a:output]/id/?', function ($output) {
     FrontController::id($output);
 }, 'id');
 
-$router->map('POST', '/[a:output]/*', function ($output) {
-    FrontController::create($output);
-}, 'create');
 
 $router->map('GET', '/[a:output]/type/?', function ($output) {
     FrontController::type($output);

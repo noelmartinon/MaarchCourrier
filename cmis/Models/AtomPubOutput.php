@@ -4,9 +4,11 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
+
 namespace CMIS\Models;
 
 use CMIS\Utils\Utils;
+use Folder\Models\FoldersModel;
 
 class AtomPubOutput implements OutputStrategyInterface
 {
@@ -289,9 +291,16 @@ class AtomPubOutput implements OutputStrategyInterface
         // TODO: Implement getObjectByPath() method.
     }
 
-    public function createFolder()
+    public function createFolder($parent, $name)
     {
-        // TODO: Implement createFolder() method.
+        $folder = new FoldersModel();
+
+        $folder
+            ->setFolderName($name)
+            //->setParentId($parent)
+            ->create();
+
+        $this->id([CMISObject::folderToCMISObject($folder)], true, 'object' )->render();
     }
 
     public function createDocument()
@@ -306,7 +315,6 @@ class AtomPubOutput implements OutputStrategyInterface
 
     private function createAtomEntry($node, $obj)
     {
-
         $atom_feed = $this->_xml->createElement("atom:feed");
 
         $atom_feed_node = (!empty($node)) ? $node->appendChild($atom_feed) : $this->_xml->appendChild($atom_feed);
@@ -325,7 +333,6 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_feed_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
         $atom_feed_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
         $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
-
 
 
         /**
@@ -371,7 +378,7 @@ class AtomPubOutput implements OutputStrategyInterface
 
             $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
 
-            foreach ($child as $value){
+            foreach ($child as $value) {
                 $this->createAtomEntry($atom_children_node, $child);
             }
         }

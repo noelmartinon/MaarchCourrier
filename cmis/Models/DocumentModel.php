@@ -11,7 +11,7 @@ namespace CMIS\Models;
 use CMIS\Utils\Utils;
 use Folder\Models\FoldersModel;
 
-class Document extends DocumentAbstract
+class DocumentModel extends DocumentModelAbstract
 {
     /**
      * @return array
@@ -57,7 +57,7 @@ class Document extends DocumentAbstract
             SELECT res_id, title, subject, description, type_id, format, typist, creation_date,
             modification_date, folders_system_id, path, filename, filesize 
             FROM res_letterbox 
-            WHERE id => :id', [':id' => $id]);
+            WHERE res_id => :id', [':id' => $id]);
 
         $value = $stmt->fetch();
 

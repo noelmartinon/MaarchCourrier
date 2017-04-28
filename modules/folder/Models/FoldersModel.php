@@ -16,16 +16,16 @@ class FoldersModel extends FoldersModelAbstract
     public function create()
     {
         $foldertype_id = 5;
-        $db = new Database();
+        $db = new \Database();
 
         $creation_date = $db->current_datetime();
 
-        //insert into folders ( folder_id , foldertype_id , folder_name , creation_date ) values ( 'folderid' , 5 , 'foldername' , current_date)
         $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date ) values ( '"
-            .pg_escape_string($newCmisFolder->getFolderIdValue())."' , '"
+            .pg_escape_string($this->getFolderName())."' , '"
             .pg_escape_string($foldertype_id)."' , '"
-            .pg_escape_string($newCmisFolder->getNameValue())."' , "
-            .pg_escape_string($creation_date)." ) ";
+            .pg_escape_string($this->getFolderName())."' , "
+            .pg_escape_string($creation_date)." )";
+
 
         $result = $db->query($statement);
 
@@ -34,6 +34,8 @@ class FoldersModel extends FoldersModelAbstract
             //TODO throw storageException
             echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
         }
+
+       return $db->query('SELECT lastval();')->fetch()[0];
     }
 
     public function delete()
