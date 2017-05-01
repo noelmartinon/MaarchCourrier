@@ -110,4 +110,9 @@ class DocumentModel extends DocumentModelAbstract
         return $folders;
     }
 
+    public function create()
+    {
+
+    }
+
 }

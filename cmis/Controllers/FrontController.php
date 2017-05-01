@@ -106,14 +106,11 @@ class FrontController
 
             switch ($type) {
                 case 'cmis:document':
-                    $cmis->output->createDocument($_REQUEST['objectId'], $_FILES['content']);
+                    $cmis->createDocument(Utils::readObjectId($_GET['id']), $dom->getElementsByTagName('propertyString')[0]->nodeValue, $dom->getElementsByTagName('base64')[0]->nodeValue);
 
                     break;
                 case 'cmis:folder':
-
-                    $cmis
-                        ->output
-                        ->createFolder(Utils::readObjectId($_GET['id']),$dom->getElementsByTagName('propertyString')[0]->nodeValue);
+                    $cmis->createFolder(Utils::readObjectId($_GET['id']), $dom->getElementsByTagName('propertyString')[0]->nodeValue);
                     break;
             }
 

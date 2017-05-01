@@ -6,13 +6,15 @@
  * This file is part of Maarch software.
  */
 
+session_start();
+
+require '../vendor/autoload.php';
+
+
 use CMIS\Controllers\FrontController;
 use CMIS\Utils\Router;
 use CMIS\Utils\Utils;
 
-session_start();
-
-require '../vendor/autoload.php';
 
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'core/class/class_functions.php');
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'core/class/class_db_pdo.php');

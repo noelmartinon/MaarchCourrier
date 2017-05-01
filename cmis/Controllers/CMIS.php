@@ -4,6 +4,7 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
+
 namespace CMIS\Controllers;
 
 use CMIS\Models\CMISObject;
@@ -99,18 +100,47 @@ class CMIS
         return $this;
     }
 
-    public function createDocument($objectId = '', $files = [])
+    public function createFolder($parent, $name)
     {
-        if (!empty($files) && $files['error'] == UPLOAD_ERR_OK) {
-            $extension = pathinfo($files['name'])['extension'];
-            $mime_type = mime_content_type($files['tmp_name']);
+        $folder = new FoldersModel();
+
+        $folder
+            ->setFolderName($name)
+            //->setParentId($parent)
+            ->create();
+        http_response_code(201);
+
+        $this->output->id([CMISObject::folderToCMISObject($folder)], true, 'object')->render();
+    }
+
+    public function createDocument($parent, $name, $content, $base64 = true)
+    {
+        $document = new DocumentModel();
+
+        $document
+            ->setFilename($name)
+            ->create();
+
+
+        file_put_contents('ok', '1');
+
+        if ($base64) {
+            $extension = pathinfo($name)['extension'];
+
+
+            $f = finfo_open();
+
+            $mime_type = finfo_buffer($f, base64_decode($content), FILEINFO_MIME_TYPE);
 
             if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
-                move_uploaded_file($files['tmp_name'], 'workspace/' . $files['name']);
+                //move_uploaded_file($_SESSION['config']['tmppath'], $name);
+                file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $name, base64_decode($content));
             }
         }
 
-        $this->output->createDocument();
+
+        http_response_code(201);
+        //$this->output->id([CMISObject::documentToCMISObjetct($document)], true, 'object')->render();
     }
 
 

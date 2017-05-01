@@ -29,18 +29,6 @@ interface OutputStrategyInterface
     public function id($objects, $succinct, $selector);
 
     /**
-     * @param $parent
-     * @param $name
-     * @return mixed
-     */
-    public function createFolder($parent, $name);
-
-    /**
-     * @return mixed
-     */
-    public function createDocument();
-
-    /**
      * @return mixed
      */
     public function query();

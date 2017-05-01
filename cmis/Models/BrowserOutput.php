@@ -191,17 +191,6 @@ class BrowserOutput implements OutputStrategyInterface
     }
 
 
-    public function createFolder($parent, $name)
-    {
-
-        $property = array_combine($_REQUEST['propertyId'], $_REQUEST['propertyValue']);
-    }
-
-    public function createDocument()
-    {
-        // TODO: Implement createDocument() method.
-    }
-
     public function query()
     {
         // TODO: Implement query() method.

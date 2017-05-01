@@ -286,27 +286,8 @@ class AtomPubOutput implements OutputStrategyInterface
         return $this;
     }
 
-    public function getObjectByPath()
-    {
-        // TODO: Implement getObjectByPath() method.
-    }
 
-    public function createFolder($parent, $name)
-    {
-        $folder = new FoldersModel();
 
-        $folder
-            ->setFolderName($name)
-            //->setParentId($parent)
-            ->create();
-
-        $this->id([CMISObject::folderToCMISObject($folder)], true, 'object' )->render();
-    }
-
-    public function createDocument()
-    {
-        // TODO: Implement createDocument() method.
-    }
 
     public function query()
     {
