@@ -147,7 +147,7 @@ class CMIS
             ->create();
         http_response_code(201);
 
-        $this->output->createAtomEntry([CMISObject::folderToCMISObject($folder)], true, 'object')->render();
+        $this->output->id([CMISObject::folderToCMISObject($folder)], true, 'object')->render();
     }
 
     public function createDocument($parent, $name, $content, $base64 = true)
