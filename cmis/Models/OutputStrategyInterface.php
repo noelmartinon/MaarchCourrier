@@ -31,7 +31,7 @@ interface OutputStrategyInterface
     /**
      * @return mixed
      */
-    public function query();
+    public function query($objects);
 
     /**
      * @return mixed

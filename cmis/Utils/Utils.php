@@ -94,14 +94,19 @@ class Utils
 
     public static function getObjectType($objectId)
     {
-        if(preg_match('/^document/', hex2bin($objectId))){
+        if (preg_match('/^document/', hex2bin($objectId))) {
             return 'document';
-        } else if(preg_match('/^folder/', hex2bin($objectId))){
+        } else if (preg_match('/^folder/', hex2bin($objectId))) {
             return 'folder';
         } else {
             return 'workspace';
         }
 
+    }
+
+    public static function formatDateAtom($date)
+    {
+        return date_format(date_create($date), DATE_ATOM);
     }
 
     public static function echo_memory_usage()

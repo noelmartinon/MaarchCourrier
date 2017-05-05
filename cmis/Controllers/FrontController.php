@@ -93,6 +93,22 @@ class FrontController
         $cmis->id($id, $succinct, $selector)->render();
     }
 
+    public static function query($output)
+    {
+        $cmis = new CMIS(Utils::outputFactory($output));
+
+        $dom = new \DOMDocument();
+        $queryParameters = [];
+
+        if ($dom->loadXML(file_get_contents('php://input'))) {
+            $properties = $dom->getElementsByTagName('query');
+            foreach($properties[0]->childNodes as $property){
+                $queryParameters[str_ireplace('cmis:','',$property->nodeName)] = $property->nodeValue;
+            }
+            $cmis->query($queryParameters);
+        }
+    }
+
     public static function create($output)
     {
         $cmis = new CMIS(Utils::outputFactory($output));

@@ -17,6 +17,11 @@ class AtomPubOutput implements OutputStrategyInterface
             'type' => 'types',
             'title' => 'Types Collection',
             'accept' => ['']
+        ],
+        [
+            'type' => 'query',
+            'title' => 'Query  Collection',
+            'accept' => ['application/cmisquery+xml']
         ]
     ];
 
@@ -46,15 +51,18 @@ class AtomPubOutput implements OutputStrategyInterface
         $this->_xml = new \DOMDocument("1.0", "UTF-8");
     }
 
+
     /**
      * @param $objects
      * @param $succinct
+     * @param $selector
+     * @param null $node
      * @return $this
      */
-    public function id($objects, $succinct, $selector)
+    public function id($objects, $succinct, $selector, $node = null)
     {
         $atom_entry = $this->_xml->createElement("atom:entry");
-        $atom_entry_node = $this->_xml->appendChild($atom_entry);
+        $atom_entry_node = ($node) ? $node->appendChild($atom_entry) : $this->_xml->appendChild($atom_entry);
         $atom_entry_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
         $atom_entry_node->setAttribute("xmlns:cmis", "http://docs.oasis-open.org/ns/cmis/core/200908/");
         $atom_entry_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
@@ -83,16 +91,19 @@ class AtomPubOutput implements OutputStrategyInterface
          * @var $object CMISObject
          */
         foreach ($objects as $object) {
-            $atom_object_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:object"));
+
+            $obj_node = $this->_xml->createElement("cmisra:object");
+            $obj_node->setAttribute("xmlns:ns3", "http://docs.oasis-open.org/ns/cmis/messaging/200908/");
+            $atom_object_node = $atom_entry_node->appendChild($obj_node);
             $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
             foreach ($object->toArray() as $property) {
                 $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
-                $atom_property->setAttribute('propertyDefinitionId', $property['id']);
-                $atom_property->setAttribute('displayName', $property['displayName']);
-                $atom_property->setAttribute('localName', $property['localName']);
-                $atom_property->setAttribute('queryName', $property['queryName']);
+                $atom_property->setAttribute("propertyDefinitionId", $property['id']);
+                $atom_property->setAttribute("displayName", $property['displayName']);
+                $atom_property->setAttribute("localName", $property['localName']);
+                $atom_property->setAttribute("queryName", $property['queryName']);
                 $atom_property_node = $atom_properties_node->appendChild($atom_property);
-                $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
+                $atom_property_node->appendChild($this->_xml->createElement("cmis:value", $property['value']));
 
             }
         }
@@ -123,31 +134,6 @@ class AtomPubOutput implements OutputStrategyInterface
 
         return $this;
     }
-
-    /* private function atomLinks()
-     {
-         $descendants = $this->_xml->createElement('atom:link');
-         $descendants->setAttribute('rel', 'http://docs.oasis-open.org/ns/cmis/link/200908/foldertree');
-         $descendants->setAttribute('type', 'application/cmistree+xml');
-         $descendants->setAttribute('href', $this->_webroot . $this->_conf['CMIS']['repositoryId'] . '/foldertree?id=' . $this->_conf['CMIS']['repositoryId']);
-         $this->_app_workspace_node->appendChild($descendants);
-
-         $descendants = $this->_xml->createElement('atom:link');
-         $descendants->setAttribute('rel', 'http://docs.oasis-open.org/ns/cmis/link/200908/typedescendants');
-         $descendants->setAttribute('type', 'application/cmistree+xml');
-         $descendants->setAttribute('href', $this->_webroot . $this->_conf['CMIS']['repositoryId'] . '/foldertree');
-         $this->_app_workspace_node->appendChild($descendants);
-
-         $descendants = $this->_xml->createElement('atom:link');
-         $descendants->setAttribute('rel', 'http://docs.oasis-open.org/ns/cmis/link/200908/rootdescendants');
-         $descendants->setAttribute('type', 'application/cmistree+xml');
-         $descendants->setAttribute('href', $this->_webroot . $this->_conf['CMIS']['repositoryId'] . '/descendants?id=' . $this->_conf['CMIS']['repositoryId']);
-         $descendants->setAttribute('cmisra:id', $this->_conf['CMIS']['repositoryId']);
-         $this->_app_workspace_node->appendChild($descendants);
-
-
-         return $this;
-     }*/
 
     public function templates()
     {
@@ -287,12 +273,34 @@ class AtomPubOutput implements OutputStrategyInterface
     }
 
 
-
-
-    public function query()
+    public function query($objects)
     {
-        // TODO: Implement query() method.
+        $atom_feed = $this->_xml->createElement("atom:feed");
+
+        $atom_feed_node = (!empty($node)) ? $node->appendChild($atom_feed) : $this->_xml->appendChild($atom_feed);
+        $atom_feed_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
+        $atom_feed_node->setAttribute("xmlns:cmis", "http://docs.oasis-open.org/ns/cmis/core/200908/");
+        $atom_feed_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
+        $atom_feed_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
+
+        $atom_author = $this->_xml->createElement("atom:author");
+        $atom_feed_node->appendChild($atom_author);
+
+        $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
+
+        /** @var $obj CMISObject */
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:id", base64_encode('query')));
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
+        $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
+
+        foreach ($objects as $object){
+            $this->id([$object], null, null, $atom_feed_node);
+        }
+
+        return $this;
     }
+
 
     private function createAtomEntry($node, $obj)
     {

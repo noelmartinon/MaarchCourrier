@@ -129,7 +129,7 @@ class CMISObject extends \SplObjectStorage
             'queryName' => 'cmis:creationDate',
             'type' => 'dateTime',
             'cardinality' => 'single',
-            'value' => $_creationDate
+            'value' => Utils::formatDateAtom($_creationDate)
         ];
 
         $this->_changeToken = [
@@ -159,7 +159,7 @@ class CMISObject extends \SplObjectStorage
             'queryName' => 'cmis:lastModificationDate',
             'type' => 'dateTime',
             'cardinality' => 'single',
-            'value' => $_lastModificationDate
+            'value' => Utils::formatDateAtom($_lastModificationDate)
         ];
 
         $this->_lastModifiedBy = [

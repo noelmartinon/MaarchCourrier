@@ -45,6 +45,11 @@ $router->map('GET', '/', function () {
 });
 
 
+$router->map('POST', '/[a:output]/query/?', function ($output) {
+    FrontController::query($output);
+}, 'query');
+
+
 $router->map('POST', '/[a:output]/[*:route]', function ($output) {
     FrontController::create($output);
 }, 'create');
