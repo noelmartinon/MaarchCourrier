@@ -141,10 +141,19 @@ class CMIS
     {
         $folder = new FoldersModel();
 
-        $folder
-            ->setFolderName($name)
-            //->setParentId($parent)
-            ->create();
+        file_put_contents("data", $parent . PHP_EOL, FILE_APPEND);
+
+        if($parent != '/'){
+            $folder
+                ->setFolderName($name)
+                ->setParentId($parent)
+                ->create();
+        } else {
+            $folder
+                ->setFolderName($name)
+                ->create();
+        }
+
         http_response_code(201);
 
         $this->output->id([CMISObject::folderToCMISObject($folder)], true, 'object')->render();

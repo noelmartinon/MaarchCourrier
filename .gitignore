@@ -193,4 +193,5 @@ technique.log
 composer.lock
 apps/maarch_entreprise/xml/config.xml
 apps/maarch_entreprise/tmp
+tmp/
 cmis/logs

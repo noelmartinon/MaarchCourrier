@@ -20,7 +20,7 @@ class AtomPubOutput implements OutputStrategyInterface
         ],
         [
             'type' => 'query',
-            'title' => 'Query  Collection',
+            'title' => 'Query Collection',
             'accept' => ['application/cmisquery+xml']
         ]
     ];
@@ -73,7 +73,7 @@ class AtomPubOutput implements OutputStrategyInterface
 
         $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
 
-        $atom_entry_node->appendChild($this->_xml->createElement("atom:id", $this->_conf['CMIS']['rootFolderId']));
+        $atom_entry_node->appendChild($this->_xml->createElement("atom:id", "MTMz"));
         $atom_entry_node->appendChild($this->_xml->createElement("atom:published", date(DATE_ATOM)));
         $atom_entry_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
         $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
