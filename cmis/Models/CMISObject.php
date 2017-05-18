@@ -471,8 +471,10 @@ class CMISObject extends \SplObjectStorage
                         }
                     }
                 } else {
-                    /** @var $folder DocumentModel */
-                    $root->attach(self::documentToCMISObjetct($folder));
+                    if ($isRootFolder) {
+                        /** @var $folder DocumentModel */
+                        $root->attach(self::documentToCMISObjetct($folder));
+                    }
                 }
 
                 if ($isRootFolder) {
