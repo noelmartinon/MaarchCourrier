@@ -48,7 +48,7 @@ abstract class DocumentModelAbstract
         $this->_path = $_path;
         $this->_filename = $_filename;
         $this->_filesize = $_filesize;
-        $this->_uniqid = Utils::createObjectId($_folders_system_id, 'document');
+        $this->_uniqid = Utils::createObjectId($_res_id, 'document');
     }
 
 
@@ -67,6 +67,7 @@ abstract class DocumentModelAbstract
     public function setResId($res_id)
     {
         $this->_res_id = $res_id;
+        $this->_uniqid = Utils::createObjectId($res_id, 'document');
         return $this;
     }
 

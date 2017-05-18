@@ -154,7 +154,7 @@ class CMIS
 
         http_response_code(201);
 
-        $this->output->id([CMISObject::folderToCMISObject($folder)], true, 'object')->render();
+        $this->output->id($folder->getUniqid(),[CMISObject::folderToCMISObject($folder)], true, 'object')->render();
     }
 
     public function createDocument($parent, $name, $content, $base64 = true)
@@ -187,15 +187,11 @@ class CMIS
 
             $document->create();
             // }
+
+            http_response_code(201);
+
+            $this->output->id($document->getUniqid(),[CMISObject::documentToCMISObjetct($document)], true, 'object')->render();
         }
-
-        http_response_code(201);
-        ob_start();
-        $this->output->id([CMISObject::documentToCMISObjetct($document)], true, 'object')->render();
-        $r = ob_get_contents();
-        ob_get_flush();
-
-        file_put_contents("r", $r);
     }
 
 
@@ -203,7 +199,7 @@ class CMIS
     {
         $object = CMISObject::getById($id);
 
-        $this->output->id([$object], $succinct, $selector);
+        $this->output->id($id,[$object], $succinct, $selector);
         return $this;
     }
 

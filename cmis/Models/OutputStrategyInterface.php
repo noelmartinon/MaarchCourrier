@@ -20,13 +20,14 @@ interface OutputStrategyInterface
     public function repository();
 
     /**
+     * @param $id
      * @param [CMISObject] $objects
      * @param $succinct
      * @param $selector
      * @return mixed
      *
      */
-    public function id($objects, $succinct, $selector);
+    public function id($id, $objects, $succinct, $selector);
 
     /**
      * @return mixed
@@ -68,6 +69,7 @@ interface OutputStrategyInterface
      * @param $id
      * @return mixed
      */
+
     public function descendants($id);
 
     /**

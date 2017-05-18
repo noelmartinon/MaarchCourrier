@@ -57,7 +57,7 @@ class DocumentModel extends DocumentModelAbstract
             SELECT res_id, title, subject, description, type_id, format, typist, creation_date,
             modification_date, folders_system_id, path, filename, filesize 
             FROM res_letterbox 
-            WHERE res_id => :id', [':id' => $id]);
+            WHERE res_id = :id', [':id' => $id]);
 
         $value = $stmt->fetch();
 
@@ -86,12 +86,9 @@ class DocumentModel extends DocumentModelAbstract
         $folders = FoldersModel::getFolderTree($folder_id);
         $documents = self::getList();
 
-
-        //TODO add the documents at the root of the folder
         /**
          * @var $folder FoldersModel
          */
-
         foreach ($folders as $folder) {
             if (!empty($documents[$folder->getFoldersSystemId()])) {
                 foreach ($documents[$folder->getFoldersSystemId()] as $document) {
@@ -107,6 +104,11 @@ class DocumentModel extends DocumentModelAbstract
                 }
             }
         }
+
+        foreach ($documents[""] as $document){
+            array_push($folders, $document);
+        }
+
         return $folders;
     }
 
@@ -136,7 +138,11 @@ class DocumentModel extends DocumentModelAbstract
             echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
         }
 
-        return $db->query('SELECT lastval();')->fetch()[0];
+        $lastval = $db->query('SELECT lastval();')->fetch()[0];
+
+        $this->setResId($lastval);
+
+        return $lastval;
     }
 
 }

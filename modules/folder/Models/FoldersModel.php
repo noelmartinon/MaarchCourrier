@@ -21,21 +21,25 @@ class FoldersModel extends FoldersModelAbstract
         $creation_date = $db->current_datetime();
 
         $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date ) values ( '"
-            .pg_escape_string($this->getFolderName())."' , '"
-            .pg_escape_string($foldertype_id)."' , '"
-            .pg_escape_string($this->getFolderName())."' , "
-            .pg_escape_string($creation_date)." )";
+            . pg_escape_string($this->getFolderName()) . "' , '"
+            . pg_escape_string($foldertype_id) . "' , '"
+            . pg_escape_string($this->getFolderName()) . "' , "
+            . pg_escape_string($creation_date) . " )";
 
 
         $result = $db->query($statement);
 
         //TODO gerer les cas d erreurs
-        if($result === false){
+        if ($result === false) {
             //TODO throw storageException
             echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
         }
 
-       return $db->query('SELECT lastval();')->fetch()[0];
+        $lastval = $db->query('SELECT lastval();')->fetch()[0];
+
+        $this->setFoldersSystemId($lastval);
+
+        return $lastval;
     }
 
     public function delete()
@@ -128,13 +132,20 @@ class FoldersModel extends FoldersModelAbstract
             if ($value['folder_level'] == 1) {
                 $array[$value['folders_system_id']] = $folder;
             } else {
-                $array[$value['parent_id']]->attach($folder);
+                if($array[$value['parent_id']]){
+                    $array[$value['parent_id']]->attach($folder);
+                }
             }
         }
 
         return $array;
     }
 
+    public function hasChildren()
+    {
+        $database = new \Database();
+        $database->query('SELECT ');
+    }
 
     /**
      * @param integer $id
@@ -169,7 +180,7 @@ class FoldersModel extends FoldersModelAbstract
 
             $CMISObject = new CMISObject(bin2hex('folder_' . $value['folders_system_id']), '/', 'cmis:folder', ''
                 , $value['typist'], 'cmis:folder', bin2hex('folder_' . $value['parent_id']), $value['creation_date']
-                , null, $value['folder_name'], $value['last_modified_date'],$value['typist']);
+                , null, $value['folder_name'], $value['last_modified_date'], $value['typist']);
 
 
             if ($value['folder_level'] == 1) {

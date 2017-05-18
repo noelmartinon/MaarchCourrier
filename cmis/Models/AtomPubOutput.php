@@ -53,13 +53,14 @@ class AtomPubOutput implements OutputStrategyInterface
 
 
     /**
+     * @param $id
      * @param $objects
      * @param $succinct
      * @param $selector
      * @param null $node
      * @return $this
      */
-    public function id($objects, $succinct, $selector, $node = null)
+    public function id($id, $objects, $succinct, $selector, $node = null)
     {
         $atom_entry = $this->_xml->createElement("atom:entry");
         $atom_entry_node = ($node) ? $node->appendChild($atom_entry) : $this->_xml->appendChild($atom_entry);
@@ -82,7 +83,7 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_link = $this->_xml->createElement("atom:link");
         $atom_link_node = $atom_entry->appendChild($atom_link);
         $atom_link_node->setAttribute("rel", "down");
-        $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "/descendants?id=" . $this->_conf['CMIS']['rootFolderId']);
+        $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "/descendants?id=" . $id);
         $atom_link_node->setAttribute("type", "application/cmistree+xml");
 
         $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
@@ -91,7 +92,6 @@ class AtomPubOutput implements OutputStrategyInterface
          * @var $object CMISObject
          */
         foreach ($objects as $object) {
-
             $obj_node = $this->_xml->createElement("cmisra:object");
             $obj_node->setAttribute("xmlns:ns3", "http://docs.oasis-open.org/ns/cmis/messaging/200908/");
             $atom_object_node = $atom_entry_node->appendChild($obj_node);
@@ -316,6 +316,7 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_feed_node->appendChild($atom_author);
 
         $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));
+
 
         /** @var $obj CMISObject */
         $atom_feed_node->appendChild($this->_xml->createElement("atom:id", $obj->getObjectId()['value']));
