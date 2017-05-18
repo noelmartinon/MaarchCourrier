@@ -112,7 +112,31 @@ class DocumentModel extends DocumentModelAbstract
 
     public function create()
     {
+        $db = new \Database();
+        $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id) 
+                      values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN')";
 
+        $result = $db->query($statement, [
+            ":subject" => $this->getSubject(),
+            ":format" => $this->getFormat(),
+            ":path" => $this->getPath(),
+            ":typeid" => $this->getTypeId(),
+            ":filename" => $this->getFilename(),
+            ":status" => "NEW",
+            ":description" => $this->getDescription(),
+            ":tablename" => "res_letterbox",
+            ":initiator" => "VILLE",
+            ":destination" => "VILLE",
+            ":typist" => $this->getTypist()
+        ]);
+
+        //TODO gerer les cas d erreurs
+        if ($result === false) {
+            //TODO throw storageException
+            echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
+        }
+
+        return $db->query('SELECT lastval();')->fetch()[0];
     }
 
 }

@@ -502,11 +502,9 @@ class CMISObject extends \SplObjectStorage
 
     public static function documentToCMISObjetct(DocumentModel $document)
     {
-        // Check uniqid if it is res_id of something else
-        /*
         return new CMISObject($document->getUniqid(), $document->getPath(), 'cmis:document', '', $document->getTypist(), 'cmis:document'
             , $document->getFolderUniqueId(), null, null, $document->getFilename());
-        */
+
     }
 
     public static function folderToCMISObject(FoldersModel $folder)

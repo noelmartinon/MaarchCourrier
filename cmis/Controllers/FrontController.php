@@ -113,10 +113,20 @@ class FrontController
     {
         $cmis = new CMIS(Utils::outputFactory($output));
 
+        $queryParameters = [];
         $dom = new \DOMDocument();
 
         // Stream handler
         if ($dom->loadXML(file_get_contents('php://input'))) {
+
+
+            file_put_contents('xml', $dom->saveXML());
+            $properties = $dom->getElementsByTagName('properties');
+            foreach($properties[0]->childNodes as $property){
+                $queryParameters[str_ireplace('cmis:','',$property->getAttribute('propertyDefinitionId'))] = $property->nodeValue;
+            }
+
+            file_put_contents('test', print_r($queryParameters, true));
 
             $type = $dom->getElementsByTagName('propertyId')[0]->nodeValue;
 
@@ -131,7 +141,7 @@ class FrontController
             }
 
         } else {
-            switch ($_REQUEST['cmisaction']) {
+           /* switch ($_REQUEST['cmisaction']) {
                 case 'createDocument':
                     $cmis->output->createDocument($_REQUEST['objectId'], $_FILES['content']);
 
@@ -139,7 +149,7 @@ class FrontController
                 case 'createFolder':
                     $cmis->output->createFolder(null, null);
                     break;
-            }
+            }*/
         }
 
     }

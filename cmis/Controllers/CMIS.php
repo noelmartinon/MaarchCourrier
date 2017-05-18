@@ -141,9 +141,7 @@ class CMIS
     {
         $folder = new FoldersModel();
 
-        file_put_contents("data", $parent . PHP_EOL, FILE_APPEND);
-
-        if($parent != '/'){
+        if ($parent != '/') {
             $folder
                 ->setFolderName($name)
                 ->setParentId($parent)
@@ -161,32 +159,43 @@ class CMIS
 
     public function createDocument($parent, $name, $content, $base64 = true)
     {
-        $document = new DocumentModel();
-
-        $document
-            ->setFilename($name)
-            ->create();
-
-
-        file_put_contents('ok', '1');
-
         if ($base64) {
+            $document = new DocumentModel();
+
+
+            if ($parent != '/') {
+                $document
+                    ->setFoldersSystemId($parent);
+            }
+
             $extension = pathinfo($name)['extension'];
-
-
             $f = finfo_open();
-
             $mime_type = finfo_buffer($f, base64_decode($content), FILEINFO_MIME_TYPE);
 
-            if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
-                //move_uploaded_file($_SESSION['config']['tmppath'], $name);
-                file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $name, base64_decode($content));
-            }
+            $document
+                ->setFormat($extension)
+                ->setSubject($name)
+                ->setFilename($name)
+                ->setTypeId(101)
+                ->setTypist('superadmin')
+                ->setPath("/" . $name);
+
+
+            //if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
+            //move_uploaded_file($_SESSION['config']['tmppath'], $name);
+            file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $name, base64_decode($content));
+
+            $document->create();
+            // }
         }
 
-
         http_response_code(201);
-        //$this->output->id([CMISObject::documentToCMISObjetct($document)], true, 'object')->render();
+        ob_start();
+        $this->output->id([CMISObject::documentToCMISObjetct($document)], true, 'object')->render();
+        $r = ob_get_contents();
+        ob_get_flush();
+
+        file_put_contents("r", $r);
     }
 
 
