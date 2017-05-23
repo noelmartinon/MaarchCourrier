@@ -137,60 +137,69 @@ class CMIS
         return $this;
     }
 
-    public function createFolder($parent, $name)
+    public function createFolder($parent, $queryParameters)
     {
         $folder = new FoldersModel();
 
+        foreach ($queryParameters as $key => $queryParameter) {
+            $folder->set($key, $queryParameter);
+        }
+
         if ($parent != '/') {
             $folder
-                ->setFolderName($name)
+                ->setFolderName($queryParameters['name'])
                 ->setParentId($parent)
                 ->create();
         } else {
             $folder
-                ->setFolderName($name)
+                ->setFolderName($queryParameters['name'])
                 ->create();
         }
 
         http_response_code(201);
 
-        $this->output->id($folder->getUniqid(),[CMISObject::folderToCMISObject($folder)], true, 'object')->render();
+        $this->output->id($folder->getUniqid(), CMISObject::folderToCMISObject($folder), true, 'object')->render();
     }
 
-    public function createDocument($parent, $name, $content, $base64 = true)
+    public function createDocument($parent, $queryParameters, $content, $base64 = true)
     {
+
         if ($base64) {
             $document = new DocumentModel();
 
+
+            foreach ($queryParameters as $key => $queryParameter) {
+                $document->set($key, $queryParameter);
+            }
 
             if ($parent != '/') {
                 $document
                     ->setFoldersSystemId($parent);
             }
 
-            $extension = pathinfo($name)['extension'];
+            $extension = pathinfo($queryParameters['name'])['extension'];
             $f = finfo_open();
             $mime_type = finfo_buffer($f, base64_decode($content), FILEINFO_MIME_TYPE);
 
             $document
                 ->setFormat($extension)
-                ->setSubject($name)
-                ->setFilename($name)
+                ->setSubject($queryParameters['name'])
+                ->setFilename($queryParameters['name'])
                 ->setTypeId(101)
                 ->setTypist('superadmin')
-                ->setPath("/" . $name);
+                ->setPath("/" . $queryParameters['name']);
 
 
             //if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
             //move_uploaded_file($_SESSION['config']['tmppath'], $name);
-            file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $name, base64_decode($content));
+            file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $queryParameters['name'], base64_decode($content));
 
             $document->create();
             // }
 
             http_response_code(201);
 
-            $this->output->id($document->getUniqid(),[CMISObject::documentToCMISObjetct($document)], true, 'object')->render();
+            $this->output->id($document->getUniqid(), CMISObject::documentToCMISObjetct($document), true, 'object')->render();
         }
     }
 
@@ -199,7 +208,7 @@ class CMIS
     {
         $object = CMISObject::getById($id);
 
-        $this->output->id($id,[$object], $succinct, $selector);
+        $this->output->id($id, $object, $succinct, $selector);
         return $this;
     }
 

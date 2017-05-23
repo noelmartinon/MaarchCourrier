@@ -7,6 +7,7 @@
 
 namespace CMIS\Models;
 
+use CMIS\Controllers\CMIS;
 use CMIS\Utils\Utils;
 use Folder\Models\FoldersModel;
 
@@ -54,13 +55,13 @@ class AtomPubOutput implements OutputStrategyInterface
 
     /**
      * @param $id
-     * @param $objects
+     * @param $object CMISObject
      * @param $succinct
      * @param $selector
      * @param null $node
      * @return $this
      */
-    public function id($id, $objects, $succinct, $selector, $node = null)
+    public function id($id, $object, $succinct, $selector, $node = null)
     {
         $atom_entry = $this->_xml->createElement("atom:entry");
         $atom_entry_node = ($node) ? $node->appendChild($atom_entry) : $this->_xml->appendChild($atom_entry);
@@ -88,24 +89,20 @@ class AtomPubOutput implements OutputStrategyInterface
 
         $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
-        /**
-         * @var $object CMISObject
-         */
-        foreach ($objects as $object) {
-            $obj_node = $this->_xml->createElement("cmisra:object");
-            $obj_node->setAttribute("xmlns:ns3", "http://docs.oasis-open.org/ns/cmis/messaging/200908/");
-            $atom_object_node = $atom_entry_node->appendChild($obj_node);
-            $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
-            foreach ($object->toArray() as $property) {
-                $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
-                $atom_property->setAttribute("propertyDefinitionId", $property['id']);
-                $atom_property->setAttribute("displayName", $property['displayName']);
-                $atom_property->setAttribute("localName", $property['localName']);
-                $atom_property->setAttribute("queryName", $property['queryName']);
-                $atom_property_node = $atom_properties_node->appendChild($atom_property);
-                $atom_property_node->appendChild($this->_xml->createElement("cmis:value", $property['value']));
+        $obj_node = $this->_xml->createElement("cmisra:object");
+        $obj_node->setAttribute("xmlns:ns3", "http://docs.oasis-open.org/ns/cmis/messaging/200908/");
+        $atom_object_node = $atom_entry_node->appendChild($obj_node);
+        $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
+        foreach ($object->toArray() as $property) {
+            $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
+            $atom_property->setAttribute("propertyDefinitionId", $property['id']);
+            $atom_property->setAttribute("displayName", $property['displayName']);
+            $atom_property->setAttribute("localName", $property['localName']);
+            $atom_property->setAttribute("queryName", $property['queryName']);
+            $atom_property_node = $atom_properties_node->appendChild($atom_property);
+            $atom_property_node->appendChild($this->_xml->createElement("cmis:value", $property['value']));
 
-            }
+
         }
 
         return $this;
@@ -294,8 +291,9 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_feed_node->appendChild($this->_xml->createElement("atom:edited", date(DATE_ATOM)));
         $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
-        foreach ($objects as $object){
-            $this->id([$object], null, null, $atom_feed_node);
+        /** @var $object CMISObject */
+        foreach ($objects as $object) {
+            $this->id($object->getObjectId(),$object, null, null, $atom_feed_node);
         }
 
         return $this;

@@ -13,6 +13,25 @@ use Folder\Models\FoldersModel;
 
 class DocumentModel extends DocumentModelAbstract
 {
+
+    public function set($param, $value)
+    {
+        switch ($param) {
+            case "description":
+                $this->setDescription($value);
+                break;
+            case "createdBy":
+                $this->setTypist($value);
+                break;
+            case "parentId":
+                $this->setFoldersSystemId($value);
+                break;
+            case "lastModificationDate":
+                $this->setModificationDate($value);
+                break;
+        }
+    }
+
     /**
      * @return array
      */
@@ -105,7 +124,7 @@ class DocumentModel extends DocumentModelAbstract
             }
         }
 
-        foreach ($documents[""] as $document){
+        foreach ($documents[""] as $document) {
             array_push($folders, $document);
         }
 

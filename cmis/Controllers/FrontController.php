@@ -118,20 +118,19 @@ class FrontController
 
         // Stream handler
         if ($dom->loadXML(file_get_contents('php://input'))) {
+
             $properties = $dom->getElementsByTagName('properties');
             foreach($properties[0]->childNodes as $property){
                 $queryParameters[str_ireplace('cmis:','',$property->getAttribute('propertyDefinitionId'))] = $property->nodeValue;
             }
 
-            $type = $dom->getElementsByTagName('propertyId')[0]->nodeValue;
-
-            switch ($type) {
+            switch ($queryParameters['objectTypeId']) {
                 case 'cmis:document':
-                    $cmis->createDocument(Utils::readObjectId($_GET['id']), $dom->getElementsByTagName('propertyString')[0]->nodeValue, $dom->getElementsByTagName('base64')[0]->nodeValue);
+                    $cmis->createDocument(Utils::readObjectId($_GET['id']), $queryParameters, $dom->getElementsByTagName('base64')[0]->nodeValue);
 
                     break;
                 case 'cmis:folder':
-                    $cmis->createFolder(Utils::readObjectId($_GET['id']), $dom->getElementsByTagName('propertyString')[0]->nodeValue);
+                    $cmis->createFolder(Utils::readObjectId($_GET['id']),$queryParameters);
                     break;
             }
 

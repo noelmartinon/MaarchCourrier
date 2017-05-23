@@ -13,6 +13,24 @@ use CMIS\Utils\Utils;
 
 class FoldersModel extends FoldersModelAbstract
 {
+    public function set($param, $value)
+    {
+        switch ($param) {
+            case "description":
+                $this->setDescription($value);
+                break;
+            case "createdBy":
+                $this->setTypist($value);
+                break;
+            case "parentId":
+                $this->setParentId($value);
+                break;
+            case "lastModificationDate":
+                $this->setLastModifiedDate($value);
+                break;
+        }
+    }
+
     public function create()
     {
         $foldertype_id = 5;
@@ -20,14 +38,14 @@ class FoldersModel extends FoldersModelAbstract
 
         $creation_date = $db->current_datetime();
 
-        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date ) values ( '"
-            . pg_escape_string($this->getFolderName()) . "' , '"
-            . pg_escape_string($foldertype_id) . "' , '"
-            . pg_escape_string($this->getFolderName()) . "' , "
-            . pg_escape_string($creation_date) . " )";
+        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description ) values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description)";
 
-
-        $result = $db->query($statement);
+        $result = $db->query($statement, [
+            ":folder_id" => $this->getFolderName(),
+            ":foldertype_id" => $foldertype_id ,
+            ":folder_name" => $this->getFolderName() ,
+            ":description" => $this->getDescription()
+        ]);
 
         //TODO gerer les cas d erreurs
         if ($result === false) {
