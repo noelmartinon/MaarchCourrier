@@ -38,7 +38,7 @@ class AtomPubOutput implements OutputStrategyInterface
             'type' => 'objectbyid',
             'mediatype' => 'application/atom+xml;type=entry'
 
-        ],  [
+        ], [
             'template' => '/type?id={id}',
             'type' => 'typebyid',
             'mediatype' => ''
@@ -69,6 +69,7 @@ class AtomPubOutput implements OutputStrategyInterface
      */
     public function id($id, $object, $succinct, $selector, $node = null)
     {
+        $id = (!empty($id)) ? $id : $object->getObjectId()['value'];
         $atom_entry = $this->_xml->createElement("atom:entry");
         $atom_entry_node = ($node) ? $node->appendChild($atom_entry) : $this->_xml->appendChild($atom_entry);
         $atom_entry_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
