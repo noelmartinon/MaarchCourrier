@@ -212,6 +212,16 @@ class CMIS
         return $this;
     }
 
+    public function path($id, $path)
+    {
+
+        $object = CMISObject::getByPath($path);
+
+        $this->output->id($id, $object, false, null);
+        return $this;
+    }
+
+
     public function renderType($type)
     {
         $this->output->renderType($type);

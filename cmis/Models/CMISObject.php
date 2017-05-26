@@ -409,6 +409,12 @@ class CMISObject extends \SplObjectStorage
         }
     }
 
+
+    public static function getByPath($path)
+    {
+        return self::folderToCMISObject(FoldersModel::getByPath($path));
+    }
+
     public static function getAllObjects($objectId = null)
     {
         $conf = parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);

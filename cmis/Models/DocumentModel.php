@@ -9,6 +9,7 @@ namespace CMIS\Models;
 
 
 use CMIS\Utils\Utils;
+use function FastRoute\TestFixtures\empty_options_cached;
 use Folder\Models\FoldersModel;
 
 class DocumentModel extends DocumentModelAbstract
@@ -105,6 +106,8 @@ class DocumentModel extends DocumentModelAbstract
         $folders = FoldersModel::getFolderTree($folder_id);
         $documents = self::getList();
 
+
+
         /**
          * @var $folder FoldersModel
          */
@@ -124,8 +127,10 @@ class DocumentModel extends DocumentModelAbstract
             }
         }
 
-        foreach ($documents[""] as $document) {
-            array_push($folders, $document);
+        if(!empty($documents[""])){
+            foreach ($documents[""] as $document) {
+                array_push($folders, $document);
+            }
         }
 
         return $folders;

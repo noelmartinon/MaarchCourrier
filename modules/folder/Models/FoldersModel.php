@@ -42,8 +42,8 @@ class FoldersModel extends FoldersModelAbstract
 
         $result = $db->query($statement, [
             ":folder_id" => $this->getFolderName(),
-            ":foldertype_id" => $foldertype_id ,
-            ":folder_name" => $this->getFolderName() ,
+            ":foldertype_id" => $foldertype_id,
+            ":folder_name" => $this->getFolderName(),
             ":description" => $this->getDescription()
         ]);
 
@@ -103,6 +103,48 @@ class FoldersModel extends FoldersModelAbstract
     }
 
     /**
+     * @param string $path
+     * @return FoldersModel
+     */
+    public static function getByPath($path = "/")
+    {
+
+        if(preg_match("/^\//", $path)){
+            $path = substr($path, 1);
+        }
+
+        $database = new \Database();
+        $stmt = $database->query('
+            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
+            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            FROM folders 
+            WHERE folder_name = :path 
+            ORDER BY folder_level', [':path' => $path]);
+
+        $value = $stmt->fetch();
+
+        $folder = new self();
+
+        $folder
+            ->setFoldersSystemId($value['folders_system_id'])
+            ->setFolderId($value['folder_id'])
+            ->setFoldertypeId($value['foldertype_id'])
+            ->setParentId($value['parent_id'])
+            ->setFolderName($value['folder_name'])
+            ->setSubject($value['subject'])
+            ->setDescription($value['description'])
+            ->setAuthor($value['author'])
+            ->setTypist($value['typist'])
+            ->setStatus($value['status'])
+            ->setFolderLevel($value['folder_level'])
+            ->setCreationDate($value['creation_date'])
+            ->setLastModifiedDate($value['last_modified_date']);
+
+
+        return $folder;
+    }
+
+    /**
      * @param integer $id
      * @return array
      */
@@ -150,7 +192,7 @@ class FoldersModel extends FoldersModelAbstract
             if ($value['folder_level'] == 1) {
                 $array[$value['folders_system_id']] = $folder;
             } else {
-                if($array[$value['parent_id']]){
+                if ($array[$value['parent_id']]) {
                     $array[$value['parent_id']]->attach($folder);
                 }
             }

@@ -102,8 +102,8 @@ class FrontController
 
         if ($dom->loadXML(file_get_contents('php://input'))) {
             $properties = $dom->getElementsByTagName('query');
-            foreach($properties[0]->childNodes as $property){
-                $queryParameters[str_ireplace('cmis:','',$property->nodeName)] = $property->nodeValue;
+            foreach ($properties[0]->childNodes as $property) {
+                $queryParameters[str_ireplace('cmis:', '', $property->nodeName)] = $property->nodeValue;
             }
             $cmis->query($queryParameters);
         }
@@ -120,8 +120,8 @@ class FrontController
         if ($dom->loadXML(file_get_contents('php://input'))) {
 
             $properties = $dom->getElementsByTagName('properties');
-            foreach($properties[0]->childNodes as $property){
-                $queryParameters[str_ireplace('cmis:','',$property->getAttribute('propertyDefinitionId'))] = $property->nodeValue;
+            foreach ($properties[0]->childNodes as $property) {
+                $queryParameters[str_ireplace('cmis:', '', $property->getAttribute('propertyDefinitionId'))] = $property->nodeValue;
             }
 
             switch ($queryParameters['objectTypeId']) {
@@ -130,22 +130,31 @@ class FrontController
 
                     break;
                 case 'cmis:folder':
-                    $cmis->createFolder(Utils::readObjectId($_GET['id']),$queryParameters);
+                    $cmis->createFolder(Utils::readObjectId($_GET['id']), $queryParameters);
                     break;
             }
 
         } else {
-           /* switch ($_REQUEST['cmisaction']) {
-                case 'createDocument':
-                    $cmis->output->createDocument($_REQUEST['objectId'], $_FILES['content']);
+            /* switch ($_REQUEST['cmisaction']) {
+                 case 'createDocument':
+                     $cmis->output->createDocument($_REQUEST['objectId'], $_FILES['content']);
 
-                    break;
-                case 'createFolder':
-                    $cmis->output->createFolder(null, null);
-                    break;
-            }*/
+                     break;
+                 case 'createFolder':
+                     $cmis->output->createFolder(null, null);
+                     break;
+             }*/
         }
 
+    }
+
+
+    public static function path($output)
+    {
+        $cmis = new CMIS(Utils::outputFactory($output));
+        $path = (!empty($_GET['path']))?$_GET['path']:"/";
+
+        $cmis->path($_GET['objectId'], $path)->render();
     }
 
     public static function type($output)

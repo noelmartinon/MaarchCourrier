@@ -28,11 +28,17 @@ class AtomPubOutput implements OutputStrategyInterface
 
     private $_templates = [
         [
+            'template' => '/path?path={path}',
+            'type' => 'objectbypath',
+            'mediatype' => 'application/atom+xml;type=entry'
+
+        ],
+        [
             'template' => '/id?objectId={id}',
             'type' => 'objectbyid',
             'mediatype' => 'application/atom+xml;type=entry'
 
-        ], [
+        ],  [
             'template' => '/type?id={id}',
             'type' => 'typebyid',
             'mediatype' => ''
@@ -107,6 +113,7 @@ class AtomPubOutput implements OutputStrategyInterface
 
         return $this;
     }
+
 
     private function collections()
     {
@@ -188,6 +195,7 @@ class AtomPubOutput implements OutputStrategyInterface
     {
         //set_time_limit(0);
         $objects = CMISObject::getAllObjects($id);
+
         $this->createAtomEntry(null, $objects);
 
         return $this;
@@ -293,7 +301,7 @@ class AtomPubOutput implements OutputStrategyInterface
 
         /** @var $object CMISObject */
         foreach ($objects as $object) {
-            $this->id($object->getObjectId(),$object, null, null, $atom_feed_node);
+            $this->id($object->getObjectId(), $object, null, null, $atom_feed_node);
         }
 
         return $this;
