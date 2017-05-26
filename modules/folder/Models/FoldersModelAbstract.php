@@ -321,7 +321,14 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
 
     public function getParentUniqid($raw = true)
     {
-        return ($raw) ? $this->_parent_id : Utils::readObjectId($this->_parent_id, 'folder');
+        if ($this->_parent_id == 0) {
+            $parentUnique = Utils::createObjectId("/");
+        } else {
+            $parentUnique = ($raw) ? $this->_parent_id : Utils::readObjectId($this->_parent_id, 'folder');
+        }
+
+
+        return $parentUnique;
     }
 
     public function getType()

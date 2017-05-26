@@ -38,13 +38,16 @@ class FoldersModel extends FoldersModelAbstract
 
         $creation_date = $db->current_datetime();
 
-        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description ) values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description)";
+        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level )
+                      values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level)";
 
         $result = $db->query($statement, [
             ":folder_id" => $this->getFolderName(),
             ":foldertype_id" => $foldertype_id,
             ":folder_name" => $this->getFolderName(),
-            ":description" => $this->getDescription()
+            ":description" => $this->getDescription(),
+            ":parent_id" => $this->getParentId(),
+            ":folder_level" => $this->getFolderLevel()
         ]);
 
         //TODO gerer les cas d erreurs

@@ -149,6 +149,7 @@ class CMIS
             $folder
                 ->setFolderName($queryParameters['name'])
                 ->setParentId($parent)
+                ->setFolderLevel(2)
                 ->create();
         } else {
             $folder

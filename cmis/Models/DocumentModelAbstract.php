@@ -309,7 +309,7 @@ abstract class DocumentModelAbstract
 
     public function getFolderUniqueId()
     {
-        return bin2hex('folder_' . $this->_folders_system_id);
+        return Utils::createObjectId($this->_folders_system_id, 'folder');
     }
 
     public function getType()

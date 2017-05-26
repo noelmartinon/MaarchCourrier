@@ -450,6 +450,9 @@ class CMISObject extends \SplObjectStorage
 
                             if ($first_level->getType() == 'folder') {
                                 /** @var  $first_level FoldersModel */
+
+
+
                                 $CMISObject2 = new self($first_level->getUniqid(), '/' . $folder->getFolderName() . '/' . $first_level->getFolderName(), 'cmis:folder', ''
                                     , $first_level->getTypist(), 'cmis:folder', $first_level->getParentUniqid()
                                     , $first_level->getCreationDate(), null, $first_level->getFolderName()

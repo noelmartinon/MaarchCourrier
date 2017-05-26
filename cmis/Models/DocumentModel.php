@@ -139,8 +139,8 @@ class DocumentModel extends DocumentModelAbstract
     public function create()
     {
         $db = new \Database();
-        $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id) 
-                      values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN')";
+        $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id, folders_system_id) 
+                      values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN', :folders_system_id)";
 
         $result = $db->query($statement, [
             ":subject" => $this->getSubject(),
@@ -153,7 +153,8 @@ class DocumentModel extends DocumentModelAbstract
             ":tablename" => "res_letterbox",
             ":initiator" => "VILLE",
             ":destination" => "VILLE",
-            ":typist" => $this->getTypist()
+            ":typist" => $this->getTypist(),
+            ":folders_system_id" => $this->getFoldersSystemId()
         ]);
 
         //TODO gerer les cas d erreurs

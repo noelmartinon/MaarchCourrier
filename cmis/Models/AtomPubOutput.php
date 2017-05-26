@@ -61,7 +61,7 @@ class AtomPubOutput implements OutputStrategyInterface
 
     /**
      * @param $id
-     * @param $object CMISObject
+     * @param $object
      * @param $succinct
      * @param $selector
      * @param null $node
