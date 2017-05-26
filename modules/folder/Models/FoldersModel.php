@@ -71,8 +71,13 @@ class FoldersModel extends FoldersModelAbstract
      */
     public static function getById($id = null)
     {
-        $database = new \Database();
-        $stmt = $database->query('
+        $folder = new self();
+
+        if (!empty($id)) {
+
+
+            $database = new \Database();
+            $stmt = $database->query('
             SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
             author,typist,status,folder_level,creation_date,destination, last_modified_date 
             FROM folders 
@@ -80,24 +85,27 @@ class FoldersModel extends FoldersModelAbstract
             OR parent_id = :id 
             ORDER BY folder_level', [':id' => $id]);
 
-        $value = $stmt->fetch();
+            $value = $stmt->fetch();
 
-        $folder = new self();
 
-        $folder
-            ->setFoldersSystemId($value['folders_system_id'])
-            ->setFolderId($value['folder_id'])
-            ->setFoldertypeId($value['foldertype_id'])
-            ->setParentId($value['parent_id'])
-            ->setFolderName($value['folder_name'])
-            ->setSubject($value['subject'])
-            ->setDescription($value['description'])
-            ->setAuthor($value['author'])
-            ->setTypist($value['typist'])
-            ->setStatus($value['status'])
-            ->setFolderLevel($value['folder_level'])
-            ->setCreationDate($value['creation_date'])
-            ->setLastModifiedDate($value['last_modified_date']);
+
+            $folder
+                ->setFoldersSystemId($value['folders_system_id'])
+                ->setFolderId($value['folder_id'])
+                ->setFoldertypeId($value['foldertype_id'])
+                ->setParentId($value['parent_id'])
+                ->setFolderName($value['folder_name'])
+                ->setSubject($value['subject'])
+                ->setDescription($value['description'])
+                ->setAuthor($value['author'])
+                ->setTypist($value['typist'])
+                ->setStatus($value['status'])
+                ->setFolderLevel($value['folder_level'])
+                ->setCreationDate($value['creation_date'])
+                ->setLastModifiedDate($value['last_modified_date']);
+        } else {
+            $folder->setUniqid(Utils::createObjectId('/'), true);
+        }
 
         return $folder;
     }
@@ -109,7 +117,7 @@ class FoldersModel extends FoldersModelAbstract
     public static function getByPath($path = "/")
     {
 
-        if(preg_match("/^\//", $path)){
+        if (preg_match("/^\//", $path)) {
             $path = substr($path, 1);
         }
 

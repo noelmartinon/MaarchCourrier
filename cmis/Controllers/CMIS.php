@@ -167,7 +167,6 @@ class CMIS
         if ($base64) {
             $document = new DocumentModel();
 
-
             foreach ($queryParameters as $key => $queryParameter) {
                 $document->set($key, $queryParameter);
             }

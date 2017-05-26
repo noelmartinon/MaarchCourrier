@@ -12,7 +12,6 @@ namespace Folder\Models;
 use CMIS\Utils\Utils;
 
 
-
 abstract class FoldersModelAbstract extends \SplObjectStorage
 {
     private $_folders_system_id, $_folder_id, $_foldertype_id, $_parent_id, $_folder_name, $_subject, $_description
@@ -313,16 +312,16 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
      * @param string $uniqid
      * @return $this
      */
-    public function setUniqid($uniqid)
+    public function setUniqid($uniqid, $raw = false)
     {
-        $this->_uniqid =  Utils::createObjectId($uniqid, 'folder');
+        $this->_uniqid = ($raw) ? $uniqid : Utils::createObjectId($uniqid, 'folder');
         return $this;
     }
 
 
     public function getParentUniqid($raw = true)
     {
-        return($raw) ? $this->_parent_id: Utils::readObjectId($this->_parent_id, 'folder');
+        return ($raw) ? $this->_parent_id : Utils::readObjectId($this->_parent_id, 'folder');
     }
 
     public function getType()
