@@ -119,7 +119,7 @@ class CMISObject extends \SplObjectStorage
             'queryName' => 'cmis:parentId',
             'type' => 'id',
             'cardinality' => 'single',
-            'value' => $_parentId
+            'value' => ($_parentId == 0)?Utils::createObjectId('/'):$_parentId
         ];
 
         $this->_creationDate = [
