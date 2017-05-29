@@ -94,6 +94,12 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "/descendants?id=" . $id);
         $atom_link_node->setAttribute("type", "application/cmistree+xml");
 
+        $atom_link = $this->_xml->createElement("atom:link");
+        $atom_link_node = $atom_entry->appendChild($atom_link);
+        $atom_link_node->setAttribute("rel", "down");
+        $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "/children?id=" . $id);
+        $atom_link_node->setAttribute("type", "application/atom+xml;type=feed");
+
         $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
         $obj_node = $this->_xml->createElement("cmisra:object");
@@ -108,8 +114,6 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_property->setAttribute("queryName", $property['queryName']);
             $atom_property_node = $atom_properties_node->appendChild($atom_property);
             $atom_property_node->appendChild($this->_xml->createElement("cmis:value", $property['value']));
-
-
         }
 
         return $this;
@@ -192,20 +196,18 @@ class AtomPubOutput implements OutputStrategyInterface
     }
 
 
-    public function descendants($id)
+    public function descendants($objects)
     {
-        //set_time_limit(0);
-        $objects = CMISObject::getAllObjects($id);
-
         $this->createAtomEntry(null, $objects);
 
         return $this;
     }
 
-
-    public function getObjects()
+    public function children($objects)
     {
-        // TODO: Implement getObjects() method.
+        $this->createAtomEntry(null, $objects, true);
+
+        return $this;
     }
 
     public function generate()
@@ -309,7 +311,7 @@ class AtomPubOutput implements OutputStrategyInterface
     }
 
 
-    private function createAtomEntry($node, $obj)
+    private function createAtomEntry($node, $obj, $children = false)
     {
         $atom_feed = $this->_xml->createElement("atom:feed");
 
@@ -373,11 +375,14 @@ class AtomPubOutput implements OutputStrategyInterface
                 $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
             }
 
-            $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
+            if(!$children){
+                $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
 
-            foreach ($child as $value) {
-                $this->createAtomEntry($atom_children_node, $child);
+                foreach ($child as $value) {
+                    $this->createAtomEntry($atom_children_node, $child);
+                }
             }
+
         }
     }
 

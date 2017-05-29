@@ -75,6 +75,10 @@ $router->map('GET', '/[a:output]/path/?', function ($output) {
     FrontController::path($output);
 }, 'path');
 
+$router->map('GET', '/[a:output]/children/?', function ($output) {
+    FrontController::children($output);
+}, 'children');
+
 
 $router->map('GET', '/[a:output]/type/?', function ($output) {
     FrontController::type($output);

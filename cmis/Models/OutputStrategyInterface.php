@@ -60,17 +60,18 @@ interface OutputStrategyInterface
      */
     public function loadConfiguration($conf);
 
-    /**
-     * @return mixed
-     */
-    public function getObjects();
 
     /**
-     * @param $id
+     * @param $objects
      * @return mixed
      */
+    public function descendants($objects);
 
-    public function descendants($id);
+    /**
+     * @param $objects
+     * @return mixed
+     */
+    public function children($objects);
 
     /**
      * @param $type

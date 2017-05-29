@@ -133,7 +133,15 @@ class CMIS
 
     public function descendants($id)
     {
-        $this->output->descendants($id);
+        $objects = CMISObject::getAllObjects($id);
+        $this->output->descendants($objects);
+        return $this;
+    }
+
+    public function children($id)
+    {
+        $objects = CMISObject::getAllObjects($id);
+        $this->output->children($objects);
         return $this;
     }
 
@@ -214,7 +222,6 @@ class CMIS
 
     public function path($id, $path)
     {
-
         $object = CMISObject::getByPath($path);
 
         $this->output->id($id, $object, false, null);

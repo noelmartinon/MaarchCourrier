@@ -84,6 +84,13 @@ class FrontController
         $cmis->descendants($id)->render();
     }
 
+    public static function children($output)
+    {
+        $cmis = new CMIS(Utils::outputFactory($output));
+        $id = (!empty($_GET['id'])) ? $_GET['id'] : Utils::createObjectId('/');
+        $cmis->children($id)->render();
+    }
+
     public static function id($output)
     {
         $cmis = new CMIS(Utils::outputFactory($output));
@@ -156,6 +163,8 @@ class FrontController
 
         $cmis->path($_GET['objectId'], $path)->render();
     }
+
+
 
     public static function type($output)
     {

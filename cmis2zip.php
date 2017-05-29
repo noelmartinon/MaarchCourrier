@@ -12,18 +12,14 @@ $files = new RecursiveIteratorIterator(
 );
 
 $zip->addEmptyDir('cmis');
-foreach ($files as $name => $file)
-{
-    if (!$file->isDir())
-    {
+foreach ($files as $name => $file) {
+    if (!$file->isDir()) {
         $filePath = $file->getRealPath();
         $relativePath = substr($filePath, strlen($rootPath) + 1);
 
-        if ($file->getFilename() != 'access.log')
-        {
-            $zip->addFile($filePath, 'cmis/' .  $relativePath);
+        if ($file->getFilename() != 'access.log') {
+            $zip->addFile($filePath, 'cmis/' . $relativePath);
         }
-
     }
 }
 
@@ -37,13 +33,10 @@ $files = new RecursiveIteratorIterator(
     RecursiveIteratorIterator::LEAVES_ONLY
 );
 
-
 $zip->addEmptyDir('modules/folder/Models');
 
-foreach ($files as $name => $file)
-{
-    if (!$file->isDir())
-    {
+foreach ($files as $name => $file) {
+    if (!$file->isDir()) {
         $filePath = $file->getRealPath();
         $relativePath = substr($filePath, strlen($rootPath) + 1);
 
