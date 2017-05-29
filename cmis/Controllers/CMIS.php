@@ -158,6 +158,7 @@ class CMIS
                 ->setFolderName($queryParameters['name'])
                 ->setParentId($parent)
                 ->setFolderLevel(2)
+                ->setTypist($_SERVER['PHP_AUTH_USER'])
                 ->create();
         } else {
             $folder
@@ -194,7 +195,7 @@ class CMIS
                 ->setSubject($queryParameters['name'])
                 ->setFilename($queryParameters['name'])
                 ->setTypeId(101)
-                ->setTypist('superadmin')
+                ->setTypist($_SERVER['PHP_AUTH_USER'])
                 ->setPath("/" . $queryParameters['name']);
 
 
