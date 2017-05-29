@@ -360,6 +360,12 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "?id=" . $child->getObjectId()['value']);
             $atom_link_node->setAttribute("type", "application/cmistree+xml");
 
+            $atom_link = $this->_xml->createElement("atom:link");
+            $atom_link_node = $atom_entry->appendChild($atom_link);
+            $atom_link_node->setAttribute("rel", "down");
+            $atom_link_node->setAttribute("href", str_replace(['/id','descendants'], ['', 'children'], $this->_webroot) . "?id=" . $child->getObjectId()['value']);
+            $atom_link_node->setAttribute("type", "application/cmistree+xml");
+
             $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
             $atom_object_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:object"));
