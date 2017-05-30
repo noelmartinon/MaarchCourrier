@@ -151,7 +151,7 @@ class CMIS
 
         $properties = [];
         foreach ($queryParameters as $key => $queryParameter) {
-            if($key != 'name' && $key != 'objectTypeId'){
+            if ($key != 'name' && $key != 'objectTypeId') {
                 $properties[$key]['value'] = $queryParameter;
             }
         }
@@ -159,18 +159,18 @@ class CMIS
 
         if ($parent != '/') {
             $folder
-                ->setFolderName($queryParameters['name'])
                 ->setParentId($parent)
-                ->setFolderLevel(2)
-                ->setCreationDate(date(DATE_ATOM))
-                ->setLastModifiedDate(date(DATE_ATOM))
-                ->setTypist($_SERVER['PHP_AUTH_USER'])
-                ->create();
+                ->setFolderLevel(2);
         } else {
-            $folder
-                ->setFolderName($queryParameters['name'])
-                ->create();
+            $folder->setFolderLevel(1);
         }
+
+        $folder
+            ->setCreationDate(date(DATE_ATOM))
+            ->setLastModifiedDate(date(DATE_ATOM))
+            ->setTypist($_SERVER['PHP_AUTH_USER'])
+            ->setFolderName($queryParameters['name'])
+            ->create();
 
         http_response_code(201);
 
@@ -185,7 +185,7 @@ class CMIS
 
             $properties = [];
             foreach ($queryParameters as $key => $queryParameter) {
-                if($key != 'name'&& $key != 'objectTypeId') {
+                if ($key != 'name' && $key != 'objectTypeId') {
                     $properties[$key]['value'] = $queryParameter;
                 }
             }
