@@ -15,7 +15,7 @@ use CMIS\Utils\Utils;
 abstract class FoldersModelAbstract extends \SplObjectStorage
 {
     private $_folders_system_id, $_folder_id, $_foldertype_id, $_parent_id, $_folder_name, $_subject, $_description
-    , $_author, $_typist, $_status, $_folder_level, $_creation_date, $_last_modified_date, $_uniqid;
+    , $_author, $_typist, $_status, $_folder_level, $_creation_date, $_last_modified_date, $_uniqid, $_otherProperties;
 
     /**
      * FoldersModelAbstract constructor.
@@ -32,10 +32,11 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
      * @param $_folder_level
      * @param $_creation_date
      * @param $_last_modified_date
+     * @param $_otherProperties
      */
     public function __construct($_folders_system_id = null, $_folder_id = null, $_foldertype_id = null, $_parent_id = null
         , $_folder_name = null, $_subject = null, $_description = null, $_author = null, $_typist = null, $_status = null
-        , $_folder_level = null, $_creation_date = null, $_last_modified_date = null)
+        , $_folder_level = null, $_creation_date = null, $_last_modified_date = null, $_otherProperties = [])
     {
         $this->_folders_system_id = $_folders_system_id;
         $this->_folder_id = $_folder_id;
@@ -50,6 +51,7 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
         $this->_folder_level = $_folder_level;
         $this->_creation_date = $_creation_date;
         $this->_last_modified_date = $_last_modified_date;
+        $this->_otherProperties = $_otherProperties;
         $this->_uniqid = Utils::createObjectId($_folders_system_id, 'folder');
     }
 
@@ -335,6 +337,24 @@ abstract class FoldersModelAbstract extends \SplObjectStorage
     {
         return 'folder';
     }
+
+    /**
+     * @return array
+     */
+    public function getOtherProperties()
+    {
+        return $this->_otherProperties;
+    }
+
+    /**
+     * @param array $otherProperties
+     */
+    public function setOtherProperties($otherProperties)
+    {
+        $this->_otherProperties = $otherProperties;
+    }
+
+
 
 
 }

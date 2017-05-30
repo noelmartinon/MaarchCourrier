@@ -78,11 +78,9 @@ class FoldersModel extends FoldersModelAbstract
 
         if (!empty($id)) {
 
-
             $database = new \Database();
             $stmt = $database->query('
-            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
-            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            SELECT *
             FROM folders 
             WHERE folders_system_id = :id 
             OR parent_id = :id 
@@ -90,8 +88,7 @@ class FoldersModel extends FoldersModelAbstract
 
             $value = $stmt->fetch();
 
-
-
+            $otherProperties = self::getOtherPropertiesArray($stmt, $value);
             $folder
                 ->setFoldersSystemId($value['folders_system_id'])
                 ->setFolderId($value['folder_id'])
@@ -105,7 +102,8 @@ class FoldersModel extends FoldersModelAbstract
                 ->setStatus($value['status'])
                 ->setFolderLevel($value['folder_level'])
                 ->setCreationDate($value['creation_date'])
-                ->setLastModifiedDate($value['last_modified_date']);
+                ->setLastModifiedDate($value['last_modified_date'])
+                ->setOtherProperties($otherProperties);
         } else {
             $folder->setUniqid(Utils::createObjectId('/'), true);
         }
@@ -126,14 +124,14 @@ class FoldersModel extends FoldersModelAbstract
 
         $database = new \Database();
         $stmt = $database->query('
-            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
-            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            SELECT *
             FROM folders 
             WHERE folder_name = :path 
             ORDER BY folder_level', [':path' => $path]);
 
         $value = $stmt->fetch();
 
+        $otherProperties = self::getOtherPropertiesArray($stmt, $value);
         $folder = new self();
 
         $folder
@@ -149,7 +147,8 @@ class FoldersModel extends FoldersModelAbstract
             ->setStatus($value['status'])
             ->setFolderLevel($value['folder_level'])
             ->setCreationDate($value['creation_date'])
-            ->setLastModifiedDate($value['last_modified_date']);
+            ->setLastModifiedDate($value['last_modified_date'])
+            ->setOtherProperties($otherProperties);
 
 
         return $folder;
@@ -166,16 +165,14 @@ class FoldersModel extends FoldersModelAbstract
 
         if ($id) {
             $stmt = $database->query('
-            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
-            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            SELECT *
             FROM folders 
             WHERE folders_system_id = :id 
             OR parent_id = :id 
             ORDER BY folder_level', [':id' => $id]);
         } else {
             $stmt = $database->query('
-            SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
-            author,typist,status,folder_level,creation_date,destination, last_modified_date 
+            SELECT * 
             FROM folders 
             ORDER BY folder_level');
         }
@@ -185,6 +182,8 @@ class FoldersModel extends FoldersModelAbstract
 
         foreach ($result as $value) {
             $folder = new self();
+
+            $otherProperties = self::getOtherPropertiesArray($stmt, $value);
             $folder
                 ->setFoldersSystemId($value['folders_system_id'])
                 ->setFolderId($value['folder_id'])
@@ -198,7 +197,8 @@ class FoldersModel extends FoldersModelAbstract
                 ->setStatus($value['status'])
                 ->setFolderLevel($value['folder_level'])
                 ->setCreationDate($value['creation_date'])
-                ->setLastModifiedDate($value['last_modified_date']);
+                ->setLastModifiedDate($value['last_modified_date'])
+                ->setOtherProperties($otherProperties);
 
             if ($value['folder_level'] == 1) {
                 $array[$value['folders_system_id']] = $folder;
@@ -212,11 +212,6 @@ class FoldersModel extends FoldersModelAbstract
         return $array;
     }
 
-    public function hasChildren()
-    {
-        $database = new \Database();
-        $database->query('SELECT ');
-    }
 
     /**
      * @param integer $id
@@ -264,5 +259,29 @@ class FoldersModel extends FoldersModelAbstract
         return $array;
     }
 
+    private static function getOtherPropertiesArray($stmt, $value)
+    {
+        $otherProperties = [];
+        $size = sizeof($value);
+        for ($i = 0; $i < $size; $i++) {
+            $meta = $stmt->getColumnMeta($i);
 
+            if ($meta['native_type'] == 'int2' || $meta['native_type'] == 'int4' || $meta['native_type'] == 'int8' || $meta['native_type'] == 'int16' || $meta['native_type'] == 'numeric') {
+                $type = 'Id';
+            } else if ($meta['native_type'] == 'varchar' || $meta['native_type'] == 'bpchar' || $meta['native_type'] == 'text') {
+                $type = 'String';
+            } else if ($meta['native_type'] == 'date' || $meta['native_type'] == 'timestamp') {
+                $type = 'DateTime';
+            } else {
+                $type = $meta['native_type'];
+            }
+
+            $otherProperties[$meta['name']] = [
+                "type" => $type,
+                "value" => $value[$meta['name']]
+            ];
+        }
+
+        return $otherProperties;
+    }
 }

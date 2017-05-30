@@ -182,8 +182,7 @@ class CMIS
             }
 
             if ($parent != '/') {
-                $document
-                    ->setFoldersSystemId($parent);
+                $document->setFoldersSystemId($parent);
             }
 
             $extension = pathinfo($queryParameters['name'])['extension'];

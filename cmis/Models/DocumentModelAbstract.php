@@ -13,7 +13,7 @@ use CMIS\Utils\Utils;
 abstract class DocumentModelAbstract
 {
     private $_res_id, $_title, $_subject, $_description, $_type_id, $_format, $_typist, $_creation_date, $_modification_date
-    , $_folders_system_id, $_path, $_filename, $_filesize, $_uniqid;
+    , $_folders_system_id, $_path, $_filename, $_filesize, $_uniqid, $_otherProperties;
 
     /**
      * DocumentAbstract constructor.
@@ -30,10 +30,11 @@ abstract class DocumentModelAbstract
      * @param $_path
      * @param $_filename
      * @param $_filesize
+     * @param $_otherProperties
      */
     public function __construct($_res_id = null, $_title = null, $_subject = null, $_description = null, $_type_id = null
         , $_format = null, $_typist = null, $_creation_date = null, $_modification_date = null, $_folders_system_id = null
-        , $_path = null, $_filename = null, $_filesize = null)
+        , $_path = null, $_filename = null, $_filesize = null, $_otherProperties = [])
     {
         $this->_res_id = $_res_id;
         $this->_title = $_title;
@@ -48,6 +49,7 @@ abstract class DocumentModelAbstract
         $this->_path = $_path;
         $this->_filename = $_filename;
         $this->_filesize = $_filesize;
+        $this->_otherProperties = $_otherProperties;
         $this->_uniqid = Utils::createObjectId($_res_id, 'document');
     }
 
@@ -316,5 +318,23 @@ abstract class DocumentModelAbstract
     {
         return 'document';
     }
+
+    /**
+     * @return array
+     */
+    public function getOtherProperties()
+    {
+        return $this->_otherProperties;
+    }
+
+    /**
+     * @param mixed $otherProperties
+     */
+    public function setOtherProperties($otherProperties)
+    {
+        $this->_otherProperties = $otherProperties;
+    }
+
+
 
 }

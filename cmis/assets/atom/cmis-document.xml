@@ -509,6 +509,22 @@
             <cmis:orderable>false</cmis:orderable>
             <cmis:defaultValue/>
         </cmis:propertyIdDefinition>
+        <cmis:propertyIdDefinition>
+            <cmis:id>cmis:res_parent</cmis:id>
+            <cmis:localName>res_parent</cmis:localName>
+            <cmis:localNamespace>res_parent</cmis:localNamespace>
+            <cmis:displayName>res_parent</cmis:displayName>
+            <cmis:queryName>cmis:res_parent</cmis:queryName>
+            <cmis:description>res_parent</cmis:description>
+            <cmis:propertyType>id</cmis:propertyType>
+            <cmis:cardinality>single</cmis:cardinality>
+            <cmis:updatability>readwrite</cmis:updatability>
+            <cmis:inherited>false</cmis:inherited>
+            <cmis:required>false</cmis:required>
+            <cmis:queryable>false</cmis:queryable>
+            <cmis:orderable>false</cmis:orderable>
+            <cmis:defaultValue/>
+        </cmis:propertyIdDefinition>
         <cmis:propertyStringDefinition>
             <cmis:id>cmis:title</cmis:id>
             <cmis:localName>title</cmis:localName>
