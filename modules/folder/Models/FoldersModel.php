@@ -13,23 +13,6 @@ use CMIS\Utils\Utils;
 
 class FoldersModel extends FoldersModelAbstract
 {
-    public function set($param, $value)
-    {
-        switch ($param) {
-            case "description":
-                $this->setDescription($value);
-                break;
-            case "createdBy":
-                $this->setTypist($value);
-                break;
-            case "parentId":
-                $this->setParentId($value);
-                break;
-            case "lastModificationDate":
-                $this->setLastModifiedDate($value);
-                break;
-        }
-    }
 
     public function create()
     {
@@ -38,17 +21,43 @@ class FoldersModel extends FoldersModelAbstract
 
         $creation_date = $db->current_datetime();
 
-        $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level )
+
+        if (empty($this->getOtherProperties())) {
+            $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level )
                       values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level)";
 
-        $result = $db->query($statement, [
-            ":folder_id" => $this->getFolderName(),
-            ":foldertype_id" => $foldertype_id,
-            ":folder_name" => $this->getFolderName(),
-            ":description" => $this->getDescription(),
-            ":parent_id" => $this->getParentId(),
-            ":folder_level" => $this->getFolderLevel()
-        ]);
+            $result = $db->query($statement, [
+                ":folder_id" => $this->getFolderName(),
+                ":foldertype_id" => $foldertype_id,
+                ":folder_name" => $this->getFolderName(),
+                ":description" => $this->getDescription(),
+                ":parent_id" => $this->getParentId(),
+                ":folder_level" => $this->getFolderLevel()
+            ]);
+        } else {
+            $columns = [];
+            $flags = [];
+            $queryParameters = [];
+            foreach ($this->getOtherProperties() as $key => $property) {
+                if ($key != 'res_parent') {
+                    $columns[] = $key;
+                    $flags[] = ':' . $key;
+                    $queryParameters[':' . $key] = $property;
+                }
+            }
+
+            $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level ," . implode(',',$columns) . " )
+                      values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level," . implode(',',$flags) . ")";
+
+            $result = $db->query($statement, array_merge([
+                ":folder_id" => $this->getFolderName(),
+                ":foldertype_id" => $foldertype_id,
+                ":folder_name" => $this->getFolderName(),
+                ":description" => $this->getDescription(),
+                ":parent_id" => $this->getParentId(),
+                ":folder_level" => $this->getFolderLevel()
+            ], $queryParameters));
+        }
 
         //TODO gerer les cas d erreurs
         if ($result === false) {

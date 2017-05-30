@@ -149,15 +149,21 @@ class CMIS
     {
         $folder = new FoldersModel();
 
+        $properties = [];
         foreach ($queryParameters as $key => $queryParameter) {
-            $folder->set($key, $queryParameter);
+            if($key != 'name' && $key != 'objectTypeId'){
+                $properties[$key]['value'] = $queryParameter;
+            }
         }
+        $folder->setOtherProperties($properties);
 
         if ($parent != '/') {
             $folder
                 ->setFolderName($queryParameters['name'])
                 ->setParentId($parent)
                 ->setFolderLevel(2)
+                ->setCreationDate(date(DATE_ATOM))
+                ->setLastModifiedDate(date(DATE_ATOM))
                 ->setTypist($_SERVER['PHP_AUTH_USER'])
                 ->create();
         } else {
@@ -177,13 +183,19 @@ class CMIS
         if ($base64) {
             $document = new DocumentModel();
 
+            $properties = [];
             foreach ($queryParameters as $key => $queryParameter) {
-                $document->set($key, $queryParameter);
+                if($key != 'name'&& $key != 'objectTypeId') {
+                    $properties[$key]['value'] = $queryParameter;
+                }
             }
+            $document->setOtherProperties($properties);
+
 
             if ($parent != '/') {
                 $document->setFoldersSystemId($parent);
             }
+
 
             $extension = pathinfo($queryParameters['name'])['extension'];
             $f = finfo_open();
@@ -193,16 +205,25 @@ class CMIS
                 ->setFormat($extension)
                 ->setSubject($queryParameters['name'])
                 ->setFilename($queryParameters['name'])
+                ->setCreationDate(date(DATE_ATOM))
+                ->setModificationDate(date(DATE_ATOM))
                 ->setTypeId(101)
                 ->setTypist($_SERVER['PHP_AUTH_USER'])
                 ->setPath("/" . $queryParameters['name']);
 
 
+            // TODO Uncomment in production
             //if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
-            //move_uploaded_file($_SESSION['config']['tmppath'], $name);
+
             file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $queryParameters['name'], base64_decode($content));
 
             $document->create();
+
+
+            if (!empty($queryParameters['res_parent'])) {
+                $document->linked($queryParameters['res_parent']);
+            }
+
             // }
 
             http_response_code(201);

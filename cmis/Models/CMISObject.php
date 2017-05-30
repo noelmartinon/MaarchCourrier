@@ -464,7 +464,7 @@ class CMISObject extends \SplObjectStorage
                                 if ($folder->count() > 0) {
                                     foreach ($first_level as $second_level) {
                                         /** @var $second_level DocumentModel */
-                                        $CMISObject3 = new self($id, $second_level->getPath(), 'cmis:document', ''
+                                        $CMISObject3 = new self($second_level->getUniqid(), $second_level->getPath(), 'cmis:document', ''
                                             , $second_level->getTypist(), 'cmis:document', $second_level->getFolderUniqueId(), $second_level->getCreationDate(), null
                                             , $second_level->getFilename(), $second_level->getModificationDate(), $second_level->getTypist(), $second_level->getOtherProperties());
 
@@ -474,7 +474,7 @@ class CMISObject extends \SplObjectStorage
 
                             } else {
                                 /** @var $first_level DocumentModel */
-                                $CMISObject2 = new self($id, $first_level->getPath(), 'cmis:document', ''
+                                $CMISObject2 = new self($first_level->getUniqid(), $first_level->getPath(), 'cmis:document', ''
                                     , $first_level->getTypist(), 'cmis:document', $first_level->getFolderUniqueId(), null, null
                                     , $first_level->getFilename(), $first_level->getModificationDate(), $first_level->getTypist(), $first_level->getOtherProperties());
                             }
@@ -505,6 +505,13 @@ class CMISObject extends \SplObjectStorage
         if ($this->_otherProperties) {
 
             foreach ($this->_otherProperties as $key => $property) {
+
+                if($property['type'] == 'DateTime' && empty($property['value'])){
+                    $property['value'] = '0000-00-00T00:00:00+00:00';
+                } else if($property['type'] == 'DateTime' && !empty($property['value'])) {
+                    $property['value'] = Utils::formatDateAtom($property['value']);
+                }
+
                 array_push($array, [
                     'id' => 'cmis:' . $key,
                     'localName' => $key,
@@ -524,7 +531,7 @@ class CMISObject extends \SplObjectStorage
             'queryName' => 'cmis:res_parent',
             'type' => 'Id',
             'cardinality' => 'single',
-            'value' => ''
+            'value' => $property['value']
         ]);
 
         return $array;
