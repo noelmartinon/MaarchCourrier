@@ -91,6 +91,11 @@ class CMIS
 
         $objects = [];
         $request = str_ireplace(['cmis:folder', 'cmis:document'], ['folders', 'res_letterbox'], $queryParameters['statement']);
+
+        foreach (['WHERE', 'DELETE', 'DROP', 'INSERT', 'GROUP','HAVING','UNION', 'INTERSECT', 'MINUS', 'EXCEPT', 'ALTER', 'CREATE', 'INNER','JOIN'] as $value) {
+            $request = preg_replace('/'.$value.' (.*)/i', '', $request);
+        }
+
         $db = new \Database();
         $stmt = $db->query($request);
         $results = $stmt->fetchAll();
