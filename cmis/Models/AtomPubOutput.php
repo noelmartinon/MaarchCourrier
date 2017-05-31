@@ -345,6 +345,10 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_entry_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
             $atom_entry_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
 
+            if($children){
+                $atom_entry_node->appendChild($this->_xml->createElement("cmisra:numItems", sizeof($obj)));
+            }
+
             $atom_author = $this->_xml->createElement("atom:author");
             $atom_entry_node->appendChild($atom_author);
             $atom_author->appendChild($this->_xml->createElement("atom:name", 'System'));

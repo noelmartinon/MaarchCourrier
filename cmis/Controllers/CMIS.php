@@ -100,13 +100,14 @@ class CMIS
             foreach ($results as $result) {
                 array_push($objects, new CMISObject(Utils::createObjectId($result['res_id'], 'document'), $result['path'], 'cmis:document', $result['filename'],
                     $result['typist'], 'cmis:document', $result['folders_system_id'], $result['creation_date'],
-                    null, $result['filename'], $result['modification_date'], $result['typist']));
+                    null, $result['filename'], $result['modification_date'], $result['typist'], DocumentModel::getOtherPropertiesArray($stmt, $result)));
+
             }
         } else if (array_key_exists('folders_system_id', $results[0])) {
             foreach ($results as $result) {
                 array_push($objects, new CMISObject(Utils::createObjectId($result['folders_system_id'], 'folder'), $_path = '/', 'cmis:folder', $result['folder_name'],
                     $result['typist'], 'cmis:folder', $result['parent_id'], $result['creation_date'],
-                    null, $result['folder_name'], $result['last_modified_date'], $result['typist']));
+                    null, $result['folder_name'], $result['last_modified_date'], $result['typist'], FoldersModel::getOtherPropertiesArray($stmt, $result)));
             }
         }
 

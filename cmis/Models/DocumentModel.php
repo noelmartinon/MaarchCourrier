@@ -187,7 +187,7 @@ class DocumentModel extends DocumentModelAbstract
         return $lastval;
     }
 
-    private static function getOtherPropertiesArray($stmt, $value)
+    public static function getOtherPropertiesArray($stmt, $value)
     {
         $otherProperties = [];
         $size = sizeof($value);

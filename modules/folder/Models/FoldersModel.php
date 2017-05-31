@@ -268,7 +268,7 @@ class FoldersModel extends FoldersModelAbstract
         return $array;
     }
 
-    private static function getOtherPropertiesArray($stmt, $value)
+    public static function getOtherPropertiesArray($stmt, $value)
     {
         $otherProperties = [];
         $size = sizeof($value);
