@@ -25,8 +25,7 @@ class CMISObject extends \SplObjectStorage
         $_name,
         $_lastModificationDate,
         $_lastModifiedBy,
-        $_otherProperties,
-        $_conf;
+        $_otherProperties;
 
     /**
      * CMISObject constructor.
@@ -178,6 +177,8 @@ class CMISObject extends \SplObjectStorage
 
     public function toArray()
     {
+
+
         $array = array_merge($this->getOtherPropertiesFormatted(), (array)$this);
         return $array;
     }
@@ -503,24 +504,26 @@ class CMISObject extends \SplObjectStorage
         $array = [];
 
         if ($this->_otherProperties) {
-
             foreach ($this->_otherProperties as $key => $property) {
+                if (!empty($key)) {
 
-                if($property['type'] == 'DateTime' && empty($property['value'])){
-                    $property['value'] = '0000-00-00T00:00:00+00:00';
-                } else if($property['type'] == 'DateTime' && !empty($property['value'])) {
-                    $property['value'] = Utils::formatDateAtom($property['value']);
+                    if ($property['type'] == 'DateTime' && empty($property['value'])) {
+                        //$property['value'] = '0000-00-00T00:00:00+00:00';
+                        $property['value'] = date(DATE_ATOM, 0);
+                    } else if ($property['type'] == 'DateTime' && !empty($property['value'])) {
+                        $property['value'] = Utils::formatDateAtom($property['value']);
+                    }
+
+                    array_push($array, [
+                        'id' => 'cmis:' . $key,
+                        'localName' => $key,
+                        'displayName' => $key,
+                        'queryName' => 'cmis:' . $key,
+                        'type' => $property['type'],
+                        'cardinality' => 'single',
+                        'value' => $property['value']
+                    ]);
                 }
-
-                array_push($array, [
-                    'id' => 'cmis:' . $key,
-                    'localName' => $key,
-                    'displayName' => $key,
-                    'queryName' => 'cmis:' . $key,
-                    'type' => $property['type'],
-                    'cardinality' => 'single',
-                    'value' => $property['value']
-                ]);
             }
         }
 

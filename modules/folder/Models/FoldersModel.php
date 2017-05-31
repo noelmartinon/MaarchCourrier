@@ -46,8 +46,8 @@ class FoldersModel extends FoldersModelAbstract
                 }
             }
 
-            $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level ," . implode(',',$columns) . " )
-                      values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level," . implode(',',$flags) . ")";
+            $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level ," . implode(',', $columns) . " )
+                      values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level," . implode(',', $flags) . ")";
 
             $result = $db->query($statement, array_merge([
                 ":folder_id" => $this->getFolderName(),
@@ -274,21 +274,22 @@ class FoldersModel extends FoldersModelAbstract
         $size = sizeof($value);
         for ($i = 0; $i < $size; $i++) {
             $meta = $stmt->getColumnMeta($i);
+            if (!empty($meta['name'])) {
+                if ($meta['native_type'] == 'int2' || $meta['native_type'] == 'int4' || $meta['native_type'] == 'int8' || $meta['native_type'] == 'int16' || $meta['native_type'] == 'numeric') {
+                    $type = 'Id';
+                } else if ($meta['native_type'] == 'varchar' || $meta['native_type'] == 'bpchar' || $meta['native_type'] == 'text') {
+                    $type = 'String';
+                } else if ($meta['native_type'] == 'date' || $meta['native_type'] == 'timestamp') {
+                    $type = 'DateTime';
+                } else {
+                    $type = $meta['native_type'];
+                }
 
-            if ($meta['native_type'] == 'int2' || $meta['native_type'] == 'int4' || $meta['native_type'] == 'int8' || $meta['native_type'] == 'int16' || $meta['native_type'] == 'numeric') {
-                $type = 'Id';
-            } else if ($meta['native_type'] == 'varchar' || $meta['native_type'] == 'bpchar' || $meta['native_type'] == 'text') {
-                $type = 'String';
-            } else if ($meta['native_type'] == 'date' || $meta['native_type'] == 'timestamp') {
-                $type = 'DateTime';
-            } else {
-                $type = $meta['native_type'];
+                $otherProperties[$meta['name']] = [
+                    "type" => $type,
+                    "value" => $value[$meta['name']]
+                ];
             }
-
-            $otherProperties[$meta['name']] = [
-                "type" => $type,
-                "value" => $value[$meta['name']]
-            ];
         }
 
         return $otherProperties;

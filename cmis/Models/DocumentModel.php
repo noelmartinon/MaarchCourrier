@@ -155,8 +155,8 @@ class DocumentModel extends DocumentModelAbstract
             }
 
 
-            $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id, folders_system_id ," . implode(',',$columns) . " ) 
-                      values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN', :folders_system_id," . implode(',',$flags) . ")";
+            $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id, folders_system_id ," . implode(',', $columns) . " ) 
+                      values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN', :folders_system_id," . implode(',', $flags) . ")";
 
 
             $result = $db->query($statement, array_merge([
@@ -194,20 +194,22 @@ class DocumentModel extends DocumentModelAbstract
         for ($i = 0; $i < $size; $i++) {
             $meta = $stmt->getColumnMeta($i);
 
-            if ($meta['native_type'] == 'int2' || $meta['native_type'] == 'int4' || $meta['native_type'] == 'int8' || $meta['native_type'] == 'int16' || $meta['native_type'] == 'numeric') {
-                $type = 'Id';
-            } else if ($meta['native_type'] == 'varchar' || $meta['native_type'] == 'bpchar' || $meta['native_type'] == 'text') {
-                $type = 'String';
-            } else if ($meta['native_type'] == 'date' || $meta['native_type'] == 'timestamp') {
-                $type = 'DateTime';
-            } else {
-                $type = $meta['native_type'];
-            }
+            if (!empty($meta['name'])) {
+                if ($meta['native_type'] == 'int2' || $meta['native_type'] == 'int4' || $meta['native_type'] == 'int8' || $meta['native_type'] == 'int16' || $meta['native_type'] == 'numeric') {
+                    $type = 'Id';
+                } else if ($meta['native_type'] == 'varchar' || $meta['native_type'] == 'bpchar' || $meta['native_type'] == 'text') {
+                    $type = 'String';
+                } else if ($meta['native_type'] == 'date' || $meta['native_type'] == 'timestamp') {
+                    $type = 'DateTime';
+                } else {
+                    $type = $meta['native_type'];
+                }
 
-            $otherProperties[$meta['name']] = [
-                "type" => $type,
-                "value" => $value[$meta['name']]
-            ];
+                $otherProperties[$meta['name']] = [
+                    "type" => $type,
+                    "value" => $value[$meta['name']]
+                ];
+            }
         }
 
         return $otherProperties;

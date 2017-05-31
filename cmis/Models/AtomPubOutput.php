@@ -357,14 +357,14 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_link = $this->_xml->createElement("atom:link");
             $atom_link_node = $atom_entry->appendChild($atom_link);
             $atom_link_node->setAttribute("rel", "down");
-            $atom_link_node->setAttribute("href", str_replace('/id', '', $this->_webroot) . "?id=" . $child->getObjectId()['value']);
+            $atom_link_node->setAttribute("href", str_replace(['/id', 'children'], ['', 'descendants'], $this->_webroot) . "?id=" . $child->getObjectId()['value']);
             $atom_link_node->setAttribute("type", "application/cmistree+xml");
 
             $atom_link = $this->_xml->createElement("atom:link");
             $atom_link_node = $atom_entry->appendChild($atom_link);
             $atom_link_node->setAttribute("rel", "down");
-            $atom_link_node->setAttribute("href", str_replace(['/id','descendants'], ['', 'children'], $this->_webroot) . "?id=" . $child->getObjectId()['value']);
-            $atom_link_node->setAttribute("type", "application/cmistree+xml");
+            $atom_link_node->setAttribute("href", str_replace(['/id', 'descendants'], ['', 'children'], $this->_webroot) . "?id=" . $child->getObjectId()['value']);
+            $atom_link_node->setAttribute("type", "application/atom+xml;type=feed");
 
             $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
@@ -372,16 +372,18 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_properties_node = $atom_object_node->appendChild($this->_xml->createElement("cmis:properties"));
 
             foreach ($child->toArray() as $property) {
-                $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
-                $atom_property->setAttribute('propertyDefinitionId', $property['id']);
-                $atom_property->setAttribute('displayName', $property['displayName']);
-                $atom_property->setAttribute('localName', $property['localName']);
-                $atom_property->setAttribute('queryName', $property['queryName']);
-                $atom_property_node = $atom_properties_node->appendChild($atom_property);
-                $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
+                if (!empty($property['type'])) {
+                    $atom_property = $this->_xml->createElement('cmis:property' . ucfirst($property['type']));
+                    $atom_property->setAttribute('propertyDefinitionId', $property['id']);
+                    $atom_property->setAttribute('displayName', $property['displayName']);
+                    $atom_property->setAttribute('localName', $property['localName']);
+                    $atom_property->setAttribute('queryName', $property['queryName']);
+                    $atom_property_node = $atom_properties_node->appendChild($atom_property);
+                    $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
+                }
             }
 
-            if(!$children){
+            if (!$children) {
                 $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
 
                 foreach ($child as $value) {
