@@ -5,7 +5,7 @@ Gestionnaire Électronique de Correspondances – Libre et Open Source –
 
 Démonstration : http://demo.maarchcourrier.com/  
 Build : https://sourceforge.net/projects/maarch/files/Maarch%20Courrier/MaarchCourrier-17.06.tar.gz  
-VM : https://sourceforge.net/projects/maarch/files/Maarch%20Courrier/VMs/Maarch%20Courrier%2017.06%20Prod.ova
+VM : https://sourceforge.net/projects/maarch/files/Maarch%20Courrier/VMs/Maarch%20Courrier%2017.06%20Prod.ova  
 Documentation : http://wiki.maarch.org/Maarch_Courrier  
 
 
@@ -28,7 +28,7 @@ Documentation : http://wiki.maarch.org/Maarch_Courrier
 * [7-zip](http://www.7-zip.org/)
 * [wkhtmltopdf et wkhtmltoimage](http://wkhtmltopdf.org/downloads.html) 
 * [LibreOffice](http://libreoffice.org/) pour la conversion de documents
-* [Java Runtime Environment]() >= 7
+* Java Runtime Environment >= 7
 
 
 ###  Recommandations pour le php.ini
