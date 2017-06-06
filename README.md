@@ -33,10 +33,10 @@ Documentation : http://wiki.maarch.org/Maarch_Courrier
 
 ###  Recommandations pour le php.ini
 
-error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT
-display_errors (On)
-short_open_tags (On)
-magic_quotes_gpc (Off)
+error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT  
+display_errors (On)  
+short_open_tags (On)  
+magic_quotes_gpc (Off)  
 
 
 ## Le coin des developpeurs
