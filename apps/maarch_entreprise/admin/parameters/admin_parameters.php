@@ -42,7 +42,7 @@ $admin->manage_location_bar($page_path, $page_label, $page_id, $init, $level);
 /***********************************************************/
 
 ?>
-<table width="100%">
+<table width="100%" id="controlParamTechnicTable">
     <tr>
         <td align="left">
             <input class="button" type="button" value="<?php echo _CONTROL_PARAM_TECHNIC;

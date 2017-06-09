@@ -53,6 +53,7 @@ var ProfileComponent = (function () {
         $j('#divList').remove();
         $j('#magicContactsTable').remove();
         $j('#manageBasketsOrderTable').remove();
+        $j('#controlParamTechnicTable').remove();
         $j('#container').width("99%");
         if ($j('#content h1')[0] && $j('#content h1')[0] != $j('my-app h1')[0]) {
             $j('#content h1')[0].remove();
