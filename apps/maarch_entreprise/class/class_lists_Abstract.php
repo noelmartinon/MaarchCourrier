@@ -3332,11 +3332,26 @@ abstract class lists_Abstract extends Database
                         !empty($this->params['defaultAction']) && 
                         $lineIsDisabled === false
                     ) {
-                        $content .= '<td'.$columnStyle.' onmouseover="this.style.cursor=\'pointer\';" '
-                            .'onClick="validForm( \'page\', \''.$keyValue.'\', \''
-                            .$this->params['defaultAction'].'\');" width="'.$resultTheLine[$column]['size'].'%" '
-                            .$class.'><div align="'.$resultTheLine[$column]['align'].'">'
-                            .$columnValue.'</div></td>';
+                        $aService = Basket_Baskets_Service::getServiceFromActionId(['id' => $this->params['defaultAction']]);
+                        if ($aService['actionPage'] == 'visa_mail') {
+                            if (PROD_MODE) {
+                                $content .= '<td'.$columnStyle.' onmouseover="this.style.cursor=\'pointer\';" '
+                                    .'onClick="islockForSignatureBook(\'' .$keyValue. '\', \'' .$_SESSION['current_basket']['id']. '\', true);" width="'.$resultTheLine[$column]['size'].'%" '
+                                    .$class.'><div align="'.$resultTheLine[$column]['align'].'">'
+                                    .$columnValue.'</div></td>';
+                            } else {
+                                $content .= '<td'.$columnStyle.' onmouseover="this.style.cursor=\'pointer\';" '
+                                    .'onClick="islockForSignatureBook(\'' .$keyValue. '\', \'' .$_SESSION['current_basket']['id']. '\', false);" width="'.$resultTheLine[$column]['size'].'%" '
+                                    .$class.'><div align="'.$resultTheLine[$column]['align'].'">'
+                                    .$columnValue.'</div></td>';
+                            }
+                        } else {
+                            $content .= '<td'.$columnStyle.' onmouseover="this.style.cursor=\'pointer\';" '
+                                .'onClick="validForm( \'page\', \''.$keyValue.'\', \''
+                                .$this->params['defaultAction'].'\');" width="'.$resultTheLine[$column]['size'].'%" '
+                                .$class.'><div align="'.$resultTheLine[$column]['align'].'">'
+                                .$columnValue.'</div></td>';
+                        }
                     } else {
                         $content .= '<td'.$columnStyle.' width="'.$resultTheLine[$column]['size'].'%" '
                             .$class.'><div align="'.$resultTheLine[$column]['align'].'">'
