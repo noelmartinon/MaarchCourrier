@@ -130,7 +130,6 @@ var SignatureBookComponent = (function () {
                 _this.loading = false;
                 setTimeout(function () {
                     $j("#rightPanelContent").niceScroll({ touchbehavior: false, cursorcolor: "#666", cursoropacitymax: 0.6, cursorwidth: 4 });
-                    $j(".pjSign").niceScroll({ touchbehavior: false, cursorcolor: "#666", cursoropacitymax: 0.6, cursorwidth: 4 });
                     if ($j(".tooltipstered").length == 0) {
                         $j("#obsVersion").tooltipster({
                             interactive: true
