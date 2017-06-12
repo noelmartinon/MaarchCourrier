@@ -241,7 +241,7 @@ class UserModelAbstract extends \Apps_Table_Service
             $extension = $extension[count($extension) - 1];
             $fileNameOnTmp = 'tmp_file_' . $_SESSION['user']['UserId'] . '_' . rand() . '.' . strtolower($extension);
             $filePathOnTmp = $_SESSION['config']['tmppath'] . $fileNameOnTmp; // TODO No Session
-            if (copy($pathToSignature, $filePathOnTmp)) {
+            if (file_exists($pathToSignature) && copy($pathToSignature, $filePathOnTmp)) {
                 $aReturn[$key]['pathToSignatureOnTmp'] = $_SESSION['config']['businessappurl'] . '/tmp/' . $fileNameOnTmp; // TODO No Session
             } else {
                 $aReturn[$key]['pathToSignatureOnTmp'] = '';

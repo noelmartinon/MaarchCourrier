@@ -87,7 +87,6 @@ class VisaController
 
     public function unsignFile(RequestInterface $request, ResponseInterface $response, $aArgs)
     {
-
         $resId = $aArgs['resId'];
         $collId = $aArgs['collId'];
 
