@@ -140,7 +140,6 @@ export class SignatureBookComponent implements OnInit {
 
                     setTimeout(() => {
                         $j("#rightPanelContent").niceScroll({touchbehavior:false, cursorcolor:"#666", cursoropacitymax:0.6, cursorwidth:4});
-                        $j(".pjSign").niceScroll({touchbehavior:false, cursorcolor:"#666", cursoropacitymax:0.6, cursorwidth:4});
                         if ($j(".tooltipstered").length == 0) {
                             $j("#obsVersion").tooltipster({
                                 interactive: true
