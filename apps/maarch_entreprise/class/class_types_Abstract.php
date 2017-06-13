@@ -512,9 +512,9 @@ abstract class types_Abstract extends database
                     $db->query(
                         "INSERT INTO " . DOCTYPES_TABLE . " (coll_id, "
                         ." description, doctypes_first_level_id, "
-                        . "doctypes_second_level_id, retention_final_disposition, retention_rule, duration_current_use, enabled ) VALUES (?, ?, ?, ?,?,?,? 'Y' )",
+                        . "doctypes_second_level_id, retention_final_disposition, retention_rule, duration_current_use, enabled ) VALUES (?, ?, ?, ?, ?, ?, ?, 'Y' )",
                         array($_SESSION['m_admin']['doctypes']['COLL_ID'], $tmp, $_SESSION['m_admin']['doctypes']['STRUCTURE'], $_SESSION['m_admin']['doctypes']['SUB_FOLDER'],
-                            $_SESSION['m_admin']['doctypes']['RETENTION_FINAL_DISPOSITION'], $_SESSION['m_admin']['doctypes']['RETENTION_RULE'], $_SESSION['m_admin']['doctypes']['DURATION_CURRENT_USE'])
+                            $_SESSION['m_admin']['doctypes']['RETENTION_FINAL_DISPOSITION'], $_SESSION['m_admin']['doctypes']['RETENTION_RULE'], (int)$_SESSION['m_admin']['doctypes']['DURATION_CURRENT_USE'])
                     );
                     //$this->show();
                     $stmt = $db->query(
