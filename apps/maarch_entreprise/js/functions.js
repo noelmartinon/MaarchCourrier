@@ -3094,7 +3094,7 @@ function linkDuplicate(id_form) {
             }
         });
     }
-    alert('Opération terminé!');
+    alert('Opération terminée!');
 }
 
 function loadTab(resId,collId,titleTab,pathScriptTab,module){
