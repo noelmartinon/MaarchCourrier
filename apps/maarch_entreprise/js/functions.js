@@ -3057,7 +3057,6 @@ function linkDuplicate(id_form) {
         if(document.forms[id_form][i].type == 'radio' && document.forms[id_form][i].checked == true){
             master = document.forms[id_form][i].value;
             master_address = document.getElementById('master_address_fusion_id_'+document.forms[id_form][i].value).value
-            //console.log(document.forms[id_form][i].value);
         }
     }
     var index = slave.indexOf(master);
