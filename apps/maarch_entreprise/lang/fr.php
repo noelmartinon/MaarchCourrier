@@ -1007,7 +1007,7 @@ if (!defined("_ID_CONTACT_TYPE_PB")) define("_ID_CONTACT_TYPE_PB","Il y a un pro
 if (!defined("_THE_CONTACT_TYPE")) define("_THE_CONTACT_TYPE","Le type de contact");
 if (!defined("_CONTACT_TYPE_DEL")) define("_CONTACT_TYPE_DEL","Suppression du type de contact");
 if (!defined("_DELETED_CONTACT_TYPE")) define("_DELETED_CONTACT_TYPE","Type de contact supprimé");
-if (!defined("_WARNING_MESSAGE_DEL_CONTACT_TYPE")) define("_WARNING_MESSAGE_DEL_CONTACT_TYPE","Avertissement :<br> La suppression d'un type de contact entraine la réaffectation des contacts à un nouveau type de contact.");
+if (!defined("_WARNING_MESSAGE_DEL_CONTACT_TYPE")) define("_WARNING_MESSAGE_DEL_CONTACT_TYPE","Avertissement : La suppression d'un type de contact entraine la réaffectation des contacts à un nouveau type de contact.");
 if (!defined("_CONTACT_TYPE_REAFFECT")) define("_CONTACT_TYPE_REAFFECT","Réaffectation des contacts");
 if (!defined("_ALL")) define("_ALL","Tous");
 if (!defined("_CONTACT_ALREADY_CREATED")) define("_CONTACT_ALREADY_CREATED","Contacts déjà existants");
@@ -1029,7 +1029,7 @@ if (!defined("_THE_CONTACT_PURPOSE")) define("_THE_CONTACT_PURPOSE","La dénomin
 if (!defined("_CONTACT_PURPOSE_DEL")) define("_CONTACT_PURPOSE_DEL","Suppression d'une dénomination");
 if (!defined("_DELETED_CONTACT_PURPOSE")) define("_DELETED_CONTACT_PURPOSE","Dénomination supprimée");
 if (!defined("_CONTACT_PURPOSE_REAFFECT")) define("_CONTACT_PURPOSE_REAFFECT","Réaffectation des adresses");
-if (!defined("_WARNING_MESSAGE_DEL_CONTACT_PURPOSE")) define("_WARNING_MESSAGE_DEL_CONTACT_PURPOSE","Avertissement :<br> La suppression d'une dénomination entraine la réaffectation des adresses à une nouvelle dénomination.");
+if (!defined("_WARNING_MESSAGE_DEL_CONTACT_PURPOSE")) define("_WARNING_MESSAGE_DEL_CONTACT_PURPOSE","Avertissement : La suppression d'une dénomination entraine la réaffectation des adresses à une nouvelle dénomination.");
 if (!defined("_CONTACT_PURPOSE_WILL_BE_CREATED")) define("_CONTACT_PURPOSE_WILL_BE_CREATED","Cette dénomination n'existe pas. Elle sera créée automatiquement.");
 
 if (!defined("_SEARCH_CONTACTS")) define("_SEARCH_CONTACTS","Rechercher un contact");
