@@ -10,6 +10,7 @@ namespace Folder\Models;
 
 use CMIS\Models\CMISObject;
 use CMIS\Utils\Utils;
+use CMIS\Utils\Database;
 
 class FoldersModel extends FoldersModelAbstract
 {
@@ -17,16 +18,15 @@ class FoldersModel extends FoldersModelAbstract
     public function create()
     {
         $foldertype_id = 5;
-        $db = new \Database();
 
-        $creation_date = $db->current_datetime();
+        $creation_date = Database::getInstance()->current_datetime();
 
 
         if (empty($this->getOtherProperties())) {
             $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level )
                       values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level)";
 
-            $result = $db->query($statement, [
+            $result = Database::getInstance()->query($statement, [
                 ":folder_id" => $this->getFolderName(),
                 ":foldertype_id" => $foldertype_id,
                 ":folder_name" => $this->getFolderName(),
@@ -49,7 +49,7 @@ class FoldersModel extends FoldersModelAbstract
             $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level ," . implode(',', $columns) . " )
                       values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level," . implode(',', $flags) . ")";
 
-            $result = $db->query($statement, array_merge([
+            $result = Database::getInstance()->query($statement, array_merge([
                 ":folder_id" => $this->getFolderName(),
                 ":foldertype_id" => $foldertype_id,
                 ":folder_name" => $this->getFolderName(),
@@ -65,7 +65,7 @@ class FoldersModel extends FoldersModelAbstract
             echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
         }
 
-        $lastval = $db->query('SELECT lastval();')->fetch()[0];
+        $lastval = Database::getInstance()->lastInsertId('folders_system_id_seq');
 
         $this->setFoldersSystemId($lastval);
 
@@ -87,8 +87,7 @@ class FoldersModel extends FoldersModelAbstract
 
         if (!empty($id)) {
 
-            $database = new \Database();
-            $stmt = $database->query('
+            $stmt = Database::getInstance()->query('
             SELECT *
             FROM folders 
             WHERE folders_system_id = :id 
@@ -97,7 +96,7 @@ class FoldersModel extends FoldersModelAbstract
 
             $value = $stmt->fetch();
 
-            $otherProperties = self::getOtherPropertiesArray($stmt, $value);
+            $otherProperties = Database::getOtherPropertiesArray($value);
             $folder
                 ->setFoldersSystemId($value['folders_system_id'])
                 ->setFolderId($value['folder_id'])
@@ -131,8 +130,7 @@ class FoldersModel extends FoldersModelAbstract
             $path = substr($path, 1);
         }
 
-        $database = new \Database();
-        $stmt = $database->query('
+        $stmt = Database::getInstance()->query('
             SELECT *
             FROM folders 
             WHERE folder_name = :path 
@@ -140,7 +138,7 @@ class FoldersModel extends FoldersModelAbstract
 
         $value = $stmt->fetch();
 
-        $otherProperties = self::getOtherPropertiesArray($stmt, $value);
+        $otherProperties = self::getOtherPropertiesArray($value);
         $folder = new self();
 
         $folder
@@ -169,18 +167,17 @@ class FoldersModel extends FoldersModelAbstract
      */
     public static function getFolderTree($id = null)
     {
-        $database = new \Database();
         $array = [];
 
         if ($id) {
-            $stmt = $database->query('
+            $stmt = Database::getInstance()->query('
             SELECT *
             FROM folders 
             WHERE folders_system_id = :id 
             OR parent_id = :id 
             ORDER BY folder_level', [':id' => $id]);
         } else {
-            $stmt = $database->query('
+            $stmt = Database::getInstance()->query('
             SELECT * 
             FROM folders 
             ORDER BY folder_level');
@@ -189,10 +186,12 @@ class FoldersModel extends FoldersModelAbstract
 
         $result = $stmt->fetchAll();
 
+
         foreach ($result as $value) {
             $folder = new self();
 
-            $otherProperties = self::getOtherPropertiesArray($stmt, $value);
+            $otherProperties = Database::getOtherPropertiesArray($value);
+
             $folder
                 ->setFoldersSystemId($value['folders_system_id'])
                 ->setFolderId($value['folder_id'])
@@ -228,11 +227,10 @@ class FoldersModel extends FoldersModelAbstract
      */
     public static function getFolderTreeAsCMISObject($id = null)
     {
-        $database = new \Database();
         $array = [];
 
         if ($id) {
-            $stmt = $database->query('
+            $stmt = Database::getInstance()->query('
             SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
             author,typist,status,folder_level,creation_date,destination, last_modified_date 
             FROM folders 
@@ -240,7 +238,7 @@ class FoldersModel extends FoldersModelAbstract
             OR parent_id = :id 
             ORDER BY folder_level', [':id' => $id]);
         } else {
-            $stmt = $database->query('
+            $stmt = Database::getInstance()->query('
             SELECT folders_system_id,folder_id,foldertype_id,parent_id,folder_name,subject,description,
             author,typist,status,folder_level,creation_date,destination, last_modified_date 
             FROM folders 
@@ -268,7 +266,8 @@ class FoldersModel extends FoldersModelAbstract
         return $array;
     }
 
-    public static function getOtherPropertiesArray($stmt, $value)
+    // CANNOT WORKS WITH ORACLE
+    /*public static function getOtherPropertiesArray($stmt, $value)
     {
         $otherProperties = [];
         $size = sizeof($value);
@@ -293,5 +292,5 @@ class FoldersModel extends FoldersModelAbstract
         }
 
         return $otherProperties;
-    }
+    }*/
 }

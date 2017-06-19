@@ -92,12 +92,12 @@ class CMIS
         $objects = [];
         $request = str_ireplace(['cmis:folder', 'cmis:document'], ['folders', 'res_letterbox'], $queryParameters['statement']);
 
-        foreach (['WHERE', 'DELETE', 'DROP', 'INSERT', 'GROUP','HAVING','UNION', 'INTERSECT', 'MINUS', 'EXCEPT', 'ALTER', 'CREATE', 'INNER','JOIN'] as $value) {
-            $request = preg_replace('/'.$value.' (.*)/i', '', $request);
+        foreach (['WHERE', 'DELETE', 'DROP', 'INSERT', 'GROUP', 'HAVING', 'UNION', 'INTERSECT', 'MINUS', 'EXCEPT', 'ALTER', 'CREATE', 'INNER', 'JOIN'] as $value) {
+            $request = preg_replace('/' . $value . ' (.*)/i', '', $request);
         }
 
-        $db = new \Database();
-        $stmt = $db->query($request);
+        $stmt = Database::getInstance()->query($request);
+
         $results = $stmt->fetchAll();
 
 
@@ -219,18 +219,18 @@ class CMIS
 
 
             // TODO Uncomment in production
-            //if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
+            if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
 
-            file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $queryParameters['name'], base64_decode($content));
+                file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $queryParameters['name'], base64_decode($content));
 
-            $document->create();
+                $document->create();
 
 
-            if (!empty($queryParameters['res_parent'])) {
-                $document->linked($queryParameters['res_parent']);
+                if (!empty($queryParameters['res_parent'])) {
+                    $document->linked($queryParameters['res_parent']);
+                }
+
             }
-
-            // }
 
             http_response_code(201);
 

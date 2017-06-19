@@ -13,56 +13,63 @@ class FrontController
 {
     public static function initSession()
     {
-        if (empty($_SESSION['user'])) {
-            $portal = new \portal();
-            $portal->unset_session();
-            $portal->build_config();
-            $coreTools = new \core_tools();
-            $_SESSION['custom_override_id'] = $coreTools->get_custom_id();
-            if (isset($_SESSION['custom_override_id'])
-                && !empty($_SESSION['custom_override_id'])
-                && isset($_SESSION['config']['corepath'])
-                && !empty($_SESSION['config']['corepath'])
-            ) {
-                $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-                    . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR;
-                set_include_path(
-                    $path . PATH_SEPARATOR . $_SESSION['config']['corepath']
-                    . PATH_SEPARATOR . get_include_path()
-                );
-            } else if (isset($_SESSION['config']['corepath'])
-                && !empty($_SESSION['config']['corepath'])
-            ) {
-                set_include_path(
-                    $_SESSION['config']['corepath'] . PATH_SEPARATOR . get_include_path()
-                );
+        $custom = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'custom.xml';
+        $general = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . 'maarch_entreprise' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
+
+        $dom = new \DOMDocument();
+        if (file_exists($custom)) {
+            $dom = new \DOMDocument();
+            $dom->loadXML(file_get_contents($custom));
+
+            $customName = '';
+
+
+            $scriptPath = explode('/', $_SERVER['SCRIPT_NAME']);
+
+            $customs = $dom->getElementsByTagName('custom');
+            foreach ($customs as $custom) {
+                if ($custom->getElementsByTagName('path')->length != 0) {
+                    if ($scriptPath[(sizeof($scriptPath) - 3)] == $dom->getElementsByTagName('path')->item(0)->nodeValue) {
+                        $customName = $custom->getElementsByTagName('custom_id')->item(0)->nodeValue;
+                        break;
+                    }
+                } else {
+                    $customName = $custom->getElementsByTagName('custom_id')->item(0)->nodeValue;
+                }
             }
-            // Load configuration from xml into session
-            \Core_CoreConfig_Service::buildCoreConfig('core' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml');
-            $_SESSION['config']['app_id'] = $_SESSION['businessapps'][0]['appid'];
-            require_once 'apps/' . $_SESSION['businessapps'][0]['appid'] . '/class/class_business_app_tools.php';
 
-            \Core_CoreConfig_Service::buildBusinessAppConfig();
+            $dom->loadXML(file_get_contents(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . $customName . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . 'maarch_entreprise' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml'));
 
-            // Load Modules configuration from xml into session
-            \Core_CoreConfig_Service::loadModulesConfig($_SESSION['modules']);
-            \Core_CoreConfig_Service::loadAppServices();
-            \Core_CoreConfig_Service::loadModulesServices($_SESSION['modules']);
+        } else {
+
+            $dom->loadXML(file_get_contents($general));
         }
+
+        $_SESSION['cmis_databaseserver'] = $dom->getElementsByTagName('databaseserver')->item(0)->nodeValue;
+        $_SESSION['cmis_databaseserverport'] = $dom->getElementsByTagName('databaseserverport')->item(0)->nodeValue;
+        $_SESSION['cmis_databasetype'] = $dom->getElementsByTagName('databasetype')->item(0)->nodeValue;
+        $_SESSION['cmis_databasename'] = $dom->getElementsByTagName('databasename')->item(0)->nodeValue;
+        $_SESSION['cmis_databaseuser'] = $dom->getElementsByTagName('databaseuser')->item(0)->nodeValue;
+        $_SESSION['cmis_databasepassword'] = $dom->getElementsByTagName('databasepassword')->item(0)->nodeValue;
+        $_SESSION['cmis_databasesearchlimit'] = $dom->getElementsByTagName('databasesearchlimit')->item(0)->nodeValue;
+
     }
 
     public static function login()
     {
-        if (empty($_SESSION['user'])) {
-            $loginObj = new \login();
-            $loginMethods = $loginObj->build_login_method();
-            $oSessionService = new \Core_Session_Service();
-            $loginObj->execute_login_script($loginMethods, true);
+        if (!empty($_SESSION['cmis_username'])) {
+            $valid = true;
+        } else if (empty($_SESSION['cmis_username'])) {
+            $valid = Utils::userExists($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+            $_SESSION['cmis_username'] = $_SERVER['PHP_AUTH_USER'];
+        } else {
+            $valid = false;
         }
 
-        if ($_SESSION['error']) {
-            http_response_code(401);
-            echo $_SESSION['error'];
+        if (!$valid) {
+            header('WWW-Authenticate: Basic realm="My Realm"');
+            header('HTTP/1.0 401 Unauthorized');
+            echo "Access denied";
             exit();
         }
     }
@@ -159,11 +166,10 @@ class FrontController
     public static function path($output)
     {
         $cmis = new CMIS(Utils::outputFactory($output));
-        $path = (!empty($_GET['path']))?$_GET['path']:"/";
+        $path = (!empty($_GET['path'])) ? $_GET['path'] : "/";
 
         $cmis->path($_GET['objectId'], $path)->render();
     }
-
 
 
     public static function type($output)

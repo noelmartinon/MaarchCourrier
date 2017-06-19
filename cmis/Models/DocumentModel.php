@@ -8,8 +8,8 @@
 namespace CMIS\Models;
 
 
+use CMIS\Utils\Database;
 use CMIS\Utils\Utils;
-use function FastRoute\TestFixtures\empty_options_cached;
 use Folder\Models\FoldersModel;
 
 class DocumentModel extends DocumentModelAbstract
@@ -21,13 +21,13 @@ class DocumentModel extends DocumentModelAbstract
     public static function getList()
     {
         $array = [];
-        $database = new \Database();
-        $stmt = $database->query('SELECT * FROM res_letterbox');
+
+        $stmt = Database::getInstance()->query('SELECT * FROM res_letterbox');
 
         $result = $stmt->fetchAll();
 
         foreach ($result as $value) {
-            $otherProperties = self::getOtherPropertiesArray($stmt, $value);
+            $otherProperties = Database::getOtherPropertiesArray($value);
 
             $document = new self();
             $document
@@ -55,14 +55,13 @@ class DocumentModel extends DocumentModelAbstract
 
     public static function getById($id)
     {
-        $database = new \Database();
-        $stmt = $database->query('
+        $stmt = Database::getInstance()->query('
             SELECT * 
             FROM res_letterbox 
             WHERE res_id = :id', [':id' => $id]);
 
         $value = $stmt->fetch();
-        $otherProperties = self::getOtherPropertiesArray($stmt, $value);
+        $otherProperties = Database::getOtherPropertiesArray($value);
         $document = new self();
         $document
             ->setResId($value['res_id'])
@@ -121,13 +120,11 @@ class DocumentModel extends DocumentModelAbstract
     public function create()
     {
 
-        $db = new \Database();
-
         if (empty($this->getOtherProperties())) {
             $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id, folders_system_id) 
                       values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN', :folders_system_id)";
 
-            $result = $db->query($statement, [
+            $result = Database::getInstance()->query($statement, [
                 ":subject" => $this->getSubject(),
                 ":format" => $this->getFormat(),
                 ":path" => $this->getPath(),
@@ -159,7 +156,7 @@ class DocumentModel extends DocumentModelAbstract
                       values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN', :folders_system_id," . implode(',', $flags) . ")";
 
 
-            $result = $db->query($statement, array_merge([
+            $result = Database::getInstance()->query($statement, array_merge([
                 ":subject" => $this->getSubject(),
                 ":format" => $this->getFormat(),
                 ":path" => $this->getPath(),
@@ -180,15 +177,16 @@ class DocumentModel extends DocumentModelAbstract
             echo "<br />ERREUR : création du fichier non réalisée storageException.<br />";
         }
 
-        $lastval = $db->query('SELECT lastval();')->fetch()[0];
+        $lastval = Database::getInstance()->lastInsertId('res_id_mlb_seq');
 
         $this->setResId($lastval);
 
         return $lastval;
     }
 
-    public static function getOtherPropertiesArray($stmt, $value)
+    /*public static function getOtherPropertiesArray($stmt, $value)
     {
+
         $otherProperties = [];
         $size = sizeof($value);
         for ($i = 0; $i < $size; $i++) {
@@ -213,12 +211,11 @@ class DocumentModel extends DocumentModelAbstract
         }
 
         return $otherProperties;
-    }
+    }*/
 
     public function linked($parent)
     {
-        $db = new \Database();
-        $db->query("INSERT INTO res_linked (res_parent, res_child, coll_id) VALUES (:parent, :child, 'letterbox_coll');", [
+        Database::getInstance()->query("INSERT INTO res_linked (res_parent, res_child, coll_id) VALUES (:parent, :child, 'letterbox_coll');", [
             ":parent" => Utils::readObjectId($parent, 'document'),
             ":child" => $this->getResId()
         ]);
