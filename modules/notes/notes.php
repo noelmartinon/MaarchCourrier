@@ -100,7 +100,7 @@ if (isset($_REQUEST['load'])) {
         
     //Fields
     array_push($select[NOTES_TABLE], "id", "identifier", "date_note", "user_id", "note_text", "note_text as note_short", "coll_id");    //Notes
-    array_push($select[USERS_TABLE], "user_id", "lastname || ' ' || firstname as user", "lastname as visibleBy");           //Users
+    array_push($select[USERS_TABLE], "user_id", "lastname || ' ' || firstname as userConcat", "lastname as visibleBy");           //Users
         
     //Where clause
     $where_tab = array();
@@ -210,8 +210,8 @@ if (isset($_REQUEST['load'])) {
                     $tabNotes[$indNotes1][$indNotes2]["show"] = true;
                     $tabNotes[$indNotes1][$indNotes2]["order"] = "date_note";
                 }
-                if ($tabNotes[$indNotes1][$indNotes2][$value] == "user") {
-                    $tabNotes[$indNotes1][$indNotes2]["user"] = $tabNotes[$indNotes1][$indNotes2]['value'];
+                if ($tabNotes[$indNotes1][$indNotes2][$value] == "userConcat") {
+                    $tabNotes[$indNotes1][$indNotes2]["userConcat"] = $tabNotes[$indNotes1][$indNotes2]['value'];
                     $tabNotes[$indNotes1][$indNotes2]["label"] = _USER;
                     $tabNotes[$indNotes1][$indNotes2]["size"] = 10;
                     $tabNotes[$indNotes1][$indNotes2]["label_align"] = "left";
