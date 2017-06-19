@@ -1,5 +1,15 @@
 <?php
 
+/**
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
+
+* @brief   get_entity_vol
+* @author  dev <dev@maarch.org>
+* @ingroup entities
+*/
+
 require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_request.php");
 require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_security.php");
 require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_manage_status.php");
@@ -218,7 +228,7 @@ elseif($report_type == 'array')
 }
 //Utilisation de la clause de sécurité de Maarch
 
-$where_clause = $sec->get_where_clause_from_coll_id('letterbox_coll');
+$where_clause = $sec->get_where_clause_from_coll_id_and_basket('letterbox_coll');
 if ($where_clause)
 	$where_clause = " and ".$where_clause;
 

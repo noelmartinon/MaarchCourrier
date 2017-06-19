@@ -20,7 +20,6 @@ require_once('modules'.DIRECTORY_SEPARATOR.'entities'.DIRECTORY_SEPARATOR.'class
 
 $_ENV['date_pattern'] = "/^[0-3][0-9]-[0-1][0-9]-[1-2][0-9][0-9][0-9]$/";
 
-
 $graph = new graphics();
 $req   = new request();
 $db    = new Database();
@@ -33,7 +32,8 @@ if($_REQUEST['sub_entities'] == 'true'){
         $sub_entities[] = users_entities_Abstract::getEntityChildren($value);
     }
     $sub_entities1 = "'";
-    for( $i=0; $i< count($sub_entities ); $i++){
+    $subEntitiesCount = count($sub_entities);
+    for( $i=0; $i< $subEntitiesCount; $i++){
         $sub_entities1 .= implode("','",$sub_entities[$i]);
         $sub_entities1 .= "','";
     }
@@ -42,7 +42,7 @@ if($_REQUEST['sub_entities'] == 'true'){
 $entities_chosen = "'" . join("','", $entities_chosen) . "'";
 
 $status_chosen = '';
-$where_status = '';
+$where_status  = '';
 if (!empty($_POST['status_chosen'])) {
     $status_chosen = explode("#", $_POST['status_chosen']);
     $status_chosen = "'" . join("','", $status_chosen) . "'";
@@ -50,7 +50,7 @@ if (!empty($_POST['status_chosen'])) {
 }
 
 $priority_chosen = '';
-$where_priority = '';
+$where_priority  = '';
 if (!empty($_POST['priority_chosen'])  || $_POST['priority_chosen'] === "0") {
     $priority_chosen = explode("#", $_POST['priority_chosen']);
     $priority_chosen = "'" . join("','", $priority_chosen) . "'";
@@ -68,13 +68,12 @@ $report_type   = $_REQUEST['report_type'];
 $core_tools    = new core_tools();
 $core_tools->load_lang();
 
-
 //Limitation aux documents pouvant être recherchés
 $str_status = '(';
 for ($i=0;$i<count($search_status);$i++) {
-
     $str_status .= "'".$search_status[$i]['ID']."',";
 }
+
 $str_status = preg_replace('/,$/', ')', $str_status);
 
 //Récupération de l'ensemble des types de documents
@@ -85,7 +84,6 @@ if (!$_REQUEST['entities_chosen']) {
 } else {
     $stmt = $db->query("select entity_id, short_label from ".ENT_ENTITIES." where enabled = 'Y' and entity_id IN (".$entities_chosen.") order by short_label",array());
 }
-
 
 $entities = array();
 while ($res = $stmt->fetchObject()) {
@@ -171,7 +169,6 @@ if ($period_type == 'period_year') {
         exit();
     }
 
-
     if (preg_match($_ENV['date_pattern'],$_REQUEST['date_start'])==false  && $_REQUEST['date_start'] <> ''  ) {
         
         echo '<div class="error">'._WRONG_DATE_FORMAT.' : '.$_REQUEST['date_start'].'</div>';
@@ -207,9 +204,7 @@ if ($period_type == 'period_year') {
 }
 
 $has_data = false;
-//$title = _MAIL_VOL_BY_ENT_REPORT.' '.$date_title ;
 $db = new Database();
-
 
 if ($report_type == 'graph') {
     $vol_an = array();
@@ -221,18 +216,18 @@ if ($report_type == 'graph') {
 }
 //Utilisation de la clause de sécurité de Maarch
 
-$where_clause = $sec->get_where_clause_from_coll_id('letterbox_coll');
-//var_dump($where_clause);
+$where_clause = $sec->get_where_clause_from_coll_id_and_basket('letterbox_coll');
+
 if ($where_clause) {
     $where_clause = " and ".$where_clause;
 }
 
-$totalCourrier=array();
+$totalCourrier = array();
 $totalEntities = count($entities);
 
 for ($i=0; $i<$totalEntities;$i++) {
     $stmt = $db->query("select count(*) as total from ".$view." where destination = ? and ".$view.".status not in ('DEL','BAD') ".$where_date." ".$where_status." ".$where_priority . $where_clause." ", array($entities[$i]['ID']));
-    //$db->show();
+
     $res = $stmt->fetchObject();
         
     if ($report_type == 'graph') {
@@ -246,8 +241,7 @@ for ($i=0; $i<$totalEntities;$i++) {
 
     if ($res->total<>0) {
         $has_data = true;
-    }
-        
+    }    
 }
 
 if ($report_type == 'array') {
@@ -265,7 +259,6 @@ if ($report_type == 'graph') {
     $src1 = $_SESSION['config']['businessappurl']."index.php?display=true&module=reports&page=graphs&type=histo&largeur=$largeur&hauteur=600&marge_bas=300&title=".$title;
     $_SESSION['GRAPH']['VALUES']='';
     for ($i=0;$i<count($vol_an);$i++) {
-        //$src1 .= "&values[]=".$vol_an[$i];
         $_SESSION['GRAPH']['VALUES'][$i]=$vol_an[$i];
     }
 
@@ -273,12 +266,10 @@ if ($report_type == 'graph') {
     array_unshift($data, array('LABEL' => _ENTITY, 'VALUE' => _NB_MAILS1));
 }
 
-
 if ($has_data) {
     if ($report_type == 'graph') {
 
         $labels1 = "'".implode("','", $_SESSION['labels1'])."'";
-        //var_dump($labels1);
 
         echo "{label: [".utf8_encode($labels1)."] ".
             ", data: ['".utf8_encode(str_replace(",", "','", addslashes(implode(",", $_SESSION['GRAPH']['VALUES']))))."']".
@@ -288,7 +279,7 @@ if ($has_data) {
     } elseif ($report_type == 'array') {
 
         $_SESSION['export_data_stat'] = $data;
-        $form =	"<input type='button' class='button' value='Exporter les données' onclick='record_data(\"" . $_SESSION['config']['businessappurl']."index.php?display=true&dir=reports&page=record_data \")' style='float:right;'/>";
+        $form = "<input type='button' class='button' value='Exporter les données' onclick='record_data(\"" . $_SESSION['config']['businessappurl']."index.php?display=true&dir=reports&page=record_data \")' style='float:right;'/>";
         echo $form;
         
         

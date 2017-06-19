@@ -917,6 +917,43 @@ class security extends Database
     }
 
     /**
+    * Returns where clause of the collection for the current user from the collection identifier and basket where clause
+    *
+    * @param  $coll_id string Collection identifier
+    * @return string Collection where clause
+    */
+    public function get_where_clause_from_coll_id_and_basket($coll_id)
+    {
+        $collectionWhereClause = $this->get_where_clause_from_coll_id($coll_id);
+
+        if(empty($collectionWhereClause)){
+            $collectionWhereClause = '1=0';
+        }
+
+        $userBaskets = count($_SESSION['user']['baskets']);
+
+        for($ind_bask = 0; $ind_bask < $userBaskets; $ind_bask++) {
+            if ($_SESSION['user']['baskets'][$ind_bask]['coll_id'] == $coll_id 
+                && $_SESSION['user']['baskets'][$ind_bask]['is_folder_basket'] == 'N' 
+                && isset($_SESSION['user']['baskets'][$ind_bask]['clause']) 
+                && trim($_SESSION['user']['baskets'][$ind_bask]['clause']) <> '') {
+                    $basketWhereClause .= ' or ('.$_SESSION['user']['baskets'][$ind_bask]['clause'].')';
+            }
+        }
+
+        if(empty($basketWhereClause)){
+            $basketWhereClause = '1=0';
+        } else {
+            $basketWhereClause = preg_replace('/^ or/', '', $basketWhereClause);
+        }
+
+        $whereRequest = '('.$collectionWhereClause.' or '. $basketWhereClause .')';
+        
+        return $whereRequest;
+
+    }
+
+    /**
     * Returns where clause of the collection for the current user from the collection view
     *
     * @param  $view string View
