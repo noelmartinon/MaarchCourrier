@@ -1046,6 +1046,14 @@ function validate_user_submit()
                     );
 
     if (isset($_SESSION['m_admin']['users']['groups'])) {
+            $query       = $db->limit_select(0, 1, 'id', 'user_signatures', 'user_id = ? order by id desc ');
+            $stmt        = $db->query($query, array($user->{'user_id'}));
+            $id_user_signature = $stmt->fetchObject();
+            if ($id_user_signature && isset($user->{'signature_path'})) {
+                $db->query('UPDATE user_signatures SET signature_label = ?, signature_path = ?, signature_file_name = ? WHERE user_id = ? and id = ?', ['', $user->{'signature_path'}, $user->{'signature_file_name'}, $user->{'user_id'}, $id_user_signature->id]);
+            } elseif(isset($user->{'signature_path'})) {
+                $db->query('INSERT INTO user_signatures (user_id, signature_label, signature_path, signature_file_name) VALUES (?, ?, ?, ?)', [$user->{'user_id'}, '', $user->{'signature_path'}, $user->{'signature_file_name'}]);
+            }
         $control = $uc->save($user, $_SESSION['m_admin']['users']['groups'], $mode, $params);
     }
     if (!empty($entitiesUserToRedirect)) {
