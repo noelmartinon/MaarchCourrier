@@ -70,6 +70,9 @@ class MergedJsAbstract {
 		//Maarch
 		include('apps/maarch_entreprise/js/functions.js');
 		include('apps/maarch_entreprise/js/indexing.js');
+                
+                //INPI
+		include('apps/maarch_entreprise/js/keypress.js');
 
 //		include('apps/maarch_entreprise/js/RSVP.js');
 //		include('apps/maarch_entreprise/js/render.js');
