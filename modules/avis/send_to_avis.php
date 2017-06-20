@@ -1,36 +1,31 @@
 <?php
+/**
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 
-/*
- * Copyright Maarch since 2008 under licence GPLv3.
- * See LICENCE.txt file at the root folder for more details.
- * This file is part of Maarch software.
- * 
- */
-
-/*
- * @brief send_to_avis
- * @author dev@maarch.org
- * @ingroup avis
- * 
- */
+* @brief   send_to_avis
+* @author  dev <dev@maarch.org>
+* @ingroup core
+*/
 
 $confirm = false;
 $etapes = array('form');
 $frm_width = '650px';
-$frm_height = 'auto';
-require("modules/entities/entities_tables.php");
-require_once("modules/entities/class/EntityControler.php");
-require_once('modules/entities/class/class_manage_entities.php');
+$frm_height = '90%';
+require "modules/entities/entities_tables.php";
+require_once "modules/entities/class/EntityControler.php";
+require_once 'modules/entities/class/class_manage_entities.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "avis" . DIRECTORY_SEPARATOR
         . "class" . DIRECTORY_SEPARATOR
         . "avis_controler.php";
 
 function get_form_txt($values, $path_manage_action, $id_action, $table, $module, $coll_id, $mode)
 {
-    require_once('apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php');
+    include_once 'apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php';
     $cr7 = new chrono();
 
-    require_once 'apps/maarch_entreprise/definition_mail_categories.php';
+    include_once 'apps/maarch_entreprise/definition_mail_categories.php';
 
     $res_id = $values[0];
 
@@ -75,7 +70,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         $frm_str .= $chrono_number;
     }
     $frm_str .= '</h2><br/>';
-    require 'modules/templates/class/templates_controler.php';
+    include 'modules/templates/class/templates_controler.php';
     $templatesControler = new templates_controler();
     $templates = array();
 
@@ -92,7 +87,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
     $allEntitiesTree = array();
     $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
-            $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
+        $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
     );
     if ($destination <> '') {
         $templates = $templatesControler->getAllTemplatesForProcess($destination);
@@ -240,9 +235,9 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         return false;
 
     $res_id = $arr_id[0];
-    require_once('modules/entities/class/class_manage_listdiff.php');
-    require_once('modules/notes/class/notes_controler.php');
-    require_once('modules/avis/class/avis_controler.php');
+    include_once 'modules/entities/class/class_manage_listdiff.php';
+    include_once 'modules/notes/class/notes_controler.php';
+    include_once 'modules/avis/class/avis_controler.php';
     $note = new notes_controler();
 
 
@@ -257,7 +252,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     }
 
 
-    # save note
+    //save note
     if ($formValues['note_content_to_users'] != '') {
         //Add notes
         $userIdTypist = $_SESSION['user']['UserId'];
