@@ -104,6 +104,9 @@ function listmodel_setObjectId(objectId)
             onSuccess: function(answer){
                 objectId_input.innerHTML = answer.responseText;
                 objectId_input.style.display = 'block';
+                if(objectId != ''){
+                   new Chosen($('objectId'),{width: "300px", disable_search_threshold: 10, search_contains: true});
+                }
             }
         }
     );
@@ -274,7 +277,7 @@ if ($mode != 'del') {
     $frm .= '<label for="objectType" >'._OBJECT_TYPE.' : </label>';
     $frm .= '</td>';
     $frm .= '<td>';
-    $frm .= '<select id="objectType" onChange="listmodel_setObjectType();listmodel_setObjectId();" style="width:300px;"';
+    $frm .= '<select name="objectType" id="objectType" onChange="listmodel_setObjectType();listmodel_setObjectId();" style="width:300px;"';
     if ($mode == 'up') {
         $frm .= ' disabled="true" ';
     }
@@ -290,6 +293,7 @@ if ($mode != 'del') {
         $frm .= '</option>';
     }
     $frm .= '</select>';
+    $frm .= '<script type="text/javascript">new Chosen($(\'objectType\'),{width: "300px", disable_search_threshold: 10, search_contains: true});</script>';
     $frm .= '</td>';
     $frm .= '</tr>';
     $frm .= '<tr>';
