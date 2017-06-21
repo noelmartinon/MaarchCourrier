@@ -181,7 +181,7 @@ elseif($mode == "up" || $mode == "add")
 
                             echo '<option value="'.$METHOD['ID'].'" '.$vala.'  >'.constant($METHOD['BRUT_LABEL']).'</option>';
                         }
-                        if ($METHOD['ID'] == 'sso' && $METHOD['ACTIVATED'] == 'true') {
+                        if (($METHOD['ID'] == 'sso' || $METHOD['ID'] == 'cas') && $METHOD['ACTIVATED'] == 'true') {
                             $ssoLogin = true;
                         }
                     }

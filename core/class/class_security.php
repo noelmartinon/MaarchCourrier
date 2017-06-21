@@ -115,16 +115,16 @@ class security extends Database
                         . "and status <> :status "
                         . "and (loginmode = :loginmode1 or loginmode = :loginmode2)";
                     $params = array(
-                        'password' => $pass, 
-                        'ra_code' => $this->getPasswordHash($ra_code),
+                        'password'           => $pass, 
+                        'ra_code'            => $this->getPasswordHash($ra_code),
                         'ra_expiration_date' => date('Y-m-d 00:00:00'),
-                        'status' => 'DEL',
-                        'loginmode1' => 'standard',
-                        'loginmode2' => 'sso',
+                        'status'             => 'DEL',
+                        'loginmode1'         => 'standard',
+                        'loginmode2'         => 'sso',
                     );
                 } else {
                     $comp = " and password = :password and STATUS <> 'DEL' "
-                          . "and (loginmode = 'standard' or loginmode  = 'sso')";
+                          . "and (loginmode in ('standard', 'sso', 'cas'))";
                     $params = array('password' => $pass);
                 }
             }
@@ -185,13 +185,13 @@ class security extends Database
                     'Initials'    => $user->__get('initials'),
                     'Phone'       => $user->__get('phone'),
                     'Mail'        => $user->__get('mail'),
-                    'department' => $user->__get('department'),
-                    'thumbprint' => $user->__get('thumbprint'),
+                    'department'  => $user->__get('department'),
+                    'thumbprint'  => $user->__get('thumbprint'),
                     /*'signature_path' => $user->__get('signature_path'),
                     'signature_file_name' => $user->__get('signature_file_name'),*/
                     'pathToSignature' => $_SESSION['user']['pathToSignature'],
-                    'Status' => $user->__get('status'),
-                    'cookie_date' => $user->__get('cookie_date'),
+                    'Status'          => $user->__get('status'),
+                    'cookie_date'     => $user->__get('cookie_date'),
                 );
                 // $_SESSION['error'] =  '';
                 /*setcookie(

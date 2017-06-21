@@ -20,7 +20,6 @@ if(empty($_COOKIE)){
         . 'index.php?display=true&page=login'
     );
     exit;
-
 }
 
 if (file_exists('../../core/init.php')) {
@@ -35,7 +34,30 @@ $core->load_lang();
 $func = new functions();
 
 $_SESSION['error'] = '';
-if (isset($_REQUEST['login'])) {
+if(isset($_SESSION['web_cas_url'])){
+    include_once('apps/maarch_entreprise/tools/phpCAS/CAS.php');
+
+    phpCAS::client(constant($_SESSION['cas_version']), $_SESSION['cas_serveur'], (int)$_SESSION['cas_port'], $_SESSION['cas_context'], true);
+
+    if(!empty($_SESSION['cas_certificate'])){
+        phpCAS::setCasServerCACert($_SESSION['cas_certificate']);
+    } else {
+        phpCAS::setNoCasServerValidation();
+    }
+
+    phpCAS::forceAuthentication();
+    $Id = phpCAS::getUser();
+
+    if(!empty($_SESSION['cas_id_separator'])){
+        $tmpId = explode($_SESSION['cas_id_separator'], $Id);
+        $login = $tmpId[0];
+    } else {
+        $login = $Id;
+    }
+
+    $_REQUEST['pass'] = 'maarch';
+
+} else if (isset($_REQUEST['login'])) {
     $login = $func->wash($_REQUEST['login'], 'no', _THE_ID, 'yes');
 } else {
     $login = '';

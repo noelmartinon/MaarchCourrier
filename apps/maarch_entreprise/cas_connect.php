@@ -40,7 +40,13 @@ $cas_port      = $loginRequestArray['WEB_CAS_PORT'];
 $cas_context   = $loginRequestArray['WEB_CAS_CONTEXT'];
 $id_separator  = $loginRequestArray['ID_SEPARATOR'];
 $certificate   = $loginRequestArray['PATH_CERTIFICATE'];
-// $cas_chemin_ac = "apps/maarch_entreprise/tools/phpCAS/AC-RGS-Certigna-Racine-SHA1.pem" ;
+
+$_SESSION['cas_version']      = $loginRequestArray['CAS_VERSION'];
+$_SESSION['cas_serveur']      = $cas_serveur;
+$_SESSION['cas_port']         = $cas_port;
+$_SESSION['cas_context']      = $cas_context;
+$_SESSION['cas_certificate']  = $certificate;
+$_SESSION['cas_id_separator'] = $id_separator;
 
 phpCAS::setDebug();
 phpCAS::setVerbose(true);
@@ -54,11 +60,10 @@ if(!empty($certificate)){
 } else {
     phpCAS::setNoCasServerValidation();
 }
-//echo 'avant';
+
 // L'authentification.
 phpCAS::forceAuthentication();
-//echo 'apres';exit;
-//exit;
+
 if($loginRequestArray['CAS_VERSION'] == 'CAS_VERSION_2_0'){
     // Lecture identifiant utilisateur (courriel)
     $Id = phpCAS::getUser();
@@ -71,10 +76,8 @@ if($loginRequestArray['CAS_VERSION'] == 'CAS_VERSION_2_0'){
         $userId = $Id;
     }
     
-
 } elseif($loginRequestArray['CAS_VERSION'] == 'SAML_VERSION_1_1'){
     // $attrSAML = phpCAS::getAttributes();
-    // var_export($attrSAML);
     echo _CAS_SAML_NOT_SUPPORTED;
     exit;
 
@@ -107,12 +110,13 @@ if ($restMode) {
     $security = new security();
     $_SESSION['error'] = '';
     $pass = $security->getPasswordHash($loginArray['password']);
-    $res = $security->login($userId  , $pass);
-    //$core->show_array($res);
+    $res  = $security->login($userId, $pass);
+
     $_SESSION['user'] = $res['user'];
     if (!empty($res['error'])) {
         $_SESSION['error'] = $res['error'];
     }
+
     //Traces fonctionnelles
     $trace->add(
         "users",
@@ -124,11 +128,9 @@ if ($restMode) {
         false
     );
 } else {
-    header("location: " . $_SESSION['config']['businessappurl'] 
-        . "log.php?login=" . $userId 
-        . "&pass=" . $loginArray['password']);
+    header("location: log.php");
+
     //Traces fonctionnelles
-    
     $trace->add(
         "users",
         $userId,
@@ -142,7 +144,3 @@ if ($restMode) {
 
     exit();
 }
-
-
-
-

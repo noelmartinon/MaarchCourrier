@@ -1311,6 +1311,7 @@ if (!defined("_TITLE_STATS_CHOICE_PERIOD"))  define("_TITLE_STATS_CHOICE_PERIOD"
 /******************** Authentification method  ************/
 
 if (!defined("_STANDARD_LOGIN")) define("_STANDARD_LOGIN", "Authentification Maarch");
+if (!defined("_CAS_LOGIN")) define("_CAS_LOGIN", "Authentification CAS");
 if (!defined("_ACTIVEX_LOGIN")) define("_ACTIVEX_LOGIN", "Authentification Ms Internet Explorer - ActiveX");
 if (!defined("_HOW_CAN_I_LOGIN")) define("_HOW_CAN_I_LOGIN", "Je n'arrive pas à me connecter...");
 if (!defined("_CONNECT")) define("_CONNECT", "Se connecter");
@@ -1905,6 +1906,13 @@ if (!defined('_UPDATED_EMAIL_SIGNATURE'))
     define('_UPDATED_EMAIL_SIGNATURE', 'Signature de mail modifiée');
 if (!defined('_DELETED_EMAIL_SIGNATURE'))
     define('_DELETED_EMAIL_SIGNATURE', 'Signature de mail supprimée');
+
+if (!defined('_UNDEFINED_USER'))
+    define('_UNDEFINED_USER', 'Utilisateur non répertorié');
+if (!defined('_ACTIVATE_ABSENCE'))
+    define('_ACTIVATE_ABSENCE', 'Activer mon absence');
+if (!defined('_AUTO_LOGOUT_AFTER_BASKETS_REDIRECTIONS'))
+    define('_AUTO_LOGOUT_AFTER_BASKETS_REDIRECTIONS', 'Vous allez être automatiquement déconnecté après avoir défini vos redirections de bannettes');
 /***** Profile *****/
 
 /**** admin update control ****/
