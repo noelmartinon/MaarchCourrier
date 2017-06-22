@@ -40,7 +40,7 @@ if ($_SESSION['config']['databasetype'] == 'POSTGRESQL') {
             );
 } else {
     $stmt = $db->query("select template_label as tag from " 
-               . _TEMPLATES_TABLE_NAME . " where template_label like ? order by template_label",
+               . _TEMPLATES_TABLE_NAME . " where lower(template_label) like lower(?) order by template_label",
                array($_REQUEST['what'] . '%')
             );
 }

@@ -164,7 +164,7 @@ if (! empty($_SESSION['error'])) {
                 // Instantiate database.
                 $database = new Database();
                 $stmt = $database->query(
-                    "SELECT * FROM users WHERE user_id ILIKE ?", 
+                    "SELECT * FROM users WHERE lower(user_id) LIKE lower(?)", 
                     array($login)
                 ); //permet de rechercher les utilisateurs dans le LDAP sans prendre en compte la casse
                 $result = $stmt->fetch();

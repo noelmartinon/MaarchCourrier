@@ -210,7 +210,7 @@ function display_list()
         $where_what[] = $what.'%';
 
     } else {
-        $where .= " (tag_label like ? ) ";
+        $where .= " (lower(tag_label) like lower(?) ) ";
         $where_what[] = $what.'%';
     }
 

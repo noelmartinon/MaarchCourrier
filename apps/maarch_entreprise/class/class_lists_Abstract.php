@@ -831,7 +831,7 @@ abstract class lists_Abstract extends Database
                         $_SESSION['filters']['folder']['CLAUSE'] = "folder_id = '".$folderId."'";
 
                     } else if ($_REQUEST['filter'] == 'identifier') {
-                        $_SESSION['filters']['identifier']['CLAUSE'] = "alt_identifier ilike ('%".$_SESSION['filters']['identifier']['VALUE']."%')";
+                        $_SESSION['filters']['identifier']['CLAUSE'] = "lower(alt_identifier) like lower('%".$_SESSION['filters']['identifier']['VALUE']."%')";
 
                     } else if ($_REQUEST['filter'] == 'type') {
                     

@@ -39,8 +39,8 @@ $where_what = array();
 if($_SESSION['config']['databasetype'] == "POSTGRESQL")
 {
 	// Pourquoi il y a deux tag_label sur la même chose?
-	//$where .= " (tag_label ilike ? or tag_label ilike ? ) ";
-	$where .= " (tag_label ilike ? ) ";
+	//$where .= " (lower(tag_label) like lower(?) or lower(tag_label) like lower(?) ) ";
+	$where .= " (lower(tag_label) like lower(?) ) ";
 	$limit = " limit 10";
 	$where_what[] = '%'.$_REQUEST['Input'].'%';
 	//$where_what[] = '%'.$_REQUEST['Input'].'%';

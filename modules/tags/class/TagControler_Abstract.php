@@ -558,7 +558,7 @@ abstract class tag_controler_Abstract extends ObjectControler
         //Primo, test de l'existance du mot clé en base.
         /*$stmt = $db->query(
             "SELECT tag_label FROM " ._TAG_TABLE_NAME
-            . " WHERE  coll_id = ? AND tag_label ILIKE ?"
+            . " WHERE  coll_id = ? AND lower(tag_label) LIKE lower(?)"
         ,array($coll_id,$new_tag_label));
         //$db->show();exit();
         if ($stmt->rowCount() == 0)

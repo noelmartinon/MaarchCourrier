@@ -68,7 +68,7 @@ $arrayPDO = array();
         $_SESSION['folder_search']['folder_name'] = trim($_REQUEST['folder_name']);
         if($_SESSION['config']['databasetype'] == "POSTGRESQL")
         {
-            $where_request .= " ".$view.".folder_name ilike :foldername and ";
+            $where_request .= " lower(".$view.".folder_name) like lower(:foldername) and ";
             $arrayPDO = array_merge($arrayPDO, array(":foldername" => "%".$_SESSION['folder_search']['folder_name']."%"));
         }
         else
@@ -82,7 +82,7 @@ $arrayPDO = array();
         if(!empty($_SESSION['folder_search']['folder_name'])){
             if($_SESSION['config']['databasetype'] == "POSTGRESQL")
             {
-                $where_request .= " ".$view.".folder_name ilike :foldername and ";
+                $where_request .= " lower(".$view.".folder_name) like lower(:foldername) and ";
                 $arrayPDO = array_merge($arrayPDO, array(":foldername" => "%".$_SESSION['folder_search']['folder_name']."%"));
             }
             else
@@ -101,7 +101,7 @@ $arrayPDO = array();
         $_SESSION['folder_search']['folder_id'] = trim($_REQUEST['folder_id']);
         if($_SESSION['config']['databasetype'] == "POSTGRESQL")
         {
-            $where_request .= " ".$view.".folder_id ilike :folderid and ";
+            $where_request .= " lower(".$view.".folder_id) like lower(:folderid) and ";
             $arrayPDO = array_merge($arrayPDO, array(":folderid" => "%".$_SESSION['folder_search']['folder_id']."%"));
         }
         else
@@ -116,7 +116,7 @@ $arrayPDO = array();
             
             if($_SESSION['config']['databasetype'] == "POSTGRESQL")
             {
-                $where_request .= " ".$view.".folder_id ilike :folderid and ";
+                $where_request .= " lower(".$view.".folder_id) like lower(:folderid) and ";
                 $arrayPDO = array_merge($arrayPDO, array(":folderid" => "%".$_SESSION['folder_search']['folder_id']."%"));
             }
             else

@@ -250,7 +250,7 @@ function display_list() {
         $where_what[] = $what.'%';
 
     } else {
-        $where .= " (thesaurus_name like ?  or thesaurus_name like ? ) ";
+        $where .= " (lower(thesaurus_name) like lower(?)  or lower(thesaurus_name) like (?) ) ";
         $where_what[] = $what.'%';
         $where_what[] = $what.'%';
     }

@@ -463,7 +463,7 @@ if (count($_REQUEST['meta']) > 0) {
                     ."or lower(title) LIKE lower(:multifieldWelcome) "
                     ."or res_id in (select identifier from notes where lower(translate(note_text,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) like lower(:multifieldWelcome)) "
                     ."or res_id in (select res_id_master from res_view_attachments where (lower(translate(identifier,'/','')) like lower(:multifieldWelcome) OR lower(identifier) like lower(:multifieldWelcome)) AND status NOT IN ('DEL','OBS','TMP')) "
-                    ."or contact_id in (select contact_id from view_contacts where society ilike :multifieldWelcome or contact_firstname ilike :multifieldWelcome or contact_lastname ilike :multifieldWelcome) or (exp_user_id in (select user_id from users where firstname ilike :multifieldWelcome or lastname ilike :multifieldWelcome )))";
+                    ."or contact_id in (select contact_id from view_contacts where lower(society) like lower(:multifieldWelcome) or lower(contact_firstname) like lower(:multifieldWelcome) or lower(contact_lastname) like lower(:multifieldWelcome)) or (exp_user_id in (select user_id from users where lower(firstname) like lower(:multifieldWelcome) or lower(lastname) like lower(:multifieldWelcome) )))";
                 $arrayPDO = array_merge($arrayPDO, array(":multifieldWelcome" => "%".$_REQUEST['welcome']."%"));
                 $welcome = $_REQUEST['welcome'];
                 set_include_path('apps' . DIRECTORY_SEPARATOR 
@@ -774,15 +774,15 @@ if (count($_REQUEST['meta']) > 0) {
             {
                 $json_txt .= " 'contactid_external' : ['".addslashes(trim($_REQUEST['contactid_external']))."'], 'contactid' : ['".addslashes(trim($_REQUEST['contactid']))."'],";
                     $contact_id = $_REQUEST['contactid'];
-                    $where_request .= " (contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) ".
-                        " or res_id in (SELECT res_id_master FROM res_view_attachments WHERE dest_contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) ) ) and ";
+                    $where_request .= " (contact_id in (select contact_id from view_contacts where lower(society) like lower(:contactId) or lower(contact_firstname) like lower(:contactId) or lower(contact_lastname) like lower(:contactId) ".
+                        " or res_id in (SELECT res_id_master FROM res_view_attachments WHERE dest_contact_id in (select contact_id from view_contacts where lower(society) like lower(:contactId) or lower(contact_firstname) like lower(:contactId) or lower(contact_lastname) like lower(:contactId) ) ) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":contactId" => "%".$contact_id."%"));
             }
             elseif ($tab_id_fields[$j] == 'addresses_id' && !empty($_REQUEST['addresses_id']))
             {
                 $json_txt .= " 'addresses_id' : ['".addslashes(trim($_REQUEST['addresses_id']))."'], 'addresses_id' : ['".addslashes(trim($_REQUEST['addresses_id']))."'],";
                     $addresses_id = $_REQUEST['addresses_id'];
-                    $where_request .= " address_id in (select ca_id from view_contacts where lastname ilike :addressId or firstname ilike :addressId ) and ";
+                    $where_request .= " address_id in (select ca_id from view_contacts where lower(lastname) like lower(:addressId) or lower(firstname) like lower(:addressId) ) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":addressId" => "%".$addresses_id."%"));
             }
             // CONTACTS INTERNAL
@@ -800,7 +800,7 @@ if (count($_REQUEST['meta']) > 0) {
                 $json_txt .= " 'contactid_internal' : ['".addslashes(trim($_REQUEST['contactid_internal']))."'], 'contact_internal_id' : ['".addslashes(trim($_REQUEST['contactid_internal']))."']";
                     $contactid_internal = pg_escape_string($_REQUEST['contactid_internal']);
                     //$where_request .= " ((user_firstname = '".$contactid_internal."' or user_lastname = '".$contactid_internal."') or ";
-                    $where_request .= " (exp_user_id in (select user_id from users where firstname ilike :contactIdInternal or lastname ilike :contactIdInternal )) and ";
+                    $where_request .= " (exp_user_id in (select user_id from users where lower(firstname) like lower(:contactIdInternal) or lower(lastname) like lower(:contactIdInternal) )) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":contactIdInternal" => "%".$contactid_internal."%"));
             }
             // Nom du signataire
@@ -817,7 +817,7 @@ if (count($_REQUEST['meta']) > 0) {
                 $json_txt .= " 'signatory_name' : ['".addslashes(trim($_REQUEST['signatory_name']))."']";
                     $signatory_name = pg_escape_string($_REQUEST['signatory_name']);
                     //$where_request .= " ((user_firstname = '".$contactid_internal."' or user_lastname = '".$contactid_internal."') or ";
-                    $where_request .= " (res_id in (select res_id from listinstance where item_id in (select user_id from users where firstname ilike :signatoryName or lastname ilike :signatoryName) "
+                    $where_request .= " (res_id in (select res_id from listinstance where item_id in (select user_id from users where lower(firstname) like lower(:signatoryName) or lower(lastname) like lower(:signatoryName)) "
                         ."and coll_id = '" . $coll_id . "' and item_mode = 'sign' and difflist_type = 'VISA_CIRCUIT')) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":signatoryName" => "%".$signatory_name."%"));
             }
