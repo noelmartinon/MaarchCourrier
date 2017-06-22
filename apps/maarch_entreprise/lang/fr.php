@@ -155,7 +155,7 @@ if (!defined("_WARNING_MESSAGE_DEL_USER"))
 if (!defined("_INFO_MESSAGE_UPDATE_USER"))
     define("_INFO_MESSAGE_UPDATE_USER", "Afin de garder la confidentialité des courriers en cours de traitement du service, il est recommandé de réaffecter ceux-ci à un autre utilisateur");
 if (!defined("_INFO_MESSAGE_UPDATE_USER2"))
-    define("_INFO_MESSAGE_UPDATE_USER2", "Les courriers confidentiels que vous avez créé ne seront pas affectés");
+    define("_INFO_MESSAGE_UPDATE_USER2", "Les courriers confidentiels que vous avez créés ne seront pas affectés");
 if (!defined("_WARNING_MESSAGE_UPDATE_USER"))
     define("_WARNING_MESSAGE_UPDATE_USER", "Si vous choisissez \"AUCUN REMPLACEMENT\" et que l'utilisateur actuel est en destinataire, celui-ci ne sera pas supprimé !");
 if (!defined("_MESSAGE_REAFFECT_USER_LISTMODEL"))
@@ -1770,7 +1770,7 @@ if (!defined("_SAVE_MODIFICATION")) define("_SAVE_MODIFICATION", "Enregistrer le
 
 if (!defined("_CONFIDENTIALITY")) define("_CONFIDENTIALITY", "Confidentiel");
 if (!defined("_CONFIDENTIAL")) define("_CONFIDENTIAL", "Confidentiel");
-if (!defined("_CONFIDENTIAL_DOCUMENTS")) define("_CONFIDENTIAL_DOCUMENTS", "courrier(s) confidentiel");
+if (!defined("_CONFIDENTIAL_DOCUMENTS")) define("_CONFIDENTIAL_DOCUMENTS", "courrier(s) confidentiel(s)");
 
 
 if (!defined("_SIGNATORY_NAME")) define("_SIGNATORY_NAME", "Nom du signataire");
