@@ -136,69 +136,51 @@ class security extends Database
 
         if (isset($user)) {
             if ($user->__get('enabled') == 'Y') {
-                $ugc = new usergroups_controler();
-                $sec_controler = new SecurityControler();
+                $ugc            = new usergroups_controler();
+                $sec_controler  = new SecurityControler();
                 $serv_controler = new ServiceControler();
                 if (isset($_SESSION['modules_loaded']['visa'])) {
-                    /*if ($user->__get('signature_path') <> '' 
-                        && $user->__get('signature_file_name') <> '' 
-                    ) {*/
-                        /*$_SESSION['user']['signature_path'] = $user->__get('signature_path');
-                        $_SESSION['user']['signature_file_name'] = $user->__get('signature_file_name');*/
-                        require_once "modules" . DIRECTORY_SEPARATOR . "visa" . DIRECTORY_SEPARATOR. "class" . DIRECTORY_SEPARATOR. "class_user_signatures.php";
-                        $us = new UserSignatures();
-                        $db = new Database();
-                        $query = "select path_template from " 
-                            . _DOCSERVERS_TABLE_NAME 
-                            . " where docserver_id = 'TEMPLATES'";
-                        $stmt = $db->query($query);
-                        $resDs = $stmt->fetchObject();
-                        $pathToDs = $resDs->path_template;
 
-                        $tab_sign = $us->getForUser($s_login);
-                        $_SESSION['user']['pathToSignature'] = array();
-                        foreach ($tab_sign as $sign) {
-                            $path = $pathToDs . str_replace(
-                                "#", 
-                                DIRECTORY_SEPARATOR, 
-                                $sign['signature_path']
-                            )
-                            . $sign['signature_file_name'];
-                            array_push($_SESSION['user']['pathToSignature'], $path);
-                        }
+                    require_once "modules" . DIRECTORY_SEPARATOR . "visa" . DIRECTORY_SEPARATOR. "class" . DIRECTORY_SEPARATOR. "class_user_signatures.php";
+                    $us = new UserSignatures();
+                    $db = new Database();
+                    $query = "select path_template from " 
+                        . _DOCSERVERS_TABLE_NAME 
+                        . " where docserver_id = 'TEMPLATES'";
+                    $stmt     = $db->query($query);
+                    $resDs    = $stmt->fetchObject();
+                    $pathToDs = $resDs->path_template;
 
-                        /*$_SESSION['user']['pathToSignature'] = $pathToDs . str_replace(
-                                "#", 
-                                DIRECTORY_SEPARATOR, 
-                                $_SESSION['user']['signature_path']
-                            )
-                            . $_SESSION['user']['signature_file_name'];
-                        */
-                        $_SESSION['user']['code_session'] = $ra_code;
-                    //}
+                    $tab_sign = $us->getForUser($s_login);
+                    $_SESSION['user']['pathToSignature'] = array();
+                    foreach ($tab_sign as $sign) {
+                        $path = $pathToDs . str_replace(
+                            "#", 
+                            DIRECTORY_SEPARATOR, 
+                            $sign['signature_path']
+                        )
+                        . $sign['signature_file_name'];
+                        array_push($_SESSION['user']['pathToSignature'], $path);
+                    }
+
+                    $_SESSION['user']['code_session'] = $ra_code;
+
                 }
                 $array = array(
-                    'change_pass' => $user->__get('change_password'),
-                    'UserId'      => $user->__get('user_id'),
-                    'FirstName'   => $user->__get('firstname'),
-                    'LastName'    => $user->__get('lastname'),
-                    'Initials'    => $user->__get('initials'),
-                    'Phone'       => $user->__get('phone'),
-                    'Mail'        => $user->__get('mail'),
-                    'department'  => $user->__get('department'),
-                    'thumbprint'  => $user->__get('thumbprint'),
-                    /*'signature_path' => $user->__get('signature_path'),
-                    'signature_file_name' => $user->__get('signature_file_name'),*/
+                    'change_pass'     => $user->__get('change_password'),
+                    'UserId'          => $user->__get('user_id'),
+                    'FirstName'       => $user->__get('firstname'),
+                    'LastName'        => $user->__get('lastname'),
+                    'Initials'        => $user->__get('initials'),
+                    'Phone'           => $user->__get('phone'),
+                    'Mail'            => $user->__get('mail'),
+                    'department'      => $user->__get('department'),
+                    'thumbprint'      => $user->__get('thumbprint'),
                     'pathToSignature' => $_SESSION['user']['pathToSignature'],
                     'Status'          => $user->__get('status'),
                     'cookie_date'     => $user->__get('cookie_date'),
                 );
-                // $_SESSION['error'] =  '';
-                /*setcookie(
-                    'maarch', 'UserId=' . $array['UserId'] . '&key='
-                    . $user->__get('cookie_key'), time() - 3600000,
-                    0, 0, $_SERVER["HTTPS"], 1
-                );*/
+
                 $key = md5(
                     time() . '%' . $array['FirstName'] . '%' . $array['UserId']
                     . '%' . $array['UserId'] . '%' . date('dmYHmi') . '%'
@@ -213,11 +195,7 @@ class security extends Database
                 }
                 // #TODO : usefull ?
                 $uc->save($user, 'up');
-                /*setcookie(
-                    'maarch', 'UserId=' . $array['UserId'] . '&key='
-                    . $key, time() + ($_SESSION['config']['cookietime'] * 1000),
-                    0, 0, $_SERVER["HTTPS"], 1
-                );*/
+
                 $array['primarygroup'] = $ugc ->getPrimaryGroup(
                     $array['UserId']
                 );
@@ -257,9 +235,9 @@ class security extends Database
                     $hist = new history();
                     $ip = $_SERVER['REMOTE_ADDR'];
                     $navigateur = addslashes($_SERVER['HTTP_USER_AGENT']);
-                    $_SESSION['user']['UserId'] = $s_login;
-                    $_SESSION['user']['department'] = $array['department'];
-					$_SESSION['user']['thumbprint'] = $array['thumbprint'];
+                    $_SESSION['user']['UserId']       = $s_login;
+                    $_SESSION['user']['department']   = $array['department'];
+                    $_SESSION['user']['thumbprint']   = $array['thumbprint'];
                     $_SESSION['user']['primarygroup'] = $array['primarygroup'];
                     $hist->add(
                         $_SESSION['tablename']['users'],
@@ -270,13 +248,13 @@ class security extends Database
                     );
                 }
 
-                if ($array['change_pass'] == 'Y') {
+                if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url'])) {
                     return array(
                         'user'  => $array,
                         'error' => $error,
                         'url'   => 'index.php?display=true&page=change_pass'
                     );
-                }else if (isset($_SESSION['requestUri'])
+                } else if (isset($_SESSION['requestUri'])
                     && trim($_SESSION['requestUri']) <> ''
                     && ! preg_match('/page=login/', $_SESSION['requestUri'])) {
                     return array(
@@ -329,7 +307,6 @@ class security extends Database
         $users = new class_users(); 
         $userInfo = $users->get_user($_SESSION['user']['UserId']);
         
-        
         $authorized_characters = '0123456789';
         $cpt_motDePasse = 1;
         $cptMax_motDePasse = 4;
@@ -345,7 +322,6 @@ class security extends Database
         $db = new Database();
         $db->query("UPDATE users set ra_code = ? WHERE user_id = ?", array($this->getPasswordHash($raCodeGenerated), $_SESSION['user']['UserId']), false);
         $db->query("UPDATE users set ra_expiration_date = ? WHERE user_id = ?", array($expiration_date, $_SESSION['user']['UserId']), false);
-        
         
         /* GENERATION DU MAIL */
         $mailToSend = '<html>';
@@ -380,14 +356,14 @@ class security extends Database
         $mailer->SMTPDebug = 0;
         
         $mailer->Debugoutput = 'html';
-        $mailer->Host = (string)$mailerParams->smtp_host;
-        $mailer->Port = (string)$mailerParams->smtp_port;
-        $mailer->SMTPSecure = (string)$mailerParams->smtp_secure;
-        $mailer->SMTPAuth = filter_var($mailerParams->smtp_auth, FILTER_VALIDATE_BOOLEAN);
+        $mailer->Host        = (string)$mailerParams->smtp_host;
+        $mailer->Port        = (string)$mailerParams->smtp_port;
+        $mailer->SMTPSecure  = (string)$mailerParams->smtp_secure;
+        $mailer->SMTPAuth    = filter_var($mailerParams->smtp_auth, FILTER_VALIDATE_BOOLEAN);
         
         $mailer->Username = (string)$mailerParams->smtp_user;
         $mailer->Password = (string)$mailerParams->smtp_password;
-        $mailer->Helo = (string)$mailerParams->domains;
+        $mailer->Helo     = (string)$mailerParams->domains;
         
         if ((string)$mailerParams->type == "smtp") $mailer->isSMTP();
         $mailer->setFrom((string)$mailerParams->mailfrom,(string)$mailerParams->mailfromname);
@@ -398,15 +374,11 @@ class security extends Database
         $mailer->msgHTML($mailToSend);
         if (!$mailer->send()) {
             $_SESSION['error'] .= ' mail not send to '.$userInfo['mail'].': '.$mailer->ErrorInfo;
-            //$_SESSION['error'] .= '<pre>'.print_r($mailer,true).'</pre>';
+
             if ($redirect){
                 if ($_SESSION['isSmartphone']) header('location: smartphone/index.php?page=login');
                 else header('location: index.php?page=login&display=true');
             }
-            /*else{
-                echo $_SESSION['error'];
-                exit();
-            }*/
         } else {
             $_SESSION['error'] .= ' '._CONFIRM_ASK_RA_CODE_7;
             $_SESSION['recup_user']['login'] = $login;
@@ -435,52 +407,41 @@ class security extends Database
             {
                 $serv_controler = new ServiceControler();
                 $_SESSION['user']['change_pass'] = $user->__get('change_password');
-                $_SESSION['user']['UserId'] = $user->__get('user_id');
-                $_SESSION['user']['FirstName'] = $user->__get('firstname');
-                $_SESSION['user']['LastName'] = $user->__get('lastname');
-                $_SESSION['user']['Phone'] = $user->__get('phone');
-                $_SESSION['user']['Mail'] = $user->__get('mail');
-                $_SESSION['user']['department'] = $user->__get('department');
-                $_SESSION['user']['thumbprint'] = $user->__get('thumbprint');
+                $_SESSION['user']['UserId']      = $user->__get('user_id');
+                $_SESSION['user']['FirstName']   = $user->__get('firstname');
+                $_SESSION['user']['LastName']    = $user->__get('lastname');
+                $_SESSION['user']['Phone']       = $user->__get('phone');
+                $_SESSION['user']['Mail']        = $user->__get('mail');
+                $_SESSION['user']['department']  = $user->__get('department');
+                $_SESSION['user']['thumbprint']  = $user->__get('thumbprint');
+
                 if (isset($_SESSION['modules_loaded']['visa'])) {
-                    /*if ($user->__get('signature_path') <> '' 
-                        && $user->__get('signature_file_name') <> '' 
-                    ) {*/
-                        /*$_SESSION['user']['signature_path'] = $user->__get('signature_path');
-                        $_SESSION['user']['signature_file_name'] = $user->__get('signature_file_name');*/
-                        require_once "modules" . DIRECTORY_SEPARATOR . "visa" . DIRECTORY_SEPARATOR. "class" . DIRECTORY_SEPARATOR. "class_user_signatures.php";
-                        $us = new UserSignatures();
+                    require_once "modules" . DIRECTORY_SEPARATOR . "visa" . DIRECTORY_SEPARATOR. "class" . DIRECTORY_SEPARATOR. "class_user_signatures.php";
+                    $us = new UserSignatures();
 
-                        $db = new Database();
-                        $query = "select path_template from " 
-                            . _DOCSERVERS_TABLE_NAME 
-                            . " where docserver_id = 'TEMPLATES'";
-                        $stmt = $db->query($query);
-                        $resDs = $stmt->fetchObject();
-                        $pathToDs = $resDs->path_template;
+                    $db = new Database();
+                    $query = "select path_template from " 
+                        . _DOCSERVERS_TABLE_NAME 
+                        . " where docserver_id = 'TEMPLATES'";
+                    $stmt = $db->query($query);
+                    $resDs = $stmt->fetchObject();
+                    $pathToDs = $resDs->path_template;
 
-                        $tab_sign = $us->getForUser($_SESSION['user']['UserId']);
-                        $_SESSION['user']['pathToSignature'] = array();
-                        foreach ($tab_sign as $sign) {
-                            $path = $pathToDs . str_replace(
-                                "#", 
-                                DIRECTORY_SEPARATOR, 
-                                $sign['signature_path']
-                            )
-                            . $sign['signature_file_name'];
-                            array_push($_SESSION['user']['pathToSignature'], $path);
-                        }
-                        /*$_SESSION['user']['pathToSignature'] = $pathToDs . str_replace(
-                                "#", 
-                                DIRECTORY_SEPARATOR, 
-                                $_SESSION['user']['signature_path']
-                            )
-                            . $_SESSION['user']['signature_file_name'];*/
-                    //}
+                    $tab_sign = $us->getForUser($_SESSION['user']['UserId']);
+                    $_SESSION['user']['pathToSignature'] = array();
+                    foreach ($tab_sign as $sign) {
+                        $path = $pathToDs . str_replace(
+                            "#", 
+                            DIRECTORY_SEPARATOR, 
+                            $sign['signature_path']
+                        )
+                        . $sign['signature_file_name'];
+                        array_push($_SESSION['user']['pathToSignature'], $path);
+                    }
                 }
 
                 $_SESSION['error'] =  "";
-                /*setcookie("maarch", "UserId=".$_SESSION['user']['UserId']."&key=".$line->cookie_key,time()-3600000, 0, 0, $_SERVER["HTTPS"], 1);*/
+
                 $key = md5(time()."%".$_SESSION['user']['FirstName']."%".$_SESSION['user']['UserId']."%".$_SESSION['user']['UserId']."%".date("dmYHmi")."%");
 
                 $user->__set('cookie_key', $key);
@@ -490,7 +451,6 @@ class security extends Database
                     $user->__set('cookie_date',date("Y-m-d")." ".date("H:m:i"));
 
                 $uc->save($user, 'up');
-                /*setcookie("maarch", "UserId=".$_SESSION['user']['UserId']."&key=".$key,time()+($_SESSION['config']['cookietime']*60), 0, 0, $_SERVER["HTTPS"], 1);*/
 
                 $_SESSION['user']['primarygroup'] =  $ugc->getPrimaryGroup($_SESSION['user']['UserId']);
                 $sec_controler = new SecurityControler();
@@ -517,36 +477,20 @@ class security extends Database
                     $hist->add($_SESSION['tablename']['users'],$_SESSION['user']['UserId'],"LOGIN","IP : ".$ip.", BROWSER : ".$navigateur , $_SESSION['config']['databasetype']);
                 }
 */
-                if($_SESSION['user']['change_pass'] == 'Y')
-                {
+                if($_SESSION['user']['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url'])) {
                     header("location: ".$_SESSION['config']['businessappurl']."index.php?display=true&page=change_pass");
                     exit();
-                }
-                /*if($_SESSION['origin'] == "scan")
-                {
-                    header("location: ../../modules/indexing_searching/index_file.php");
-                    exit();
-                }
-                elseif($_SESSION['origin'] == "files")
-                {
-                    header("location: ../../modules/indexing_searching/index_file.php");
-                    exit();
-                }*/
-                else
-                {
+
+                } else {
                     header("location: ".$_SESSION['config']['businessappurl']."index.php");
                     exit();
                 }
-            }
-            else
-            {
+            } else {
                 $_SESSION['error'] = _SUSPENDED_ACCOUNT;
                 header("location: ".$_SESSION['config']['businessappurl']."index.php");
                 exit();
             }
-        }
-        else
-        {
+        } else {
             $_SESSION['error'] = _ERROR;
             header("location: ".$_SESSION['config']['businessappurl']."index.php?display=true&page=login");
             exit();

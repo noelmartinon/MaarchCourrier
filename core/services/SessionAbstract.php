@@ -282,29 +282,6 @@ class Core_SessionAbstract_Service extends Core_Abstract_Service {
             'url'   => 'index.php?' . $_SESSION['requestUri']*/
         );
 
-/*
-        if ($array['change_pass'] == 'Y') {
-            return array(
-                'user'  => $array,
-                'error' => $error,
-                'url'   => 'index.php?display=true&page=change_pass'
-            );
-        }else if (isset($_SESSION['requestUri'])
-            && trim($_SESSION['requestUri']) <> ''
-            && ! preg_match('/page=login/', $_SESSION['requestUri'])) {
-            return array(
-                'user'  => $array,
-                'error' => $error,
-                'url'   => 'index.php?' . $_SESSION['requestUri']
-            );
-        } else {
-            return array(
-                'user'  => $array,
-                'error' => $error,
-                'url'   => 'index.php'
-            );
-        }
-*/
         return true;
     }
 }
