@@ -991,6 +991,7 @@ if (!defined("_VIEW_TREE_CONTACTS")) define("_VIEW_TREE_CONTACTS","Arborescence 
 
 if (!defined("_ADDRESSES_LIST")) define("_ADDRESSES_LIST","Liste des adresses");
 if (!defined("_SEARCH_ADDRESSES")) define("_SEARCH_ADDRESSES","Rechercher Nom/Adresse");
+if (!defined("_ADDRESS_NB")) define("_ADDRESS_NB","Nombre d'adresse");
 
 if (!defined("_CONTACT_TYPES_LIST")) define("_CONTACT_TYPES_LIST","Liste des types de contact");
 if (!defined("_DESC_CONTACT_TYPES")) define("_DESC_CONTACT_TYPES","Type de contact");
