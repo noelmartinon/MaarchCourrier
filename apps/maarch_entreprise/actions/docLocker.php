@@ -70,7 +70,7 @@ class docLocker
             $query .= $this->table . " ";
         $query .= "SET ";
             $query .= "locker_user_id = ?, ";
-            $query .= "locker_time = current_timestamp + interval '1 MINUTE' ";
+            $query .= "locker_time = current_timestamp + interval '1' MINUTE ";
         $query .= "WHERE ";
             $query .= "res_id = ?";
 
