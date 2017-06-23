@@ -445,7 +445,7 @@ abstract class types_Abstract extends database
                     WHERE type_id = ?",
                     array($_SESSION['m_admin']['doctypes']['LABEL'], $_SESSION['m_admin']['doctypes']['STRUCTURE'], $_SESSION['m_admin']['doctypes']['SUB_FOLDER'],
                         $_SESSION['m_admin']['doctypes']['RETENTION_FINAL_DISPOSITION'], $_SESSION['m_admin']['doctypes']['RETENTION_RULE'],
-                        $_SESSION['m_admin']['doctypes']['DURATION_CURRENT_USE'], $_SESSION['m_admin']['doctypes']['COLL_ID'],
+                        (int) $_SESSION['m_admin']['doctypes']['DURATION_CURRENT_USE'], $_SESSION['m_admin']['doctypes']['COLL_ID'],
                         $_SESSION['m_admin']['doctypes']['TYPE_ID'] )
                 );
 
