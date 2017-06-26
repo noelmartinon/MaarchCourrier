@@ -795,7 +795,8 @@ class dbquery extends functions
             return $line->lastinsertid;
         case 'SQLSERVER'    : return '';
         case 'ORACLE'       : 
-            $this->query("select " . $sequenceName . ".currval as lastinsertid from dual");
+            //$this->query("select " . $sequenceName . ".currval as lastinsertid from dual");
+            $this->query("SELECT to_char(Last_number) as lastinsertid FROM user_sequences where sequence_name = '" . $sequenceName . "'");
             $line = $this->fetch_object($this->query);
             return $line->lastinsertid;
         default             : return false;
