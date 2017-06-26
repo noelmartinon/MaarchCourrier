@@ -1055,7 +1055,7 @@ function validate_user_submit()
                     );
 
     if (isset($_SESSION['m_admin']['users']['groups'])) {
-            $query       = $db->limit_select(0, 1, 'id', 'user_signatures', 'user_id = ? order by id desc ');
+            $query       = $db->limit_select(0, 1, 'id', 'user_signatures', 'user_id = ? ', ' order by id desc');
             $stmt        = $db->query($query, array($user->{'user_id'}));
             $id_user_signature = $stmt->fetchObject();
             if ($id_user_signature && isset($user->{'signature_path'})) {
