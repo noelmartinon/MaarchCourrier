@@ -91,14 +91,14 @@ class ContactsModelAbstract extends Apps_Table_Service
         static::checkNumeric($aArgs, ['id']);
 
         $aReturn = static::select([
-            'select'    => ['count(*)'],
+            'select'    => ['count(*) as count'],
             'table'     => ['res_view_letterbox'],
             'where'     => ['contact_id = ?'],
             'data'      => [$aArgs['id']],
         ]);
         
         $aReturnBis = static::select([
-            'select'    => ['count(*)'],
+            'select'    => ['count(*) as count'],
             'table'     => ['contacts_res'],
             'where'     => ['contact_id = ?'],
             'data'      => [$aArgs['id']],

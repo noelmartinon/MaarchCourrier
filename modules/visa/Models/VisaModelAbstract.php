@@ -19,7 +19,7 @@ class VisaModelAbstract extends Apps_Table_Service
 
 
         $aReturn = static::select([
-            'select'    => ['COUNT(*)'],
+            'select'    => ['COUNT(*) as count'],
             'table'     => ['listinstance'],
             'where'     => ['res_id = ?', 'item_mode in (?)'],
             'data'      => [$aArgs['resId'], ['visa', 'sign']]
