@@ -88,6 +88,7 @@ var SignatureBookComponent = (function () {
         this.route.params.subscribe(function (params) {
             _this.resId = +params['resId'];
             _this.basketId = params['basketId'];
+            _this.signatureBook.resList = []; // This line is added because of manage action behaviour (processAfterAction is called twice)
             lockDocument(_this.resId);
             setInterval(function () { lockDocument(_this.resId); }, 50000);
             _this.http.get(_this.coreUrl + 'rest/' + _this.basketId + '/signatureBook/' + _this.resId)
@@ -164,14 +165,16 @@ var SignatureBookComponent = (function () {
                 }
             }
         }
-        unlockDocument(this.resId);
-        if (idToGo >= 0) {
-            $j("#send").removeAttr("disabled");
-            $j("#send").css("opacity", "1");
-            this.zone.run(function () { return _this.changeLocation(idToGo, "action"); });
-        }
-        else {
-            this.zone.run(function () { return _this.backToBasket(); });
+        if (c > 0) {
+            unlockDocument(this.resId);
+            if (idToGo >= 0) {
+                $j("#send").removeAttr("disabled");
+                $j("#send").css("opacity", "1");
+                this.zone.run(function () { return _this.changeLocation(idToGo, "action"); });
+            }
+            else {
+                this.zone.run(function () { return _this.backToBasket(); });
+            }
         }
     };
     SignatureBookComponent.prototype.changeSignatureBookLeftContent = function (id) {
