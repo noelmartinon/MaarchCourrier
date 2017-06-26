@@ -216,7 +216,7 @@ try {
         #### Info contacts ####
         $stmt2 = Bt_doQuery(
             $GLOBALS['db'], 
-            "SELECT count(*) as nb FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode <> 'third'", array($selectedFile->res_id)
+            "SELECT count(*) as nb FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and contact_mode <> 'third'", array($selectedFile->res_id)
         );
 
         $Nb_contact = $stmt2->fetchObject();
@@ -269,7 +269,7 @@ try {
 
             $stmt2 = Bt_doQuery(
                 $GLOBALS['db'], 
-                "SELECT contact_id FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode <> 'third'", array($selectedFile->res_id)
+                "SELECT contact_id FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and contact_mode <> 'third'", array($selectedFile->res_id)
             );
 
             $contactId = $stmt2->fetchObject();
@@ -323,7 +323,7 @@ try {
         #### Info tiers beneficaires ####
         $stmt2 = Bt_doQuery(
             $GLOBALS['db'], 
-            "SELECT count(*) as nb FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode = 'third'", array($selectedFile->res_id)
+            "SELECT count(*) as nb FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and contact_mode = 'third'", array($selectedFile->res_id)
         );
 
         $Nb_contact_third = $stmt2->fetchObject();
@@ -337,7 +337,7 @@ try {
 
         $stmt2 = Bt_doQuery(
                 $GLOBALS['db'], 
-                "SELECT * FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode = 'third'", array($selectedFile->res_id)
+                "SELECT * FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and contact_mode = 'third'", array($selectedFile->res_id)
             );
 
             $contactThirdId = $stmt2->fetchObject();

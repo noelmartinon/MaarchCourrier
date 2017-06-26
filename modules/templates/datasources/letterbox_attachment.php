@@ -145,7 +145,7 @@ $datasources['attachments'] = array();
 $myAttachment['chrono'] = $chronoAttachment;
 
 //thirds
-$stmt = $dbDatasource->query("SELECT * FROM contacts_res WHERE res_id = ? AND mode = ? ", [$doc['res_id'], 'third']);
+$stmt = $dbDatasource->query("SELECT * FROM contacts_res WHERE res_id = ? AND contact_mode = ? ", [$doc['res_id'], 'third']);
 $datasources['thirds']= [];
 $countThird = 1;
 while ($third = $stmt->fetchObject()) {
