@@ -165,7 +165,8 @@ class Apps_Table_Service extends Core_Abstract_Service {
             if ( ! is_numeric($args['limit']) ) {
                 throw new Core_MaarchException_Service('limit must be : numeric');
             }
-            $limit = ' LIMIT '.$args['limit'];
+            //$limit = ' LIMIT '.$args['limit'];
+            $limit = $args['limit'];
         }
 
         if(!isset($GLOBALS['configFile'])){
