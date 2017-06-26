@@ -165,8 +165,11 @@ class Apps_Table_Service extends Core_Abstract_Service {
             if ( ! is_numeric($args['limit']) ) {
                 throw new Core_MaarchException_Service('limit must be : numeric');
             }
-            //$limit = ' LIMIT '.$args['limit'];
-            $limit = $args['limit'];
+            if ($_SESSION['config']['databasetype'] == 'ORACLE') {
+                $where .= ' AND ROWNUM <=' . $args['limit'];
+            } else {
+                $limit = ' LIMIT '.$args['limit'];
+            }
         }
 
         if(!isset($GLOBALS['configFile'])){
@@ -175,11 +178,11 @@ class Apps_Table_Service extends Core_Abstract_Service {
         $db = new Database($GLOBALS['configFile']);
         
         // Query :
-        if ($limit <> '') {
-            $queryExt = $db->limit_select(0, $limit, $select, $tablename, $where, $group_by, '', $order_by);
-        } else {
+        // if ($limit <> '') {
+        //     $queryExt = $db->limit_select(0, $limit, $select, $tablename, $where, $group_by, '', $order_by);
+        // } else {
             $queryExt = "SELECT $select FROM $tablename $where $group_by $order_by";
-        }
+        //}
         
         //Core_Logs_Service::debug(['message'=>'Requête:'.$queryExt]); 
         //echo "the query " . $queryExt . PHP_EOL;var_export($data). PHP_EOL;
