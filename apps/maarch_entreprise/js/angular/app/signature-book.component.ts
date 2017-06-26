@@ -94,6 +94,7 @@ export class SignatureBookComponent implements OnInit {
             this.resId      = +params['resId'];
             this.basketId   = params['basketId'];
 
+            this.signatureBook.resList = []; // This line is added because of manage action behaviour (processAfterAction is called twice)
             lockDocument(this.resId);
             setInterval(() => {lockDocument(this.resId)}, 50000);
             this.http.get(this.coreUrl + 'rest/' + this.basketId + '/signatureBook/' + this.resId)
@@ -176,13 +177,15 @@ export class SignatureBookComponent implements OnInit {
             }
         }
 
-        unlockDocument(this.resId);
-        if (idToGo >= 0) {
-            $j("#send").removeAttr("disabled");
-            $j("#send").css("opacity", "1");
-            this.zone.run(() => this.changeLocation(idToGo, "action"));
-        } else {
-            this.zone.run(() => this.backToBasket());
+        if (c > 0) { // This (if)line is added because of manage action behaviour (processAfterAction is called twice)
+            unlockDocument(this.resId);
+            if (idToGo >= 0) {
+                $j("#send").removeAttr("disabled");
+                $j("#send").css("opacity", "1");
+                this.zone.run(() => this.changeLocation(idToGo, "action"));
+            } else {
+                this.zone.run(() => this.backToBasket());
+            }
         }
     }
 
