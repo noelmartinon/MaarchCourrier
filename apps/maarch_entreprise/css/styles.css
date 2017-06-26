@@ -3595,3 +3595,7 @@ a.actionList {
 input.button {
 width:auto;
 }
+
+#frmsearch2 .autocomplete, #frmcontact .autocomplete{
+    top:auto !important;
+}

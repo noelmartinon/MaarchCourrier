@@ -1977,7 +1977,7 @@ $content .= '</div>';
                     . '</iframe>';
         $content .= '</div>';
     }
-    $content .= '<div id="info_contact_div_attach" style="display:none;float:right;width:70%;background-color:#deedf3">';
+    $content .= '<div id="info_contact_div_attach" style="display:none;float:right;width:65%;background-color:#deedf3">';
         $content .= '<iframe width="100%" height="800" name="info_contact_iframe_attach" id="info_contact_iframe_attach"'
                 . ' scrolling="auto" frameborder="0" style="display:block;">'
                 . '</iframe>';
