@@ -237,7 +237,7 @@ class VisaController
             $pathToFind = $value['path'] . str_replace(strrchr($value['filename'], '.'), '.pdf', $value['filename']);
             $isConverted = false;
             foreach ($attachments as $tmpKey => $tmpValue) {
-                if (strpos($value['format'], 'xl') !== 0 && $tmpValue['attachment_type'] == 'converted_pdf' && ($tmpValue['path'] . $tmpValue['filename'] == $pathToFind)) {
+                if (strpos($value['format'], 'xl') !== 0 && $value['format'] != 'pptx' && $tmpValue['attachment_type'] == 'converted_pdf' && ($tmpValue['path'] . $tmpValue['filename'] == $pathToFind)) {
                     if ($value['status'] != 'SIGN') {
                         $viewerId = $tmpValue['res_id'];
                     }
