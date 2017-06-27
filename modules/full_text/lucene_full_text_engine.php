@@ -365,6 +365,9 @@ if ($_ENV['tablename'] == 'res_attachments' || $_ENV['tablename'] == 'res_versio
 
     $_ENV['logger']->write("docServers ".$_ENV['tablename']." found !");
 
+    $queryCount = "SELECT count(1) as count FROM "
+        . $_ENV['tablename'] . " WHERE (" . $fulltextColumnName . " = '0' or "
+        . $fulltextColumnName . " = '' or " . $fulltextColumnName . " is null) AND format = 'pdf'";
     $queryIndexFullText = "SELECT res_id, docserver_id, path, filename, format FROM "
         . $_ENV['tablename'] . " WHERE (" . $fulltextColumnName . " = '0' or "
         . $fulltextColumnName . " = '' or " . $fulltextColumnName . " is null) AND format = 'pdf'";
@@ -372,28 +375,34 @@ if ($_ENV['tablename'] == 'res_attachments' || $_ENV['tablename'] == 'res_versio
     
     $_ENV['logger']->write("docServers ".$_ENV['tablename']." found !");
 
+    $queryCount = "SELECT count(1) as count FROM "
+        . $_ENV['tablename'] . " WHERE " . $fulltextColumnName . " = '0' or "
+        . $fulltextColumnName . " = '' or " . $fulltextColumnName . " is null ";
     $queryIndexFullText = "SELECT res_id, docserver_id, path, filename, format FROM "
         . $_ENV['tablename'] . " WHERE " . $fulltextColumnName . " = '0' or "
         . $fulltextColumnName . " = '' or " . $fulltextColumnName . " is null ";
 }
 
 //$_ENV['logger']->write("query to found document with no full text : ".$queryIndexFullText);
-$stmt = $_ENV['db']->query($queryIndexFullText);
+$stmt = $_ENV['db']->query($queryCount);
 $cpt_batch_size=0;
 //$_ENV['logger']->write("max_batch_size : ".$_ENV['max_batch_size']);
+$nbResToFulltext = $stmt->fetchObject()->count;
 
-if ($stmt->rowCount() === 0) {
+if ($nbResToFulltext === 0) {
     Bt_exitBatch(0, 'No document to process');
 }else{
-    $_ENV['logger']->write($stmt->rowCount().' document(s) to proceed.');
+    $_ENV['logger']->write($nbResToFulltext.' document(s) to proceed.');
 }
+
+$stmt = $_ENV['db']->query($queryIndexFullText);
 
 while ($queryResult=$stmt->fetch(PDO::FETCH_NUM)) {
     if ($_ENV['max_batch_size'] >= $cpt_batch_size) {
         $pathToFile = $pathToDocServer[$queryResult[1]]
             . str_replace("#", DIRECTORY_SEPARATOR, $queryResult[2])
             . DIRECTORY_SEPARATOR . $queryResult[3];
-        $_ENV['logger']->write("processing of document ".($cpt_batch_size+1)."/".$stmt->rowCount()." (RES_ID => ". $queryResult[0] . ", FORMAT => ".$queryResult[4].", FILE => " . $pathToFile.")");
+        $_ENV['logger']->write("processing of document ".($cpt_batch_size+1)."/".$nbResToFulltext." (RES_ID => ". $queryResult[0] . ", FORMAT => ".$queryResult[4].", FILE => " . $pathToFile.")");
         $result = indexFullText(
             $pathToFile, $indexFileDirectory, $queryResult[4], $queryResult[0]
         );
