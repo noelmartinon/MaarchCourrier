@@ -183,7 +183,6 @@ while ($queryResult = $stmt1->fetchObject()) {
 $docserversList = implode(', ', $docserversList);
 //$GLOBALS['logger']->write("List of docServers : " . $docserversList);
 
-
 if (is_dir($pathToDocServer[(string)$docserverId])) {
     $pathOutput = $pathToDocServer[(string)$docserverId];
     $GLOBALS['logger']->write("TNL path: ".$pathOutput);
@@ -195,15 +194,23 @@ if (is_dir($pathToDocServer[(string)$docserverId])) {
 }
 $cpt_batch_size=0;
 
+$queryCount = "select count(1) as count from "
+    . $GLOBALS['tablename'] . " where (tnl_filename = '' or tnl_filename is null) "
+    . " and (filename <> '' or filename is not null)";
+$stmt1 = $GLOBALS['db']->query($queryCount);
+
+$nbResToProcess = $stmt1->fetchObject()->count;
+
 $queryMakeThumbnails = "select res_id, docserver_id, path, filename, format from "
-    . $GLOBALS['tablename'] . " where tnl_filename = '' or tnl_filename is null ";
+    . $GLOBALS['tablename'] . " where (tnl_filename = '' or tnl_filename is null) "
+    . " and (filename <> '' or filename is not null)";
 
 $stmt1 = $GLOBALS['db']->query($queryMakeThumbnails);
 
-if ($stmt1->rowCount() === 0) {
+if ($nbResToProcess === 0) {
     Bt_exitBatch(0, 'No document to process');
 } else {
-    $GLOBALS['logger']->write($stmt1->rowCount()." document(s) to process...");
+    $GLOBALS['logger']->write($nbResToProcess." document(s) to process...");
 }
 
 $i = 1;
@@ -218,7 +225,7 @@ while ($queryResult=$stmt1->fetchObject()) {
         $outputPathFile  = $pathOutput . str_replace("#", DIRECTORY_SEPARATOR, $queryResult->path) 
             . str_replace(pathinfo($pathToFile, PATHINFO_EXTENSION), "png",$queryResult->filename);
         
-        $GLOBALS['logger']->write('Process n°'.$i.'/'.$stmt1->rowCount().' (RES_ID => '.$queryResult->res_id.', FORMAT => '.$fileFormat.', PATH => '.$pathToFile.')');
+        $GLOBALS['logger']->write('Process n°'.$i.'/'.$nbResToProcess.' (RES_ID => '.$queryResult->res_id.', FORMAT => '.$fileFormat.', PATH => '.$pathToFile.')');
         
         
         if (strtoupper($fileFormat) <> 'PDF' 
