@@ -980,31 +980,12 @@ function launch_autocompleter2_contacts_v2(path_script, id_text, id_div, cat_id,
                 var res = all_li.split(",");
                 parent.$(contact_id).value = res[0];
                 parent.$(address_id).value = res[1];
-                if (path_script2 && res[1]) {
-                    getDepartment(path_script2, res[1]);
-                }
                 
             }
         });
     else {
         return false;
     }
-}
-
-function getDepartment(path_script, address_id) {
-    new Ajax.Request(path_script,
-    {
-        method:'post',
-        parameters: { address_id : address_id
-                    },
-            onSuccess: function(answer){
-            eval("response = "+answer.responseText);
-            if(response.status == 0 ) {
-                parent.$("department_number").value = response.departement_name;
-                parent.$("department_number_id").value = response.departement_id;
-            }
-        }
-    });
 }
 
 function putInSessionContact(path_script){
@@ -1502,7 +1483,6 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
             } else if (parent.$('transmissionAddressidAttach'+transmission)){
                 parent.$('transmissionAddressidAttach'+transmission).value = response.addressId;
             }
-            getDepartment('index.php?display=true&page=getDepartment', response.addressId);
         }       
     });
     }else{
@@ -1550,7 +1530,6 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
             } else if (parent.parent.$('mlb_coll_ext/address_id')){
                 parent.parent.$('mlb_coll_ext/address_id').value = response.addressId;
             }
-            getDepartment('index.php?display=true&page=getDepartment', response.addressId);
         }       
     });
     }
