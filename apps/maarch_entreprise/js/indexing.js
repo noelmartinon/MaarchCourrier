@@ -980,31 +980,12 @@ function launch_autocompleter2_contacts_v2(path_script, id_text, id_div, cat_id,
                 var res = all_li.split(",");
                 parent.$(contact_id).value = res[0];
                 parent.$(address_id).value = res[1];
-                if (path_script2 && res[1]) {
-                    getDepartment(path_script2, res[1]);
-                }
                 
             }
         });
     else {
         return false;
     }
-}
-
-function getDepartment(path_script, address_id) {
-    new Ajax.Request(path_script,
-    {
-        method:'post',
-        parameters: { address_id : address_id
-                    },
-            onSuccess: function(answer){
-            eval("response = "+answer.responseText);
-            if(response.status == 0 ) {
-                parent.$("department_number").value = response.departement_name;
-                parent.$("department_number_id").value = response.departement_id;
-            }
-        }
-    });
 }
 
 function putInSessionContact(path_script){
@@ -1502,7 +1483,6 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
             } else if (parent.$('transmissionAddressidAttach'+transmission)){
                 parent.$('transmissionAddressidAttach'+transmission).value = response.addressId;
             }
-            getDepartment('index.php?display=true&page=getDepartment', response.addressId);
         }       
     });
     }else{
@@ -1520,6 +1500,8 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
                 parent.$('contact').value = response.contactName;
             } else if (parent.parent.$('contact')  && parent.parent.$('add_multi_contact_tr').style.display == 'none') {
                 parent.parent.$('contact').value = response.contactName;
+            } else if (parent.parent.$('mlb_coll_ext/exp_contact_name')) {
+                parent.parent.$('mlb_coll_ext/exp_contact_name').value = response.contactName;
             }
             if (parent.$('email') && parent.$('add_multi_contact_tr').style.display != 'none') {
                 parent.$('email').value = response.contactName;
@@ -1534,6 +1516,8 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
                 parent.$('contactid').value = response.contactId;
             } else if (parent.parent.$('contactid')){
                 parent.parent.$('contactid').value = response.contactId;
+            } else if (parent.parent.$('mlb_coll_ext/exp_contact_id')){
+                parent.parent.$('mlb_coll_ext/exp_contact_id').value = response.contactId;
             }
             if (parent.$('addressidAttach')) {
                 parent.$('addressidAttach').value = response.addressId;
@@ -1543,8 +1527,9 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
                 parent.$('addressid').value = response.addressId;
             } else if (parent.parent.$('addressid')){
                 parent.parent.$('addressid').value = response.addressId;
+            } else if (parent.parent.$('mlb_coll_ext/address_id')){
+                parent.parent.$('mlb_coll_ext/address_id').value = response.addressId;
             }
-            getDepartment('index.php?display=true&page=getDepartment', response.addressId);
         }       
     });
     }
