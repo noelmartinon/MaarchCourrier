@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <CONFIG>
+        <name>export_seda</name>
+        <comment>_EXPORT_SEDA_COMMENT</comment>
+        <file_prefix>seda</file_prefix>
+        <loaded>true</loaded>
+        <sae>MaarchRM</sae>
+        <token></token>
+        <urlSAEService>http://srv-maarchrm-ap</urlSAEService>
+        <urlSAE>http://maarchrm/transfer/sent</urlSAE>
+        <deleteData>true</deleteData>
+    </CONFIG>
+    <TABLENAME/>
+    <HISTORY>
+        <sedaup>true</sedaup>
+        <sedaadd>true</sedaadd>
+        <sedadel>true</sedadel>
+    </HISTORY>
+</root>

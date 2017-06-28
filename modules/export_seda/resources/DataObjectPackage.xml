@@ -1,0 +1,28 @@
+<DataObjectPackage>
+    <?merge $dataObjectPackage.binaryDataObject ?>
+    <BinaryDataObject id="doc_[?merge .id ?]">
+        <Attachment filename="[?merge .attachment.filename ?]"/>
+        <Uri><?merge .uri ?></Uri>
+        <MessageDigest algorithm="[?merge .messageDigest.algorithm ?]"><?merge .messageDigest.value ?></MessageDigest>
+        <Size><?merge .size.value ?></Size>
+        <FormatIdentification>
+            <MimeType><?merge .formatIdentification.mimeType ?></MimeType>
+            <FormatId><?merge .formatIdentification.formatId ?></FormatId>
+        </FormatIdentification>
+        <?merge .fileInfo.bool() ?>
+        <FileInfo>
+            <Filename><?merge .fileInfo.filename ?></Filename>
+        </FileInfo>
+    </BinaryDataObject>
+    <?merge $dataObjectPackage.physicalDataObject.bool() ?>
+    <PhysicalDataObject>
+        <?merge .bool() ?>
+        <PhysicalId schemeID="[?merge .physicalId.schemeID ?]" schemeName="[?merge .physicalId.schemeName ?]" schemeAgencyID="[?merge .physicalId.schemeAgencyID ?]" schemeAgencyName="[?merge .physicalId.schemeAgencyName ?]" schemeVersionID="[?merge .physicalId.schemeVersionID ?]" schemeDataURI="[?merge .physicalId.schemeDataURI ?]" schemeURI="[?merge .physicalId.schemeURI ?]"><?merge .physicalId.value ?></PhysicalId>
+    </PhysicalDataObject>
+    <DescriptiveMetadata>
+        <?merge $dataObjectPackage.descriptiveMetadata ?>
+        <?xinclude /resources/ArchiveUnit.xml ?>
+    </DescriptiveMetadata>
+    <?merge $dataObjectPackage.managementMetadata $managementMetadata ?>
+    <?xinclude /resources/ManagementMetadata.xml ?>
+</DataObjectPackage>
