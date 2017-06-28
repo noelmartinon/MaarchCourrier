@@ -113,6 +113,7 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $num_args = count($args);
     if ($num_args == 0) return "<ul></ul>"; 
        
+    $aAlreadyCatch = [];
     //STEP 1 : search with lastname (physical contact)
     $query = "SELECT contact_id,ca_id,contact_firstname, contact_lastname, society,address_num,address_street,is_private,CASE WHEN LOWER(translate(contact_lastname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) like LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) THEN contact_lastname END as trust_result FROM view_contacts WHERE is_corporate_person = 'N' AND contact_enabled = 'Y' AND enabled = 'Y' AND (LOWER(translate(contact_lastname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))) ORDER BY contact_lastname,contact_firstname ASC";
     $arrayPDO = array('%'.$_REQUEST['Input'].'%','%'.$_REQUEST['Input'].'%');
@@ -122,47 +123,48 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $m = 30;
     if ($nb_step1 >= $m) $l = $m;
     else $l = $nb_step1;
-    
-    $found = false;
 
     for ($i=0; $i<$l; $i++) {
 
         $res = $stmt->fetchObject();
 
-        if($res->trust_result){
-            $count_trust = strlen($res->trust_result);
-            $count_input = strlen($_REQUEST['Input']);
+        if(!isset($aAlreadyCatch[$res->contact_id.",".$res->ca_id])){
+            if($res->trust_result){
+                $count_trust = strlen($res->trust_result);
+                $count_input = strlen($_REQUEST['Input']);
 
-            $confidence_index = round(($count_input*100)/$count_trust);
-        }else{
-            $confidence_index = '??';
+                $confidence_index = round(($count_input*100)/$count_trust);
+            }else{
+                $confidence_index = '??';
+            }
+
+            if(!empty($res->society)){
+                $arr_contact_info = array($res->contact_firstname,$res->contact_lastname,'('.$res->society.')');
+            }else{
+                $arr_contact_info = array($res->contact_firstname,$res->contact_lastname);
+            }
+            $contact_info = implode(' ', $arr_contact_info);
+
+            $address = '';
+
+            if(!empty($res->address_street) && $res->is_private != 'Y'){
+                $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
+                $address = implode(' ', $arr_address);
+            }else if($res->is_private == 'Y'){
+                $address = 'adresse confidentielle';
+            }else{
+                $address = 'aucune information sur l\'adresse';
+            }
+
+            if ($i%2==1) $color = 'LightYellow';
+            else $color = 'white';
+
+            echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
+                    . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
+                ."</li>";
+            $aAlreadyCatch[$res->contact_id.",".$res->ca_id] = 'added';
         }
-
-        if(!empty($res->society)){
-            $arr_contact_info = array($res->contact_firstname,$res->contact_lastname,'('.$res->society.')');
-        }else{
-            $arr_contact_info = array($res->contact_firstname,$res->contact_lastname);
-        }
-        $contact_info = implode(' ', $arr_contact_info);
-
-        $address = '';
-
-        if(!empty($res->address_street) && $res->is_private != 'Y'){
-            $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-            $address = implode(' ', $arr_address);
-        }else if($res->is_private == 'Y'){
-            $address = 'adresse confidentielle';
-        }else{
-            $address = 'aucune information sur l\'adresse';
-        }
-
-        if ($i%2==1) $color = 'LightYellow';
-        else $color = 'white';
-
-        echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
-                . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
-                . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
-            ."</li>";
     }
 
     //STEP 2 : search with lastname(corporate contact)
@@ -174,35 +176,36 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $m = 30;
     if ($nb_step2 >= $m) $l = $m;
     else $l = $nb_step2;
-    
-    $found = false;
 
     for ($i=0; $i<$l; $i++) {
      
         $res = $stmt->fetchObject();
 
-        $count_trust = strlen($res->trust_result);
-        $count_input = strlen($_REQUEST['Input']);
-        $confidence_index = round(($count_input*100)/$count_trust);
+        if(!isset($aAlreadyCatch[$res->contact_id.",".$res->ca_id])){
+            $count_trust = strlen($res->trust_result);
+            $count_input = strlen($_REQUEST['Input']);
+            $confidence_index = round(($count_input*100)/$count_trust);
 
-        $address = '';
-        $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-        $tmp_address = implode(' ', $arr_address);
+            $address = '';
+            $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
+            $tmp_address = implode(' ', $arr_address);
 
-        if(!empty($res->firstname) || !empty($res->lastname) ){
-            $arr_address = array($res->firstname.' '.$res->lastname,$tmp_address);
-            $address = implode(', ', $arr_address);
-        }else{
-            $address = $tmp_address;
+            if(!empty($res->firstname) || !empty($res->lastname) ){
+                $arr_address = array($res->firstname.' '.$res->lastname,$tmp_address);
+                $address = implode(', ', $arr_address);
+            }else{
+                $address = $tmp_address;
+            }
+
+            if ($i%2==1) $color = 'LightYellow';
+            else $color = 'white';
+
+            echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
+                    . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
+                ."</li>";
+            $aAlreadyCatch[$res->contact_id.",".$res->ca_id] = 'added';
         }
-
-        if ($i%2==1) $color = 'LightYellow';
-        else $color = 'white';
-
-        echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
-                . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
-                . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
-            ."</li>";
     }
 
     //STEP 3 : search with society(physical contact)
@@ -214,47 +217,48 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $m = 30;
     if ($nb_step3 >= $m) $l = $m;
     else $l = $nb_step3;
-    
-    $found = false;
 
     for ($i=0; $i<$l; $i++) {
 
         $res = $stmt->fetchObject();
 
-        if($res->trust_result){
-            $count_trust = strlen($res->trust_result);
-            $count_input = strlen($_REQUEST['Input']);
+        if(!isset($aAlreadyCatch[$res->contact_id.",".$res->ca_id])){
+            if($res->trust_result){
+                $count_trust = strlen($res->trust_result);
+                $count_input = strlen($_REQUEST['Input']);
 
-            $confidence_index = round(($count_input*100)/$count_trust);
-        }else{
-            $confidence_index = '??';
+                $confidence_index = round(($count_input*100)/$count_trust);
+            }else{
+                $confidence_index = '??';
+            }
+
+            if(!empty($res->society)){
+                $arr_contact_info = array($res->contact_firstname,$res->contact_lastname,'('.$res->society.')');
+            }else{
+                $arr_contact_info = array($res->contact_firstname,$res->contact_lastname);
+            }
+            $contact_info = implode(' ', $arr_contact_info);
+
+            $address = '';
+
+            if(!empty($res->address_street) && $res->is_private != 'Y'){
+                $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
+                $address = implode(' ', $arr_address);
+            }else if($res->is_private == 'Y'){
+                $address = 'adresse confidentielle';
+            }else{
+                $address = 'aucune information sur l\'adresse';
+            }
+
+            if ($i%2==1) $color = 'LightYellow';
+            else $color = 'white';
+
+            echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
+                    . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
+                ."</li>";
+            $aAlreadyCatch[$res->contact_id.",".$res->ca_id] = 'added';
         }
-
-        if(!empty($res->society)){
-            $arr_contact_info = array($res->contact_firstname,$res->contact_lastname,'('.$res->society.')');
-        }else{
-            $arr_contact_info = array($res->contact_firstname,$res->contact_lastname);
-        }
-        $contact_info = implode(' ', $arr_contact_info);
-
-        $address = '';
-
-        if(!empty($res->address_street) && $res->is_private != 'Y'){
-            $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-            $address = implode(' ', $arr_address);
-        }else if($res->is_private == 'Y'){
-            $address = 'adresse confidentielle';
-        }else{
-            $address = 'aucune information sur l\'adresse';
-        }
-
-        if ($i%2==1) $color = 'LightYellow';
-        else $color = 'white';
-
-        echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
-                . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
-                . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
-            ."</li>";
     }
     ///////////////////////
 
@@ -267,40 +271,42 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $m = 30;
     if ($nb_step4 >= $m) $l = $m;
     else $l = $nb_step4;
-    
-    $found = false;
 
     for ($i=0; $i<$l; $i++) {
      
         $res = $stmt->fetchObject();
 
-        if($res->trust_result){
-            $count_trust = strlen($res->trust_result);
-            $count_input = strlen($_REQUEST['Input']);
+        if(!isset($aAlreadyCatch[$res->contact_id.",".$res->ca_id])){
+            if($res->trust_result){
+                $count_trust = strlen($res->trust_result);
+                $count_input = strlen($_REQUEST['Input']);
 
-            $confidence_index = round(($count_input*100)/$count_trust);
-        }else{
-            $confidence_index = '??';
+                $confidence_index = round(($count_input*100)/$count_trust);
+            }else{
+                $confidence_index = '??';
+            }
+            
+
+            $address = '';
+            $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
+            $tmp_address = implode(' ', $arr_address);
+
+            if(!empty($res->firstname) || !empty($res->lastname) ){
+                $arr_address = array($res->firstname.' '.$res->lastname,$tmp_address);
+                $address = implode(', ', $arr_address);
+            }else{
+                $address = $tmp_address;
+            }
+
+            if ($i%2==1) $color = 'LightYellow';
+            else $color = 'white';
+
+            echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
+                    . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
+                ."</li>";
+            $aAlreadyCatch[$res->contact_id.",".$res->ca_id] = 'added';
         }
-        
-
-        $address = '';
-        $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-        $tmp_address = implode(' ', $arr_address);
-
-        if(!empty($res->firstname) || !empty($res->lastname) ){
-            $arr_address = array($res->firstname.' '.$res->lastname,$tmp_address);
-            $address = implode(', ', $arr_address);
-        }else{
-            $address = $tmp_address;
-        }
-
-        if ($i%2==1) $color = 'LightYellow';
-        else $color = 'white';
-        echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title='confiance : ".$confidence_index."%'><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
-                . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
-                . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
-            ."</li>";
     }
     ///////////////////////
 
@@ -314,37 +320,39 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $m = 30;
     if ($nb_step5 >= $m) $l = $m;
     else $l = $nb_step5;
-    
-    $found = false;
 
     for ($i=0; $i<$l; $i++) {
 
         $res = $stmt->fetchObject();
 
-        if(!empty($res->society)){
-            $arr_contact_info = array($res->contact_firstname,$res->contact_lastname,'('.$res->society.')');
-        }else{
-            $arr_contact_info = array($res->contact_firstname,$res->contact_lastname);
+        if(!isset($aAlreadyCatch[$res->contact_id.",".$res->ca_id])){
+            if(!empty($res->society)){
+                $arr_contact_info = array($res->contact_firstname,$res->contact_lastname,'('.$res->society.')');
+            }else{
+                $arr_contact_info = array($res->contact_firstname,$res->contact_lastname);
+            }
+            $contact_info = implode(' ', $arr_contact_info);
+
+            $address = '';
+
+            if(!empty($res->address_street) && $res->is_private != 'Y'){
+                $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
+                $address = implode(' ', $arr_address);
+            }else if($res->is_private == 'Y'){
+                $address = 'adresse confidentielle';
+            }else{
+                $address = 'aucune information sur l\'adresse';
+            }
+
+            if ($i%2==1) $color = 'LightYellow';
+            else $color = 'white';
+
+            echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title=''><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
+                    . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
+                ."</li>";
+            $aAlreadyCatch[$res->contact_id.",".$res->ca_id] = 'added';
         }
-        $contact_info = implode(' ', $arr_contact_info);
-
-        $address = '';
-
-        if(!empty($res->address_street) && $res->is_private != 'Y'){
-            $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-            $address = implode(' ', $arr_address);
-        }else if($res->is_private == 'Y'){
-            $address = 'adresse confidentielle';
-        }else{
-            $address = 'aucune information sur l\'adresse';
-        }
-
-        if ($i%2==1) $color = 'LightYellow';
-        else $color = 'white';
-        echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title=''><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
-                . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
-                . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
-            ."</li>";
     }
 
 
@@ -360,30 +368,32 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $m = 30;
     if ($nb_step6 >= $m) $l = $m;
     else $l = $nb_step6;
-    
-    $found = false;
 
     for ($i=0; $i<$l; $i++) {
      
         $res = $stmt->fetchObject();
 
-        $address = '';
-        $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-        $tmp_address = implode(' ', $arr_address);
+        if(!isset($aAlreadyCatch[$res->contact_id.",".$res->ca_id])){
+            $address = '';
+            $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
+            $tmp_address = implode(' ', $arr_address);
 
-        if(!empty($res->firstname) || !empty($res->lastname) ){
-            $arr_address = array($res->firstname.' '.$res->lastname,$tmp_address);
-            $address = implode(', ', $arr_address);
-        }else{
-            $address = $tmp_address;
+            if(!empty($res->firstname) || !empty($res->lastname) ){
+                $arr_address = array($res->firstname.' '.$res->lastname,$tmp_address);
+                $address = implode(', ', $arr_address);
+            }else{
+                $address = $tmp_address;
+            }
+
+            if ($i%2==1) $color = 'LightYellow';
+            else $color = 'white';
+
+            echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title=''><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
+                    . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
+                ."</li>";
+            $aAlreadyCatch[$res->contact_id.",".$res->ca_id] = 'added';
         }
-
-        if ($i%2==1) $color = 'LightYellow';
-        else $color = 'white';
-        echo "<li id='".$res->contact_id.",".$res->ca_id."' style='font-size:12px;background-color:$color;' title=''><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
-                . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
-                . '<div style="font-size:9px;font-style:italic;"> - ' .str_replace($args, $args_bold, $address).'</div>'
-            ."</li>";
     }
     if($nb_step1 == 0 && $nb_step2 == 0 && $nb_step3 == 0 && $nb_step4 == 0 && $nb_step5 == 0 && $nb_step6 == 0) echo "<li></li>";
     echo "</ul>";
