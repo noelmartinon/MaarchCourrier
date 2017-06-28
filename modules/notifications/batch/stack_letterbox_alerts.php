@@ -16,11 +16,15 @@ while ($state <> 'END') {
     /* Load parameters                                                    */
     /**********************************************************************/
     case 'LOAD_ALERTS_NOTIFS' :
-        $query = "SELECT notification_sid, event_id FROM " 
-        . _NOTIFICATIONS_TABLE_NAME 
-        . " WHERE event_id IN ('alert1', 'alert2') ";
+        $query = "SELECT count(1) as count FROM " 
+            . _NOTIFICATIONS_TABLE_NAME 
+            . " WHERE event_id IN ('alert1', 'alert2') ";
         $stmt = Bt_doQuery($db, $query);
-        $totalAlertsToProcess = $stmt->rowCount();
+        $totalAlertsToProcess = $stmt->fetchObject()->count;
+        $query = "SELECT notification_sid, event_id FROM " 
+            . _NOTIFICATIONS_TABLE_NAME 
+            . " WHERE event_id IN ('alert1', 'alert2') ";
+        $stmt = Bt_doQuery($db, $query);
         if ($totalAlertsToProcess === 0) {
             Bt_exitBatch(0, 'No alert parametered');
         }
@@ -38,9 +42,11 @@ while ($state <> 'END') {
     /* Load parameters                                                   */
     /**********************************************************************/
     case 'LOAD_DOCTYPES' :
+        $query = "SELECT count(1) as count FROM " . $collDoctypeExt;
+        $stmt = Bt_doQuery($db, $query);
+        $totalDocTypes = $stmt->fetchObject()->count;
         $query = "SELECT * FROM " . $collDoctypeExt;
         $stmt = Bt_doQuery($db, $query);
-        $totalDocTypes = $stmt->rowCount();
         $GLOBALS['doctypes'] = array();
         while ($doctypeRecordset = $stmt->fetchObject()) {
             $GLOBALS['doctypes'][$doctypeRecordset->type_id] = $doctypeRecordset;
@@ -53,6 +59,14 @@ while ($state <> 'END') {
     /* List the resources to proccess for alarms                          */
     /**********************************************************************/
     case 'LIST_DOCS' :
+        $query = "SELECT count(1) as count" 
+            . " FROM " . $collView
+            . " WHERE closing_date IS null"
+            . " AND status NOT IN ('CLO', 'DEL', 'END')"
+            . " AND (flag_alarm1 = 'N' OR flag_alarm2 = 'N')"
+            . " AND process_limit_date IS NOT NULL";
+        $stmt = Bt_doQuery($GLOBALS['db'], $query);
+        $totalDocsToProcess = $stmt->fetchObject()->count;
         $query = "SELECT res_id, type_id, process_limit_date, flag_alarm1, flag_alarm2" 
             . " FROM " . $collView
             . " WHERE closing_date IS null"
@@ -60,7 +74,6 @@ while ($state <> 'END') {
             . " AND (flag_alarm1 = 'N' OR flag_alarm2 = 'N')"
             . " AND process_limit_date IS NOT NULL";
         $stmt = Bt_doQuery($GLOBALS['db'], $query);
-        $totalDocsToProcess = $stmt->rowCount();
         $currentDoc = 0;
         if ($totalDocsToProcess === 0) {
             Bt_exitBatch(0, 'No document to process');
