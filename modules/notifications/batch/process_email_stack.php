@@ -16,10 +16,14 @@ while ($state <> 'END') {
     /* List the stack to proceed                                          */
     /**********************************************************************/
     case 'LOAD_EMAILS' :
+        $query = "SELECT count(1) as count FROM " . _NOTIF_EMAIL_STACK_TABLE_NAME
+            . " WHERE exec_date is NULL";
+        $stmt = Bt_doQuery($GLOBALS['db'], $query, array());
+        $totalEmailsToProcess = $stmt->fetchObject()->count;
         $query = "SELECT * FROM " . _NOTIF_EMAIL_STACK_TABLE_NAME
             . " WHERE exec_date is NULL";
         $stmt = Bt_doQuery($GLOBALS['db'], $query, array());
-        $totalEmailsToProcess = $stmt->rowCount();
+       // $totalEmailsToProcess = $stmt->rowCount();
         $currentEmail = 0;
         if ($totalEmailsToProcess === 0) {
             Bt_exitBatch(0, 'No notification to send');

@@ -30,6 +30,8 @@ class MyPDOStatement
     {
         if ($method == 'rowCount') {
             return $this->nbResult();
+        } elseif ($method == 'fetchObject') {
+            return $this->fetchMyObject();
         } else {
             return call_user_func_array(array($this->pdoStatement, $method), $args);
         }
@@ -47,6 +49,25 @@ class MyPDOStatement
                 $stmtRC = $db->query($query, $this->queryArgs); 
                 $fetch = $stmtRC->fetchObject();
                 return $fetch->rc;
+        }
+    }
+
+    protected function fetchMyObject()
+    {
+        switch ($_SESSION['config']['databasetype']) {
+            case 'POSTGRESQL'   : 
+                //see later if special cases
+                return $this->pdoStatement->fetchObject();
+            case 'ORACLE' :
+                $result = $this->pdoStatement->fetchObject();
+                foreach ($result as $name => $value) {
+                    if (gettype($value) == 'resource') {
+                        $result->$name = stream_get_contents($value);
+                    }
+                }
+                return $result;
+            default :
+                return $this->pdoStatement->fetchObject();
         }
     }
 }
