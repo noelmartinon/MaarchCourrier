@@ -55,12 +55,11 @@ class MyPDOStatement
     {
         $db = new Database();
         switch ($db->driver) {
-            case 'pgsql'   : 
+            case 'pgsql'   :
                 //see later if special cases
                 return $this->pdoStatement->fetchObject();
-            case 'oci' :
+            default :
                 $result = $this->pdoStatement->fetchObject();
-                //var_dump($result);
                 if ($result) {
                     foreach ($result as $name => $value) {
                         if (gettype($value) == 'resource') {
@@ -69,8 +68,6 @@ class MyPDOStatement
                     }
                 }
                 return $result;
-            default :
-                return $this->pdoStatement->fetchObject();
         }
     }
 }
