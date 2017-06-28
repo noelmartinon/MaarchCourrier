@@ -287,10 +287,29 @@ abstract class contacts_v2_Abstract extends Database
                     $hist = new history();
                     $hist->add($_SESSION['tablename']['contacts_v2'], $id,"ADD",'contacts_v2_add',$msg, $_SESSION['config']['databasetype']);
                 }
+
+                    $sQueryString = '';
+                    $aQueryValues = [];
+                    foreach (['lastname' => $_SESSION['m_admin']['contact']['LASTNAME'], 
+                            'firstname' => $_SESSION['m_admin']['contact']['FIRSTNAME'], 
+                            'society' => $_SESSION['m_admin']['contact']['SOCIETY'], 
+                            'function' => $_SESSION['m_admin']['contact']['FUNCTION'],
+                            'is_corporate_person' => $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']] as $key => $value) {
+                        if($key != 'lastname'){
+                            $sQueryString .= ' and ';
+                        }
+                        if(empty(trim($value))){
+                            $sQueryString .= ' ('.$key.' = \'\' or '.$key.' is null) ';
+                        } else {
+                            $sQueryString .= $key . ' = ? ';
+                            array_push($aQueryValues, $value);
+                        }
+                    }
+
                     $stmt = $db->query("SELECT contact_id, creation_date FROM ".$_SESSION['tablename']['contacts_v2']
-                        ." WHERE lastname = ? and firstname = ? and society = ? and function = ? and is_corporate_person = ? order by creation_date desc"
-                        , array($_SESSION['m_admin']['contact']['LASTNAME'], $_SESSION['m_admin']['contact']['FIRSTNAME'], $_SESSION['m_admin']['contact']['SOCIETY']
-                            , $_SESSION['m_admin']['contact']['FUNCTION'], $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']));
+                        ." WHERE ".$sQueryString." order by creation_date desc"
+                        , $aQueryValues);
+
                     $res = $stmt->fetchObject();
                     $id = $res->contact_id;
                     $_SESSION['contact']['current_contact_id'] = $id;
