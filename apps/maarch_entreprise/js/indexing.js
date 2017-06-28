@@ -1520,6 +1520,8 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
                 parent.$('contact').value = response.contactName;
             } else if (parent.parent.$('contact')  && parent.parent.$('add_multi_contact_tr').style.display == 'none') {
                 parent.parent.$('contact').value = response.contactName;
+            } else if (parent.parent.$('mlb_coll_ext/exp_contact_name')) {
+                parent.parent.$('mlb_coll_ext/exp_contact_name').value = response.contactName;
             }
             if (parent.$('email') && parent.$('add_multi_contact_tr').style.display != 'none') {
                 parent.$('email').value = response.contactName;
@@ -1534,6 +1536,8 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
                 parent.$('contactid').value = response.contactId;
             } else if (parent.parent.$('contactid')){
                 parent.parent.$('contactid').value = response.contactId;
+            } else if (parent.parent.$('mlb_coll_ext/exp_contact_id')){
+                parent.parent.$('mlb_coll_ext/exp_contact_id').value = response.contactId;
             }
             if (parent.$('addressidAttach')) {
                 parent.$('addressidAttach').value = response.addressId;
@@ -1543,6 +1547,8 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
                 parent.$('addressid').value = response.addressId;
             } else if (parent.parent.$('addressid')){
                 parent.parent.$('addressid').value = response.addressId;
+            } else if (parent.parent.$('mlb_coll_ext/address_id')){
+                parent.parent.$('mlb_coll_ext/address_id').value = response.addressId;
             }
             getDepartment('index.php?display=true&page=getDepartment', response.addressId);
         }       
