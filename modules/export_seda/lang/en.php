@@ -1,6 +1,7 @@
 <?php
 
 if (!defined("_EXPORT_SEDA_COMMENT"))
+<<<<<<< HEAD:modules/export_seda/lang/en.php
     define("_EXPORT_SEDA_COMMENT", "SEDA export");
 
 if (!defined("_EXPORT_SEDA"))
@@ -8,6 +9,15 @@ if (!defined("_EXPORT_SEDA"))
 
 if (!defined("_EXPORT_SEDA_VIEW"))
     define("_EXPORT_SEDA_VIEW", "See SEDA export");
+=======
+    define("_EXPORT_SEDA_COMMENT", "Export");
+
+if (!defined("_EXPORT_SEDA"))
+    define("_EXPORT_SEDA", "Export");
+
+if (!defined("_EXPORT_SEDA_VIEW"))
+    define("_EXPORT_SEDA_VIEW", "See message export");
+>>>>>>> ff573a68e... Fix #5642 Rename module export export_seda:modules/export_seda/lang/en.php
 
 if (!defined("_INFORMATION_MESSAGE"))
     define("_INFORMATION_MESSAGE", "Information message");

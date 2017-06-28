@@ -10,7 +10,11 @@
 /**
 * @brief Export seda Action
 * @author dev@maarch.org
+<<<<<<< HEAD:modules/export_seda/export_seda.php
 * @ingroup export_seda
+=======
+* @ingroup export seda
+>>>>>>> ff573a68e... Fix #5642 Rename module export export_seda:modules/export_seda/export_seda.php
 */
 
 /**
@@ -85,8 +89,10 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         $frm_str .= '</div>';
         $frm_str .='<div align="center">';
         $frm_str .='<input type="button" name="zip" id="zip" class="button"  value="'._ZIP.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_seda_zip&reference='.$messageObject->messageIdentifier->value.'\',\'zip\');"/>&nbsp&nbsp&nbsp';
-        $frm_str .='<input type="button" name="sendMessage" id="sendMessage" class="button"  value="'._SEND_MESSAGE.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_transfer_SAE&reference='.$messageObject->messageIdentifier->value.'&resIds='.$result.'\',\'sendMessage\');"/>';
-        $frm_str .='</div>';
+        if (file_exists(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml")) {
+            $frm_str .= '<input type="button" name="sendMessage" id="sendMessage" class="button"  value="' . _SEND_MESSAGE . '" onclick="actionSeda(\'' . $path_to_script . '&page=Ajax_transfer_SAE&reference=' . $messageObject->messageIdentifier->value . '&resIds=' . $result . '\',\'sendMessage\');"/>';
+        }
+            $frm_str .='</div>';
 
         $frm_str .='<div align="center"  name="validSend" id="validSend" style="display: none "><input type="button" class="button" name="validateMessage" id="validateMessage" value="'._VALIDATE_MANUAL_DELIVERY.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_validate_change_status&reference='.$messageObject->messageIdentifier->value.'\',\'validateMessage\');"/></div>';
     } else {
@@ -96,11 +102,9 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     }
 
     //$config = parse_ini_file(__DIR__.'/config.ini');
-    $xml = simplexml_load_file(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml");
-    $urlSAE = (string) $xml->CONFIG->urlSAE;
+    $frm_str .= '<div align="center"  name="valid" id="valid" style="display: none "><br><input type="button" class="button" name="validateReload" id="validateReload" value="' . _VALIDATE . '" onclick="window.location.reload()"/></div>';
+    $frm_str .= '<hr />';
 
-    $frm_str .='<div align="center"  name="valid" id="valid" style="display: none "><a href="'.$urlSAE.'">'._URLSAE.'</a><span name="nameSAE"></span><br><input type="button" class="button" name="validateReload" id="validateReload" value="'._VALIDATE.'" onclick="window.location.reload()"/></div>';
-    $frm_str .='<hr />';
     $frm_str .='<div align="center">';
     $frm_str .='<input type="button" name="cancel" id="cancel" class="button"  value="'._CANCEL.'" onclick="pile_actions.action_pop();destroyModal(\'modal_'.$id_action.'\');"/>';
     $frm_str .='</div>';

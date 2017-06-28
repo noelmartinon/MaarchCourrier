@@ -1,7 +1,12 @@
 <?php
 
+<<<<<<< HEAD:modules/export_seda/lang/fr.php
 if (!defined("_EXPORT_SEDA_COMMENT"))
     define("_EXPORT_SEDA_COMMENT", "Export SEDA");
+=======
+if (!defined("_EXPORTSEDA_COMMENT"))
+    define("_EXPORT_SEDA_COMMENT", "Export");
+>>>>>>> ff573a68e... Fix #5642 Rename module export export_seda:modules/export_seda/lang/fr.php
 
 if (!defined("_EXPORT_SEDA"))
     define("_EXPORT_SEDA","Transferer vos courriers");
@@ -16,7 +21,11 @@ if (!defined("_RESET_LETTER"))
 
 
 if (!defined("_EXPORT_SEDA_VIEW"))
+<<<<<<< HEAD:modules/export_seda/lang/fr.php
     define("_EXPORT_SEDA_VIEW", "Voir le bordereau SEDA");
+=======
+    define("_EXPORT_SEDA_VIEW", "Voir le bordereau");
+>>>>>>> ff573a68e... Fix #5642 Rename module export export_seda:modules/export_seda/lang/fr.php
 
 if (!defined("_INFORMATION_MESSAGE"))
     define("_INFORMATION_MESSAGE", "Information bordereau");

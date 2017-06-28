@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+An action page is described in a ACTIONPAGE tag :
+    <ACTIONPAGE>
+        <ID>redirect</ID>  => Action identifier
+        <LABEL>_REDIRECTION</LABEL> => Action label, can be a language constant or not
+        <NAME>redirect</NAME> => name of the action page without the .php, here the action page is redirect.php
+        <ORIGIN>module</ORIGIN> => action origin : apps or module
+        <MODULE>entities</MODULE> => If origin is module, the module name
+        <KEYWORD>redirect</KEYWORD> => Keyword used for special parameters (tag not mandatory)
+        <FLAG_CREATE>false</FLAG_CREATE> => true if the action create a new ressource, false otherwise (we recommend to leave it at false except for the indexing action page)
+    </ACTIONPAGE>
+-->
+<ROOT>
+    <ACTIONPAGE>
+        <ID>export_seda</ID>
+        <LABEL>_EXPORT_SEDA</LABEL>
+        <NAME>export_seda</NAME>
+        <ORIGIN>module</ORIGIN>
+        <MODULE>export_seda</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>check_acknowledgement</ID>
+        <LABEL>_CHECK_ACKNOWLEDGEMENT</LABEL>
+        <NAME>check_acknowledgement</NAME>
+        <ORIGIN>module</ORIGIN>
+        <MODULE>export_seda</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>check_reply</ID>
+        <LABEL>_CHECK_REPLY</LABEL>
+        <NAME>check_reply</NAME>
+        <ORIGIN>module</ORIGIN>
+        <MODULE>export_seda</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>purge_letter</ID>
+        <LABEL>_PURGE_LETTER</LABEL>
+        <NAME>purge_letter</NAME>
+        <ORIGIN>module</ORIGIN>
+        <MODULE>export_seda</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>reset_letter</ID>
+        <LABEL>_RESET_LETTER</LABEL>
+        <NAME>reset_letter</NAME>
+        <ORIGIN>module</ORIGIN>
+        <MODULE>export_seda</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+</ROOT>

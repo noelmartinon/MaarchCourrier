@@ -73,6 +73,9 @@ class DOMTemplateProcessor
         $this->xinclude();
         $this->xinclude();
         $this->xinclude();
+        $this->xinclude();
+        $this->xinclude();
+        $this->xinclude();
         $this->mergedNodes = new \SplObjectStorage();
         $this->mergedForms = new \SplObjectStorage();
 

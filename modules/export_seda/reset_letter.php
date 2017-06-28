@@ -10,7 +10,11 @@
 /**
  * @brief reset letter
  * @author dev@maarch.org
+<<<<<<< HEAD:modules/export_seda/reset_letter.php
  * @ingroup export_seda
+=======
+ * @ingroup export seda
+>>>>>>> ff573a68e... Fix #5642 Rename module export export_seda:modules/export_seda/reset_letter.php
  */
 
 /**
