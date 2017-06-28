@@ -40,11 +40,10 @@ class MyPDOStatement
     protected function nbResult()
     {
         $db = new Database();
-        switch ($_SESSION['config']['databasetype']) {
-            case 'POSTGRESQL'   : 
+        switch ($db->driver) {
+            case 'pgsql'   : 
                 return $this->pdoStatement->rowCount();
             default :
-                $db = new Database();
                 $query = "select count(1) as rc from (" . $this->pdoStatement->queryString . ")";
                 $stmtRC = $db->query($query, $this->queryArgs); 
                 $fetch = $stmtRC->fetchObject();
@@ -54,11 +53,12 @@ class MyPDOStatement
 
     protected function fetchMyObject()
     {
-        switch ($_SESSION['config']['databasetype']) {
-            case 'POSTGRESQL'   : 
+        $db = new Database();
+        switch ($db->driver) {
+            case 'pgsql'   : 
                 //see later if special cases
                 return $this->pdoStatement->fetchObject();
-            case 'ORACLE' :
+            case 'oci' :
                 $result = $this->pdoStatement->fetchObject();
                 //var_dump($result);
                 if ($result) {

@@ -34,7 +34,7 @@ class Database extends functions
      */
     private static $preparedStmt = array();
 
-    private $driver;
+    public  $driver;
     private $server;
     private $port;
     private $user;
