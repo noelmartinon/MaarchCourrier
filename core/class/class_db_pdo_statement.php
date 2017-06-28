@@ -60,9 +60,12 @@ class MyPDOStatement
                 return $this->pdoStatement->fetchObject();
             case 'ORACLE' :
                 $result = $this->pdoStatement->fetchObject();
-                foreach ($result as $name => $value) {
-                    if (gettype($value) == 'resource') {
-                        $result->$name = stream_get_contents($value);
+                //var_dump($result);
+                if ($result) {
+                    foreach ($result as $name => $value) {
+                        if (gettype($value) == 'resource') {
+                            $result->$name = stream_get_contents($value);
+                        }
                     }
                 }
                 return $result;
