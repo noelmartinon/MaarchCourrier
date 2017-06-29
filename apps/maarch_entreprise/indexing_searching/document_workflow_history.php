@@ -142,7 +142,7 @@ if (isset($_REQUEST['load'])) {
                 .".lastname, h.info FROM " .$_SESSION['tablename']['history']
                 ." h, ".$_SESSION['tablename']['users'] ." WHERE "
                 .$whereTableOrView." and h.record_id = ? and h.user_id = ".$_SESSION['tablename']['users']
-                .".user_id".$where." and event_id ~ '^[0-9]+$' and event_type like 'ACTION#%' ".$orderstr, array($id));
+                .".user_id".$where." and event_id NOT LIKE '^[0-9]+$' and event_type like 'ACTION#%' ".$orderstr, array($id));
             // $request->show();
             
             $tab=array();

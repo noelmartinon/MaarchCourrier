@@ -34,7 +34,7 @@ class HistoryModelAbstract extends Apps_Table_Service
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['history', 'users'],
             'left_join' => ['history.user_id = users.user_id'],
-            'where'     => ['history.record_id = ?', 'history.event_type like ?', 'history.event_id ~ ?'],
+            'where'     => ['history.record_id = ?', 'history.event_type like ?', 'history.event_id NOT LIKE ?'],
             'data'      => [$aArgs['id'], 'ACTION#%', '^[0-9]+$'],
             'order_by'  => empty($aArgs['orderBy']) ? ['event_date'] : $aArgs['orderBy']
         ]);
