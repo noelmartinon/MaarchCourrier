@@ -106,7 +106,12 @@ class Utils
 
     public static function formatDateAtom($date)
     {
-        return date_format(date_create($date), DATE_ATOM);
+        if (preg_match('/\//', $date)) {
+            $d = \DateTime::createFromFormat('j/m/y', $date);
+            return $d->format(DATE_ATOM);
+        } else {
+            return date_format(date_create($date), DATE_ATOM);
+        }
     }
 
     public static function userExists($login, $pwd)
@@ -119,39 +124,34 @@ class Utils
     }
 
 
-
-    public static function getCustomId(){
-        if(!file_exists($_SESSION['config']['corepath'].'custom'.DIRECTORY_SEPARATOR.'custom.xml'))
-        {
+    public static function getCustomId()
+    {
+        if (!file_exists($_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR . 'custom.xml')) {
             return '';
         }
         $linkToApps = false;
         $arr = explode('/', $_SERVER['SCRIPT_NAME']);
-        for($cptArr=0;$cptArr<count($arr);$cptArr++) {
-            if($arr[$cptArr] == "apps") {
+        for ($cptArr = 0; $cptArr < count($arr); $cptArr++) {
+            if ($arr[$cptArr] == "apps") {
                 $linkToApps = true;
             }
         }
-        if($linkToApps) {
-            $path = $arr[count($arr)-4];
+        if ($linkToApps) {
+            $path = $arr[count($arr) - 4];
         } else {
-            $path = $arr[count($arr)-3];
+            $path = $arr[count($arr) - 3];
         }
 
-        $xml = simplexml_load_file($_SESSION['config']['corepath'].'custom'.DIRECTORY_SEPARATOR.'custom.xml');
-        foreach($xml->custom as $custom)
-        {
-            if(trim($path) <> "" && isset( $custom->path) && $custom->path == trim($path))
-            {
-                return (string) $custom->custom_id;
+        $xml = simplexml_load_file($_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR . 'custom.xml');
+        foreach ($xml->custom as $custom) {
+            if (trim($path) <> "" && isset($custom->path) && $custom->path == trim($path)) {
+                return (string)$custom->custom_id;
             }
-            if($custom->ip == $_SERVER['SERVER_ADDR'])
-            {
-                return (string) $custom->custom_id;
+            if ($custom->ip == $_SERVER['SERVER_ADDR']) {
+                return (string)$custom->custom_id;
             }
-            if($custom->external_domain == $_SERVER['HTTP_HOST'] xor $custom->domain == $_SERVER['HTTP_HOST'])
-            {
-                return (string) $custom->custom_id;
+            if ($custom->external_domain == $_SERVER['HTTP_HOST'] xor $custom->domain == $_SERVER['HTTP_HOST']) {
+                return (string)$custom->custom_id;
             }
         }
         return '';

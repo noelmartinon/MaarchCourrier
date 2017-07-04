@@ -41,13 +41,26 @@ class Database
         }
 
         try {
-            $this->_connection = new \PDO($driver . ':dbname=' . $_SESSION['cmis_databasename'] . ';host=' . $_SESSION['cmis_databaseserver'],
-                $_SESSION['cmis_databaseuser'],
-                $_SESSION['cmis_databasepassword'], [
-                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-                ]);
 
+            if($_SESSION['cmis_databasetype'] == 'oci'){
+                $dsn = $driver . ':dbname=' . $_SESSION['cmis_databasename'] . ';host=' . $_SESSION['cmis_databaseserver'] . ';charset=UTF8';
+            } else {
+                $dsn = $driver . ':dbname=' . $_SESSION['cmis_databasename'] . ';host=' . $_SESSION['cmis_databaseserver'];
+            }
+
+            $this->_connection = new \PDO($dsn,
+                $_SESSION['cmis_databaseuser'],
+                $_SESSION['cmis_databasepassword']);
+
+            $this->_connection->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+            $this->_connection->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
+
+
+            if($_SESSION['cmis_databasetype'] != 'oci'){
+                $this->_connection->exec("SET CHARACTER SET utf8");
+            }
+
         } catch (\PDOException $e) {
             error_log($e->getMessage());
         }

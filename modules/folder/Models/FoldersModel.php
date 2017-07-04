@@ -6,6 +6,7 @@
  * This file is part of Maarch software.
  */
 
+
 namespace Folder\Models;
 
 use CMIS\Models\CMISObject;
@@ -172,7 +173,7 @@ class FoldersModel extends FoldersModelAbstract
         if ($id) {
             $stmt = Database::getInstance()->query('
             SELECT *
-            FROM folders 
+            FROM folders
             WHERE folders_system_id = :id 
             OR parent_id = :id 
             ORDER BY folder_level', [':id' => $id]);
@@ -183,11 +184,7 @@ class FoldersModel extends FoldersModelAbstract
             ORDER BY folder_level');
         }
 
-
-        $result = $stmt->fetchAll();
-
-
-        foreach ($result as $value) {
+        while ($value = $stmt->fetch()) {
             $folder = new self();
 
             $otherProperties = Database::getOtherPropertiesArray($value);
@@ -245,10 +242,7 @@ class FoldersModel extends FoldersModelAbstract
             ORDER BY folder_level');
         }
 
-
-        $result = $stmt->fetchAll();
-
-        foreach ($result as $value) {
+        while ($value = $stmt->fetch()) {
 
 
             $CMISObject = new CMISObject(bin2hex('folder_' . $value['folders_system_id']), '/', 'cmis:folder', ''

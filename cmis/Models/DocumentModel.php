@@ -24,10 +24,11 @@ class DocumentModel extends DocumentModelAbstract
 
         $stmt = Database::getInstance()->query('SELECT * FROM res_letterbox');
 
-        $result = $stmt->fetchAll();
-
-        foreach ($result as $value) {
+        while ($value = $stmt->fetch()) {
             $otherProperties = Database::getOtherPropertiesArray($value);
+
+
+            $before = memory_get_usage();
 
             $document = new self();
             $document
@@ -47,7 +48,11 @@ class DocumentModel extends DocumentModelAbstract
                 ->setOtherProperties($otherProperties);
 
             $array[$value['folders_system_id']][] = $document;
+
+
         }
+
+        Utils::echo_memory_peak_usage();
 
         return $array;
     }

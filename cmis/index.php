@@ -15,11 +15,9 @@ use CMIS\Controllers\FrontController;
 use CMIS\Utils\Router;
 use CMIS\Utils\Utils;
 
-
-session_destroy();
+ini_set('memory_limit', '2000M');
 
 FrontController::initSession();
-
 
 //TODO Remove in production
 //FrontController::fakeAuth();
@@ -28,6 +26,8 @@ FrontController::login();
 
 $router = new Router();
 $router->setBasePath('/MaarchCourrier/cmis');
+
+ini_set('memory_limit', '2048M');
 
 $router->map('GET', '/', function () {
     header('Location:atom');
