@@ -390,7 +390,8 @@ else if(empty($_POST['values']) || !isset($_POST['action_id']) || empty($_POST['
     require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_history.php");
     $hist = new history();
     $arr_res = explode('#', $res_action['result']);
-    if(!is_array($res_action['history_msg'])){
+    if(!is_array($res_action['history_msg']) && $res_action['history_msg'] <> NULL){
+
         $res_action['history_msg'] = [$res_action['history_msg']];
     }
     
