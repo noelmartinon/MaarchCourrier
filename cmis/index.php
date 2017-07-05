@@ -8,6 +8,7 @@
 
 session_start();
 
+
 require '../vendor/autoload.php';
 
 
@@ -27,7 +28,6 @@ FrontController::login();
 $router = new Router();
 $router->setBasePath('/MaarchCourrier/cmis');
 
-ini_set('memory_limit', '2048M');
 
 $router->map('GET', '/', function () {
     header('Location:atom');

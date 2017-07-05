@@ -45,6 +45,9 @@ class FrontController
             $dom->loadXML(file_get_contents($general));
         }
 
+        $conf = parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);
+
+        $_SESSION['cmis_maarch_version'] = $conf['maarch']['productVersion'];
         $_SESSION['cmis_databaseserver'] = $dom->getElementsByTagName('databaseserver')->item(0)->nodeValue;
         $_SESSION['cmis_databaseserverport'] = $dom->getElementsByTagName('databaseserverport')->item(0)->nodeValue;
         $_SESSION['cmis_databasetype'] = $dom->getElementsByTagName('databasetype')->item(0)->nodeValue;
@@ -61,7 +64,9 @@ class FrontController
             $valid = true;
         } else if (empty($_SESSION['cmis_username'])) {
             $valid = Utils::userExists($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-            $_SESSION['cmis_username'] = $_SERVER['PHP_AUTH_USER'];
+            if($valid){
+                $_SESSION['cmis_username'] = $_SERVER['PHP_AUTH_USER'];
+            }
         } else {
             $valid = false;
         }
