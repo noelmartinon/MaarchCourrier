@@ -174,7 +174,7 @@ class CMIS
         $folder
             ->setCreationDate(date(DATE_ATOM))
             ->setLastModifiedDate(date(DATE_ATOM))
-            ->setTypist($_SERVER['PHP_AUTH_USER'])
+            ->setTypist($_SESSION['cmis_username'])
             ->setFolderName($queryParameters['name'])
             ->create();
 
@@ -214,7 +214,7 @@ class CMIS
                 ->setCreationDate(date(DATE_ATOM))
                 ->setModificationDate(date(DATE_ATOM))
                 ->setTypeId(101)
-                ->setTypist($_SERVER['PHP_AUTH_USER'])
+                ->setTypist($_SESSION['cmis_username'])
                 ->setPath("/" . $queryParameters['name']);
 
 

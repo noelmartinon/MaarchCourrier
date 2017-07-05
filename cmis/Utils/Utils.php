@@ -116,17 +116,18 @@ class Utils
 
     public static function userExists($login, $pwd)
     {
-        if($_SESSION['cmis_maarch_version'] == '1.6'){
+        if($_SESSION['cmis_maarch_version'] == '1.4'){
             return sizeof(Database::getInstance()->query(
                     'SELECT user_id FROM users WHERE user_id = :id AND password = :pwd', [
                     ':id' => $login,
-                    ':pwd' => hash('sha512', $pwd)
+                    ':pwd' => md5($pwd)
                 ])->fetchAll()) > 0;
         } else {
             return sizeof(Database::getInstance()->query(
                     'SELECT user_id FROM users WHERE user_id = :id AND password = :pwd', [
                     ':id' => $login,
-                    ':pwd' => md5($pwd)
+                    ':pwd' => hash('sha512', $pwd)
+
                 ])->fetchAll()) > 0;
         }
 
