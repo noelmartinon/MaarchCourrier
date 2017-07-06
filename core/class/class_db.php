@@ -230,13 +230,28 @@ class dbquery extends functions
             
         case 'ORACLE' : 
             if ($this->_server <> '') {
+$tns = "(DESCRIPTION = "
+                    . "(ADDRESS_LIST ="
+                        . "(ADDRESS = (PROTOCOL = TCP)(HOST = " . $this->_server . ")(PORT = " . $this->_port . "))"
+                    . ")"
+                    . "(CONNECT_DATA ="
+                        . "(SERVICE_NAME = " . $this->_database . ")"
+                    . ")"
+                . ")";
+
                 $this->_sqlLink = oci_connect(
+                    $this->_user, 
+                    $this->_password,  
+                    $tns, 
+                    'UTF8'
+                );
+                /*$this->_sqlLink = oci_connect(
                     $this->_user, 
                     $this->_password, '//' . 
                     $this->_server . '/' . 
                     $this->_database, 
                     'UTF8'
-                );
+                );*/
             } else {
                 $this->_sqlLink = oci_connect(
                     $this->_user, 
