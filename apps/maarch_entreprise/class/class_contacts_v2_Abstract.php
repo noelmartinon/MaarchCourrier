@@ -508,7 +508,62 @@ abstract class contacts_v2_Abstract extends Database
 
                 $_SESSION['m_admin']['communication'] = array();
                 $line = $stmt->fetchObject();
-                $_SESSION['m_admin']['communication']['ID']              = $line->id;Lurl']."index.php?display=true&page=contacts_v2_up_db";
+                $_SESSION['m_admin']['communication']['ID']              = $line->id;
+                $_SESSION['m_admin']['communication']['CONTACT_ID']      = $line->contact_id;
+                $_SESSION['m_admin']['communication']['TYPE']            = functions::show_string($line->type);
+                $_SESSION['m_admin']['communication']['VALUE']           = functions::show_string($line->value);
+            }
+        }
+        else if($mode == 'add' && !isset($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']))
+        {
+            $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] = 'Y';
+            $_SESSION['m_admin']['contact']['IS_EXTERNAL_CONTACT'] = 'N';
+        }
+        require_once("apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_business_app_tools.php");
+        $business = new business_app_tools();
+        $tmp = $business->get_titles();
+        $titles = $tmp['titles'];
+
+        if($iframe != true){
+            echo '<h1>';
+            if($mode == "up") {
+                ?><i class="fa fa-edit fa-2x"></i><?php
+                echo '&nbsp;' . _MODIFY_CONTACT;
+            }
+            elseif($mode == "add") {
+                ?><i class="fa fa-plus fa-2x"></i><?php
+                echo '&nbsp;' . _ADD_NEW_CONTACT;
+            }
+            elseif($mode == "view") {
+                ?><i class="fa fa-users fa-2x"></i><?php
+                echo '&nbsp;' . _VIEW;
+            }
+            echo '</h1><br/><div class="block">';
+        }else{
+            echo '<div class="block"><h2>';
+            if($mode == "up") {
+                echo _CONTACT;
+            }
+            elseif($mode == "add") {
+                echo _ADD_NEW_CONTACT;
+            }
+            elseif($mode == "view") {
+                ?><i class="fa fa-users fa-2x"></i><?php
+                echo '&nbsp;' . _VIEW;
+            }
+            echo '</h2>';
+        }
+        ?>
+        <div id="inner_content_contact" class="clearfix" align="center" style="margin-bottom:15px;width:100% !important;">
+            <?php
+            if($state == false)
+            {
+                echo "<br /><br /><br /><br />"._THE_CONTACT." "._UNKOWN."<br /><br /><br /><br />";
+            }
+            else
+            {
+                $can_add_contact = ($admin ? "" : "Y");
+                $action = $_SESSION['config']['businessappurl']."index.php?display=true&page=contacts_v2_up_db";
                 if(!$admin)
                 {
                     $action = $_SESSION['config']['businessappurl']."index.php?display=true&dir=my_contacts&page=my_contact_up_db";
