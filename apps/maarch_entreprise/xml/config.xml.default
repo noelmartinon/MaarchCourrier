@@ -38,6 +38,7 @@
         <contact_types>contact_types</contact_types>
         <contact_purposes>contact_purposes</contact_purposes>
         <contact_addresses>contact_addresses</contact_addresses>
+        <contact_communication>contact_communication</contact_communication>
         <tags>tags</tags>
     </TABLENAME>
     <WORKBATCH>
@@ -186,6 +187,9 @@
         <contact_addresses_del>true</contact_addresses_del>
         <contact_addresses_add>true</contact_addresses_add>
         <contact_addresses_up>true</contact_addresses_up>
+        <contact_communication_del>true</contact_communication_del>
+        <contact_communication_add>true</contact_communication_add>
+        <contact_communication_up>true</contact_communication_up>
     </HISTORY>
     <KEYWORDS>
         <id>ERR</id>

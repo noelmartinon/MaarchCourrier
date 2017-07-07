@@ -130,6 +130,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['tablename']['contact_types']         = (string) $tablename->contact_types;
             $_SESSION['tablename']['contact_purposes']      = (string) $tablename->contact_purposes;
             $_SESSION['tablename']['contact_addresses']     = (string) $tablename->contact_addresses;
+            $_SESSION['tablename']['contact_communication']     = (string) $tablename->contact_communication;
             $_SESSION['tablename']['tags']                  = (string) $tablename->tags;
             
             $_SESSION['config']['tmppath'] = $_SESSION['config']['corepath'] . 'apps' 
@@ -278,6 +279,9 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['history']['contact_addresses_del']    = (string) $history->contact_addresses_del;
             $_SESSION['history']['contact_addresses_add']    = (string) $history->contact_addresses_add;
             $_SESSION['history']['contact_addresses_up']     = (string) $history->contact_addresses_up;
+            $_SESSION['history']['contact_communication_del']    = (string) $history->contact_communication_del;
+            $_SESSION['history']['contact_communication_add']    = (string) $history->contact_communication_add;
+            $_SESSION['history']['contact_communication_up']     = (string) $history->contact_communication_up;
             $_SESSION['history_keywords'] = array();
             foreach ($xmlconfig->KEYWORDS as $keyword) {
                 $tmp = (string) $keyword->label;
