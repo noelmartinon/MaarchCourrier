@@ -42,7 +42,7 @@ class RequestSeda
 
         $queryParams[] = $reference;
 
-        $query = "SELECT * FROM seda WHERE reference = ?";
+        $query = "SELECT * FROM message_exchange WHERE reference = ?";
 
         $smtp = $this->db->query($query,$queryParams);
         
@@ -57,7 +57,7 @@ class RequestSeda
 
         $queryParams[] = $id;
 
-        $query = "SELECT * FROM seda WHERE message_id = ?";
+        $query = "SELECT * FROM message_exchange WHERE message_id = ?";
 
         $smtp = $this->db->query($query,$queryParams);
 
@@ -249,7 +249,7 @@ class RequestSeda
 		$queryParams[] = $orgIdentifier;
 		$queryParams[] = $orgIdentifier;
 
-		$query = "SELECT COUNT(*) FROM seda WHERE sender_org_identifier = ? OR recipient_org_identifier = ?";
+		$query = "SELECT COUNT(*) FROM message_exchange WHERE sender_org_identifier = ? OR recipient_org_identifier = ?";
 
 		$smtp = $this->db->query($query,$queryParams);
 		
@@ -292,7 +292,7 @@ class RequestSeda
 		$messageId = uniqid();
 
 		try {
-			$query = ("INSERT INTO seda (
+			$query = ("INSERT INTO message_exchange (
 				message_id,
 				schema,
 				type,
@@ -510,15 +510,16 @@ class RequestSeda
         return true;
     }
 
-	public function insertUnitIdentifier($messageId, $tableName, $resId) 
+	public function insertUnitIdentifier($messageId, $tableName, $resId, $disposition = "")
 	{
 		try {
-			$query = ("INSERT INTO unit_identifier VALUES (?,?,?)");
+			$query = ("INSERT INTO unit_identifier VALUES (?,?,?,?)");
 			$queryParams = [];
 
 			$queryParams[] = $messageId;
 			$queryParams[] = $tableName;
 			$queryParams[] = $resId;
+			$queryParams[] = $disposition;
 
 			$res = $this->db->query($query,$queryParams);
 		} catch (Exception $e) {
@@ -534,7 +535,7 @@ class RequestSeda
         $queryParams[] = $reference;
 
         try {
-            $query = "UPDATE seda SET status = ? WHERE reference = ?";
+            $query = "UPDATE message_exchange SET status = ? WHERE reference = ?";
 
             $smtp = $this->db->query($query,$queryParams);
         } catch (Exception $e) {
@@ -581,7 +582,7 @@ class RequestSeda
 		$queryParams = [];
 		$queryParams[] = $messageId;
 		try {
-			$query = "DELETE FROM seda WHERE message_id = ?";
+			$query = "DELETE FROM message_exchange WHERE message_id = ?";
 
 			$smtp = $this->db->query($query,$queryParams);
 		} catch (Exception $e) {
