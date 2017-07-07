@@ -11,6 +11,14 @@ ALTER TABLE seda RENAME TO message_exchange;
 ALTER TABLE message_exchange DROP COLUMN IF EXISTS file_path;
 ALTER TABLE message_exchange ADD file_path text default NULL;
 
+/** ADD NEW COLUMN IS TRANSFERABLE **/
+ALTER TABLE contacts_v2 DROP COLUMN  IF EXISTS  is_external_contact;
+ALTER TABLE contacts_v2 ADD COLUMN is_external_contact character(1) DEFAULT 'N';
+
+/** ADD NEW COLUMN IS TRANSFERABLE **/
+ALTER TABLE contacts_v2 DROP COLUMN  IF EXISTS  external_contact_id;
+ALTER TABLE contacts_v2 ADD COLUMN external_contact_id character varying(32);
+
 DROP SEQUENCE IF EXISTS contact_communication_id_seq CASCADE;
 CREATE SEQUENCE contact_communication_id_seq
 INCREMENT 1
