@@ -17,7 +17,7 @@ ALTER TABLE contacts_v2 ADD COLUMN is_external_contact character(1) DEFAULT 'N';
 
 /** ADD NEW COLUMN IS TRANSFERABLE **/
 ALTER TABLE contacts_v2 DROP COLUMN  IF EXISTS  external_contact_id;
-ALTER TABLE contacts_v2 ADD COLUMN external_contact_id character varying(32);
+ALTER TABLE contacts_v2 ADD COLUMN external_contact_id character varying(128);
 
 DROP SEQUENCE IF EXISTS contact_communication_id_seq CASCADE;
 CREATE SEQUENCE contact_communication_id_seq
