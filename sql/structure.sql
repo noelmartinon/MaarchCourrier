@@ -2382,6 +2382,7 @@ CREATE TABLE sendmail
   creation_date timestamp without time zone NOT NULL,
   send_date timestamp without time zone DEFAULT NULL,
   sender_email character varying(255) DEFAULT NULL,
+  message_exchange_id text DEFAULT NULL,
   CONSTRAINT sendmail_pkey PRIMARY KEY (email_id )
  );
 
@@ -3004,7 +3005,7 @@ CREATE TABLE message_exchange
   "active" boolean,
   "archived" boolean,
   
-  "file_path" text,
+  "file_path" text default NULL,
 
   PRIMARY KEY ("message_id")
 )
@@ -3017,5 +3018,5 @@ CREATE TABLE unit_identifier
   "message_id" text NOT NULL,
   "tablename" text NOT NULL,
   "res_id" text NOT NULL,
-  "disposition" text
+  "disposition" text default NULL
 );
