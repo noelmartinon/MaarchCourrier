@@ -2954,7 +2954,7 @@ CREATE FUNCTION order_alphanum(text) RETURNS text AS $$
 $$ LANGUAGE SQL;
 
 
-CREATE TABLE seda
+CREATE TABLE message_exchange
 (
   "message_id" text NOT NULL,
   "schema" text,
@@ -2987,6 +2987,8 @@ CREATE TABLE seda
   
   "active" boolean,
   "archived" boolean,
+  
+  "file_path" text,
 
   PRIMARY KEY ("message_id")
 )
@@ -2998,5 +3000,6 @@ CREATE TABLE unit_identifier
 (
   "message_id" text NOT NULL,
   "tablename" text NOT NULL,
-  "res_id" text NOT NULL
+  "res_id" text NOT NULL,
+  "disposition" text
 );
