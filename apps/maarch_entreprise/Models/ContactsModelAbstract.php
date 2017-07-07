@@ -50,6 +50,70 @@ class ContactsModelAbstract extends Apps_Table_Service
         return $aReturn;
     }
 
+    public static function getFullAddressById(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['addressId']);
+        static::checkNumeric($aArgs, ['addressId']);
+
+        $aReturn = static::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['view_contacts'],
+            'where'     => ['ca_id = ?'],
+            'data'      => [$aArgs['addressId']],
+        ]);
+
+        return $aReturn;
+    }
+
+    public static function getContactFullLabel(array $aArgs = []){
+        static::checkRequired($aArgs, ['addressId']);
+        static::checkNumeric($aArgs, ['addressId']);
+
+        $fullAddress = self::getFullAddressById($aArgs);
+        $fullAddress = $fullAddress[0];
+
+        if ($fullAddress['is_corporate_person'] == 'Y') {
+            $contactName = $fullAddress['society'] . ' ' ;
+            if (!empty($fullAddress['society_short'])) {
+                $contactName .= '('.$fullAddress['society_short'].') ';
+            }
+        } else {
+            $contactName = $fullAddress['contact_lastname'] . ' ' . $fullAddress['contact_firstname'] . ' ';
+            if (!empty($fullAddress['society'])) {
+                $contactName .= '(' . $fullAddress['society'] . ') ';
+            }                        
+        }
+        if (!empty($fullAddress['external_contact_id'])) {
+            $contactName .= ' - ' . $fullAddress['external_contact_id'] . ' ';
+        }
+        if ($fullAddress['is_private'] == 'Y') {
+            $contactName .= '('._CONFIDENTIAL_ADDRESS.')';
+        } else {
+            $contactName .= '- ' . $fullAddress['contact_purpose_label'] . ' : ';
+            if (!empty($fullAddress['lastname']) || !empty($fullAddress['firstname'])) {
+                $contactName .= $fullAddress['lastname'] . ' ' . $fullAddress['firstname'] . ' ';
+            }
+            if (!empty($fullAddress['address_num']) || !empty($fullAddress['address_street']) || !empty($fullAddress['address_postal_code']) || !empty($fullAddress['address_town'])) {
+                $contactName .= ', '.$fullAddress['address_num'] .' ' . $fullAddress['address_street'] .' ' . $fullAddress['address_postal_code'] .' ' . strtoupper($fullAddress['address_town']);
+            }
+        }
+
+        return $contactName;
+    }
+
+    public static function getLabelContactPurpose(array $aArgs = []){
+        static::checkRequired($aArgs, ['purposeId']);
+        static::checkNumeric($aArgs, ['purposeId']);
+
+        $aReturn = static::select([
+            'select'    => ['label'],
+            'table'     => ['contact_purposes'],
+            'where'     => ['id = ?'],
+            'data'      => [$aArgs['purposeId']],
+        ]);
+
+    }
+
     public static function getLabelledContactWithAddress(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['contactId', 'addressId']);

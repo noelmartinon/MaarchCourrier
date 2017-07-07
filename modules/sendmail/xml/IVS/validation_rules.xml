@@ -26,6 +26,7 @@
 		<parameter name="templateMail" type="integer" />
 		<parameter name="selectSignatures" type="string" />
 		<parameter name="action" type="string" />
+		<parameter name="formContent" type="string" />
 	</validationRule>
 
 	<validationRule name="mail_form" extends="standardForm" mode="error">
@@ -35,6 +36,7 @@
 		<parameter name="coll_id" type="collection_list" />
 		<parameter name="id" type="integer" />
 		<parameter name="size" type="size" />
+		<parameter name="formContent" type="string" />
 	</validationRule>
 
 	<validationRule name="sendmail" extends="standardForm" mode="error">
@@ -51,5 +53,3 @@
 	</validationRule>
 
 </validationRules>
-
-

@@ -42,6 +42,7 @@ require_once 'modules/sendmail/sendmail_tables.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/class/class_email_signatures.php';
+require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
     
 $core_tools     = new core_tools();
 $request        = new request();
@@ -50,6 +51,7 @@ $is             = new indexing_searching_app();
 $users_tools    = new class_users();
 $sendmail_tools = new sendmail();
 $db             = new Database();
+$contactModel   = new ContactsModel();
 
 $parameters = '';
 
@@ -84,6 +86,12 @@ if (isset($_REQUEST['what']) && !empty($_REQUEST['what'])) $parameters .= '&what
 if (isset($_REQUEST['template']) && !empty($_REQUEST['template'])) $parameters .= '&template='.$_REQUEST['template'];
 if (isset($_REQUEST['start']) && !empty($_REQUEST['start'])) $parameters .= '&start='.$_REQUEST['start'];
 
+if (isset($_REQUEST['formContent']) && !empty($_REQUEST['formContent'])) {
+    $formContent = $_GET['formContent'];
+} else {
+    $formContent = 'mail';
+}
+
 //Keep the origin
 $origin = '';
 if (isset($_REQUEST['origin']) && !empty($_REQUEST['origin'])) {
@@ -107,60 +115,64 @@ if ($mode == 'add') {
     $content .= '<form name="formEmail" id="formEmail" method="post" action="#">';
     $content .= '<input type="hidden" value="'.$identifier.'" name="identifier" id="identifier">';
     $content .= '<input type="hidden" value="Y" name="is_html" id="is_html">';
-    $content .= '<table border="0" align="left" width="100%" cellspacing="5">';
+    $content .= '<input type="hidden" value="'.$_GET['formContent'].'" name="formContent" id="formContent">';
+    $content .= '<table border="0" align="left" width="100%" cellspacing="5" ';
+    if($formContent == 'messageExchange'){
+        $content .= 'style="margin-left: -30px;" ';
+    }
+    $content .= '>';
     $content .= '<tr>';
-    $content .= '<td align="right" nowrap width="10%"><b>'.ucfirst(_FROM_SHORT).' </b></td><td>';
+    if($formContent != 'messageExchange'){
+        $content .= '<td align="right" nowrap width="10%"><b>'.ucfirst(_FROM_SHORT).' </b></td><td>';
 
-    $userEntitiesMails = array();
+        $userEntitiesMails = array();
 
-    if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
-        $userEntitiesMails = $sendmail_tools->getAttachedEntitiesMails($_SESSION['user']['UserId']);
-    }
-
-    $content .='<select name="sender_email" id="sender_email">
-                    <option value="'.$_SESSION['user']['Mail'].'" ';
-    if(empty($userEntitiesMails)){
-        $content .= 'selected="selected"';
-    }
-    $content .='>'.functions::xssafe($_SESSION['user']['FirstName']) . ' ' . functions::xssafe($_SESSION['user']['LastName']) . ' (' . $_SESSION['user']['Mail'] . ')</option>';
-    foreach ($userEntitiesMails as $key => $value) {
-        $primaryentity = explode(',', $key);
-        if($primaryentity[0] == $_SESSION['user']['primaryentity']['id']){
-            $content .= '<option value="'.$key.'" selected="selected" >' . $value . '</option>';
-        }else{
-            $content .= '<option value="'.$key.'" >' . $value . '</option>';
+        if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
+            $userEntitiesMails = $sendmail_tools->getAttachedEntitiesMails($_SESSION['user']['UserId']);
         }
+
+        $content .='<select name="sender_email" id="sender_email">
+                        <option value="'.$_SESSION['user']['Mail'].'" ';
+        if(empty($userEntitiesMails)){
+            $content .= 'selected="selected"';
+        }
+        $content .='>'.functions::xssafe($_SESSION['user']['FirstName']) . ' ' . functions::xssafe($_SESSION['user']['LastName']) . ' (' . $_SESSION['user']['Mail'] . ')</option>';
+        foreach ($userEntitiesMails as $key => $value) {
+            $primaryentity = explode(',', $key);
+            if($primaryentity[0] == $_SESSION['user']['primaryentity']['id']){
+                $content .= '<option value="'.$key.'" selected="selected" >' . $value . '</option>';
+            }else{
+                $content .= '<option value="'.$key.'" >' . $value . '</option>';
+            }
+        }
+        $content .='</select>';
+        $content .='</td>';
+        $content .= '</tr>';
+        $content .= '<tr>';
+        $content .= '<td align="right" >'._EMAIL.'</label></td>';
+        $content .= '<td colspan="2"><input type="text" name="email" id="email" value="" class="emailSelect" />';
+        $content .= '<div id="adressList" class="autocomplete"></div>';
+        $content .= '<script type="text/javascript">addEmailAdress(\'email\', \'adressList\', \''
+            .$_SESSION['config']['businessappurl']
+            .'index.php?display=true&module=sendmail&page=adresss_autocomletion\', \'what\', \'2\');</script>';
+        $content .= ' <select name="target" id="target">'
+            .'<option id="target_target_to" value="to">'._SEND_TO_SHORT.'</option>'
+            .'<option id="target_cc" value="cc">'._COPY_TO_SHORT.'</option>'
+            .'<option id="target_cci" value="cci">'._COPY_TO_INVISIBLE_SHORT.'</option>'
+            .'</select>';
+        $content .=' <input type="button" name="add" value="&nbsp;'._ADD
+                        .'&nbsp;" id="valid" class="button" onclick="updateAdress(\''.$path_to_script
+                        .'&mode=adress\', \'add\', document.getElementById(\'email\').value, '
+                        .'document.getElementById(\'target\').value, false, \''.(addslashes(_EMAIL_WRONG_FORMAT)).'\');" />&nbsp;';
+        $content .= '</td>';
+        $content .= '</tr>';
     }
-    $content .='</select>';
-    $content .='</td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<td align="right" >'._EMAIL.'</label></td>';
-    $content .= '<td colspan="2"><input type="text" name="email" id="email" value="" class="emailSelect" />';
-    $content .= '<div id="adressList" class="autocomplete"></div>';
-    $content .= '<script type="text/javascript">addEmailAdress(\'email\', \'adressList\', \''
-        .$_SESSION['config']['businessappurl']
-        .'index.php?display=true&module=sendmail&page=adresss_autocomletion\', \'what\', \'2\');</script>';
-    $content .= ' <select name="target" id="target">'
-        .'<option id="target_target_to" value="to">'._SEND_TO_SHORT.'</option>'
-        .'<option id="target_cc" value="cc">'._COPY_TO_SHORT.'</option>'
-        .'<option id="target_cci" value="cci">'._COPY_TO_INVISIBLE_SHORT.'</option>'
-        .'</select>';
-    $content .=' <input type="button" name="add" value="&nbsp;'._ADD
-                    .'&nbsp;" id="valid" class="button" onclick="updateAdress(\''.$path_to_script
-                    .'&mode=adress\', \'add\', document.getElementById(\'email\').value, '
-                    .'document.getElementById(\'target\').value, false, \''.(addslashes(_EMAIL_WRONG_FORMAT)).'\');" />&nbsp;';
-    $content .= '</td>';
-    $content .= '</tr>';
     $content .= '<tr>';
     $content .= '<td align="right" nowrap width="10%"><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'
         ._SEND_TO_SHORT.'</label></td>';
 
-    $exp_contact_id = null;
-    $dest_contact_id = null;
-    $exp_user_id = null;
+    $exp_user_id  = null;
     $dest_user_id = null;
-    $adresse_mail = null;
     $db = new Database();
     $stmt = $db->query("SELECT res_id, category_id, address_id, exp_user_id, dest_user_id, admission_date
                 FROM mlb_coll_ext 
@@ -171,11 +183,11 @@ if ($mode == 'add') {
                 and  res_id = ?)", array($_SESSION['doc_id']));
     $res = $stmt->fetchObject();
     
-    $res_id = $res->res_id;
-    $category_id = $res->category_id;
-    $address_id = $res->address_id;
-    $exp_user_id = $res->exp_user_id;
-    $dest_user_id = $res->dest_user_id;
+    $res_id         = $res->res_id;
+    $category_id    = $res->category_id;
+    $address_id     = $res->address_id;
+    $exp_user_id    = $res->exp_user_id;
+    $dest_user_id   = $res->dest_user_id;
     $admission_date = $res->admission_date;
 
     if ($res_id != null) {
@@ -183,45 +195,53 @@ if ($mode == 'add') {
         $rawSubject = $stmt->fetchObject();
         $subject = $rawSubject->subject;
     }
-    if($address_id != null){
-        $stmt = $db->query("SELECT email FROM contact_addresses WHERE id = ?", array($address_id));
-        $adr = $stmt->fetchObject();
-        $adress_mail = $adr->email;
-    }elseif($exp_user_id != null){
-        $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($exp_user_id));
-        $adr = $stmt->fetchObject();
-        $adress_mail = $adr->mail;
-    }elseif($dest_user_id != null){
-        $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($dest_user_id));
-        $adr = $stmt->fetchObject();
-        $adress_mail = $adr->mail;
+    if($formContent != 'messageExchange'){
+        if($address_id != null){
+            $adr = $contactModel->getFullAddressById(['select' => ['email'], 'addressId' => $address_id]);
+            $adress_mail = $adr[0]['email'];
+        }elseif($exp_user_id != null){
+            $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($exp_user_id));
+            $adr = $stmt->fetchObject();
+            $adress_mail = $adr->mail;
+        }elseif($dest_user_id != null){
+            $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($dest_user_id));
+            $adr = $stmt->fetchObject();
+            $adress_mail = $adr->mail;
+        }
+    } else if($address_id != null) {
+        $adress_mail = $contactModel->getContactFullLabel(['addressId' => $address_id]);
     }
-    if($adress_mail != null and ($_SESSION['user']['UserId'] != $exp_user_id and $_SESSION['user']['UserId'] != $dest_user_id)){
-    $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput"><div id="loading_to" style="display:none;"></div><div class="email_element" id="0_'.$adress_mail.'">'.$adress_mail.'&nbsp;<div class="email_delete_button" id="0" onclick="updateAdress(\''.$_SESSION['config']['coreurl'].'apps/maarch_entreprise/index.php?display=true&amp;module=sendmail&amp;page=sendmail_ajax_content&amp;identifier=106&amp;origin=document&amp;coll_id=letterbox_coll&amp;size=full&amp;mode=adress\', \'del\', \''.$adress_mail.'\', \'to\', this.id);"
-         alt=\"Supprimer\" title=\"Supprimer\">x</div></div></div>'
+    if($formContent == 'messageExchange'){
+        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'.$adress_mail.'</td>';
+    } else if($adress_mail != null and $_SESSION['user']['UserId'] != $exp_user_id and $_SESSION['user']['UserId'] != $dest_user_id){
+        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput"><div id="loading_to" style="display:none;"></div><div class="email_element" id="0_'.$adress_mail.'">'.
+        $adress_mail.'&nbsp;<div class="email_delete_button" id="0" onclick="updateAdress(\''.$_SESSION['config']['coreurl'].'apps/maarch_entreprise/index.php?display=true&amp;module=sendmail&amp;page=sendmail_ajax_content&amp;identifier=106&amp;origin=document&amp;coll_id=letterbox_coll&amp;size=full&amp;mode=adress\', \'del\', \''.$adress_mail.'\', \'to\', this.id);"
+             alt=\"Supprimer\" title=\"Supprimer\">x</div></div></div>'
         .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
-    $_SESSION['adresses']['to'][0] = $adress_mail;
-        }else{
-    $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'
+        $_SESSION['adresses']['to'][0] = $adress_mail;
+    } else {
+        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'
         .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
-             }
+    }
 
     $content .= '</tr>';
-    $content .= '<tr><td colspan="3"><a href="javascript://" '
-		.'onclick="new Effect.toggle(\'tr_cc\', \'blind\', {delay:0.2});'
-		.'new Effect.toggle(\'tr_cci\', \'blind\', {delay:0.2});">'
-		._SHOW_OTHER_COPY_FIELDS.'</a></td></tr>';
-    $content .= '<tr id="tr_cc" style="display:none">';
-    $content .= '<td align="right" nowrap><label>'._COPY_TO_SHORT.'</label></td>';
-    $content .= '<td colspan="2"><div name="cc" id="cc" class="emailInput">'
-        .'<div id="loading_cc" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
-    $content .= '</tr>';
-    $content .= '<tr id="tr_cci" style="display:none">';
-    $content .= '<td align="right" nowrap><label>'._COPY_TO_INVISIBLE_SHORT.'</label></td>';
-    $content .= '<td colspan="2"><div name="cci" id="cci" class="emailInput">'
-        .'<div id="loading_cci" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
-    $content .= '</tr>';
-    $content .= '<tr>';
+    if($formContent != 'messageExchange'){
+        $content .= '<tr><td colspan="3"><a href="javascript://" '
+    		.'onclick="new Effect.toggle(\'tr_cc\', \'blind\', {delay:0.2});'
+    		.'new Effect.toggle(\'tr_cci\', \'blind\', {delay:0.2});">'
+    		._SHOW_OTHER_COPY_FIELDS.'</a></td></tr>';
+        $content .= '<tr id="tr_cc" style="display:none">';
+        $content .= '<td align="right" nowrap><label>'._COPY_TO_SHORT.'</label></td>';
+        $content .= '<td colspan="2"><div name="cc" id="cc" class="emailInput">'
+            .'<div id="loading_cc" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
+        $content .= '</tr>';
+        $content .= '<tr id="tr_cci" style="display:none">';
+        $content .= '<td align="right" nowrap><label>'._COPY_TO_INVISIBLE_SHORT.'</label></td>';
+        $content .= '<td colspan="2"><div name="cci" id="cci" class="emailInput">'
+            .'<div id="loading_cci" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
+        $content .= '</tr>';
+        $content .= '<tr>';
+    }
     $content .= '<td align="right" nowrap><span class="red_asterisk"><i class="fa fa-star"></i></span><label> '._EMAIL_OBJECT.' </label></td>';
 
     $content .= '<td colspan="2">';
@@ -416,39 +436,49 @@ if ($mode == 'add') {
     
     $content .= '</div>';
     $content .='<hr />';
-    $content .= '<tr>';
-    $content .= '<td><label style="padding-right:10px">' . _Label_ADD_TEMPLATE_MAIL . '</label></td>';
-    $content .= '<select name="templateMail" id="templateMail" style="width:200px" '
-                . 'onchange="addTemplateToEmail($(\'templateMail\').value, \''
-                            . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
-                            . '&module=templates&page=templates_ajax_content_for_mails&id=' . $_REQUEST['identifier'] . '\');">';
+    if($formContent != 'messageExchange'){
+        $content .= '<tr>';
+        $content .= '<td><label style="padding-right:10px">' . _Label_ADD_TEMPLATE_MAIL . '</label></td>';
+        $content .= '<select name="templateMail" id="templateMail" style="width:200px" '
+                    . 'onchange="addTemplateToEmail($(\'templateMail\').value, \''
+                                . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
+                                . '&module=templates&page=templates_ajax_content_for_mails&id=' . $_REQUEST['identifier'] . '\');">';
 
-    $content .= '<option value="">' . _ADD_TEMPLATE_MAIL . '</option>';
-    
-    $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail'");
-    while ( $result=$stmt->fetchObject()) {
-        $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
+        $content .= '<option value="">' . _ADD_TEMPLATE_MAIL . '</option>';
+        
+        $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail'");
+        while ( $result=$stmt->fetchObject()) {
+            $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
+        }
+        $content .= '</select>';
+        $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature de mail' . '</label>';
+        $emailSignaturesClass = new EmailSignatures();
+
+        $mailSignatures = $emailSignaturesClass->getForCurrentUser();
+        $content .= '<script type="text/javascript">var mailSignaturesJS = ' . json_encode($mailSignatures) . ';</script>';
+        $content .= '<select style="width: 20%;" name="selectSignatures" id ="selectSignatures" onchange="changeSignature(this.options[this.selectedIndex], mailSignaturesJS)">';
+        $content .= '<option value="none" data-nb="-1" selected >Sans signature</option>';
+        for ($i = 0; $mailSignatures[$i]; $i++) {
+            $content .= '<option value="' . $mailSignatures[$i]['id'] . '" data-nb="' . $i . '">' . $mailSignatures[$i]['title'] . '</option>';
+        }
+        $content .= '</select>';
+        $content .= '</tr></br></br>';
     }
-    $content .= '</select>';
-    $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature de mail' . '</label>';
-    $emailSignaturesClass = new EmailSignatures();
-
-    $mailSignatures = $emailSignaturesClass->getForCurrentUser();
-    $content .= '<script type="text/javascript">var mailSignaturesJS = ' . json_encode($mailSignatures) . ';</script>';
-    $content .= '<select style="width: 20%;" name="selectSignatures" id ="selectSignatures" onchange="changeSignature(this.options[this.selectedIndex], mailSignaturesJS)">';
-    $content .= '<option value="none" data-nb="-1" selected >Sans signature</option>';
-    for ($i = 0; $mailSignatures[$i]; $i++) {
-        $content .= '<option value="' . $mailSignatures[$i]['id'] . '" data-nb="' . $i . '">' . $mailSignatures[$i]['title'] . '</option>';
-    }
-    $content .= '</select>';
-    $content .= '</tr></br></br>';
-
     //Body
-    $displayHtml = 'block';
-    $displayRaw = 'none';
+
+    if($formContent != 'messageExchange'){
+        $displayHtml = 'block';
+        $displayRaw = 'none';
+    } else {
+        $displayHtml = 'none';
+        $displayRaw = 'block';
+    }
     $content .='<script type="text/javascript">var mode="html";</script>';
+
      //Show/hide html VS raw mode
-    $content .= '<a href="javascript://" onclick="switchMode(\'show\');"><em>'._HTML_OR_RAW.'</em></a>';
+    if($formContent != 'messageExchange'){
+        $content .= '<a href="javascript://" onclick="switchMode(\'show\');"><em>'._HTML_OR_RAW.'</em></a>';
+    }
     
     //load tinyMCE editor
     ob_start();
@@ -473,10 +503,12 @@ if ($mode == 'add') {
     $content .=' <input type="button" name="valid" value="&nbsp;'._SEND_EMAIL
                 .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
                 .$path_to_script.'&mode=added&for=send\', \'formEmail\');" />&nbsp;';
+    if($formContent != 'messageExchange'){
     //Save
     $content .=' <input type="button" name="valid" value="&nbsp;'._SAVE_EMAIL
                 .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
                 .$path_to_script.'&mode=added&for=save\', \'formEmail\');" />&nbsp;';
+    }
     //Cancel
     $content .='<input type="button" name="cancel" id="cancel" class="button" value="'
                 ._CANCEL.'" onclick="window.parent.destroyModal(\'form_email\');"/>';

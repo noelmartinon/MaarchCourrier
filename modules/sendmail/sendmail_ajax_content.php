@@ -177,7 +177,7 @@ switch ($mode) {
             $content .='<iframe name="form_mail" id="form_mail" src="'
                 . $_SESSION['config']['businessappurl']
                 . 'index.php?display=true&module=sendmail&page=mail_form&identifier='
-                . $identifier.'&origin=document&coll_id='.$collId.'&mode='.$mode.$parameters.'" '
+                . $identifier.'&origin=document&coll_id='.$collId.'&mode='.$mode.$parameters.'&formContent='.$_GET['formContent'].'" '
                 . 'frameborder="0" width="100%" style="height:540px;padding:0px;overflow-x:hidden;overflow-y: auto;"></iframe>';
         }
     break;

@@ -82,6 +82,8 @@ if (!defined("_EMAIL_NOT_EXIST"))
 //ADD
 if (!defined("_NEW_EMAIL"))
     define("_NEW_EMAIL","Nouveau message");
+if (!defined("_NEW_NUMERIC_PACKAGE"))
+    define("_NEW_NUMERIC_PACKAGE","Nouveau paquet numérique");
 if (!defined("_CREATE_EMAIL"))
     define("_CREATE_EMAIL", "Créer");
 if (!defined("_EMAIL_ADDED"))
