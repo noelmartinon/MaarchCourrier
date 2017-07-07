@@ -1,15 +1,15 @@
 
-####### M2M ###########
+/****** M2M *******/
 ALTER TABLE unit_identifier DROP COLUMN IF EXISTS disposition;
-ALTER TABLE unit_identifier ADD disposition text default NULL,;
+ALTER TABLE unit_identifier ADD disposition text default NULL;
 
 ALTER TABLE sendmail DROP COLUMN IF EXISTS message_exchange_id;
-ALTER TABLE sendmail ADD message_exchange_id text default NULL,;
+ALTER TABLE sendmail ADD message_exchange_id text default NULL;
 
 ALTER TABLE seda RENAME TO message_exchange;
 
 ALTER TABLE message_exchange DROP COLUMN IF EXISTS file_path;
-ALTER TABLE message_exchange ADD file_path text default NULL,;
+ALTER TABLE message_exchange ADD file_path text default NULL;
 
 DROP SEQUENCE IF EXISTS contact_communication_id_seq CASCADE;
 CREATE SEQUENCE contact_communication_id_seq
