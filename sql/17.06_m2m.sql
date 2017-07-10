@@ -6,7 +6,7 @@ ALTER TABLE unit_identifier ADD disposition text default NULL;
 ALTER TABLE sendmail DROP COLUMN IF EXISTS message_exchange_id;
 ALTER TABLE sendmail ADD message_exchange_id text default NULL;
 
-ALTER TABLE seda RENAME TO message_exchange;
+ALTER TABLE IF EXISTS seda RENAME TO message_exchange;
 
 ALTER TABLE message_exchange DROP COLUMN IF EXISTS file_path;
 ALTER TABLE message_exchange ADD file_path text default NULL;

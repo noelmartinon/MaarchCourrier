@@ -84,7 +84,7 @@ class ContactsModelAbstract extends Apps_Table_Service
             }                        
         }
         if (!empty($fullAddress['external_contact_id'])) {
-            $contactName .= ' - ' . $fullAddress['external_contact_id'] . ' ';
+            $contactName .= ' - <b>' . $fullAddress['external_contact_id'] . '</b> ';
         }
         if ($fullAddress['is_private'] == 'Y') {
             $contactName .= '('._CONFIDENTIAL_ADDRESS.')';
@@ -111,7 +111,25 @@ class ContactsModelAbstract extends Apps_Table_Service
             'where'     => ['id = ?'],
             'data'      => [$aArgs['purposeId']],
         ]);
+    }
 
+    public static function getContactCommunication(array $aArgs = []){
+        static::checkRequired($aArgs, ['contactId']);
+        static::checkNumeric($aArgs, ['contactId']);
+
+        $aReturn = static::select([
+            'select'    => ['*'],
+            'table'     => ['contact_communication'],
+            'where'     => ['contact_id = ?'],
+            'data'      => [$aArgs['contactId']],
+        ]);
+
+        if($aArgs['allValues'] === true){
+            return $aReturn[0];
+        } else {
+            return $aReturn[0]['value'].' ('.$aReturn[0]['type'].')';
+        }
+        
     }
 
     public static function getLabelledContactWithAddress(array $aArgs = [])

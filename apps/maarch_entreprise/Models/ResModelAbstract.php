@@ -40,6 +40,21 @@ class ResModelAbstract extends Apps_Table_Service
         return $aReturn[0];
     }
 
+    public static function getMlbCollExtById(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['resId']);
+        static::checkNumeric($aArgs, ['resId']);
+
+        $aReturn = static::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['mlb_coll_ext'],
+            'where'     => ['res_id = ?'],
+            'data'      => [$aArgs['resId']]
+        ]);
+
+        return $aReturn[0];
+    }
+
     public static function put(array $aArgs = [])
     {
         // TODO collId stands for table in DB => à Changer pour aller récupérer la table lié à collId

@@ -13,12 +13,39 @@
 * @ingroup entities
 */
 
-namespace Entities\Models;
+// namespace Entities\Models;
 
 require_once 'apps/maarch_entreprise/services/Table.php';
 
 class EntitiesModelAbstract extends \Apps_Table_Service
 {
+
+    public static function getById(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['entityId']);
+        if (is_array($aArgs['entityId'])) {
+            $where = ['entity_id in (?)'];
+        } else {
+            static::checkString($aArgs, ['entityId']);
+            $where = ['entity_id = ?'];
+        }
+
+        $aEntities = static::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['entities'],
+            'where'     => $where,
+            'data'      => [$aArgs['entityId']]
+        ]);
+
+        if (empty($aEntities[0])) {
+            return [];
+        } elseif (is_array($aArgs['entityId'])) {
+            return $aEntities;
+        } else {
+            return $aEntities[0];
+        }
+    }
+
 
     public static function getByEmail(array $aArgs = [])
     {

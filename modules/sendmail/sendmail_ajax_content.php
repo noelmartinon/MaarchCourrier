@@ -42,22 +42,16 @@ require_once 'modules/sendmail/sendmail_tables.php';
 require_once 'modules/notifications/notifications_tables_definition.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
+require_once 'modules/sendmail/Controllers/MessageExchangeController.php';
+
     
-$core_tools     = new core_tools();
-$request        = new request();
-$db        		= new Database();
-$sec            = new security();
-$is             = new indexing_searching_app();
-$users_tools    = new class_users();
-$sendmail_tools = new sendmail();
-
-
-    // require_once('core'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.'class_request.php');
-    // $db = new Database();
-    // $stmt = $db->query("SELECT action_page FROM actions WHERE id = ?", array($_SESSION['id_action']));
-    // $action_page = $stmt->fetchObject(); 
-    // $action_page = $action_page->action_page;
-    //var_dump($action_page);
+$core_tools                = new core_tools();
+$request                   = new request();
+$db                        = new Database();
+$sec                       = new security();
+$is                        = new indexing_searching_app();
+$users_tools               = new class_users();
+$sendmail_tools            = new sendmail();
 
 
 if($_SESSION['features']['send_to_contact_with_mandatory_attachment'] == true && !isset($_REQUEST['join_attachment']) && $_REQUEST['action'] == 'send_to_contact_with_mandatory_attachment'){
@@ -103,6 +97,12 @@ if (isset($_REQUEST['mode']) && !empty($_REQUEST['mode'])) {
 $identifier = '';
 if (isset($_REQUEST['identifier']) && ! empty($_REQUEST['identifier'])) {
     $identifier = trim($_REQUEST['identifier']);
+}
+
+//formContent of the element wich is noted
+$formContent = '';
+if (isset($_GET['formContent']) && ! empty($_GET['formContent'])) {
+    $formContent = trim($_GET['formContent']);
 }
 
 //Collection
@@ -183,117 +183,126 @@ switch ($mode) {
     break;
         
     case 'added':
-        $userEntitiesMails = array();
-        if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
-            $userEntitiesMails = $sendmail_tools->checkAttachedEntitiesMails($_SESSION['user']['UserId']);
-        }
-        if (empty($identifier)) {
-            $error = $request->wash_html(_IDENTIFIER.' '._IS_EMPTY.'!','NONE');
-            $status = 1;
-        } else if (!in_array($_REQUEST['sender_email'], array_keys($userEntitiesMails)) && $core_tools->test_service('use_mail_services', 'sendmail', false)) {
-            $error = $request->wash_html(_INCORRECT_SENDER,'NONE');
-            $status = 1;
+        if($formContent == 'messageExchange'){
+            $return = MessageExchangeController::createMessageExchange($_REQUEST);
+            if(!empty($return['errors'])){
+                $error = implode(", ", $return['errors']);
+                $status = 1;
+            }
         } else {
-            if (isset($_SESSION['adresses']['to']) && count($_SESSION['adresses']['to']) > 0 ) {
-                if (!empty($_REQUEST['object'])) {
-                    // print_r($_REQUEST);exit;
-                    
-                    //Check adress for to
-                    $to =  join(',', $_SESSION['adresses']['to']);
-                    $error = $sendmail_tools->CheckEmailAdress($to);
-                    
-                    if (empty($error)) {
+            $userEntitiesMails = array();
+            if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
+                $userEntitiesMails = $sendmail_tools->checkAttachedEntitiesMails($_SESSION['user']['UserId']);
+            }
+            if (empty($identifier)) {
+                $error = $request->wash_html(_IDENTIFIER.' '._IS_EMPTY.'!','NONE');
+                $status = 1;
+            } else if (!in_array($_REQUEST['sender_email'], array_keys($userEntitiesMails)) && $core_tools->test_service('use_mail_services', 'sendmail', false)) {
+                $error = $request->wash_html(_INCORRECT_SENDER,'NONE');
+                $status = 1;
+            } else {
+                if (isset($_SESSION['adresses']['to']) && count($_SESSION['adresses']['to']) > 0 ) {
+                    if (!empty($_REQUEST['object'])) {
                         
-                        //Check adress for cc
-                        (isset($_SESSION['adresses']['cc']) && count($_SESSION['adresses']['cc']) > 0)? 
-                            $cc =  join(',', $_SESSION['adresses']['cc']) : $cc = '';
-                        $error = $sendmail_tools->CheckEmailAdress($cc);
+                        //Check adress for to
+                        $to =  join(',', $_SESSION['adresses']['to']);
+                        $error = $sendmail_tools->CheckEmailAdress($to);
                         
                         if (empty($error)) {
-                        
-                            //Check adress for cci
-                            (isset($_SESSION['adresses']['cci']) && count($_SESSION['adresses']['cci']) > 0)? 
-                                $cci =  join(',', $_SESSION['adresses']['cci']) : $cci = '';
-                            $error = $sendmail_tools->CheckEmailAdress($cci);
+                            
+                            //Check adress for cc
+                            (isset($_SESSION['adresses']['cc']) && count($_SESSION['adresses']['cc']) > 0)? 
+                                $cc =  join(',', $_SESSION['adresses']['cc']) : $cc = '';
+                            $error = $sendmail_tools->CheckEmailAdress($cc);
                             
                             if (empty($error)) {
                             
-                                //Data
-                                $collId = $_REQUEST['coll_id'];
-                                $object = $_REQUEST['object'];
-                                $senderEmail = $_REQUEST['sender_email'];
-                                (isset($_REQUEST['join_file']) 
-                                    && count($_REQUEST['join_file']) > 0
-                                )? $res_master_attached = 'Y' : $res_master_attached = 'N';
-								//Version attached
-                                if (isset($_REQUEST['join_attachment']) && count($_REQUEST['join_attachment']) > 0) {
-                                    $attachment_list = join(',', $_REQUEST['join_attachment']);
-                                }      
-								//Attachments								
-								if (isset($_REQUEST['join_version']) && count($_REQUEST['join_version']) > 0) {
-                                    $version_list = join(',', $_REQUEST['join_version']);
-                                }
-								//Notes
-                                if (isset($_REQUEST['notes']) && count($_REQUEST['notes']) > 0) {
-                                    $note_list = join(',', $_REQUEST['notes']);
-                                }
-
-                                $userId = $_SESSION['user']['UserId'];
-                                (!empty($_REQUEST['is_html']) && $_REQUEST['is_html'] == 'Y')? $isHtml = 'Y' : $isHtml = 'N';
-                                //Body content
-                                if ($isHtml == 'Y') {
-                                    $body = $sendmail_tools->cleanHtml($_REQUEST['body_from_html']);
-                                } else {
-                                     $body = $_REQUEST['body_from_raw'];
-                                }
+                                //Check adress for cci
+                                (isset($_SESSION['adresses']['cci']) && count($_SESSION['adresses']['cci']) > 0)? 
+                                    $cci =  join(',', $_SESSION['adresses']['cci']) : $cci = '';
+                                $error = $sendmail_tools->CheckEmailAdress($cci);
                                 
-                                //Status
-                                if ($_REQUEST['for'] == 'save') {
-                                    $email_status = 'D';
-                                } else if ($_REQUEST['for'] == 'send'){
-                                    $email_status = 'W';
-                                }
-                          
-                                //Query                 
-                                $stmt = $db->query(
-                                    "INSERT INTO " . EMAILS_TABLE . "(coll_id, res_id, user_id, to_list, cc_list,
-                                    cci_list, email_object, email_body, is_res_master_attached, res_version_id_list, 
-                                    res_attachment_id_list, note_id_list, is_html, email_status, creation_date, sender_email) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
-									array($collId, $identifier, $userId, $to, $cc, $cci, $object, $body, $res_master_attached, 
-									$version_list, $attachment_list, $note_list, $isHtml, $email_status, $senderEmail)
-                                );
-                               
+                                if (empty($error)) {
                                 
-                                //Last insert ID from sequence
-                                $id = $request->last_insert_id('sendmail_email_id_seq');
+                                    //Data
+                                    $collId = $_REQUEST['coll_id'];
+                                    $object = $_REQUEST['object'];
+                                    $senderEmail = $_REQUEST['sender_email'];
+                                    (isset($_REQUEST['join_file']) 
+                                        && count($_REQUEST['join_file']) > 0
+                                    )? $res_master_attached = 'Y' : $res_master_attached = 'N';
+    								//Version attached
+                                    if (isset($_REQUEST['join_attachment']) && count($_REQUEST['join_attachment']) > 0) {
+                                        $attachment_list = join(',', $_REQUEST['join_attachment']);
+                                    }      
+    								//Attachments								
+    								if (isset($_REQUEST['join_version']) && count($_REQUEST['join_version']) > 0) {
+                                        $version_list = join(',', $_REQUEST['join_version']);
+                                    }
+    								//Notes
+                                    if (isset($_REQUEST['notes']) && count($_REQUEST['notes']) > 0) {
+                                        $note_list = join(',', $_REQUEST['notes']);
+                                    }
 
-                                //History
-                                if ($_SESSION['history']['mailadd']) {
-                                    $hist = new history();
-                                    if (isset($_REQUEST['origin']) && $_REQUEST['origin'] == "folder") {
+                                    $userId = $_SESSION['user']['UserId'];
+                                    (!empty($_REQUEST['is_html']) && $_REQUEST['is_html'] == 'Y')? $isHtml = 'Y' : $isHtml = 'N';
+                                    //Body content
+                                    if ($isHtml == 'Y') {
+                                        $body = $sendmail_tools->cleanHtml($_REQUEST['body_from_html']);
+                                    } else {
+                                         $body = $_REQUEST['body_from_raw'];
+                                    }
+                                    
+                                    //Status
+                                    if ($_REQUEST['for'] == 'save') {
+                                        $email_status = 'D';
+                                    } else if ($_REQUEST['for'] == 'send'){
+                                        $email_status = 'W';
+                                    }
+                              
+                                    //Query                 
+                                    $stmt = $db->query(
+                                        "INSERT INTO " . EMAILS_TABLE . "(coll_id, res_id, user_id, to_list, cc_list,
+                                        cci_list, email_object, email_body, is_res_master_attached, res_version_id_list, 
+                                        res_attachment_id_list, note_id_list, is_html, email_status, creation_date, sender_email) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
+    									array($collId, $identifier, $userId, $to, $cc, $cci, $object, $body, $res_master_attached, 
+    									$version_list, $attachment_list, $note_list, $isHtml, $email_status, $senderEmail)
+                                    );
+                                   
+                                    
+                                    //Last insert ID from sequence
+                                    $id = $request->last_insert_id('sendmail_email_id_seq');
+
+                                    //History
+                                    if ($_SESSION['history']['mailadd']) {
+                                        $hist = new history();
+                                        if (isset($_REQUEST['origin']) && $_REQUEST['origin'] == "folder") {
+                                            $hist->add(
+                                                $table, $identifier, "UP", 'folderup', _EMAIL_ADDED . _ON_FOLDER_NUM
+                                                . $identifier . ' (' . $id . ') : "' . $request->cut_string($object, 254) .'"',
+                                                $_SESSION['config']['databasetype'], 'sendmail'
+                                            );
+                                        } else if (isset($_REQUEST['origin']) && $_REQUEST['origin'] == "document") {
+                                            $hist->add(
+                                                $view, $identifier, "UP", 'resup',  _EMAIL_ADDED . _ON_DOC_NUM
+                                                . $identifier . ' (' . $id . ') : "' . $request->cut_string($object, 254) .'"',
+                                                $_SESSION['config']['databasetype'], 'sendmail'
+                                            );
+                                        }
+
                                         $hist->add(
-                                            $table, $identifier, "UP", 'folderup', _EMAIL_ADDED . _ON_FOLDER_NUM
-                                            . $identifier . ' (' . $id . ') : "' . $request->cut_string($object, 254) .'"',
-                                            $_SESSION['config']['databasetype'], 'sendmail'
-                                        );
-                                    } else if (isset($_REQUEST['origin']) && $_REQUEST['origin'] == "document") {
-                                        $hist->add(
-                                            $view, $identifier, "UP", 'resup',  _EMAIL_ADDED . _ON_DOC_NUM
-                                            . $identifier . ' (' . $id . ') : "' . $request->cut_string($object, 254) .'"',
+                                            EMAILS_TABLE, $id, "ADD", 'mailadd', _EMAIL_ADDED . ' (' . $id . ')',
                                             $_SESSION['config']['databasetype'], 'sendmail'
                                         );
                                     }
-
-                                    $hist->add(
-                                        EMAILS_TABLE, $id, "ADD", 'mailadd', _EMAIL_ADDED . ' (' . $id . ')',
-                                        $_SESSION['config']['databasetype'], 'sendmail'
-                                    );
+                                    
+                                    //Reload and show message
+                                    $js =  $list_origin."window.parent.top.$('main_info').innerHTML = '"._EMAIL_ADDED."';";
+                
+                                } else {
+                                    $status = 1;
                                 }
-                                
-                                //Reload and show message
-                                $js =  $list_origin."window.parent.top.$('main_info').innerHTML = '"._EMAIL_ADDED."';";
-            
                             } else {
                                 $status = 1;
                             }
@@ -301,15 +310,13 @@ switch ($mode) {
                             $status = 1;
                         }
                     } else {
+                        $error = $request->wash_html(_EMAIL_OBJECT.' '._IS_EMPTY.'!','NONE');
                         $status = 1;
                     }
                 } else {
-                    $error = $request->wash_html(_EMAIL_OBJECT.' '._IS_EMPTY.'!','NONE');
+                    $error = $request->wash_html(_SEND_TO.' '._IS_EMPTY.'!','NONE');
                     $status = 1;
                 }
-            } else {
-                $error = $request->wash_html(_SEND_TO.' '._IS_EMPTY.'!','NONE');
-                $status = 1;
             }
         }
     break;

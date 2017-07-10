@@ -119,7 +119,7 @@ function validEmailForm(path, form_id) {
 
     var attachments = $j("#joined_files input.check");
 
-    if (attachments.length > 0 && path.includes("for=send")) {
+    if (attachments.length > 0 && (path.includes("for=send") || path.includes("formContent=messageExchange"))) {
         var hasOneChecked = false;
         for (var i = 0; i < attachments.length; i++) {
             if (attachments[i].checked == true) {
@@ -129,9 +129,14 @@ function validEmailForm(path, form_id) {
         }
 
         if (!hasOneChecked) {
-            var cfm = confirm('Aucune pièce jointe sélectionnée. Voulez-vous quand même envoyer le mail ?');
-            if (!cfm) {
+            if(path.includes("formContent=messageExchange")){
+                alert('Aucune pièce jointe sélectionnée');
                 return;
+            } else if(path.includes("for=send")){
+                var cfm = confirm('Aucune pièce jointe sélectionnée. Voulez-vous quand même envoyer le mail ?');
+                if (!cfm) {
+                    return;
+                }
             }
         }
     }

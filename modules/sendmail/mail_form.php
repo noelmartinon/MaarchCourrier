@@ -43,6 +43,7 @@ require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/class/class_email_signatures.php';
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
+require_once 'modules/entities/Models/EntitiesModel.php';
     
 $core_tools     = new core_tools();
 $request        = new request();
@@ -51,7 +52,6 @@ $is             = new indexing_searching_app();
 $users_tools    = new class_users();
 $sendmail_tools = new sendmail();
 $db             = new Database();
-$contactModel   = new ContactsModel();
 
 $parameters = '';
 
@@ -102,7 +102,7 @@ if (isset($_REQUEST['origin']) && !empty($_REQUEST['origin'])) {
 //Path to actual script
 $path_to_script = $_SESSION['config']['businessappurl']
     ."index.php?display=true&module=sendmail&page=sendmail_ajax_content&identifier="
-    .$identifier."&origin=".$origin.$parameters;
+    .$identifier."&origin=".$origin."&formContent=".$formContent.$parameters;
     
 $core_tools->load_lang();
 $core_tools->load_html();
@@ -122,9 +122,9 @@ if ($mode == 'add') {
     }
     $content .= '>';
     $content .= '<tr>';
-    if($formContent != 'messageExchange'){
-        $content .= '<td align="right" nowrap width="10%"><b>'.ucfirst(_FROM_SHORT).' </b></td><td>';
+    $content .= '<td align="right" nowrap width="10%"><b>'.ucfirst(_FROM_SHORT).' </b></td><td>';
 
+    if($formContent != 'messageExchange'){
         $userEntitiesMails = array();
 
         if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
@@ -144,10 +144,14 @@ if ($mode == 'add') {
             }else{
                 $content .= '<option value="'.$key.'" >' . $value . '</option>';
             }
-        }
-        $content .='</select>';
-        $content .='</td>';
-        $content .= '</tr>';
+        } 
+    } else {
+        $content .= functions::xssafe($_SESSION['user']['FirstName']) . ' ' . functions::xssafe($_SESSION['user']['LastName']) . ' (' . EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']])['short_label'] . ')';
+    }
+    $content .='</select>';
+    $content .='</td>';
+    $content .= '</tr>';
+    if($formContent != 'messageExchange'){
         $content .= '<tr>';
         $content .= '<td align="right" >'._EMAIL.'</label></td>';
         $content .= '<td colspan="2"><input type="text" name="email" id="email" value="" class="emailSelect" />';
@@ -171,10 +175,12 @@ if ($mode == 'add') {
     $content .= '<td align="right" nowrap width="10%"><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'
         ._SEND_TO_SHORT.'</label></td>';
 
-    $exp_user_id  = null;
-    $dest_user_id = null;
+    $exp_user_id     = null;
+    $dest_user_id    = null;
+    $exp_contact_id  = null;
+    $dest_contact_id = null;
     $db = new Database();
-    $stmt = $db->query("SELECT res_id, category_id, address_id, exp_user_id, dest_user_id, admission_date
+    $stmt = $db->query("SELECT res_id, category_id, address_id, exp_user_id, dest_user_id, admission_date, exp_contact_id, dest_contact_id
                 FROM mlb_coll_ext 
                 WHERE (( exp_contact_id is not null 
                 or dest_contact_id is not null 
@@ -183,12 +189,14 @@ if ($mode == 'add') {
                 and  res_id = ?)", array($_SESSION['doc_id']));
     $res = $stmt->fetchObject();
     
-    $res_id         = $res->res_id;
-    $category_id    = $res->category_id;
-    $address_id     = $res->address_id;
-    $exp_user_id    = $res->exp_user_id;
-    $dest_user_id   = $res->dest_user_id;
-    $admission_date = $res->admission_date;
+    $res_id          = $res->res_id;
+    $category_id     = $res->category_id;
+    $address_id      = $res->address_id;
+    $exp_user_id     = $res->exp_user_id;
+    $dest_user_id    = $res->dest_user_id;
+    $admission_date  = $res->admission_date;
+    $exp_contact_id  = $res->exp_contact_id;
+    $dest_contact_id = $res->dest_contact_id;
 
     if ($res_id != null) {
         $stmt = $db->query("SELECT subject FROM res_letterbox WHERE res_id = ?", array($res_id));
@@ -197,7 +205,7 @@ if ($mode == 'add') {
     }
     if($formContent != 'messageExchange'){
         if($address_id != null){
-            $adr = $contactModel->getFullAddressById(['select' => ['email'], 'addressId' => $address_id]);
+            $adr = ContactsModel::getFullAddressById(['select' => ['email'], 'addressId' => $address_id]);
             $adress_mail = $adr[0]['email'];
         }elseif($exp_user_id != null){
             $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($exp_user_id));
@@ -209,7 +217,7 @@ if ($mode == 'add') {
             $adress_mail = $adr->mail;
         }
     } else if($address_id != null) {
-        $adress_mail = $contactModel->getContactFullLabel(['addressId' => $address_id]);
+        $adress_mail = ContactsModel::getContactFullLabel(['addressId' => $address_id]);
     }
     if($formContent == 'messageExchange'){
         $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'.$adress_mail.'</td>';
@@ -225,6 +233,18 @@ if ($mode == 'add') {
     }
 
     $content .= '</tr>';
+    if($formContent == 'messageExchange'){
+        if($exp_contact_id != null){
+            $contact_id = $exp_contact_id;
+        } else {
+            $contact_id = $dest_contact_id;
+        }
+        $communicationType = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
+        if(empty($communicationType)){
+            $communicationType = 'Aucun';
+        }
+        $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">Moyen de communication : '.$communicationType.'</td></tr>';
+    }
     if($formContent != 'messageExchange'){
         $content .= '<tr><td colspan="3"><a href="javascript://" '
     		.'onclick="new Effect.toggle(\'tr_cc\', \'blind\', {delay:0.2});'
