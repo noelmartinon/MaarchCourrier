@@ -699,11 +699,11 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
 
     /****** RECOMMANDE ******/
     $frmStr .= '<tr id="reference_number_tr" style="display:none;">';
-    $frmStr .= '<td ><label for="reference_number" class="form_title" >' ._MONITORING_NUMBER.'</label></td>';
+    $frmStr .= '<td><label for="reference_number" class="form_title" >' ._MONITORING_NUMBER.'</label></td>';
     $frmStr .= '<td>&nbsp;</td>';
-    $frmStr .= '<td><input type="text" name="reference_number" id="reference_number"/></td>';
-    $frmStr .= '</tr>'; 
-    
+    $frmStr .= '<td class="indexing_field"><input type="text" name="reference_number" id="reference_number"/></td>';
+    $frmStr .= '</tr>';
+
     /*** Subject ***/
     $frmStr .= '<tr id="subject_tr" style="display:' . $displayValue . ';">';
     $frmStr .= '<td><label for="subject" class="form_title" >' . _SUBJECT
@@ -716,6 +716,26 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
             . 'style="display:inline;"><i class="fa fa-star"></i></span>&nbsp;</td>';
     $frmStr .= '</tr>';
     
+        /*** Initiator ***/
+    $frmStr .= '<tr id="initiator_tr" style="display:'
+        . $displayValue . ';">';
+    $frmStr .= '<td><label for="intitiator" class="form_title" >'
+            . _INITIATOR . '</label></td>';
+    $frmStr .= '<td>&nbsp;</td>';
+    $frmStr .= '<td class="indexing_field">'
+            . '<select name="initiator" id="initiator">';
+    foreach ($_SESSION['user']['entities'] as $entity) {
+        $frmStr .= '<option value="'.$entity['ENTITY_ID'].'">'.$entity['ENTITY_LABEL'].'</option>';
+    }
+    $frmStr .= '</select>'
+            . '</td>';
+    $frmStr .= '<td><span class="red_asterisk" '
+            . 'id="process_limit_date_use_mandatory" style="display:inline;"><i class="fa fa-star"></i>'
+            . '</span>&nbsp;</td>';
+    $frmStr .= '</tr>';
+    $frmStr .= '<script>new Chosen($(\'initiator\'),{width: "226px", disable_search_threshold: 10, search_contains: true});</script>';
+
+
     /*** Entities : department + diffusion list ***/
     if ($core->is_module_loaded('entities')) {
         $frmStr .= '<tr id="department_tr" style="display:' . $displayValue
@@ -763,7 +783,7 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
         $frmStr .= '</tr>';
         $frmStr .= '<script>new Chosen($(\'destination\'),{width: "226px", disable_search_threshold: 10, search_contains: true});</script>';
     }
-    
+
     /*** Process limit date ***/
     $frmStr .= '<tr id="process_limit_date_use_tr" style="display:'
             . $displayValue . ';">';
@@ -1482,16 +1502,29 @@ function manage_form($arrId, $history, $actionId, $label_action, $status, $collI
     }
 
     //store the initiator entity
-    if (isset($_SESSION['user']['primaryentity']['id'])) {
+    $initiator = get_value_fields($formValues, 'initiator');
+    if(!empty($initiator)){
         array_push(
             $_SESSION['data'],
             array(
                 'column' => 'initiator',
-                'value' => $_SESSION['user']['primaryentity']['id'],
+                'value' => $initiator,
                 'type' => 'string',
             )
         );
+    }else{
+        if (isset($_SESSION['user']['primaryentity']['id'])) {
+            array_push(
+                $_SESSION['data'],
+                array(
+                    'column' => 'initiator',
+                    'value' => $_SESSION['user']['primaryentity']['id'],
+                    'type' => 'string',
+                )
+            );
+        }
     }
+
     $status_id = get_value_fields($formValues, 'status');
     if(empty($status_id) || $status_id === "") $status_id = 'BAD';
     array_push(

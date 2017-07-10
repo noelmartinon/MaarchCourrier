@@ -482,6 +482,55 @@ class ExportFunctions
         }
     }
 
+    function get_category_label($libelle)
+    {
+
+        $query_status = "SELECT category_id FROM res_view_letterbox r WHERE r.res_id = ##res_id## ";
+
+        $db = new Database();
+
+        $i=0;
+        foreach($this->object_export as $line_name => $line_value) {
+            if ($i == 0) {
+                $line_value->get_category_label = $libelle;
+                $i++;
+                continue;
+            }
+
+            $res_id = $line_value->res_id;
+            $query = str_replace('##res_id##', '?', $query_status);
+            $stmt = $db->query($query, array($res_id));
+
+            $result = $stmt->fetchObject();
+
+            $line_value->get_category_label = $_SESSION['coll_categories']['letterbox_coll'][$result->category_id];
+        }
+    }
+
+    function get_contact_function($libelle)
+    {
+
+        $query_status = "SELECT c.function FROM mlb_coll_ext r LEFT JOIN contacts_v2 c ON c.contact_id = r.dest_contact_id WHERE r.res_id = ##res_id## ";
+
+        $db = new Database();
+
+        foreach($this->object_export as $line_name => $line_value) {
+            if ($i == 0) {
+                $line_value->get_contact_function = $libelle;
+                $i++;
+                continue;
+            }
+
+            $res_id = $line_value->res_id;
+            $query = str_replace('##res_id##', '?', $query_status);
+            $stmt = $db->query($query, array($res_id));
+
+            $result = $stmt->fetchObject();
+
+            $line_value->get_contact_function = $result->function;
+        }
+    }
+
     function get_entity_dest_short_label($libelle)
     {
 
@@ -507,6 +556,34 @@ class ExportFunctions
             $result = $stmt->fetchObject();
 
             $line_value->get_entity_dest_short_label = $entities->getentityshortlabel($result->destination);
+        }
+    }
+
+    function get_entity_initiator_short_label($libelle)
+    {
+
+        $query_status = "SELECT initiator FROM res_view_letterbox r WHERE r.res_id = ##res_id## ";
+
+        $db = new Database();
+
+        require_once("modules/entities/class/class_manage_entities.php");
+        $entities = new entity();
+
+        $i=0;
+        foreach($this->object_export as $line_name => $line_value) {
+            if ($i == 0) {
+                $line_value->get_entity_initiator_short_label = $libelle;
+                $i++;
+                continue;
+            }
+
+            $res_id = $line_value->res_id;
+            $query = str_replace('##res_id##', '?', $query_status);
+            $stmt = $db->query($query, array($res_id));
+
+            $result = $stmt->fetchObject();
+
+            $line_value->get_entity_initiator_short_label = $entities->getentityshortlabel($result->initiator);
         }
     }
 
