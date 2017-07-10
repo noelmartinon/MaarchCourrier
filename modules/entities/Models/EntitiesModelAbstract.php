@@ -13,7 +13,7 @@
 * @ingroup entities
 */
 
-// namespace Entities\Models;
+namespace Entities\Models;
 
 require_once 'apps/maarch_entreprise/services/Table.php';
 

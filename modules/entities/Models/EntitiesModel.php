@@ -13,9 +13,7 @@
 * @ingroup entities
 */
 
-// namespace Entities\Models;
-
-require_once 'modules/entities/Models/EntitiesModelAbstract.php';
+namespace Entities\Models;
 
 class EntitiesModel extends EntitiesModelAbstract
 {

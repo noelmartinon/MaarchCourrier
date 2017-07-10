@@ -43,7 +43,6 @@ require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/class/class_email_signatures.php';
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
-require_once 'modules/entities/Models/EntitiesModel.php';
     
 $core_tools     = new core_tools();
 $request        = new request();
@@ -114,7 +113,11 @@ if ($mode == 'add') {
     $content .= '<div class="block">';
     $content .= '<form name="formEmail" id="formEmail" method="post" action="#">';
     $content .= '<input type="hidden" value="'.$identifier.'" name="identifier" id="identifier">';
-    $content .= '<input type="hidden" value="Y" name="is_html" id="is_html">';
+    if($formContent == 'messageExchange'){
+        $content .= '<input type="hidden" value="N" name="is_html" id="is_html">';
+    } else {
+        $content .= '<input type="hidden" value="Y" name="is_html" id="is_html">';
+    }
     $content .= '<input type="hidden" value="'.$_GET['formContent'].'" name="formContent" id="formContent">';
     $content .= '<table border="0" align="left" width="100%" cellspacing="5" ';
     if($formContent == 'messageExchange'){
@@ -146,7 +149,7 @@ if ($mode == 'add') {
             }
         } 
     } else {
-        $content .= functions::xssafe($_SESSION['user']['FirstName']) . ' ' . functions::xssafe($_SESSION['user']['LastName']) . ' (' . EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']])['short_label'] . ')';
+        $content .= functions::xssafe($_SESSION['user']['FirstName']) . ' ' . functions::xssafe($_SESSION['user']['LastName']) . ' (' . \Entities\Models\EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']])['short_label'] . ')';
     }
     $content .='</select>';
     $content .='</td>';
