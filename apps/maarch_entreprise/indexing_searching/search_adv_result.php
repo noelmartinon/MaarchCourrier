@@ -138,8 +138,9 @@ if (count($_REQUEST['meta']) > 0) {
                     $where_request .= "or res_id = :multifield2 ";
                     $arrayPDO = array_merge($arrayPDO, array(":multifield2" => $_REQUEST['multifield'])); 
                 }
-                
-                $arrayPDO = array_merge($arrayPDO, array(":multifield" => "%".$_REQUEST['multifield']."%")); 
+
+                $multifield = $func->normalize($_REQUEST['multifield']);
+                $arrayPDO = array_merge($arrayPDO, array(":multifield" => "%".$multifield."%"));
                 
                 $where_request .=" and  ";
             } elseif ($tab_id_fields[$j] == 'numcase' && !empty($_REQUEST['numcase'])) {
@@ -464,7 +465,8 @@ if (count($_REQUEST['meta']) > 0) {
                     ."or res_id in (select identifier from notes where lower(translate(note_text,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) like lower(:multifieldWelcome)) "
                     ."or res_id in (select res_id_master from res_view_attachments where (lower(translate(identifier,'/','')) like lower(:multifieldWelcome) OR lower(identifier) like lower(:multifieldWelcome)) AND status NOT IN ('DEL','OBS','TMP')) "
                     ."or contact_id in (select contact_id from view_contacts where society ilike :multifieldWelcome or contact_firstname ilike :multifieldWelcome or contact_lastname ilike :multifieldWelcome) or (exp_user_id in (select user_id from users where firstname ilike :multifieldWelcome or lastname ilike :multifieldWelcome )))";
-                $arrayPDO = array_merge($arrayPDO, array(":multifieldWelcome" => "%".$_REQUEST['welcome']."%"));
+                $multifieldWelcome = $func->normalize($_REQUEST['welcome']);
+                $arrayPDO = array_merge($arrayPDO, array(":multifieldWelcome" => "%".$multifieldWelcome."%"));
                 $welcome = $_REQUEST['welcome'];
                 set_include_path('apps' . DIRECTORY_SEPARATOR 
                     . $_SESSION['config']['app_id'] 
