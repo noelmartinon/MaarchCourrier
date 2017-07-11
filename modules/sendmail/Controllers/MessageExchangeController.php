@@ -8,7 +8,7 @@
 */
 
 /**
-* @brief Resource Controller
+* @brief Message Exchange Controller
 * @author dev@maarch.org
 * @ingroup core
 */
@@ -19,31 +19,30 @@ require_once 'modules/export_seda/RequestSeda.php';
 
 class MessageExchangeController
 {
-
     public static function createMessageExchange($aArgs = [])
     {
         $errors = self::control($aArgs);
 
-        if(!empty($errors)){
+        if (!empty($errors)) {
             return ['errors' => $errors];
         }
         $mlbCollExt = ResModel::getMlbCollExtById(['resId' => $aArgs['identifier']]);
-        if(empty($mlbCollExt)){
+        if (empty($mlbCollExt)) {
             return ['errors' => "wrong identifier"];
         }
 
-        if(empty($mlbCollExt['exp_contact_id']) && empty($mlbCollExt['dest_contact_id'])){
+        if (empty($mlbCollExt['exp_contact_id']) && empty($mlbCollExt['dest_contact_id'])) {
             return ['errors' => "no contact"];
         }
 
-        if($mlbCollExt['exp_contact_id'] != null){
+        if ($mlbCollExt['exp_contact_id'] != null) {
             $contact_id = $mlbCollExt['exp_contact_id'];
         } else {
             $contact_id = $mlbCollExt['dest_contact_id'];
         }
 
         $ArchivalAgencyCommunicationType   = ContactsModel::getContactCommunication([
-                                                'contactId' => $contact_id, 
+                                                'contactId' => $contact_id,
                                                 'allValues' => true
                                             ]);
 
@@ -52,17 +51,19 @@ class MessageExchangeController
         $AllInfoMainMail                   = ResModel::getById(['resId' => $aArgs['identifier']]);
 
 
-        if(!empty($aArgs['join_file'])){
+        if (!empty($aArgs['join_file'])) {
             $fileInfo = [$AllInfoMainMail];
         }
-        if(!empty($aArgs['join_attachment'])){
+        if (!empty($aArgs['join_attachment'])) {
+            foreach ($aArgs['join_attachment'] as $key => $value) {
+                if (empty($value)) {
+                    unset($aArgs['join_attachment'][$key]);
+                }
+            }
             $AttachmentsInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id in (?)'], 'data' => $aArgs['join_attachment']]);
         }
         // if(!empty($aArgs['join_version'])){
         //     $AttachmentsVersionInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id_version in (?)'], 'data' => $aArgs['join_version']]);
-        // }
-        // if(!empty($aArgs['notes'])){          // TODO !!
-        //     $NotesInfo = $AllInfoMainMail;
         // }
 
         $return = self::generateMessageObject([
@@ -76,12 +77,12 @@ class MessageExchangeController
             ],
             'file'               => $fileInfo,
             'attachment'         => $AttachmentsInfo,
-            'attachment_version' => $AttachmentsVersionInfo,
-            // 'notes'              => [],   // TODO !!
-            'res'                => ResModel::getById(['resId' => $aArgs['identifier']])[0]
+            // 'attachment_version' => $AttachmentsVersionInfo,
+            'res'                => $AllInfoMainMail
 
         ]);
-var_export($return);exit;
+        var_export($return);
+        exit;
         return $return;
     }
 
@@ -90,95 +91,33 @@ var_export($return);exit;
         $RequestSeda = new RequestSeda();
         $date        = new DateTime;
 
-        $messageObject = new stdClass();
+        $messageObject                    = new stdClass();
         $messageObject->Comment           = $aArgs['Comment'];
         $messageObject->Date              = $date->format(DateTime::ATOM);
         $messageObject->MessageIdentifier = $RequestSeda->generateUniqueId();
 
-        /********* DATA OBJECT PACKAGE *********/
-        $messageObject->DataObjectPackage = new stdClass();
-
+        /********* BINARY DATA OBJECT PACKAGE *********/
+        $messageObject->DataObjectPackage                   = new stdClass();
         $messageObject->DataObjectPackage->BinaryDataObject = [];
 
-        if(!empty($aArgs['file'])) {
+        if (!empty($aArgs['file'])) {
             $binaryDataObject = self::getBinaryDataObject($aArgs['file'], 'res_letterbox');
             array_push($messageObject->DataObjectPackage->BinaryDataObject, $binaryDataObject);
         }
 
-        if(!empty($aArgs['attachment'])) {
+        if (!empty($aArgs['attachment'])) {
             $binaryDataObject = self::getBinaryDataObject($aArgs['attachment'], 'res_attachments');
             array_push($messageObject->DataObjectPackage->BinaryDataObject, $binaryDataObject);
         }
 
+        /********* DESCRIPTIVE META DATA *********/
+        $messageObject->DataObjectPackage->DescriptiveMetadata = self::getDescriptiveMetaDataObject($aArgs);
+
         /********* ARCHIVAL AGENCY *********/
-        $messageObject->ArchivalAgency             = new stdClass();
-        $messageObject->ArchivalAgency->Identifier = $aArgs['ArchivalAgency']['ContactInformations']['external_contact_id'];
-
-        $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata       = new stdClass();
-        $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Name = trim($aArgs['ArchivalAgency']['ContactInformations']['society'] . ' ' . $aArgs['ArchivalAgency']['ContactInformations']['contact_lastname'] . ' ' . $aArgs['ArchivalAgency']['ContactInformations']['contact_firstname']);
-
-        if(isset($aArgs['ArchivalAgency']['CommunicationType']['type'])){
-            $arcCommunicationObject          = new stdClass();
-            $arcCommunicationObject->Channel = $aArgs['ArchivalAgency']['CommunicationType']['type'];
-            $arcCommunicationObject->value   = $aArgs['ArchivalAgency']['CommunicationType']['value'];
-
-            $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication = [$arcCommunicationObject];
-        }
-
-        $contactObject = new stdClass();
-        $contactObject->DepartmentName = $aArgs['ArchivalAgency']['ContactInformations']['department'];
-        $contactObject->PersonName     = $aArgs['ArchivalAgency']['ContactInformations']['lastname'] . " " . $aArgs['ArchivalAgency']['ContactInformations']['firstname'];
-
-        $addressObject = new stdClass();
-        $addressObject->CityName      = $aArgs['ArchivalAgency']['ContactInformations']['address_town'];
-        $addressObject->Country       = $aArgs['ArchivalAgency']['ContactInformations']['address_country'];
-        $addressObject->Postcode      = $aArgs['ArchivalAgency']['ContactInformations']['address_postal_code'];
-        $addressObject->PostOfficeBox = $aArgs['ArchivalAgency']['ContactInformations']['address_num'];
-        $addressObject->StreetName    = $aArgs['ArchivalAgency']['ContactInformations']['address_street'];
-
-        $contactObject->Address = [$addressObject];
-
-        $communicationContactPhoneObject          = new stdClass();
-        $communicationContactPhoneObject->Channel = 'phone';
-        $communicationContactPhoneObject->value   = $aArgs['ArchivalAgency']['ContactInformations']['phone'];
-
-        $communicationContactEmailObject          = new stdClass();
-        $communicationContactEmailObject->Channel = 'email';
-        $communicationContactEmailObject->value   = $aArgs['ArchivalAgency']['ContactInformations']['email'];
-
-        $contactObject->Communication = [$communicationContactPhoneObject, $communicationContactEmailObject];
-
-        $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Contact = [$contactObject];
+        $messageObject->ArchivalAgency = self::getArchivalAgencyObject(['ArchivalAgency' => $aArgs['ArchivalAgency']]);
 
         /********* TRANSFERRING AGENCY *********/
-        $messageObject->TransferringAgency             = new stdClass();
-        $messageObject->TransferringAgency->Identifier = $aArgs['TransferringAgency']['EntitiesInformations']['business_id'];
-
-        $messageObject->TransferringAgency->OrganizationDescriptiveMetadata                      = new stdClass();
-        $messageObject->TransferringAgency->OrganizationDescriptiveMetadata->LegalClassification = "";  // TODO : GET ENTITY ROOT
-        $messageObject->TransferringAgency->OrganizationDescriptiveMetadata->Name                = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
-
-        $traCommunicationObject          = new stdClass();
-        $traCommunicationObject->Channel = 'email';
-        $traCommunicationObject->value   = $aArgs['TransferringAgency']['EntitiesInformations']['email'];
-
-        $messageObject->TransferringAgency->OrganizationDescriptiveMetadata->Communication = [$traCommunicationObject];
-
-        $contactUserObject                 = new stdClass();
-        $contactUserObject->DepartmentName = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
-        $contactUserObject->PersonName     = $_SESSION['user']['LastName'] . " " . $_SESSION['user']['FirstName'];
-
-        $communicationUserPhoneObject          = new stdClass();
-        $communicationUserPhoneObject->Channel = 'phone';
-        $communicationUserPhoneObject->value   = $_SESSION['user']['Phone'];
-
-        $communicationUserEmailObject          = new stdClass();
-        $communicationUserEmailObject->Channel = 'email';
-        $communicationUserEmailObject->value   = $_SESSION['user']['Mail'];
-
-        $contactUserObject->Communication = [$communicationUserPhoneObject, $communicationUserEmailObject];
-
-        $messageObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact = [$contactUserObject];
+        $messageObject->TransferringAgency = self::getTransferringAgencyObject(['TransferringAgency' => $aArgs['TransferringAgency']]);
 
         return $messageObject;
     }
@@ -191,7 +130,7 @@ var_export($return);exit;
         foreach ($aArgs as $value) {
             $docServers = $RequestSeda->getDocServer($value['docserver_id']);
 
-            if ($tablename == 'res_version') {
+            if ($tablename == 'res_version_attachments') {
                 $value['res_id'] = $value['res_id_version'];
             }
             if ($tablename) {
@@ -221,7 +160,147 @@ var_export($return);exit;
         return $binaryDataObject;
     }
 
-    protected function control($aArgs = []){
+    public static function getDescriptiveMetaDataObject($aArgs = [])
+    {
+        $DescriptiveMetadataObject = new stdClass();
+
+        $DescriptiveMetadataArchiveUnitId = 'mail_1';
+        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId = new stdClass();
+        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->Content = self::getContent([
+            'DescriptionLevel'                       => 'File',
+            'Title'                                  => $aArgs['res']['subject'],
+            'OriginatingSystemId'                    => $aArgs['res']['res_id'],
+            'OriginatingAgencyArchiveUnitIdentifier' => $aArgs['res']['alt_identifier'],
+            'DocumentType'                           => $aArgs['res']['type_label'],
+            'Status'                                 => $aArgs['res']['status'],
+            'Writer'                                 => $aArgs['res']['typist'],
+            'CreatedDate'                            => $aArgs['res']['creation_date'],
+        ]);
+
+        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->ArchiveUnit = [];
+        foreach ($aArgs['attachment'] as $key => $value) {
+            $attachmentArchiveUnit = new stdClass();
+            $DescriptiveMetadataArchiveUnitIdAttachment = 'attachment_' . $key;
+            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment          = new stdClass();
+            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->content = self::getContent([
+                'DescriptionLevel'                       => 'Item',
+                'Title'                                  => $value['title'],
+                'OriginatingSystemId'                    => $value['res_id'],
+                'OriginatingAgencyArchiveUnitIdentifier' => $value['identifier'],
+                'DocumentType'                           => $_SESSION['attachment_types'][$value['attachment_type']],
+                'Status'                                 => $value['status'],
+                'Writer'                                 => $value['typist'],
+                'CreatedDate'                            => $value['creation_date'],
+            ]);
+            $dataObjectReference                        = new stdClass();
+            $dataObjectReference->DataObjectReferenceId = 'res_attachments_'.$value['res_id'];
+            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->DataObjectReference = [$dataObjectReference];
+
+            array_push($DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->ArchiveUnit, $attachmentArchiveUnit);
+        }
+
+        return $DescriptiveMetadataObject;
+    }
+
+    public static function getContent($aArgs = [])
+    {
+        $contentObject                                         = new stdClass();
+        $contentObject->DescriptionLevel                       = $aArgs['DescriptionLevel'];
+        $contentObject->Title                                  = [$aArgs['Title']];
+        $contentObject->OriginatingSystemId                    = $aArgs['OriginatingSystemId'];
+        $contentObject->OriginatingAgencyArchiveUnitIdentifier = $aArgs['OriginatingAgencyArchiveUnitIdentifier'];
+        $contentObject->DocumentType                           = $aArgs['DocumentType'];
+        $contentObject->Status                                 = $aArgs['Status']; // TODO : STATUS LABEL
+
+        $userInfos = \Core\Models\UserModel::getById(['userId' => $aArgs['Writer']]);
+        $writer = new stdClass();
+        $writer->FirstName     = $userInfos['firstname'];
+        $writer->LastName      = $userInfos['lastname'];
+        $contentObject->Writer = [$writer];
+
+        $contentObject->CreatedDate = $aArgs['CreatedDate'];
+
+        return $contentObject;
+    }
+
+    public static function getArchivalAgencyObject($aArgs = [])
+    {
+        $archivalAgencyObject             = new stdClass();
+        $archivalAgencyObject->Identifier = $aArgs['ArchivalAgency']['ContactInformations']['external_contact_id'];
+
+        $archivalAgencyObject->OrganizationDescriptiveMetadata       = new stdClass();
+        $archivalAgencyObject->OrganizationDescriptiveMetadata->Name = trim($aArgs['ArchivalAgency']['ContactInformations']['society'] . ' ' . $aArgs['ArchivalAgency']['ContactInformations']['contact_lastname'] . ' ' . $aArgs['ArchivalAgency']['ContactInformations']['contact_firstname']);
+
+        if (isset($aArgs['ArchivalAgency']['CommunicationType']['type'])) {
+            $arcCommunicationObject          = new stdClass();
+            $arcCommunicationObject->Channel = $aArgs['ArchivalAgency']['CommunicationType']['type'];
+            $arcCommunicationObject->value   = $aArgs['ArchivalAgency']['CommunicationType']['value'];
+
+            $archivalAgencyObject->OrganizationDescriptiveMetadata->Communication = [$arcCommunicationObject];
+        }
+
+        $contactObject = new stdClass();
+        $contactObject->DepartmentName = $aArgs['ArchivalAgency']['ContactInformations']['department'];
+        $contactObject->PersonName     = $aArgs['ArchivalAgency']['ContactInformations']['lastname'] . " " . $aArgs['ArchivalAgency']['ContactInformations']['firstname'];
+
+        $addressObject = new stdClass();
+        $addressObject->CityName      = $aArgs['ArchivalAgency']['ContactInformations']['address_town'];
+        $addressObject->Country       = $aArgs['ArchivalAgency']['ContactInformations']['address_country'];
+        $addressObject->Postcode      = $aArgs['ArchivalAgency']['ContactInformations']['address_postal_code'];
+        $addressObject->PostOfficeBox = $aArgs['ArchivalAgency']['ContactInformations']['address_num'];
+        $addressObject->StreetName    = $aArgs['ArchivalAgency']['ContactInformations']['address_street'];
+
+        $contactObject->Address = [$addressObject];
+
+        $communicationContactPhoneObject          = new stdClass();
+        $communicationContactPhoneObject->Channel = 'phone';
+        $communicationContactPhoneObject->value   = $aArgs['ArchivalAgency']['ContactInformations']['phone'];
+
+        $communicationContactEmailObject          = new stdClass();
+        $communicationContactEmailObject->Channel = 'email';
+        $communicationContactEmailObject->value   = $aArgs['ArchivalAgency']['ContactInformations']['email'];
+
+        $contactObject->Communication = [$communicationContactPhoneObject, $communicationContactEmailObject];
+
+        $archivalAgencyObject->OrganizationDescriptiveMetadata->Contact = [$contactObject];
+
+        return $archivalAgencyObject;
+    }
+
+    public static function getTransferringAgencyObject($aArgs = [])
+    {
+        $TransferringAgencyObject             = new stdClass();
+        $TransferringAgencyObject->Identifier = $aArgs['TransferringAgency']['EntitiesInformations']['business_id'];
+
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata                      = new stdClass();
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->LegalClassification = "";  // TODO : GET ENTITY ROOT
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->Name                = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
+
+        $traCommunicationObject          = new stdClass();
+        $traCommunicationObject->Channel = 'email';
+        $traCommunicationObject->value   = $aArgs['TransferringAgency']['EntitiesInformations']['email'];
+
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->Communication = [$traCommunicationObject];
+
+        $contactUserObject                 = new stdClass();
+        $contactUserObject->DepartmentName = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
+        $contactUserObject->PersonName     = $_SESSION['user']['LastName'] . " " . $_SESSION['user']['FirstName'];
+
+        $communicationUserPhoneObject          = new stdClass();
+        $communicationUserPhoneObject->Channel = 'phone';
+        $communicationUserPhoneObject->value   = $_SESSION['user']['Phone'];
+
+        $communicationUserEmailObject          = new stdClass();
+        $communicationUserEmailObject->Channel = 'email';
+        $communicationUserEmailObject->value   = $_SESSION['user']['Mail'];
+
+        $contactUserObject->Communication = [$communicationUserPhoneObject, $communicationUserEmailObject];
+
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->Contact = [$contactUserObject];
+    }
+
+    protected function control($aArgs = [])
+    {
         $errors = [];
 
         if (empty($aArgs['object'])) {
@@ -247,5 +326,4 @@ var_export($return);exit;
 
         return $errors;
     }
-
 }
