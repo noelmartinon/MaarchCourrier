@@ -210,7 +210,7 @@ class MessageExchangeController
         $contentObject->OriginatingSystemId                    = $aArgs['OriginatingSystemId'];
         $contentObject->OriginatingAgencyArchiveUnitIdentifier = $aArgs['OriginatingAgencyArchiveUnitIdentifier'];
         $contentObject->DocumentType                           = $aArgs['DocumentType'];
-        $contentObject->Status                                 = $aArgs['Status']; // TODO : STATUS LABEL
+        $contentObject->Status                                 = \Core\Models\StatusModel::getById(['id' => $aArgs['Status']])[0]['label_status'];
 
         $userInfos = \Core\Models\UserModel::getById(['userId' => $aArgs['Writer']]);
         $writer = new stdClass();
@@ -273,7 +273,9 @@ class MessageExchangeController
         $TransferringAgencyObject->Identifier = $aArgs['TransferringAgency']['EntitiesInformations']['business_id'];
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata                      = new stdClass();
-        $TransferringAgencyObject->OrganizationDescriptiveMetadata->LegalClassification = "";  // TODO : GET ENTITY ROOT
+
+        $entityRoot = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $aArgs['TransferringAgency']['EntitiesInformations']['entity_id']]);
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->LegalClassification = $entityRoot[0]['entity_label'];
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Name                = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
 
         $traCommunicationObject          = new stdClass();
@@ -297,6 +299,8 @@ class MessageExchangeController
         $contactUserObject->Communication = [$communicationUserPhoneObject, $communicationUserEmailObject];
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Contact = [$contactUserObject];
+
+        return $TransferringAgencyObject;
     }
 
     protected function control($aArgs = [])
@@ -304,24 +308,15 @@ class MessageExchangeController
         $errors = [];
 
         if (empty($aArgs['object'])) {
-            array_push(
-                $errors,
-                _SUBJECT . ' ' . _EMPTY
-            );
+            array_push($errors, _SUBJECT . ' ' . _EMPTY);
         }
 
         if (empty($aArgs['identifier']) || !is_numeric($aArgs['identifier'])) {
-            array_push(
-                $errors,
-                'wrong format for identifier'
-            );
+            array_push($errors, 'wrong format for identifier');
         }
 
         if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['join_version']) && empty($aArgs['notes'])) {
-            array_push(
-                $errors,
-                'no attachment'
-            );
+            array_push($errors, 'no attachment');
         }
 
         return $errors;

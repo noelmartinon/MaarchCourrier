@@ -337,15 +337,12 @@ if ($mode == 'add') {
         $attachment_files = $sendmail_tools->getJoinedFiles($collId, $table, $identifier, true);
         if (count($attachment_files) >0) {
             $content .='<br/>';
-            $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._ATTACHMENTS.'</div>';
+            $content .='<div><span style="color:rgb(22, 173, 235);font-weight:bold;">'._ATTACHMENTS.'</span><span style="float: right;font-weight:bold">Principal</span></div>';
             $content .= "<table cellspacing=\"3\" id=\"show_pj_mail\" style=\"border-collapse:collapse;width:100%;\">";
-            //var_dump($attachment_files);
+
             for($i=0; $i < count($attachment_files); $i++) {
-                $it = $i+1;
-                //nouvelle ligne toutes les 3 infos
-                //if($it%4 == 0 || $it == 1){
-                    $content .= "<tr style=\"vertical-align:top;\">";
-                //}
+
+                $content .= "<tr style=\"vertical-align:top;\">";
 
                 //Get data
                 $id = $attachment_files[$i]['id']; 
@@ -355,15 +352,15 @@ if ($mode == 'add') {
                     $description = substr($description, 0, 70);
                     $description .= "...";
                 }
-                $format = $attachment_files[$i]['format'];
-                $mime_type = $is->get_mime_type($attachment_files[$i]['format']);
-                $att_type = $attachment_files[$i]['format'];
-                $filesize = $attachment_files[$i]['filesize']/1024;
+                $format          = $attachment_files[$i]['format'];
+                $mime_type       = $is->get_mime_type($attachment_files[$i]['format']);
+                $att_type        = $attachment_files[$i]['format'];
+                $filesize        = $attachment_files[$i]['filesize']/1024;
                 $attachment_type = $_SESSION['attachment_types'][$attachment_files[$i]['attachment_type']];
-                $chrono = $attachment_files[$i]['identifier'];
-                $dest_society = $attachment_files[$i]['society'];
-                $dest_firstname = $attachment_files[$i]['firstname'];
-                $dest_lastname = $attachment_files[$i]['lastname'];
+                $chrono          = $attachment_files[$i]['identifier'];
+                $dest_society    = $attachment_files[$i]['society'];
+                $dest_firstname  = $attachment_files[$i]['firstname'];
+                $dest_lastname   = $attachment_files[$i]['lastname'];
                 ($filesize > 1)? $filesize = ceil($filesize).' Ko' :  $filesize = $filesize.' Octets';
                 
                 $content .= "<th style=\"width:25px;border: dashed 1px grey;border-right:none;vertical-align:middle;\" alt=\"".$description
@@ -401,20 +398,21 @@ if ($mode == 'add') {
                     $content .= "<span style='font-size: 10px;color: rgb(22, 173, 235);font-style:italic;'>" . $chrono . "</span> - ";
                 $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                 $content .= "</td>";   
+                if($formContent == 'messageExchange'){
+                    $content .= "<td style=\"width:1%;text-align:center\"><input type=radio id=\"main_exchange_doc\" name=\"main_exchange_doc\" value=\"".$id."\">";   
+                    $content .= "</td>";
+                }
 
-                //if($it%3 == 0 && $it != 1){
-                    $content .= "</tr>";
-                //}
+                $content .= "</tr>";
 
 				$filename = $sendmail_tools->createFilename($description, $format);
 
-                // $all_joined_files .= $description.': '.$filename.PHP_EOL;
             }
             $content .= "</table>";
         }
     }
     //Notes            
-    if ($core_tools->is_module_loaded('notes')) {
+    if ($core_tools->is_module_loaded('notes') && $formContent != 'messageExchange') {
         require_once "modules" . DIRECTORY_SEPARATOR . "notes" . DIRECTORY_SEPARATOR
             . "class" . DIRECTORY_SEPARATOR
             . "class_modules_tools.php";
@@ -425,11 +423,7 @@ if ($mode == 'add') {
             $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._NOTES.'</div>';
             $content .= "<table cellspacing=\"3\" style=\"border-collapse:collapse;width:100%;\">";
             for($i=0; $i < count($user_notes); $i++) {
-                $it = $i+1;
-                //nouvelle ligne toutes les 3 infos
-                //if($it%4 == 0 || $it == 1){
-                    $content .= "<tr style=\"vertical-align:top;\">";
-                //}
+                $content .= "<tr style=\"vertical-align:top;\">";
 
                 //Get data
                 $id = $user_notes[$i]['id']; 
@@ -447,12 +441,9 @@ if ($mode == 'add') {
                 $content .= "title=\"".$note."\"><span style=\"font-size: 10px;color: rgb(22, 173, 235);\">".$userArray['firstname']." ".$userArray['lastname']." </span><span style=\"font-size: 10px;color: grey;\">".$date."</span><br/>"
                     ."<strong>". $noteShort."</strong></td>"; 
 
-                //if($it%3 == 0 && $it != 1){
-                    $content .= "</tr>";
-                //}
+                $content .= "</tr>";
             }
             
-            // $all_joined_files .= _NOTES.": notes_".$identifier."_".date(dmY).".html\n";
             $content .= "</table>";
         }
     }
@@ -719,11 +710,7 @@ if ($mode == 'add') {
                     $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._ATTACHMENTS.'</div>';
                     $content .= "<table cellspacing=\"3\" id=\"show_pj_mail\" style=\"border-collapse:collapse;width:100%;\">";
                     for($i=0; $i < count($attachment_files); $i++) {
-                        $it = $i+1;
-                        //nouvelle ligne toutes les 3 infos
-                        //if($it%4 == 0 || $it == 1){
-                            $content .= "<tr style=\"vertical-align:top;\">";
-                        //}
+                        $content .= "<tr style=\"vertical-align:top;\">";
 
                         //Get data
                         $id = $attachment_files[$i]['id']; 
@@ -786,9 +773,8 @@ if ($mode == 'add') {
                         $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                         $content .= "</td>";   
 
-                        //if($it%3 == 0 && $it != 1){
-                            $content .= "</tr>";
-                        //}
+                        $content .= "</tr>";
+
                         //Filename
 						$filename = $sendmail_tools->createFilename($description, $format);
                         $all_joined_files .= $description.': '.$filename.PHP_EOL;
@@ -809,11 +795,7 @@ if ($mode == 'add') {
                     $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._NOTES.'</div>';
                     $content .= "<table cellspacing=\"3\" style=\"border-collapse:collapse;width:100%;\">";
                     for($i=0; $i < count($user_notes); $i++) {
-                        $it = $i+1;
-                        //nouvelle ligne toutes les 3 infos
-                        //if($it%4 == 0 || $it == 1){
-                            $content .= "<tr style=\"vertical-align:top;\">";
-                        //}
+                        $content .= "<tr style=\"vertical-align:top;\">";
 
                         //Get data
                         $id = $user_notes[$i]['id']; 
@@ -835,12 +817,9 @@ if ($mode == 'add') {
                         $content .= "title=\"".$note."\"><span style=\"font-size: 10px;color: rgb(22, 173, 235);\">".$userArray['firstname']." ".$userArray['lastname']." </span><span style=\"font-size: 10px;color: grey;\">".$date."</span><br/>"
                             ."<strong>". $noteShort."</strong></td>"; 
 
-                        //if($it%3 == 0 && $it != 1){
-                            $content .= "</tr>";
-                        //}
+                        $content .= "</tr>";
                     }
                     
-                    // $all_joined_files .= _NOTES.": notes_".$identifier."_".date(dmY).".html\n";
                     $content .= "</table>";
                     //Filename
                     $filename = "notes_".$identifier."_".date(dmY).".html";
@@ -1092,11 +1071,7 @@ if ($mode == 'add') {
                     $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._ATTACHMENTS.'</div>';
                     $content .= "<table cellspacing=\"3\" id=\"show_pj_mail\" style=\"border-collapse:collapse;width:100%;\">";
                     for($i=0; $i < count($attachment_files); $i++) {
-                        $it = $i+1;
-                        //nouvelle ligne toutes les 3 infos
-                        //if($it%4 == 0 || $it == 1){
-                            $content .= "<tr style=\"vertical-align:top;\">";
-                        //}
+                        $content .= "<tr style=\"vertical-align:top;\">";
 
                         //Get data
                         $id = $attachment_files[$i]['id']; 
@@ -1150,9 +1125,8 @@ if ($mode == 'add') {
                         $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                         $content .= "</td>";   
 
-                        //if($it%3 == 0 && $it != 1){
-                            $content .= "</tr>";
-                        //}
+                        $content .= "</tr>";
+
                         //Filename
                         $filename = $sendmail_tools->createFilename($description, $format);
                         $all_joined_files .= $description.': '.$filename.PHP_EOL;
@@ -1173,11 +1147,7 @@ if ($mode == 'add') {
                     $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._NOTES.'</div>';
                     $content .= "<table cellspacing=\"3\" style=\"border-collapse:collapse;width:100%;\">";
                     for($i=0; $i < count($user_notes); $i++) {
-                        $it = $i+1;
-                        //nouvelle ligne toutes les 3 infos
-                        //if($it%4 == 0 || $it == 1){
-                            $content .= "<tr style=\"vertical-align:top;\">";
-                        //}
+                        $content .= "<tr style=\"vertical-align:top;\">";
 
                         //Get data
                         $id = $user_notes[$i]['id']; 
@@ -1199,12 +1169,10 @@ if ($mode == 'add') {
                         $content .= "title=\"".$note."\"><span style=\"font-size: 10px;color: rgb(22, 173, 235);\">".$userArray['firstname']." ".$userArray['lastname']." </span><span style=\"font-size: 10px;color: grey;\">".$date."</span><br/>"
                             ."<strong>". $noteShort."</strong></td>"; 
 
-                        //if($it%3 == 0 && $it != 1){
-                            $content .= "</tr>";
-                        //}
+                        $content .= "</tr>";
+
                     }
                     
-                    // $all_joined_files .= _NOTES.": notes_".$identifier."_".date(dmY).".html\n";
                     $content .= "</table>";
                     //Filename
                     $filename = "notes_".$identifier."_".date(dmY).".html";

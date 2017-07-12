@@ -78,4 +78,22 @@ class EntitiesModelAbstract extends \Apps_Table_Service
 
         return $aReturn;
     }
+
+    public static function getEntityRootById(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['entityId']);
+        static::checkString($aArgs, ['entityId']);
+
+        $aReturn = self::getById([
+            'select'   => ['entity_id', 'entity_label', 'parent_entity_id'],
+            'entityId' => [$aArgs['entityId']]
+        ]);
+
+        if(!empty($aReturn[0]['parent_entity_id'])){
+            $aReturn = self::getEntityRootById(['entityId' => $aReturn[0]['parent_entity_id']]);
+        }
+
+        return $aReturn;
+    }
+
 }
