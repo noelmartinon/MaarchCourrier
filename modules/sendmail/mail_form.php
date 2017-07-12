@@ -268,10 +268,14 @@ if ($mode == 'add') {
     $content .= '<td align="right" nowrap><span class="red_asterisk"><i class="fa fa-star"></i></span><label> '._EMAIL_OBJECT.' </label></td>';
 
     $content .= '<td colspan="2">';
+
+    if($formContent == 'messageExchange'){
+        $readOnlyObject = "readonly";
+    }
     if ($category_id === 'outgoing')
-        $content .= '<input name="object" id="object" class="emailInput" type="text" value="' . $subject . '" />';
+        $content .= '<input name="object" id="object" class="emailInput" type="text" value="' . $subject . '" '.$readOnlyObject.'/>';
     else
-        $content .= '<input name="object" id="object" class="emailInput" type="text" value="' . _EMAIL_OBJECT_ANSWER . ' ' . functions::format_date_db($admission_date).'" />';
+        $content .= '<input name="object" id="object" class="emailInput" type="text" value="' . _EMAIL_OBJECT_ANSWER . ' ' . functions::format_date_db($admission_date).'" '.$readOnlyObject.'/>';
 
     $content .= '</td></tr>';
     $content .= '</table><br />';
@@ -289,7 +293,11 @@ if ($mode == 'add') {
     $joined_files = $sendmail_tools->getJoinedFiles($collId, $table, $identifier);
     if (count($joined_files) >0) {
         $content .='<br/>';
-        $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._DOC.'</div>';
+        $content .='<div><span style="color:rgb(22, 173, 235);font-weight:bold;">'._DOC.'</span>';
+            if($formContent == 'messageExchange'){
+                $content .='<span style="float: right;font-weight:bold">Principal</span>';
+            }
+            $content .='</div>';
         for($i=0; $i < count($joined_files); $i++) {
             //Get data
             $id = $joined_files[$i]['id']; 
@@ -326,6 +334,10 @@ if ($mode == 'add') {
                 $content .= ' onclick="clickAttachments('.$id.')" ';
                 $content .= "><strong>" . $description . "</strong> <span style=\"font-size: 10px;color: grey;\">(" . $att_type . " - " . $filesize .")</span></td>";
             }
+            if($formContent == 'messageExchange'){
+                $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;\"><input type=radio name=\"main_exchange_doc\" value=\"".$id."\">";   
+                $content .= "</td>";
+            }
             $content .= "</tr></table>";
 			$filename = $sendmail_tools->createFilename($description.$version, $format);
             $all_joined_files .= $description.': '.$filename.PHP_EOL;
@@ -337,7 +349,7 @@ if ($mode == 'add') {
         $attachment_files = $sendmail_tools->getJoinedFiles($collId, $table, $identifier, true);
         if (count($attachment_files) >0) {
             $content .='<br/>';
-            $content .='<div><span style="color:rgb(22, 173, 235);font-weight:bold;">'._ATTACHMENTS.'</span><span style="float: right;font-weight:bold">Principal</span></div>';
+            $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._ATTACHMENTS.'</div>';
             $content .= "<table cellspacing=\"3\" id=\"show_pj_mail\" style=\"border-collapse:collapse;width:100%;\">";
 
             for($i=0; $i < count($attachment_files); $i++) {
@@ -399,7 +411,7 @@ if ($mode == 'add') {
                 $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                 $content .= "</td>";   
                 if($formContent == 'messageExchange'){
-                    $content .= "<td style=\"width:1%;text-align:center\"><input type=radio id=\"main_exchange_doc\" name=\"main_exchange_doc\" value=\"".$id."\">";   
+                    $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;\"><input type=radio name=\"main_exchange_doc\" value=\"".$id."\">";   
                     $content .= "</td>";
                 }
 

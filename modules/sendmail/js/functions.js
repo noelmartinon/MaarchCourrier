@@ -141,6 +141,11 @@ function validEmailForm(path, form_id) {
         }
     }
 
+    if (typeof($j('input[name=main_exchange_doc]:checked', '#formEmail').val()) === 'undefined' && path.includes("formContent=messageExchange")) {
+        alert('Aucun document principal sélectionné');
+        return;
+    }
+
     tinyMCE.triggerSave();
     new Ajax.Request(path,
     {

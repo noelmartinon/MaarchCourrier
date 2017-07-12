@@ -307,12 +307,12 @@ class MessageExchangeController
     {
         $errors = [];
 
-        if (empty($aArgs['object'])) {
-            array_push($errors, _SUBJECT . ' ' . _EMPTY);
-        }
-
         if (empty($aArgs['identifier']) || !is_numeric($aArgs['identifier'])) {
             array_push($errors, 'wrong format for identifier');
+        }
+
+        if (empty($aArgs['main_exchange_doc']) || !is_numeric($aArgs['main_exchange_doc'])) {
+            array_push($errors, 'wrong format for main_exchange_doc');
         }
 
         if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['join_version']) && empty($aArgs['notes'])) {
