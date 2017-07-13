@@ -50,22 +50,52 @@ class MessageExchangeController
         $TransferringAgencyInformations    = \Entities\Models\EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']]);
         $AllInfoMainMail                   = ResModel::getById(['resId' => $aArgs['identifier']]);
 
+        $tmpMainExchangeDoc = explode("__", $aArgs['main_exchange_doc']);
+        $MainExchangeDoc    = ['tablename' => $tmpMainExchangeDoc[0], 'res_id' => $tmpMainExchangeDoc[1]];
 
-        if (!empty($aArgs['join_file'])) {
+        if (!empty($aArgs['join_file']) || $MainExchangeDoc['tablename'] == 'res_letterbox') {
+            $AllInfoMainMail['Title']                                  = $AllInfoMainMail['subject'];
+            $AllInfoMainMail['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
+            $AllInfoMainMail['DocumentType']                           = $AllInfoMainMail['type_label'];
+            $AllInfoMainMail['tablenameExchangeMessage']               = 'res_letterbox';
             $fileInfo = [$AllInfoMainMail];
         }
-        if (!empty($aArgs['join_attachment'])) {
+
+        if(!empty($aArgs['join_attachment'])){
             foreach ($aArgs['join_attachment'] as $key => $value) {
                 if (empty($value)) {
                     unset($aArgs['join_attachment'][$key]);
                 }
             }
-            $AttachmentsInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id in (?)'], 'data' => $aArgs['join_attachment']]);
         }
-        // if(!empty($aArgs['join_version'])){
-        //     $AttachmentsVersionInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id_version in (?)'], 'data' => $aArgs['join_version']]);
-        // }
+        if($MainExchangeDoc['tablename'] == 'res_attachments'){
+            $aArgs['join_attachment'][] = $MainExchangeDoc['res_id']; 
+        }
 
+        if (!empty($aArgs['join_attachment'])) {
+            $AttachmentsInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id in (?)'], 'data' => [$aArgs['join_attachment']]]);
+        } else {
+            $AttachmentsInfo = [];
+        }
+
+        if($MainExchangeDoc['tablename'] == 'res_letterbox'){
+            $mainDocument     = $fileInfo;
+            $aMergeAttachment = array_merge($fileInfo, $AttachmentsInfo);
+        } else {
+            foreach ($AttachmentsInfo as $key => $value) {
+                $AttachmentsInfo[$key]['Title']                                  = $value['title'];
+                $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
+                $AttachmentsInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
+                $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
+                if($value['res_id'] == $MainExchangeDoc['res_id']){
+                    $mainDocument = [$AttachmentsInfo[$key]];
+                    unset($AttachmentsInfo[$key]);
+                }
+            }
+            $aMergeAttachment = array_merge($mainDocument, $AttachmentsInfo);
+        }
+
+        /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
         $return = self::generateMessageObject([
             'Comment' => [$aArgs['body_from_raw']],
             'ArchivalAgency' => [
@@ -75,14 +105,15 @@ class MessageExchangeController
             'TransferringAgency' => [
                 'EntitiesInformations' => $TransferringAgencyInformations
             ],
-            'file'               => $fileInfo,
-            'attachment'         => $AttachmentsInfo,
-            // 'attachment_version' => $AttachmentsVersionInfo,
-            'res'                => $AllInfoMainMail
-
+            'attachment'            => $aMergeAttachment,
+            'res'                   => $mainDocument,
+            'mainExchangeDocument'  => $MainExchangeDoc
         ]);
         var_export($return);
         exit;
+
+        /******** SAVE MESSAGE EXCHANGE *********/
+
         return $return;
     }
 
@@ -100,15 +131,8 @@ class MessageExchangeController
         $messageObject->DataObjectPackage                   = new stdClass();
         $messageObject->DataObjectPackage->BinaryDataObject = [];
 
-        if (!empty($aArgs['file'])) {
-            $binaryDataObject = self::getBinaryDataObject($aArgs['file'], 'res_letterbox');
-            array_push($messageObject->DataObjectPackage->BinaryDataObject, $binaryDataObject);
-        }
-
-        if (!empty($aArgs['attachment'])) {
-            $binaryDataObject = self::getBinaryDataObject($aArgs['attachment'], 'res_attachments');
-            array_push($messageObject->DataObjectPackage->BinaryDataObject, $binaryDataObject);
-        }
+        $binaryDataObject = self::getBinaryDataObject($aArgs['attachment']);
+        array_push($messageObject->DataObjectPackage->BinaryDataObject, $binaryDataObject);
 
         /********* DESCRIPTIVE META DATA *********/
         $messageObject->DataObjectPackage->DescriptiveMetadata = self::getDescriptiveMetaDataObject($aArgs);
@@ -122,19 +146,19 @@ class MessageExchangeController
         return $messageObject;
     }
 
-    public static function getBinaryDataObject($aArgs = [], $tablename)
+    public static function getBinaryDataObject($aArgs = [])
     {
         $binaryDataObject = new stdClass();
         $RequestSeda      = new RequestSeda();
 
-        foreach ($aArgs as $value) {
+        foreach ($aArgs as $key => $value) {
             $docServers = $RequestSeda->getDocServer($value['docserver_id']);
 
-            if ($tablename == 'res_version_attachments') {
+            if ($value['tablenameExchangeMessage'] == 'res_version_attachments') {
                 $value['res_id'] = $value['res_id_version'];
             }
-            if ($tablename) {
-                $binaryDataObjectId = $tablename . "_" . $value['res_id'];
+            if ($value['tablenameExchangeMessage']) {
+                $binaryDataObjectId = $value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
             } else {
                 $binaryDataObjectId = $value['res_id'];
             }
@@ -168,32 +192,32 @@ class MessageExchangeController
         $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId = new stdClass();
         $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->Content = self::getContent([
             'DescriptionLevel'                       => 'File',
-            'Title'                                  => $aArgs['res']['subject'],
-            'OriginatingSystemId'                    => $aArgs['res']['res_id'],
-            'OriginatingAgencyArchiveUnitIdentifier' => $aArgs['res']['alt_identifier'],
-            'DocumentType'                           => $aArgs['res']['type_label'],
-            'Status'                                 => $aArgs['res']['status'],
-            'Writer'                                 => $aArgs['res']['typist'],
-            'CreatedDate'                            => $aArgs['res']['creation_date'],
+            'Title'                                  => $aArgs['res'][0]['Title'],
+            'OriginatingSystemId'                    => $aArgs['res'][0]['res_id'],
+            'OriginatingAgencyArchiveUnitIdentifier' => $aArgs['res'][0]['OriginatingAgencyArchiveUnitIdentifier'],
+            'DocumentType'                           => $aArgs['res'][0]['DocumentType'],
+            'Status'                                 => $aArgs['res'][0]['status'],
+            'Writer'                                 => $aArgs['res'][0]['typist'],
+            'CreatedDate'                            => $aArgs['res'][0]['creation_date'],
         ]);
 
         $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->ArchiveUnit = [];
         foreach ($aArgs['attachment'] as $key => $value) {
             $attachmentArchiveUnit = new stdClass();
-            $DescriptiveMetadataArchiveUnitIdAttachment = 'attachment_' . $key;
+            $DescriptiveMetadataArchiveUnitIdAttachment = 'archiveUnit_'.$value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
             $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment          = new stdClass();
             $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->content = self::getContent([
                 'DescriptionLevel'                       => 'Item',
-                'Title'                                  => $value['title'],
+                'Title'                                  => $value['Title'],
                 'OriginatingSystemId'                    => $value['res_id'],
-                'OriginatingAgencyArchiveUnitIdentifier' => $value['identifier'],
-                'DocumentType'                           => $_SESSION['attachment_types'][$value['attachment_type']],
+                'OriginatingAgencyArchiveUnitIdentifier' => $value['OriginatingAgencyArchiveUnitIdentifier'],
+                'DocumentType'                           => $value['DocumentType'],
                 'Status'                                 => $value['status'],
                 'Writer'                                 => $value['typist'],
                 'CreatedDate'                            => $value['creation_date'],
             ]);
             $dataObjectReference                        = new stdClass();
-            $dataObjectReference->DataObjectReferenceId = 'res_attachments_'.$value['res_id'];
+            $dataObjectReference->DataObjectReferenceId = $value['tablenameExchangeMessage'].'_'.$key.'_'.$value['res_id'];
             $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->DataObjectReference = [$dataObjectReference];
 
             array_push($DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->ArchiveUnit, $attachmentArchiveUnit);
@@ -311,11 +335,11 @@ class MessageExchangeController
             array_push($errors, 'wrong format for identifier');
         }
 
-        if (empty($aArgs['main_exchange_doc']) || !is_numeric($aArgs['main_exchange_doc'])) {
+        if (empty($aArgs['main_exchange_doc'])) {
             array_push($errors, 'wrong format for main_exchange_doc');
         }
 
-        if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['join_version']) && empty($aArgs['notes'])) {
+        if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['main_exchange_doc'])) {
             array_push($errors, 'no attachment');
         }
 

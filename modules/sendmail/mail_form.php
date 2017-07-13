@@ -110,7 +110,7 @@ $core_tools->load_header('', true, false);
 $core_tools->load_js(); 
 //ADD
 if ($mode == 'add') {
-    $content .= '<div class="block">';
+    $content .= '<div style="padding: 10px;">';
     $content .= '<form name="formEmail" id="formEmail" method="post" action="#">';
     $content .= '<input type="hidden" value="'.$identifier.'" name="identifier" id="identifier">';
     if($formContent == 'messageExchange'){
@@ -212,11 +212,11 @@ if ($mode == 'add') {
             $adress_mail = $adr[0]['email'];
         }elseif($exp_user_id != null){
             $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($exp_user_id));
-            $adr = $stmt->fetchObject();
+            $adr  = $stmt->fetchObject();
             $adress_mail = $adr->mail;
         }elseif($dest_user_id != null){
             $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($dest_user_id));
-            $adr = $stmt->fetchObject();
+            $adr  = $stmt->fetchObject();
             $adress_mail = $adr->mail;
         }
     } else if($address_id != null) {
@@ -302,11 +302,11 @@ if ($mode == 'add') {
             //Get data
             $id = $joined_files[$i]['id']; 
             $description = $joined_files[$i]['label'];
-            $format = $joined_files[$i]['format'];
-            $format = $joined_files[$i]['format'];
-            $mime_type = $is->get_mime_type($joined_files[$i]['format']);
-            $att_type = $joined_files[$i]['format'];
-            $filesize = $joined_files[$i]['filesize']/1024;
+            $format      = $joined_files[$i]['format'];
+            $format      = $joined_files[$i]['format'];
+            $mime_type   = $is->get_mime_type($joined_files[$i]['format']);
+            $att_type    = $joined_files[$i]['format'];
+            $filesize    = $joined_files[$i]['filesize']/1024;
             ($filesize > 1)? $filesize = ceil($filesize).' Ko' :  $filesize = round($filesize,2).' Octets';
 			//Show data
 			$version = '';
@@ -335,7 +335,7 @@ if ($mode == 'add') {
                 $content .= "><strong>" . $description . "</strong> <span style=\"font-size: 10px;color: grey;\">(" . $att_type . " - " . $filesize .")</span></td>";
             }
             if($formContent == 'messageExchange'){
-                $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;\"><input type=radio name=\"main_exchange_doc\" value=\"".$id."\">";   
+                $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" value=\"res_letterbox__".$id."\">";   
                 $content .= "</td>";
             }
             $content .= "</tr></table>";
@@ -359,7 +359,7 @@ if ($mode == 'add') {
                 //Get data
                 $id = $attachment_files[$i]['id']; 
                 $id_converted = $attachment_files[$i]['converted_pdf']; 
-                $description = $attachment_files[$i]['label'];
+                $description  = $attachment_files[$i]['label'];
                 if (strlen($description) > 73) {
                     $description = substr($description, 0, 70);
                     $description .= "...";
@@ -411,7 +411,7 @@ if ($mode == 'add') {
                 $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                 $content .= "</td>";   
                 if($formContent == 'messageExchange'){
-                    $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;\"><input type=radio name=\"main_exchange_doc\" value=\"".$id."\">";   
+                    $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" value=\"res_attachments__".$id."\">";   
                     $content .= "</td>";
                 }
 
@@ -732,15 +732,15 @@ if ($mode == 'add') {
                             $description = substr($description, 0, 70);
                             $description .= "...";
                         }
-                        $format = $attachment_files[$i]['format'];
-                        $mime_type = $is->get_mime_type($attachment_files[$i]['format']);
-                        $att_type = $attachment_files[$i]['format'];
-                        $filesize = $attachment_files[$i]['filesize']/1024;
+                        $format          = $attachment_files[$i]['format'];
+                        $mime_type       = $is->get_mime_type($attachment_files[$i]['format']);
+                        $att_type        = $attachment_files[$i]['format'];
+                        $filesize        = $attachment_files[$i]['filesize']/1024;
                         $attachment_type = $_SESSION['attachment_types'][$attachment_files[$i]['attachment_type']];
-                        $chrono = $attachment_files[$i]['identifier'];
-                        $dest_society = $attachment_files[$i]['society'];
-                        $dest_firstname = $attachment_files[$i]['firstname'];
-                        $dest_lastname = $attachment_files[$i]['lastname'];
+                        $chrono          = $attachment_files[$i]['identifier'];
+                        $dest_society    = $attachment_files[$i]['society'];
+                        $dest_firstname  = $attachment_files[$i]['firstname'];
+                        $dest_lastname   = $attachment_files[$i]['lastname'];
                         ($filesize > 1)? $filesize = ceil($filesize).' Ko' :  $filesize = $filesize.' Octets';
                         
                         $content .= "<th style=\"width:25px;border: dashed 1px grey;border-right:none;vertical-align:middle;\" alt=\"".$description
@@ -871,12 +871,12 @@ if ($mode == 'add') {
 
             //Body
             if ($emailArray['isHtml'] == 'Y') {
-                $displayRaw = 'none';
-                $displayHtml = 'block';
+                $displayRaw   = 'none';
+                $displayHtml  = 'block';
                 $textAreaMode = 'html';
             } else {
-                $displayRaw = 'block';
-                $displayHtml = 'none';
+                $displayRaw   = 'block';
+                $displayHtml  = 'none';
                 $textAreaMode = 'raw';
             }
             $content .='<script type="text/javascript">var mode="'.$textAreaMode.'";</script>';
@@ -1030,11 +1030,11 @@ if ($mode == 'add') {
                     //Get data
                     $id = $joined_files[$i]['id']; 
                     $description = $joined_files[$i]['label'];
-                    $format = $joined_files[$i]['format'];
-                    $format = $joined_files[$i]['format'];
-                    $mime_type = $is->get_mime_type($joined_files[$i]['format']);
-                    $att_type = $joined_files[$i]['format'];
-                    $filesize = $joined_files[$i]['filesize']/1024;
+                    $format      = $joined_files[$i]['format'];
+                    $format      = $joined_files[$i]['format'];
+                    $mime_type   = $is->get_mime_type($joined_files[$i]['format']);
+                    $att_type    = $joined_files[$i]['format'];
+                    $filesize    = $joined_files[$i]['filesize']/1024;
                     ($filesize > 1)? $filesize = ceil($filesize).' Ko' :  $filesize = round($filesize,2).' Octets';
 
                     //Show data
@@ -1093,15 +1093,15 @@ if ($mode == 'add') {
                             $description = substr($description, 0, 70);
                             $description .= "...";
                         }
-                        $format = $attachment_files[$i]['format'];
-                        $mime_type = $is->get_mime_type($attachment_files[$i]['format']);
-                        $att_type = $attachment_files[$i]['format'];
-                        $filesize = $attachment_files[$i]['filesize']/1024;
+                        $format          = $attachment_files[$i]['format'];
+                        $mime_type       = $is->get_mime_type($attachment_files[$i]['format']);
+                        $att_type        = $attachment_files[$i]['format'];
+                        $filesize        = $attachment_files[$i]['filesize']/1024;
                         $attachment_type = $_SESSION['attachment_types'][$attachment_files[$i]['attachment_type']];
-                        $chrono = $attachment_files[$i]['identifier'];
-                        $dest_society = $attachment_files[$i]['society'];
-                        $dest_firstname = $attachment_files[$i]['firstname'];
-                        $dest_lastname = $attachment_files[$i]['lastname'];
+                        $chrono          = $attachment_files[$i]['identifier'];
+                        $dest_society    = $attachment_files[$i]['society'];
+                        $dest_firstname  = $attachment_files[$i]['firstname'];
+                        $dest_lastname   = $attachment_files[$i]['lastname'];
                         ($filesize > 1)? $filesize = ceil($filesize).' Ko' :  $filesize = $filesize.' Octets';
                         
                         $content .= "<th style=\"width:25px;border: dashed 1px grey;border-right:none;vertical-align:middle;\" alt=\"".$description
@@ -1162,11 +1162,11 @@ if ($mode == 'add') {
                         $content .= "<tr style=\"vertical-align:top;\">";
 
                         //Get data
-                        $id = $user_notes[$i]['id']; 
+                        $id        = $user_notes[$i]['id']; 
                         $noteShort = $request->cut_string($user_notes[$i]['label'], 50);
-                        $note = $user_notes[$i]['label'];
+                        $note      = $user_notes[$i]['label'];
                         $userArray = $users_tools->get_user($user_notes[$i]['author']);
-                        $date = $request->dateformat($user_notes[$i]['date']);
+                        $date      = $request->dateformat($user_notes[$i]['date']);
                         
                         $content .= "<th style=\"width:25px;border: dashed 1px grey;border-right:none;vertical-align:middle;\" alt=\"".$note
                             . "\" title=\"".$note

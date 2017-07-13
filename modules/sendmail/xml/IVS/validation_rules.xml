@@ -27,7 +27,7 @@
 		<parameter name="selectSignatures" type="string" />
 		<parameter name="action" type="string" />
 		<parameter name="formContent" type="string" />
-		<parameter name="main_exchange_doc" type="integer" />
+		<parameter name="main_exchange_doc" type="string" />
 	</validationRule>
 
 	<validationRule name="mail_form" extends="standardForm" mode="error">
