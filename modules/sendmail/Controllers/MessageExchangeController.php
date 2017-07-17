@@ -97,7 +97,7 @@ class MessageExchangeController
         }
 
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
-        $return = self::generateMessageObject([
+        $dataObject = self::generateMessageObject([
             'Comment' => [$aArgs['body_from_raw']],
             'ArchivalAgency' => [
                 'CommunicationType'   => $ArchivalAgencyCommunicationType,
@@ -110,12 +110,34 @@ class MessageExchangeController
             'res'                   => $mainDocument,
             'mainExchangeDocument'  => $MainExchangeDoc
         ]);
-        var_export($return);
+
+        /******** SAVE MESSAGE *********/
+        self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier']]);
+        self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'messageIdentifier' => $dataObject->MessageIdentifier]);
+        
+        var_export($dataObject);
         exit;
 
-        /******** SAVE MESSAGE EXCHANGE *********/
+        return $dataObject;
+    }
 
-        return $return;
+    protected function control($aArgs = [])
+    {
+        $errors = [];
+
+        if (empty($aArgs['identifier']) || !is_numeric($aArgs['identifier'])) {
+            array_push($errors, 'wrong format for identifier');
+        }
+
+        if (empty($aArgs['main_exchange_doc'])) {
+            array_push($errors, 'wrong format for main_exchange_doc');
+        }
+
+        if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['main_exchange_doc'])) {
+            array_push($errors, 'no attachment');
+        }
+
+        return $errors;
     }
 
     public static function generateMessageObject($aArgs = [])
@@ -328,22 +350,58 @@ class MessageExchangeController
         return $TransferringAgencyObject;
     }
 
-    protected function control($aArgs = [])
+    public static function saveMessageExchange($aArgs = [])
     {
-        $errors = [];
+        $dataObject = $aArgs['dataObject'];
+        $oData                                        = new stdClass();
+        $oData->messageId                             = $dataObject->MessageIdentifier;
+        $oData->date                                  = $dataObject->Date;
 
-        if (empty($aArgs['identifier']) || !is_numeric($aArgs['identifier'])) {
-            array_push($errors, 'wrong format for identifier');
-        }
+        $oData->messageIdentifier                     = new stdClass();
+        $oData->messageIdentifier->value              = ""; // TODO : ???
+        
+        $oData->transferringAgency                    = new stdClass();
+        $oData->transferringAgency->identifier        = new stdClass();
+        $oData->transferringAgency->identifier->value = $dataObject->TransferringAgency->Identifier;
+        
+        $oData->archivalAgency                        = new stdClass();
+        $oData->archivalAgency->identifier            = new stdClass();
+        $oData->archivalAgency->identifier->value     = $dataObject->ArchivalAgency->Identifier;
+        
+        $oData->archivalAgreement                     = new stdClass();
+        $oData->archivalAgreement->value              = ""; // TODO : ???
+        
+        $oData->replyCode                             = new stdClass();
+        $oData->replyCode->value                      = ""; // TODO : ???
 
-        if (empty($aArgs['main_exchange_doc'])) {
-            array_push($errors, 'wrong format for main_exchange_doc');
-        }
+        $aDataExtension = [
+            'status'            => 'wait', 
+            'fullMessageObject' => $dataObject, 
+            'resIdMaster'       => $aArgs['res_id_master']
+        ];
 
-        if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['main_exchange_doc'])) {
-            array_push($errors, 'no attachment');
-        }
+        $RequestSeda = new RequestSeda();
+        $messageIdentifier = $RequestSeda->insertMessage($oData, 'numericPackage', $aDataExtension);
 
-        return $errors;
+        return $messageIdentifier;
     }
+
+    public static function saveUnitIdentifier($aArgs = [])
+    {
+        $messageIdentifier = $aArgs['messageIdentifier'];
+        $RequestSeda       = new RequestSeda();
+
+        foreach ($aArgs['attachment'] as $key => $value) {
+            $disposition = "attachment";
+            if($key == 0){
+                $disposition = "body";
+            }
+
+            $RequestSeda->insertUnitIdentifier($messageIdentifier, $value['tablenameExchangeMessage'], $value['res_id'], $disposition);
+        }
+
+        return true;
+        
+    }
+
 }

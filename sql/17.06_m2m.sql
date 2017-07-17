@@ -11,6 +11,9 @@ ALTER TABLE IF EXISTS seda RENAME TO message_exchange;
 ALTER TABLE message_exchange DROP COLUMN IF EXISTS file_path;
 ALTER TABLE message_exchange ADD file_path text default NULL;
 
+ALTER TABLE message_exchange DROP COLUMN IF EXISTS res_id_master;
+ALTER TABLE message_exchange ADD res_id_master numeric default NULL;
+
 /** ADD NEW COLUMN IS TRANSFERABLE **/
 ALTER TABLE contacts_v2 DROP COLUMN  IF EXISTS  is_external_contact;
 ALTER TABLE contacts_v2 ADD COLUMN is_external_contact character(1) DEFAULT 'N';

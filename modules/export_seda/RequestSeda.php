@@ -302,12 +302,30 @@ class RequestSeda
         return $uniqueId;
     }
 
-	public function insertMessage($messageObject, $type)
+	public function insertMessage($messageObject, $type, $aArgs = [])
 	{
 		$queryParams = [];
 
         if($messageObject->messageId){
 		    $messageObject->messageId = $this->generateUniqueId();
+        }
+
+        if(empty($aArgs['status'])){
+            $status = "sent";
+        } else {
+            $status = $aArgs['status'];
+        }
+
+        if(empty($aArgs['fullMessageObject'])){
+            $messageObjectToSave = $messageObject;
+        } else {
+            $messageObjectToSave = $aArgs['fullMessageObject'];
+        }
+
+        if(empty($aArgs['resIdMaster'])){
+            $resIdMaster = null;
+        } else {
+            $resIdMaster = $aArgs['resIdMaster'];
         }
 
 		try {
@@ -328,13 +346,14 @@ class RequestSeda
 				size,
 				data,
 				active,
-				archived)
-				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+				archived,
+                res_id_master)
+				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
 			$queryParams[] = $messageObject->messageId; // Message Id
 			$queryParams[] = "2.1"; //Schema
 			$queryParams[] = $type; // Type
-			$queryParams[] = "sent"; // Status
+			$queryParams[] = $status; // Status
 			$queryParams[] = $messageObject->date; // Date
 			$queryParams[] = $messageObject->messageIdentifier->value; // Reference
 			$queryParams[] = $_SESSION['user']['UserId']; // Account Id
@@ -345,9 +364,10 @@ class RequestSeda
 			$queryParams[] = $messageObject->archivalAgreement->value; // Archival agreement reference
 			$queryParams[] = $messageObject->replyCode->value; //ReplyCode
 			$queryParams[] = 0; // size
-			$queryParams[] = json_encode($messageObject);//$messageObject; // Data
+			$queryParams[] = json_encode($messageObjectToSave);//$messageObject; // Data
 			$queryParams[] = 1; // active
-			$queryParams[] = 0; // archived
+            $queryParams[] = 0; // archived
+			$queryParams[] = $resIdMaster; // res_id_master
 
 			$res = $this->db->query($query,$queryParams);
 
