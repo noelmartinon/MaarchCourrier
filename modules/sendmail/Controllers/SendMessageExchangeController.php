@@ -391,7 +391,7 @@ class SendMessageExchangeController
         $oData->replyCode->value                      = ""; // TODO : ???
 
         $aDataExtension = [
-            'status'            => 'wait', 
+            'status'            => 'W', 
             'fullMessageObject' => $dataObject, 
             'resIdMaster'       => $aArgs['res_id_master']
         ];

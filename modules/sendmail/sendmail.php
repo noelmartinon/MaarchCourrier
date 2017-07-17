@@ -401,6 +401,9 @@ if (isset($_REQUEST['start']) && !empty($_REQUEST['start'])) $parameters .= '&st
         $content .= '<script>loadToolbarBadge(\'sendmail_tab\',\''.$toolbarBagde_script.'\');</script>';
         // $debug = $list->debug();
 
+    /********* MESSAGE EXCHANGE PART ***************/
+    include_once "modules/sendmail/messageExchangeList.php";
+
         
-    echo "{status : " . $status . ", content : '" . addslashes($debug.$content) . "', error : '" . addslashes($error) . "'}";
+    echo "{status : " . $status . ", content : '" . addslashes($debug.$content.$contentMessageExchange) . "', error : '" . addslashes($error) . "'}";
 }
