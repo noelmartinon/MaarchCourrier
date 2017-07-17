@@ -114,18 +114,18 @@ class SendMessageExchangeController
         ]);
 
         /******** SAVE MESSAGE *********/
-        self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier']]);
-        self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'messageIdentifier' => $dataObject->MessageIdentifier]);
+        $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier']]);
+        self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'messageId' => $messageId]);
 
         $hist    = new history();
         $request = new request();
         $hist->add(
             'res_letterbox', $aArgs['identifier'], "UP", 'resup',  _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
-            . $aArgs['identifier'] . ' ('.$dataObject->MessageIdentifier.') : "' . $request->cut_string($mainDocument[0]['Title'], 254) .'"',
+            . $aArgs['identifier'] . ' ('.$messageId.') : "' . $request->cut_string($mainDocument[0]['Title'], 254) .'"',
             $_SESSION['config']['databasetype'], 'sendmail'
         );
         $hist->add(
-            'message_exchange', $dataObject->MessageIdentifier, "ADD", 'messageexchangeadd', _NUMERIC_PACKAGE_ADDED . ' (' . $dataObject->MessageIdentifier . ')',
+            'message_exchange', $messageId, "ADD", 'messageexchangeadd', _NUMERIC_PACKAGE_ADDED . ' (' . $messageId . ')',
             $_SESSION['config']['databasetype'], 'sendmail'
         );
 
@@ -157,13 +157,12 @@ class SendMessageExchangeController
 
     public static function generateMessageObject($aArgs = [])
     {
-        $RequestSeda = new RequestSeda();
         $date        = new DateTime;
 
         $messageObject                    = new stdClass();
         $messageObject->Comment           = $aArgs['Comment'];
         $messageObject->Date              = $date->format(DateTime::ATOM);
-        $messageObject->MessageIdentifier = $RequestSeda->generateUniqueId();
+        $messageObject->MessageIdentifier = 'ArchiveTransfer_'.date("Ymd_His");
 
         /********* BINARY DATA OBJECT PACKAGE *********/
         $messageObject->DataObjectPackage                   = new stdClass();
@@ -367,13 +366,15 @@ class SendMessageExchangeController
 
     public static function saveMessageExchange($aArgs = [])
     {
+        $RequestSeda = new RequestSeda();
+
         $dataObject = $aArgs['dataObject'];
         $oData                                        = new stdClass();
-        $oData->messageId                             = $dataObject->MessageIdentifier;
+        $oData->messageId                             = $RequestSeda->generateUniqueId();
         $oData->date                                  = $dataObject->Date;
 
         $oData->messageIdentifier                     = new stdClass();
-        $oData->messageIdentifier->value              = ""; // TODO : ???
+        $oData->messageIdentifier->value              = $dataObject->MessageIdentifier;
         
         $oData->transferringAgency                    = new stdClass();
         $oData->transferringAgency->identifier        = new stdClass();
@@ -395,16 +396,15 @@ class SendMessageExchangeController
             'resIdMaster'       => $aArgs['res_id_master']
         ];
 
-        $RequestSeda = new RequestSeda();
-        $messageIdentifier = $RequestSeda->insertMessage($oData, 'numericPackage', $aDataExtension);
+        $messageId = $RequestSeda->insertMessage($oData, 'ArchiveTransfer', $aDataExtension);
 
-        return $messageIdentifier;
+        return $messageId;
     }
 
     public static function saveUnitIdentifier($aArgs = [])
     {
-        $messageIdentifier = $aArgs['messageIdentifier'];
-        $RequestSeda       = new RequestSeda();
+        $messageId   = $aArgs['messageId'];
+        $RequestSeda = new RequestSeda();
 
         foreach ($aArgs['attachment'] as $key => $value) {
             $disposition = "attachment";
@@ -412,7 +412,7 @@ class SendMessageExchangeController
                 $disposition = "body";
             }
 
-            $RequestSeda->insertUnitIdentifier($messageIdentifier, $value['tablenameExchangeMessage'], $value['res_id'], $disposition);
+            $RequestSeda->insertUnitIdentifier($messageId, $value['tablenameExchangeMessage'], $value['res_id'], $disposition);
         }
 
         return true;
