@@ -53,6 +53,7 @@ class MessageExchangeController
         $tmpMainExchangeDoc = explode("__", $aArgs['main_exchange_doc']);
         $MainExchangeDoc    = ['tablename' => $tmpMainExchangeDoc[0], 'res_id' => $tmpMainExchangeDoc[1]];
 
+        $fileInfo = [];
         if (!empty($aArgs['join_file']) || $MainExchangeDoc['tablename'] == 'res_letterbox') {
             $AllInfoMainMail['Title']                                  = $AllInfoMainMail['subject'];
             $AllInfoMainMail['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
@@ -68,14 +69,14 @@ class MessageExchangeController
                 }
             }
         }
+
         if($MainExchangeDoc['tablename'] == 'res_attachments'){
             $aArgs['join_attachment'][] = $MainExchangeDoc['res_id']; 
         }
 
+        $AttachmentsInfo = [];
         if (!empty($aArgs['join_attachment'])) {
             $AttachmentsInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id in (?)'], 'data' => [$aArgs['join_attachment']]]);
-        } else {
-            $AttachmentsInfo = [];
         }
 
         if($MainExchangeDoc['tablename'] == 'res_letterbox'){
@@ -92,7 +93,7 @@ class MessageExchangeController
                     unset($AttachmentsInfo[$key]);
                 }
             }
-            $aMergeAttachment = array_merge($mainDocument, $AttachmentsInfo);
+            $aMergeAttachment = array_merge($mainDocument, $fileInfo, $AttachmentsInfo);
         }
 
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
@@ -129,10 +130,7 @@ class MessageExchangeController
 
         /********* BINARY DATA OBJECT PACKAGE *********/
         $messageObject->DataObjectPackage                   = new stdClass();
-        $messageObject->DataObjectPackage->BinaryDataObject = [];
-
-        $binaryDataObject = self::getBinaryDataObject($aArgs['attachment']);
-        array_push($messageObject->DataObjectPackage->BinaryDataObject, $binaryDataObject);
+        $messageObject->DataObjectPackage->BinaryDataObject = self::getBinaryDataObject($aArgs['attachment']);
 
         /********* DESCRIPTIVE META DATA *********/
         $messageObject->DataObjectPackage->DescriptiveMetadata = self::getDescriptiveMetaDataObject($aArgs);
@@ -148,12 +146,10 @@ class MessageExchangeController
 
     public static function getBinaryDataObject($aArgs = [])
     {
-        $binaryDataObject = new stdClass();
-        $RequestSeda      = new RequestSeda();
+        $aReturn     = [];
+        $RequestSeda = new RequestSeda();
 
         foreach ($aArgs as $key => $value) {
-            $docServers = $RequestSeda->getDocServer($value['docserver_id']);
-
             if ($value['tablenameExchangeMessage'] == 'res_version_attachments') {
                 $value['res_id'] = $value['res_id_version'];
             }
@@ -163,25 +159,30 @@ class MessageExchangeController
                 $binaryDataObjectId = $value['res_id'];
             }
 
+            $binaryDataObject                      = new stdClass();
             $binaryDataObject->$binaryDataObjectId = new stdClass();
 
-            $binaryDataObject->$binaryDataObjectId->messageDigest = new stdClass();
-            $binaryDataObject->$binaryDataObjectId->messageDigest->value = $value['fingerprint'];
+            $binaryDataObject->$binaryDataObjectId->messageDigest            = new stdClass();
+            $binaryDataObject->$binaryDataObjectId->messageDigest->value     = $value['fingerprint'];
             $binaryDataObject->$binaryDataObjectId->messageDigest->algorithm = "sha256";
 
-            $binaryDataObject->$binaryDataObjectId->size = $value['filesize'];
+            $binaryDataObject->$binaryDataObjectId->size                     = $value['filesize'];
 
             $uri = str_replace("##", DIRECTORY_SEPARATOR, $value['path']);
             $uri = str_replace("#", DIRECTORY_SEPARATOR, $uri);
             
             $binaryDataObject->$binaryDataObjectId->Attachment           = new stdClass();
+            $docServers = $RequestSeda->getDocServer($value['docserver_id']);
             $binaryDataObject->$binaryDataObjectId->Attachment->uri      = $docServers->path_template . $uri;
             $binaryDataObject->$binaryDataObjectId->Attachment->filename = basename($value['filename']);
 
-            $binaryDataObject->$binaryDataObjectId->FormatIdentification = mime_content_type($docServers->path_template . $uri . $value['filename']);
+            $binaryDataObject->$binaryDataObjectId->FormatIdentification           = new stdClass();
+            $binaryDataObject->$binaryDataObjectId->FormatIdentification->MimeType = mime_content_type($docServers->path_template . $uri . $value['filename']);
+
+            array_push($aReturn, $binaryDataObject);
         }
 
-        return $binaryDataObject;
+        return $aReturn;
     }
 
     public static function getDescriptiveMetaDataObject($aArgs = [])
@@ -189,7 +190,7 @@ class MessageExchangeController
         $DescriptiveMetadataObject = new stdClass();
 
         $DescriptiveMetadataArchiveUnitId = 'mail_1';
-        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId = new stdClass();
+        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId          = new stdClass();
         $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->Content = self::getContent([
             'DescriptionLevel'                       => 'File',
             'Title'                                  => $aArgs['res'][0]['Title'],
@@ -206,7 +207,7 @@ class MessageExchangeController
             $attachmentArchiveUnit = new stdClass();
             $DescriptiveMetadataArchiveUnitIdAttachment = 'archiveUnit_'.$value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
             $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment          = new stdClass();
-            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->content = self::getContent([
+            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->Content = self::getContent([
                 'DescriptionLevel'                       => 'Item',
                 'Title'                                  => $value['Title'],
                 'OriginatingSystemId'                    => $value['res_id'],
@@ -237,9 +238,9 @@ class MessageExchangeController
         $contentObject->Status                                 = \Core\Models\StatusModel::getById(['id' => $aArgs['Status']])[0]['label_status'];
 
         $userInfos = \Core\Models\UserModel::getById(['userId' => $aArgs['Writer']]);
-        $writer = new stdClass();
+        $writer                = new stdClass();
         $writer->FirstName     = $userInfos['firstname'];
-        $writer->LastName      = $userInfos['lastname'];
+        $writer->BirthName     = $userInfos['lastname'];
         $contentObject->Writer = [$writer];
 
         $contentObject->CreatedDate = $aArgs['CreatedDate'];
