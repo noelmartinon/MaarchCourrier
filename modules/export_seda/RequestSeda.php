@@ -306,7 +306,7 @@ class RequestSeda
 	{
 		$queryParams = [];
 
-        if($messageObject->messageId){
+        if(empty($messageObject->messageId)){
 		    $messageObject->messageId = $this->generateUniqueId();
         }
 

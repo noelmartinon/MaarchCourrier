@@ -42,9 +42,9 @@ require_once 'modules/sendmail/sendmail_tables.php';
 require_once 'modules/notifications/notifications_tables_definition.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
-require_once 'modules/sendmail/Controllers/MessageExchangeController.php';
+require_once 'modules/sendmail/Controllers/SendMessageExchangeController.php';
 
-    
+
 $core_tools                = new core_tools();
 $request                   = new request();
 $db                        = new Database();
@@ -184,7 +184,7 @@ switch ($mode) {
         
     case 'added':
         if($formContent == 'messageExchange'){
-            $return = MessageExchangeController::createMessageExchange($_REQUEST);
+            $return = SendMessageExchangeController::createMessageExchange($_REQUEST);
             if(!empty($return['errors'])){
                 $error = implode(", ", $return['errors']);
                 $status = 1;

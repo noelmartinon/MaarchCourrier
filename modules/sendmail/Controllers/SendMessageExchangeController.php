@@ -19,7 +19,7 @@ require_once 'modules/export_seda/RequestSeda.php';
 require_once "core/class/class_request.php";
 require_once "core/class/class_history.php";
 
-class MessageExchangeController
+class SendMessageExchangeController
 {
     public static function createMessageExchange($aArgs = [])
     {
