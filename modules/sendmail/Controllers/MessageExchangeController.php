@@ -16,6 +16,8 @@
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'apps/maarch_entreprise/Models/ResModel.php';
 require_once 'modules/export_seda/RequestSeda.php';
+require_once "core/class/class_request.php";
+require_once "core/class/class_history.php";
 
 class MessageExchangeController
 {
@@ -114,11 +116,24 @@ class MessageExchangeController
         /******** SAVE MESSAGE *********/
         self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier']]);
         self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'messageIdentifier' => $dataObject->MessageIdentifier]);
-        
-        var_export($dataObject);
-        exit;
 
-        return $dataObject;
+        $hist    = new history();
+        $request = new request();
+        $hist->add(
+            'res_letterbox', $aArgs['identifier'], "UP", 'resup',  _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
+            . $aArgs['identifier'] . ' ('.$dataObject->MessageIdentifier.') : "' . $request->cut_string($mainDocument[0]['Title'], 254) .'"',
+            $_SESSION['config']['databasetype'], 'sendmail'
+        );
+        $hist->add(
+            'message_exchange', $dataObject->MessageIdentifier, "ADD", 'messageexchangeadd', _NUMERIC_PACKAGE_ADDED . ' (' . $dataObject->MessageIdentifier . ')',
+            $_SESSION['config']['databasetype'], 'sendmail'
+        );
+
+        /******** GENERATION DU BORDEREAU + ENVOI
+
+        /*********** TODO : ALEX MORIN *********/
+
+        return true;
     }
 
     protected function control($aArgs = [])

@@ -83,6 +83,8 @@ if (!defined("_NEW_EMAIL"))
     define("_NEW_EMAIL","New mail");
 if (!defined("_NEW_NUMERIC_PACKAGE"))
     define("_NEW_NUMERIC_PACKAGE","New numeric package");
+if (!defined("_NUMERIC_PACKAGE_ADDED"))
+    define("_NUMERIC_PACKAGE_ADDED","Numeric package added");
 if (!defined("_CREATE_EMAIL"))
     define("_CREATE_EMAIL", "Create");
 if (!defined("_EMAIL_ADDED"))
