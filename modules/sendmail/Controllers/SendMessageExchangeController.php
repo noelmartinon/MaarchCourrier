@@ -82,6 +82,12 @@ class SendMessageExchangeController
         }
 
         if($MainExchangeDoc['tablename'] == 'res_letterbox'){
+            foreach ($AttachmentsInfo as $key => $value) {
+                $AttachmentsInfo[$key]['Title']                                  = $value['title'];
+                $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
+                $AttachmentsInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
+                $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
+            }
             $mainDocument     = $fileInfo;
             $aMergeAttachment = array_merge($fileInfo, $AttachmentsInfo);
         } else {
