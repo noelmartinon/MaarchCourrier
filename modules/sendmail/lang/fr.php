@@ -88,6 +88,10 @@ if (!defined("_NUMERIC_PACKAGE_ADDED"))
     define("_NUMERIC_PACKAGE_ADDED","Paquet numérique ajouté");
 if (!defined("_NUMERIC_PACKAGE_SENT"))
     define("_NUMERIC_PACKAGE_SENT","Paquets numériques envoyés");
+if (!defined("_COMMUNICATION_MODE"))
+    define("_COMMUNICATION_MODE","Moyen de communication");
+if (!defined("_NOTHING"))
+    define("_NOTHING","Aucun");
 if (!defined("_CREATE_EMAIL"))
     define("_CREATE_EMAIL", "Créer");
 if (!defined("_EMAIL_ADDED"))

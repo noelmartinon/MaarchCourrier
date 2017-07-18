@@ -43,6 +43,7 @@ require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/class/class_email_signatures.php';
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
+require_once 'modules/sendmail/Controllers/ReadMessageExchangeController.php';
     
 $core_tools     = new core_tools();
 $request        = new request();
@@ -244,9 +245,9 @@ if ($mode == 'add') {
         }
         $communicationType = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
         if(empty($communicationType)){
-            $communicationType = 'Aucun';
+            $communicationType = _NOTHING;
         }
-        $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">Moyen de communication : '.$communicationType.'</td></tr>';
+        $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">' . _COMMUNICATION_MODE . ' : '.$communicationType.'</td></tr>';
     }
     if($formContent != 'messageExchange'){
         $content .= '<tr><td colspan="3"><a href="javascript://" '
@@ -946,29 +947,32 @@ if ($mode == 'add') {
         
         $id = $_REQUEST['id'];
         if($formContent == 'messageExchange'){
-            
+            $emailArray = ReadMessageExchangeController::getMessageExchange(['id' => $id]);
         } else {
             $emailArray = $sendmail_tools->getEmail($id, false);
         }
 
         //Check if mail exists
         if (count($emailArray) > 0 ) {
-			$usermailArray = $users_tools->get_user($emailArray['userId']);
-		
             $content .= '<div class="block">';
             $content .= '<table border="0" align="left" width="100%" cellspacing="5">';
             $content .= '<tr>';
 
-			$content .= '<td width="10%" align="right" nowrap><b>'.ucfirst(_FROM_SHORT).' </b></td><td width="90%" colspan="2">';
+            $content .= '<td width="10%" align="right" nowrap><b>'.ucfirst(_FROM_SHORT).' </b></td><td width="90%" colspan="2">';
 
-            $mailEntities = $sendmail_tools->getAttachedEntitiesMails();
-
-            if (in_array($emailArray['sender_email'], array_keys($mailEntities))) {
-                $content .= $mailEntities[$emailArray['sender_email']];
-            } else if ($emailArray['sender_email'] == $usermailArray['mail']) {
-                 $content .= $usermailArray['firstname'] . " " . $usermailArray['lastname'] . " (".$emailArray['sender_email'].")";
+            if($formContent == 'messageExchange'){
+                $content .= $emailArray['from'];
             } else {
-                $content .= $sendmail_tools->explodeSenderEmail($emailArray['sender_email']);
+                $usermailArray = $users_tools->get_user($emailArray['userId']);
+                $mailEntities  = $sendmail_tools->getAttachedEntitiesMails();
+
+                if (in_array($emailArray['sender_email'], array_keys($mailEntities))) {
+                    $content .= $mailEntities[$emailArray['sender_email']];
+                } else if ($emailArray['sender_email'] == $usermailArray['mail']) {
+                    $content .= $usermailArray['firstname'] . " " . $usermailArray['lastname'] . " (".$emailArray['sender_email'].")";
+                } else {
+                    $content .= $sendmail_tools->explodeSenderEmail($emailArray['sender_email']);
+                }
             }
 
             $content .= '<br/></td>';
@@ -982,31 +986,39 @@ if ($mode == 'add') {
             $content .= '<td align="right" nowrap width="10%"><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'
                 ._SEND_TO_SHORT.'</label></td>';
             $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">';
-            $content .= $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], 'to', true);
+            if($formContent == 'messageExchange'){
+                $content .= $emailArray['contactInfo'];
+            } else {
+                $content .= $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], 'to', true);
+            }
             $content .= '</div></td>';
             $content .= '</tr>';
-            //CC
-            if (count($emailArray['cc']) > 0) {
-                $_SESSION['adresses']['cc'] = array();
-                $_SESSION['adresses']['cc'] = $emailArray['cc'];
-            }
-            $content .= '<tr>';
-            $content .= '<td align="right" nowrap><label>'._COPY_TO_SHORT.'</label></td>';
-            $content .= '<td colspan="2"><div name="cc" id="cc" class="emailInput">';
-            $content .= $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], 'cc', true);
-            $content .= '</div></td>';
-            $content .= '</tr>';
-            //CCI
-            if (count($emailArray['cci']) > 0) {
-                $_SESSION['adresses']['cci'] = array();
-                $_SESSION['adresses']['cci'] = $emailArray['cci'];
-            }
-            $content .= '<tr>';
-            $content .= '<td align="right" nowrap><label>'._COPY_TO_INVISIBLE_SHORT.'</label></td>';
-            $content .= '<td colspan="2"><div name="cci" id="cci" class="emailInput">';
-            $content .= $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], 'cci', true);
-            $content .= '</div></td>';
-            $content .= '</tr>';   
+            if($formContent == 'messageExchange'){
+                $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">' . _COMMUNICATION_MODE . ' : '.$emailArray['communicationType'].'</td></tr>';
+            } else {
+                //CC
+                if (count($emailArray['cc']) > 0) {
+                    $_SESSION['adresses']['cc'] = array();
+                    $_SESSION['adresses']['cc'] = $emailArray['cc'];
+                }
+                $content .= '<tr>';
+                $content .= '<td align="right" nowrap><label>'._COPY_TO_SHORT.'</label></td>';
+                $content .= '<td colspan="2"><div name="cc" id="cc" class="emailInput">';
+                $content .= $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], 'cc', true);
+                $content .= '</div></td>';
+                $content .= '</tr>';
+                //CCI
+                if (count($emailArray['cci']) > 0) {
+                    $_SESSION['adresses']['cci'] = array();
+                    $_SESSION['adresses']['cci'] = $emailArray['cci'];
+                }
+                $content .= '<tr>';
+                $content .= '<td align="right" nowrap><label>'._COPY_TO_INVISIBLE_SHORT.'</label></td>';
+                $content .= '<td colspan="2"><div name="cci" id="cci" class="emailInput">';
+                $content .= $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], 'cci', true);
+                $content .= '</div></td>';
+                $content .= '</tr>';  
+            } 
             //Object
             $content .= '<tr>';
             $content .= '<td align="right" nowrap><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'._EMAIL_OBJECT.' </label></td>';
@@ -1029,7 +1041,11 @@ if ($mode == 'add') {
             $joined_files = $sendmail_tools->getJoinedFiles($collId, $table, $identifier);
             if (count($joined_files) >0) {
                 $content .='<br/>';
-                $content .='<div style="color:rgb(22, 173, 235);font-weight:bold;">'._DOC.'</div>';
+                $content .='<div><span style="color:rgb(22, 173, 235);font-weight:bold;">'._DOC.'</span>';
+                    if($formContent == 'messageExchange'){
+                        $content .='<span style="float: right;font-weight:bold">Principal</span>';
+                    }
+            $content .='</div>';
                 for($i=0; $i < count($joined_files); $i++) {
                     //Get data
                     $id = $joined_files[$i]['id']; 
@@ -1072,6 +1088,13 @@ if ($mode == 'add') {
                         $content .= ' onclick="clickAttachments('.$id.')" ';
                         $content .= "><strong>" . $description . "</strong> <span style=\"font-size: 10px;color: grey;\">(" . $att_type . " - " . $filesize .")</span></td>";
                     }
+                    if($formContent == 'messageExchange'){
+                        $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" disabled ";
+                        if($emailArray['disposition']->tablename == 'res_letterbox' && $emailArray['disposition']->res_id == $id){
+                            $content .= " checked ";
+                        } 
+                        $content .= "></td>";
+                    }
                     $content .= "</tr></table>";
                     //Filename
                     $filename = $sendmail_tools->createFilename($description.$version, $format);
@@ -1092,7 +1115,7 @@ if ($mode == 'add') {
                         //Get data
                         $id = $attachment_files[$i]['id']; 
                         $id_converted = $attachment_files[$i]['converted_pdf']; 
-                        $description = $attachment_files[$i]['label'];
+                        $description  = $attachment_files[$i]['label'];
                         if (strlen($description) > 73) {
                             $description = substr($description, 0, 70);
                             $description .= "...";
@@ -1140,7 +1163,13 @@ if ($mode == 'add') {
                             $content .= "<span style='font-size: 10px;color: rgb(22, 173, 235);font-style:italic;'>" . $chrono . "</span> - ";
                         $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                         $content .= "</td>";   
-
+                        if($formContent == 'messageExchange'){
+                            $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" disabled ";
+                            if($emailArray['disposition']->tablename == 'res_attachments' && $emailArray['disposition']->res_id == $id){
+                                $content .= " checked ";
+                            } 
+                            $content .= "></td>";
+                        }
                         $content .= "</tr>";
 
                         //Filename

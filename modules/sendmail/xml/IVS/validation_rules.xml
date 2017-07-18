@@ -1,7 +1,7 @@
 <validationRules>
 	<validationRule name="sendmail_ajax_content" extends="standardForm" mode="error">
 		<parameter name="module" type="identifier" />
-		<parameter name="id" type="integer" />
+		<parameter name="id" type="base64" />
 		<parameter name="identifier" type="integer" />
 		<parameter name="origin" type="identifier" />
 		<parameter name="coll_id" type="collection_list" />

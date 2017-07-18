@@ -72,7 +72,7 @@ class RequestSeda
 
         $queryParams[] = $messageId;
 
-        $query = "SELECT res_id FROM unit_identifier WHERE message_id = ?";
+        $query = "SELECT * FROM unit_identifier WHERE message_id = ?";
 
         $smtp = $this->db->query($query,$queryParams);
         

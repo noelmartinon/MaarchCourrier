@@ -87,6 +87,10 @@ if (!defined("_NUMERIC_PACKAGE_ADDED"))
     define("_NUMERIC_PACKAGE_ADDED","Numeric package added");
 if (!defined("_NUMERIC_PACKAGE_SENT"))
     define("_NUMERIC_PACKAGE_SENT","Numeric package sent");
+if (!defined("_COMMUNICATION_MODE"))
+    define("_COMMUNICATION_MODE","Communication mode");
+if (!defined("_NOTHING"))
+    define("_NOTHING","Aucun");
 if (!defined("_CREATE_EMAIL"))
     define("_CREATE_EMAIL", "Create");
 if (!defined("_EMAIL_ADDED"))
