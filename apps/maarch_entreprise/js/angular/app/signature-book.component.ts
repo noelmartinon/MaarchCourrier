@@ -462,9 +462,9 @@ export class SignatureBookComponent implements OnInit {
                     this.router.navigate([path]);
                 } else {
                     if (origin == "view") {
-                        alert("Courrier verouillé par " + data.lockBy);
+                        alert("Courrier verrouillé par " + data.lockBy);
                     } else if (origin == "action") {
-                        alert("Courrier suivant verouillé par " + data.lockBy);
+                        alert("Courrier suivant verrouillé par " + data.lockBy);
                         this.backToBasket();
                     }
                 }
