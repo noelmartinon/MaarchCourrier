@@ -213,10 +213,11 @@ class SendMessageExchangeController
             $uri = str_replace("##", DIRECTORY_SEPARATOR, $value['path']);
             $uri = str_replace("#", DIRECTORY_SEPARATOR, $uri);
             
-            $binaryDataObject->$binaryDataObjectId->Attachment           = new stdClass();
             $docServers = $RequestSeda->getDocServer($value['docserver_id']);
-            $binaryDataObject->$binaryDataObjectId->Attachment->uri      = $docServers->path_template . $uri;
+            $binaryDataObject->$binaryDataObjectId->Attachment           = new stdClass();
+            $binaryDataObject->$binaryDataObjectId->Attachment->uri      = '';
             $binaryDataObject->$binaryDataObjectId->Attachment->filename = basename($value['filename']);
+            $binaryDataObject->$binaryDataObjectId->Attachment->value    = base64_encode(file_get_contents($docServers->path_template . $uri . '/'. $value['filename']));
 
             $binaryDataObject->$binaryDataObjectId->FormatIdentification           = new stdClass();
             $binaryDataObject->$binaryDataObjectId->FormatIdentification->MimeType = mime_content_type($docServers->path_template . $uri . $value['filename']);
