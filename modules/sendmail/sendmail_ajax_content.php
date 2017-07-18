@@ -189,6 +189,8 @@ switch ($mode) {
                 $error = implode(", ", $return['errors']);
                 $status = 1;
             }
+            //Reload and show message
+            $js =  $list_origin."window.parent.top.$('main_info').innerHTML = '"._EMAIL_ADDED."';";
         } else {
             $userEntitiesMails = array();
             if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {

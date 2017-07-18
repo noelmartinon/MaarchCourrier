@@ -35,7 +35,7 @@
 		<parameter name="identifier" type="integer" />
 		<parameter name="origin" type="identifier" />
 		<parameter name="coll_id" type="collection_list" />
-		<parameter name="id" type="integer" />
+		<parameter name="id" type="base64" />
 		<parameter name="size" type="size" />
 		<parameter name="formContent" type="string" />
 	</validationRule>

@@ -106,130 +106,19 @@ $select["message_exchange"] = [];
                     $tab[$i][$j]["show"]        = true;
                     $tab[$i][$j]["order"]       = 'status';
                 }
-                // if($tab[$i][$j][$value]=="firstname")
-                // {
-                //     $firstname =  $request->show_string($tab[$i][$j]["value"]);
-                // }
-                // if($tab[$i][$j][$value]=="lastname")
-                // {
-                //     $tab[$i][$j]["value"] = $request->show_string($tab[$i][$j]["value"]). ' ' .$firstname ;
-                //     $tab[$i][$j]["label"]=_USER;
-                //     $tab[$i][$j]["size"]=$sizeUser;
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=false;
-                //     $tab[$i][$j]["order"]='lastname';
-                // }
-                
-                // if($tab[$i][$j][$value]=="email_destinataire")
-                // {
-                //     $tab_dest = explode(',', $tab[$i][$j]['value']);
-                //     $tab[$i][$j]['value'] = implode(', ', $tab_dest);
-                //     $tab[$i][$j]["value"] = $tab[$i][$j]['value'];
-                //     $tab[$i][$j]["label"]=_RECIPIENT;
-                //     $tab[$i][$j]["size"]=$sizeObject;
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=true;
-                //     $tab[$i][$j]["order"]='email_destinataire';
-                // }
-                // if($tab[$i][$j][$value]=="email_object")
-                // {
-                //     $tab[$i][$j]["value"] = addslashes($tab[$i][$j]["value"]);
-                //     $tab[$i][$j]["label"]=_EMAIL_OBJECT;
-                //     $tab[$i][$j]["size"]=$sizeObject;
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=false;
-                //     $tab[$i][$j]["order"]='email_object';
-                // }
-                // if($tab[$i][$j][$value]=="email_object_short")
-                // {
-                //     $tab[$i][$j]["value"] = $request->cut_string( $request->show_string($tab[$i][$j]["value"]), $cutString);
-                //     $tab[$i][$j]["label"]=_EMAIL_OBJECT;
-                //     $tab[$i][$j]["size"]=$sizeObject;
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=true;
-                //     $tab[$i][$j]["order"]='email_object_short';
-                // }
-                // if($tab[$i][$j][$value]=="status_label")
-                // {
-                //     $tab[$i][$j]["value"] =  addslashes($_SESSION['sendmail']['status'][$tab[$i][$j]["value"]]['label']);
-                //     $tab[$i][$j]["label"]=_STATUS;
-                //     $tab[$i][$j]["size"]="1";
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=false;
-                //     $tab[$i][$j]["order"]='status_label';
-                // }
-
-                // if($tab[$i][$j][$value]=="mail")
-                // {
-                //     $tab[$i][$j]["value"] = $request->show_string($tab[$i][$j]["value"]) ;
-                //     $tab[$i][$j]["label"]=_SENDER;
-                //     $tab[$i][$j]["size"]=$sizeUser;
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=false;
-                //     $tab[$i][$j]["order"]='mail';
-                // }
-                // if($tab[$i][$j][$value]=="sender_email")
-                // {
-
-                //     $tab[$i][$j]["value"] = $sendmail_tools->explodeSenderEmail($tab[$i][$j]["value"]);
-
-                //     $tab[$i][$j]["label"]=_SENDER;
-                //     $tab[$i][$j]["size"]="20";
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=true;
-                //     $tab[$i][$j]["order"]='sender_email';
-                // }
-                // if($tab[$i][$j][$value]=="id")
-                // {
-                //     $tab[$i][$j]["value"] = ($sendmail_tools->haveJoinedFiles($tab[$i][$j]["value"]))? 
-                //         '<i class="fa fa-paperclip fa-2x" title="'. _JOINED_FILES.'"></i>' : 
-                //             '';
-                //     $tab[$i][$j]["label"]=false;
-                //     $tab[$i][$j]["size"]="1";
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=true;
-                //     $tab[$i][$j]["order"]=false;
-                // }
-                // if($tab[$i][$j][$value]=="email_status")
-                // {
-                //     $tab[$i][$j]["label"]=_STATUS;
-                //     $tab[$i][$j]["size"]="1";
-                //     $tab[$i][$j]["label_align"]="left";
-                //     $tab[$i][$j]["align"]="left";
-                //     $tab[$i][$j]["valign"]="bottom";
-                //     $tab[$i][$j]["show"]=false;
-                //     $tab[$i][$j]["order"]='email_status';
-                // }
             }
         }
     }
     
     //List
-    $listKey = 'message_id';                                                            //Cle de la liste
-    $paramsTab = array();                                                               //Initialiser le tableau de param�tres
-    $paramsTab['bool_sortColumn'] = false;                                              //Affichage Tri
-    $paramsTab['pageTitle'] ='<br><br>'._NUMERIC_PACKAGE_SENT;                          //Titre de la page
-    $paramsTab['bool_bigPageTitle'] = false;                                            //Affichage du titre en grand
-    $paramsTab['urlParameters'] = 'identifier='.$identifier
-            ."&origin=".$origin.'&display=true'.$parameters;                            //Parametres d'url supplementaires   
-    $paramsTab['listHeight'] = '100%';                                                  //Hauteur de la liste
-    $paramsTab['listCss'] = $css;                                                       //CSS
+    $listKey                        = 'message_id';                                       //Cle de la liste
+    $paramsTab                      = array();                                            //Initialiser le tableau de param�tres
+    $paramsTab['bool_sortColumn']   = false;                                              //Affichage Tri
+    $paramsTab['pageTitle']         ='<br><br>'._NUMERIC_PACKAGE_SENT;                    //Titre de la page
+    $paramsTab['bool_bigPageTitle'] = false;                                              //Affichage du titre en grand
+    $paramsTab['urlParameters']     = 'identifier='.$identifier."&origin=".$origin.'&display=true'.$parameters;                            //Parametres d'url supplementaires   
+    $paramsTab['listHeight']        = '100%';                                             //Hauteur de la liste
+    $paramsTab['listCss']           = $css;                                               //CSS
     
     //Action icons array
     $paramsTab['actionIcons'] = array();      
