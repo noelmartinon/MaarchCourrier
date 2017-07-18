@@ -945,7 +945,11 @@ if ($mode == 'add') {
     if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
         
         $id = $_REQUEST['id'];
-        $emailArray = $sendmail_tools->getEmail($id, false);
+        if($formContent == 'messageExchange'){
+            
+        } else {
+            $emailArray = $sendmail_tools->getEmail($id, false);
+        }
 
         //Check if mail exists
         if (count($emailArray) > 0 ) {

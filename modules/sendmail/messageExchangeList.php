@@ -72,7 +72,7 @@ $select["message_exchange"] = [];
                 }
                 if($tab[$i][$j][$value]=="recipient_org_identifier")
                 {
-                    $tab[$i][$j]["label"]       = "recipient_org_identifier";
+                    $tab[$i][$j]["label"]       = _RECIPIENT;
                     $tab[$i][$j]["size"]        = "11";
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
@@ -84,7 +84,7 @@ $select["message_exchange"] = [];
                 {
                     $userInfo = \Core\Models\UserModel::getById(['userId' => $tab[$i][$j]["value"]]);
                     $tab[$i][$j]["value"]       = $userInfo['firstname'] . " " . $userInfo['lastname'];
-                    $tab[$i][$j]["label"]       = _USER;
+                    $tab[$i][$j]["label"]       = _SENDER;
                     $tab[$i][$j]["size"]        = "5";
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
@@ -221,15 +221,14 @@ $select["message_exchange"] = [];
     }
     
     //List
-    $listKey = 'message_id';                                                              //Cle de la liste
+    $listKey = 'message_id';                                                            //Cle de la liste
     $paramsTab = array();                                                               //Initialiser le tableau de param�tres
-    $paramsTab['bool_sortColumn'] = false;                                               //Affichage Tri
-    $paramsTab['pageTitle'] ='<hr><br>Envoi des paquets numérique';                             //Titre de la page
+    $paramsTab['bool_sortColumn'] = false;                                              //Affichage Tri
+    $paramsTab['pageTitle'] ='<br><br>'._NUMERIC_PACKAGE_SENT;                          //Titre de la page
     $paramsTab['bool_bigPageTitle'] = false;                                            //Affichage du titre en grand
     $paramsTab['urlParameters'] = 'identifier='.$identifier
             ."&origin=".$origin.'&display=true'.$parameters;                            //Parametres d'url supplementaires   
     $paramsTab['listHeight'] = '100%';                                                  //Hauteur de la liste
-    $paramsTab['bool_showSmallToolbar'] = true;                                         //Mini barre d'outils
     $paramsTab['listCss'] = $css;                                                       //CSS
     
     //Action icons array
@@ -237,7 +236,7 @@ $select["message_exchange"] = [];
     $read = array(
     "script"        => "showEmailForm('".$_SESSION['config']['businessappurl']
                                 ."index.php?display=true&module=sendmail&page=sendmail_ajax_content"
-                                ."&mode=read&id=@@email_id@@&identifier=".$identifier."&origin=".$origin
+                                ."&mode=read&id=@@message_id@@&identifier=".$identifier."&origin=".$origin.'&formContent=messageExchange'
                                 . $parameters."');",
         "icon"      =>  'eye',
         "tooltip"   =>  _READ

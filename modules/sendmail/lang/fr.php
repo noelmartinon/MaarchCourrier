@@ -86,6 +86,8 @@ if (!defined("_NEW_NUMERIC_PACKAGE"))
     define("_NEW_NUMERIC_PACKAGE","Nouveau paquet numérique");
 if (!defined("_NUMERIC_PACKAGE_ADDED"))
     define("_NUMERIC_PACKAGE_ADDED","Paquet numérique ajouté");
+if (!defined("_NUMERIC_PACKAGE_SENT"))
+    define("_NUMERIC_PACKAGE_SENT","Paquets numériques envoyés");
 if (!defined("_CREATE_EMAIL"))
     define("_CREATE_EMAIL", "Créer");
 if (!defined("_EMAIL_ADDED"))
