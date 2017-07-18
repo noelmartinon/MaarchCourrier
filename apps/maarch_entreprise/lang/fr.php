@@ -1576,12 +1576,12 @@ if (!defined("_LOCKED"))                            define("_LOCKED", "Verrouill
 if (!defined("_PRINCIPAL_LIST"))                    define("_PRINCIPAL_LIST", "Liste principale");
 if (!defined("_SUBLIST"))                           define("_SUBLIST", "Sous-liste");
 if (!defined("_TOGGLE"))                            define("_TOGGLE", "Afficher / Masquer");
-if (!defined("_HELP_LIST_KEYWORDS"))                define("_HELP_LIST_KEYWORDS", "Aide sur les clauses de verouillage");
+if (!defined("_HELP_LIST_KEYWORDS"))                define("_HELP_LIST_KEYWORDS", "Aide sur les clauses de verrouillage");
 if (!defined("_HELP_LIST_KEYWORD1"))                define("_HELP_LIST_KEYWORD1", "<b>Les opérateurs de comparaison</b> permettent de comparer deux valeurs: a == b :Egal, a <> b ou a != b :Différent, a < b : Plus petit que, a > b : Plus grand.");
 if (!defined("_HELP_LIST_KEYWORD2"))                define("_HELP_LIST_KEYWORD2", "<b>Les opérateurs logiques</b>: a && b: ET ( And )	Vrai si a ET b sont vrais, a || b OU ( Or )	Vrai si a OU b est vrai.");
-if (!defined("_HELP_LIST_KEYWORD_EXEMPLE_TITLE"))   define("_HELP_LIST_KEYWORD_EXEMPLE_TITLE", "Condition de verouillage des lignes la liste/sous-liste.<br><br>L'ajout du paramètre <b>@@nom_du_champ@@</b> permet de faire référence à la valeur du champ de critère. Il est possible de mettre plusieurs @@nom_du_champ@@ différents dans la déclaration.");
+if (!defined("_HELP_LIST_KEYWORD_EXEMPLE_TITLE"))   define("_HELP_LIST_KEYWORD_EXEMPLE_TITLE", "Condition de verrouillage des lignes la liste/sous-liste.<br><br>L'ajout du paramètre <b>@@nom_du_champ@@</b> permet de faire référence à la valeur du champ de critère. Il est possible de mettre plusieurs @@nom_du_champ@@ différents dans la déclaration.");
 if (!defined("_HELP_LIST_KEYWORD_EXEMPLE"))         define("_HELP_LIST_KEYWORD_EXEMPLE", "Ex: @@status@@ <> 'NEW' || '@@type_id@@ <> '10'<br><br>Ex: (@@doctype_secon_level =='50' && @@dest_user@@=='bblier\") || doctype_secon_level == '10'");
-if (!defined("_SYNTAX_ERROR_LOCK_CLAUSE"))          define("_SYNTAX_ERROR_LOCK_CLAUSE", "Erreur dans la syntaxe de la clause de verouillage");
+if (!defined("_SYNTAX_ERROR_LOCK_CLAUSE"))          define("_SYNTAX_ERROR_LOCK_CLAUSE", "Erreur dans la syntaxe de la clause de verrouillage");
 if (!defined("_DOCUMENTS_LIST_WITH_FILTERS"))       define("_DOCUMENTS_LIST_WITH_FILTERS", "Liste avec filtres"); //liste
 if (!defined("_DOCUMENTS_LIST_WITH_ATTACHMENTS"))   define("_DOCUMENTS_LIST_WITH_ATTACHMENTS", "Liste avec filtre et réponses"); //liste
 if (!defined("_DOCUMENTS_LIST_COPIES"))             define("_DOCUMENTS_LIST_COPIES", "Liste des copies"); //liste + template

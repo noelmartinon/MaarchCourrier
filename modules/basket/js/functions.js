@@ -291,7 +291,7 @@ function islockForSignatureBook(resId, basketId, prodmode){
             var response = JSON.parse(result);
 
             if (response.lock) {
-                alert("Courrier verouillé par " + response.lockBy);
+                alert("Courrier verrouillé par " + response.lockBy);
             } else {
                 if (prodmode) {
                     triggerAngular(true, "#/" + basketId + "/signatureBook/" + resId);

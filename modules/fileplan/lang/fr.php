@@ -80,13 +80,13 @@ if (!defined("_EDIT_FILEPLAN_SHORT"))
 if (!defined("_FILEPLAN_UPDATED"))
     define("_FILEPLAN_UPDATED", "Plan de classement modifiée");
 if (!defined("_ENABLE_FILEPLAN"))
-    define("_ENABLE_FILEPLAN", "Déverouiller");
+    define("_ENABLE_FILEPLAN", "Déverrouiller");
 if (!defined("_FILEPLAN_ENABLED"))
-    define("_FILEPLAN_ENABLED", "Plan de classement déverouillé");
+    define("_FILEPLAN_ENABLED", "Plan de classement déverrouillé");
 if (!defined("_DISABLE_FILEPLAN"))
     define("_DISABLE_FILEPLAN", "Verrouiller");    
 if (!defined("_FILEPLAN_DISABLED"))
-    define("_FILEPLAN_DISABLED", "Plan de classement verouilleré");
+    define("_FILEPLAN_DISABLED", "Plan de classement verrouillé");
 if (!defined("_REMOVE_FILEPLAN_INFOS_1"))
     define("_REMOVE_FILEPLAN_INFOS_1", "Voulez-vous supprimez le plan de classement suivant et retirer les documents liés?");
 if (!defined("_REMOVE_FILEPLAN_INFOS_2"))
@@ -133,13 +133,13 @@ if (!defined("_POSITION_UPDATED"))
     define("_POSITION_UPDATED", "Position modifiée");
 	//ENABLE/DISABLE
 if (!defined("_ENABLE_POSITION"))
-    define("_ENABLE_POSITION", "Déverouiller");
+    define("_ENABLE_POSITION", "Déverrouiller");
 if (!defined("_POSITION_ENABLED"))
-    define("_POSITION_ENABLED", "Position déverouillée");
+    define("_POSITION_ENABLED", "Position déverrouillée");
 if (!defined("_DISABLE_POSITION"))
-    define("_DISABLE_POSITION", "Verouiller");    
+    define("_DISABLE_POSITION", "Verrouiller");    
 if (!defined("_POSITION_DISABLED"))
-    define("_POSITION_DISABLED", "Position verouillerée");
+    define("_POSITION_DISABLED", "Position verrouillée");
 	//REMOVE
 if (!defined("_REMOVE_POSITION"))
     define("_REMOVE_POSITION", "Supprimer la position");
