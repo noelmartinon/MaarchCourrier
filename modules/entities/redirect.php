@@ -474,7 +474,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     
     # Pb with action chain : main action page is saved after this. 
     #   if process, $_SESSION['process']['diff_list'] will override this one
-    
+    $_SESSION['ListDiffFromRedirect'] = true;
     $_SESSION['process']['diff_list'] = $new_difflist;
     $_SESSION['action_error'] = $message;
     return array('result' => implode('#', $arr_id), 'history_msg' => $message);
