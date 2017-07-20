@@ -420,7 +420,7 @@ class CMISObject extends \SplObjectStorage
         return self::folderToCMISObject(FoldersModel::getByPath($path));
     }
 
-    public static function getAllObjects($objectId = null)
+    public static function getAllObjects($objectId = null, $maxItems, $skipCount)
     {
         $conf = parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'conf/conf.ini', true);
         $isRootFolder = ($objectId == Utils::createObjectId($conf['CMIS']['rootFolder']));
@@ -434,7 +434,7 @@ class CMISObject extends \SplObjectStorage
                 , $document->getFolderUniqueId(), null, null, $document->getFilename());
 
         } else {
-            $folders = ($id == '/') ? DocumentModel::getListWithFolders('') : DocumentModel::getListWithFolders($id);
+            $folders = ($id == '/') ? DocumentModel::getListWithFolders('', $maxItems, $skipCount) : DocumentModel::getListWithFolders($id, $maxItems, $skipCount);
 
             if ($isRootFolder) {
                 $root = new self($objectId, '/', 'cmis:folder', 'Espace Racine');

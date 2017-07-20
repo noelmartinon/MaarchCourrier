@@ -42,7 +42,7 @@ class Database
 
         try {
 
-            if($_SESSION['cmis_databasetype'] == 'oci'){
+            if ($_SESSION['cmis_databasetype'] == 'ORACLE') {
                 $dsn = $driver . ':dbname=' . $_SESSION['cmis_databasename'] . ';host=' . $_SESSION['cmis_databaseserver'] . ';charset=UTF8';
             } else {
                 $dsn = $driver . ':dbname=' . $_SESSION['cmis_databasename'] . ';host=' . $_SESSION['cmis_databaseserver'];
@@ -52,12 +52,12 @@ class Database
                 $_SESSION['cmis_databaseuser'],
                 $_SESSION['cmis_databasepassword']);
 
-            $this->_connection->setAttribute( \PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->_connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->_connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
             $this->_connection->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
 
 
-            if($_SESSION['cmis_databasetype'] != 'oci'){
+            if ($_SESSION['cmis_databasetype'] == 'MYSQL') {
                 $this->_connection->exec("SET CHARACTER SET utf8");
             }
 
@@ -73,6 +73,11 @@ class Database
     public function getConnection()
     {
         return $this->_connection;
+    }
+
+    public static function isOracle()
+    {
+        return ($_SESSION['cmis_databasetype'] == 'ORACLE');
     }
 
     public function query($req, $data = [])
@@ -126,7 +131,7 @@ class Database
 
         switch ($_SESSION['cmis_databasetype']) {
             case 'POSTGRESQL';
-                return self::$_instance->query('SELECT lastval();')->fetch()[0];
+                return self::$_instance->query('SELECT lastval();')->fetch()['lastval'];
                 break;
             case 'ORACLE';
                 return self::$_instance->query('SELECT  ' . $sequenceName . '.currval as lastinsertid FROM dual')->fetch()[0];

@@ -23,7 +23,8 @@ class FoldersModel extends FoldersModelAbstract
         $creation_date = Database::getInstance()->current_datetime();
 
 
-        if (empty($this->getOtherProperties())) {
+        $otherProperties = $this->getOtherProperties();
+        if (empty($otherProperties )) {
             $statement = "insert into folders ( folder_id , foldertype_id , folder_name , creation_date, description, parent_id, folder_level )
                       values ( :folder_id,  :foldertype_id , :folder_name , NOW(), :description, :parent_id, :folder_level)";
 

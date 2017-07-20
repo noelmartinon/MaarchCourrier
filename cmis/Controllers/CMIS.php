@@ -10,6 +10,7 @@ namespace CMIS\Controllers;
 use CMIS\Models\CMISObject;
 use CMIS\Models\DocumentModel;
 use CMIS\Models\OutputStrategyInterface;
+use CMIS\Utils\Database;
 use CMIS\Utils\Utils;
 use Folder\Models\FoldersModel;
 
@@ -105,14 +106,14 @@ class CMIS
             foreach ($results as $result) {
                 array_push($objects, new CMISObject(Utils::createObjectId($result['res_id'], 'document'), $result['path'], 'cmis:document', $result['filename'],
                     $result['typist'], 'cmis:document', $result['folders_system_id'], $result['creation_date'],
-                    null, $result['filename'], $result['modification_date'], $result['typist'], DocumentModel::getOtherPropertiesArray($stmt, $result)));
+                    null, $result['filename'], $result['modification_date'], $result['typist'], Database::getOtherPropertiesArray($stmt, $result)));
 
             }
         } else if (array_key_exists('folders_system_id', $results[0])) {
             foreach ($results as $result) {
                 array_push($objects, new CMISObject(Utils::createObjectId($result['folders_system_id'], 'folder'), $_path = '/', 'cmis:folder', $result['folder_name'],
                     $result['typist'], 'cmis:folder', $result['parent_id'], $result['creation_date'],
-                    null, $result['folder_name'], $result['last_modified_date'], $result['typist'], FoldersModel::getOtherPropertiesArray($stmt, $result)));
+                    null, $result['folder_name'], $result['last_modified_date'], $result['typist'], Database::getOtherPropertiesArray($stmt, $result)));
             }
         }
 
@@ -137,17 +138,18 @@ class CMIS
         return $this;
     }
 
-    public function descendants($id)
+    public function descendants($id, $maxItems = 100, $skipCount = 0)
     {
-        $objects = CMISObject::getAllObjects($id);
-        $this->output->descendants($objects);
+        $objects = CMISObject::getAllObjects($id, $maxItems, $skipCount);
+        $this->output->descendants($objects, $maxItems, $skipCount);
         return $this;
     }
 
-    public function children($id)
+    public function children($id, $maxItems = 100, $skipCount = 0)
     {
-        $objects = CMISObject::getAllObjects($id);
-        $this->output->children($objects);
+        $objects = CMISObject::getAllObjects($id, $maxItems, $skipCount);
+
+        $this->output->children($objects, $maxItems, $skipCount);
         return $this;
     }
 
@@ -207,10 +209,19 @@ class CMIS
             $f = finfo_open();
             $mime_type = finfo_buffer($f, base64_decode($content), FILEINFO_MIME_TYPE);
 
+            $partialName = time() . '.' . $extension;
+
+            if ($this->_conf['maarch']['productVersion'] == '1.4') {
+                $newName = 'tmp_file_' . $partialName;
+            } else {
+                $newName = 'tmp_file_' . $_SESSION['cmis_username'] . '_' . $partialName;
+
+            }
+
             $document
                 ->setFormat($extension)
                 ->setSubject($queryParameters['name'])
-                ->setFilename($queryParameters['name'])
+                ->setFilename($partialName)
                 ->setCreationDate(date(DATE_ATOM))
                 ->setModificationDate(date(DATE_ATOM))
                 ->setTypeId(101)
@@ -220,9 +231,7 @@ class CMIS
 
             // TODO Uncomment in production
             if (in_array($extension, $this->_conf['upload']['acceptedType']) && $mime_type == $this->_mime_types[$extension]) {
-
-                file_put_contents($_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR . $queryParameters['name'], base64_decode($content));
-
+                file_put_contents($_SESSION['cmis_tmppath'] . DIRECTORY_SEPARATOR . $newName, base64_decode($content));
                 $document->create();
 
 

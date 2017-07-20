@@ -16,7 +16,7 @@ use CMIS\Controllers\FrontController;
 use CMIS\Utils\Router;
 use CMIS\Utils\Utils;
 
-ini_set('memory_limit', '2000M');
+ini_set('memory_limit', '4000M');
 
 FrontController::initSession();
 

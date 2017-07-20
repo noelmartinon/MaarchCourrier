@@ -196,16 +196,16 @@ class AtomPubOutput implements OutputStrategyInterface
     }
 
 
-    public function descendants($objects)
+    public function descendants($objects, $maxItems, $skipCount)
     {
-        $this->createAtomEntry(null, $objects);
+        $this->createAtomEntry(null, $objects, false, $maxItems, $skipCount);
 
         return $this;
     }
 
-    public function children($objects)
+    public function children($objects, $maxItems, $skipCount)
     {
-        $this->createAtomEntry(null, $objects, true);
+        $this->createAtomEntry(null, $objects, true, $maxItems, $skipCount);
 
         return $this;
     }
@@ -311,7 +311,7 @@ class AtomPubOutput implements OutputStrategyInterface
     }
 
 
-    private function createAtomEntry($node, $obj, $children = false)
+    private function createAtomEntry($node, $obj, $children = false, $maxItems, $skipCount)
     {
         $atom_feed = $this->_xml->createElement("atom:feed");
 
@@ -334,10 +334,30 @@ class AtomPubOutput implements OutputStrategyInterface
         $atom_feed_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
 
+        $atom_link = $this->_xml->createElement("atom:link");
+        $atom_link_node = $atom_feed_node->appendChild($atom_link);
+        $atom_link_node->setAttribute("rel", "next");
+        $atom_link_node->setAttribute("href",  $this->_webroot . "?maxItems=" . $maxItems . '&skipCount='. ($skipCount + 1));
+        $atom_link_node->setAttribute("type", "application/atom+xml;type=feed");
+
+        $atom_link = $this->_xml->createElement("atom:link");
+        $atom_link_node = $atom_feed_node->appendChild($atom_link);
+        $atom_link_node->setAttribute("rel", "last");
+        $atom_link_node->setAttribute("href",  $this->_webroot . "?maxItems=" . $maxItems . '&skipCount='. floor($obj->count() / $maxItems) );
+        $atom_link_node->setAttribute("type", "application/atom+xml;type=feed");
+
         /**
          * @var $child CMISObject
          */
+
+        $i= 0;
         foreach ($obj as $child) {
+
+            //echo $i .' < '.($maxItems * $skipCount) . ' && ' .$i  .' > '. ($skipCount * $maxItems + $maxItems) . ' :::: '.$skipCount. '<br>';
+            if($i < ($maxItems * $skipCount) || $i > ($skipCount * $maxItems + $maxItems)){
+                continue;
+            }
+
             $atom_entry = $this->_xml->createElement("atom:entry");
             $atom_entry_node = $atom_feed_node->appendChild($atom_entry);
             $atom_entry_node->setAttribute("xmlns:atom", "http://www.w3.org/2005/Atom");
@@ -345,7 +365,7 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_entry_node->setAttribute("xmlns:cmisra", "http://docs.oasis-open.org/ns/cmis/restatom/200908/");
             $atom_entry_node->setAttribute("xmlns:app", "http://www.w3.org/2007/app");
 
-            if($children){
+            if ($children) {
                 $atom_entry_node->appendChild($this->_xml->createElement("cmisra:numItems", sizeof($obj)));
             }
 
@@ -370,6 +390,9 @@ class AtomPubOutput implements OutputStrategyInterface
             $atom_link_node->setAttribute("href", str_replace(['/id', 'descendants'], ['', 'children'], $this->_webroot) . "?id=" . $child->getObjectId()['value']);
             $atom_link_node->setAttribute("type", "application/atom+xml;type=feed");
 
+
+
+
             $atom_entry_node->appendChild($this->_xml->createElement("atom:updated", date(DATE_ATOM)));
 
             $atom_object_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:object"));
@@ -385,15 +408,19 @@ class AtomPubOutput implements OutputStrategyInterface
                     $atom_property_node = $atom_properties_node->appendChild($atom_property);
                     $atom_property_node->appendChild($this->_xml->createElement('cmis:value', $property['value']));
                 }
+
             }
 
             if (!$children) {
                 $atom_children_node = $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children"));
 
                 foreach ($child as $value) {
-                    $this->createAtomEntry($atom_children_node, $child);
+                    $this->createAtomEntry($atom_children_node, $child , false, $maxItems, $skipCount);
+                    $atom_entry_node->appendChild($this->_xml->createElement("cmisra:children", 'true'));
                 }
             }
+
+            $i++;
 
         }
     }

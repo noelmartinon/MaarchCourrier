@@ -55,7 +55,7 @@ class FrontController
         $_SESSION['cmis_databaseuser'] = $dom->getElementsByTagName('databaseuser')->item(0)->nodeValue;
         $_SESSION['cmis_databasepassword'] = $dom->getElementsByTagName('databasepassword')->item(0)->nodeValue;
         $_SESSION['cmis_databasesearchlimit'] = $dom->getElementsByTagName('databasesearchlimit')->item(0)->nodeValue;
-
+        $_SESSION['cmis_tmppath'] = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . 'maarch_entreprise' . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR;
     }
 
     public static function login()
@@ -64,7 +64,7 @@ class FrontController
             $valid = true;
         } else if (empty($_SESSION['cmis_username'])) {
             $valid = Utils::userExists($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-            if($valid){
+            if ($valid) {
                 $_SESSION['cmis_username'] = $_SERVER['PHP_AUTH_USER'];
             }
         } else {
@@ -93,14 +93,20 @@ class FrontController
     {
         $cmis = new CMIS(Utils::outputFactory($output));
         $id = (!empty($_GET['id'])) ? $_GET['id'] : Utils::createObjectId('/');
-        $cmis->descendants($id)->render();
+
+        $maxItems = (!empty($_GET['maxItems']) && is_numeric($_GET['maxItems'])) ? intval($_GET['maxItems']) : 100;
+        $skipCount = (!empty($_GET['skipCount']) && is_numeric($_GET['maxItems'])) ? intval($_GET['skipCount']) : 0;
+        $cmis->descendants($id, $maxItems, $skipCount)->render();
     }
 
     public static function children($output)
     {
         $cmis = new CMIS(Utils::outputFactory($output));
         $id = (!empty($_GET['id'])) ? $_GET['id'] : Utils::createObjectId('/');
-        $cmis->children($id)->render();
+
+        $maxItems = (!empty($_GET['maxItems']) && is_numeric($_GET['maxItems'])) ? intval($_GET['maxItems']) : 100;
+        $skipCount = (!empty($_GET['skipCount']) && is_numeric($_GET['maxItems'])) ? intval($_GET['skipCount']) : 0;
+        $cmis->children($id, $maxItems, $skipCount)->render();
     }
 
     public static function id($output)

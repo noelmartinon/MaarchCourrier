@@ -4,6 +4,7 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
+
 namespace CMIS\Models;
 
 interface OutputStrategyInterface
@@ -63,15 +64,19 @@ interface OutputStrategyInterface
 
     /**
      * @param $objects
+     * @param int $maxItems
+     * @param int $skipCount
      * @return mixed
      */
-    public function descendants($objects);
+    public function descendants($objects, $maxItems, $skipCount);
 
     /**
      * @param $objects
+     * @param int $maxItems
+     * @param int $skipCount
      * @return mixed
      */
-    public function children($objects);
+    public function children($objects, $maxItems, $skipCount);
 
     /**
      * @param $type

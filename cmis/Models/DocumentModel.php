@@ -16,19 +16,35 @@ class DocumentModel extends DocumentModelAbstract
 {
 
     /**
+     * @param $maxItems
+     * @param $skipCount
      * @return array
      */
-    public static function getList()
+    public static function getList($maxItems, $skipCount)
     {
         $array = [];
 
-        $stmt = Database::getInstance()->query('SELECT * FROM res_letterbox');
+        /*if (Database::isOracle()) {
+            $sql = '
+                select * 
+                from (select rownum rnk, a.* 
+                      from res_letterbox a
+                      order by res_id)
+                where rnk between ' . ($maxItems * $skipCount) . ' AND ' . ($skipCount * $maxItems + $maxItems);
+            $stmt = Database::getInstance()->query($sql);
+        } else {
+            $sql = 'SELECT * FROM res_letterbox LIMIT ' . $maxItems . ' OFFSET ' . ($skipCount * $maxItems);
+
+            $stmt = Database::getInstance()->query($sql);
+        }*/
+
+        $sql = 'SELECT * FROM res_letterbox LIMIT 15000';
+
+        $stmt = Database::getInstance()->query($sql);
 
         while ($value = $stmt->fetch()) {
             $otherProperties = Database::getOtherPropertiesArray($value);
 
-
-            $before = memory_get_usage();
 
             $document = new self();
             $document
@@ -52,7 +68,6 @@ class DocumentModel extends DocumentModelAbstract
 
         }
 
-        Utils::echo_memory_peak_usage();
 
         return $array;
     }
@@ -88,10 +103,10 @@ class DocumentModel extends DocumentModelAbstract
 
     }
 
-    public static function getListWithFolders($folder_id)
+    public static function getListWithFolders($folder_id, $maxItems, $skipCount)
     {
         $folders = FoldersModel::getFolderTree($folder_id);
-        $documents = self::getList();
+        $documents = self::getList($maxItems, $skipCount);
 
 
         /**
@@ -124,8 +139,8 @@ class DocumentModel extends DocumentModelAbstract
 
     public function create()
     {
-
-        if (empty($this->getOtherProperties())) {
+        $otherProperties = $this->getOtherProperties();
+        if (empty($otherProperties )) {
             $statement = "insert into res_letterbox ( subject ,  format , creation_date, path, filename ,status, description, tablename, initiator, destination, typist, type_id, docserver_id, folders_system_id) 
                       values (:subject, :format, CURRENT_TIMESTAMP, :path, :filename, :status, :description, :tablename, :initiator, :destination, :typist, :typeid, 'FASTHD_MAN', :folders_system_id)";
 
@@ -183,7 +198,6 @@ class DocumentModel extends DocumentModelAbstract
         }
 
         $lastval = Database::getInstance()->lastInsertId('res_id_mlb_seq');
-
         $this->setResId($lastval);
 
         return $lastval;
@@ -217,6 +231,7 @@ class DocumentModel extends DocumentModelAbstract
 
         return $otherProperties;
     }*/
+
 
     public function linked($parent)
     {
