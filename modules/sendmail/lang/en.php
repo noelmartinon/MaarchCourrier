@@ -147,3 +147,8 @@ if (!defined("_USE_MAIL_SERVICES_DESC"))
     define("_USE_MAIL_SERVICES_DESC", "Use emails services as sender");
 if (!defined("_INCORRECT_SENDER"))
     define("_INCORRECT_SENDER", "Incorrect sender");
+
+if (!defined("_OPERATION_DATE"))
+    define("_OPERATION_DATE", "Operation date");
+if (!defined("_RECEPTION_DATE"))
+    define("_RECEPTION_DATE", "Reception date");
