@@ -63,6 +63,22 @@ class EntitiesModelAbstract extends \Apps_Table_Service
         return $aReturn;
     }
 
+    public static function getByBusinessId(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['businessId']);
+        static::checkString($aArgs, ['businessId']);
+
+        $aReturn = static::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['entities'],
+            'where'     => ['business_id = ? and enabled = ?'],
+            'data'      => [$aArgs['businessId'], 'Y'],
+            'limit'     => 1,
+        ]);
+
+        return $aReturn;
+    }
+
     public static function getByUserId(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['user_id']);

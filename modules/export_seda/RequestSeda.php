@@ -358,9 +358,9 @@ class RequestSeda
 			$queryParams[] = $messageObject->messageIdentifier->value; // Reference
 			$queryParams[] = $_SESSION['user']['UserId']; // Account Id
 			$queryParams[] = $messageObject->transferringAgency->identifier->value; // Sender org identifier id
-			$queryParams[] = ""; //SenderOrgNAme
+			$queryParams[] = $aArgs['SenderOrgNAme']; //SenderOrgNAme
 			$queryParams[] = $messageObject->archivalAgency->identifier->value; // Recipient org identifier id
-			$queryParams[] = ""; //RecipientOrgNAme
+			$queryParams[] = $aArgs['RecipientOrgNAme']; //RecipientOrgNAme
 			$queryParams[] = $messageObject->archivalAgreement->value; // Archival agreement reference
 			$queryParams[] = $messageObject->replyCode->value; //ReplyCode
 			$queryParams[] = 0; // size

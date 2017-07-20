@@ -168,7 +168,7 @@ class SendMessageExchangeController
         $messageObject                    = new stdClass();
         $messageObject->Comment           = $aArgs['Comment'];
         $messageObject->Date              = $date->format(DateTime::ATOM);
-        $messageObject->MessageIdentifier = 'ArchiveTransfer_'.date("Ymd_His");
+        $messageObject->MessageIdentifier = 'ArchiveTransfer_'.date("Ymd_His").'_'.$_SESSION['user']['UserId'];
 
         /********* BINARY DATA OBJECT PACKAGE *********/
         $messageObject->DataObjectPackage                   = new stdClass();
@@ -400,7 +400,9 @@ class SendMessageExchangeController
         $aDataExtension = [
             'status'            => 'W', 
             'fullMessageObject' => $dataObject, 
-            'resIdMaster'       => $aArgs['res_id_master']
+            'resIdMaster'       => $aArgs['res_id_master'],
+            'SenderOrgNAme'     => $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact[0]->DepartmentName,
+            'RecipientOrgNAme'  => $dataObject->ArchivalAgency->OrganizationDescriptiveMetadata->Name,
         ];
 
         $messageId = $RequestSeda->insertMessage($oData, 'ArchiveTransfer', $aDataExtension);

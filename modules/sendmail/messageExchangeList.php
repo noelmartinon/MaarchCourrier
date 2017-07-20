@@ -5,8 +5,8 @@ $select = [];
 $select["message_exchange"] = [];
     
 //Fields
-    array_push($select["message_exchange"], "message_id", "date", "reference", 
-        "account_id", "sender_org_identifier", "recipient_org_identifier", "status", "data", "res_id_master");
+    array_push($select["message_exchange"], "message_id", "date", "reference", "sender_org_name", "account_id",
+        "recipient_org_identifier", "recipient_org_name", "status", "data", "res_id_master");
     
 //Where clause
     $where_tab = array();
@@ -21,7 +21,8 @@ $select["message_exchange"] = [];
 
 //Request
     $tab=$request->PDOselect($select, $where, [$identifier], $orderstr,$_SESSION['config']['databasetype']);
-    
+
+if(!empty($tab)){    
 //Result Array
     for ($i=0;$i<count($tab);$i++)
     {
@@ -41,9 +42,9 @@ $select["message_exchange"] = [];
                     $tab[$i][$j]["order"]       = 'message_id';
                 }
                 if($tab[$i][$j][$value]=="date")
-                    {
+                {
                     $tab[$i][$j]["label"]       = _CREATION_DATE;
-                    $tab[$i][$j]["size"]        = "11";
+                    $tab[$i][$j]["size"]        = "9";
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
                     $tab[$i][$j]["valign"]      = "bottom";
@@ -53,39 +54,40 @@ $select["message_exchange"] = [];
                 if($tab[$i][$j][$value]=="reference")
                 {
                     $tab[$i][$j]["label"]       = _IDENTIFIER;
-                    $tab[$i][$j]["size"]        = "11";
+                    $tab[$i][$j]["size"]        = "9";
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
                     $tab[$i][$j]["valign"]      = "bottom";
                     $tab[$i][$j]["show"]        = true;
                     $tab[$i][$j]["order"]       = 'reference';
                 }
-                if($tab[$i][$j][$value]=="sender_org_identifier")
+                if($tab[$i][$j][$value]=="recipient_org_name")
                 {
-                    $tab[$i][$j]["label"]       = "sender_org_identifier";
-                    $tab[$i][$j]["size"]        = "11";
+                    $tab[$i][$j]["value"]       = $tab[$i][$j]["value"] . " (" . $recipient_org_identifier . ")";
+                    $tab[$i][$j]["label"]       = _RECIPIENT;
+                    $tab[$i][$j]["size"]        = "20";
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
                     $tab[$i][$j]["valign"]      = "bottom";
                     $tab[$i][$j]["show"]        = true;
-                    $tab[$i][$j]["order"]       = 'sender_org_identifier';
+                    $tab[$i][$j]["order"]       = 'recipient_org_name';
+                }
+                if($tab[$i][$j][$value]=="sender_org_name")
+                {
+                    $sender_org_name = $tab[$i][$j]["value"];
+                    $tab[$i][$j]["show"]        = false;
                 }
                 if($tab[$i][$j][$value]=="recipient_org_identifier")
                 {
-                    $tab[$i][$j]["label"]       = _RECIPIENT;
-                    $tab[$i][$j]["size"]        = "11";
-                    $tab[$i][$j]["label_align"] = "left";
-                    $tab[$i][$j]["align"]       = "left";
-                    $tab[$i][$j]["valign"]      = "bottom";
-                    $tab[$i][$j]["show"]        = true;
-                    $tab[$i][$j]["order"]       = 'recipient_org_identifier';
+                    $recipient_org_identifier = $tab[$i][$j]["value"];
+                    $tab[$i][$j]["show"]      = false;
                 }
                 if($tab[$i][$j][$value]=="account_id")
                 {
                     $userInfo = \Core\Models\UserModel::getById(['userId' => $tab[$i][$j]["value"]]);
-                    $tab[$i][$j]["value"]       = $userInfo['firstname'] . " " . $userInfo['lastname'];
+                    $tab[$i][$j]["value"]       = $userInfo['firstname'] . " " . $userInfo['lastname'] . " (".$sender_org_name.")";
                     $tab[$i][$j]["label"]       = _SENDER;
-                    $tab[$i][$j]["size"]        = "5";
+                    $tab[$i][$j]["size"]        = "20";
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
                     $tab[$i][$j]["valign"]      = "bottom";
@@ -137,3 +139,4 @@ $select["message_exchange"] = [];
     //Output
     $status = 0;
     $contentMessageExchange = $list->showList($tab, $paramsTab, $listKey);
+}
