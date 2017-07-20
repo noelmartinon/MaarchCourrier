@@ -709,7 +709,7 @@ abstract class lists_Abstract extends Database
         $haveFilter = false;
         
         foreach ($_SESSION['filters'] as $key => $val) {
-            if (!empty($_SESSION['filters'][$key]['VALUE'])) {
+            if (!empty($_SESSION['filters'][$key]['VALUE']) || ($key == 'priority' && $_SESSION['filters'][$key]['VALUE'] == 0)) {
                 $haveFilter = true;
                 break;
             }
@@ -754,7 +754,7 @@ abstract class lists_Abstract extends Database
            $this->_resetFilter2();
            
         } else { //Init filter value and clause
-            if(isset($_REQUEST['value']) && !empty($_REQUEST['value'])) {
+            if(isset($_REQUEST['value']) && (!empty($_REQUEST['value']) || ($_REQUEST['filter'] == 'priority' &&  $_REQUEST['value'] == 0))) {
                 
                 if ($_REQUEST['value'] == 'none') {
                     //Reset if none
@@ -923,15 +923,11 @@ abstract class lists_Abstract extends Database
                         }
                         
                         $_SESSION['filters']['creation_date']['CLAUSE'] = join(' and ', $creation_date);
-                    } else if($_REQUEST['filter'] == 'priority' && isset($_REQUEST['value']) &&  $_REQUEST['value'] != 0) {
+                    } else if($_REQUEST['filter'] == 'priority' && isset($_REQUEST['value'])) {
                         $_SESSION['filters']['priority']['CLAUSE'] = "priority = '".$_REQUEST['value']."'";
 
                     }
                 }
-            } elseif($_REQUEST['filter'] == 'priority' && isset($_REQUEST['value']) &&  $_REQUEST['value'] == 0) {
-                //j'ai créé cette condition pour le filtre des priorités parce que lorsque la valeur de $_request[value] est égale à 0, on ne rentre pas dans la condition et donc le filtre ne fonctionne pas lorsque c'est égale à 0.
-                        $_SESSION['filters']['priority']['VALUE'] = '0';
-                        $_SESSION['filters']['priority']['CLAUSE'] = "priority = '".$_REQUEST['value']."'";
             }
         } 
         
