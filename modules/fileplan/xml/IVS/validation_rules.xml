@@ -23,6 +23,7 @@
 		<parameter name="valid" type="string" />
 		<parameter name="cancel" type="string" />
 		<parameter name="position_label" type="string" />
+		<parameter name="position_id" type="integer" />
 		<parameter name="url" type="url" />
 		<parameter name="parent_id" type="identifier_fileplan" />
 		<parameter name="values" type="arrayOfStrings" />
