@@ -6,7 +6,7 @@ $select["message_exchange"] = [];
     
 //Fields
     array_push($select["message_exchange"], "message_id", "date", "reference", "sender_org_name", "account_id",
-        "recipient_org_identifier", "recipient_org_name", "status", "data", "res_id_master");
+        "recipient_org_identifier", "recipient_org_name", "reception_date", "operation_date", "status", "data", "res_id_master");
     
 //Where clause
     $where_tab = array();
@@ -60,6 +60,28 @@ if(!empty($tab)){
                     $tab[$i][$j]["valign"]      = "bottom";
                     $tab[$i][$j]["show"]        = true;
                     $tab[$i][$j]["order"]       = 'reference';
+                }
+                if($tab[$i][$j][$value]=="operation_date")
+                {
+                    $tab[$i][$j]["value"]       = $request->dateformat($tab[$i][$j]["value"]);
+                    $tab[$i][$j]["label"]       = _OPERATION_DATE;
+                    $tab[$i][$j]["size"]        = "9";
+                    $tab[$i][$j]["label_align"] = "left";
+                    $tab[$i][$j]["align"]       = "left";
+                    $tab[$i][$j]["valign"]      = "bottom";
+                    $tab[$i][$j]["show"]        = true;
+                    $tab[$i][$j]["order"]       = 'operation_date';
+                }
+                if($tab[$i][$j][$value]=="reception_date")
+                {
+                    $tab[$i][$j]["value"]       = $request->dateformat($tab[$i][$j]["value"]);
+                    $tab[$i][$j]["label"]       = _RECEPTION_DATE;
+                    $tab[$i][$j]["size"]        = "9";
+                    $tab[$i][$j]["label_align"] = "left";
+                    $tab[$i][$j]["align"]       = "left";
+                    $tab[$i][$j]["valign"]      = "bottom";
+                    $tab[$i][$j]["show"]        = true;
+                    $tab[$i][$j]["order"]       = 'reception_date';
                 }
                 if($tab[$i][$j][$value]=="recipient_org_name")
                 {

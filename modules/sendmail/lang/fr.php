@@ -149,3 +149,7 @@ if (!defined("_USE_MAIL_SERVICES_DESC"))
     define("_USE_MAIL_SERVICES_DESC", "Utiliser les courriels de ses services en tant qu'expéditeur");
 if (!defined("_INCORRECT_SENDER"))
     define("_INCORRECT_SENDER", "Expéditeur inccorect");
+if (!defined("_OPERATION_DATE"))
+    define("_OPERATION_DATE", "Date de prise en charge");
+if (!defined("_RECEPTION_DATE"))
+    define("_RECEPTION_DATE", "Date de réception");

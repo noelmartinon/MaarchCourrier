@@ -954,7 +954,7 @@ if ($mode == 'add') {
 
         //Check if mail exists
         if (count($emailArray) > 0 ) {
-            $content .= '<div class="block">';
+            $content .= '<div>';
             $content .= '<table border="0" align="left" width="100%" cellspacing="5">';
             $content .= '<tr>';
 
