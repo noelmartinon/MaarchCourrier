@@ -134,7 +134,7 @@ class Database
                 return self::$_instance->query('SELECT lastval();')->fetch()['lastval'];
                 break;
             case 'ORACLE';
-                return self::$_instance->query('SELECT  ' . $sequenceName . '.currval as lastinsertid FROM dual')->fetch()[0];
+                return self::$_instance->query('SELECT  ' . $sequenceName . '.currval as lastinsertid FROM dual')->fetch()['lastinsertid'];
                 break;
             case 'MYSQL';
                 return self::$_instance->lastInsertId();
