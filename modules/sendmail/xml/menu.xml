@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<root>
-</root>
+<ROOT>
+    <MENU>
+        <id>save_numeric_package</id>
+        <libconst>_SAVE_NUMERIC_PACKAGE</libconst>
+        <url>/saveNumericPackage</url>
+        <style>fa fa-users</style>
+        <angular>true</angular>
+    </MENU>
+</ROOT>

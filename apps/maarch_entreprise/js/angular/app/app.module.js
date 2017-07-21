@@ -13,6 +13,7 @@ var http_1 = require("@angular/http");
 var forms_1 = require("@angular/forms");
 var app_component_1 = require("./app.component");
 var profile_component_1 = require("./profile.component");
+var save_numeric_package_component_1 = require("./save-numeric-package.component");
 var signature_book_component_1 = require("./signature-book.component");
 var AppModule = (function () {
     function AppModule() {
@@ -26,12 +27,13 @@ AppModule = __decorate([
             forms_1.FormsModule,
             router_1.RouterModule.forRoot([
                 { path: 'profile', component: profile_component_1.ProfileComponent },
+                { path: 'saveNumericPackage', component: save_numeric_package_component_1.SaveNumericPackageComponent },
                 { path: ':basketId/signatureBook/:resId', component: signature_book_component_1.SignatureBookComponent },
                 { path: '**', redirectTo: '', pathMatch: 'full' },
             ], { useHash: true }),
             http_1.HttpModule
         ],
-        declarations: [app_component_1.AppComponent, profile_component_1.ProfileComponent, signature_book_component_1.SignatureBookComponent, signature_book_component_1.SafeUrlPipe],
+        declarations: [app_component_1.AppComponent, profile_component_1.ProfileComponent, save_numeric_package_component_1.SaveNumericPackageComponent, signature_book_component_1.SignatureBookComponent, signature_book_component_1.SafeUrlPipe],
         bootstrap: [app_component_1.AppComponent]
     })
 ], AppModule);

@@ -374,14 +374,20 @@ class core_tools extends functions
                     $libmenu  = constant($libmenu);
                 }
                 $_SESSION['menu'][$k]['libconst'] = $libmenu;
-                $_SESSION['menu'][$k]['url'] = $_SESSION['config']['businessappurl']
-                    . (string) $MENU2->url;
-                if (trim((string) $MENU2->target) <> "") {
-                    $tmp = preg_replace(
-                        '/\/core\/$/', '/', $_SESSION['urltocore']
-                    );
-                    $_SESSION['menu'][$k]['url'] = $tmp. (string) $MENU2->url;
-                    $_SESSION['menu'][$k]['target'] = (string) $MENU2->target;
+                $_SESSION['menu'][$k]['angular'] = empty((string)$MENU2->angular) ? 'false' : (string)$MENU2->angular;
+                if($_SESSION['menu'][$k]['angular'] == 'false'){
+                    $_SESSION['menu'][$k]['url'] = $_SESSION['config']['businessappurl']
+                        . (string) $MENU2->url;
+                    if (trim((string) $MENU2->target) <> "") {
+                        $tmp = preg_replace(
+                            '/\/core\/$/', '/', $_SESSION['urltocore']
+                        );
+                        $_SESSION['menu'][$k]['url'] = $tmp
+                            . (string) $MENU2->url;
+                        $_SESSION['menu'][$k]['target'] = (string) $MENU2->target;
+                    }
+                } else {
+                    $_SESSION['menu'][$k]['url'] = (string) $MENU2->url;
                 }
                 $_SESSION['menu'][$k]['style'] = (string) $MENU2->style;
                 $_SESSION['menu'][$k]['show'] = true;
@@ -438,16 +444,21 @@ class core_tools extends functions
                         ) {
                             $libmenu  = constant($libmenu);
                         }
+                        $_SESSION['menu'][$k]['angular'] = empty((string)$MENU->angular) ? 'false' : (string)$MENU->angular;
                         $_SESSION['menu'][$k]['libconst'] = $libmenu;
-                        $_SESSION['menu'][$k]['url'] = $_SESSION['config']['businessappurl']
-                            . (string) $MENU->url;
-                        if (trim((string) $MENU->target) <> "") {
-                            $tmp = preg_replace(
-                                '/\/core\/$/', '/', $_SESSION['urltocore']
-                            );
-                            $_SESSION['menu'][$k]['url'] = $tmp
+                        if($_SESSION['menu'][$k]['angular'] == 'false'){
+                            $_SESSION['menu'][$k]['url'] = $_SESSION['config']['businessappurl']
                                 . (string) $MENU->url;
-                            $_SESSION['menu'][$k]['target'] = (string) $MENU->target;
+                            if (trim((string) $MENU->target) <> "") {
+                                $tmp = preg_replace(
+                                    '/\/core\/$/', '/', $_SESSION['urltocore']
+                                );
+                                $_SESSION['menu'][$k]['url'] = $tmp
+                                    . (string) $MENU->url;
+                                $_SESSION['menu'][$k]['target'] = (string) $MENU->target;
+                            }
+                        } else {
+                            $_SESSION['menu'][$k]['url'] = (string) $MENU->url;
                         }
                         $_SESSION['menu'][$k]['style'] = (string) $MENU->style;
                         $_SESSION['menu'][$k]['show'] = true;
@@ -484,32 +495,43 @@ class core_tools extends functions
         array_multisort($label, SORT_ASC, $label, SORT_ASC, $menu);
 
         // Browses the menu items
-        for($i=0;$i<count($menu);$i++) {
-            if($menu[$i]['show'] == true)
-            {
-                $tmp = $menu[$i]['url'];
+        for ($i=0;$i<count($menu);$i++) {
 
-                if(preg_match('/php$/', $tmp))
-                {
-                    $tmp .= "?reinit=true";
-                }
-                else
-                {
-                    $tmp .= "&reinit=true";
-                }
-                $tmp = htmlentities  ( $tmp,ENT_COMPAT, 'UTF-8', true); // Encodes
-                ?>
-                <li onmouseover="this.className='on';" onmouseout="this.className='';">
-                <a href="#" onclick="window.open('<?php echo($tmp);?>', '<?php
-                    if(isset($menu[$i]['target']) && $menu[$i]['target'] <> '') {
-                        echo $menu[$i]['target'];
+            if($menu[$i]['show'] == true) {
+                if ($menu[$i]['angular'] == 'true') {
+                    if (PROD_MODE) {
+                        $prodMode = 'true';
                     } else {
-                        echo '_self';
-                    }?>');"><span><span style="width:30px;height:30px;display:inline-block;text-align:center;"><i class="<?php 
-                        echo $menu[$i]['style'] . ' fa-2x';
-                        ?>"></i></span><span><?php 
-                        echo trim($menu[$i]['libconst']);?></span></span></a></li>
-                <?php
+                        $prodMode = 'false';
+                    }
+                    echo '<li onmouseover="this.className=\'on\';" onmouseout="this.className=\'\';"><a onClick="triggerAngular('.$prodMode.', \'#'.$menu[$i]['url'].'\')" style="cursor: pointer"><span><span style="width:30px;height:30px;display:inline-block;text-align:center;">';
+                    echo "<i class='{$menu[$i]['style']} fa-2x'></i></span><span>{$menu[$i]['libconst']}</span></span></a></li>";
+                } else {
+                    $tmp = $menu[$i]['url'];
+
+                    if(preg_match('/php$/', $tmp))
+                    {
+                        $tmp .= "?reinit=true";
+                    }
+                    else
+                    {
+                        $tmp .= "&reinit=true";
+                    }
+                    $tmp = htmlentities  ( $tmp,ENT_COMPAT, 'UTF-8', true); // Encodes
+                    ?>
+                    <li onmouseover="this.className='on';" onmouseout="this.className='';">
+                    <a href="#" onclick="window.open('<?php echo($tmp);?>', '<?php
+                        if(isset($menu[$i]['target']) && $menu[$i]['target'] <> '') {
+                            echo $menu[$i]['target'];
+                        } else {
+                            echo '_self';
+                        }?>');"><span><span style="width:30px;height:30px;display:inline-block;text-align:center;"><i class="<?php
+                            echo $menu[$i]['style'] . ' fa-2x';
+                            ?>"></i></span><span><?php
+                            echo trim($menu[$i]['libconst']);?></span></span></a></li>
+                    <?php
+                }
+
             }
         }
 

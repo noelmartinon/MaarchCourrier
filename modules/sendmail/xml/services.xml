@@ -30,4 +30,12 @@
 	        <page>mail_form.php</page>
 	    </WHEREAMIUSED>
 	</SERVICE>
+	<SERVICE>
+	   <id>save_numeric_package</id> <!-- if servicetype = menu, this id must be equal to the id of the menu item -->
+	   <name>_SAVE_NUMERIC_PACKAGE</name>
+	   <comment>_SAVE_NUMERIC_PACKAGE</comment>
+	   <servicetype>menu</servicetype>
+	   <system_service>false</system_service>
+	   <enabled>true</enabled>
+	</SERVICE>
 </root>
