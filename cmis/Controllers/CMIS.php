@@ -90,11 +90,28 @@ class CMIS
 
         // TODO Need to refactor w/ the WHERE condition
 
+
         $objects = [];
         $request = str_ireplace(['cmis:folder', 'cmis:document'], ['folders', 'res_letterbox'], $queryParameters['statement']);
 
         foreach (['WHERE', 'DELETE', 'DROP', 'INSERT', 'GROUP', 'HAVING', 'UNION', 'INTERSECT', 'MINUS', 'EXCEPT', 'ALTER', 'CREATE', 'INNER', 'JOIN'] as $value) {
             $request = preg_replace('/' . $value . ' (.*)/i', '', $request);
+        }
+
+
+        if (Database::isOracle()) {
+            $request = str_ireplace(['cmis:folder', 'cmis:document'], ['folders a', 'res_letterbox a'], $queryParameters['statement']);
+
+            $request = preg_replace('/select\s+\*/i', 'select rownum rnk, a.*', $request);
+
+            $request = '
+                select * 
+                from (' . $request . ')
+                where rnk between ' . ($queryParameters['maxItems'] * $queryParameters['skipCount']) . ' AND ' . ($queryParameters['skipCount'] * $queryParameters['maxItems'] + $queryParameters['maxItems']);
+
+        } else {
+            $request = str_ireplace(['cmis:folder', 'cmis:document'], ['folders', 'res_letterbox'], $queryParameters['statement']);
+            $request .= ' LIMIT ' . $queryParameters['maxItems'] . ' OFFSET ' . ($queryParameters['skipCount'] * $queryParameters['maxItems']);
         }
 
         $stmt = Database::getInstance()->query($request);
@@ -106,14 +123,14 @@ class CMIS
             foreach ($results as $result) {
                 array_push($objects, new CMISObject(Utils::createObjectId($result['res_id'], 'document'), $result['path'], 'cmis:document', $result['filename'],
                     $result['typist'], 'cmis:document', $result['folders_system_id'], $result['creation_date'],
-                    null, $result['filename'], $result['modification_date'], $result['typist'], Database::getOtherPropertiesArray($stmt, $result)));
+                    null, $result['filename'], $result['modification_date'], $result['typist'], Database::getOtherPropertiesArray($result)));
 
             }
         } else if (array_key_exists('folders_system_id', $results[0])) {
             foreach ($results as $result) {
                 array_push($objects, new CMISObject(Utils::createObjectId($result['folders_system_id'], 'folder'), $_path = '/', 'cmis:folder', $result['folder_name'],
                     $result['typist'], 'cmis:folder', $result['parent_id'], $result['creation_date'],
-                    null, $result['folder_name'], $result['last_modified_date'], $result['typist'], Database::getOtherPropertiesArray($stmt, $result)));
+                    null, $result['folder_name'], $result['last_modified_date'], $result['typist'], Database::getOtherPropertiesArray($result)));
             }
         }
 
@@ -226,7 +243,7 @@ class CMIS
                 ->setModificationDate(date(DATE_ATOM))
                 ->setTypeId(101)
                 ->setTypist($_SESSION['cmis_username'])
-                ->setPath("/" . $queryParameters['name']);
+                ->setPath("/" . $partialName);
 
 
             // TODO Uncomment in production
