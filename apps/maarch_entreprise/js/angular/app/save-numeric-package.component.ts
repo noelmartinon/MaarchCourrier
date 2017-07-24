@@ -22,7 +22,6 @@ export class SaveNumericPackageComponent implements OnInit {
 
     numericPackage              : any       = {
         base64                  : "",
-        base64ForJs             : "",
         name                    : "",
         type                    : "",
         size                    : 0,
@@ -81,7 +80,6 @@ export class SaveNumericPackageComponent implements OnInit {
 
     resfreshUpload(b64Content: any) {
         this.numericPackage.base64 = b64Content.replace(/^data:.*?;base64,/, "");
-        this.numericPackage.base64ForJs = b64Content;
     }
 
     uploadNumericPackage(fileInput: any) {
@@ -118,13 +116,12 @@ export class SaveNumericPackageComponent implements OnInit {
                     } else {
                         this.numericPackage  = {
                             base64                  : "",
-                            base64ForJs             : "",
                             name                    : "",
                             type                    : "",
                             size                    : 0,
                             label                   : "",
                         };
-                        this.resultInfo = 'OKKK';
+                        this.resultInfo = 'Paquet numérique correctement importé';
                         $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
                         $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
                             $j("#resultInfo").slideUp(500);
@@ -136,7 +133,6 @@ export class SaveNumericPackageComponent implements OnInit {
             this.numericPackage.size        = 0;
             this.numericPackage.type        = "";
             this.numericPackage.base64      = "";
-            this.numericPackage.base64ForJs = "";
 
             this.resultInfo = "Aucun paquet numérique séléctionné";
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');

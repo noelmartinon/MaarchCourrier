@@ -19,7 +19,6 @@ var SaveNumericPackageComponent = (function () {
         this.zone = zone;
         this.numericPackage = {
             base64: "",
-            base64ForJs: "",
             name: "",
             type: "",
             size: 0,
@@ -66,7 +65,6 @@ var SaveNumericPackageComponent = (function () {
     };
     SaveNumericPackageComponent.prototype.resfreshUpload = function (b64Content) {
         this.numericPackage.base64 = b64Content.replace(/^data:.*?;base64,/, "");
-        this.numericPackage.base64ForJs = b64Content;
     };
     SaveNumericPackageComponent.prototype.uploadNumericPackage = function (fileInput) {
         if (fileInput.target.files && fileInput.target.files[0]) {
@@ -99,13 +97,12 @@ var SaveNumericPackageComponent = (function () {
                 else {
                     _this.numericPackage = {
                         base64: "",
-                        base64ForJs: "",
                         name: "",
                         type: "",
                         size: 0,
                         label: "",
                     };
-                    _this.resultInfo = 'OKKK';
+                    _this.resultInfo = 'Paquet numérique correctement importé';
                     $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
                     $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
                         $j("#resultInfo").slideUp(500);
@@ -118,7 +115,6 @@ var SaveNumericPackageComponent = (function () {
             this.numericPackage.size = 0;
             this.numericPackage.type = "";
             this.numericPackage.base64 = "";
-            this.numericPackage.base64ForJs = "";
             this.resultInfo = "Aucun paquet numérique séléctionné";
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
             $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {

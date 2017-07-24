@@ -4,7 +4,7 @@
         <id>save_numeric_package</id>
         <libconst>_SAVE_NUMERIC_PACKAGE</libconst>
         <url>/saveNumericPackage</url>
-        <style>fa fa-users</style>
+        <style>fa fa-file-archive-o</style>
         <angular>true</angular>
     </MENU>
 </ROOT>
