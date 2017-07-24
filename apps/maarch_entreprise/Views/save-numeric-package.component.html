@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="index.php" style="cursor: pointer">
-                    <i class="fa fa-arrow-circle-left" title="{{user.lang.back}}"></i>
+                    <i class="fa fa-arrow-circle-left" title="Retour"></i>
                 </a>
             </div>
         </div>
@@ -20,96 +20,11 @@
         </div>
         <div class="col-md-4 col-md-offset-1" style="border-left:solid 1px white;border-right:solid 1px white;background-color: #CEE9F1;border-top: solid 2px #FDD16C;border-bottom: solid 2px #FDD16C;padding:10px;">
             <h2>Enregistrer un packet numérique</h2>
-            <form class="form-horizontal" (ngSubmit)="onSubmit()" #profileForm="ngForm">
-              <input type="file" name="pic" accept="image/*">
+            <form class="form-horizontal" (ngSubmit)="submitNumericPackage()" #saveNumericPackageForm="ngForm">
+              <input type="file" name="files[]"(change)="uploadNumericPackage($event)">
               <br>
-              <input type="submit" class="btn btn-default">
+              <input type="submit" class="btn btn-default" [disabled]="!saveNumericPackageForm.form.valid">
             </form>
-            <!-- <form class="form-horizontal" (ngSubmit)="onSubmit()" #profileForm="ngForm">
-                <div class="form-group">
-                    <div class="col-sm-5" style="font-weight:bold;">
-                        <input type="text" class="form-control" id="lastname" name="lastname" title="{{user.lang.lastname}}" placeholder="{{user.lang.lastname}}" [(ngModel)]="user.lastname" required>
-                    </div>
-                    <div class="col-sm-5" style="font-weight:bold;">
-                        <input type="text" class="form-control" id="firstname" name="firstname" title="{{user.lang.firstname}}" placeholder="{{user.lang.firstname}}" [(ngModel)]="user.firstname" required>
-                    </div>
-                    <div class="col-sm-2" style="font-style:italic;">
-                        <input type="text" class="form-control" id="initials" name="initials" title="{{user.lang.initials}}" placeholder="{{user.lang.initials}}" [(ngModel)]="user.initials">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-12">
-                         <div class="input-group">
-                             <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-                             <input type="text" class="form-control" id="userId" title="{{user.lang.userId}}" value="{{user.user_id}}" disabled>
-                             <span class="input-group-btn">
-                                <button (click)="displayPassword()" class="btn btn-success" type="button" title="{{user.lang.changePsw}}"><i class="fa fa-key" aria-hidden="true"></i></button>
-                            </span>
-                         </div>
-                    </div>
-                </div>
-                <div *ngIf="showPassword" style="margin-bottom: 5%">
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-key" aria-hidden="true"></i></span>
-                                <input type="password" class="form-control" style="display: none">
-                                <input type="password" [(ngModel)]="passwordModel.currentPassword" class="form-control" name="currentPassword" placeholder="{{user.lang.currentPsw}}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-6">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-key" aria-hidden="true"></i></span>
-                                <input type="password" [(ngModel)]="passwordModel.newPassword" class="form-control" name="newPassword" placeholder="{{user.lang.newPsw}}">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-key" aria-hidden="true"></i></span>
-                                <input type="password" [(ngModel)]="passwordModel.reNewPassword" class="form-control" name="reNewPassword" placeholder="{{user.lang.renewPsw}}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div style="text-align:center;">
-                            <button type="button" (click)="updatePassword()" [disabled]="!passwordModel.currentPassword || !passwordModel.newPassword || !passwordModel.reNewPassword" class="btn btn-default">{{user.lang.changePsw}}</button>
-                        </div>
-                    </div>
-                    <hr style="background-color: grey; height: 1px">
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-12">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-phone" aria-hidden="true"></i></span>
-                            <input type="tel" class="form-control" id="phone" name="phone" title="{{user.lang.phoneNumber}}" placeholder="{{user.lang.phoneNumber}}" [(ngModel)]="user.phone" pattern="^(?:0|\+\d\d?\d?\s?)[1-9]([\.\-\s]?\d\d){4}([\.\-\s]?\d?\d?)$">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-12">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>
-                            <input type="email" class="form-control" id="mail" name="mail" title="{{user.lang.email}}"  placeholder="{{user.lang.email}}" [(ngModel)]="user.mail" pattern="[^@\s]+@[^@\s]+">
-                        </div>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-12">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-paw" aria-hidden="true"></i></span>
-                            <input type="text" class="form-control" id="fingerprint" name="fingerprint" title="{{user.lang.fingerprint}}" placeholder="{{user.lang.fingerprint}}" [(ngModel)]="user.thumbprint">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div style="text-align:center;">
-                        <button type="submit" class="btn btn-default" [disabled]="!profileForm.form.valid">{{user.lang.saveModification}}</button>
-                    </div>
-                </div>
-            </form> -->
         </div>
         <div class="col-md-3 col-md-offset-1">
         </div>

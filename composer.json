@@ -6,7 +6,8 @@
             "Attachments\\": "modules/attachments/",
             "Baskets\\": "modules/basket/",
             "Entities\\": "modules/entities/",
-    		"Visa\\": "modules/visa/"
+            "Visa\\": "modules/visa/",
+    		"Sendmail\\": "modules/sendmail/"
     	}
     },
     "require": {
