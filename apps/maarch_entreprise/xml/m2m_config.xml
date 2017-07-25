@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ROOT>
+    <res_letterbox>
+        <type_id>1</type_id>
+        <status>NEW</status>
+    </res_letterbox>
+    <contacts_v2>
+        <contact_type>100</contact_type>
+    </contacts_v2>
+    <contact_addresses>
+        <contact_purpose_id>1</contact_purpose_id>
+    </contact_addresses>
+</ROOT>
