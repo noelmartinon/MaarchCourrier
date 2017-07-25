@@ -168,14 +168,14 @@ class ReceiveMessageExchangeController
         }
 
         $dataValue = [];
-        array_push($dataValue, ['column' => 'typist',       'value' => 'messageexchange',                   'type' => 'string']);
-        array_push($dataValue, ['column' => 'type_id',      'value' => $defaultConfig['type_id'],           'type' => 'integer']);
-        array_push($dataValue, ['column' => 'subject',      'value' => $mainDocumentMetaData->Title[0],     'type' => 'string']);
-        array_push($dataValue, ['column' => 'doc_date',     'value' => $mainDocumentMetaData->CreatedDate,  'type' => 'date']);
-        array_push($dataValue, ['column' => 'destination',  'value' => $destination[0]['entity_id'],        'type' => 'string']);
-        array_push($dataValue, ['column' => 'initiator',    'value' => 'messageexchange',                   'type' => 'string']);
-        array_push($dataValue, ['column' => 'dest_user',    'value' => $destUser[0]['user_id'],             'type' => 'string']);
-        array_push($dataValue, ['column' => 'reference',    'value' => "",                                  'type' => 'string']);
+        array_push($dataValue, ['column' => 'typist',           'value' => 'messageexchange',                                             'type' => 'string']);
+        array_push($dataValue, ['column' => 'type_id',          'value' => $defaultConfig['type_id'],                                     'type' => 'integer']);
+        array_push($dataValue, ['column' => 'subject',          'value' => $mainDocumentMetaData->Title[0],                               'type' => 'string']);
+        array_push($dataValue, ['column' => 'doc_date',         'value' => $mainDocumentMetaData->CreatedDate,                            'type' => 'date']);
+        array_push($dataValue, ['column' => 'destination',      'value' => $destination[0]['entity_id'],                                  'type' => 'string']);
+        array_push($dataValue, ['column' => 'initiator',        'value' => 'messageexchange',                                             'type' => 'string']);
+        array_push($dataValue, ['column' => 'dest_user',        'value' => $destUser[0]['user_id'],                                       'type' => 'string']);
+        array_push($dataValue, ['column' => 'reference_number', 'value' => $mainDocumentMetaData->OriginatingAgencyArchiveUnitIdentifier, 'type' => 'string']);
 
         $allDatas = [
             "encodedFile" => $documentMetaData->Attachment->value,
