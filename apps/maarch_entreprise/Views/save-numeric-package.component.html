@@ -21,7 +21,7 @@
             <form class="form-horizontal" (ngSubmit)="submitNumericPackage()" #saveNumericPackageForm="ngForm">
               <input id="numericPackageFilePath" type="file" name="files[]"(change)="uploadNumericPackage($event)">
               <br>
-              <input type="submit" class="btn btn-default" [disabled]="!saveNumericPackageForm.form.valid">
+              <input type="submit" class="btn btn-default" [disabled]="!saveNumericPackageForm.form.valid" value="Enregistrer">
             </form>
         </div>
     </div>

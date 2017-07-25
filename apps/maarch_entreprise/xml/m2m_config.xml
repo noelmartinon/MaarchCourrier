@@ -4,6 +4,9 @@
         <type_id>1</type_id>
         <status>NEW</status>
     </res_letterbox>
+    <res_attachments>
+        <attachment_type>simple_attachment</attachment_type>
+    </res_attachments>
     <contacts_v2>
         <contact_type>100</contact_type>
     </contacts_v2>

@@ -92,7 +92,11 @@ class ReceiveMessageExchangeController
         }
 
         /************** RES ATTACHMENT *****************/
+        $resAttachmentReturn = self::saveResAttachment(["dataObject" => $dataObjectExemple, "resId" => $resLetterboxReturn[0], "defaultConfig" => $aDefaultConfig]);
 
+        if(!empty($resAttachmentReturn['errors'])){
+            return $response->withJson(["errors" => $resAttachmentReturn['errors']]);
+        }
 
         return $response->withJson(["resId" => $resLetterboxReturn[0]]);
 
@@ -168,12 +172,12 @@ class ReceiveMessageExchangeController
         }
 
         $dataValue = [];
-        array_push($dataValue, ['column' => 'typist',           'value' => 'messageexchange',                                             'type' => 'string']);
+        array_push($dataValue, ['column' => 'typist',           'value' => 'superadmin',                                                  'type' => 'string']);
         array_push($dataValue, ['column' => 'type_id',          'value' => $defaultConfig['type_id'],                                     'type' => 'integer']);
         array_push($dataValue, ['column' => 'subject',          'value' => $mainDocumentMetaData->Title[0],                               'type' => 'string']);
         array_push($dataValue, ['column' => 'doc_date',         'value' => $mainDocumentMetaData->CreatedDate,                            'type' => 'date']);
         array_push($dataValue, ['column' => 'destination',      'value' => $destination[0]['entity_id'],                                  'type' => 'string']);
-        array_push($dataValue, ['column' => 'initiator',        'value' => 'messageexchange',                                             'type' => 'string']);
+        array_push($dataValue, ['column' => 'initiator',        'value' => 'superadmin',                                                  'type' => 'string']);
         array_push($dataValue, ['column' => 'dest_user',        'value' => $destUser[0]['user_id'],                                       'type' => 'string']);
         array_push($dataValue, ['column' => 'reference_number', 'value' => $mainDocumentMetaData->OriginatingAgencyArchiveUnitIdentifier, 'type' => 'string']);
 
@@ -289,6 +293,75 @@ class ReceiveMessageExchangeController
         $note      = $noteModel->create($aDataNote);
 
         return true;
+    }
+
+    protected static function saveResAttachment($aArgs = [])
+    {
+        $dataObject        = $aArgs['dataObject'];
+        $resIdMaster       = $aArgs['resId'];
+        $defaultConfig     = $aArgs['defaultConfig']['res_attachments'];
+        $dataObjectPackage = $dataObject->DataObjectPackage;
+        $resController     = new ResController();
+
+        $DescriptiveMetadata = $dataObjectPackage->DescriptiveMetadata;
+
+        foreach ($DescriptiveMetadata as $value) {
+            $attachments = $value->ArchiveUnit;
+            break;
+        }
+
+        // First one is the main document. Already added
+        unset($attachments[0]);
+
+        if(!empty($attachments)){
+            foreach ($attachments as $attachment) {
+                foreach ($attachment as $value) {
+                    $attachmentContent      = $value->Content;
+                    $attachmentDataObjectId = $value->DataObjectReference[0]->DataObjectReferenceId;
+
+                    $BinaryDataObjectInfo = self::getBinaryDataObjectInfo(["binaryDataObject" => $dataObjectPackage->BinaryDataObject, "binaryDataObjectId" => $attachmentDataObjectId]);
+                    $filename             = $BinaryDataObjectInfo->Attachment->filename;
+                    $fileFormat           = substr($filename, strrpos($filename, '.') + 1);
+
+                    $dataValue = [];
+                    array_push($dataValue, ['column' => 'typist',          'value' => 'superadmin',                      'type' => 'string']);
+                    array_push($dataValue, ['column' => 'type_id',         'value' => '0',                               'type' => 'integer']);
+                    array_push($dataValue, ['column' => 'res_id_master',   'value' => $resIdMaster,                      'type' => 'integer']);
+                    array_push($dataValue, ['column' => 'attachment_type', 'value' => $defaultConfig['attachment_type'], 'type' => 'string']);
+                    array_push($dataValue, ['column' => 'relation',        'value' => '1',                               'type' => 'integer']);
+                    array_push($dataValue, ['column' => 'coll_id',         'value' => 'letterbox_coll',                  'type' => 'string']);
+
+                    array_push($dataValue, ['column' => 'doc_date',        'value' => $attachmentContent->CreatedDate,   'type' => 'date']);
+                    array_push($dataValue, ['column' => 'title',           'value' => $attachmentContent->Title,         'type' => 'string']);
+
+                    $allDatas = [
+                        "encodedFile" => $BinaryDataObjectInfo->Attachment->value,
+                        "data"        => $dataValue,
+                        "collId"      => "letterbox_coll",
+                        "table"       => "res_attachments",
+                        "fileFormat"  => $fileFormat,
+                        "status"      => 'TRA'
+                    ];
+                    
+                    $resId = $resController->storeResource($allDatas);
+
+                }
+            }
+        }
+        return $resId;
+    }
+
+    protected function getBinaryDataObjectInfo($aArgs = [])
+    {
+        $dataObject   = $aArgs['binaryDataObject'];
+        $dataObjectId = $aArgs['binaryDataObjectId'];
+
+        foreach ($dataObject as $key => $value) {
+            if(!empty($value->$dataObjectId)){
+                return $value->$dataObjectId;
+            }
+        }
+        return null;
     }
 
 }
