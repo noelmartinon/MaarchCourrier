@@ -102,6 +102,7 @@ var SaveNumericPackageComponent = (function () {
                         size: 0,
                         label: "",
                     };
+                    $j("#numericPackageFilePath").val(null);
                     _this.resultInfo = 'Paquet numérique correctement importé';
                     $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
                     $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {

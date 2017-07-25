@@ -88,6 +88,8 @@ if (!defined("_NUMERIC_PACKAGE_ADDED"))
     define("_NUMERIC_PACKAGE_ADDED","Paquet numérique ajouté");
 if (!defined("_NUMERIC_PACKAGE_SENT"))
     define("_NUMERIC_PACKAGE_SENT","Paquets numériques envoyés");
+if (!defined("_NUMERIC_PACKAGE"))
+    define("_NUMERIC_PACKAGE","Paquet numérique");
 if (!defined("_COMMUNICATION_MODE"))
     define("_COMMUNICATION_MODE","Moyen de communication");
 if (!defined("_NOTHING"))

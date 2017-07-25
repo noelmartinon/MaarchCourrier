@@ -29,6 +29,10 @@
             <id>courier</id>
             <label>_COURIER</label>
         </nature>
+        <nature with_reference="true">
+            <id>message_exchange</id>
+            <label>_NUMERIC_PACKAGE</label>
+        </nature>
         <nature with_reference="false">
             <id>other</id>
             <label>_OTHER</label>

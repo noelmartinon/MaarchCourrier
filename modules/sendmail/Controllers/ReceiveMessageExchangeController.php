@@ -19,11 +19,14 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Core\Controllers\ResController;
 use Core\Controllers\ResExtController;
+use Core\Models\UserModel;
+use Entities\Models\EntitiesModel;
 
 // require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 // require_once 'apps/maarch_entreprise/Models/ResModel.php';
 // require_once 'modules/export_seda/RequestSeda.php';
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
+require_once 'modules/notes/Models/NotesModel.php';
 
 class ReceiveMessageExchangeController
 {
@@ -60,25 +63,38 @@ class ReceiveMessageExchangeController
 
         $dataObjectExemple = json_decode($sDataObjectExemple);
 
-        /********** RES LETTERBOX **************/
-        $saveResLetterbox = self::saveMessageExchangeInResLetterbox(["dataObject" => $dataObjectExemple]);
+        /*************** RES LETTERBOX **************/
+        $resLetterboxReturn = self::saveResLetterbox(["dataObject" => $dataObjectExemple]);
 
-        if(!empty($saveResLetterbox['errors'])){
-            return $response->withJson(["errors" => $saveResLetterbox['errors']]);
+        if(!empty($resLetterboxReturn['errors'])){
+            return $response->withJson(["errors" => $resLetterboxReturn['errors']]);
         }
 
-        /********** CONTACT **************/
-        $return = self::saveContact(["dataObject" => $dataObjectExemple]);
+        /*************** CONTACT **************/
+        $contactReturn = self::saveContact(["dataObject" => $dataObjectExemple]);
 
-        if($return['returnCode'] <> 0){
+        if($contactReturn['returnCode'] <> 0){
+            return $response->withJson(["errors" => $contactReturn['errors']]);
+        }
+
+        /************** MLB COLL EXT **************/
+        $return = self::saveExtensionTable(["contact" => $contactReturn, "resId" => $resLetterboxReturn[0]]);
+
+        if(!empty($return['errors'])){
             return $response->withJson(["errors" => $return['errors']]);
         }
 
-        // Save mlb_coll_ext
-        // Save note
-        // Save res_attachment
+        /************** NOTES *****************/
+        $notesReturn = self::saveNotes(["dataObject" => $dataObjectExemple, "resId" => $resLetterboxReturn[0]]);
 
-        return $response->withJson(["resId" => $saveResLetterbox[0]]);
+        if(!empty($notesReturn['errors'])){
+            return $response->withJson(["errors" => $notesReturn['errors']]);
+        }
+
+        /************** RES ATTACHMENT *****************/
+
+
+        return $response->withJson(["resId" => $resLetterboxReturn[0]]);
 
     }
 
@@ -93,7 +109,7 @@ class ReceiveMessageExchangeController
         return true;
     }
 
-    protected static function saveMessageExchangeInResLetterbox($aArgs = [])
+    protected static function saveResLetterbox($aArgs = [])
     {
         $dataObject = $aArgs['dataObject'];
 
@@ -102,24 +118,41 @@ class ReceiveMessageExchangeController
         foreach ($DescriptiveMetadata as $value) {
             $mainDocument         = $value->ArchiveUnit[0];
             $mainDocumentMetaData = $value->Content;
+            break;
         }
 
         foreach ($mainDocument as $value) {
             $DataObjectReferenceId = $value->DataObjectReference[0]->DataObjectReferenceId;
+            break;
         }
 
         $documentMetaData = $dataObject->DataObjectPackage->BinaryDataObject[0]->$DataObjectReferenceId;
         $filename         = $documentMetaData->Attachment->filename;
         $fileFormat       = substr($filename, strrpos($filename, '.') + 1);
 
+        $archivalAgency = $dataObject->ArchivalAgency;
+        $destination    = EntitiesModel::getByBusinessId(['businessId' => $archivalAgency->Identifier]);
+        $Communication  = $archivalAgency->OrganizationDescriptiveMetadata->Contact[0]->Communication;
+
+        foreach ($Communication as $value) {
+            if($value->Channel == 'email'){
+                $email = $value->value;
+                break;
+            }
+        }
+
+        if(!empty($email)){
+            $destUser = UserModel::getByEmail(['mail' => $email]);
+        }
+
         $dataValue = [];
-        array_push($dataValue, ['column' => 'typist',       'value' => 'messageexchange',   'type' => 'string']);
-        array_push($dataValue, ['column' => 'type_id',      'value' => '1',                 'type' => 'integer']);
-        array_push($dataValue, ['column' => 'subject',      'value' => $mainDocumentMetaData->Title[0], 'type' => 'string']);
-        array_push($dataValue, ['column' => 'doc_date',     'value' => $mainDocumentMetaData->CreatedDate, 'type' => 'date']);
-        array_push($dataValue, ['column' => 'destination',  'value' => '',                  'type' => 'string']); // TODO
-        array_push($dataValue, ['column' => 'initiator',    'value' => '',                  'type' => 'string']); // TODO
-        array_push($dataValue, ['column' => 'dest_user',    'value' => '',                  'type' => 'string']); // TODO
+        array_push($dataValue, ['column' => 'typist',       'value' => 'messageexchange',                   'type' => 'string']);
+        array_push($dataValue, ['column' => 'type_id',      'value' => '1',                                 'type' => 'integer']); // TODO CONFIG
+        array_push($dataValue, ['column' => 'subject',      'value' => $mainDocumentMetaData->Title[0],     'type' => 'string']);
+        array_push($dataValue, ['column' => 'doc_date',     'value' => $mainDocumentMetaData->CreatedDate,  'type' => 'date']);
+        array_push($dataValue, ['column' => 'destination',  'value' => $destination[0]['entity_id'],        'type' => 'string']);
+        array_push($dataValue, ['column' => 'initiator',    'value' => 'messageexchange',                   'type' => 'string']);
+        array_push($dataValue, ['column' => 'dest_user',    'value' => $destUser[0]['user_id'],             'type' => 'string']);
 
         $allDatas = [
             "encodedFile" => $documentMetaData->Attachment->value,
@@ -127,23 +160,24 @@ class ReceiveMessageExchangeController
             "collId"      => "letterbox_coll",
             "table"       => "res_letterbox",
             "fileFormat"  => $fileFormat,
-            "status"      => "NEW"
+            "status"      => "NEW" // TODO CONFIG
         ];
 
         $resController = new ResController();
-        $resId = $resController->storeResource($allDatas);
+        $resId         = $resController->storeResource($allDatas);
         return $resId;
     }
 
     protected static function saveContact($aArgs = [])
     {
-        $dataObject         = $aArgs['dataObject'];
-        $transferringAgency = $dataObject->TransferringAgency;
+        $dataObject                 = $aArgs['dataObject'];
+        $transferringAgency         = $dataObject->TransferringAgency;
+        $transferringAgencyMetadata = $transferringAgency->OrganizationDescriptiveMetadata;
 
-        $personName  = $transferringAgency->OrganizationDescriptiveMetadata->Contact[0]->PersonName;
+        $personName  = $transferringAgencyMetadata->Contact[0]->PersonName;
         $aPersonName = explode(" ", $personName);
 
-        $Communication = $transferringAgency->OrganizationDescriptiveMetadata->Contact[0]->Communication;
+        $Communication = $transferringAgencyMetadata->Contact[0]->Communication;
 
         foreach ($Communication as $value) {
             if($value->Channel == 'phone'){
@@ -155,17 +189,17 @@ class ReceiveMessageExchangeController
         }
 
         $aDataContact = [];
-        array_push($aDataContact, ['column' => 'contact_type',        'value' => '100',       'type' => 'integer', 'table' => 'contacts_v2']); // TODO
-        array_push($aDataContact, ['column' => 'society',             'value' => $transferringAgency->OrganizationDescriptiveMetadata->LegalClassification, 'type' => 'string', 'table' => 'contacts_v2']);
-        array_push($aDataContact, ['column' => 'is_corporate_person', 'value' => 'Y',         'type' => 'string', 'table' => 'contacts_v2']);
-        array_push($aDataContact, ['column' => 'external_contact_id', 'value' => $transferringAgency->identifier,         'type' => 'string', 'table' => 'contacts_v2']);
+        array_push($aDataContact, ['column' => 'contact_type',        'value' => '100',                             'type' => 'integer', 'table' => 'contacts_v2']); // TODO CONFIG
+        array_push($aDataContact, ['column' => 'society',             'value' => $transferringAgencyMetadata->LegalClassification, 'type' => 'string', 'table' => 'contacts_v2']);
+        array_push($aDataContact, ['column' => 'is_corporate_person', 'value' => 'Y',                               'type' => 'string', 'table' => 'contacts_v2']);
+        array_push($aDataContact, ['column' => 'external_contact_id', 'value' => $transferringAgency->identifier,   'type' => 'string', 'table' => 'contacts_v2']);
 
-        array_push($aDataContact, ['column' => 'contact_purpose_id',  'value' => '1',         'type' => 'integer', 'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'firstname',           'value' => $aPersonName[1],         'type' => 'string', 'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'lastname',            'value' => $aPersonName[0],         'type' => 'string', 'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'departement',         'value' => $transferringAgency->OrganizationDescriptiveMetadata->Name,         'type' => 'string', 'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'phone',               'value' => $phone,         'type' => 'string', 'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'email',                'value' => $email,         'type' => 'string', 'table' => 'contact_addresses']);
+        array_push($aDataContact, ['column' => 'contact_purpose_id',  'value' => '1',                               'type' => 'integer', 'table' => 'contact_addresses']); // TODO CONFIG
+        array_push($aDataContact, ['column' => 'firstname',           'value' => $aPersonName[1],                   'type' => 'string',  'table' => 'contact_addresses']);
+        array_push($aDataContact, ['column' => 'lastname',            'value' => $aPersonName[0],                   'type' => 'string',  'table' => 'contact_addresses']);
+        array_push($aDataContact, ['column' => 'departement',         'value' => $transferringAgencyMetadata->Name, 'type' => 'string',  'table' => 'contact_addresses']);
+        array_push($aDataContact, ['column' => 'phone',               'value' => $phone,                            'type' => 'string',  'table' => 'contact_addresses']);
+        array_push($aDataContact, ['column' => 'email',               'value' => $email,                            'type' => 'string',  'table' => 'contact_addresses']);
 
         $contactModel = new \ContactsModel();
         $contact      = $contactModel->CreateContact($aDataContact);
@@ -175,7 +209,7 @@ class ReceiveMessageExchangeController
             "allValues" => true
         ]);
 
-        $contactCommunication = $transferringAgency->OrganizationDescriptiveMetadata->Communication;
+        $contactCommunication = $transferringAgencyMetadata->Communication;
         if(empty($contactCommunicationExisted) && !empty($contactCommunication)){
             foreach ( $contactCommunication as $value) {
                 $contactModel->createContactCommunication([
@@ -186,6 +220,50 @@ class ReceiveMessageExchangeController
             }
         }
         return $contact;
+    }
+
+    protected static function saveExtensionTable($aArgs = [])
+    {
+        $contact = $aArgs['contact'];
+        
+        $dataValue = [];
+        array_push($dataValue, ['column' => 'nature_id',       'value' => 'message_exchange',    'type' => 'string']);
+        array_push($dataValue, ['column' => 'category_id',     'value' => 'incoming',            'type' => 'string']);
+        array_push($dataValue, ['column' => 'alt_identifier',  'value' => '',                    'type' => 'string']);
+        array_push($dataValue, ['column' => 'exp_contact_id',  'value' => $contact['contactId'], 'type' => 'integer']);
+        array_push($dataValue, ['column' => 'address_id',      'value' => $contact['addressId'], 'type' => 'integer']);
+
+        $allDatas = [
+            "resId"    => $aArgs['resId'],
+            "data"     => $dataValue,
+            "table"    => "mlb_coll_ext",
+            "resTable" => "res_letterbox"
+        ];
+
+        $ResExtController = new ResExtController();
+        $return           = $ResExtController->storeExtResource($allDatas); 
+
+        return $return;
+    }
+
+    protected static function saveNotes($aArgs = [])
+    {
+        $dataObject                 = $aArgs['dataObject'];
+        $transferringAgencyMetadata = $dataObject->TransferringAgency->OrganizationDescriptiveMetadata;
+        $headerNote                 = $transferringAgencyMetadata->Contact[0]->PersonName . ' (' . $transferringAgencyMetadata->LegalClassification . ' - ' . $transferringAgencyMetadata->Name . ') : ';
+
+        $aDataNote = [
+            "identifier" => $aArgs['resId'],
+            "tablename"  => "res_letterbox",
+            "user_id"    => "superadmin",
+            "note_text"  => $headerNote . $dataObject->Comment[0],
+            "coll_id"    => "letterbox_coll",
+        ];
+
+        $noteModel = new \NotesModel();
+        $note      = $noteModel->create($aDataNote);
+
+        return true;
     }
 
 }

@@ -87,6 +87,8 @@ if (!defined("_NUMERIC_PACKAGE_ADDED"))
     define("_NUMERIC_PACKAGE_ADDED","Numeric package added");
 if (!defined("_NUMERIC_PACKAGE_SENT"))
     define("_NUMERIC_PACKAGE_SENT","Numeric package sent");
+if (!defined("_NUMERIC_PACKAGE"))
+    define("_NUMERIC_PACKAGE","Numeric package");
 if (!defined("_COMMUNICATION_MODE"))
     define("_COMMUNICATION_MODE","Communication mode");
 if (!defined("_NOTHING"))

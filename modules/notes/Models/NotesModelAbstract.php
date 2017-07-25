@@ -30,12 +30,12 @@ class NotesModelAbstract extends Apps_Table_Service
 
         //get notes
         $aReturn = static::select([
-                    'select' => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-                    'table' => ['notes', 'users'],
-                    'left_join' => ['notes.user_id = users.user_id'],
-                    'where' => ['notes.identifier = ?'],
-                    'data' => [$aArgs['resId']],
-                    'order_by' => empty($aArgs['orderBy']) ? ['date_note'] : $aArgs['orderBy']
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['notes', 'users'],
+            'left_join' => ['notes.user_id = users.user_id'],
+            'where'     => ['notes.identifier = ?'],
+            'data'      => [$aArgs['resId']],
+            'order_by'  => empty($aArgs['orderBy']) ? ['date_note'] : $aArgs['orderBy']
         ]);
 
         $tmpNoteId = [];
@@ -47,11 +47,11 @@ class NotesModelAbstract extends Apps_Table_Service
         if (!empty($tmpNoteId)) {
             $tmpEntitiesRestriction = [];
             $entities = static::select([
-                        'select' => ['note_id', 'item_id'],
-                        'table' => ['note_entities'],
-                        'where' => ['note_id in (?)'],
-                        'data' => [$tmpNoteId],
-                        'order_by' => ['item_id']
+                'select'   => ['note_id', 'item_id'],
+                'table'    => ['note_entities'],
+                'where'    => ['note_id in (?)'],
+                'data'     => [$tmpNoteId],
+                'order_by' => ['item_id']
             ]);
 
             foreach ($entities as $key => $value) {
@@ -78,9 +78,9 @@ class NotesModelAbstract extends Apps_Table_Service
 
         $aEntities = static::select([
             'select' => 'entity_id',
-            'table' => ['users_entities'],
-            'where' => ['user_id = ?'],
-            'data' => [$_SESSION['user']['UserId']]
+            'table'  => ['users_entities'],
+            'where'  => ['user_id = ?'],
+            'data'   => [$_SESSION['user']['UserId']]
         ]);
 
         foreach ($aEntities as $value) {
@@ -88,11 +88,11 @@ class NotesModelAbstract extends Apps_Table_Service
         }
 
         $aNotes = static::select([
-            'select' => ['notes.id','user_id', 'item_id'],
-            'table' => ['notes', 'note_entities'],
+            'select'    => ['notes.id','user_id', 'item_id'],
+            'table'     => ['notes', 'note_entities'],
             'left_join' => ['notes.id = note_entities.note_id'],
-            'where' => ['identifier = ?'],
-            'data' => [$aArgs['resId']]
+            'where'     => ['identifier = ?'],
+            'data'      => [$aArgs['resId']]
         ]);
 
         foreach ($aNotes as $value) {
@@ -110,8 +110,24 @@ class NotesModelAbstract extends Apps_Table_Service
             }
         }
 
-
         return $nb;
+    }
+
+    public static function create(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['identifier', 'tablename', 'user_id', 'coll_id', 'note_text']);
+        static::checkNumeric($aArgs, ['identifier']);
+
+        static::insertInto([
+            'identifier' => $aArgs['identifier'],
+            'tablename'  => $aArgs['tablename'],
+            'user_id'    => $aArgs['user_id'],
+            'date_note'  => 'CURRENT_TIMESTAMP',
+            'note_text'  => $aArgs['note_text'],
+            'coll_id'    => $aArgs['coll_id'],
+        ], 'notes');
+
+        return true;
     }
 
 }
