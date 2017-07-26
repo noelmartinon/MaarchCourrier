@@ -97,6 +97,14 @@ class SendMessageExchangeController
                 $AttachmentsInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
                 $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
                 if ($value['res_id'] == $MainExchangeDoc['res_id']) {
+                    if($AllInfoMainMail['category_id'] == 'outgoing'){
+                        $AttachmentsInfo[$key]                                           = [];
+                        $AttachmentsInfo[$key]                                           = $AllInfoMainMail;
+                        $AttachmentsInfo[$key]['Title']                                  = $AllInfoMainMail['subject'];
+                        $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
+                        $AttachmentsInfo[$key]['DocumentType']                           = $AllInfoMainMail['type_label'];
+                        $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
+                    }
                     $mainDocument = [$AttachmentsInfo[$key]];
                     unset($AttachmentsInfo[$key]);
                 }
