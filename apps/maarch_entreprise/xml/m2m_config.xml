@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>
     <res_letterbox>
-        <type_id>1</type_id>
+        <type_id>101</type_id>
         <status>NEW</status>
+        <priority>2</priority>
     </res_letterbox>
     <res_attachments>
         <attachment_type>simple_attachment</attachment_type>
