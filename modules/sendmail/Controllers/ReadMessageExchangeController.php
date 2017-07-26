@@ -52,13 +52,13 @@ class ReadMessageExchangeController
 
         $aDataForm['attachments'] = [];
         foreach ($unitIdentifierData as $value) {
-            if($value->tablename == 'res_attachments'){
+            if ($value->tablename == 'res_attachments') {
                 $aDataForm['attachments'][] = $value->res_id;
             }
-            if($value->tablename == 'res_letterbox'){
+            if ($value->tablename == 'res_letterbox') {
                 $aDataForm['resMasterAttached'] = 'Y';
             }
-            if($value->disposition == 'body'){
+            if ($value->disposition == 'body') {
                 $aDataForm['disposition'] = $value;
             }
         }
@@ -76,5 +76,4 @@ class ReadMessageExchangeController
 
         return $errors;
     }
-
 }

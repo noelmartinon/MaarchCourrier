@@ -64,7 +64,7 @@ class SendMessageExchangeController
             $fileInfo = [$AllInfoMainMail];
         }
 
-        if(!empty($aArgs['join_attachment'])){
+        if (!empty($aArgs['join_attachment'])) {
             foreach ($aArgs['join_attachment'] as $key => $value) {
                 if (empty($value)) {
                     unset($aArgs['join_attachment'][$key]);
@@ -72,8 +72,8 @@ class SendMessageExchangeController
             }
         }
 
-        if($MainExchangeDoc['tablename'] == 'res_attachments'){
-            $aArgs['join_attachment'][] = $MainExchangeDoc['res_id']; 
+        if ($MainExchangeDoc['tablename'] == 'res_attachments') {
+            $aArgs['join_attachment'][] = $MainExchangeDoc['res_id'];
         }
 
         $AttachmentsInfo = [];
@@ -81,7 +81,7 @@ class SendMessageExchangeController
             $AttachmentsInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id in (?)'], 'data' => [$aArgs['join_attachment']]]);
         }
 
-        if($MainExchangeDoc['tablename'] == 'res_letterbox'){
+        if ($MainExchangeDoc['tablename'] == 'res_letterbox') {
             foreach ($AttachmentsInfo as $key => $value) {
                 $AttachmentsInfo[$key]['Title']                                  = $value['title'];
                 $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
@@ -96,7 +96,7 @@ class SendMessageExchangeController
                 $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
                 $AttachmentsInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
                 $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
-                if($value['res_id'] == $MainExchangeDoc['res_id']){
+                if ($value['res_id'] == $MainExchangeDoc['res_id']) {
                     $mainDocument = [$AttachmentsInfo[$key]];
                     unset($AttachmentsInfo[$key]);
                 }
@@ -126,7 +126,7 @@ class SendMessageExchangeController
         $hist    = new history();
         $request = new request();
         $hist->add(
-            'res_letterbox', $aArgs['identifier'], "UP", 'resup',  _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
+            'res_letterbox', $aArgs['identifier'], "UP", 'resup', _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
             . $aArgs['identifier'] . ' ('.$messageId.') : "' . $request->cut_string($mainDocument[0]['Title'], 254) .'"',
             $_SESSION['config']['databasetype'], 'sendmail'
         );
@@ -398,8 +398,8 @@ class SendMessageExchangeController
         $oData->replyCode->value                      = ""; // TODO : ???
 
         $aDataExtension = [
-            'status'            => 'W', 
-            'fullMessageObject' => $dataObject, 
+            'status'            => 'W',
+            'fullMessageObject' => $dataObject,
             'resIdMaster'       => $aArgs['res_id_master'],
             'SenderOrgNAme'     => $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact[0]->DepartmentName,
             'RecipientOrgNAme'  => $dataObject->ArchivalAgency->OrganizationDescriptiveMetadata->Name,
@@ -417,7 +417,7 @@ class SendMessageExchangeController
 
         foreach ($aArgs['attachment'] as $key => $value) {
             $disposition = "attachment";
-            if($key == 0){
+            if ($key == 0) {
                 $disposition = "body";
             }
 
@@ -425,7 +425,5 @@ class SendMessageExchangeController
         }
 
         return true;
-        
     }
-
 }
