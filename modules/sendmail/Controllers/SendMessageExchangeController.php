@@ -8,7 +8,7 @@
 */
 
 /**
-* @brief Message Exchange Controller
+* @brief Send Message Exchange Controller
 * @author dev@maarch.org
 * @ingroup core
 */
@@ -397,6 +397,8 @@ class SendMessageExchangeController
         $oData->replyCode                             = new stdClass();
         $oData->replyCode->value                      = ""; // TODO : ???
 
+        $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
+
         $aDataExtension = [
             'status'            => 'W',
             'fullMessageObject' => $dataObject,
@@ -425,5 +427,20 @@ class SendMessageExchangeController
         }
 
         return true;
+    }
+
+    protected static function cleanBase64Value($aArgs = [])
+    {
+        $dataObject = $aArgs['dataObject'];
+        $aCleanDataObject = [];
+        foreach ($dataObject->DataObjectPackage->BinaryDataObject as $key => $BinaryDataObjectValue) {
+            foreach ($BinaryDataObjectValue as $dataObjectId => $value) {
+                $value->Attachment->value = "";
+                $BinaryDataObjectValue->$dataObjectId = $value;
+            }
+            $aCleanDataObject[$key] = $BinaryDataObjectValue;
+        }
+        $dataObject->DataObjectPackage->BinaryDataObject = $aCleanDataObject;
+        return $dataObject;
     }
 }

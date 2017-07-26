@@ -8,7 +8,7 @@
 */
 
 /**
-* @brief Message Exchange Controller
+* @brief Read Message Exchange Controller
 * @author dev@maarch.org
 * @ingroup core
 */
@@ -30,18 +30,16 @@ class ReadMessageExchangeController
         $RequestSeda         = new RequestSeda();
         $messageExchangeData = $RequestSeda->getMessageByIdentifier($aArgs['id']);
         $unitIdentifierData  = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
-
         $messageExchangeData = json_decode($messageExchangeData->data);
 
         $aDataForm = [];
         $TransferringAgencyMetaData = $messageExchangeData->TransferringAgency->OrganizationDescriptiveMetadata;
         $aDataForm['from']          = $TransferringAgencyMetaData->Contact[0]->PersonName . ' (' . $TransferringAgencyMetaData->Name . ')';
 
-        $ArchivalAgencyMetaData         = $messageExchangeData->ArchivalAgency->OrganizationDescriptiveMetadata;
+        $ArchivalAgency                 = $messageExchangeData->ArchivalAgency;
+        $ArchivalAgencyMetaData         = $ArchivalAgency->OrganizationDescriptiveMetadata;
         $aDataForm['communicationType'] = $ArchivalAgencyMetaData->Communication[0]->value . ' (' . $ArchivalAgencyMetaData->Communication[0]->Channel . ')';
-
-        $ArchivalAgency           = $messageExchangeData->ArchivalAgency;
-        $aDataForm['contactInfo'] = $ArchivalAgencyMetaData->Name . ' - <b>' . $ArchivalAgency->Identifier . '</b> - ' . $ArchivalAgencyMetaData->Contact[0]->PersonName;
+        $aDataForm['contactInfo']       = $ArchivalAgencyMetaData->Name . ' - <b>' . $ArchivalAgency->Identifier . '</b> - ' . $ArchivalAgencyMetaData->Contact[0]->PersonName;
 
         $addressInfo = $ArchivalAgencyMetaData->Contact[0]->Address[0]->PostOfficeBox . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->StreetName . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->Postcode . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->CityName . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->Country;
 
