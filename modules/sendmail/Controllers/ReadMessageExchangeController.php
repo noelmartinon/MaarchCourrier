@@ -53,6 +53,9 @@ class ReadMessageExchangeController
             if ($value->tablename == 'res_attachments') {
                 $aDataForm['attachments'][] = $value->res_id;
             }
+            if ($value->tablename == 'res_version_attachments') {
+                $aDataForm['attachments_version'][] = $value->res_id;
+            }
             if ($value->tablename == 'res_letterbox') {
                 $aDataForm['resMasterAttached'] = 'Y';
             }

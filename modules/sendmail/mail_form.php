@@ -379,8 +379,10 @@ if ($mode == 'add') {
                 
                 if($isVersion){
                     $inputName = "join_version_attachment[]";
+                    $mainExchangeDocValue = "res_version_attachments";
                 } else {
                     $inputName = "join_attachment[]";
+                    $mainExchangeDocValue = "res_attachments";
                 }
 
                 $content .= "<th style=\"width:25px;border: dashed 1px grey;border-right:none;vertical-align:middle;\" alt=\"".$description
@@ -414,7 +416,7 @@ if ($mode == 'add') {
                 $content .= "<span style='font-size: 10px;color: grey;font-style:italic;'>" . $dest_firstname . " " . $dest_lastname. " " . $dest_society . "</span>";
                 $content .= "</td>";   
                 if($formContent == 'messageExchange'){
-                    $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" value=\"res_attachments__".$id."\">";   
+                    $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" value=\"".$mainExchangeDocValue."__".$id."\">";   
                     $content .= "</td>";
                 }
 
@@ -1184,7 +1186,8 @@ if ($mode == 'add') {
                         $content .= "</td>";   
                         if($formContent == 'messageExchange'){
                             $content .= "<td style=\"width:1%;text-align:center;width: 8%;margin-right: 2px;vertical-align: middle\"><input type=radio name=\"main_exchange_doc\" disabled ";
-                            if($emailArray['disposition']->tablename == 'res_attachments' && $emailArray['disposition']->res_id == $id){
+                            if($emailArray['disposition']->res_id == $id && ($emailArray['disposition']->tablename == 'res_attachments' && !$isVersion) 
+                                || ($emailArray['disposition']->tablename == 'res_version_attachments' && $isVersion)){
                                 $content .= " checked ";
                             } 
                             $content .= "></td>";

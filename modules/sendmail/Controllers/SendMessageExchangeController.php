@@ -43,11 +43,8 @@ class SendMessageExchangeController
             $contact_id = $mlbCollExt['dest_contact_id'];
         }
 
-        $ArchivalAgencyCommunicationType   = ContactsModel::getContactCommunication([
-                                                'contactId' => $contact_id,
-                                                'allValues' => true
-                                            ]);
-
+        /***************** GET MAIL INFOS *****************/
+        $ArchivalAgencyCommunicationType   = ContactsModel::getContactCommunication(['contactId' => $contact_id, 'allValues' => true]);
         $ArchivalAgencyContactInformations = ContactsModel::getFullAddressById(['addressId' => $mlbCollExt['address_id']]);
         $TransferringAgencyInformations    = \Entities\Models\EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']]);
         $AllInfoMainMail                   = ResModel::getById(['resId' => $aArgs['identifier']]);
@@ -64,52 +61,57 @@ class SendMessageExchangeController
             $fileInfo = [$AllInfoMainMail];
         }
 
-        if (!empty($aArgs['join_attachment'])) {
-            foreach ($aArgs['join_attachment'] as $key => $value) {
-                if (empty($value)) {
-                    unset($aArgs['join_attachment'][$key]);
-                }
-            }
-        }
-
         if ($MainExchangeDoc['tablename'] == 'res_attachments') {
             $aArgs['join_attachment'][] = $MainExchangeDoc['res_id'];
         }
+        if ($MainExchangeDoc['tablename'] == 'res_version_attachments') {
+            $aArgs['join_version_attachment'][] = $MainExchangeDoc['res_id'];
+        }
 
+        /**************** GET ATTACHMENTS INFOS ***************/
         $AttachmentsInfo = [];
         if (!empty($aArgs['join_attachment'])) {
             $AttachmentsInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id in (?)'], 'data' => [$aArgs['join_attachment']]]);
-        }
-
-        if ($MainExchangeDoc['tablename'] == 'res_letterbox') {
             foreach ($AttachmentsInfo as $key => $value) {
                 $AttachmentsInfo[$key]['Title']                                  = $value['title'];
                 $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
                 $AttachmentsInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
                 $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
             }
+        }
+        $AttVersionInfo = [];
+        if (!empty($aArgs['join_version_attachment'])) {
+            $AttVersionInfo = \Attachments\Models\AttachmentsModel::getAttachmentsWithOptions(['where' => ['res_id_version in (?)'], 'data' => [$aArgs['join_version_attachment']]]);
+            foreach ($AttVersionInfo as $key => $value) {
+                $AttVersionInfo[$key]['res_id']                                 = $value['res_id_version'];
+                $AttVersionInfo[$key]['Title']                                  = $value['title'];
+                $AttVersionInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
+                $AttVersionInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
+                $AttVersionInfo[$key]['tablenameExchangeMessage']               = 'res_version_attachments';
+            }
+        }
+        $aAllAttachment = array_merge($AttachmentsInfo, $AttVersionInfo);
+
+        /*********** ORDER ATTACHMENTS IN MAIL ***************/
+        if ($MainExchangeDoc['tablename'] == 'res_letterbox') {
             $mainDocument     = $fileInfo;
-            $aMergeAttachment = array_merge($fileInfo, $AttachmentsInfo);
+            $aMergeAttachment = array_merge($fileInfo, $aAllAttachment);
         } else {
-            foreach ($AttachmentsInfo as $key => $value) {
-                $AttachmentsInfo[$key]['Title']                                  = $value['title'];
-                $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
-                $AttachmentsInfo[$key]['DocumentType']                           = $_SESSION['attachment_types'][$value['attachment_type']];
-                $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
-                if ($value['res_id'] == $MainExchangeDoc['res_id']) {
+            foreach ($aAllAttachment as $key => $value) {
+                if (($value['res_id'] == $MainExchangeDoc['res_id']) && ($MainExchangeDoc['tablename'] == $value['tablenameExchangeMessage'])) {
                     if($AllInfoMainMail['category_id'] == 'outgoing'){
-                        $AttachmentsInfo[$key]                                           = [];
-                        $AttachmentsInfo[$key]                                           = $AllInfoMainMail;
-                        $AttachmentsInfo[$key]['Title']                                  = $AllInfoMainMail['subject'];
-                        $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
-                        $AttachmentsInfo[$key]['DocumentType']                           = $AllInfoMainMail['type_label'];
-                        $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
+                        $aAllAttachment[$key]                                           = [];
+                        $aAllAttachment[$key]                                           = $AllInfoMainMail;
+                        $aAllAttachment[$key]['Title']                                  = $AllInfoMainMail['subject'];
+                        $aAllAttachment[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
+                        $aAllAttachment[$key]['DocumentType']                           = $AllInfoMainMail['type_label'];
+                        $aAllAttachment[$key]['tablenameExchangeMessage']               = $value['tablenameExchangeMessage'];
                     }
-                    $mainDocument = [$AttachmentsInfo[$key]];
-                    unset($AttachmentsInfo[$key]);
+                    $mainDocument = [$aAllAttachment[$key]];
+                    unset($aAllAttachment[$key]);
                 }
             }
-            $aMergeAttachment = array_merge($mainDocument, $fileInfo, $AttachmentsInfo);
+            $aMergeAttachment = array_merge($mainDocument, $fileInfo, $aAllAttachment);
         }
 
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
@@ -200,9 +202,6 @@ class SendMessageExchangeController
         $RequestSeda = new RequestSeda();
 
         foreach ($aArgs as $key => $value) {
-            if ($value['tablenameExchangeMessage'] == 'res_version_attachments') {
-                $value['res_id'] = $value['res_id_version'];
-            }
             if ($value['tablenameExchangeMessage']) {
                 $binaryDataObjectId = $value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
             } else {
