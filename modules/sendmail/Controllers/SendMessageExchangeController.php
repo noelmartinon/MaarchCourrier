@@ -98,20 +98,22 @@ class SendMessageExchangeController
             $aMergeAttachment = array_merge($fileInfo, $aAllAttachment);
         } else {
             foreach ($aAllAttachment as $key => $value) {
-                if (($value['res_id'] == $MainExchangeDoc['res_id']) && ($MainExchangeDoc['tablename'] == $value['tablenameExchangeMessage'])) {
+                if ($value['res_id'] == $MainExchangeDoc['res_id'] && $MainExchangeDoc['tablename'] == $value['tablenameExchangeMessage']) {
                     if($AllInfoMainMail['category_id'] == 'outgoing'){
-                        $aAllAttachment[$key]                                           = [];
-                        $aAllAttachment[$key]                                           = $AllInfoMainMail;
-                        $aAllAttachment[$key]['Title']                                  = $AllInfoMainMail['subject'];
-                        $aAllAttachment[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
-                        $aAllAttachment[$key]['DocumentType']                           = $AllInfoMainMail['type_label'];
-                        $aAllAttachment[$key]['tablenameExchangeMessage']               = $value['tablenameExchangeMessage'];
+                        $aOutgoingMailInfo                                           = $AllInfoMainMail;
+                        $aOutgoingMailInfo['Title']                                  = $AllInfoMainMail['subject'];
+                        $aOutgoingMailInfo['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
+                        $aOutgoingMailInfo['DocumentType']                           = $AllInfoMainMail['type_label'];
+                        $aOutgoingMailInfo['tablenameExchangeMessage']               = $AllInfoMainMail['tablenameExchangeMessage'];
+                        $mainDocument = [$aOutgoingMailInfo];
+                    } else {
+                        $mainDocument = $aAllAttachment[$key];
                     }
-                    $mainDocument = [$aAllAttachment[$key]];
+                    $firstAttachment = [$aAllAttachment[$key]];
                     unset($aAllAttachment[$key]);
                 }
             }
-            $aMergeAttachment = array_merge($mainDocument, $fileInfo, $aAllAttachment);
+            $aMergeAttachment = array_merge($firstAttachment, $fileInfo, $aAllAttachment);
         }
 
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
@@ -202,7 +204,7 @@ class SendMessageExchangeController
         $RequestSeda = new RequestSeda();
 
         foreach ($aArgs as $key => $value) {
-            if ($value['tablenameExchangeMessage']) {
+            if (!empty($value['tablenameExchangeMessage'])) {
                 $binaryDataObjectId = $value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
             } else {
                 $binaryDataObjectId = $value['res_id'];
