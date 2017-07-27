@@ -203,6 +203,30 @@ while ($state <> 'END') {
 						}
 					}
                 }
+
+				//Res version attachment
+				if (!empty($email->res_version_att_id_list)) {
+                    $attachments = explode(',', $email->res_version_att_id_list);
+					foreach($attachments as $attachment_id) {
+						$GLOBALS['logger']->write("set attachment version on res attachment : " . $attachment_id, 'INFO');
+						$attachmentFile = $sendmail_tools->getAttachment(
+								$email->coll_id, 
+								$email->res_id,
+								$attachment_id,
+								true
+							);
+						if(is_file($attachmentFile['file_path'])) {
+							//Filename
+							$attachmentFilename = $sendmail_tools->createFilename($attachmentFile['label'], $attachmentFile['ext']);
+							$GLOBALS['logger']->write("set attachment version filename : " . $attachmentFilename, 'INFO');
+
+							//File content
+							$file_content = $GLOBALS['mailer']->getFile($attachmentFile['file_path']);
+							//Add file
+							$GLOBALS['mailer']->addAttachment($file_content, $attachmentFilename, $attachmentFile['mime_type']); 
+						}
+					}
+                }
 				
 				//Notes
 				if (!empty($email->note_id_list)) {

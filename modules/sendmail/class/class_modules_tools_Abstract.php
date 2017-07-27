@@ -128,6 +128,7 @@ abstract class SendmailAbstract extends Database
             . EMAILS_TABLE
             . " where email_id = ? and (is_res_master_attached ='Y' or"
             . " res_attachment_id_list <> '' or"
+            . " res_version_att_id_list <> '' or"
             . " res_version_id_list <> '' or"
             . " note_id_list <> '')", array($id )
         );
@@ -177,12 +178,12 @@ abstract class SendmailAbstract extends Database
 
                         array_push(
                             $joinedFiles,
-                            array('id' => $res->res_id, //ID
-                                'label' => $this->show_string($label), //Label
-                                'format' => $res->format, //Format
-                                'filesize' => $res->filesize, //Filesize
+                            array('id'       => $res->res_id, //ID
+                                'label'      => $this->show_string($label), //Label
+                                'format'     => $res->format, //Format
+                                'filesize'   => $res->filesize, //Filesize
                                 'is_version' => true, //Have version bool
-                                'version' => $res->relation //Version
+                                'version'    => $res->relation //Version
                             )
                         );
                     }
@@ -196,20 +197,19 @@ abstract class SendmailAbstract extends Database
         } else {
             include_once 'modules/attachments/attachments_tables.php';
             $stmt = $db->query(
-                "SELECT rva.res_id, rva.description, rva.subject, rva.title, rva.format, rva.filesize, rva.res_id_master, rva.attachment_type, rva.identifier, cv2.society, cv2.firstname, cv2.lastname, rva.filename, rva.path
+                "SELECT rva.res_id, rva.res_id_version, rva.description, rva.subject, rva.title, rva.format, rva.filesize, rva.res_id_master, rva.attachment_type, rva.identifier, cv2.society, cv2.firstname, cv2.lastname, rva.filename, rva.path
                 FROM res_view_attachments rva LEFT JOIN contacts_v2 cv2 ON rva.dest_contact_id = cv2.contact_id WHERE rva.res_id_master = ? and rva.coll_id = ? and rva.status <> 'DEL' and rva.status <> 'OBS' and rva.attachment_type NOT IN ('converted_pdf','print_folder') ORDER BY rva.attachment_type, rva.description",
                 array($id, $coll_id)
             );
         }
-        // $db->show();
 
         while ($res = $stmt->fetchObject()) {
 
             //check converted_pdf
-            $pathConvert = $res->path;
-            $realFilename = explode('.', $res->filename);
+            $pathConvert     = $res->path;
+            $realFilename    = explode('.', $res->filename);
             $filenameConvert = $realFilename[0].'.pdf';
-            //var_dump($filenameConvert);
+
             $stmt2 = $db->query(
                 "SELECT rva.res_id
                 FROM res_view_attachments rva  WHERE rva.path = ? and rva.filename = ? and rva.attachment_type = 'converted_pdf'",
@@ -225,20 +225,28 @@ abstract class SendmailAbstract extends Database
             elseif (strlen(trim($res->description)) > 0)
                 $label = $res->description;
 
+            if(!empty($res->res_id)) {
+                $id        = $res->res_id;
+                $isVersion = false;
+            } else {
+                $id        = $res->res_id_version;
+                $isVersion = true;
+            }
+
             array_push(
                 $joinedFiles,
-                array('id' => $res->res_id, //ID
-                    'label' => $this->show_string($label), //Label
-                    'format' => $res->format, //Format
-                    'filesize' => $res->filesize, //Filesize
-                    'is_version' => false, //
-                    'version' => '', //
+                array('id'            => $id, //ID
+                    'label'           => $this->show_string($label), //Label
+                    'format'          => $res->format, //Format
+                    'filesize'        => $res->filesize, //Filesize
+                    'is_version'      => $isVersion,
+                    'version'         => '',
                     'attachment_type' => $res->attachment_type,
-                    'identifier' => $res->identifier,
-                    'society' => $res->society,
-                    'firstname' => $res->firstname,
-                    'lastname' => $res->lastname,
-                    'converted_pdf' => $converted->res_id
+                    'identifier'      => $res->identifier,
+                    'society'         => $res->society,
+                    'firstname'       => $res->firstname,
+                    'lastname'        => $res->lastname,
+                    'converted_pdf'   => $converted->res_id
                 )
             );
         }
@@ -293,7 +301,6 @@ abstract class SendmailAbstract extends Database
         if (!empty($id)) {
             $db = new Database();
             if ($owner=== true) {
-
                 $where = " and user_id = ? ";
                 $arrayPDO = array($_SESSION['user']['UserId']);
                 $stmt = $db->query(
@@ -311,10 +318,10 @@ abstract class SendmailAbstract extends Database
             }
 
             if ($stmt->rowCount() > 0) {
-                $res = $stmt->fetchObject();
-                $email['id'] = $res->email_id;
+                $res             = $stmt->fetchObject();
+                $email['id']     = $res->email_id;
                 $email['collId'] = $res->coll_id;
-                $email['resId'] = $res->res_id;
+                $email['resId']  = $res->res_id;
                 $email['userId'] = $res->user_id;
                 $email['to'] = array();
                 if (!empty($res->to_list)) {
@@ -336,20 +343,24 @@ abstract class SendmailAbstract extends Database
                 if (!empty($res->res_attachment_id_list)) {
                     $email['attachments'] = explode(',', $res->res_attachment_id_list);
                 }
+                $email['attachments_version'] = array();
+                if (!empty($res->res_version_att_id_list)) {
+                    $email['attachments_version'] = explode(',', $res->res_version_att_id_list);
+                }
                 $email['notes'] = array();
                 if (!empty($res->note_id_list)) {
                     $email['notes'] = explode(',', $res->note_id_list);
                 }
-                $email['object'] = $this->show_string($res->email_object);
-                $body = str_replace('###', ';', $res->email_body);
-                $body = str_replace('___', '--', $body);
-                $email['body'] = $this->show_string($body);
+                $email['object']            = $this->show_string($res->email_object);
+                $body                       = str_replace('###', ';', $res->email_body);
+                $body                       = str_replace('___', '--', $body);
+                $email['body']              = $this->show_string($body);
                 $email['resMasterAttached'] = $res->is_res_master_attached;
-                $email['isHtml'] = $res->is_html;
-                $email['status'] = $res->email_status;
-                $email['creationDate'] = $this->format_date_db($res->creation_date);
-                $email['sendDate'] = $this->format_date_db($res->send_date);
-                $email['sender_email'] = $res->sender_email;
+                $email['isHtml']            = $res->is_html;
+                $email['status']            = $res->email_status;
+                $email['creationDate']      = $this->format_date_db($res->creation_date);
+                $email['sendDate']          = $this->format_date_db($res->send_date);
+                $email['sender_email']      = $res->sender_email;
             }
         }
 
@@ -361,7 +372,6 @@ abstract class SendmailAbstract extends Database
         $content = '';
         //Init with loading div
         $content .= '<div id="loading_'.$inputField.'" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></i></div>';
-        // $content .=  print_r($adressArray, true);
         //Get info from session array and display tag
         if (isset($adressArray[$inputField]) && count($adressArray[$inputField]) > 0) {
             foreach ($adressArray[$inputField] as $key => $adress) {
@@ -403,7 +413,6 @@ abstract class SendmailAbstract extends Database
                 . 'docservers_controler.php';
             $docserverControler = new docservers_controler();
             $docserverLocation = array();
-            // echo '--> '.$coll_id.'/'.$res_id.'/'.$table.'/'.$adrTable.PHP_EOL;
             $docserverLocation = $docserverControler->retrieveDocserverNetLinkOfResource(
                 $res_id, $table, $adrTable
             );
@@ -436,17 +445,13 @@ abstract class SendmailAbstract extends Database
                 $label = $res->description;
             $viewResourceArr['label'] = $this->show_string($label);
 
-            //$viewResourceArr['status'] /ko /ok
-            //$viewResourceArr['error']
-            // $this->show_array($viewResourceArr);
         }
 
         return $viewResourceArr;
     }
 
-    public function getAttachment($coll_id, $res_id_master, $res_attachment)
+    public function getAttachment($coll_id, $res_id_master, $res_attachment, $isVersion = false)
     {
-
         include_once 'modules/attachments/attachments_tables.php';
         include_once 'core/core_tables.php';
         include_once 'core/docservers_tools.php';
@@ -454,9 +459,14 @@ abstract class SendmailAbstract extends Database
         $viewAttachmentArr = array();
 
         $db = new Database();
+        if(!$isVersion){
+            $table = "res_attachments";
+        } else {
+            $table = "res_version_attachments";
+        }
         $stmt = $db->query(
             "select description, subject, title, docserver_id, path, filename, format from "
-            . RES_ATTACHMENTS_TABLE . " where res_id = ? and coll_id = ? and res_id_master = ? ",
+            . $table . " where res_id = ? and coll_id = ? and res_id_master = ? ",
             array($res_attachment, $coll_id, $res_id_master)
         );
         if ($stmt->rowCount() > 0) {
@@ -468,11 +478,11 @@ abstract class SendmailAbstract extends Database
                 $label = $line->subject;
             elseif (strlen(trim($line->description)) > 0)
                 $label = $line->description;
-            //
+
             $docserver = $line->docserver_id;
-            $path = $line->path;
-            $filename = $line->filename;
-            $format = $line->format;
+            $path      = $line->path;
+            $filename  = $line->filename;
+            $format    = $line->format;
             $stmt = $db->query(
                 "select path_template from " . _DOCSERVERS_TABLE_NAME
                 . " where docserver_id = ? ",
@@ -494,46 +504,43 @@ abstract class SendmailAbstract extends Database
                 copy($file, $filePathOnTmp);
 
                 $viewAttachmentArr = array(
-                    'status' => 'ok',
-                    'label' => $this->show_string($label),
-                    'mime_type' => $mimeType,
-                    'ext' => $format,
+                    'status'       => 'ok',
+                    'label'        => $this->show_string($label),
+                    'mime_type'    => $mimeType,
+                    'ext'          => $format,
                     'file_content' => '',
-                    'tmp_path' => $_SESSION['config']
-                    ['tmppath'],
-                    'file_path' => $filePathOnTmp,
+                    'tmp_path'     => $_SESSION['config']['tmppath'],
+                    'file_path'    => $filePathOnTmp,
                     'called_by_ws' => '',
-                    'error' => ''
+                    'error'        => ''
                 );
             } else {
                 $viewAttachmentArr = array(
-                    'status' => 'ko',
-                    'label' => '',
-                    'mime_type' => '',
-                    'ext' => '',
+                    'status'       => 'ko',
+                    'label'        => '',
+                    'mime_type'    => '',
+                    'ext'          => '',
                     'file_content' => '',
-                    'tmp_path' => '',
-                    'file_path' => '',
+                    'tmp_path'     => '',
+                    'file_path'    => '',
                     'called_by_ws' => '',
-                    'error' => _FILE_NOT_EXISTS_ON_THE_SERVER
+                    'error'        => _FILE_NOT_EXISTS_ON_THE_SERVER
                 );
 
             }
         } else {
             $viewAttachmentArr = array(
-                'status' => 'ko',
-                'label' => '',
-                'mime_type' => '',
-                'ext' => '',
+                'status'       => 'ko',
+                'label'        => '',
+                'mime_type'    => '',
+                'ext'          => '',
                 'file_content' => '',
-                'tmp_path' => '',
-                'file_path' => '',
+                'tmp_path'     => '',
+                'file_path'    => '',
                 'called_by_ws' => '',
-                'error' => _NO_RIGHT_ON_RESOURCE_OR_RESOURCE_NOT_EXISTS
+                'error'        => _NO_RIGHT_ON_RESOURCE_OR_RESOURCE_NOT_EXISTS
             );
         }
-
-        // $this->show_array($viewAttachmentArr);
 
         return $viewAttachmentArr;
     }
@@ -876,4 +883,3 @@ abstract class SendmailAbstract extends Database
     }
 
 }
-

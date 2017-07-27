@@ -233,12 +233,16 @@ switch ($mode) {
                                     (isset($_REQUEST['join_file']) 
                                         && count($_REQUEST['join_file']) > 0
                                     )? $res_master_attached = 'Y' : $res_master_attached = 'N';
-    								//Version attached
+                                    //attachment
                                     if (isset($_REQUEST['join_attachment']) && count($_REQUEST['join_attachment']) > 0) {
                                         $attachment_list = join(',', $_REQUEST['join_attachment']);
-                                    }      
-    								//Attachments								
-    								if (isset($_REQUEST['join_version']) && count($_REQUEST['join_version']) > 0) {
+                                    } 
+                                    //Version attachment
+                                    if (isset($_REQUEST['join_version_attachment']) && count($_REQUEST['join_version_attachment']) > 0) {
+                                        $attachment_version_list = join(',', $_REQUEST['join_version_attachment']);
+                                    }   
+                                    //version document                              
+                                    if (isset($_REQUEST['join_version']) && count($_REQUEST['join_version']) > 0) {
                                         $version_list = join(',', $_REQUEST['join_version']);
                                     }
     								//Notes
@@ -266,10 +270,10 @@ switch ($mode) {
                                     $stmt = $db->query(
                                         "INSERT INTO " . EMAILS_TABLE . "(coll_id, res_id, user_id, to_list, cc_list,
                                         cci_list, email_object, email_body, is_res_master_attached, res_version_id_list, 
-                                        res_attachment_id_list, note_id_list, is_html, email_status, creation_date, sender_email) 
-                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
-    									array($collId, $identifier, $userId, $to, $cc, $cci, $object, $body, $res_master_attached, 
-    									$version_list, $attachment_list, $note_list, $isHtml, $email_status, $senderEmail)
+                                        res_attachment_id_list, res_version_att_id_list,note_id_list, is_html, email_status, creation_date, sender_email) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
+                                        array($collId, $identifier, $userId, $to, $cc, $cci, $object, $body, $res_master_attached, 
+                                        $version_list, $attachment_list, $attachment_version_list, $note_list, $isHtml, $email_status, $senderEmail)
                                     );
                                    
                                     
@@ -376,6 +380,9 @@ switch ($mode) {
                                     if (isset($_REQUEST['join_attachment']) && count($_REQUEST['join_attachment']) > 0) {
                                         $attachment_list = join(',', $_REQUEST['join_attachment']);
                                     }
+                                    if (isset($_REQUEST['join_version_attachment']) && count($_REQUEST['join_version_attachment']) > 0) {
+                                        $attachment_version_list = join(',', $_REQUEST['join_version_attachment']);
+                                    }
                                     if (isset($_REQUEST['notes']) && count($_REQUEST['notes']) > 0) {
                                         $note_list = join(',', $_REQUEST['notes']);
                                     }
@@ -398,12 +405,12 @@ switch ($mode) {
                                     //Query                 
                                     $db->query(
                                         "UPDATE " . EMAILS_TABLE . " SET to_list = ?, cc_list = ?, cci_list = ?, email_object = ?, 
-												email_body = ?, is_res_master_attached = ?, res_version_id_list = ?, 
-												res_attachment_id_list = ?, note_id_list = ?, 
-												is_html = ?, email_status = ?, sender_email = ? where email_id = ? "
+                                                email_body = ?, is_res_master_attached = ?, res_version_id_list = ?, 
+                                                res_attachment_id_list = ?, res_version_att_id_list = ?, note_id_list = ?, 
+                                                is_html = ?, email_status = ?, sender_email = ? where email_id = ? "
                                             ." and res_id =  ? and user_id = ?",
-                                            array($to, $cc, $cci, $object, $body, $res_master_attached, $version_list, $attachment_list, $note_list, $isHtml,
-												$email_status, $senderEmail, $id, $identifier, $userId )
+                                            array($to, $cc, $cci, $object, $body, $res_master_attached, $version_list, $attachment_list, $attachment_version_list, $note_list, $isHtml,
+                                                $email_status, $senderEmail, $id, $identifier, $userId )
                                     );
                                     
                                     //History

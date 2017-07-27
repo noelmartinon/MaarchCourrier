@@ -53,3 +53,6 @@ CREATE OR REPLACE VIEW view_contacts AS
    RIGHT JOIN contact_addresses ca ON c.contact_id = ca.contact_id
    LEFT JOIN contact_purposes cp ON ca.contact_purpose_id = cp.id
    LEFT JOIN contact_types ct ON c.contact_type = ct.id;
+ 
+ALTER TABLE sendmail DROP COLUMN IF EXISTS res_version_att_id_list; 
+ALTER TABLE sendmail ADD COLUMN res_version_att_id_list character varying(255); 

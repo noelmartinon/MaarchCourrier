@@ -255,6 +255,9 @@ MyAjax.Autocompleter = Class.create(Ajax.Autocompleter, {
 function clickAttachments(id){
     $("join_file_"+id).click();
 }
+function clickAttachmentsInput(id){
+    $("join_attachment_"+id).click();
+}
 function clickAttachmentsNotes(id){
     $("note_"+id).click();
 }

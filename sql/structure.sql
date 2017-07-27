@@ -2378,6 +2378,7 @@ CREATE TABLE sendmail
   is_res_master_attached character varying(1) NOT NULL DEFAULT 'Y',
   res_version_id_list character varying(255) DEFAULT NULL,
   res_attachment_id_list character varying(255) DEFAULT NULL,
+  res_version_att_id_list character varying(255) DEFAULT NULL, 
   note_id_list character varying(255) DEFAULT NULL,
   is_html character varying(1) NOT NULL DEFAULT 'Y',
   email_status character varying(1) NOT NULL DEFAULT 'D',

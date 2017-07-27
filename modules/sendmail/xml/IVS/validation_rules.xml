@@ -18,6 +18,7 @@
 		<parameter name="body_from_raw" type="string" />
 		<parameter name="cancel" type="identifier" />
 		<parameter name="join_attachment" type="identifier" />
+		<parameter name="join_version_attachment" type="identifier" />
 		<parameter name="join_file" type="identifier" />
 		<parameter name="notes" type="string" />
 		<parameter name="object" type="string" />
