@@ -49,6 +49,7 @@ class ReadMessageExchangeController
         $aDataForm['object']      = $messageExchangeData->DataObjectPackage->DescriptiveMetadata->mail_1->Content->Title[0];
 
         $aDataForm['attachments'] = [];
+        $aDataForm['attachments_version'] = [];
         foreach ($unitIdentifierData as $value) {
             if ($value->tablename == 'res_attachments') {
                 $aDataForm['attachments'][] = $value->res_id;

@@ -1152,6 +1152,7 @@ if ($mode == 'add') {
                             . "\" title=\"".$description
                             . "\"><input style=\"margin-left: 3px\" disabled=\"disabled\" type=\"checkbox\" id=\"join_attachment_".$id."\" name=\"".$inputName."\"";
 
+                        $checked = "";
                         if(($isVersion && in_array($id, $emailArray['attachments_version'])) || (!$isVersion && in_array($id, $emailArray['attachments']))){
                             $checked = ' checked="checked"';
                         }
