@@ -23,6 +23,7 @@ var SaveNumericPackageComponent = (function () {
             type: "",
             size: 0,
             label: "",
+            extension: "",
         };
         this.resultInfo = "";
         this.loading = false;
@@ -30,7 +31,7 @@ var SaveNumericPackageComponent = (function () {
             componentAfterUpload: function (base64Content) { return _this.processAfterUpload(base64Content); },
         };
     }
-    SaveNumericPackageComponent.prototype.prepareProfile = function () {
+    SaveNumericPackageComponent.prototype.preparePage = function () {
         $j('#inner_content').remove();
         $j('#menunav').hide();
         $j('#divList').remove();
@@ -54,7 +55,7 @@ var SaveNumericPackageComponent = (function () {
         }
     };
     SaveNumericPackageComponent.prototype.ngOnInit = function () {
-        this.prepareProfile();
+        this.preparePage();
         this.updateBreadcrumb(angularGlobals.applicationName);
         this.coreUrl = angularGlobals.coreUrl;
         this.loading = false;
@@ -72,6 +73,7 @@ var SaveNumericPackageComponent = (function () {
             this.numericPackage.name = fileInput.target.files[0].name;
             this.numericPackage.size = fileInput.target.files[0].size;
             this.numericPackage.type = fileInput.target.files[0].type;
+            this.numericPackage.extension = fileInput.target.files[0].name.split('.').pop();
             if (this.numericPackage.label == "") {
                 this.numericPackage.label = this.numericPackage.name;
             }
@@ -101,6 +103,7 @@ var SaveNumericPackageComponent = (function () {
                         type: "",
                         size: 0,
                         label: "",
+                        extension: "",
                     };
                     $j("#numericPackageFilePath").val(null);
                     _this.resultInfo = 'Paquet numérique correctement importé';
@@ -116,6 +119,7 @@ var SaveNumericPackageComponent = (function () {
             this.numericPackage.size = 0;
             this.numericPackage.type = "";
             this.numericPackage.base64 = "";
+            this.numericPackage.extension = "";
             this.resultInfo = "Aucun paquet numérique séléctionné";
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
             $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {

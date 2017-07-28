@@ -26,6 +26,7 @@ export class SaveNumericPackageComponent implements OnInit {
         type                    : "",
         size                    : 0,
         label                   : "",
+        extension               : "",
     };
 
     resultInfo                  : string    = "";
@@ -38,7 +39,7 @@ export class SaveNumericPackageComponent implements OnInit {
         };
     }
 
-    prepareProfile() {
+    preparePage() {
         $j('#inner_content').remove();
         $j('#menunav').hide();
         $j('#divList').remove();
@@ -66,7 +67,7 @@ export class SaveNumericPackageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.prepareProfile();
+        this.preparePage();
         this.updateBreadcrumb(angularGlobals.applicationName);
         this.coreUrl = angularGlobals.coreUrl;
 
@@ -89,6 +90,7 @@ export class SaveNumericPackageComponent implements OnInit {
             this.numericPackage.name = fileInput.target.files[0].name;
             this.numericPackage.size = fileInput.target.files[0].size;
             this.numericPackage.type = fileInput.target.files[0].type;
+            this.numericPackage.extension = fileInput.target.files[0].name.split('.').pop();
             if (this.numericPackage.label == "") {
                 this.numericPackage.label = this.numericPackage.name;
             }
@@ -120,6 +122,7 @@ export class SaveNumericPackageComponent implements OnInit {
                             type                    : "",
                             size                    : 0,
                             label                   : "",
+                            extension               : "",
                         };
                         $j("#numericPackageFilePath").val(null);
                         this.resultInfo = 'Paquet numérique correctement importé';
@@ -134,6 +137,7 @@ export class SaveNumericPackageComponent implements OnInit {
             this.numericPackage.size        = 0;
             this.numericPackage.type        = "";
             this.numericPackage.base64      = "";
+            this.numericPackage.extension   = "";
 
             this.resultInfo = "Aucun paquet numérique séléctionné";
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
