@@ -50,21 +50,21 @@ abstract class entity_Abstract extends functions
                 {
                     $_SESSION['m_admin']['entity']['entityId'] = functions::show_string($id);
                     $line = $stmt->fetchObject();
-                    $_SESSION['m_admin']['entity']['label'] = functions::show_string($line->entity_label);
-                    $_SESSION['m_admin']['entity']['short_label'] = functions::show_string($line->short_label);
-                    $_SESSION['m_admin']['entity']['enabled'] = functions::show_string($line->enabled);
-                    $_SESSION['m_admin']['entity']['adrs1'] = functions::show_string($line->adrs_1);
-                    $_SESSION['m_admin']['entity']['adrs2'] = functions::show_string($line->adrs_2);
-                    $_SESSION['m_admin']['entity']['adrs3'] = functions::show_string($line->adrs_3);
-                    $_SESSION['m_admin']['entity']['zcode'] = functions::show_string($line->zipcode);
-                    $_SESSION['m_admin']['entity']['city'] = functions::show_string($line->city);
-                    $_SESSION['m_admin']['entity']['country'] = functions::show_string($line->country);
-                    $_SESSION['m_admin']['entity']['email'] = functions::show_string($line->email);
-                    $_SESSION['m_admin']['entity']['business'] = functions::show_string($line->business_id);
-                    $_SESSION['m_admin']['entity']['parent'] = functions::show_string($line->parent_entity_id);
-                    $_SESSION['m_admin']['entity']['type'] = functions::show_string($line->entity_type);
+                    $_SESSION['m_admin']['entity']['label']              = functions::show_string($line->entity_label);
+                    $_SESSION['m_admin']['entity']['short_label']        = functions::show_string($line->short_label);
+                    $_SESSION['m_admin']['entity']['enabled']            = functions::show_string($line->enabled);
+                    $_SESSION['m_admin']['entity']['adrs1']              = functions::show_string($line->adrs_1);
+                    $_SESSION['m_admin']['entity']['adrs2']              = functions::show_string($line->adrs_2);
+                    $_SESSION['m_admin']['entity']['adrs3']              = functions::show_string($line->adrs_3);
+                    $_SESSION['m_admin']['entity']['zcode']              = functions::show_string($line->zipcode);
+                    $_SESSION['m_admin']['entity']['city']               = functions::show_string($line->city);
+                    $_SESSION['m_admin']['entity']['country']            = functions::show_string($line->country);
+                    $_SESSION['m_admin']['entity']['email']              = functions::show_string($line->email);
+                    $_SESSION['m_admin']['entity']['business']           = functions::show_string($line->business_id);
+                    $_SESSION['m_admin']['entity']['parent']             = functions::show_string($line->parent_entity_id);
+                    $_SESSION['m_admin']['entity']['type']               = functions::show_string($line->entity_type);
                     $_SESSION['m_admin']['entity']['archival_agreement'] = functions::show_string($line->archival_agreement);
-                    $_SESSION['m_admin']['entity']['archival_agency'] = functions::show_string($line->archival_agency);
+                    $_SESSION['m_admin']['entity']['archival_agency']    = functions::show_string($line->archival_agency);
                 }
             }
             //$core_tools->execute_modules_services($_SESSION['modules_services'], 'entity_up', "include");
@@ -976,6 +976,16 @@ abstract class entity_Abstract extends functions
         {
             $_SESSION['m_admin']['entity']['email'] = functions::wash($_REQUEST['email'], "mail", _ENTITY_EMAIL, 'yes', 0, 255);
         }
+        $_SESSION['m_admin']['entity']['archival_agreement'] = '';
+        if(isset($_REQUEST['archival_agreement']) && !empty($_REQUEST['archival_agreement']))
+        {
+            $_SESSION['m_admin']['entity']['archival_agreement'] = functions::wash($_REQUEST['archival_agreement'], "no", _ARCHIVAL_AGREEMENT, 'yes', 0, 255);
+        }
+        $_SESSION['m_admin']['entity']['archival_agency'] = '';
+        if(isset($_REQUEST['archival_agency']) && !empty($_REQUEST['archival_agency']))
+        {
+            $_SESSION['m_admin']['entity']['archival_agency'] = functions::wash($_REQUEST['archival_agency'], "no", _ARCHIVAL_AGENCY, 'yes', 0, 255);
+        }
         $_SESSION['m_admin']['entity']['business'] = '';
         if(isset($_REQUEST['business']) && !empty($_REQUEST['business']))
         {
@@ -1087,7 +1097,7 @@ abstract class entity_Abstract extends functions
                         $entityPath .= $entityIdForTree . '/' . $_SESSION['m_admin']['entity']['entityId'];
                     }
                     
-                    $stmt = $db->query('INSERT INTO '.ENT_ENTITIES." (entity_id, entity_label, short_label, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type, entity_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($_SESSION['m_admin']['entity']['entityId'],$_SESSION['m_admin']['entity']['label'],$_SESSION['m_admin']['entity']['short_label'],$_SESSION['m_admin']['entity']['adrs1'],$_SESSION['m_admin']['entity']['adrs2'],$_SESSION['m_admin']['entity']['adrs3'],$_SESSION['m_admin']['entity']['zcode'],$_SESSION['m_admin']['entity']['city'],$_SESSION['m_admin']['entity']['country'],$_SESSION['m_admin']['entity']['email'],$_SESSION['m_admin']['entity']['business'],$_SESSION['m_admin']['entity']['parent'],$_SESSION['m_admin']['entity']['type'],$entityPath));
+                    $stmt = $db->query('INSERT INTO '.ENT_ENTITIES." (entity_id, entity_label, short_label, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type, entity_path, archival_agency, archival_agreement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($_SESSION['m_admin']['entity']['entityId'],$_SESSION['m_admin']['entity']['label'],$_SESSION['m_admin']['entity']['short_label'],$_SESSION['m_admin']['entity']['adrs1'],$_SESSION['m_admin']['entity']['adrs2'],$_SESSION['m_admin']['entity']['adrs3'],$_SESSION['m_admin']['entity']['zcode'],$_SESSION['m_admin']['entity']['city'],$_SESSION['m_admin']['entity']['country'],$_SESSION['m_admin']['entity']['email'],$_SESSION['m_admin']['entity']['business'],$_SESSION['m_admin']['entity']['parent'],$_SESSION['m_admin']['entity']['type'],$entityPath,$_SESSION['m_admin']['entity']['archival_agency'],$_SESSION['m_admin']['entity']['archival_agreement']));
                     $_SESSION['service_tag'] = 'entity_add_db';
                     $core->execute_modules_services($_SESSION['modules_services'], 'entity_add_db', "include");
                     $core->execute_app_services($_SESSION['app_services'], 'entity_add_db', 'include');
@@ -1137,7 +1147,7 @@ abstract class entity_Abstract extends functions
                     $entityPath .= $entityIdForTree . '/' . $_SESSION['m_admin']['entity']['entityId'];
                 }
                     
-                $stmt = $db->query('UPDATE '.ENT_ENTITIES." set entity_label = ? , short_label = ? , adrs_1 = ?, adrs_2 = ?, adrs_3 = ?, zipcode = ?, city = ?, country = ?, email = ?, business_id = ?, parent_entity_id = ?, entity_type = ?, entity_path = ? where entity_id = ?",array($_SESSION['m_admin']['entity']['label'], $_SESSION['m_admin']['entity']['short_label'], $_SESSION['m_admin']['entity']['adrs1'], $_SESSION['m_admin']['entity']['adrs2'],$_SESSION['m_admin']['entity']['adrs3'], $_SESSION['m_admin']['entity']['zcode'], $_SESSION['m_admin']['entity']['city'], $_SESSION['m_admin']['entity']['country'], $_SESSION['m_admin']['entity']['email'], $_SESSION['m_admin']['entity']['business'], $_SESSION['m_admin']['entity']['parent'], $_SESSION['m_admin']['entity']['type'], $entityPath,$_SESSION['m_admin']['entity']['entityId']));
+                $stmt = $db->query('UPDATE '.ENT_ENTITIES." set entity_label = ? , short_label = ? , adrs_1 = ?, adrs_2 = ?, adrs_3 = ?, zipcode = ?, city = ?, country = ?, email = ?, business_id = ?, parent_entity_id = ?, entity_type = ?, entity_path = ?, archival_agency = ?, archival_agreement = ? where entity_id = ?",array($_SESSION['m_admin']['entity']['label'], $_SESSION['m_admin']['entity']['short_label'], $_SESSION['m_admin']['entity']['adrs1'], $_SESSION['m_admin']['entity']['adrs2'],$_SESSION['m_admin']['entity']['adrs3'], $_SESSION['m_admin']['entity']['zcode'], $_SESSION['m_admin']['entity']['city'], $_SESSION['m_admin']['entity']['country'], $_SESSION['m_admin']['entity']['email'], $_SESSION['m_admin']['entity']['business'], $_SESSION['m_admin']['entity']['parent'], $_SESSION['m_admin']['entity']['type'], $entityPath, $_SESSION['m_admin']['entity']['archival_agency'], $_SESSION['m_admin']['entity']['archival_agreement'],$_SESSION['m_admin']['entity']['entityId']));
                 $_SESSION['service_tag'] = 'entity_up_db';
                 $core->execute_modules_services($_SESSION['modules_services'], 'entity_up_db', "include");
                 $core->execute_app_services($_SESSION['app_services'], 'entity_up_db', 'include');
