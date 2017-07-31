@@ -312,21 +312,6 @@ class Core_CoreConfigAbstract_Service extends Core_Abstract_Service {
             $_SESSION['history']['contact_addresses_del']    = (string) $history->contact_addresses_del;
             $_SESSION['history']['contact_addresses_add']    = (string) $history->contact_addresses_add;
             $_SESSION['history']['contact_addresses_up']     = (string) $history->contact_addresses_up;
-            $_SESSION['history_keywords'] = array();
-            foreach ($xmlconfig->KEYWORDS as $keyword) {
-                $tmp = (string) $keyword->label;
-                if (!empty($tmp) && defined($tmp) && constant($tmp) <> NULL) {
-                    $tmp = constant($tmp);
-                }
-
-                array_push(
-                    $_SESSION['history_keywords'],
-                    array(
-                        'id'    => (string) $keyword->id,
-                        'label' => $tmp,
-                    )
-                );
-            }
 
             $i = 0;
             foreach ($xmlconfig->MODULES as $modules) {
