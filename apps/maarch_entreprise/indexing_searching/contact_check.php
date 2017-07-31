@@ -61,7 +61,7 @@ if(empty($_POST['contact_id']) || $_POST['category'] == 'outgoing'){
 
 	//EXCLUDE OWN RES_ID
 	if($_POST['res_id'] != "none"){
-		$query .= " AND res_id NOT IN (?)";
+		$wherePDO .= " AND res_id NOT IN (?)";
 		$allResId = explode(",", $_POST['res_id']);
 		$arrayPDO = array_merge($arrayPDO, array($allResId));
 		$_SESSION['excludeId'] = $_POST['res_id'];
