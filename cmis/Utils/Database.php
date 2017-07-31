@@ -99,7 +99,6 @@ class Database
 
         foreach ($result as $key => $val) {
 
-
             if (preg_match('/_id/', $key)) {
                 $type = 'Id';
             } else if (preg_match('/date/', $key)) {

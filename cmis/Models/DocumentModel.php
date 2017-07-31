@@ -26,8 +26,8 @@ class DocumentModel extends DocumentModelAbstract
 
         /*if (Database::isOracle()) {
             $sql = '
-                select * 
-                from (select rownum rnk, a.* 
+                select *
+                from (select rownum rnk, a.*
                       from res_letterbox a
                       order by res_id)
                 where rnk between ' . ($maxItems * $skipCount) . ' AND ' . ($skipCount * $maxItems + $maxItems);
@@ -38,7 +38,7 @@ class DocumentModel extends DocumentModelAbstract
             $stmt = Database::getInstance()->query($sql);
         }*/
 
-        $sql = 'SELECT * FROM res_letterbox LIMIT 15000';
+        $sql = 'SELECT * FROM res_letterbox';
 
         $stmt = Database::getInstance()->query($sql);
 
@@ -61,7 +61,7 @@ class DocumentModel extends DocumentModelAbstract
                 ->setPath($value['path'])
                 ->setFilename($value['filename'])
                 ->setFilesize($value['filesize'])
-                ->setOtherProperties($otherProperties);
+                ->setOtherProperties($otherProperties); 
 
             $array[$value['folders_system_id']][] = $document;
 
