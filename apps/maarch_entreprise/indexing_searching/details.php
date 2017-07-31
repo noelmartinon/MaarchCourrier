@@ -768,7 +768,10 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                         echo 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\');"';
                                     } else if ($key == 'priority') {
                                         echo 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
-                                    }?>
+                                    } else if ($key == 'nature_id') {
+										echo 'disabled=none';
+									}
+									?>
                                     >
                                     <?php
                                         if ($key == 'type_id')
@@ -795,7 +798,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                             {
                                                 for($k=0; $k<count($data[$key]['select']);$k++)
                                                 {
-                                                    ?><option <?php if ($data[$key]['value'] ==$data[$key]['select'][$k]['ID']){ echo 'selected="selected"';}?> value="<?php functions::xecho($data[$key]['select'][$k]['ID']);?>" ><?php functions::xecho($data[$key]['select'][$k]['LABEL']);?></option><?php
+                                                    ?><option <?php if ($data[$key]['value'] ==$data[$key]['select'][$k]['ID']){}?> value="<?php functions::xecho($data[$key]['select'][$k]['ID']);?>" ><?php functions::xecho($data[$key]['select'][$k]['LABEL']);?></option><?php
                                                 }
                                             }
                                         }
