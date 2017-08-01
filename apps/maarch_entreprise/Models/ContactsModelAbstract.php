@@ -127,7 +127,11 @@ class ContactsModelAbstract extends Apps_Table_Service
         if($aArgs['allValues'] === true){
             return $aReturn[0];
         } else {
-            return $aReturn[0]['value'].' ('.$aReturn[0]['type'].')';
+            if(empty($aReturn)){
+                return "";
+            } else {
+                return $aReturn[0]['value'].' ('.$aReturn[0]['type'].')';
+            }
         }
         
     }

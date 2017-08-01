@@ -91,6 +91,8 @@ if (!defined("_NUMERIC_PACKAGE"))
     define("_NUMERIC_PACKAGE","Numeric package");
 if (!defined("_COMMUNICATION_MODE"))
     define("_COMMUNICATION_MODE","Communication mode");
+if (!defined("_NO_COMMUNICATION_MODE"))
+    define("_NO_COMMUNICATION_MODE","No communication mode");
 if (!defined("_NOTHING"))
     define("_NOTHING","Aucun");
 if (!defined("_CREATE_EMAIL"))

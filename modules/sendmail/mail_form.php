@@ -243,9 +243,11 @@ if ($mode == 'add') {
         } else {
             $contact_id = $dest_contact_id;
         }
-        $communicationType = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
-        if(empty($communicationType)){
-            $communicationType = _NOTHING;
+        $communicationTypeModel = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
+        if(empty($communicationTypeModel)){
+            $communicationType = '<span style="color:red">'._NOTHING.'</span>';
+        } else {
+            $communicationType = $communicationTypeModel;
         }
         $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">' . _COMMUNICATION_MODE . ' : '.$communicationType.'</td></tr>';
     }
@@ -530,15 +532,19 @@ if ($mode == 'add') {
     //Buttons
     $content .='<hr style="margin-top:2px;" />';
     $content .='<div align="center">';
-    //Send
-    $content .=' <input type="button" name="valid" value="&nbsp;'._SEND_EMAIL
-                .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
-                .$path_to_script.'&mode=added&for=send\', \'formEmail\');" />&nbsp;';
+    if((!empty($communicationTypeModel) && $formContent == 'messageExchange') || $formContent != 'messageExchange'){
+        //Send
+        $content .=' <input type="button" name="valid" value="&nbsp;'._SEND_EMAIL
+                    .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
+                    .$path_to_script.'&mode=added&for=send\', \'formEmail\');" />&nbsp;';
+    } else {
+        $content .= _NO_COMMUNICATION_MODE . " ";
+    }
     if($formContent != 'messageExchange'){
-    //Save
-    $content .=' <input type="button" name="valid" value="&nbsp;'._SAVE_EMAIL
-                .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
-                .$path_to_script.'&mode=added&for=save\', \'formEmail\');" />&nbsp;';
+        //Save
+        $content .=' <input type="button" name="valid" value="&nbsp;'._SAVE_EMAIL
+                    .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
+                    .$path_to_script.'&mode=added&for=save\', \'formEmail\');" />&nbsp;';
     }
     //Cancel
     $content .='<input type="button" name="cancel" id="cancel" class="button" value="'
