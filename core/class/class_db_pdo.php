@@ -410,8 +410,9 @@ class Database extends functions
                     break;
                     
                 case 'ORACLE' : 
-                    if($where_def) $where_def .= ' AND ';
-                    $where_def .= ' ROWNUM <= ' . $count;
+                    //if($where_def) $where_def .= ' AND ';
+                    //$where_def .= ' ROWNUM <= ' . $count;
+                    $limit_clause = ' ROWNUM <= ' . $count;
                     break;
                     
                 default : 
@@ -440,18 +441,15 @@ class Database extends functions
                 ' ' . $other_clauses .
                 ' ' . $limit_clause .
                 ' ' . $order_by;*/
-            if ($other_clauses <> '') {
-                $other_clauses = ' WHERE ' . $other_clauses;
-            }
             $query = 'SELECT * FROM (SELECT' . 
                 ' ' . $select_opts . 
                 ' ' . $select_expr . 
                 ' FROM ' . $table_refs .
-                ' ' .
+                ' WHERE ' . $where_def .
                 ' ' . $other_clauses .
-                ' ' . $limit_clause .
+                // ' ' . $limit_clause .
                 ' ' . $order_by .
-                ') WHERE ' . $where_def;
+                ') WHERE ' . $limit_clause;
         } else {
             $query = 'SELECT' . 
                 ' ' . $select_opts . 
