@@ -487,7 +487,7 @@ class core_tools extends functions
         for ($i=0;$i<count($menu);$i++) {
 
             if($menu[$i]['show'] == true) {
-                if ($menu[$i]['id'] == 'admin') {
+                if ($menu[$i]['id'] == 'adminNEW') {
                     if (PROD_MODE) {
                         echo '<li onmouseover="this.className=\'on\';" onmouseout="this.className=\'\';"><a onClick="triggerAngular(true, \'#/administration\')" style="cursor: pointer"><span><span style="width:30px;height:30px;display:inline-block;text-align:center;">';
                     } else {
@@ -685,7 +685,7 @@ class core_tools extends functions
         echo '<div style="width: 85%;margin: auto;">';
         for ($i=0;$i<count($arrTmpQuicklaunch);$i++) {
             if ($arrTmpQuicklaunch[$i]['show'] == true) {
-                if ($arrTmpQuicklaunch[$i]['id'] == 'admin') {
+                if ($arrTmpQuicklaunch[$i]['id'] == 'adminNEW') {
                     if (PROD_MODE) {
                         echo '<a onClick="triggerAngular(true, \'#/administration\')" style="display: inline-block;width: 45%;float:left;cursor: pointer">';
                     } else {
