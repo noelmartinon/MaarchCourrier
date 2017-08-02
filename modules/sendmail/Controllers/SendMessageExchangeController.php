@@ -217,11 +217,11 @@ class SendMessageExchangeController
             $binaryDataObject                      = new stdClass();
             $binaryDataObject->$binaryDataObjectId = new stdClass();
 
-            $binaryDataObject->$binaryDataObjectId->messageDigest            = new stdClass();
-            $binaryDataObject->$binaryDataObjectId->messageDigest->value     = $value['fingerprint'];
-            $binaryDataObject->$binaryDataObjectId->messageDigest->algorithm = "sha256";
+            $binaryDataObject->$binaryDataObjectId->MessageDigest            = new stdClass();
+            $binaryDataObject->$binaryDataObjectId->MessageDigest->value     = $value['fingerprint'];
+            $binaryDataObject->$binaryDataObjectId->MessageDigest->algorithm = "sha256";
 
-            $binaryDataObject->$binaryDataObjectId->size                     = $value['filesize'];
+            $binaryDataObject->$binaryDataObjectId->Size                     = $value['filesize'];
 
             $uri = str_replace("##", DIRECTORY_SEPARATOR, $value['path']);
             $uri = str_replace("#", DIRECTORY_SEPARATOR, $uri);
