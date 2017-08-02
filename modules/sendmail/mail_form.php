@@ -243,7 +243,9 @@ if ($mode == 'add') {
         } else {
             $contact_id = $dest_contact_id;
         }
-        $communicationTypeModel = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
+        if(!empty($contact_id)){
+            $communicationTypeModel = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
+        }
         if(empty($communicationTypeModel)){
             $communicationType = '<span style="color:red">'._NOTHING.'</span>';
         } else {
