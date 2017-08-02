@@ -148,6 +148,7 @@ if (!defined("_EMAIL")) define("_EMAIL", "Email");
 if (!defined("_DOCTYPE"))    define("_DOCTYPE", "Document type");
 if (!defined("_DOCTYPES_MAIL"))    define("_DOCTYPES_MAIL", "Mail type");
 if (!defined("_TYPE"))    define("_TYPE", "Type");
+if (!defined("_URL"))    define("_URL", "URL");
 if (!defined("_WARNING_MESSAGE_DEL_TYPE"))
     define("_WARNING_MESSAGE_DEL_TYPE", "Warning :<br> The deletion of a document type leads to documents reallocation to a new type.");
 if (!defined("_WARNING_MESSAGE_DEL_GROUP"))
@@ -914,6 +915,10 @@ if (!defined("_CONTACT_MODIFIED")) define("_CONTACT_MODIFIED", "Modified contact
 if (!defined("_CONTACT_DELETED")) define("_CONTACT_DELETED", "Deleted contact");
 if (!defined("_MODIFY_CONTACT")) define("_MODIFY_CONTACT", "Modify a contact");
 if (!defined("_IS_CORPORATE_PERSON")) define("_IS_CORPORATE_PERSON", "Corporate body");
+if (!defined("_IS_INTERNAL_CONTACT")) define("_IS_INTERNAL_CONTACT","Internal contact");
+if (!defined("_IS_EXTERNAL_CONTACT")) define("_IS_EXTERNAL_CONTACT","External contact");
+if (!defined("_SEARCH_DIRECTORY")) define("_SEARCH_DIRECTORY","Directory search");
+if (!defined("_EXTERNAL_CONTACT_ID")) define("_EXTERNAL_CONTACT_ID","External contact ID");
 if (!defined("_INDIVIDUAL")) define("_INDIVIDUAL", "Private individual");
 if (!defined("_CONTACT_TARGET")) define("_CONTACT_TARGET", "For what contact is that possible to use this type?");
 if (!defined("_CONTACT_TARGET_LIST")) define("_CONTACT_TARGET_LIST", "Target of the contact type");
@@ -1095,6 +1100,14 @@ if (!defined("_CHOOSE_A_CONTACT")) define("_CHOOSE_A_CONTACT","Choose a contact"
 
 if (!defined("_CREATE_CONTACTS")) define("_CREATE_CONTACTS","All the contacts");
 if (!defined("_LINKED_CONTACT")) define("_LINKED_CONTACT","Linked to a contact");
+
+if (!defined("_COMMUNICATION_TYPE")) define("_COMMUNICATION_TYPE","Communication type");
+if (!defined("_COMMUNICATION_VALUE")) define("_COMMUNICATION_VALUE","Value");
+if (!defined("_COMMUNICATION_ADDED")) define("_COMMUNICATION_ADDED","Communication added");
+if (!defined("_COMMUNICATION_MODIFIED")) define("_COMMUNICATION_MODIFIED","Communication modified");
+if (!defined("_COMMUNICATION_DELETED")) define("_COMMUNICATION_DELETED","Communication deleted");
+if (!defined("_CHOOSE_COMMUNICATION_TYPES")) define("_CHOOSE_COMMUNICATION_TYPES","Choose communication types");
+if (!defined("_CONTACT_COMMUNICATION_DEFINE")) define("_CONTACT_COMMUNICATION_DEFINE","Communication define");
 
 //// INDEXING SEARCHING
 if (!defined("_NO_COLLECTION_ACCESS_FOR_THIS_USER")) define("_NO_COLLECTION_ACCESS_FOR_THIS_USER", "No access to the documentary collections for this user");

@@ -1782,6 +1782,28 @@ function unlock(path_script, id, coll)
         });
     }
 }
+function checkCommunication(contactId){
+    if (!contactId) {
+        Element.setStyle($('type_contact_communication_icon'), {visibility : 'hidden'});
+        return false;
+    }
+
+    $j.ajax({
+        url      : '../../rest/contact/checkCommunication',
+        type     : 'get',
+        data: {
+            contactId  : contactId
+        },
+        success: function(answer) {
+            if(answer[0]) {
+                Element.setStyle($('type_contact_communication_icon'), {visibility : 'visible'});
+            } else {
+                Element.setStyle($('type_contact_communication_icon'), {visibility : 'hidden'});
+            }
+
+        }
+    });
+}
 
 function setContactType(mode, creation){
     new Ajax.Request("index.php?dir=my_contacts&page=setContactType",
@@ -1863,6 +1885,40 @@ function show_admin_contacts( is_corporate, display)
         if(society_mandatory)
         {
             society_mandatory.style.display = 'none';
+        }
+    }
+}
+
+/**
+* Show or hide the data related to a person in the external contacts admin
+*
+* @param is_external Bool True the contact is external contact
+**/
+function show_admin_external_contact( is_external, display)
+{
+    var display_value = display || 'inline';
+    var searchDirectory = $("search_directory");
+    var externalContactLabel = $("external_contact_id");
+    if(is_external === false)
+    {
+        if(searchDirectory)
+        {
+            searchDirectory.style.display = "none";
+        }
+        if(externalContactLabel)
+        {
+            externalContactLabel.style.display = "none";
+        }
+    }
+    else
+    {
+        if(searchDirectory)
+        {
+            searchDirectory.style.display = display_value;
+        }
+        if(externalContactLabel)
+        {
+            externalContactLabel.style.display = display_value;
         }
     }
 }

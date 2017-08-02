@@ -611,9 +611,10 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
     $frmStr .=' <i class="fa fa-user" title="'._SINGLE_CONTACT.'" style="cursor:pointer;color:#009DC5;" id="type_contact_external_icon" onclick="$$(\'#type_contact_external\')[0].click();$(\'type_contact_internal_icon\').setStyle({color: \'#666\'});$(\'type_contact_external_icon\').setStyle({color: \'#009DC5\'});$(\'type_multi_contact_external_icon\').setStyle({color: \'#666\'});"></i>';
 
     $frmStr .=' <i class="fa fa-users" title="'._MULTI_CONTACT.'" style="cursor:pointer;" id="type_multi_contact_external_icon" onclick="$$(\'#type_multi_contact_external\')[0].click();$(\'type_contact_internal_icon\').setStyle({color: \'#666\'});$(\'type_contact_external_icon\').setStyle({color: \'#666\'});$(\'type_multi_contact_external_icon\').setStyle({color: \'#009DC5\'});"></i>';
+    $frmStr .=' <i class="fa fa-tty" title="'. _CONTACT_COMMUNICATION_DEFINE. '"style="visibility:hidden;display:inline;"" id="type_contact_communication_icon"></i>';
     $frmStr .=' <span style="position:relative;"><input type="text" name="contact" onkeyup="erase_contact_external_id(\'contact\', \'contactid\');erase_contact_external_id(\'contact\', \'addressid\');"'
-            . 'id="contact" onblur="clear_error(\'frm_error_' . $actionId . '\');'
-            . 'display_contact_card(\'visible\');if(document.getElementById(\'type_contact_external\').checked == true){check_date_exp(\''.$path_to_script.'\', \''.$path_check_date_link.'\');}" /><div id="show_contacts" '
+        . 'id="contact" onblur="clear_error(\'frm_error_' . $actionId . '\');'
+        . 'display_contact_card(\'visible\');checkCommunication(document.getElementById(\'contactid\').value);if(document.getElementById(\'type_contact_external\').checked == true){check_date_exp(\''.$path_to_script.'\', \''.$path_check_date_link.'\');}" /><div id="show_contacts" '
             . 'class="autocomplete autocompleteIndex" style="width:100%;left:0px;top:17px;"></div><div class="autocomplete autocompleteIndex" id="searching_autocomplete" style="display: none;text-align:left;padding:5px;left:0px;width:100%;top:17px;"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> chargement ...</div></span></td>';
     $frmStr .= '<td><span class="red_asterisk" id="contact_mandatory" '
             . 'style="display:inline;"><i class="fa fa-star"></i></span>&nbsp;</td>';

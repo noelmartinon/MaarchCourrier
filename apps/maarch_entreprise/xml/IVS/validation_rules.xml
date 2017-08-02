@@ -349,12 +349,16 @@
       <parameter name="firstname" type="string" />
       <parameter name="function" type="string" />
       <parameter name="is_corporate" type="YN" />
+      <parameter name="is_external" type="YN" />
+      <parameter name="external_contact_id" type="string" />
       <parameter name="lastname" type="personname" />
       <parameter name="society" type="string" />
       <parameter name="society_short" type="string" />
       <parameter name="title" type="string" />
       <parameter name="dir" type="identifier" />
       <parameter name="mycontact" type="identifier" />
+      <parameter name="communication_type" type="string" />
+      <parameter name="communication_value" type="string" />
     </validationRule>
 
     <validationRule name="contactConfirm" extends="standardForm" mode="error">
