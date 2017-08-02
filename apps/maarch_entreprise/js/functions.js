@@ -1783,7 +1783,7 @@ function unlock(path_script, id, coll)
     }
 }
 function checkCommunication(contactId){
-    if (!contactId || !NUMBER.isInteger(contactId)) {
+    if (!contactId || !Number.isInteger(parseInt(contactId))) {
         Element.setStyle($('type_contact_communication_icon'), {visibility : 'hidden'});
         return false;
     }
