@@ -39,12 +39,12 @@ class ReadMessageExchangeController
         $ArchivalAgency                 = $messageExchangeData->ArchivalAgency;
         $ArchivalAgencyMetaData         = $ArchivalAgency->OrganizationDescriptiveMetadata;
         $aDataForm['communicationType'] = $ArchivalAgencyMetaData->Communication[0]->value . ' (' . $ArchivalAgencyMetaData->Communication[0]->Channel . ')';
-        $aDataForm['contactInfo']       = $ArchivalAgencyMetaData->Name . ' - <b>' . $ArchivalAgency->Identifier . '</b> - ' . $ArchivalAgencyMetaData->Contact[0]->PersonName;
+        $aDataForm['contactInfo']       = $ArchivalAgencyMetaData->Name . ' - <b>' . $ArchivalAgency->Identifier->value . '</b> - ' . $ArchivalAgencyMetaData->Contact[0]->PersonName;
 
         $addressInfo = $ArchivalAgencyMetaData->Contact[0]->Address[0]->PostOfficeBox . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->StreetName . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->Postcode . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->CityName . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->Country;
 
         $aDataForm['contactInfo'] .= ', ' . $addressInfo;
-        $aDataForm['body']        = $messageExchangeData->Comment[0];
+        $aDataForm['body']        = $messageExchangeData->Comment[0]->value;
         $aDataForm['isHtml']      = 'N';
         $aDataForm['object']      = $messageExchangeData->DataObjectPackage->DescriptiveMetadata->mail_1->Content->Title[0];
 

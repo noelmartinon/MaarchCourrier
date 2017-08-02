@@ -116,9 +116,11 @@ class SendMessageExchangeController
             $aMergeAttachment = array_merge($firstAttachment, $fileInfo, $aAllAttachment);
         }
 
+        $oComment = new stdClass();
+        $oComment->value = $aArgs['body_from_raw'];
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
         $dataObject = self::generateMessageObject([
-            'Comment' => [$aArgs['body_from_raw']],
+            'Comment' => [$oComment],
             'ArchivalAgency' => [
                 'CommunicationType'   => $ArchivalAgencyCommunicationType,
                 'ContactInformations' => $ArchivalAgencyContactInformations[0]
@@ -175,12 +177,14 @@ class SendMessageExchangeController
 
     public static function generateMessageObject($aArgs = [])
     {
-        $date        = new DateTime;
+        $date = new DateTime;
 
-        $messageObject                    = new stdClass();
-        $messageObject->Comment           = $aArgs['Comment'];
-        $messageObject->Date              = $date->format(DateTime::ATOM);
-        $messageObject->MessageIdentifier = 'ArchiveTransfer_'.date("Ymd_His").'_'.$_SESSION['user']['UserId'];
+        $messageObject          = new stdClass();
+        $messageObject->Comment = $aArgs['Comment'];
+        $messageObject->Date    = $date->format(DateTime::ATOM);
+
+        $messageObject->MessageIdentifier = new stdClass();
+        $messageObject->MessageIdentifier->value = 'ArchiveTransfer_'.date("Ymd_His").'_'.$_SESSION['user']['UserId'];
 
         /********* BINARY DATA OBJECT PACKAGE *********/
         $messageObject->DataObjectPackage                   = new stdClass();
@@ -302,8 +306,9 @@ class SendMessageExchangeController
 
     public static function getArchivalAgencyObject($aArgs = [])
     {
-        $archivalAgencyObject             = new stdClass();
-        $archivalAgencyObject->Identifier = $aArgs['ArchivalAgency']['ContactInformations']['external_contact_id'];
+        $archivalAgencyObject                    = new stdClass();
+        $archivalAgencyObject->Identifier        = new stdClass();
+        $archivalAgencyObject->Identifier->value = $aArgs['ArchivalAgency']['ContactInformations']['external_contact_id'];
 
         $archivalAgencyObject->OrganizationDescriptiveMetadata       = new stdClass();
         $archivalAgencyObject->OrganizationDescriptiveMetadata->Name = trim($aArgs['ArchivalAgency']['ContactInformations']['society'] . ' ' . $aArgs['ArchivalAgency']['ContactInformations']['contact_lastname'] . ' ' . $aArgs['ArchivalAgency']['ContactInformations']['contact_firstname']);
@@ -346,8 +351,9 @@ class SendMessageExchangeController
 
     public static function getTransferringAgencyObject($aArgs = [])
     {
-        $TransferringAgencyObject             = new stdClass();
-        $TransferringAgencyObject->Identifier = $aArgs['TransferringAgency']['EntitiesInformations']['business_id'];
+        $TransferringAgencyObject                    = new stdClass();
+        $TransferringAgencyObject->Identifier        = new stdClass();
+        $TransferringAgencyObject->Identifier->value = $aArgs['TransferringAgency']['EntitiesInformations']['business_id'];
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata                      = new stdClass();
 
@@ -390,15 +396,15 @@ class SendMessageExchangeController
         $oData->date                                  = $dataObject->Date;
 
         $oData->messageIdentifier                     = new stdClass();
-        $oData->messageIdentifier->value              = $dataObject->MessageIdentifier;
+        $oData->messageIdentifier->value              = $dataObject->MessageIdentifier->value;
         
         $oData->transferringAgency                    = new stdClass();
         $oData->transferringAgency->identifier        = new stdClass();
-        $oData->transferringAgency->identifier->value = $dataObject->TransferringAgency->Identifier;
+        $oData->transferringAgency->identifier->value = $dataObject->TransferringAgency->Identifier->value;
         
         $oData->archivalAgency                        = new stdClass();
         $oData->archivalAgency->identifier            = new stdClass();
-        $oData->archivalAgency->identifier->value     = $dataObject->ArchivalAgency->Identifier;
+        $oData->archivalAgency->identifier->value     = $dataObject->ArchivalAgency->Identifier->value;
         
         $oData->archivalAgreement                     = new stdClass();
         $oData->archivalAgreement->value              = ""; // TODO : ???
