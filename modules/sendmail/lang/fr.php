@@ -83,13 +83,13 @@ if (!defined("_EMAIL_NOT_EXIST"))
 if (!defined("_NEW_EMAIL"))
     define("_NEW_EMAIL","Nouveau message");
 if (!defined("_NEW_NUMERIC_PACKAGE"))
-    define("_NEW_NUMERIC_PACKAGE","Nouveau paquet numérique");
+    define("_NEW_NUMERIC_PACKAGE","Nouveau pli numérique");
 if (!defined("_NUMERIC_PACKAGE_ADDED"))
-    define("_NUMERIC_PACKAGE_ADDED","Paquet numérique ajouté");
+    define("_NUMERIC_PACKAGE_ADDED","Pli numérique ajouté");
 if (!defined("_NUMERIC_PACKAGE_SENT"))
-    define("_NUMERIC_PACKAGE_SENT","Paquets numériques envoyés");
+    define("_NUMERIC_PACKAGE_SENT","Plis numériques envoyés");
 if (!defined("_NUMERIC_PACKAGE"))
-    define("_NUMERIC_PACKAGE","Paquet numérique");
+    define("_NUMERIC_PACKAGE","Pli numérique");
 if (!defined("_COMMUNICATION_MODE"))
     define("_COMMUNICATION_MODE","Moyen de communication");
 if (!defined("_NO_COMMUNICATION_MODE"))

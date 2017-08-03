@@ -62,7 +62,7 @@ export class SaveNumericPackageComponent implements OnInit {
 
     updateBreadcrumb(applicationName: string) {
         if ($j('#ariane')[0]) {
-            $j('#ariane')[0].innerHTML = "<a href='index.php?reinit=true'>" + applicationName + "</a> > Enregistrer un packet numérique";
+            $j('#ariane')[0].innerHTML = "<a href='index.php?reinit=true'>" + applicationName + "</a> > Enregistrer un pli numérique";
         }
     }
 
@@ -125,7 +125,7 @@ export class SaveNumericPackageComponent implements OnInit {
                             extension               : "",
                         };
                         $j("#numericPackageFilePath").val(null);
-                        this.resultInfo = 'Paquet numérique correctement importé';
+                        this.resultInfo = 'Pli numérique correctement importé';
                         $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
                         $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
                             $j("#resultInfo").slideUp(500);
@@ -139,7 +139,7 @@ export class SaveNumericPackageComponent implements OnInit {
             this.numericPackage.base64      = "";
             this.numericPackage.extension   = "";
 
-            this.resultInfo = "Aucun paquet numérique séléctionné";
+            this.resultInfo = "Aucun pli numérique séléctionné";
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
             $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
                 $j("#resultInfo").slideUp(500);

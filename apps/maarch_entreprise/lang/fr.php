@@ -1991,4 +1991,4 @@ if (!defined('_UPDATE_DESC_END'))
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE'))
     define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucun tag de disponible pour une mise à jour');
 if (!defined('_SAVE_NUMERIC_PACKAGE'))
-    define('_SAVE_NUMERIC_PACKAGE', 'Enregistrer un packet numérique');
+    define('_SAVE_NUMERIC_PACKAGE', 'Enregistrer un pli numérique');
