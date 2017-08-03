@@ -411,7 +411,7 @@ class SendMessageExchangeController
         $oData->replyCode                             = new stdClass();
         $oData->replyCode->value                      = ""; // TODO : ???
 
-        // $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
+        $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
 
         $aDataExtension = [
             'status'            => 'W',
