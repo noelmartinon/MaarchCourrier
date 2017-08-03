@@ -46,7 +46,7 @@ class ReadMessageExchangeController
         $aDataForm['contactInfo'] .= ', ' . $addressInfo;
         $aDataForm['body']        = $messageExchangeData->Comment[0]->value;
         $aDataForm['isHtml']      = 'N';
-        $aDataForm['object']      = $messageExchangeData->DataObjectPackage->DescriptiveMetadata->ArchiveUnit->Content->Title[0];
+        $aDataForm['object']      = $messageExchangeData->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0];
 
         $aDataForm['attachments'] = [];
         $aDataForm['attachments_version'] = [];

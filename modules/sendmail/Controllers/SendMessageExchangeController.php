@@ -243,11 +243,13 @@ class SendMessageExchangeController
 
     public static function getDescriptiveMetaDataObject($aArgs = [])
     {
-        $DescriptiveMetadataObject                  = new stdClass();
-        $DescriptiveMetadataObject->ArchiveUnit     = new stdClass();
-        $DescriptiveMetadataObject->ArchiveUnit->id = 'mail_1';
+        $DescriptiveMetadataObject              = new stdClass();
+        $DescriptiveMetadataObject->ArchiveUnit = [];
 
-        $DescriptiveMetadataObject->ArchiveUnit->Content = self::getContent([
+        $documentArchiveUnit                    = new stdClass();
+        $documentArchiveUnit->id                = 'mail_1';
+
+        $documentArchiveUnit->Content = self::getContent([
             'DescriptionLevel'                       => 'File',
             'Title'                                  => $aArgs['res'][0]['Title'],
             'OriginatingSystemId'                    => $aArgs['res'][0]['res_id'],
@@ -258,7 +260,7 @@ class SendMessageExchangeController
             'CreatedDate'                            => $aArgs['res'][0]['creation_date'],
         ]);
 
-        $DescriptiveMetadataObject->ArchiveUnit->ArchiveUnit = [];
+        $documentArchiveUnit->ArchiveUnit = [];
         foreach ($aArgs['attachment'] as $key => $value) {
             $attachmentArchiveUnit     = new stdClass();
             $attachmentArchiveUnit->id = 'archiveUnit_'.$value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
@@ -276,8 +278,9 @@ class SendMessageExchangeController
             $dataObjectReference->DataObjectReferenceId = $value['tablenameExchangeMessage'].'_'.$key.'_'.$value['res_id'];
             $attachmentArchiveUnit->DataObjectReference = [$dataObjectReference];
 
-            array_push($DescriptiveMetadataObject->ArchiveUnit->ArchiveUnit, $attachmentArchiveUnit);
+            array_push($documentArchiveUnit->ArchiveUnit, $attachmentArchiveUnit);
         }
+        array_push($DescriptiveMetadataObject->ArchiveUnit, $documentArchiveUnit);
 
         return $DescriptiveMetadataObject;
     }
