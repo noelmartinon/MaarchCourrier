@@ -214,26 +214,26 @@ class SendMessageExchangeController
                 $binaryDataObjectId = $value['res_id'];
             }
 
-            $binaryDataObject                      = new stdClass();
-            $binaryDataObject->$binaryDataObjectId = new stdClass();
+            $binaryDataObject                           = new stdClass();
+            $binaryDataObject->id                       = $binaryDataObjectId;
 
-            $binaryDataObject->$binaryDataObjectId->MessageDigest            = new stdClass();
-            $binaryDataObject->$binaryDataObjectId->MessageDigest->value     = $value['fingerprint'];
-            $binaryDataObject->$binaryDataObjectId->MessageDigest->algorithm = "sha256";
+            $binaryDataObject->MessageDigest            = new stdClass();
+            $binaryDataObject->MessageDigest->value     = $value['fingerprint'];
+            $binaryDataObject->MessageDigest->algorithm = "sha256";
 
-            $binaryDataObject->$binaryDataObjectId->Size                     = $value['filesize'];
+            $binaryDataObject->Size                     = $value['filesize'];
 
             $uri = str_replace("##", DIRECTORY_SEPARATOR, $value['path']);
             $uri = str_replace("#", DIRECTORY_SEPARATOR, $uri);
             
             $docServers = $RequestSeda->getDocServer($value['docserver_id']);
-            $binaryDataObject->$binaryDataObjectId->Attachment           = new stdClass();
-            $binaryDataObject->$binaryDataObjectId->Attachment->uri      = '';
-            $binaryDataObject->$binaryDataObjectId->Attachment->filename = basename($value['filename']);
-            $binaryDataObject->$binaryDataObjectId->Attachment->value    = base64_encode(file_get_contents($docServers->path_template . $uri . '/'. $value['filename']));
+            $binaryDataObject->Attachment           = new stdClass();
+            $binaryDataObject->Attachment->uri      = '';
+            $binaryDataObject->Attachment->filename = basename($value['filename']);
+            $binaryDataObject->Attachment->value    = base64_encode(file_get_contents($docServers->path_template . $uri . '/'. $value['filename']));
 
-            $binaryDataObject->$binaryDataObjectId->FormatIdentification           = new stdClass();
-            $binaryDataObject->$binaryDataObjectId->FormatIdentification->MimeType = mime_content_type($docServers->path_template . $uri . $value['filename']);
+            $binaryDataObject->FormatIdentification           = new stdClass();
+            $binaryDataObject->FormatIdentification->MimeType = mime_content_type($docServers->path_template . $uri . $value['filename']);
 
             array_push($aReturn, $binaryDataObject);
         }
@@ -243,11 +243,11 @@ class SendMessageExchangeController
 
     public static function getDescriptiveMetaDataObject($aArgs = [])
     {
-        $DescriptiveMetadataObject = new stdClass();
+        $DescriptiveMetadataObject                  = new stdClass();
+        $DescriptiveMetadataObject->ArchiveUnit     = new stdClass();
+        $DescriptiveMetadataObject->ArchiveUnit->id = 'mail_1';
 
-        $DescriptiveMetadataArchiveUnitId = 'mail_1';
-        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId          = new stdClass();
-        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->Content = self::getContent([
+        $DescriptiveMetadataObject->ArchiveUnit->Content = self::getContent([
             'DescriptionLevel'                       => 'File',
             'Title'                                  => $aArgs['res'][0]['Title'],
             'OriginatingSystemId'                    => $aArgs['res'][0]['res_id'],
@@ -258,12 +258,11 @@ class SendMessageExchangeController
             'CreatedDate'                            => $aArgs['res'][0]['creation_date'],
         ]);
 
-        $DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->ArchiveUnit = [];
+        $DescriptiveMetadataObject->ArchiveUnit->ArchiveUnit = [];
         foreach ($aArgs['attachment'] as $key => $value) {
-            $attachmentArchiveUnit = new stdClass();
-            $DescriptiveMetadataArchiveUnitIdAttachment = 'archiveUnit_'.$value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
-            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment          = new stdClass();
-            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->Content = self::getContent([
+            $attachmentArchiveUnit     = new stdClass();
+            $attachmentArchiveUnit->id = 'archiveUnit_'.$value['tablenameExchangeMessage'] . "_" . $key . "_" . $value['res_id'];
+            $attachmentArchiveUnit->Content = self::getContent([
                 'DescriptionLevel'                       => 'Item',
                 'Title'                                  => $value['Title'],
                 'OriginatingSystemId'                    => $value['res_id'],
@@ -275,9 +274,9 @@ class SendMessageExchangeController
             ]);
             $dataObjectReference                        = new stdClass();
             $dataObjectReference->DataObjectReferenceId = $value['tablenameExchangeMessage'].'_'.$key.'_'.$value['res_id'];
-            $attachmentArchiveUnit->$DescriptiveMetadataArchiveUnitIdAttachment->DataObjectReference = [$dataObjectReference];
+            $attachmentArchiveUnit->DataObjectReference = [$dataObjectReference];
 
-            array_push($DescriptiveMetadataObject->$DescriptiveMetadataArchiveUnitId->ArchiveUnit, $attachmentArchiveUnit);
+            array_push($DescriptiveMetadataObject->ArchiveUnit->ArchiveUnit, $attachmentArchiveUnit);
         }
 
         return $DescriptiveMetadataObject;
@@ -412,7 +411,7 @@ class SendMessageExchangeController
         $oData->replyCode                             = new stdClass();
         $oData->replyCode->value                      = ""; // TODO : ???
 
-        $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
+        // $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
 
         $aDataExtension = [
             'status'            => 'W',
@@ -448,12 +447,9 @@ class SendMessageExchangeController
     {
         $dataObject = $aArgs['dataObject'];
         $aCleanDataObject = [];
-        foreach ($dataObject->DataObjectPackage->BinaryDataObject as $key => $BinaryDataObjectValue) {
-            foreach ($BinaryDataObjectValue as $dataObjectId => $value) {
-                $value->Attachment->value = "";
-                $BinaryDataObjectValue->$dataObjectId = $value;
-            }
-            $aCleanDataObject[$key] = $BinaryDataObjectValue;
+        foreach ($dataObject->DataObjectPackage->BinaryDataObject as $key => $value) {
+            $value->Attachment->value = "";
+            $aCleanDataObject[$key] = $value;
         }
         $dataObject->DataObjectPackage->BinaryDataObject = $aCleanDataObject;
         return $dataObject;
