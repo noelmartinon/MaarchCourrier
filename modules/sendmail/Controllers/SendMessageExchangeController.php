@@ -16,6 +16,7 @@
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'apps/maarch_entreprise/Models/ResModel.php';
 require_once 'modules/export_seda/RequestSeda.php';
+require_once 'modules/export_seda/Controllers/SendMessage.php';
 require_once "core/class/class_request.php";
 require_once "core/class/class_history.php";
 
@@ -133,8 +134,12 @@ class SendMessageExchangeController
             'mainExchangeDocument'  => $MainExchangeDoc
         ]);
 
+        /*/******** GENERATION DU BORDEREAU */
+        $sendMessage = new SendMessage();
+        $filePath = $sendMessage->generateMessageFile($dataObject, "ArchiveTransfer");
+
         /******** SAVE MESSAGE *********/
-        $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier']]);
+        $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier'], 'file_path' => $filePath]);
         self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'messageId' => $messageId]);
 
         $hist    = new history();
@@ -149,9 +154,10 @@ class SendMessageExchangeController
             $_SESSION['config']['databasetype'], 'sendmail'
         );
 
-        /******** GENERATION DU BORDEREAU + ENVOI
+        /******** ENVOI
 
         /*********** TODO : ALEX MORIN *********/
+        //$sendMessage->send($dataObject);
 
         return true;
     }
@@ -422,6 +428,7 @@ class SendMessageExchangeController
             'resIdMaster'       => $aArgs['res_id_master'],
             'SenderOrgNAme'     => $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact[0]->DepartmentName,
             'RecipientOrgNAme'  => $dataObject->ArchivalAgency->OrganizationDescriptiveMetadata->Name,
+            'filePath'         => $aArgs['file_path'],
         ];
 
         $messageId = $RequestSeda->insertMessage($oData, 'ArchiveTransfer', $aDataExtension);
