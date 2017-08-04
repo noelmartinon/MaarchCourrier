@@ -116,7 +116,7 @@ class SendMessageExchangeController
                         $aOutgoingMailInfo['tablenameExchangeMessage']               = $AllInfoMainMail['tablenameExchangeMessage'];
                         $mainDocument = [$aOutgoingMailInfo];
                     } else {
-                        $mainDocument = $aAllAttachment[$key];
+                        $mainDocument = [$aAllAttachment[$key]];
                     }
                     $firstAttachment = [$aAllAttachment[$key]];
                     unset($aAllAttachment[$key]);
@@ -196,24 +196,26 @@ class SendMessageExchangeController
         $oBody->value = $headerNote . ' ' . $aArgs['body'];
         array_push($aReturn, $oBody);
 
-        $noteModel = new \NotesModel();
-        $notes     = $noteModel->getByResId([
-            'select' => ['notes.id', 'notes.user_id', 'notes.date_note', 'notes.note_text', 'users.firstname', 'users.lastname', 'users_entities.entity_id'], 
-            'resId' => $aArgs['resId']
-        ]);
+        if(!empty($aArgs['notes'])){
+            $noteModel = new \NotesModel();
+            $notes     = $noteModel->getByResId([
+                'select' => ['notes.id', 'notes.user_id', 'notes.date_note', 'notes.note_text', 'users.firstname', 'users.lastname', 'users_entities.entity_id'], 
+                'resId' => $aArgs['resId']
+            ]);
 
-        if(!empty($notes)){
-            foreach ($notes as $key => $value) {
-                if(!in_array($value['id'], $aArgs['notes'])){
-                    continue;
+            if(!empty($notes)){
+                foreach ($notes as $value) {
+                    if(!in_array($value['id'], $aArgs['notes'])){
+                        continue;
+                    }
+
+                    $oComment        = new stdClass();
+                    $date            = new DateTime($value['date_note']);
+                    $entityRoot      = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $value['entity_id']]);
+                    $userEntity      = \Entities\Models\EntitiesModel::getById(['entityId' => $value['entity_id']]);
+                    $oComment->value = $value['firstname'].' '.$value['lastname'].' - '.$date->format('d-m-Y H:i:s').' ('.$entityRoot[0]['entity_label'].' - '.$userEntity['entity_label'].') : '.$value['note_text'];
+                    array_push($aReturn, $oComment);
                 }
-
-                $oComment        = new stdClass();
-                $date            = new DateTime($value['date_note']);
-                $entityRoot      = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $value['entity_id']]);
-                $userEntity      = \Entities\Models\EntitiesModel::getById(['entityId' => $value['entity_id']]);
-                $oComment->value = $value['firstname'].' '.$value['lastname'].' - '.$date->format('d-m-Y H:i:s').' ('.$entityRoot[0]['entity_label'].' - '.$userEntity['entity_label'].') : '.$value['note_text'];
-                array_push($aReturn, $oComment);
             }
         }
         return $aReturn;
