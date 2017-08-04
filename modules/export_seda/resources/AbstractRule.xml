@@ -1,4 +1,4 @@
-<?merge $abstractRule.rule.bool() ?><Rule><?merge $abstractRule.rule.value ?></Rule>
-<?merge $abstractRule.startDate.bool() ?><StartDate><?merge $abstractRule.startDate.value ?></StartDate>
-<PreventInheritance><?merge $abstractRule.preventInheritance ?></PreventInheritance>
-<RefNonRuleId><?merge $abstractRule.refNonRuleId ?></RefNonRuleId>
+<?merge $abstractRule.Rule.bool() ?><Rule><?merge $abstractRule.Rule.value ?></Rule>
+<?merge $abstractRule.StartDate.bool() ?><StartDate><?merge $abstractRule.StartDate.value ?></StartDate>
+<PreventInheritance><?merge $abstractRule.PreventInheritance ?></PreventInheritance>
+<RefNonRuleId><?merge $abstractRule.RefNonRuleId ?></RefNonRuleId>

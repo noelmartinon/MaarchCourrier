@@ -1,138 +1,138 @@
 <?merge $archiveUnit ?>
 <ArchiveUnit id="arch_[?merge .id ?]">
-    <ArchiveUnitRefId><?merge .archiveUnitRefId ?></ArchiveUnitRefId>
-    <ArchiveUnitProfile schemeID="[?merge .archiveUnitProfile.schemeID ?]" schemeName="[?merge .archiveUnitProfile.schemeName ?]" schemeAgencyID="[?merge .archiveUnitProfile.schemeAgencyID ?]" schemeAgencyName="[?merge .archiveUnitProfile.schemeAgencyName ?]" schemeVersionID="[?merge .archiveUnitProfile.schemeVersionID ?]" schemeDataURI="[?merge .archiveUnitProfile.schemeDataURI ?]" schemeURI="[?merge .archiveUnitProfile.schemeURI ?]"><?merge .archiveUnitProfile ?></ArchiveUnitProfile>
-    <?merge .management.bool() ?>
+    <ArchiveUnitRefId><?merge .ArchiveUnitRefId ?></ArchiveUnitRefId>
+    <ArchiveUnitProfile schemeID="[?merge .ArchiveUnitProfile.schemeID ?]" schemeName="[?merge .ArchiveUnitProfile.schemeName ?]" schemeAgencyID="[?merge .ArchiveUnitProfile.schemeAgencyID ?]" schemeAgencyName="[?merge .ArchiveUnitProfile.schemeAgencyName ?]" schemeVersionID="[?merge .ArchiveUnitProfile.schemeVersionID ?]" schemeDataURI="[?merge .ArchiveUnitProfile.schemeDataURI ?]" schemeURI="[?merge .ArchiveUnitProfile.schemeURI ?]"><?merge .ArchiveUnitProfile ?></ArchiveUnitProfile>
+    <?merge .Management.bool() ?>
     <Management>
-        <?merge .management.storageRule.bool() ?>
+        <?merge .Management.StorageRule.bool() ?>
         <StorageRule>
-            <?merge .management.storageRule $abstractRule ?>
+            <?merge .management.StorageRule $abstractRule ?>
             <?xinclude /resources/AbstractRule.xml ?>
-            <FinalAction><?merge .management.storageRule.finalAction ?></FinalAction>
+            <FinalAction><?merge .Management.StorageRule.FinalAction ?></FinalAction>
         </StorageRule>
-        <?merge .management.appraisalRule.bool() ?>
+        <?merge .Management.AppraisalRule.bool() ?>
         <AppraisalRule>
-            <?merge .management.appraisalRule $abstractRule ?>
+            <?merge .Management.AppraisalRule $abstractRule ?>
             <?xinclude /resources/AbstractRule.xml ?>
-            <FinalAction><?merge .management.appraisalRule.finalAction ?></FinalAction>
+            <FinalAction><?merge .Management.AppraisalRule.finalAction ?></FinalAction>
         </AppraisalRule>
-        <?merge .management.accessRule.bool() ?>
+        <?merge .Management.AccessRule.bool() ?>
         <AccessRule>
-            <?merge .management.accessRule $abstractRule ?>
+            <?merge .Management.AccessRule $abstractRule ?>
             <?xinclude /resources/AbstractRule.xml ?>
         </AccessRule>
-        <?merge .management.disseminationRule.bool() ?>
+        <?merge .Management.DisseminationRule.bool() ?>
         <DisseminationRule>
-            <?merge .management.disseminationRule $abstractRule ?>
+            <?merge .Management.DisseminationRule $abstractRule ?>
             <?xinclude /resources/AbstractRule.xml ?>
         </DisseminationRule>
-        <?merge .management.reuseRule.bool() ?>
+        <?merge .Management.ReuseRule.bool() ?>
         <ReuseRule>
-            <?merge .management.reuseRule $abstractRule ?>
+            <?merge .Management.ReuseRule $abstractRule ?>
             <?xinclude /resources/AbstractRule.xml ?>
         </ReuseRule>
-        <?merge .management.classificationRule.bool() ?>
+        <?merge .Management.ClassificationRule.bool() ?>
         <ClassificationRule>
-            <?merge .management.classificationRule $abstractRule ?>
+            <?merge .Management.ClassificationRule $abstractRule ?>
             <?xinclude /resources/AbstractRule.xml ?>
-            <ClassificationLevel><?merge .management.classificationRule.classificationLevel ?></ClassificationLevel>
-            <ClassificationOwner><?merge .management.classificationRule.classificationOwner ?></ClassificationOwner>
-            <ClassificationReassessingDate><?merge .management.classificationRule.classificationReassessingDate ?></ClassificationReassessingDate>
-            <NeedReassessingAuthorization><?merge .management.classificationRule.needReassessingAuthorization ?></NeedReassessingAuthorization>
+            <ClassificationLevel><?merge .Management.ClassificationRule.ClassificationLevel ?></ClassificationLevel>
+            <ClassificationOwner><?merge .Management.ClassificationRule.ClassificationOwner ?></ClassificationOwner>
+            <ClassificationReassessingDate><?merge .Management.ClassificationRule.ClassificationReassessingDate ?></ClassificationReassessingDate>
+            <NeedReassessingAuthorization><?merge .Management.ClassificationRule.NeedReassessingAuthorization ?></NeedReassessingAuthorization>
         </ClassificationRule>
-        <?merge .management.needAuthorization.bool() ?>
+        <?merge .Management.NeedAuthorization.bool() ?>
         <NeedAuthorization>
-            <?merge .management.needAuthorization ?>
+            <?merge .Management.NeedAuthorization ?>
         </NeedAuthorization>
-        <?merge .management.otherManagementAbstract.bool() ?>
+        <?merge .Management.OtherManagementAbstract.bool() ?>
         <OtherManagementAbstract>
-            <?merge .management.otherManagementAbstract ?>
+            <?merge .Management.OtherManagementAbstract ?>
         </OtherManagementAbstract>
     </Management>
-    <?merge .content.bool() ?>
+    <?merge .Content.bool() ?>
     <Content>
-        <DescriptionLevel listVersionID="[?merge .descriptionLevel ?]"><?merge .content.descriptionLevel ?></DescriptionLevel>
-        <?merge .content.title ?><Title><?merge . ?></Title>
-        <?merge .content.filePlanPosition ?><FilePlanPosition schemeID="[?merge .schemeID @schemeID ?]" schemeName="[?merge .schemeName @schemeName ?]" schemeAgencyID="[?merge .schemeAgencyID @schemeAgencyID ?]" schemeAgencyName="[?merge .schemeAgencyName @schemeAgencyName ?]" schemeVersionID="[?merge .schemeVersionID @schemeVersionID ?]" schemeDataURI="[?merge .schemeDataURI @schemeDataURI ?]" schemeURI="[?merge .schemeURI @schemeURI ?]"><?merge .value ?></FilePlanPosition>
-        <?merge .originatingSystemId ?><OriginatingSystemId><?merge .content.originatingSystemId ?></OriginatingSystemId>
-        <OriginatingAgencyArchiveUnitIdentifier><?merge .content.originatingAgencyArchiveUnitIdentifier ?></OriginatingAgencyArchiveUnitIdentifier>
-        <?merge .content.description.bool() ?><Description><?merge .content.description ?></Description>
-        <?merge .content.custodialHistory.bool() ?>
+        <DescriptionLevel><?merge .Content.DescriptionLevel ?></DescriptionLevel>
+        <?merge .Content.Title ?><Title><?merge . ?></Title>
+        <?merge .Content.FilePlanPosition ?><FilePlanPosition schemeID="[?merge .schemeID @schemeID ?]" schemeName="[?merge .schemeName @schemeName ?]" schemeAgencyID="[?merge .schemeAgencyID @schemeAgencyID ?]" schemeAgencyName="[?merge .schemeAgencyName @schemeAgencyName ?]" schemeVersionID="[?merge .schemeVersionID @schemeVersionID ?]" schemeDataURI="[?merge .schemeDataURI @schemeDataURI ?]" schemeURI="[?merge .schemeURI @schemeURI ?]"><?merge .value ?></FilePlanPosition>
+        <?merge .Content.OriginatingSystemId.bool() ?><OriginatingSystemId><?merge .Content.OriginatingSystemId ?></OriginatingSystemId>
+        <OriginatingAgencyArchiveUnitIdentifier><?merge .Content.OriginatingAgencyArchiveUnitIdentifier ?></OriginatingAgencyArchiveUnitIdentifier>
+        <?merge .Content.Description.bool() ?><Description><?merge .Content.Description ?></Description>
+        <?merge .Content.CustodialHistory.bool() ?>
         <CustodialHistory>
-            <?merge .content.custodialHistory.custodialHistoryItem ?>
+            <?merge .Content.CustodialHistory.CustodialHistoryItem ?>
             <CustodialHistoryItem when="[?merge .when ?]"><?merge .value ?></CustodialHistoryItem>
         </CustodialHistory>
-        <Type><?merge .content.type ?></Type>
-        <DocumentType><?merge .content.documentType ?></DocumentType>
-        <Language><?merge .content.language ?></Language>
-        <DescriptionLanguage><?merge .content.descriptionLanguage ?></DescriptionLanguage>
-        <Status><?merge .content.status ?></Status>
-        <Version><?merge .content.version ?></Version>
-        <?merge .content.tag ?><Tag><?merge .value ?></Tag>
-        <?merge .content.keyword.array() ?><Keyword>
-            <KeywordContent role="[?merge .keywordContent.role @role ?]"><?merge .keywordContent.value ?></KeywordContent>
-            <KeywordReference schemeID="[?merge .keywordReference.schemeID @schemeID ?]" schemeName="[?merge .keywordReference.schemeName @schemeName ?]" schemeAgencyID="[?merge .keywordReference.schemeAgencyID @schemeAgencyID ?]" schemeAgencyName="[?merge .keywordReference.schemeAgencyName @schemeAgencyName ?]" schemeVersionID="[?merge .keywordReference.schemeVersionID @schemeVersionID ?]" schemeDataURI="[?merge .keywordReference.schemeDataURI @schemeDataURI ?]" schemeURI="[?merge .keywordReference.schemeURI @schemeURI ?]"><?merge .keywordReference.value ?></KeywordReference>
-            <KeywordType listVersionID="[?merge .keywordType.listVersionID @listVersionID ?]"><?merge .keywordType ?></KeywordType>
+        <Type><?merge .Content.Type ?></Type>
+        <DocumentType><?merge .Content.DocumentType ?></DocumentType>
+        <Language><?merge .Content.Language ?></Language>
+        <DescriptionLanguage><?merge .Content.DescriptionLanguage ?></DescriptionLanguage>
+        <Status><?merge .Content.Status ?></Status>
+        <Version><?merge .Content.Version ?></Version>
+        <?merge .Content.Tag ?><Tag><?merge .value ?></Tag>
+        <?merge .Content.Keyword.array() ?><Keyword>
+            <KeywordContent role="[?merge .KeywordContent.role @role ?]"><?merge .KeywordContent.value ?></KeywordContent>
+            <KeywordReference schemeID="[?merge .KeywordReference.schemeID @schemeID ?]" schemeName="[?merge .KeywordReference.schemeName @schemeName ?]" schemeAgencyID="[?merge .KeywordReference.schemeAgencyID @schemeAgencyID ?]" schemeAgencyName="[?merge .KeywordReference.schemeAgencyName @schemeAgencyName ?]" schemeVersionID="[?merge .KeywordReference.schemeVersionID @schemeVersionID ?]" schemeDataURI="[?merge .KeywordReference.schemeDataURI @schemeDataURI ?]" schemeURI="[?merge .KeywordReference.schemeURI @schemeURI ?]"><?merge .KeywordReference.value ?></KeywordReference>
+            <KeywordType listVersionID="[?merge .KeywordType.listVersionID @listVersionID ?]"><?merge .KeywordType ?></KeywordType>
         </Keyword>
-        <?merge .content.originatingAgency.bool() ?>
+        <?merge .Content.OriginatingAgency.bool() ?>
         <OriginatingAgency>
-            <Identifier><?merge .content.originatingAgency.identifier.value ?></Identifier>
+            <Identifier><?merge .Content.OriginatingAgency.Identifier.value ?></Identifier>
         </OriginatingAgency>
-        <?merge .content.submissionAgency.bool() ?>
+        <?merge .Content.SubmissionAgency.bool() ?>
         <SubmissionAgency>
-            <?merge .content.submissionAgency $organization ?>
+            <?merge .Content.SubmissionAgency $organization ?>
             <?xinclude /resources/Organization.xml ?>
         </SubmissionAgency>
-        <?merge .content.authorizedAgend.bool() ?>
+        <?merge .Content.AuthorizedAgend.bool() ?>
         <AuthorizedAgent>
-            <?merge .authorizedAgent $agent ?>
+            <?merge .AuthorizedAgent $agent ?>
             <?xinclude /resources/Agent.xml ?>
         </AuthorizedAgent>
-        <?merge .content.writter.array() ?>
+        <?merge .Content.Writter.array() ?>
         <Writter>
             <?merge . $agent ?>
             <?xinclude /resources/Agent.xml ?>
         </Writter>
-        <?merge .content.addressee.array()?>
+        <?merge .Content.Addressee.array()?>
         <Addressee>
             <?merge . $agent ?>
             <?xinclude /resources/Agent.xml ?>
         </Addressee>
-        <?merge .content.recipient.array() ?>
+        <?merge .Content.Recipient.array() ?>
         <Recipient>
             <?merge . $agent ?>
             <?xinclude /resources/Agent.xml ?>
         </Recipient>
-        <Source><?merge .content.source ?></Source>
-        <?merge .content.relatedObjectReference.bool() ?>
+        <Source><?merge .Content.Source ?></Source>
+        <?merge .Content.RelatedObjectReference.bool() ?>
         <RelatedObjectReference>
-            <?merge .content.relatedObjectReference.references ?>
+            <?merge .Content.RelatedObjectReference.References ?>
             <References>
-                <ArchiveUnitRefId><?merge .archiveUnitRefId ?></ArchiveUnitRefId>
+                <ArchiveUnitRefId><?merge .ArchiveUnitRefId ?></ArchiveUnitRefId>
             </References>
         </RelatedObjectReference>
-        <CreatedDate><?merge .content.createdDate ?></CreatedDate>
-        <TransactedDate><?merge .content.transactedDate ?></TransactedDate>
-        <AcquiredDate><?merge .content.acquiredDate ?></AcquiredDate>
-        <SentDate><?merge .content.sentDate ?></SentDate>
-        <ReceivedDate><?merge .content.receivedDate ?></ReceivedDate>
-        <RegisteredDate><?merge .content.registeredDate ?></RegisteredDate>
-        <StartDate><?merge .content.startDate ?></StartDate>
-        <EndDate><?merge .content.endDate ?></EndDate>
-        <?merge .content.event.array() ?>
+        <CreatedDate><?merge .Content.CreatedDate ?></CreatedDate>
+        <TransactedDate><?merge .Content.TransactedDate ?></TransactedDate>
+        <AcquiredDate><?merge .Content.AcquiredDate ?></AcquiredDate>
+        <SentDate><?merge .Content.SentDate ?></SentDate>
+        <ReceivedDate><?merge .Content.ReceivedDate ?></ReceivedDate>
+        <RegisteredDate><?merge .Content.RegisteredDate ?></RegisteredDate>
+        <StartDate><?merge .Content.StartDate ?></StartDate>
+        <EndDate><?merge .Content.EndDate ?></EndDate>
+        <?merge .Content.Event.array() ?>
         <Event>
-            <EventIdentifier><?merge .eventIdentifier ?></EventIdentifier>
-            <EventType><?merge .eventType ?></EventType>
-            <EventDateTime><?merge .eventDateTime ?></EventDateTime>
-            <EventDetail><?merge .eventDetail ?></EventDetail>
+            <EventIdentifier><?merge .EventIdentifier ?></EventIdentifier>
+            <EventType><?merge .EventType ?></EventType>
+            <EventDateTime><?merge .EventDateTime ?></EventDateTime>
+            <EventDetail><?merge .EventDetail ?></EventDetail>
         </Event> 
     </Content>
-    <?merge .archiveUnit /resources/ArchiveUnit.xml?>
-    <?merge .dataObjectReference.bool() ?>
+    <?merge .ArchiveUnit /resources/ArchiveUnit.xml?>
+    <?merge .DataObjectReference.bool() ?>
     <DataObjectReference>
-        <?merge .dataObjectReference.dataObjectReferenceId.bool() ?>
-        <DataObjectReferenceId><?merge .dataObjectReference.dataObjectReferenceId ?></DataObjectReferenceId>
-        <?merge .dataObjectReference.dataObjectGroupReferenceId.bool() ?>
-        <DataObjectGroupReferenceId><?merge .dataObjectReference.dataObjectGroupReferenceId ?></DataObjectGroupReferenceId>
+        <?merge .DataObjectReference.DataObjectReferenceId.bool() ?>
+        <DataObjectReferenceId><?merge .DataObjectReference.DataObjectReferenceId ?></DataObjectReferenceId>
+        <?merge .DataObjectReference.DataObjectGroupReferenceId.bool() ?>
+        <DataObjectGroupReferenceId><?merge .DataObjectReference.DataObjectGroupReferenceId ?></DataObjectGroupReferenceId>
     </DataObjectReference>
 </ArchiveUnit>

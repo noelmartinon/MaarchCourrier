@@ -328,6 +328,12 @@ class RequestSeda
             $resIdMaster = $aArgs['resIdMaster'];
         }
 
+        if (empty($aArgs['filePath'])){
+            $filePath = null;
+        } else {
+            $filePath = $aArgs['filePath'];
+        }
+
 		try {
 			$query = ("INSERT INTO message_exchange (
 				message_id,
@@ -347,8 +353,9 @@ class RequestSeda
 				data,
 				active,
 				archived,
-                res_id_master)
-				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                res_id_master,
+                file_path)
+				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
 			$queryParams[] = $messageObject->messageId; // Message Id
 			$queryParams[] = "2.1"; //Schema
@@ -368,6 +375,7 @@ class RequestSeda
 			$queryParams[] = 1; // active
             $queryParams[] = 0; // archived
 			$queryParams[] = $resIdMaster; // res_id_master
+            $queryParams[] = $filePath;
 
 			$res = $this->db->query($query,$queryParams);
 

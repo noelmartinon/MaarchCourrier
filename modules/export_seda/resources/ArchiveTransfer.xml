@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ArchiveTransfer xmlns="fr:gouv:culture:archivesdefrance:seda:v2.0">
-    <?merge ArchiveTransfer.comment ?><Comment><?merge .value ?></Comment>
-    <Date><?merge ArchiveTransfer.date ?></Date>
-    <?merge ArchiveTransfer.messageIdentifier $messageIdentifier ?><?xinclude /resources/MessageIdentifier.xml ?>
-    <?merge ArchiveTransfer.archivalAgreement $archivalAgreement ?><?xinclude /resources/ArchivalAgreement.xml ?>
+    <?merge ArchiveTransfer.Comment ?><Comment><?merge .value ?></Comment>
+    <Date><?merge ArchiveTransfer.Date ?></Date>
+    <?merge ArchiveTransfer.MessageIdentifier $messageIdentifier ?><?xinclude /resources/MessageIdentifier.xml ?>
+    <?merge ArchiveTransfer.ArchivalAgreement $archivalAgreement ?><?xinclude /resources/ArchivalAgreement.xml ?>
     <?xinclude /resources/CodeListVersions.xml ?>
-    <?merge ArchiveTransfer.dataObjectPackage $dataObjectPackage ?>
+    <?merge ArchiveTransfer.DataObjectPackage $dataObjectPackage ?>
     <?xinclude /resources/DataObjectPackage.xml ?>
     <ArchivalAgency>
-        <?merge ArchiveTransfer.archivalAgency $organization ?>
+        <?merge ArchiveTransfer.ArchivalAgency $organization ?>
         <?xinclude /resources/Organization.xml ?>
     </ArchivalAgency>
     <TransferringAgency>
-        <?merge ArchiveTransfer.transferringAgency $organization ?>
+        <?merge ArchiveTransfer.TransferringAgency $organization ?>
         <?xinclude /resources/Organization.xml ?>
     </TransferringAgency>
 </ArchiveTransfer>

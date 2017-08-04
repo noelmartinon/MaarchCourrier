@@ -1,48 +1,48 @@
 <ManagementMetadata>
-    <?merge $managementMetadata.archivalProfile.bool() ?><ArchivalProfile><?merge $managementMetadata.archivalProfile.value ?></ArchivalProfile>
-    <?merge $managementMetadata.serviceLevel.bool() ?><ServiceLevel><?merge $managementMetadata.serviceLevel.value ?></ServiceLevel>
-    <?merge $managementMetadata.storageRule.bool() ?>
+    <?merge $managementMetadata.ArchivalProfile.bool() ?><ArchivalProfile><?merge $managementMetadata.ArchivalProfile.value ?></ArchivalProfile>
+    <?merge $managementMetadata.ServiceLevel.bool() ?><ServiceLevel><?merge $managementMetadata.ServiceLevel.value ?></ServiceLevel>
+    <?merge $managementMetadata.StorageRule.bool() ?>
     <StorageRule>
-        <?merge $managementMetadata.storageRule $abstractRule ?>
+        <?merge $managementMetadata.StorageRule $abstractRule ?>
         <?xinclude /resources/AbstractRule.xml ?>
-        <FinalAction><?merge $managementMetadata.storageRule.finalAction ?></FinalAction>
+        <FinalAction><?merge $managementMetadata.StorageRule.FinalAction ?></FinalAction>
     </StorageRule>
-    <?merge $managementMetadata.appraisalRule.bool() ?>
+    <?merge $managementMetadata.AppraisalRule.bool() ?>
     <AppraisalRule>
-        <?merge $managementMetadata.appraisalRule $abstractRule ?>
+        <?merge $managementMetadata.AppraisalRule $abstractRule ?>
         <?xinclude /resources/AbstractRule.xml ?>
-        <FinalAction><?merge $managementMetadata.appraisalRule.finalAction ?></FinalAction>
+        <FinalAction><?merge $managementMetadata.AppraisalRule.FinalAction ?></FinalAction>
     </AppraisalRule>
-    <?merge $managementMetadata.accessRule.bool() ?>
+    <?merge $managementMetadata.AccessRule.bool() ?>
     <AccessRule>
-        <?merge $managementMetadata.accessRule $abstractRule ?>
+        <?merge $managementMetadata.AccessRule $abstractRule ?>
         <?xinclude /resources/AbstractRule.xml ?>
     </AccessRule>
-    <?merge $managementMetadata.disseminationRule.bool() ?>
+    <?merge $managementMetadata.DisseminationRule.bool() ?>
     <DisseminationRule>
-        <?merge $managementMetadata.disseminationRule $abstractRule ?>
+        <?merge $managementMetadata.DisseminationRule $abstractRule ?>
         <?xinclude /resources/AbstractRule.xml ?>
     </DisseminationRule>
-    <?merge $managementMetadata.reuseRule.bool() ?>
+    <?merge $managementMetadata.ReuseRule.bool() ?>
     <ReuseRule>
-        <?merge $managementMetadata.reuseRule $abstractRule ?>
+        <?merge $managementMetadata.ReuseRule $abstractRule ?>
         <?xinclude /resources/AbstractRule.xml ?>
     </ReuseRule>
-    <?merge $managementMetadata.classificationRule.bool() ?>
+    <?merge $managementMetadata.ClassificationRule.bool() ?>
     <ClassificationRule>
-        <?merge $managementMetadata.classificationRule $abstractRule ?>
+        <?merge $managementMetadata.ClassificationRule $abstractRule ?>
         <?xinclude /resources/AbstractRule.xml ?>
-        <ClassificationLevel><?merge $managementMetadata.classificationRule.classificationLevel ?></ClassificationLevel>
-        <ClassificationOwner><?merge $managementMetadata.classificationRule.classificationOwner ?></ClassificationOwner>
-        <ClassificationReassessingDate><?merge $managementMetadata.classificationRule.classificationReassessingDate ?></ClassificationReassessingDate>
-        <NeedReassessingAuthorization><?merge $managementMetadata.classificationRule.needReassessingAuthorization ?></NeedReassessingAuthorization>
+        <ClassificationLevel><?merge $managementMetadata.ClassificationRule.ClassificationLevel ?></ClassificationLevel>
+        <ClassificationOwner><?merge $managementMetadata.ClassificationRule.ClassificationOwner ?></ClassificationOwner>
+        <ClassificationReassessingDate><?merge $managementMetadata.ClassificationRule.ClassificationReassessingDate ?></ClassificationReassessingDate>
+        <NeedReassessingAuthorization><?merge $managementMetadata.ClassificationRule.NeedReassessingAuthorization ?></NeedReassessingAuthorization>
     </ClassificationRule>
-    <?merge $managementMetadata.needAuthorization.bool() ?>
+    <?merge $managementMetadata.NeedAuthorization.bool() ?>
     <NeedAuthorization>
-        <?merge $managementMetadata.needAuthorization ?>
+        <?merge $managementMetadata.NeedAuthorization ?>
     </NeedAuthorization>
-    <?merge $managementMetadata.otherManagementAbstract.bool() ?>
+    <?merge $managementMetadata.OtherManagementAbstract.bool() ?>
     <OtherManagementAbstract>
-        <?merge $managementMetadata.otherManagementAbstract ?>
+        <?merge $managementMetadata.OtherManagementAbstract ?>
     </OtherManagementAbstract>
 </ManagementMetadata>
