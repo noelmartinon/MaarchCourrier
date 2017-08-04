@@ -130,6 +130,11 @@ export class SaveNumericPackageComponent implements OnInit {
                         $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
                             $j("#resultInfo").slideUp(500);
                         }); 
+
+                        if(data.basketRedirection != null){
+                            window.location.href = data.basketRedirection;
+                            // action_send_first_request('index.php?display=true&page=manage_action&module=core', 'page',  22, '', 'res_letterbox', 'basket', 'letterbox_coll');
+                        }
                     }
                 });
         } else {

@@ -22,6 +22,7 @@ use Core\Controllers\ResExtController;
 use Core\Models\UserModel;
 use Core\Models\CoreConfigModel;
 use Entities\Models\EntitiesModel;
+use Baskets\Models\BasketsModel;
 
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'modules/notes/Models/NotesModel.php';
@@ -102,7 +103,19 @@ class ReceiveMessageExchangeController
             return $response->withJson(["errors" => $resAttachmentReturn['errors']]);
         }
 
-        return $response->withJson(["resId" => $resLetterboxReturn[0]]);
+        $basketRedirection = null;
+        $userBaskets = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        foreach ($userBaskets as $value) {
+            if($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]){
+                $basketRedirection = 'http://localhost/maarch_v2/apps/maarch_entreprise/index.php?page=view_baskets&module=basket&baskets='.$value['basket_id'];
+                break;
+            }
+        }
+
+        return $response->withJson([
+            "resId"             => $resLetterboxReturn[0],
+            'basketRedirection' => $basketRedirection
+        ]);
 
     }
 

@@ -2,7 +2,7 @@
 <ROOT>
     <res_letterbox>
         <type_id>101</type_id>
-        <status>NEW</status>
+        <status>INIT</status>
         <priority>2</priority>
     </res_letterbox>
     <res_attachments>
@@ -14,4 +14,5 @@
     <contact_addresses>
         <contact_purpose_id>1</contact_purpose_id>
     </contact_addresses>
+    <basketRedirection_afterUpload>InitBasket</basketRedirection_afterUpload><!--basketId-->
 </ROOT>
