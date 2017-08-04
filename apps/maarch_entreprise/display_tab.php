@@ -11,11 +11,12 @@ if(isset($_REQUEST["titleTab"])){
 }
 require_once 'core'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.'class_request.php';
 
-$core_tools = new core_tools();
+/*$core_tools = new core_tools();
 $core_tools->load_lang();
 $core_tools->load_html();
 $core_tools->load_header('', true, false);
-$core_tools->load_js();
+$core_tools->load_header();
+$core_tools->load_js();*/
     
 $frm_str .= '<div class="desc" id="notes_div">';
 $frm_str .= '<div class="ref-unit block" style="margin-top:-2px;">';
@@ -28,3 +29,4 @@ $frm_str .= '<iframe src="' . $script . '" '
             . 'scrolling="auto" frameborder="0" onload="document.getElementById(\'load_tab\').style.display=\'none\';"></iframe>';
 
 echo $frm_str;
+
