@@ -433,7 +433,7 @@ if ($mode == 'add') {
         }
     }
     //Notes            
-    if ($core_tools->is_module_loaded('notes') && $formContent != 'messageExchange') {
+    if ($core_tools->is_module_loaded('notes')) {
         require_once "modules" . DIRECTORY_SEPARATOR . "notes" . DIRECTORY_SEPARATOR
             . "class" . DIRECTORY_SEPARATOR
             . "class_modules_tools.php";

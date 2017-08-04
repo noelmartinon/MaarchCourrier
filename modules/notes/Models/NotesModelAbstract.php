@@ -27,13 +27,14 @@ class NotesModelAbstract extends Apps_Table_Service
     public static function getByResId(array $aArgs = []) 
     {
         static::checkRequired($aArgs, ['resId']);
+        static::checkNumeric($aArgs, ['resId']);
 
         //get notes
         $aReturn = static::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['notes', 'users'],
-            'left_join' => ['notes.user_id = users.user_id'],
-            'where'     => ['notes.identifier = ?'],
+            'table'     => ['notes', 'users', 'users_entities'],
+            'left_join' => ['notes.user_id = users.user_id', 'users.user_id = users_entities.user_id'],
+            'where'     => ['notes.identifier = ?', 'users_entities.primary_entity=\'Y\''],
             'data'      => [$aArgs['resId']],
             'order_by'  => empty($aArgs['orderBy']) ? ['date_note'] : $aArgs['orderBy']
         ]);
@@ -71,6 +72,7 @@ class NotesModelAbstract extends Apps_Table_Service
     public static function countForCurrentUserByResId(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['resId']);
+        static::checkNumeric($aArgs, ['resId']);
 
         $nb = 0;
         $countedNotes = [];

@@ -16,6 +16,7 @@
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'apps/maarch_entreprise/Models/ResModel.php';
 require_once 'modules/export_seda/RequestSeda.php';
+require_once 'modules/notes/Models/NotesModel.php';
 require_once "core/class/class_request.php";
 require_once "core/class/class_history.php";
 
@@ -92,6 +93,13 @@ class SendMessageExchangeController
         }
         $aAllAttachment = array_merge($AttachmentsInfo, $AttVersionInfo);
 
+        /******************* GET NOTE INFOS **********************/
+        $aComments = self::generateComments([
+            'resId' => $aArgs['identifier'],
+            'notes' => $aArgs['notes'], 
+            'body'  => $aArgs['body_from_raw'], 
+            'TransferringAgencyInformations' => $TransferringAgencyInformations]);
+
         /*********** ORDER ATTACHMENTS IN MAIL ***************/
         if ($MainExchangeDoc['tablename'] == 'res_letterbox') {
             $mainDocument     = $fileInfo;
@@ -115,12 +123,9 @@ class SendMessageExchangeController
             }
             $aMergeAttachment = array_merge($firstAttachment, $fileInfo, $aAllAttachment);
         }
-
-        $oComment = new stdClass();
-        $oComment->value = $aArgs['body_from_raw'];
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
         $dataObject = self::generateMessageObject([
-            'Comment' => [$oComment],
+            'Comment' => $aComments,
             'ArchivalAgency' => [
                 'CommunicationType'   => $ArchivalAgencyCommunicationType,
                 'ContactInformations' => $ArchivalAgencyContactInformations[0]
@@ -135,7 +140,7 @@ class SendMessageExchangeController
 
         /******** SAVE MESSAGE *********/
         $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier']]);
-        self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'messageId' => $messageId]);
+        self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'notes' => $aArgs['notes'], 'messageId' => $messageId]);
 
         $hist    = new history();
         $request = new request();
@@ -173,6 +178,39 @@ class SendMessageExchangeController
         }
 
         return $errors;
+    }
+
+    protected function generateComments($aArgs = [])
+    {
+        $aReturn    = [];
+
+        $entityRoot = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $aArgs['TransferringAgencyInformations']['entity_id']]);
+        $headerNote = $_SESSION['user']['FirstName'] . ' ' . $_SESSION['user']['LastName'] . ' (' . $entityRoot[0]['entity_label'] . ' - ' . $aArgs['TransferringAgencyInformations']['entity_label'] . ') : ';
+        $oBody        = new stdClass();
+        $oBody->value = $headerNote . ' ' . $aArgs['body'];
+        array_push($aReturn, $oBody);
+
+        $noteModel = new \NotesModel();
+        $notes     = $noteModel->getByResId([
+            'select' => ['notes.id', 'notes.user_id', 'notes.date_note', 'notes.note_text', 'users.firstname', 'users.lastname', 'users_entities.entity_id'], 
+            'resId' => $aArgs['resId']
+        ]);
+
+        if(!empty($notes)){
+            foreach ($notes as $key => $value) {
+                if(!in_array($value['id'], $aArgs['notes'])){
+                    continue;
+                }
+
+                $oComment        = new stdClass();
+                $date            = new DateTime($value['date_note']);
+                $entityRoot      = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $value['entity_id']]);
+                $userEntity      = \Entities\Models\EntitiesModel::getById(['entityId' => $value['entity_id']]);
+                $oComment->value = $value['firstname'].' '.$value['lastname'].' - '.$date->format('d-m-Y H:i:s').' ('.$entityRoot[0]['entity_label'].' - '.$userEntity['entity_label'].') : '.$value['note_text'];
+                array_push($aReturn, $oComment);
+            }
+        }
+        return $aReturn;
     }
 
     public static function generateMessageObject($aArgs = [])
@@ -362,6 +400,7 @@ class SendMessageExchangeController
         $entityRoot = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $aArgs['TransferringAgency']['EntitiesInformations']['entity_id']]);
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->LegalClassification = $entityRoot[0]['entity_label'];
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Name                = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->UserIdentifier      = $_SESSION['user']['UserId'];
 
         $traCommunicationObject          = new stdClass();
         $traCommunicationObject->Channel = 'email';
@@ -371,7 +410,7 @@ class SendMessageExchangeController
 
         $contactUserObject                 = new stdClass();
         $contactUserObject->DepartmentName = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
-        $contactUserObject->PersonName     = $_SESSION['user']['LastName'] . " " . $_SESSION['user']['FirstName'];
+        $contactUserObject->PersonName     = $_SESSION['user']['FirstName'] . " " . $_SESSION['user']['LastName'];
 
         $communicationUserPhoneObject          = new stdClass();
         $communicationUserPhoneObject->Channel = 'phone';
@@ -441,6 +480,12 @@ class SendMessageExchangeController
             }
 
             $RequestSeda->insertUnitIdentifier($messageId, $value['tablenameExchangeMessage'], $value['res_id'], $disposition);
+        }
+
+        if(!empty($aArgs['notes'])){
+            foreach ($aArgs['notes'] as $value) {
+                $RequestSeda->insertUnitIdentifier($messageId, "notes", $value, "note");
+            }
         }
 
         return true;
