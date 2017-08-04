@@ -175,6 +175,14 @@ require_once("modules/entities/class/class_manage_entities.php");
         return false;
     }
     $recommendation_limit_date = get_value_fields($values, 'recommendation_limit_date');
+    
+    $d = DateTime::createFromFormat('d-m-Y', $recommendation_limit_date);
+    if ($d && $d->format('d-m-Y') === $recommendation_limit_date) {
+    } else {
+        $_SESSION['action_error'] = _RECOMMENDATION_LIMIT_DATE. " " . _WRONG_FORMAT;
+        return false;
+    }
+
     if($recommendation_limit_date == null || $recommendation_limit_date == ''){
         $_SESSION['action_error'] = _RECOMMENDATION_LIMIT_DATE. " " . _MANDATORY;
         return false;
