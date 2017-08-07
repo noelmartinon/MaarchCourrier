@@ -144,14 +144,14 @@ while ($state <> 'END') {
 				$GLOBALS['logger']->write("set zip on message: " . $email->message_exchange_id, 'INFO');
 
 				//Get uri zip
-				$query = "SELECT * FROM message_exchange WHERE reference = ?";
+				$query = "SELECT * FROM message_exchange WHERE message_id = ?";
 				$smtp = $stmt = Bt_doQuery($GLOBALS['db'], $query, array($email->message_exchange_id));
 				$messageExchange = $smtp->fetchObject();
 
 				//Get file content
 				if(is_file($messageExchange->file_path)) {
 					//Filename
-					$resFilename = $sendmail_tools->createFilename($email->message_exchange_id, 'zip');
+					$resFilename = $sendmail_tools->createFilename($messageExchange->reference, 'zip');
 					$GLOBALS['logger']->write("set attachment filename : " . $resFilename, 'INFO');
 
 					//File content
