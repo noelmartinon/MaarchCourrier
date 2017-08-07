@@ -284,6 +284,14 @@ while ($state <> 'END') {
 				. ", email_status = ? "
 				. " WHERE email_id = ? ";
 			$stmt = Bt_doQuery($GLOBALS['db'], $query, array($exec_result, $email->email_id));
+
+            if ($email->message_exchange_id) {
+                //Update message table
+                $query = "UPDATE message_exchange"
+                    . " SET status = ? "
+                    . " WHERE message_id = ? ";
+                $stmt = Bt_doQuery($GLOBALS['db'], $query, array($exec_result, $email->message_exchange_id));
+            }
 			$currentEmail++;
 			$state = 'SEND_AN_EMAIL';
 		} else {
