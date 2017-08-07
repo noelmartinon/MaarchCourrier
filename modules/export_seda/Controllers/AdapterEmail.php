@@ -26,26 +26,15 @@ class AdapterEmail{
             $sendmail->cci_list = '';
             $sendmail->email_object = $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0];
             $sendmail->email_body = $messageObject->Comment[0]->value;
+            $sendmail->is_res_master_attached = 'N';
             $sendmail->email_status = 'W';
             $sendmail->sender_email = $messageObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact[0]->Communication[1]->value;
-            $sendmail->message_exchange_id = $messageObject->MessageIdentifier->value;
+
+            $message = $this->db->getMessageByReference($messageObject->MessageIdentifier->value);
+            $sendmail->message_exchange_id = $message->message_id;
 
             $date = new DateTime;
             $sendmail->creation_date = $date->format(DateTime::ATOM);
-
-            $message = $this->db->getMessageByReference($messageObject->MessageIdentifier->value);
-            $unitIdentifiers = $this->db->getUnitIdentifierByMessageId($message->message_id);
-            foreach ($unitIdentifiers as $unitIdentifier) {
-                if ($unitIdentifier->disposition != 'body') {
-                    break;
-                }
-
-                if ($unitIdentifier->tablename == $_SESSION['tablename']['attach_res_attachments']) {
-                    $sendmail->is_res_master_attached = 'N';
-                } else {
-                    $sendmail->is_res_master_attached = 'Y';
-                }
-            }
 
             $mailModel = new MailModel();
             $mailModel->createMail($sendmail);

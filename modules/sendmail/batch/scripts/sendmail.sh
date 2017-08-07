@@ -1,5 +1,5 @@
 #!/bin/sh
-cd /var/www/MaarchCourrier/modules/sendmail/batch/
-emailsPath='/var/www/MaarchCourrier/modules/sendmail/batch/process_emails.php'
-php $emailsPath -c /var/www/MaarchCourrier/modules/sendmail/batch/config/config.xml
+cd /var/www//html/maarch_courrier/modules/sendmail/batch/
+emailsPath='/var/www/html/maarch_courrier/modules/sendmail/batch/process_emails.php'
+php $emailsPath -c /var/www//html/maarch_courrier/modules/sendmail/batch/config/config.xml
 

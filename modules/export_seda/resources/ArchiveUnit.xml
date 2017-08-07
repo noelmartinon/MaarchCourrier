@@ -128,11 +128,11 @@
         </Event> 
     </Content>
     <?merge .ArchiveUnit /resources/ArchiveUnit.xml?>
-    <?merge .DataObjectReference.bool() ?>
+    <?merge .DataObjectReference.array() ?>
     <DataObjectReference>
-        <?merge .DataObjectReference.DataObjectReferenceId.bool() ?>
-        <DataObjectReferenceId><?merge .DataObjectReference.DataObjectReferenceId ?></DataObjectReferenceId>
-        <?merge .DataObjectReference.DataObjectGroupReferenceId.bool() ?>
-        <DataObjectGroupReferenceId><?merge .DataObjectReference.DataObjectGroupReferenceId ?></DataObjectGroupReferenceId>
+        <?merge .DataObjectReferenceId.bool() ?>
+        <DataObjectReferenceId><?merge .DataObjectReferenceId ?></DataObjectReferenceId>
+        <?merge .DataObjectGroupReferenceId.bool() ?>
+        <DataObjectGroupReferenceId><?merge .DataObjectGroupReferenceId ?></DataObjectGroupReferenceId>
     </DataObjectReference>
 </ArchiveUnit>
