@@ -1405,7 +1405,7 @@ function process_category_check($cat_id, $values)
         $priority = get_value_fields($values, 'priority');
 
         if ($priority === '') {
-            $_SESSION['action_error'] = $_ENV['categories'][$cat_id]['priority']['label']. " " . _MANDATORY;
+            $_SESSION['action_error'] = $_ENV['categories'][$cat_id]['priority']['label']. " " . strtolower(_MANDATORY);
             return false;
         }
     }
@@ -1424,7 +1424,7 @@ function process_category_check($cat_id, $values)
             $contact_type = get_value_fields($values, 'type_multi_contact_external');
         }
         if(!$contact_type){
-            $_SESSION['action_error'] = $_ENV['categories'][$cat_id]['other_cases']['type_contact']['label'] . " " . _MANDATORY . "";
+            $_SESSION['action_error'] = $_ENV['categories'][$cat_id]['other_cases']['type_contact']['label'] . " " . strtolower(_MANDATORY) . "";
             return false;
         }
         
@@ -1455,7 +1455,7 @@ function process_category_check($cat_id, $values)
         {
             if(empty($_SESSION['indexing']['diff_list']['dest']['users'][0]['user_id']) || !isset($_SESSION['indexing']['diff_list']['dest']['users'][0]['user_id']))
             {
-                $_SESSION['action_error'] = $_ENV['categories'][$cat_id]['other_cases']['diff_list']['label']." "._MANDATORY."";
+                $_SESSION['action_error'] = $_ENV['categories'][$cat_id]['other_cases']['diff_list']['label']." ".strtolower(_MANDATORY)."";
                 return false;
             }
         }

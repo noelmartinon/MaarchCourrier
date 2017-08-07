@@ -1012,7 +1012,7 @@ function check_form($formId, $values)
         $_SESSION['upfile']['error']='0';
         $_SESSION['upfile']['format']='maarch';
     } elseif (empty($_SESSION['upfile']['format'])) {
-        $_SESSION['action_error'] = _FILE . ' ' . _MANDATORY;
+        $_SESSION['action_error'] = _FILE . ' ' . strtolower(_MANDATORY);
         return false;
     }
 
@@ -1264,7 +1264,7 @@ function process_category_check($catId, $values)
 
         if ($priority === '') {
             $_SESSION['action_error'] = $_ENV['categories'][$catId]['priority']['label']
-                . " " . _MANDATORY;
+                . " " . strtolower(_MANDATORY);
             return false;
         }
     }
@@ -1280,7 +1280,7 @@ function process_category_check($catId, $values)
         }
         if (! $contactType) {
             $_SESSION['action_error'] = $_ENV['categories'][$catId]['other_cases']['type_contact']['label']
-                . " " . _MANDATORY;
+                . " " . strtolower(_MANDATORY);
             return false;
         }
         $contact = get_value_fields($values, 'contactid');
@@ -1313,7 +1313,7 @@ function process_category_check($catId, $values)
                 || ! isset($_SESSION['indexing']['diff_list']['dest']['users'][0])
             ) {
                 $_SESSION['action_error'] = $_ENV['categories'][$catId]['other_cases']['diff_list']['label']
-                    . " " . _MANDATORY;
+                    . " " . strtolower(_MANDATORY);
                 return false;
             }
         }
