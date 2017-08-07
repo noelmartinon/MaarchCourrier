@@ -430,7 +430,7 @@ if ($mode == 'add') {
         $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
     }
     $content .= '</select>';
-    $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature de mail' . '</label>';
+    $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
     $emailSignaturesClass = new EmailSignatures();
 
     $mailSignatures = $emailSignaturesClass->getForCurrentUser();
@@ -809,7 +809,7 @@ if ($mode == 'add') {
                 $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
             }
             $content .='</select>';
-            $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature de mail' . '</label>';
+            $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
             $emailSignaturesClass = new EmailSignatures();
 
             $mailSignatures = $emailSignaturesClass->getForCurrentUser();

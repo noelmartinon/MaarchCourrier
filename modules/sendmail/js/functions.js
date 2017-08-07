@@ -17,14 +17,20 @@ function addTemplateToEmail(templateMails, path){
     {
         method      :'post',
         parameters  :{
-                        templateId : templateMails
+                        templateId : templateMails,
+                        mode : mode
                      },
         onSuccess   :function(answer){
             eval("response = " + answer.responseText);
             if (response.status == 0) {
                 var strContent = response.content;
-                var strContentReplace = strContent.replace(/\\n/g, '');
-                tinyMCE.execCommand('mceSetContent',false,strContentReplace);
+                if(mode == 'html'){
+                    var strContentReplace = strContent.replace(/\\n/g, '');
+                    tinyMCE.execCommand('mceSetContent', false, strContentReplace);
+                } else {
+                    var strContentReplace = strContent.replace(/\\n/g, '\n');
+                    $j("textarea#body_from_raw").html(strContentReplace);
+                }
             } 
         }
     });
@@ -35,13 +41,20 @@ function changeSignature(selected, mailSignaturesJS){
     var body = $('body_from_html_ifr').contentWindow.document.getElementById("tinymce");
     var customTag = body.getElementsByTagName("mailSignature");
 
-    if (customTag.length == 0) {
-        body.innerHTML += "<mailSignature>toto</mailSignature>";
+    if (mode == 'html' && customTag.length == 0) {
+        body.innerHTML += "<mailSignature>t</mailSignature>";
         customTag = body.getElementsByTagName("mailSignature");
     }
 
     if (nb >= 0) {
-        customTag[0].innerHTML = mailSignaturesJS[nb].signature;
+        var strContent = mailSignaturesJS[nb].signature;
+        if(mode == 'html'){
+            customTag[0].innerHTML = strContent;
+        } else {
+            var text = $j(strContent).text();
+            $j("textarea#body_from_raw").append(text);
+        }
+        
     } else {
         customTag[0].innerHTML = "";
     }

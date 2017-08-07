@@ -125,7 +125,7 @@ if (!defined("_EMAIL_REMOVED"))
     define("_EMAIL_REMOVED", "Email removed");
 
 if (!defined('_Label_ADD_TEMPLATE_MAIL'))
-    define('_Label_ADD_TEMPLATE_MAIL', 'Model of email');
+    define('_Label_ADD_TEMPLATE_MAIL', 'Model : ');
 if (!defined('_ADD_TEMPLATE_MAIL'))
     define('_ADD_TEMPLATE_MAIL', 'Choose a template');
 

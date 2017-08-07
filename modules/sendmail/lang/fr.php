@@ -127,7 +127,7 @@ if (!defined("_EMAIL_REMOVED"))
 
 
 if (!defined("_Label_ADD_TEMPLATE_MAIL"))
-    define("_Label_ADD_TEMPLATE_MAIL", "Modèle de courriel");
+    define("_Label_ADD_TEMPLATE_MAIL", "Modèle : ");
 if (!defined("_ADD_TEMPLATE_MAIL"))
     define("_ADD_TEMPLATE_MAIL", "Sélectionnez le modèle désiré");
 

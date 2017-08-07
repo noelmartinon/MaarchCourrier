@@ -27,6 +27,7 @@
 		<parameter name="module" type="identifier" />
 		<parameter name="id" type="integer" />
 		<parameter name="templateId" type="integer" />
+        <parameter name="mode" type="string" />
 	</validationRule>
 
 	<validationRule name="templates_ajax_content_for_notes" extends="standardForm" mode="error">
