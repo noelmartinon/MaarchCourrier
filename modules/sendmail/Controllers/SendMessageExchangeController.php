@@ -124,6 +124,9 @@ class SendMessageExchangeController
             }
             $aMergeAttachment = array_merge($firstAttachment, $fileInfo, $aAllAttachment);
         }
+
+        $mainDocument[0]['Title'] = $aArgs['object'];
+
         /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
         $dataObject = self::generateMessageObject([
             'Comment' => $aComments,
@@ -182,6 +185,10 @@ class SendMessageExchangeController
 
         if (empty($aArgs['main_exchange_doc'])) {
             array_push($errors, 'wrong format for main_exchange_doc');
+        }
+
+        if (empty($aArgs['object'])) {
+            array_push($errors, _EMAIL_OBJECT . ' ' . _IS_EMPTY);
         }
 
         if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['main_exchange_doc'])) {

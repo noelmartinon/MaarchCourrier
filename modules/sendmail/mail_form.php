@@ -274,10 +274,7 @@ if ($mode == 'add') {
 
     $content .= '<td colspan="2">';
 
-    if($formContent == 'messageExchange'){
-        $readOnlyObject = "readonly";
-    }
-    if ($category_id === 'outgoing')
+    if ($category_id == 'outgoing')
         $content .= '<input name="object" id="object" class="emailInput" type="text" value="' . $subject . '" '.$readOnlyObject.'/>';
     else
         $content .= '<input name="object" id="object" class="emailInput" type="text" value="' . _EMAIL_OBJECT_ANSWER . ' ' . functions::format_date_db($admission_date).'" '.$readOnlyObject.'/>';
