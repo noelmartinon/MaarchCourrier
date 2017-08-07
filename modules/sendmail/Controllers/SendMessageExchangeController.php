@@ -139,9 +139,9 @@ class SendMessageExchangeController
             'mainExchangeDocument'  => $MainExchangeDoc
         ]);
 
-        /*/******** GENERATION DU BORDEREAU */
+        /******** GENERATION DU BORDEREAU */
         $sendMessage = new SendMessage();
-        $filePath = $sendMessage->generateMessageFile($dataObject, "ArchiveTransfer");
+        $filePath = $sendMessage->generateMessageFile($dataObject, "ArchiveTransfer", $_SESSION['config']['tmppath']);
 
         /******** SAVE MESSAGE *********/
         $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier'], 'file_path' => $filePath]);
@@ -159,10 +159,8 @@ class SendMessageExchangeController
             $_SESSION['config']['databasetype'], 'sendmail'
         );
 
-        /******** ENVOI
-
-        /*********** TODO : ALEX MORIN *********/
-        //$sendMessage->send($dataObject);
+        /******** ENVOI *******/
+        $sendMessage->send($dataObject);
 
         return true;
     }

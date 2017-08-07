@@ -138,6 +138,28 @@ while ($state <> 'END') {
 			$GLOBALS['mailer']->setHeadCharset($GLOBALS['charset']);
 			
 			//--> Set attachments
+
+			//zip M2M
+			if ($email->message_exchange_id) {
+				$GLOBALS['logger']->write("set zip on message: " . $email->message_exchange_id, 'INFO');
+
+				//Get uri zip
+				$query = "SELECT * FROM message_exchange WHERE reference = ?";
+				$smtp = $stmt = Bt_doQuery($GLOBALS['db'], $query, array($email->message_exchange_id));
+				$messageExchange = $smtp->fetchObject();
+
+				//Get file content
+				if(is_file($messageExchange->file_path)) {
+					//Filename
+					$resFilename = $sendmail_tools->createFilename($email->message_exchange_id, 'zip');
+					$GLOBALS['logger']->write("set attachment filename : " . $resFilename, 'INFO');
+
+					//File content
+					$file_content = $GLOBALS['mailer']->getFile($messageExchange->file_path);
+					//Add file
+					$GLOBALS['mailer']->addAttachment($file_content, $resFilename);
+				}
+            } else {
 				//Res master
 				if ($email->is_res_master_attached == 'Y') {
 					$GLOBALS['logger']->write("set attachment on res master : " . $email->res_id, 'INFO');
@@ -239,7 +261,7 @@ while ($state <> 'END') {
 						$GLOBALS['mailer']->addAttachment($file_content, $noteFile['filename'], $noteFile['mime_type']); 
 					}
 				}
-			
+            }
 
 			//Now send the mail
 			$GLOBALS['logger']->write("sending e-mail ...", 'INFO');
