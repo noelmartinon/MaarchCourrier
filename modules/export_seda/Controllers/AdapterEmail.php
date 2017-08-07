@@ -14,6 +14,9 @@ class AdapterEmail{
 
     public function send($messageObject)
     {
+        $res['status'] = 0;
+        $res['content'] = '';
+
         $gec = strtolower($this->xml->M2M->gec);
 
         if ($gec == 'maarch_courrier') {
@@ -41,6 +44,7 @@ class AdapterEmail{
 
             $this->db->updateStatusMessage($messageObject->MessageIdentifier->value,'I');
         }
-        return true;
+
+        return $res;
     }
 }

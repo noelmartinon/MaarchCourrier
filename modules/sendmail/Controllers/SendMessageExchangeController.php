@@ -160,7 +160,14 @@ class SendMessageExchangeController
         );
 
         /******** ENVOI *******/
-        $sendMessage->send($dataObject);
+        $res = $sendMessage->send($dataObject);
+
+        if ($res['status'] == 1) {
+            $errors = [];
+            array_push($errors, _SENDS_FAIL);
+            array_push($errors, $res['content']);
+            return ['errors' => $errors];
+        }
 
         return true;
     }
