@@ -486,17 +486,19 @@ if ($mode == 'add') {
         $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
     }
     $content .= '</select>';
-    $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
-    $emailSignaturesClass = new EmailSignatures();
+    if($formContent != 'messageExchange'){
+        $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
+        $emailSignaturesClass = new EmailSignatures();
 
-    $mailSignatures = $emailSignaturesClass->getForCurrentUser();
-    $content .= '<script type="text/javascript">var mailSignaturesJS = ' . json_encode($mailSignatures) . ';</script>';
-    $content .= '<select style="width: 20%;" name="selectSignatures" id ="selectSignatures" onchange="changeSignature(this.options[this.selectedIndex], mailSignaturesJS)">';
-    $content .= '<option value="none" data-nb="-1" selected >Sans signature</option>';
-    for ($i = 0; $mailSignatures[$i]; $i++) {
-        $content .= '<option value="' . $mailSignatures[$i]['id'] . '" data-nb="' . $i . '">' . $mailSignatures[$i]['title'] . '</option>';
+        $mailSignatures = $emailSignaturesClass->getForCurrentUser();
+        $content .= '<script type="text/javascript">var mailSignaturesJS = ' . json_encode($mailSignatures) . ';</script>';
+        $content .= '<select style="width: 20%;" name="selectSignatures" id ="selectSignatures" onchange="changeSignature(this.options[this.selectedIndex], mailSignaturesJS)">';
+        $content .= '<option value="none" data-nb="-1" selected >Sans signature</option>';
+        for ($i = 0; $mailSignatures[$i]; $i++) {
+            $content .= '<option value="' . $mailSignatures[$i]['id'] . '" data-nb="' . $i . '">' . $mailSignatures[$i]['title'] . '</option>';
+        }
+        $content .= '</select>';
     }
-    $content .= '</select>';
     $content .= '</tr></br></br>';
 
     //Body
