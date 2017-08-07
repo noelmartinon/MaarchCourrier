@@ -17,4 +17,7 @@
         <sedaadd>true</sedaadd>
         <sedadel>true</sedadel>
     </HISTORY>
+    <M2M>
+        <gec>maarch_courrier</gec>
+    </M2M>
 </root>

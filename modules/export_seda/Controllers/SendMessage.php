@@ -31,20 +31,19 @@ class SendMessage {
     public function send($messageObject)
     {
         $channel = $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->Channel;
-        $communicationValue = $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value;
 
         if ($channel == 'url') {
             $adapterWS = new AdapterWS();
             //$adapterWS->send()
         } elseif ($channel == 'email') {
             $adapterEmail = new AdapterEmail();
-            $adapterEmail->send($communicationValue,$messageObject->MessageIdentifier->value);
+            $adapterEmail->send($messageObject);
         } else {
             return false;
         }
     }
 
-    public function generateMessageFile($messageObject, $type)
+    public function generateMessageFile($messageObject, $type, $tmpPath)
     {
         $DOMTemplate = new DOMDocument();
         $DOMTemplate->load(__DIR__ .DIRECTORY_SEPARATOR. '..'. DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.$type.'.xml');
@@ -53,30 +52,30 @@ class SendMessage {
         $DOMTemplateProcessor->merge();
         $DOMTemplateProcessor->removeEmptyNodes();
 
-        file_put_contents($_SESSION['config']['tmppath'] . $messageObject->MessageIdentifier->value . ".xml", $DOMTemplate->saveXML());
+        file_put_contents($tmpPath . $messageObject->MessageIdentifier->value . ".xml", $DOMTemplate->saveXML());
 
         foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
             $base64_decoded = base64_decode($binaryDataObject->Attachment->value);
-            $file = fopen($_SESSION['config']['tmppath'] . $binaryDataObject->Attachment->filename, 'w');
+            $file = fopen($tmpPath . $binaryDataObject->Attachment->filename, 'w');
             fwrite($file,$base64_decoded);
             fclose($file);
         }
-        $filename = $this->generateZip($messageObject,$DOMTemplate);
+        $filename = $this->generateZip($messageObject,$tmpPath);
 
         return $filename;
     }
 
-    private function generateZip($messageObject)
+    private function generateZip($messageObject,$tmpPath)
     {
         $zip = new ZipArchive();
-        $filename = $_SESSION['config']['tmppath'].$messageObject->MessageIdentifier->value. ".zip";
+        $filename = $tmpPath.$messageObject->MessageIdentifier->value. ".zip";
 
         $zip->open($filename, ZipArchive::CREATE);
 
-        $zip->addFile($_SESSION['config']['tmppath'] . $messageObject->MessageIdentifier->value . ".xml", $messageObject->MessageIdentifier->value . ".xml");
+        $zip->addFile($tmpPath . $messageObject->MessageIdentifier->value . ".xml", $messageObject->MessageIdentifier->value . ".xml");
 
         foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-            $zip->addFile($_SESSION['config']['tmppath'] . $binaryDataObject->Attachment->filename, $binaryDataObject->Attachment->filename);
+            $zip->addFile($tmpPath . $binaryDataObject->Attachment->filename, $binaryDataObject->Attachment->filename);
         }
 
         return $filename;
