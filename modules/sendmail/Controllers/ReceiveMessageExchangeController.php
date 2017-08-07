@@ -107,9 +107,13 @@ class ReceiveMessageExchangeController
         $userBaskets = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
         foreach ($userBaskets as $value) {
             if($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]){
-                $basketRedirection = 'http://localhost/maarch_v2/apps/maarch_entreprise/index.php?page=view_baskets&module=basket&baskets='.$value['basket_id'];
+                $basketRedirection = 'index.php?page=view_baskets&module=basket&baskets='.$value['basket_id'];
                 break;
             }
+        }
+
+        if(empty($basketRedirection)){
+            $basketRedirection = 'index.php';
         }
 
         return $response->withJson([
