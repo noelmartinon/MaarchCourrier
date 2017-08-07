@@ -45,5 +45,11 @@ $template->template_content = str_replace("\r", "\n", $template->template_conten
 $template->template_content = str_replace("\n", "\\n ", $template->template_content);
 $template->template_content = str_replace("''", "'", $template->template_content);
 
+if($_REQUEST['mode'] == 'raw'){
+    $template->template_content = str_replace("<br>", "\\n", $template->template_content);
+    $template->template_content = str_replace("<br />", "\\n", $template->template_content);
+    $template->template_content = strip_tags($template->template_content);
+}
+
 echo "{status : 0, content : '" . addslashes($template->template_content) . "'}";
 exit();

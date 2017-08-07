@@ -471,44 +471,47 @@ if ($mode == 'add') {
     
     $content .= '</div>';
     $content .='<hr />';
-    if($formContent != 'messageExchange'){
-        $content .= '<tr>';
-        $content .= '<td><label style="padding-right:10px">' . _Label_ADD_TEMPLATE_MAIL . '</label></td>';
-        $content .= '<select name="templateMail" id="templateMail" style="width:200px" '
-                    . 'onchange="addTemplateToEmail($(\'templateMail\').value, \''
-                                . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
-                                . '&module=templates&page=templates_ajax_content_for_mails&id=' . $_REQUEST['identifier'] . '\');">';
 
-        $content .= '<option value="">' . _ADD_TEMPLATE_MAIL . '</option>';
-        
-        $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail'");
-        while ( $result=$stmt->fetchObject()) {
-            $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
-        }
-        $content .= '</select>';
-        $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature de mail' . '</label>';
-        $emailSignaturesClass = new EmailSignatures();
+    $content .= '<tr>';
+    $content .= '<td><label style="padding-right:10px">' . _Label_ADD_TEMPLATE_MAIL . '</label></td>';
+    $content .= '<select name="templateMail" id="templateMail" style="width:200px" '
+                . 'onchange="addTemplateToEmail($(\'templateMail\').value, \''
+                            . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
+                            . '&module=templates&page=templates_ajax_content_for_mails&id=' . $_REQUEST['identifier'] . '\');">';
 
-        $mailSignatures = $emailSignaturesClass->getForCurrentUser();
-        $content .= '<script type="text/javascript">var mailSignaturesJS = ' . json_encode($mailSignatures) . ';</script>';
-        $content .= '<select style="width: 20%;" name="selectSignatures" id ="selectSignatures" onchange="changeSignature(this.options[this.selectedIndex], mailSignaturesJS)">';
-        $content .= '<option value="none" data-nb="-1" selected >Sans signature</option>';
-        for ($i = 0; $mailSignatures[$i]; $i++) {
-            $content .= '<option value="' . $mailSignatures[$i]['id'] . '" data-nb="' . $i . '">' . $mailSignatures[$i]['title'] . '</option>';
-        }
-        $content .= '</select>';
-        $content .= '</tr></br></br>';
+    $content .= '<option value="">' . _ADD_TEMPLATE_MAIL . '</option>';
+    
+    $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail'");
+    while ( $result=$stmt->fetchObject()) {
+        $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
     }
+    $content .= '</select>';
+    $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
+    $emailSignaturesClass = new EmailSignatures();
+
+    $mailSignatures = $emailSignaturesClass->getForCurrentUser();
+    $content .= '<script type="text/javascript">var mailSignaturesJS = ' . json_encode($mailSignatures) . ';</script>';
+    $content .= '<select style="width: 20%;" name="selectSignatures" id ="selectSignatures" onchange="changeSignature(this.options[this.selectedIndex], mailSignaturesJS)">';
+    $content .= '<option value="none" data-nb="-1" selected >Sans signature</option>';
+    for ($i = 0; $mailSignatures[$i]; $i++) {
+        $content .= '<option value="' . $mailSignatures[$i]['id'] . '" data-nb="' . $i . '">' . $mailSignatures[$i]['title'] . '</option>';
+    }
+    $content .= '</select>';
+    $content .= '</tr></br></br>';
+
     //Body
 
     if($formContent != 'messageExchange'){
-        $displayHtml = 'block';
-        $displayRaw = 'none';
+        $displayHtml  = 'block';
+        $displayRaw   = 'none';
+        $textAreaMode = 'html';
     } else {
-        $displayHtml = 'none';
-        $displayRaw = 'block';
+        $displayHtml  = 'none';
+        $displayRaw   = 'block';
+        $textAreaMode = 'raw';
     }
-    $content .='<script type="text/javascript">var mode="html";</script>';
+
+    $content .='<script type="text/javascript">var mode="'.$textAreaMode.'";</script>';
 
      //Show/hide html VS raw mode
     if($formContent != 'messageExchange'){
@@ -886,7 +889,6 @@ if ($mode == 'add') {
             }
             $content .= '</select>';
             $content .= '</tr></br></br>';
-
 
             //Body
             if ($emailArray['isHtml'] == 'Y') {

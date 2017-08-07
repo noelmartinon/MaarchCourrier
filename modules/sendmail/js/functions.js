@@ -17,14 +17,20 @@ function addTemplateToEmail(templateMails, path){
     {
         method      :'post',
         parameters  :{
-                        templateId : templateMails
+                        templateId : templateMails,
+                        mode : mode
                      },
         onSuccess   :function(answer){
             eval("response = " + answer.responseText);
             if (response.status == 0) {
                 var strContent = response.content;
-                var strContentReplace = strContent.replace(/\\n/g, '');
-                tinyMCE.execCommand('mceSetContent',false,strContentReplace);
+                if(mode == 'html'){
+                    var strContentReplace = strContent.replace(/\\n/g, '');
+                    tinyMCE.execCommand('mceSetContent', false, strContentReplace);
+                } else {
+                    var strContentReplace = strContent.replace(/\\n/g, '\n');
+                    $j("textarea#body_from_raw").html(strContentReplace);
+                }
             } 
         }
     });
