@@ -156,3 +156,6 @@ if (!defined("_OPERATION_DATE"))
     define("_OPERATION_DATE", "Operation date");
 if (!defined("_RECEPTION_DATE"))
     define("_RECEPTION_DATE", "Reception date");
+
+if (!defined("_SENDS_FAIL"))
+    define("_SENDS_FAIL", "Sends fail");

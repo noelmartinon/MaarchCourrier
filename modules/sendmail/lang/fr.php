@@ -157,3 +157,6 @@ if (!defined("_OPERATION_DATE"))
     define("_OPERATION_DATE", "Date de prise en charge");
 if (!defined("_RECEPTION_DATE"))
     define("_RECEPTION_DATE", "Date de réception");
+
+if (!defined("_SENDS_FAIL"))
+    define("_SENDS_FAIL", "L'envoi a échoué");

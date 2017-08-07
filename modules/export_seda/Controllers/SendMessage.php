@@ -28,19 +28,26 @@ class SendMessage {
         $this->db = new RequestSeda();
     }
 
+    /**
+     * @param $messageObject
+     * @return bool|mixed
+     */
     public function send($messageObject)
     {
         $channel = $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->Channel;
 
+        $adapter = '';
         if ($channel == 'url') {
-            $adapterWS = new AdapterWS();
-            //$adapterWS->send()
+            $adapter = new AdapterWS();
         } elseif ($channel == 'email') {
-            $adapterEmail = new AdapterEmail();
-            $adapterEmail->send($messageObject);
+            $adapter = new AdapterEmail();
         } else {
             return false;
         }
+
+        $res = $adapter->send($messageObject);
+
+        return $res;
     }
 
     public function generateMessageFile($messageObject, $type, $tmpPath)
