@@ -160,3 +160,5 @@ if (!defined("_RECEPTION_DATE"))
 
 if (!defined("_SENDS_FAIL"))
     define("_SENDS_FAIL", "L'envoi a échoué");
+if (!defined("_WRONG_FILE_TYPE_M2M"))
+    define("_WRONG_FILE_TYPE_M2M", "Seuls les fichiers ZIP sont acceptés");

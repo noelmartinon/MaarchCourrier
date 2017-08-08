@@ -51,7 +51,7 @@ class ReceiveMessageExchangeController
         $ext      = $data['extension'];
 
         if(!in_array(strtolower($ext), ['zip', 'tar'])){
-            return $response->withJson(["resId" => ""]);
+            return $response->withJson(["errors" => _WRONG_FILE_TYPE_M2M]);
         }
 
         if ($mimeType != "application/x-tar" && $mimeType != "application/zip" && $mimeType != "application/tar" && $mimeType != "application/x-gzip") {
