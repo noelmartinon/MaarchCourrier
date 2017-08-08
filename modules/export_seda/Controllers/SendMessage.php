@@ -13,7 +13,7 @@
  * @ingroup export_seda
  */
 
-require_once 'modules/export_seda/RequestSeda.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR .'../RequestSeda.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR .'../DOMTemplateProcessor.php';
 require_once __DIR__. DIRECTORY_SEPARATOR .'../Zip.php';
 require_once __DIR__. DIRECTORY_SEPARATOR . '/AdapterWS.php';

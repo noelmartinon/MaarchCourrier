@@ -359,7 +359,7 @@ class SendMessageExchangeController
         $writer->BirthName     = $userInfos['lastname'];
         $contentObject->Writer = [$writer];
 
-        $contentObject->CreatedDate = $aArgs['CreatedDate'];
+        $contentObject->CreatedDate = date("Y-m-d", strtotime($aArgs['CreatedDate']));
 
         return $contentObject;
     }
