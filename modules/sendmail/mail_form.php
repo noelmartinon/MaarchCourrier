@@ -174,6 +174,16 @@ if ($mode == 'add') {
                         .'document.getElementById(\'target\').value, false, \''.(addslashes(_EMAIL_WRONG_FORMAT)).'\');" />&nbsp;';
         $content .= '</td>';
         $content .= '</tr>';
+    } else {
+        $content .= '<tr>';
+        $content .= '<td align="right" >Contact</label></td>';
+        $content .= '<td colspan="2"><input type="text" name="user" id="user" value="" class="emailSelect" />';
+        $content .= '<div id="destUSer" class="autocomplete"></div>';
+        $content .= '<script type="text/javascript">addDestUser(\'user\', \'destUSer\', \'index.php?display=true&module=sendmail&page=contact_autocompletion\', \'what\', \'2\');</script>';
+        $content .=' <input type="hidden" id="valid" onclick="updateDestUser(\''.$path_to_script
+                        .'&mode=destUser\', \'add\', document.getElementById(\'user\').value, \'to\', false);" />&nbsp;';
+        $content .= '</td>';
+        $content .= '</tr>';
     }
     $content .= '<tr>';
     $content .= '<td align="right" nowrap width="10%"><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'
@@ -223,9 +233,7 @@ if ($mode == 'add') {
     } else if($address_id != null) {
         $adress_mail = ContactsModel::getContactFullLabel(['addressId' => $address_id]);
     }
-    if($formContent == 'messageExchange'){
-        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'.$adress_mail.'</td>';
-    } else if($adress_mail != null and $_SESSION['user']['UserId'] != $exp_user_id and $_SESSION['user']['UserId'] != $dest_user_id){
+    if($adress_mail != null and $_SESSION['user']['UserId'] != $exp_user_id and $_SESSION['user']['UserId'] != $dest_user_id){
         $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput"><div id="loading_to" style="display:none;"></div><div class="email_element" id="0_'.$adress_mail.'">'.
         $adress_mail.'&nbsp;<div class="email_delete_button" id="0" onclick="updateAdress(\''.$_SESSION['config']['coreurl'].'apps/maarch_entreprise/index.php?display=true&amp;module=sendmail&amp;page=sendmail_ajax_content&amp;identifier=106&amp;origin=document&amp;coll_id=letterbox_coll&amp;size=full&amp;mode=adress\', \'del\', \''.$adress_mail.'\', \'to\', this.id);"
              alt=\"Supprimer\" title=\"Supprimer\">x</div></div></div>'

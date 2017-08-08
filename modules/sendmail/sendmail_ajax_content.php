@@ -43,6 +43,7 @@ require_once 'modules/notifications/notifications_tables_definition.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/Controllers/SendMessageExchangeController.php';
+require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 
 
 $core_tools                = new core_tools();
@@ -506,11 +507,6 @@ switch ($mode) {
             //Reload and show message
             $js =  $list_origin."window.parent.top.$('main_info').innerHTML = '"._EMAIL_REMOVED."';";
             
-            
-            
-        
-            
-            
         } else {
             $error = $request->wash_html(_ID.' '._IS_EMPTY.'!','NONE');
             $status = 1;
@@ -520,7 +516,6 @@ switch ($mode) {
     break;
     case 'adress':
         if (isset($_REQUEST['for']) && isset($_REQUEST['field']) && isset($_REQUEST['email'])) {
-            //
             if (isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 //Clean up email
                 $email = trim($_REQUEST['email']);
@@ -547,6 +542,37 @@ switch ($mode) {
             $error = $request->wash_html(_UNKNOW_ERROR.'!','NONE');
             $status = 1;
         }
+    break;
+    case 'destUser':
+    if (isset($_REQUEST['for']) && isset($_REQUEST['field']) && isset($_REQUEST['contactAddress'])) {
+        if (isset($_REQUEST['contactAddress']) && !empty($_REQUEST['contactAddress'])) {
+            //Clean up contactAddress
+            $contactAddress = trim($_REQUEST['contactAddress']);
+            //Reset session adresses if necessary
+            if (!isset($_SESSION['adresses'][$_REQUEST['field']])) $_SESSION['adresses'][$_REQUEST['field']] = array();
+            //For ADD
+            if ($_REQUEST['for'] == 'add') {
+                $contactLabel = ContactsModel::getContactFullLabel(['addressId' => $contactAddress]);
+                // $contactCommunication = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
+                $_SESSION['adresses'][$_REQUEST['field']][$contactAddress] = $contactLabel;
+            //For DEL
+            } else  if ($_REQUEST['for'] == 'del') {
+                //unset adress in array
+                unset($_SESSION['adresses'][$_REQUEST['field']][$_REQUEST['index']]);
+                //If no adresse for field, unset the entire sub-array
+                if (count($_SESSION['adresses'][$_REQUEST['field']]) == 0) 
+                    unset($_SESSION['adresses'][$_REQUEST['field']]);
+            }
+            //Get content
+            $content = $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], $_REQUEST['field']);
+        } else {
+            $error = $request->wash_html(_EMAIL.' '._IS_EMPTY.'!','NONE');
+            $status = 1;
+        }
+    } else {
+        $error = $request->wash_html(_UNKNOW_ERROR.'!','NONE');
+        $status = 1;
+    }
     break;
 }
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes(_parse_error($error)) . "', exec_js : '".addslashes($js)."'}";

@@ -11,6 +11,19 @@ var addEmailAdress = function (idField, idList, theUrlToListScript, paramNameSrv
          });
  };
 
+ var addDestUser = function (idField, idList, theUrlToListScript, paramNameSrv, minCharsSrv) {
+     new Ajax.Autocompleter(
+         idField,
+         idList,
+         theUrlToListScript,
+         {
+             paramName: paramNameSrv,
+             minChars: minCharsSrv,
+             tokens: ',',
+             afterUpdateElement:extractDestUser
+         });
+ };
+
 function addTemplateToEmail(templateMails, path){
 
     new Ajax.Request(path,
@@ -128,6 +141,33 @@ function updateAdress(path, action, adress, target, array_index, email_format_te
     }
 }
 
+function updateDestUser(path, action, adress, target, array_index) {
+     
+    new Ajax.Request(path,
+    {
+        method:'post',
+        parameters: { url : path,
+                      'for': action,
+                      contactAddress: adress,
+                      field: target,
+                      index: array_index
+                    },
+        onLoading: function(answer) {
+            $('loading_' + target).style.display='inline';
+        },
+        onSuccess: function(answer) {
+            eval("response = "+answer.responseText);
+            if(response.status == 0){
+                $(target).innerHTML = response.content;
+                if (action == 'add') {$('user').value = '';}
+            } else {
+                alert(response.error);
+                eval(response.exec_js);
+            }
+        }
+    });
+}
+
 function validEmailForm(path, form_id) {
 
     var attachments = $j("#joined_files input.check");
@@ -217,6 +257,11 @@ function validEmailFormForSendToContact(path, form_id, path2, status) {
 function extractEmailAdress(field, item) {
     var fullAdress = item.innerHTML;
     field.value = fullAdress.match(/\(([^)]+)\)/)[1];
+}
+
+function extractDestUser(field, item) {
+    $j('#user').val(item.id);
+    $j('#valid').click();
 }
 
 function validateEmail(email) { 

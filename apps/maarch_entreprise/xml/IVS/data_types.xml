@@ -53,6 +53,7 @@
       <enumeration value="set" />
       <enumeration value="mass" />
       <enumeration value="search" />
+      <enumeration value="destUser" />
     </dataType>
     <dataType name="size" base="string">
       <enumeration value="full" />

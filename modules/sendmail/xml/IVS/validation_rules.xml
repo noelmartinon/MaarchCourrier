@@ -29,6 +29,7 @@
 		<parameter name="action" type="string" />
 		<parameter name="formContent" type="string" />
 		<parameter name="main_exchange_doc" type="string" />
+		<parameter name="contactAddress" type="integer" />
 	</validationRule>
 
 	<validationRule name="mail_form" extends="standardForm" mode="error">
