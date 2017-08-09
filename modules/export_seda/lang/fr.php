@@ -124,3 +124,15 @@ if (!defined("_LETTER_NO_ARCHIVED"))
 
 if (!defined("_ERROR_LETTER_ARCHIVED"))
     define("_ERROR_LETTER_ARCHIVED", "Vous ne pouvez pas remettre à zéro un courrier archivé. Numéro du courrier : ");
+
+if (!defined("_ERROR_MESSAGE_STRUCTURE_WRONG"))
+    define("_ERROR_MESSAGE_STRUCTURE_WRONG", "Le bordereau est mal formé.");
+
+if (!defined("_ERROR_MESSAGE_NOT_PRESENT"))
+    define("_ERROR_MESSAGE_NOT_PRESENT", "Bordereau absent.");
+
+if (!defined("_ERROR_ATTACHMENT_FILE_MISSING"))
+    define("_ERROR_ATTACHMENT_FILE_MISSING", "Pièce jointe absente");
+
+if (!defined("_ERROR_ATTACHMENT_WRONG_BASE64"))
+    define("_ERROR_ATTACHMENT_WRONG_BASE64", "Mauvaise pièce jointe");

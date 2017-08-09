@@ -114,3 +114,9 @@ if (!defined("_LETTER_NO_ARCHIVED"))
 
 if (!defined("_ERROR_LETTER_ARCHIVED"))
     define("_ERROR_LETTER_ARCHIVED", "You can not reset an archived letter. Letter number : ");
+
+if (!defined("_ERROR_ATTACHMENT_FILE_MISSING"))
+    define("_ERROR_ATTACHMENT_FILE_MISSING", "Missing attachment file");
+
+if (!defined("_ERROR_ATTACHMENT_WRONG_BASE64"))
+    define("_ERROR_ATTACHMENT_WRONG_BASE64", "Wrong attachment (wrong base64)");

@@ -195,6 +195,22 @@ class RequestSeda
 		return $entitie;
 	}
 
+    public function getEntitiesByBusinessId($businessId) {
+        $queryParams = [];
+
+        $queryParams[] = $businessId;
+
+        $query = "SELECT * FROM entities WHERE business_id = ?";
+
+        $smtp = $this->db->query($query,$queryParams);
+
+        while ($res = $smtp->fetchObject()) {
+            $entities[] = $res;
+        }
+
+        return $entities;
+    }
+
 	public function getContact($contactId)
 	{
 		$queryParams = [];
