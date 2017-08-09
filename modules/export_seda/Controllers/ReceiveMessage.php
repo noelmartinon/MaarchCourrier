@@ -155,6 +155,7 @@ class ReceiveMessage
         $listBinaryDataObject = array();
         $i = 0;
         foreach ($dataObject as $BinaryDataObject) {
+
             $listBinaryDataObject[$i]->id = (string) $BinaryDataObject->attributes();
 
             $listBinaryDataObject[$i]->MessageDigest = new stdClass();
@@ -164,7 +165,7 @@ class ReceiveMessage
             $listBinaryDataObject[$i]->Size = (string) $BinaryDataObject->Size;
 
             $listBinaryDataObject[$i]->Attachment = new stdClass();
-            //$listBinaryDataObject[$i]->Attachment->value = (string) $BinaryDataObject->Attachment->value;
+            $listBinaryDataObject[$i]->Attachment->value = (string) $BinaryDataObject->Attachment;
             foreach ($BinaryDataObject->Attachment->attributes() as $key => $value) {
                 if ($key == 'filename') {
                     $listBinaryDataObject[$i]->Attachment->filename = (string) $value;
