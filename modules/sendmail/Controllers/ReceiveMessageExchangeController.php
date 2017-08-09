@@ -49,13 +49,13 @@ class ReceiveMessageExchangeController
         }
 
         $file     = base64_decode($data['base64']);
-        $tmpName  = 'tmp_file_' .$_SESSION['user']['UserId']. '_' .rand(). '_' .$data['name'];
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($file);
         $size     = strlen($file);
         $type     = explode('/', $mimeType);
         $ext      = $data['extension'];
+        $tmpName  = 'tmp_file_' .$_SESSION['user']['UserId']. '_ArchiveTransfer_' .rand(). '.' . $ext;
 
         if(!in_array(strtolower($ext), ['zip', 'tar'])){
             return $response->withJson(["errors" => _WRONG_FILE_TYPE_M2M]);
