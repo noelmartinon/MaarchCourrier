@@ -122,7 +122,10 @@ class ReceiveMessage
         $listComment= array();
         $messageObject->Comment = new stdClass();
         foreach ($dataObject->Comment as $comment) {
-            $listComment[]->value = (string) $comment;
+            $tmpComment = new stdClass();
+            $tmpComment->value = (string) $comment;
+
+            $listComment[] = $tmpComment;
         }
         $messageObject->Comment = $listComment;
 
@@ -155,28 +158,29 @@ class ReceiveMessage
         $listBinaryDataObject = array();
         $i = 0;
         foreach ($dataObject as $BinaryDataObject) {
+            $tmpBinaryDataObject = new stdClass();
+            $tmpBinaryDataObject->id = (string) $BinaryDataObject->attributes();
 
-            $listBinaryDataObject[$i]->id = (string) $BinaryDataObject->attributes();
+            $tmpBinaryDataObject->MessageDigest = new stdClass();
+            $tmpBinaryDataObject->MessageDigest->value = (string) $BinaryDataObject->MessageDigest;
+            $tmpBinaryDataObject->MessageDigest->algorithm = (string) $BinaryDataObject->MessageDigest->attributes();
 
-            $listBinaryDataObject[$i]->MessageDigest = new stdClass();
-            $listBinaryDataObject[$i]->MessageDigest->value = (string) $BinaryDataObject->MessageDigest;
-            $listBinaryDataObject[$i]->MessageDigest->algorithm = (string) $BinaryDataObject->MessageDigest->attributes();
+            $tmpBinaryDataObject->Size = (string) $BinaryDataObject->Size;
 
-            $listBinaryDataObject[$i]->Size = (string) $BinaryDataObject->Size;
-
-            $listBinaryDataObject[$i]->Attachment = new stdClass();
-            $listBinaryDataObject[$i]->Attachment->value = (string) $BinaryDataObject->Attachment;
+            $tmpBinaryDataObject->Attachment = new stdClass();
+            $tmpBinaryDataObject->Attachment->value = (string) $BinaryDataObject->Attachment;
             foreach ($BinaryDataObject->Attachment->attributes() as $key => $value) {
                 if ($key == 'filename') {
-                    $listBinaryDataObject[$i]->Attachment->filename = (string) $value;
+                    $tmpBinaryDataObject->Attachment->filename = (string) $value;
                 } elseif ($key == 'uri') {
-                    $listBinaryDataObject[$i]->Attachment->uri = (string) $value;
+                    $tmpBinaryDataObject->Attachment->uri = (string) $value;
                 }
             }
 
-            $listBinaryDataObject[$i]->FormatIdentification = new stdClass();
-            $listBinaryDataObject[$i]->FormatIdentification->MimeType = (string) $BinaryDataObject->FormatIdentification->MimeType;
-            $i++;
+            $tmpBinaryDataObject->FormatIdentification = new stdClass();
+            $tmpBinaryDataObject->FormatIdentification->MimeType = (string) $BinaryDataObject->FormatIdentification->MimeType;
+
+            $listBinaryDataObject[] = $tmpBinaryDataObject;
         }
 
         return $listBinaryDataObject;
@@ -184,47 +188,49 @@ class ReceiveMessage
     
     private function getArchiveUnit($dataObject) {
         $listArchiveUnit = array();
-        $i =0;
         foreach ($dataObject as $ArchiveUnit) {
-            $listArchiveUnit[$i]->id = (string) $ArchiveUnit->attributes();
-            $listArchiveUnit[$i]->Content = new stdClass();
-            $listArchiveUnit[$i]->Content->DescriptionLevel = (string) $ArchiveUnit->Content->DescriptionLevel;
+            $tmpArchiveUnit = new stdClass();
+            $tmpArchiveUnit->id = (string) $ArchiveUnit->attributes();
+            $tmpArchiveUnit->Content = new stdClass();
+            $tmpArchiveUnit->Content->DescriptionLevel = (string) $ArchiveUnit->Content->DescriptionLevel;
 
-            $listArchiveUnit[$i]->Content->Title = array();
+            $tmpArchiveUnit->Content->Title = array();
             foreach ($ArchiveUnit->Content->Title as $title) {
-                $listArchiveUnit[$i]->Content->Title[] = (string) $title;
+                $tmpArchiveUnit->Content->Title[] = (string) $title;
             }
 
-            $listArchiveUnit[$i]->Content->OriginatingSystemId = (string) $ArchiveUnit->Content->OriginatingSystemId;
-            $listArchiveUnit[$i]->Content->OriginatingAgencyArchiveUnitIdentifier = (string) $ArchiveUnit->Content->OriginatingAgencyArchiveUnitIdentifier;
-            $listArchiveUnit[$i]->Content->DocumentType = (string) $ArchiveUnit->Content->DocumentType;
-            $listArchiveUnit[$i]->Content->Status = (string) $ArchiveUnit->Content->Status;
-            $listArchiveUnit[$i]->Content->CreatedDate = (string) $ArchiveUnit->Content->CreatedDate;
+            $tmpArchiveUnit->Content->OriginatingSystemId = (string) $ArchiveUnit->Content->OriginatingSystemId;
+            $tmpArchiveUnit->Content->OriginatingAgencyArchiveUnitIdentifier = (string) $ArchiveUnit->Content->OriginatingAgencyArchiveUnitIdentifier;
+            $tmpArchiveUnit->Content->DocumentType = (string) $ArchiveUnit->Content->DocumentType;
+            $tmpArchiveUnit->Content->Status = (string) $ArchiveUnit->Content->Status;
+            $tmpArchiveUnit->Content->CreatedDate = (string) $ArchiveUnit->Content->CreatedDate;
 
             if ($ArchiveUnit->Content->Writer) {
-                $listArchiveUnit[$i]->Content->Writer = array();
+                $tmpArchiveUnit->Content->Writer = array();
                 $j = 0;
                 foreach ($ArchiveUnit->Content->Writer as $Writer) {
-                    $listArchiveUnit[$i]->Content->Writer[$j]->FirstName = (string)$Writer->FirstName;
-                    $listArchiveUnit[$i]->Content->Writer[$j]->BirthName = (string)$Writer->BirthName;
+                    $tmpArchiveUnit->Content->Writer[$j]->FirstName = (string)$Writer->FirstName;
+                    $tmpArchiveUnit->Content->Writer[$j]->BirthName = (string)$Writer->BirthName;
                     $j++;
                 }
             }
 
             if ($ArchiveUnit->DataObjectReference) {
-                $listArchiveUnit[$i]->DataObjectReference = array();
+                $tmpArchiveUnit->DataObjectReference = array();
                 $j = 0;
                 foreach ($ArchiveUnit->DataObjectReference as $DataObjectReference) {
-                    $listArchiveUnit[$i]->DataObjectReference[$j]->DataObjectReferenceId = (string) $DataObjectReference->DataObjectReferenceId;
-                    $j++;
+                    $tmpDataObjectReference = new stdClass();
+                    $tmpDataObjectReference->DataObjectReferenceId = (string) $DataObjectReference->DataObjectReferenceId;
+
+                    $tmpArchiveUnit->DataObjectReference[] = $tmpDataObjectReference;
                 }
             }
 
             if ($ArchiveUnit->ArchiveUnit) {
-                $listArchiveUnit[$i]->ArchiveUnit = $this->getArchiveUnit($ArchiveUnit->ArchiveUnit);
+                $tmpArchiveUnit->ArchiveUnit = $this->getArchiveUnit($ArchiveUnit->ArchiveUnit);
             }
 
-            $i++;
+            $listArchiveUnit[] = $tmpArchiveUnit;
         }
         return $listArchiveUnit;
     }
@@ -258,11 +264,12 @@ class ReceiveMessage
 
     private function getCommunication($dataObject) {
         $listCommunication = array();
-        $i=0;
         foreach ($dataObject as $Communication) {
-            $listCommunication[$i]->Channel = (string) $Communication->Channel;
-            $listCommunication[$i]->value = (string) $Communication->CompleteNumber;
-            $i++;
+            $tmpCommunication = new stdClass();
+            $tmpCommunication->Channel = (string) $Communication->Channel;
+            $tmpCommunication->value = (string) $Communication->CompleteNumber;
+
+            $listCommunication[] = $tmpCommunication;
         }
 
         return $listCommunication;
@@ -270,14 +277,15 @@ class ReceiveMessage
 
     private function getAddress($dataObject) {
         $listAddress = array();
-        $i=0;
         foreach ($dataObject as $Address) {
-            $listAddress[$i]->CityName = (string) $Address->CityName;
-            $listAddress[$i]->Country = (string) $Address->Country;
-            $listAddress[$i]->Postcode = (string) $Address->Postcode;
-            $listAddress[$i]->PostOfficeBox = (string) $Address->PostOfficeBox;
-            $listAddress[$i]->StreetName = (string) $Address->StreetName;
-            $i++;
+            $tmpAddress = new stdClass();
+            $tmpAddress->CityName = (string) $Address->CityName;
+            $tmpAddress->Country = (string) $Address->Country;
+            $tmpAddress->Postcode = (string) $Address->Postcode;
+            $tmpAddress->PostOfficeBox = (string) $Address->PostOfficeBox;
+            $tmpAddress->StreetName = (string) $Address->StreetName;
+
+            $listAddress[] = $tmpAddress;
         }
 
         return $listAddress;
@@ -285,19 +293,19 @@ class ReceiveMessage
 
     private function getContact($dataObject) {
         $listContact = array();
-        $i=0;
         foreach ($dataObject as $Contact) {
-            $listContact[$i]->DepartmentName = (string) $Contact->DepartmentName;
-            $listContact[$i]->PersonName = (string) $Contact->PersonName;
+            $tmpContact = new stdClass();
+            $tmpContact->DepartmentName = (string) $Contact->DepartmentName;
+            $tmpContact->PersonName = (string) $Contact->PersonName;
 
             if ($Contact->Communication) {
-                $listContact[$i]->Communication = $this->getCommunication($Contact->Communication);
+                $tmpContact->Communication = $this->getCommunication($Contact->Communication);
             }
 
             if ($Contact->Address) {
-                $listContact[$i]->Address = $this->getAddress($Contact->Address);
+                $tmpContact->Address = $this->getAddress($Contact->Address);
             }
-            $i++;
+            $listContact[] = $tmpContact;
         }
 
         return $listContact;
