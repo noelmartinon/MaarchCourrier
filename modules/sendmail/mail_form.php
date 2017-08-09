@@ -95,7 +95,6 @@ if (isset($_REQUEST['formContent']) && !empty($_REQUEST['formContent'])) {
 //Keep the origin
 $origin = '';
 if (isset($_REQUEST['origin']) && !empty($_REQUEST['origin'])) {
-    //
     $origin = $_REQUEST['origin'];
 }
 
@@ -219,15 +218,15 @@ if ($mode == 'add') {
     }
     if($formContent != 'messageExchange'){
         if($address_id != null){
-            $adr = ContactsModel::getFullAddressById(['select' => ['email'], 'addressId' => $address_id]);
+            $adr         = ContactsModel::getFullAddressById(['select' => ['email'], 'addressId' => $address_id]);
             $adress_mail = $adr[0]['email'];
         }elseif($exp_user_id != null){
-            $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($exp_user_id));
-            $adr  = $stmt->fetchObject();
+            $stmt        = $db->query("SELECT mail FROM users WHERE user_id = ?", array($exp_user_id));
+            $adr         = $stmt->fetchObject();
             $adress_mail = $adr->mail;
         }elseif($dest_user_id != null){
-            $stmt = $db->query("SELECT mail FROM users WHERE user_id = ?", array($dest_user_id));
-            $adr  = $stmt->fetchObject();
+            $stmt        = $db->query("SELECT mail FROM users WHERE user_id = ?", array($dest_user_id));
+            $adr         = $stmt->fetchObject();
             $adress_mail = $adr->mail;
         }
     } else if($address_id != null) {
@@ -238,7 +237,8 @@ if ($mode == 'add') {
         }
         if(!empty($contact_id)){
             $communicationTypeModel = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
-            if(!empty($communicationTypeModel)){
+            $contactInfo            = ContactsModel::getById(['id' => $contact_id]);
+            if(!empty($communicationTypeModel) && !empty($contactInfo[0]['external_contact_id'])){
                 $adress_mail = ContactsModel::getContactFullLabel(['addressId' => $address_id]);
                 $adress_mail .= '. (' . _COMMUNICATION_TYPE . ' : '.$communicationTypeModel['value'] . ')';
             }
@@ -248,13 +248,18 @@ if ($mode == 'add') {
         if($formContent == 'messageExchange'){
             $_SESSION['adresses']['to'][$address_id] = $adress_mail;
             $onclickfunction = 'updateDestUser';
+            $elementToDel    = $address_id;
+            $modeUrl         = 'destUser';
+            $idToDel         = $address_id;
         } else {
             $_SESSION['adresses']['to'][0] = $adress_mail;
             $onclickfunction = 'updateAdress';
+            $elementToDel    = $adress_mail;
+            $idToDel         = 0;
         }
         $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput"><div id="loading_to" style="display:none;"></div><div class="email_element" id="0_'.$adress_mail.'">'.
-        $adress_mail.'&nbsp;<div class="email_delete_button" id="0" onclick="'.$onclickfunction.'(\''.$path_to_script
-                .'mode=adress\', \'del\', \''.$adress_mail.'\', \'to\', this.id);"
+        $adress_mail.'&nbsp;<div class="email_delete_button" id="'.$idToDel.'" onclick="'.$onclickfunction.'(\''.$path_to_script
+                .'&mode='.$modeUrl.'\', \'del\', \''.$elementToDel.'\', \'to\', this.id);"
              alt=\"Supprimer\" title=\"Supprimer\">x</div></div></div>'
         .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
     } else {
