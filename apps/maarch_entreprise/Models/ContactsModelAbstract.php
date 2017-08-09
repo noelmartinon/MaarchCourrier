@@ -73,12 +73,12 @@ class ContactsModelAbstract extends Apps_Table_Service
         $fullAddress = $fullAddress[0];
 
         if ($fullAddress['is_corporate_person'] == 'Y') {
-            $contactName = $fullAddress['society'] . ' ' ;
+            $contactName = strtoupper($fullAddress['society']) . ' ' ;
             if (!empty($fullAddress['society_short'])) {
                 $contactName .= '('.$fullAddress['society_short'].') ';
             }
         } else {
-            $contactName = $fullAddress['contact_lastname'] . ' ' . $fullAddress['contact_firstname'] . ' ';
+            $contactName = strtoupper($fullAddress['contact_lastname']) . ' ' . $fullAddress['contact_firstname'] . ' ';
             if (!empty($fullAddress['society'])) {
                 $contactName .= '(' . $fullAddress['society'] . ') ';
             }                        
@@ -124,14 +124,10 @@ class ContactsModelAbstract extends Apps_Table_Service
             'data'      => [$aArgs['contactId']],
         ]);
 
-        if($aArgs['allValues'] === true){
-            return $aReturn[0];
+        if(empty($aReturn)){
+            return "";
         } else {
-            if(empty($aReturn)){
-                return "";
-            } else {
-                return $aReturn[0]['value'].' ('.$aReturn[0]['type'].')';
-            }
+            return $aReturn[0];
         }
         
     }

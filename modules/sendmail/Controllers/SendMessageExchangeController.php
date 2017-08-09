@@ -46,8 +46,6 @@ class SendMessageExchangeController
         }
 
         /***************** GET MAIL INFOS *****************/
-        $ArchivalAgencyCommunicationType   = ContactsModel::getContactCommunication(['contactId' => $contact_id, 'allValues' => true]);
-        $ArchivalAgencyContactInformations = ContactsModel::getFullAddressById(['addressId' => $mlbCollExt['address_id']]);
         $TransferringAgencyInformations    = \Entities\Models\EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']]);
         $AllInfoMainMail                   = ResModel::getById(['resId' => $aArgs['identifier']]);
 
@@ -127,50 +125,57 @@ class SendMessageExchangeController
 
         $mainDocument[0]['Title'] = $aArgs['object'];
 
-        /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
-        $dataObject = self::generateMessageObject([
-            'Comment' => $aComments,
-            'ArchivalAgency' => [
-                'CommunicationType'   => $ArchivalAgencyCommunicationType,
-                'ContactInformations' => $ArchivalAgencyContactInformations[0]
-            ],
-            'TransferringAgency' => [
-                'EntitiesInformations' => $TransferringAgencyInformations
-            ],
-            'attachment'            => $aMergeAttachment,
-            'res'                   => $mainDocument,
-            'mainExchangeDocument'  => $MainExchangeDoc
-        ]);
-
-        /******** GENERATION DU BORDEREAU */
         $sendMessage = new SendMessage();
-        $filePath = $sendMessage->generateMessageFile($dataObject, "ArchiveTransfer", $_SESSION['config']['tmppath']);
-
-        /******** SAVE MESSAGE *********/
-        $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier'], 'file_path' => $filePath]);
-        self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'notes' => $aArgs['notes'], 'messageId' => $messageId]);
-
         $hist    = new history();
         $request = new request();
-        $hist->add(
-            'res_letterbox', $aArgs['identifier'], "UP", 'resup', _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
-            . $aArgs['identifier'] . ' ('.$messageId.') : "' . $request->cut_string($mainDocument[0]['Title'], 254) .'"',
-            $_SESSION['config']['databasetype'], 'sendmail'
-        );
-        $hist->add(
-            'message_exchange', $messageId, "ADD", 'messageexchangeadd', _NUMERIC_PACKAGE_ADDED . ' (' . $messageId . ')',
-            $_SESSION['config']['databasetype'], 'sendmail'
-        );
 
-        /******** ENVOI *******/
-        $res = $sendMessage->send($dataObject);
+        foreach ($_SESSION['adresses']['to'] as $key => $value) {
+            /******** GET ARCHIVAl INFORMATIONs **************/
+            $contactInfo                       = ContactsModel::getFullAddressById(['addressId' => $key]);
+            $ArchivalAgencyCommunicationType   = ContactsModel::getContactCommunication(['contactId' => $contactInfo[0]['contact_id']]);
+            $ArchivalAgencyContactInformations = ContactsModel::getFullAddressById(['addressId' => $key]);
 
-        if ($res['status'] == 1) {
-            $errors = [];
-            array_push($errors, _SENDS_FAIL);
-            array_push($errors, $res['content']);
-            return ['errors' => $errors];
-        }
+            /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
+            $dataObject = self::generateMessageObject([
+                'Comment' => $aComments,
+                'ArchivalAgency' => [
+                    'CommunicationType'   => $ArchivalAgencyCommunicationType,
+                    'ContactInformations' => $ArchivalAgencyContactInformations[0]
+                ],
+                'TransferringAgency' => [
+                    'EntitiesInformations' => $TransferringAgencyInformations
+                ],
+                'attachment'            => $aMergeAttachment,
+                'res'                   => $mainDocument,
+                'mainExchangeDocument'  => $MainExchangeDoc
+            ]);
+            /******** GENERATION DU BORDEREAU */
+            $filePath = $sendMessage->generateMessageFile($dataObject, "ArchiveTransfer", $_SESSION['config']['tmppath']);
+
+            /******** SAVE MESSAGE *********/
+            $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier'], 'file_path' => $filePath]);
+            self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'notes' => $aArgs['notes'], 'messageId' => $messageId]);
+
+            $hist->add(
+                'res_letterbox', $aArgs['identifier'], "UP", 'resup', _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
+                . $aArgs['identifier'] . ' ('.$messageId.') : "' . $request->cut_string($mainDocument[0]['Title'], 254) .'"',
+                $_SESSION['config']['databasetype'], 'sendmail'
+            );
+            $hist->add(
+                'message_exchange', $messageId, "ADD", 'messageexchangeadd', _NUMERIC_PACKAGE_ADDED . ' (' . $messageId . ')',
+                $_SESSION['config']['databasetype'], 'sendmail'
+            );
+
+            /******** ENVOI *******/
+            $res = $sendMessage->send($dataObject);
+
+            if ($res['status'] == 1) {
+                $errors = [];
+                array_push($errors, _SENDS_FAIL);
+                array_push($errors, $res['content']);
+                return ['errors' => $errors];
+            }
+         } 
 
         return true;
     }
@@ -193,6 +198,10 @@ class SendMessageExchangeController
 
         if (empty($aArgs['join_file']) && empty($aArgs['join_attachment']) && empty($aArgs['main_exchange_doc'])) {
             array_push($errors, 'no attachment');
+        }
+
+        if (empty($_SESSION['adresses']['to'])) {
+            array_push($errors, 'no dest contact');
         }
 
         return $errors;

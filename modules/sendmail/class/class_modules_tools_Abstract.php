@@ -391,6 +391,28 @@ abstract class SendmailAbstract extends Database
         return $content;
     }
 
+    public function updateContactInputField($ajaxPath, $adressArray, $inputField, $readOnly=false)
+    {
+        $content = '<div id="loading_'.$inputField.'" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></i></div>';
+        //Get info from session array and display tag
+        if (isset($adressArray[$inputField]) && count($adressArray[$inputField]) > 0) {
+            foreach ($adressArray[$inputField] as $key => $adress) {
+                if (!empty($adress)) {
+                    $content .= '<div class="email_element" id="'.$key.'_'.$adress.'">'.$adress;
+                    if ($readOnly === false) {
+                        $content .= '&nbsp;<div class="email_delete_button" id="'.$key.'"'
+                            . 'onclick="updateDestUser(\''.$ajaxPath
+                            .'&mode=destUser\', \'del\', this.id, \''
+                            .$inputField.'\', this.id);" alt="'._DELETE.'" title="'
+                            ._DELETE.'">x</div>';
+                    }
+                    $content .= '</div>';
+                }
+            }
+        }
+        return $content;
+    }
+
     public function getResource($collectionArray, $coll_id, $res_id)
     {
         $viewResourceArr = array();

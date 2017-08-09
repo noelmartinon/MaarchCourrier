@@ -21,6 +21,7 @@ use Core\Controllers\ResController;
 use Core\Controllers\ResExtController;
 use Core\Models\UserModel;
 use Core\Models\CoreConfigModel;
+use Core\Models\ServiceModel;
 use Entities\Models\EntitiesModel;
 use Baskets\Models\BasketsModel;
 
@@ -31,6 +32,11 @@ class ReceiveMessageExchangeController
 {
     public function saveMessageExchange(RequestInterface $request, ResponseInterface $response)
     {
+
+        if (!ServiceModel::hasService(['id' => 'save_numeric_package', 'userId' => $_SESSION['user']['UserId'], 'location' => 'sendmail', 'type' => 'menu'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         if (empty($_SESSION['user']['UserId'])) {
             return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
         }
@@ -250,8 +256,7 @@ class ReceiveMessageExchangeController
         $contact      = $contactModel->CreateContact($aDataContact);
 
         $contactCommunicationExisted = $contactModel->getContactCommunication([
-            "contactId" => $contact['contactId'],
-            "allValues" => true
+            "contactId" => $contact['contactId']
         ]);
 
         $contactCommunication = $transferringAgencyMetadata->Communication;

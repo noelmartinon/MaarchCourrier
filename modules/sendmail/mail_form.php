@@ -177,7 +177,7 @@ if ($mode == 'add') {
     } else {
         $content .= '<tr>';
         $content .= '<td align="right" >Contact</label></td>';
-        $content .= '<td colspan="2"><input type="text" name="user" id="user" value="" class="emailSelect" />';
+        $content .= '<td colspan="2"><input type="text" name="user" id="user" style="width:96%" />';
         $content .= '<div id="destUSer" class="autocomplete"></div>';
         $content .= '<script type="text/javascript">addDestUser(\'user\', \'destUSer\', \'index.php?display=true&module=sendmail&page=contact_autocompletion\', \'what\', \'2\');</script>';
         $content .=' <input type="hidden" id="valid" onclick="updateDestUser(\''.$path_to_script
@@ -231,21 +231,6 @@ if ($mode == 'add') {
             $adress_mail = $adr->mail;
         }
     } else if($address_id != null) {
-        $adress_mail = ContactsModel::getContactFullLabel(['addressId' => $address_id]);
-    }
-    if($adress_mail != null and $_SESSION['user']['UserId'] != $exp_user_id and $_SESSION['user']['UserId'] != $dest_user_id){
-        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput"><div id="loading_to" style="display:none;"></div><div class="email_element" id="0_'.$adress_mail.'">'.
-        $adress_mail.'&nbsp;<div class="email_delete_button" id="0" onclick="updateAdress(\''.$_SESSION['config']['coreurl'].'apps/maarch_entreprise/index.php?display=true&amp;module=sendmail&amp;page=sendmail_ajax_content&amp;identifier=106&amp;origin=document&amp;coll_id=letterbox_coll&amp;size=full&amp;mode=adress\', \'del\', \''.$adress_mail.'\', \'to\', this.id);"
-             alt=\"Supprimer\" title=\"Supprimer\">x</div></div></div>'
-        .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
-        $_SESSION['adresses']['to'][0] = $adress_mail;
-    } else {
-        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'
-        .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
-    }
-
-    $content .= '</tr>';
-    if($formContent == 'messageExchange'){
         if($exp_contact_id != null){
             $contact_id = $exp_contact_id;
         } else {
@@ -253,14 +238,32 @@ if ($mode == 'add') {
         }
         if(!empty($contact_id)){
             $communicationTypeModel = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
+            if(!empty($communicationTypeModel)){
+                $adress_mail = ContactsModel::getContactFullLabel(['addressId' => $address_id]);
+                $adress_mail .= '. (' . _COMMUNICATION_TYPE . ' : '.$communicationTypeModel['value'] . ')';
+            }
         }
-        if(empty($communicationTypeModel)){
-            $communicationType = '<span style="color:red">'._NOTHING.'</span>';
-        } else {
-            $communicationType = $communicationTypeModel;
-        }
-        $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">' . _COMMUNICATION_MODE . ' : '.$communicationType.'</td></tr>';
     }
+    if($adress_mail != null and $_SESSION['user']['UserId'] != $exp_user_id and $_SESSION['user']['UserId'] != $dest_user_id){
+        if($formContent == 'messageExchange'){
+            $_SESSION['adresses']['to'][$address_id] = $adress_mail;
+            $onclickfunction = 'updateDestUser';
+        } else {
+            $_SESSION['adresses']['to'][0] = $adress_mail;
+            $onclickfunction = 'updateAdress';
+        }
+        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput"><div id="loading_to" style="display:none;"></div><div class="email_element" id="0_'.$adress_mail.'">'.
+        $adress_mail.'&nbsp;<div class="email_delete_button" id="0" onclick="'.$onclickfunction.'(\''.$path_to_script
+                .'mode=adress\', \'del\', \''.$adress_mail.'\', \'to\', this.id);"
+             alt=\"Supprimer\" title=\"Supprimer\">x</div></div></div>'
+        .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
+    } else {
+        $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">'
+        .'<div id="loading_to" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></div></div></td>';
+    }
+
+    $content .= '</tr>';
+
     if($formContent != 'messageExchange'){
         $content .= '<tr><td colspan="3"><a href="javascript://" '
     		.'onclick="new Effect.toggle(\'tr_cc\', \'blind\', {delay:0.2});'
@@ -542,14 +545,10 @@ if ($mode == 'add') {
     //Buttons
     $content .='<hr style="margin-top:2px;" />';
     $content .='<div align="center">';
-    if((!empty($communicationTypeModel) && $formContent == 'messageExchange') || $formContent != 'messageExchange'){
-        //Send
-        $content .=' <input type="button" name="valid" value="&nbsp;'._SEND_EMAIL
-                    .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
-                    .$path_to_script.'&mode=added&for=send\', \'formEmail\');" />&nbsp;';
-    } else {
-        $content .= _NO_COMMUNICATION_MODE . " ";
-    }
+    //Send
+    $content .=' <input type="button" name="valid" value="&nbsp;'._SEND_EMAIL
+                .'&nbsp;" id="valid" class="button" onclick="validEmailForm(\''
+                .$path_to_script.'&mode=added&for=send\', \'formEmail\');" />&nbsp;';
     if($formContent != 'messageExchange'){
         //Save
         $content .=' <input type="button" name="valid" value="&nbsp;'._SAVE_EMAIL
@@ -1019,7 +1018,7 @@ if ($mode == 'add') {
             $content .= '</div></td>';
             $content .= '</tr>';
             if($formContent == 'messageExchange'){
-                $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">' . _COMMUNICATION_MODE . ' : '.$emailArray['communicationType'].'</td></tr>';
+                $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">' . _COMMUNICATION_TYPE . ' : '.$emailArray['communicationType'].'</td></tr>';
             } else {
                 //CC
                 if (count($emailArray['cc']) > 0) {

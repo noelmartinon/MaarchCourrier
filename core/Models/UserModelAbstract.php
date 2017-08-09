@@ -371,4 +371,21 @@ class UserModelAbstract extends \Apps_Table_Service
 
         return $aEntities;
     }
+
+    public static function getServicesById(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['userId']);
+        static::checkString($aArgs, ['userId']);
+
+        $aServices = static::select([
+            'select'    => ['usergroups_services.service_id'],
+            'table'     => ['usergroup_content, usergroups_services'],
+            'where'     => ['usergroup_content.group_id = usergroups_services.group_id', 'usergroup_content.user_id = ?'],
+            'data'      => [$aArgs['userId']]
+        ]);
+
+        return $aServices;
+    }
+
+    
 }

@@ -546,25 +546,23 @@ switch ($mode) {
     case 'destUser':
     if (isset($_REQUEST['for']) && isset($_REQUEST['field']) && isset($_REQUEST['contactAddress'])) {
         if (isset($_REQUEST['contactAddress']) && !empty($_REQUEST['contactAddress'])) {
-            //Clean up contactAddress
             $contactAddress = trim($_REQUEST['contactAddress']);
-            //Reset session adresses if necessary
             if (!isset($_SESSION['adresses'][$_REQUEST['field']])) $_SESSION['adresses'][$_REQUEST['field']] = array();
-            //For ADD
+
             if ($_REQUEST['for'] == 'add') {
-                $contactLabel = ContactsModel::getContactFullLabel(['addressId' => $contactAddress]);
-                // $contactCommunication = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
-                $_SESSION['adresses'][$_REQUEST['field']][$contactAddress] = $contactLabel;
-            //For DEL
+                $contactLabel         = ContactsModel::getContactFullLabel(['addressId' => $contactAddress]);
+                $contactInfo          = ContactsModel::getFullAddressById(['addressId' => $contactAddress]);
+                $contactCommunication = ContactsModel::getContactCommunication(['contactId' => $contactInfo[0]['contact_id']]);
+                $_SESSION['adresses'][$_REQUEST['field']][$contactAddress] = $contactLabel.'. ('._COMMUNICATION_TYPE.' : '.$contactCommunication['value'].'))';
+
             } else  if ($_REQUEST['for'] == 'del') {
-                //unset adress in array
                 unset($_SESSION['adresses'][$_REQUEST['field']][$_REQUEST['index']]);
                 //If no adresse for field, unset the entire sub-array
                 if (count($_SESSION['adresses'][$_REQUEST['field']]) == 0) 
                     unset($_SESSION['adresses'][$_REQUEST['field']]);
             }
-            //Get content
-            $content = $sendmail_tools->updateAdressInputField($path_to_script, $_SESSION['adresses'], $_REQUEST['field']);
+
+            $content = $sendmail_tools->updateContactInputField($path_to_script, $_SESSION['adresses'], $_REQUEST['field']);
         } else {
             $error = $request->wash_html(_EMAIL.' '._IS_EMPTY.'!','NONE');
             $status = 1;
