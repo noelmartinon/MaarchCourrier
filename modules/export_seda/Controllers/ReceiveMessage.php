@@ -44,13 +44,14 @@ class ReceiveMessage
         $zip->extractTo($messageDirectory);
 
         $messageFileName = '';
+
         foreach (glob($messageDirectory. DIRECTORY_SEPARATOR. '*.xml') as $filename) {
-            $pathParts = pathinfo($filename);
+           /* $pathParts = pathinfo($filename);
             if(strpos($zipPathParts['filename'],$pathParts['filename'] ) === false) {
                 break;
-            } else {
+            } else {*/
                 $messageFileName = $filename;
-            }
+            //}
         }
 
         if (!$messageFileName) {
