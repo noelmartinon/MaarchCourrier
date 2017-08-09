@@ -67,7 +67,7 @@ class ReceiveMessageExchangeController
 
         file_put_contents($_SESSION['config']['tmppath'] . $tmpName, $file);
 
-        /********** TODO : ENVOI $_SESSION['config']['tmppath'] . $tmpName  A ALEX MORIN pour extraction et controle *******/
+        /********** EXTRACTION DU ZIP ET CONTROLE *******/
         $receiveMessage = new \ReceiveMessage();
         $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName);
 
@@ -76,7 +76,6 @@ class ReceiveMessageExchangeController
         }
 
         $sDataObject = $res['content'];
-
         $sDataObject = json_decode($sDataObject);
         
         $aDefaultConfig = self::readXmlConfig();
