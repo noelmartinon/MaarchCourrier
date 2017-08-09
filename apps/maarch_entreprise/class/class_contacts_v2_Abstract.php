@@ -104,7 +104,7 @@ abstract class contacts_v2_Abstract extends Database
         }
         if (!empty($_SESSION['m_admin']['communication']['TYPE'])) {
             $_SESSION['m_admin']['communication']['VALUE'] = $func->wash(
-                $_REQUEST['communication_value'], 'no', _COMMUNICATION_VALUE . ' ', 'yes', 0, 32
+                $_REQUEST['communication_value'], 'no', _COMMUNICATION_VALUE . ' ', 'yes', 0, 255
             );
         }
 
