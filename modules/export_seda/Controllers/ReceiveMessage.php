@@ -207,17 +207,17 @@ class ReceiveMessage
 
             if ($ArchiveUnit->Content->Writer) {
                 $tmpArchiveUnit->Content->Writer = array();
-                $j = 0;
                 foreach ($ArchiveUnit->Content->Writer as $Writer) {
-                    $tmpArchiveUnit->Content->Writer[$j]->FirstName = (string)$Writer->FirstName;
-                    $tmpArchiveUnit->Content->Writer[$j]->BirthName = (string)$Writer->BirthName;
-                    $j++;
+                    $tmpWriter = new stdClass();
+                    $tmpWriter->FirstName = (string)$Writer->FirstName;
+                    $tmpWriter->BirthName = (string)$Writer->BirthName;
+
+                    $tmpArchiveUnit->Content->Writer = $tmpWriter;
                 }
             }
 
             if ($ArchiveUnit->DataObjectReference) {
                 $tmpArchiveUnit->DataObjectReference = array();
-                $j = 0;
                 foreach ($ArchiveUnit->DataObjectReference as $DataObjectReference) {
                     $tmpDataObjectReference = new stdClass();
                     $tmpDataObjectReference->DataObjectReferenceId = (string) $DataObjectReference->DataObjectReferenceId;
