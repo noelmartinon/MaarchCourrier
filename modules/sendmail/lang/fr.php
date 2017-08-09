@@ -160,3 +160,8 @@ if (!defined("_SENDS_FAIL"))
     define("_SENDS_FAIL", "L'envoi a échoué");
 if (!defined("_WRONG_FILE_TYPE_M2M"))
     define("_WRONG_FILE_TYPE_M2M", "Seuls les fichiers ZIP sont acceptés");
+if (!defined("_ERROR_RECEIVE_FAIL"))
+    define("_ERROR_RECEIVE_FAIL", "Erreur lors de l'envoi du zip.");
+
+if (!defined("_ERROR_CONTACT_UNKNOW"))
+    define("_ERROR_CONTACT_UNKNOW", "Contact inconnu.");

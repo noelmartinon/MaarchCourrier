@@ -1,6 +1,6 @@
 <DataObjectPackage>
     <?merge $dataObjectPackage.BinaryDataObject ?>
-    <BinaryDataObject id="doc_[?merge .id ?]">
+    <BinaryDataObject id="[?merge .id ?]">
         <?merge .Attachment.bool() ?><Attachment filename="[?merge .Attachment.filename ?]" uri="[?merge .Attachment.uri ?]"><?merge .Attachment.value ?></Attachment>
         <?merge .Uri.bool() ?><Uri><?merge .Uri ?></Uri>
         <MessageDigest algorithm="[?merge .MessageDigest.algorithm ?]"><?merge .MessageDigest.value ?></MessageDigest>

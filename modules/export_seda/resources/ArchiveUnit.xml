@@ -1,5 +1,5 @@
 <?merge $archiveUnit ?>
-<ArchiveUnit id="arch_[?merge .id ?]">
+<ArchiveUnit id="[?merge .id ?]">
     <ArchiveUnitRefId><?merge .ArchiveUnitRefId ?></ArchiveUnitRefId>
     <ArchiveUnitProfile schemeID="[?merge .ArchiveUnitProfile.schemeID ?]" schemeName="[?merge .ArchiveUnitProfile.schemeName ?]" schemeAgencyID="[?merge .ArchiveUnitProfile.schemeAgencyID ?]" schemeAgencyName="[?merge .ArchiveUnitProfile.schemeAgencyName ?]" schemeVersionID="[?merge .ArchiveUnitProfile.schemeVersionID ?]" schemeDataURI="[?merge .ArchiveUnitProfile.schemeDataURI ?]" schemeURI="[?merge .ArchiveUnitProfile.schemeURI ?]"><?merge .ArchiveUnitProfile ?></ArchiveUnitProfile>
     <?merge .Management.bool() ?>
@@ -85,23 +85,75 @@
         </SubmissionAgency>
         <?merge .Content.AuthorizedAgend.bool() ?>
         <AuthorizedAgent>
-            <?merge .AuthorizedAgent $agent ?>
-            <?xinclude /resources/Agent.xml ?>
+            <FirstName><?merge .Content.AuthorizedAgend.FirstName ?></FirstName>
+            <BirthName><?merge .Content.AuthorizedAgend.BirthName ?></BirthName>
+            <GivenName><?merge .Content.AuthorizedAgend.GivenName ?></GivenName>
+            <Gender><?merge .Content.AuthorizedAgend.Gender ?></Gender>
+            <BirthDate><?merge .Content.AuthorizedAgend.BirthDate ?></BirthDate>
+            <BirthPlace><?merge .Content.AuthorizedAgend.BirthPlace ?></BirthPlace>
+            <DeathDate><?merge .Content.AuthorizedAgend.DeathDate ?></DeathDate>
+            <DeathPlace><?merge .Content.AuthorizedAgend.DeathPlace ?></DeathPlace>
+            <Nationality><?merge .Content.AuthorizedAgend.Nationality ?></Nationality>
+            <Function><?merge .Content.AuthorizedAgend.Function ?></Function>
+            <Activity><?merge .Content.AuthorizedAgend.Activity ?></Activity>
+            <Position><?merge .Content.AuthorizedAgend.Position ?></Position>
+            <Role><?merge .Content.AuthorizedAgend.Role ?></Role>
+            <Corpname><?merge .Content.AuthorizedAgend.Corpname ?></Corpname>
+            <Identifier><?merge .Content.AuthorizedAgend.Identifier ?></Identifier>
         </AuthorizedAgent>
-        <?merge .Content.Writter.array() ?>
-        <Writter>
-            <?merge . $agent ?>
-            <?xinclude /resources/Agent.xml ?>
-        </Writter>
+        <?merge .Content.Writer.array() ?>
+        <Writer>
+            <FirstName><?merge .FirstName ?></FirstName>
+            <BirthName><?merge .BirthName ?></BirthName>
+            <GivenName><?merge .GivenName ?></GivenName>
+            <Gender><?merge .Gender ?></Gender>
+            <BirthDate><?merge .BirthDate ?></BirthDate>
+            <BirthPlace><?merge .BirthPlace ?></BirthPlace>
+            <DeathDate><?merge .DeathDate ?></DeathDate>
+            <DeathPlace><?merge .DeathPlace ?></DeathPlace>
+            <Nationality><?merge .Nationality ?></Nationality>
+            <Function><?merge .Function ?></Function>
+            <Activity><?merge .Activity ?></Activity>
+            <Position><?merge .Position ?></Position>
+            <Role><?merge .Role ?></Role>
+            <Corpname><?merge .Corpname ?></Corpname>
+            <Identifier><?merge .Identifier ?></Identifier>
+        </Writer>
         <?merge .Content.Addressee.array()?>
         <Addressee>
-            <?merge . $agent ?>
-            <?xinclude /resources/Agent.xml ?>
+            <FirstName><?merge .FirstName ?></FirstName>
+            <BirthName><?merge .BirthName ?></BirthName>
+            <GivenName><?merge .GivenName ?></GivenName>
+            <Gender><?merge .Gender ?></Gender>
+            <BirthDate><?merge .BirthDate ?></BirthDate>
+            <BirthPlace><?merge .BirthPlace ?></BirthPlace>
+            <DeathDate><?merge .DeathDate ?></DeathDate>
+            <DeathPlace><?merge .DeathPlace ?></DeathPlace>
+            <Nationality><?merge .Nationality ?></Nationality>
+            <Function><?merge .Function ?></Function>
+            <Activity><?merge .Activity ?></Activity>
+            <Position><?merge .Position ?></Position>
+            <Role><?merge .Role ?></Role>
+            <Corpname><?merge .Corpname ?></Corpname>
+            <Identifier><?merge .Identifier ?></Identifier>
         </Addressee>
         <?merge .Content.Recipient.array() ?>
         <Recipient>
-            <?merge . $agent ?>
-            <?xinclude /resources/Agent.xml ?>
+            <FirstName><?merge .FirstName ?></FirstName>
+            <BirthName><?merge .BirthName ?></BirthName>
+            <GivenName><?merge .GivenName ?></GivenName>
+            <Gender><?merge .Gender ?></Gender>
+            <BirthDate><?merge .BirthDate ?></BirthDate>
+            <BirthPlace><?merge .BirthPlace ?></BirthPlace>
+            <DeathDate><?merge .DeathDate ?></DeathDate>
+            <DeathPlace><?merge .DeathPlace ?></DeathPlace>
+            <Nationality><?merge .Nationality ?></Nationality>
+            <Function><?merge .Function ?></Function>
+            <Activity><?merge .Activity ?></Activity>
+            <Position><?merge .Position ?></Position>
+            <Role><?merge .Role ?></Role>
+            <Corpname><?merge .Corpname ?></Corpname>
+            <Identifier><?merge .Identifier ?></Identifier>
         </Recipient>
         <Source><?merge .Content.Source ?></Source>
         <?merge .Content.RelatedObjectReference.bool() ?>
