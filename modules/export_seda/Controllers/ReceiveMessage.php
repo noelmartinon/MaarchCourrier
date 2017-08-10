@@ -46,12 +46,12 @@ class ReceiveMessage
         $messageFileName = '';
 
         foreach (glob($messageDirectory. DIRECTORY_SEPARATOR. '*.xml') as $filename) {
-           /* $pathParts = pathinfo($filename);
-            if(strpos($zipPathParts['filename'],$pathParts['filename'] ) === false) {
+            $pathParts = pathinfo($filename);
+            if(strpos($pathParts['filename'],'ArchiveTransfer') === false) {
                 break;
-            } else {*/
+            } else {
                 $messageFileName = $filename;
-            //}
+            }
         }
 
         if (!$messageFileName) {
