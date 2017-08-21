@@ -162,7 +162,7 @@ class RequestSeda
 		return $user;
 	}
 
-	public function getNotes($letterboxId) 
+	public function getNotes($letterboxId)
 	{
 		$queryParams = [];
 
@@ -179,6 +179,24 @@ class RequestSeda
 
 		return $notes;
 	}
+
+    public function getMails($letterboxId)
+    {
+        $queryParams = [];
+
+        $queryParams[] = $letterboxId;
+
+        $query = "SELECT * FROM sendmail WHERE res_id = ?";
+
+        $smtp = $this->db->query($query,$queryParams);
+
+        $mails = [];
+        while ($res = $smtp->fetchObject()) {
+            $mails[] = $res;
+        }
+
+        return $mails;
+    }
 
 	public function getEntitie($entityId)
 	{
@@ -234,7 +252,8 @@ class RequestSeda
 		$query = "SELECT * FROM res_attachments WHERE res_id_master = ? AND status != 'DEL'";
 
 		$smtp = $this->db->query($query,$queryParams);
-		
+
+		$attachments = [];
 		while ($res = $smtp->fetchObject()) {
 			$attachments[] = $res;
 		}
@@ -258,7 +277,8 @@ class RequestSeda
 		return $res;
 	}
 
-	public function getAcknowledgement($resIdMaster) {
+	public function getAcknowledgement($resIdMaster)
+    {
         $queryParams = [];
 
         $queryParams[] = $resIdMaster;
@@ -272,7 +292,8 @@ class RequestSeda
         return $res;
     }
 
-    public function getReply($resIdMaster) {
+    public function getReply($resIdMaster)
+    {
         $queryParams = [];
 
         $queryParams[] = $resIdMaster;
@@ -286,13 +307,47 @@ class RequestSeda
         return $res;
     }
 
-	public function insertMessage($messageObject, $type)
-	{
-		$queryParams = [];
-		$messageId = uniqid();
+    public function getHistory($tableName, $recordId)
+    {
+        $queryParams = [];
 
-		try {
-			$query = ("INSERT INTO seda (
+        $queryParams[] = $tableName;
+        $queryParams[] = $recordId;
+
+        $query = "SELECT * FROM history WHERE table_name = ? and record_id = ?";
+
+        $smtp = $this->db->query($query,$queryParams);
+
+        $history = [];
+        while ($res = $smtp->fetchObject()) {
+            $history[] = $res;
+        }
+
+        return $history;
+    }
+
+    public function insertMessage($messageObject, $type, $aArgs = [])
+    {
+        $queryParams = [];
+
+        if(empty($messageObject->messageId)){
+            $messageObject->messageId = $this->generateUniqueId();
+        }
+
+        if(empty($aArgs['status'])){
+            $status = "sent";
+        } else {
+            $status = $aArgs['status'];
+        }
+
+        if(empty($aArgs['fullMessageObject'])){
+            $messageObjectToSave = $messageObject;
+        } else {
+            $messageObjectToSave = $aArgs['fullMessageObject'];
+        }
+
+        try {
+            $query = ("INSERT INTO seda (
 				message_id,
 				schema,
 				type,
@@ -312,34 +367,35 @@ class RequestSeda
 				archived)
 				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
-			$queryParams[] = $messageId; // Message Id
-			$queryParams[] = "2.1"; //Schema
-			$queryParams[] = $type; // Type
-			$queryParams[] = "sent"; // Status
-			$queryParams[] = $messageObject->date; // Date
-			$queryParams[] = $messageObject->messageIdentifier->value; // Reference
-			$queryParams[] = $_SESSION['user']['UserId']; // Account Id
-			$queryParams[] = $messageObject->transferringAgency->identifier->value; // Sender org identifier id
-			$queryParams[] = ""; //SenderOrgNAme
-			$queryParams[] = $messageObject->archivalAgency->identifier->value; // Recipient org identifier id
-			$queryParams[] = ""; //RecipientOrgNAme
-			$queryParams[] = $messageObject->archivalAgreement->value; // Archival agreement reference
-			$queryParams[] = $messageObject->replyCode->value; //ReplyCode
-			$queryParams[] = 0; // size
-			$queryParams[] = json_encode($messageObject);//$messageObject; // Data
-			$queryParams[] = 1; // active
-			$queryParams[] = 0; // archived
+            $queryParams[] = $messageObject->messageId; // Message Id
+            $queryParams[] = "2.1"; //Schema
+            $queryParams[] = $type; // Type
+            $queryParams[] = $status; // Status
+            $queryParams[] = $messageObject->date; // Date
+            $queryParams[] = $messageObject->messageIdentifier->value; // Reference
+            $queryParams[] = $_SESSION['user']['UserId']; // Account Id
+            $queryParams[] = $messageObject->transferringAgency->identifier->value; // Sender org identifier id
+            $queryParams[] = $aArgs['SenderOrgNAme']; //SenderOrgNAme
+            $queryParams[] = $messageObject->archivalAgency->identifier->value; // Recipient org identifier id
+            $queryParams[] = $aArgs['RecipientOrgNAme']; //RecipientOrgNAme
+            $queryParams[] = $messageObject->archivalAgreement->value; // Archival agreement reference
+            $queryParams[] = $messageObject->replyCode->value; //ReplyCode
+            $queryParams[] = 0; // size
+            $queryParams[] = json_encode($messageObjectToSave);//$messageObject; // Data
+            $queryParams[] = 1; // active
+            $queryParams[] = 0; // archived
 
-			$res = $this->db->query($query,$queryParams);
+            $res = $this->db->query($query,$queryParams);
 
-		} catch (Exception $e) {
-			return false;
-		}
+        } catch (Exception $e) {
+            return false;
+        }
 
-		return $messageId;
-	}
+        return $messageObject->messageId;
+    }
 
-	public function insertAttachment($data,$type) {
+	public function insertAttachment($data,$type)
+    {
         $docserverControler = new docservers_controler();
 
 	    $fileInfos = array(
@@ -528,7 +584,26 @@ class RequestSeda
 		return true;
 	}
 
-	public function updateStatusMessage($reference, $status){
+    public function updateDataMessage($reference, $data)
+    {
+
+        $queryParams = [];
+        $queryParams[] = $data;
+        $queryParams[] = $reference;
+
+        try {
+            $query = "UPDATE seda SET data = ? WHERE reference = ?";
+
+            $smtp = $this->db->query($query,$queryParams);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+	public function updateStatusMessage($reference, $status)
+    {
         $queryParams = [];
         $queryParams[] = $status;
         $queryParams[] = $reference;
@@ -544,7 +619,8 @@ class RequestSeda
         return true;
     }
 
-	public function updateStatusLetterbox($resId,$status) {
+	public function updateStatusLetterbox($resId,$status)
+    {
         $queryParams = [];
         $queryParams[] = $status;
         $queryParams[] = $resId;
@@ -560,7 +636,8 @@ class RequestSeda
         return true;
     }
 
-    public function updateStatusAttachment($resId,$status) {
+    public function updateStatusAttachment($resId,$status)
+    {
         $queryParams = [];
         $queryParams[] = $status;
         $queryParams[] = $resId;

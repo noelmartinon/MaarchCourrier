@@ -1,28 +1,27 @@
 <DataObjectPackage>
-    <?merge $dataObjectPackage.binaryDataObject ?>
-    <BinaryDataObject id="doc_[?merge .id ?]">
-        <Attachment filename="[?merge .attachment.filename ?]"/>
-        <Uri><?merge .uri ?></Uri>
-        <MessageDigest algorithm="[?merge .messageDigest.algorithm ?]"><?merge .messageDigest.value ?></MessageDigest>
-        <Size><?merge .size.value ?></Size>
+    <?merge $dataObjectPackage.BinaryDataObject ?>
+    <BinaryDataObject id="[?merge .id ?]">
+        <?merge .Attachment.bool() ?><Attachment filename="[?merge .Attachment.filename ?]" uri="[?merge .Attachment.uri ?]"><?merge .Attachment.value ?></Attachment>
+        <?merge .Uri.bool() ?><Uri><?merge .Uri ?></Uri>
+        <MessageDigest algorithm="[?merge .MessageDigest.algorithm ?]"><?merge .MessageDigest.value ?></MessageDigest>
+        <Size><?merge .Size ?></Size>
         <FormatIdentification>
-            <MimeType><?merge .formatIdentification.mimeType ?></MimeType>
-            <FormatId><?merge .formatIdentification.formatId ?></FormatId>
+            <MimeType><?merge .FormatIdentification.MimeType ?></MimeType>
+            <FormatId><?merge .FormatIdentification.FormatId ?></FormatId>
         </FormatIdentification>
-        <?merge .fileInfo.bool() ?>
+        <?merge .FileInfo.bool() ?>
         <FileInfo>
-            <Filename><?merge .fileInfo.filename ?></Filename>
+            <Filename><?merge .FileInfo.Filename ?></Filename>
         </FileInfo>
     </BinaryDataObject>
-    <?merge $dataObjectPackage.physicalDataObject.bool() ?>
+    <?merge $dataObjectPackage.PhysicalDataObject.bool() ?>
     <PhysicalDataObject>
         <?merge .bool() ?>
-        <PhysicalId schemeID="[?merge .physicalId.schemeID ?]" schemeName="[?merge .physicalId.schemeName ?]" schemeAgencyID="[?merge .physicalId.schemeAgencyID ?]" schemeAgencyName="[?merge .physicalId.schemeAgencyName ?]" schemeVersionID="[?merge .physicalId.schemeVersionID ?]" schemeDataURI="[?merge .physicalId.schemeDataURI ?]" schemeURI="[?merge .physicalId.schemeURI ?]"><?merge .physicalId.value ?></PhysicalId>
+        <PhysicalId schemeID="[?merge .PhysicalId.schemeID ?]" schemeName="[?merge .PhysicalId.schemeName ?]" schemeAgencyID="[?merge .PhysicalId.schemeAgencyID ?]" schemeAgencyName="[?merge .PhysicalId.schemeAgencyName ?]" schemeVersionID="[?merge .PhysicalId.schemeVersionID ?]" schemeDataURI="[?merge .PhysicalId.schemeDataURI ?]" schemeURI="[?merge .PhysicalId.schemeURI ?]"><?merge .PhysicalId.value ?></PhysicalId>
     </PhysicalDataObject>
     <DescriptiveMetadata>
-        <?merge $dataObjectPackage.descriptiveMetadata ?>
-        <?xinclude /resources/ArchiveUnit.xml ?>
+        <?merge $dataObjectPackage.DescriptiveMetadata.ArchiveUnit /resources/ArchiveUnit.xml?>
     </DescriptiveMetadata>
-    <?merge $dataObjectPackage.managementMetadata $managementMetadata ?>
+    <?merge $dataObjectPackage.ManagementMetadata $managementMetadata ?>
     <?xinclude /resources/ManagementMetadata.xml ?>
 </DataObjectPackage>

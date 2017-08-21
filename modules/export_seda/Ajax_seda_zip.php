@@ -47,17 +47,25 @@ class Extract
 	public function exportZip($reference)
 	{
 		$messageDirectory = __DIR__.DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$reference;
-		$zipfile = __DIR__.DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$reference. ".zip";
+		$zipDirectory = __DIR__.DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$reference. ".zip";
 
-		if (!is_file($zipfile)) {
+		if (!is_file($zipDirectory)) {
             if (is_dir($messageDirectory)) {
-                $this->zip->add($zipfile, $messageDirectory.DIRECTORY_SEPARATOR."*");
+                $zip = new ZipArchive();
+                $zip->open($zipDirectory, ZipArchive::CREATE);
+
+                $listFiles = scandir($messageDirectory.DIRECTORY_SEPARATOR);
+
+                foreach ( $listFiles as $filename) {
+                    if ($filename != '.' && $filename != '..') {
+                        $zip->addFile($messageDirectory . DIRECTORY_SEPARATOR . $filename, $filename);
+                    }
+
+                }
             }
         }
 
-        $zipContents = file_get_contents($zipfile);
-
-        return $zipfile;
+        return $zipDirectory;
 	}
 
 	public function download($full_path)

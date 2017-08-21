@@ -1,2 +1,33 @@
-<Identifier schemeID="[?merge $organization.identifier.schemeID @schemeID ?]" schemeName="[?merge $organization.identifier.schemeName @schemeName ?]" schemeAgencyID="[?merge $organization.identifier.schemeAgencyID @schemeAgencyID ?]" schemeAgencyName="[?merge $organization.identifier.schemeAgencyName @schemeAgencyName ?]" schemeVersionID="[?merge $organization.identifier.schemeVersionID @schemeVersionID ?]" schemeDataURI="[?merge $organization.identifier.schemeDataURI @schemeDataURI ?]" schemeURI="[?merge $organization.identifier.schemeURI @schemeURI ?]"><?merge $organization.identifier.value ?></Identifier>
-<OrganizationDescriptiveMetadata></OrganizationDescriptiveMetadata>
+<Identifier schemeID="[?merge $organization.Identifier.schemeID @schemeID ?]" schemeName="[?merge $organization.Identifier.schemeName @schemeName ?]" schemeAgencyID="[?merge $organization.Identifier.schemeAgencyID @schemeAgencyID ?]" schemeAgencyName="[?merge $organization.Identifier.schemeAgencyName @schemeAgencyName ?]" schemeVersionID="[?merge $organization.Identifier.schemeVersionID @schemeVersionID ?]" schemeDataURI="[?merge $organization.Identifier.schemeDataURI @schemeDataURI ?]" schemeURI="[?merge $organization.Identifier.schemeURI @schemeURI ?]"><?merge $organization.Identifier.value ?></Identifier>
+        <?merge $organization.OrganizationDescriptiveMetadata.bool() ?>
+<OrganizationDescriptiveMetadata>
+<?merge $organization.OrganizationDescriptiveMetadata.LegalClassification.bool() ?>
+<LegalClassification><?merge $organization.OrganizationDescriptiveMetadata.LegalClassification ?></LegalClassification>
+<?merge $organization.OrganizationDescriptiveMetadata.Name.bool() ?>
+<Name><?merge $organization.OrganizationDescriptiveMetadata.Name ?></Name>
+<?merge $organization.OrganizationDescriptiveMetadata.Address.array() ?>
+<Address>
+    <CityName><?merge .CityName ?></CityName>
+    <Country><?merge .Country ?></Country>
+    <PostCode><?merge .PostCode ?></PostCode>
+    <PostOfficeBox><?merge .PostOfficeBox ?></PostOfficeBox>
+    <StreetName><?merge .StreetName ?></StreetName>
+</Address>
+<?merge $organization.OrganizationDescriptiveMetadata.Communication.array() ?>
+<Communication>
+    <Channel><?merge .Channel ?></Channel>
+    <CompleteNumber><?merge .value ?></CompleteNumber>
+</Communication>
+<?merge $organization.OrganizationDescriptiveMetadata.Contact.array() ?>
+<Contact>
+    <?merge .DepartmentName.bool() ?>
+    <DepartmentName><?merge .DepartmentName ?></DepartmentName>
+    <?merge .PersonName.bool() ?>
+    <PersonName><?merge .PersonName ?></PersonName>
+    <?merge .Communication ?>
+    <Communication>
+        <Channel><?merge .Channel ?></Channel>
+        <CompleteNumber><?merge .value ?></CompleteNumber>
+    </Communication>
+</Contact>
+</OrganizationDescriptiveMetadata>

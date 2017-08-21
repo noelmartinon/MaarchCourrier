@@ -21,6 +21,15 @@ if (!defined("_EXPORT_SEDA_VIEW"))
 if (!defined("_INFORMATION_MESSAGE"))
     define("_INFORMATION_MESSAGE", "Information bordereau");
 
+if (!defined("_PACKAGE_TITLE"))
+    define("_PACKAGE_TITLE", "Titre du paquet");
+
+if (!defined("_GENERATE_MESSAGE"))
+    define("_GENERATE_MESSAGE", "Générer bordereau");
+
+if (!defined("_MESSAGE_TITLE_EMPTY"))
+    define("_MESSAGE_TITLE_EMPTY", "Titre du paquet vide");
+
 if (!defined("_MESSAGE_IDENTIFIER"))
     define("_MESSAGE_IDENTIFIER", "Identifiant bordereau");
 if (!defined("_ARCHIVAL_AGENCY_SIREN"))

@@ -24,6 +24,15 @@ if (!defined("_INFORMATION_ARCHIVE"))
 if (!defined("_ARCHIVE_IDENTIFIER"))
     define("_ARCHIVE_IDENTIFIER", "Archive identifier");
 
+if (!defined("_PACKAGE_TITLE"))
+    define("_PACKAGE_TITLE", "Package title");
+
+if (!defined("_GENERATE_MESSAGE"))
+    define("_GENERATE_MESSAGE", "Generate message");
+
+if (!defined("_MESSAGE_TITLE_EMPTY"))
+    define("_MESSAGE_TITLE_EMPTY", "Message title empty");
+
 if (!defined("_DESCRIPTION_LEVEL"))
     define("_DESCRIPTION_LEVEL", "Description level");
 if (!defined("_ITEM"))

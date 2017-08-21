@@ -2,8 +2,25 @@
 
 require_once __DIR__ .  DIRECTORY_SEPARATOR .'../RequestSeda.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR .'../DOMTemplateProcessor.php';
+require_once 'apps/maarch_entreprise/class/class_pdf.php';
 
 Class AbstractMessage{
+
+    private $db;
+    public  function __construct()
+    {
+        $this->db = new RequestSeda();
+    }
+
+    public function generatePackage($reference, $name) {
+        $message = $this->db->getMessageByReference($reference);
+
+        $messageObject = json_decode($message->data);
+
+        $this->saveXml($messageObject,$name,".xml");
+
+        $this->sendAttachment($messageObject);
+    }
 
     public function saveXml($messageObject, $name, $extension)
     {
@@ -20,13 +37,13 @@ Class AbstractMessage{
                 mkdir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message', 0777, true);
             }
 
-            if (!is_dir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageObject->messageIdentifier->value)) {
+            if (!is_dir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value)) {
                 umask(0);
-                mkdir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageObject->messageIdentifier->value, 0777, true);
+                mkdir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value, 0777, true);
             }
 
-            if (!file_exists(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$messageObject->messageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->messageIdentifier->value . $extension)) {
-                file_put_contents(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$messageObject->messageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->messageIdentifier->value . $extension, $DOMTemplate->saveXML());
+            if (!file_exists(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$messageObject->MessageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->MessageIdentifier->value . $extension)) {
+                file_put_contents(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$messageObject->MessageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->MessageIdentifier->value . $extension, $DOMTemplate->saveXML());
             }
 
         } catch (Exception $e) {
@@ -50,15 +67,56 @@ Class AbstractMessage{
         return $db->insertAttachment($object, $type);
     }
 
+    private function sendAttachment($messageObject)
+    {
+        $messageId = $messageObject->MessageIdentifier->value;
+
+        foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
+            $basename = basename($binaryDataObject->Uri);
+            $dest = __DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageId . DIRECTORY_SEPARATOR . $basename;
+
+            copy($binaryDataObject->Uri, $dest);
+        }
+    }
+
+    public function addTitleToMessage($reference,$title = ' ') {
+        $message = $this->db->getMessageByReference($reference);
+
+        $messageObject = json_decode($message->data);
+
+        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = $title;
+
+        $this->db->updateDataMessage($reference,json_encode($messageObject));
+
+        return true;
+    }
+
     public function changeStatus($reference, $status) {
-        $db = new RequestSeda();
-        $message = $db->getMessageByReference($reference);
-        $listResId = $db->getUnitIdentifierByMessageId($message->message_id);
+        $message = $this->db->getMessageByReference($reference);
+        $listResId = $this->db->getUnitIdentifierByMessageId($message->message_id);
 
         for ($i=0; $i < count($listResId); $i++) {
-            $db->updateStatusLetterbox($listResId[$i]->res_id,$status);
+            $this->db->updateStatusLetterbox($listResId[$i]->res_id,$status);
         }
 
         return true;
+    }
+
+    public function createPDF($name,$body) {
+        $pdf = new PDF("p", "pt", "A4");
+        $pdf->SetAuthor("MAARCH");
+        $pdf->SetTitle($name);
+
+        $pdf->SetFont('times','',12);
+        $pdf->SetTextColor(50,60,100);
+
+        $pdf->AddPage('P');
+
+        $pdf->SetAlpha(1);
+
+        $pdf->MultiCell(0,10,utf8_decode($body),0,'L');
+
+        $dir = $_SESSION['config']['tmppath'] . $name . '.pdf';
+        $pdf->Output($dir, "F");
     }
 }
