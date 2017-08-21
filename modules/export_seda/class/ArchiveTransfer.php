@@ -443,7 +443,7 @@ class ArchiveTransfer
         $management->AppraisalRule = new stdClass();
         $management->AppraisalRule->Rule = new stdClass();
         $management->AppraisalRule->Rule->value = $docTypes->retention_rule;
-        if ($docTypes->retention_final_disposition == "preservation") {
+        if ($docTypes->retention_final_disposition == "conservation") {
             $management->AppraisalRule->FinalAction = "Keep";
         } else {
             $management->AppraisalRule->FinalAction = "Destroy";
