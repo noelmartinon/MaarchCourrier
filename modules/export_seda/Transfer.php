@@ -30,13 +30,19 @@ class Transfer{
             curl_setopt($curl, CURLOPT_HTTPHEADER, $param[1]);
             curl_setopt($curl, CURLOPT_COOKIE, $param[2]);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $param[3]);
+            curl_setopt($curl, CURLOPT_FAILONERROR, true);
 
             $exec = curl_exec($curl);
             $data = json_decode($exec);
 
             if (!$data) {
                 $res['status'] = 1;
-                $res['content'] = curl_error($curl);
+                if (curl_error($curl)) {
+                    $res['content'] = curl_error($curl);
+                } else {
+                    $res['content'] = $exec;
+                }
+
             } else {
                 $res['content'] = $data;
             }
