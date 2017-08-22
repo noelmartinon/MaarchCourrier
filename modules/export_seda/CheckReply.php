@@ -7,14 +7,38 @@ Class CheckReply {
     protected $token;
     protected $SAE;
     protected $db;
+    protected $xml;
 
     public function __construct()
     {
-        $xml = simplexml_load_file(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml");
-        $this->token = (string) $xml->CONFIG->token;
+        $getXml = false;
+        $path = '';
+        if (file_exists(
+            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        ))
+        {
+            $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+                . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+            $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
+                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        }
+
+        if ($getXml) {
+            $this->xml = simplexml_load_file($path);
+        }
+
+        $this->token = (string) $this->xml->CONFIG->token;
         $tokenEncode = urlencode($this->token);
         $this->token = "LAABS-AUTH=". $tokenEncode;
-        $this->urlService = (string) $xml->CONFIG->urlSAEService . "/medona/ArchiveTransfer/history";
+        $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/ArchiveTransfer/history";
         $this->db = new RequestSeda();
 
     }

@@ -2,7 +2,10 @@
 
 require_once __DIR__ .  DIRECTORY_SEPARATOR .'../RequestSeda.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR .'../DOMTemplateProcessor.php';
-require_once 'apps/maarch_entreprise/class/class_pdf.php';
+
+if ($_SESSION['config']['app_id']) {
+    require_once 'apps/maarch_entreprise/class/class_pdf.php';
+}
 
 Class AbstractMessage{
 

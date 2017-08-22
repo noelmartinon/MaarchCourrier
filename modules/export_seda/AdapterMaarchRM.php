@@ -5,7 +5,29 @@ class AdapterMaarchRM{
 
     public function __construct()
     {
-        $this->xml = simplexml_load_file(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml");
+        $getXml = false;
+        $path = '';
+        if (file_exists(
+            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        ))
+        {
+            $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+                . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+            $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
+                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        }
+
+        if ($getXml) {
+            $this->xml = simplexml_load_file($path);
+        }
     }
 
     public function getInformations($reference) {

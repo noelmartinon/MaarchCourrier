@@ -5,11 +5,36 @@ require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once __DIR__.'/RequestSeda.php';
 
 Class Purge{
+    protected $xml;
     public function __construct()
     {
         $this->db = new RequestSeda();
-        $xml = simplexml_load_file(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml");
-        $this->deleteData = (string) $xml->CONFIG->deleteData;
+
+        $getXml = false;
+        $path = '';
+        if (file_exists(
+            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        ))
+        {
+            $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+                . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+            $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
+                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        }
+
+        if ($getXml) {
+            $this->xml = simplexml_load_file($path);
+        }
+
+        $this->deleteData = (string) $this->xml->CONFIG->deleteData;
     }
 
     public function purge($resId) {
