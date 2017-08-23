@@ -137,6 +137,9 @@ class ArchiveTransfer
             $i++;
         }
 
+        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency = new stdClass();
+        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency->Identifier = new stdClass();
+        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency->Identifier->value = $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[0]->Content->OriginatingAgency->Identifier->value;
 
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->StartDate = $startDate->format('Y-m-d');
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->EndDate = $endDate->format('Y-m-d');
@@ -429,6 +432,10 @@ class ArchiveTransfer
             foreach ($histories as $history) {
                 $content->CustodialHistory->CustodialHistoryItem[] = $this->getCustodialHistoryItem($history);
             }
+
+            if (count($content->CustodialHistory->CustodialHistoryItem) == 0) {
+                unset($content->CustodialHistory);
+            }
         }
 
         return $content;
@@ -469,8 +476,6 @@ class ArchiveTransfer
         $binaryDataObject->Attachment = new stdClass();
         $binaryDataObject->Attachment->value = base64_encode($data);
         $binaryDataObject->Attachment->filename = basename($filePath);
-
-        $binaryDataObject->Uri = $filePath;
 
         $binaryDataObject->FileInfo = new stdClass();
         $binaryDataObject->FileInfo->Filename = basename($filePath);
@@ -520,7 +525,7 @@ class ArchiveTransfer
         $custodialHistoryItem = new stdClass();
 
         $custodialHistoryItem->value = $history->info;
-        $custodialHistoryItem->when = $history->event_date;
+        $custodialHistoryItem->when = date('Y-m-d',$history->event_date);
 
         return $custodialHistoryItem;
     }

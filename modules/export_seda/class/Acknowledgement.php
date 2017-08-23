@@ -28,15 +28,108 @@ class Acknowledgement {
 	{
 	}
 
-	public function send($data, $resIds)
+	public function receive($data, $resIds)
 	{
+	    $messageObject = $this->getMessageObject($data);
 	    $abstractMessage = new AbstractMessage();
-        $abstractMessage->saveXml($data,"Acknowledgement", ".txt");
+        $abstractMessage->saveXml($messageObject,"Acknowledgement", ".xml");
 
 		foreach ($resIds as $resId) {
-            $abstractMessage->addAttachment($data->messageIdentifier->value, $resId, $data->messageIdentifier->value.".txt", "txt", "Accusé de reception",1);
+            $abstractMessage->addAttachment($messageObject->MessageIdentifier->value, $resId, $messageObject->MessageIdentifier->value.".xml", "xml", "Accusé de reception",1);
         }
 	}
 
+    private function getMessageObject($data)
+    {
+        $messageObject = new stdClass();
 
+        $messageObject->Comment = $data->comment;
+        $messageObject->Date = $data->date;
+        $messageObject->MessageIdentifier = $data->messageIdentifier;
+        $messageObject->MessageReceivedIdentifier = $data->messageReceivedIdentifier;
+
+        $messageObject->Receiver = $this->getOrganisation($data->receiver);
+        $messageObject->Sender = $this->getOrganisation($data->sender);
+
+        return $messageObject;
+    }
+
+    private function getOrganisation($data)
+    {
+        $organisationObject = new stdClass();
+        $organisationObject->Identifier = new stdClass();
+        $organisationObject->Identifier->value = $data->id;
+
+        $organisationObject->OrganizationDescriptiveMetadata = new stdClass();
+        $organisationObject->OrganizationDescriptiveMetadata->Name = $data->name;
+        $organisationObject->OrganizationDescriptiveMetadata->LegalClassification = $data->legalClassification;
+
+        if ($data->address) {
+            $organisationObject->OrganizationDescriptiveMetadata->Address = $this->getAddress($data->address);
+        }
+
+        if ($data->communication) {
+            $organisationObject->OrganizationDescriptiveMetadata->Communication = $this->getCommunication($data->communication);
+        }
+
+        if ($data->contact) {
+            $organisationObject->OrganizationDescriptiveMetadata->Contact = $this->getContact($data->contact);
+        }
+
+        return $organisationObject;
+    }
+
+    private function getContact($data)
+    {
+        $listContact = [];
+        foreach ($data as $contact) {
+            $tmpContact =  new stdClass();
+            $tmpContact->DepartmentName = $contact->departmentName;
+            $tmpContact->PersonName = $contact->personName;
+
+            if ($contact->address){
+                $tmpContact->Address = [];
+                $tmpContact->Address = $this->getAddress($contact->address);
+            }
+
+            if ($contact->communication) {
+                $tmpContact->Communication = [];
+                $tmpContact->Communication = $this->getCommunication($contact->communication);
+            }
+            $listContact[] = $tmpContact;
+        }
+        return $listContact;
+    }
+
+    private function getAddress($data)
+    {
+	    $listAddress = [];
+        foreach ($data as $address) {
+            $tmpAddress = new stdClass();
+            $tmpAddress->CityName = $address->cityName;
+            $tmpAddress->Country = $address->country;
+            $tmpAddress->PostCode = $address->postCode;
+            $tmpAddress->StreetName = $address->streetName;
+
+            $listAddress[] = $tmpAddress;
+        }
+        return $listAddress;
+    }
+
+    private function getCommunication($data)
+    {
+        $listCommunication = [];
+        foreach ($data as $communication) {
+            $tmpCommunication = new stdClass();
+            $tmpCommunication->Channel = $communication->channel;
+
+            if ($communication->completeNumber) {
+                $tmpCommunication->value = $communication->completeNumber;
+            } else {
+                $tmpCommunication->value = $communication->URIID;
+            }
+            $listCommunication[] = $tmpCommunication;
+        }
+        return $listCommunication;
+    }
 }

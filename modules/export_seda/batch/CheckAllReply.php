@@ -5,7 +5,8 @@ require_once __DIR__ . '/../class/AbstractMessage.php';
 require_once __DIR__ . '/../CheckReply.php';
 
 $checkAllReply = new CheckAllReply();
-$checkAllReply->checkAll();
+$CheckReply = new CheckReply();
+$CheckReply->checkAll();
 
 Class CheckAllReply {
     protected $token;
@@ -16,8 +17,6 @@ Class CheckAllReply {
     public function __construct()
     {
         $this->initSession();
-        $this->db = new RequestSeda();
-        $this->checkReply = new CheckReply();
     }
 
     private function initSession() {
@@ -41,8 +40,6 @@ Class CheckAllReply {
             $getXml = true;
         }
 
-        var_dump($path);
-        exit();
         if ($getXml) {
             $xml = simplexml_load_file($path);
         }
@@ -55,44 +52,5 @@ Class CheckAllReply {
         $_SESSION['config']['databasetype'] = $xml->CONFIG_BASE->databasetype;
         $_SESSION['collection_id_choice'] = $xml->COLLECTION->Id;
         $_SESSION['tablename']['docservers'] = 'docservers';
-    }
-    public function checkAll()
-    {
-        $abstractMessage = new AbstractMessage();
-
-        $letters = $this->db->getLettersByStatus("ACK_SEDA");
-
-        $unitIdentifiers = [];
-        foreach ($letters as $letter) {
-            $unitIdentifier = $this->db->getUnitIdentifierByResId($letter->res_id);
-            $message = $this->db->getMessageByIdentifier($unitIdentifier->message_id);
-
-            if(array_key_exists($message->reference, $unitIdentifiers)) {
-                $unitIdentifiers[$message->reference] .= "," . $unitIdentifier->res_id;
-            } else {
-                $unitIdentifiers[$message->reference] = $unitIdentifier->res_id;
-            }
-        }
-
-        foreach ($unitIdentifiers as $key => $value) {
-            $messageReplyIdentifier = $key. '_Reply';
-            $messageReply = $this->checkReply->getReply($messageReplyIdentifier);
-
-            if (empty($messageReply)) {
-                continue;
-            }
-
-            $data = json_decode($messageReply[0]->data);
-            $this->db->insertMessage($data, "ArchiveTransferReply");
-            $abstractMessage->saveXml($data,"ArchiveTransferReply", ".txt");
-
-            $resIds = explode(',',$value);
-            foreach ($resIds as $resId) {
-                $abstractMessage->addAttachment($messageReplyIdentifier,$resId,$messageReplyIdentifier.".txt","txt","Réponse de transfert",2);
-                $this->db->updateStatusLetterbox($resId,"REPLY_SEDA");
-            }
-        }
-
-        return true;
     }
 }

@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/RequestSeda.php';
 require_once __DIR__ . '/class/AbstractMessage.php';
+require_once __DIR__ . '/class/ArchiveTransferReply.php';
 
 Class CheckReply {
     protected $token;
@@ -70,17 +71,12 @@ Class CheckReply {
             }
 
             //créer message reply & sauvegarder xml
-            $data = json_decode($messageReply[0]->data);
-            $this->db->insertMessage($data, "ArchiveTransferReply");
-            $abstractMessage->saveXml($data,"ArchiveTransferReply", ".txt");
-
-            //créer attachment
-            //changer status courrier
             $resIds = explode(',',$value);
-            foreach ($resIds as $resId) {
-                $abstractMessage->addAttachment($messageReplyIdentifier,$resId,$messageReplyIdentifier.".txt","txt","Réponse de transfert",2);
-                $this->db->updateStatusLetterbox($resId,"REPLY_SEDA");
-            }
+            $data = json_decode($messageReply[0]->data);
+
+            $archiveTransferReply = new ArchiveTransferReply();
+            $archiveTransferReply->receive($data,$resIds);
+            $abstractMessage->changeStatus($key, 'REPLY_SEDA');
         }
 
         return true;

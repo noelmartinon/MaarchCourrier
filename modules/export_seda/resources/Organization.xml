@@ -29,5 +29,13 @@
         <Channel><?merge .Channel ?></Channel>
         <CompleteNumber><?merge .value ?></CompleteNumber>
     </Communication>
+    <?merge .Address ?>
+    <Address>
+        <CityName><?merge .CityName ?></CityName>
+        <Country><?merge .Country ?></Country>
+        <PostCode><?merge .PostCode ?></PostCode>
+        <PostOfficeBox><?merge .PostOfficeBox ?></PostOfficeBox>
+        <StreetName><?merge .StreetName ?></StreetName>
+    </Address>
 </Contact>
 </OrganizationDescriptiveMetadata>

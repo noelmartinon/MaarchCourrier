@@ -326,6 +326,23 @@ class RequestSeda
         return $history;
     }
 
+    /*** Generates a local unique identifier
+    @return string The unique id*/
+    public function generateUniqueId(){
+        $parts = explode('.', microtime(true));
+        $sec   = $parts[0];
+        if (!isset($parts[1])) {
+            $msec = 0;
+        } else {
+            $msec = $parts[1];
+        }
+        $uniqueId = str_pad(base_convert($sec, 10, 36), 6, '0', STR_PAD_LEFT) . str_pad(base_convert($msec, 10, 16), 4, '0', STR_PAD_LEFT);
+        $uniqueId .= str_pad(base_convert(mt_rand(), 10, 36), 6, '0', STR_PAD_LEFT);
+
+        return $uniqueId;
+    }
+
+
     public function insertMessage($messageObject, $type, $aArgs = [])
     {
         $queryParams = [];

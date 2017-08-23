@@ -20,49 +20,124 @@
 */
 
 require_once __DIR__ . DIRECTORY_SEPARATOR .'../DOMTemplateProcessor.php';
+require_once __DIR__ . '/AbstractMessage.php';
 
 class ArchiveTransferReply {
 
+    private $db;
     public function __construct()
     {
+        $this->db = new RequestSeda();
     }
 
-    public function send($data, $resIds)
+    public function receive($data, $resIds)
     {
-        //$xml = simplexml_load_file($fileName);
-        $messageObject = new stdClass();
-
-        if ($data->comments) {
-            $messageObject->comment = [];
-            if (is_array($data->comments)) {
-                foreach ($data->comments as $comment) {
-                    $messageObject->comment[] = $comment;
-                }
-            } else {
-                $messageObject->comment[] = $data->comments;
-            }
-        }
-
-        $messageObject->date = $data->date;
-        $messageObject->messageIdentifier =  new stdClass();
-        $messageObject->messageIdentifier->value = $data->reference;
-
-        $messageObject->messageReceivedIdentifier =  new stdClass();
-        $messageObject->messageReceivedIdentifier->value = $data->requestReference;
-
-        $messageObject->sender = new stdClass();
-        $messageObject->sender->identifier = new stdClass();
-        $messageObject->sender->identifier->value = $data->senderOrgRegNumber;
-
-        $messageObject->receiver = new stdClass();
-        $messageObject->receiver->identifier = new stdClass();
-        $messageObject->receiver->identifier->value = $data->recipientOrgRegNumber;
-
-        $this->saveXml($messageObject);
+        $messageObject = $this->getMessageObject($data);
+        $abstractMessage = new AbstractMessage();
+        $this->db->insertMessage($data, "ArchiveTransferReply");
+        $abstractMessage->saveXml($messageObject,"ArchiveTransferReply", ".xml");
 
         foreach ($resIds as $resId) {
-            $this->addAttachment($messageObject->messageIdentifier->value, $resId, $messageObject->messageIdentifier->value.".txt", "txt", "Accusé de reception");
+            $abstractMessage->addAttachment($messageObject->MessageIdentifier->value, $resId, $messageObject->MessageIdentifier->value.".xml", "xml", "Réponse au transfert",2);
         }
     }
 
+    private function getMessageObject($data)
+    {
+        $messageObject = new stdClass();
+
+        $messageObject->Comment = $data->comment;
+        $messageObject->Date = $data->date;
+        $messageObject->MessageIdentifier =  new stdClass();
+        $messageObject->MessageIdentifier->value = $data->messageIdentifier->value;
+
+        $messageObject->MessageRequestIdentifier =  new stdClass();
+        $messageObject->MessageRequestIdentifier->value = $data->messageRequestIdentifier->value;
+
+        $messageObject->ReplyCode = $data->replyCode->value . ' : ' . $data->replyCode->name;
+
+        $messageObject->ArchivalAgency = $this->getOrganisation($data->archivalAgency);
+        $messageObject->TransferringAgency = $this->getOrganisation($data->transferringAgency);
+
+        return $messageObject;
+    }
+
+    private function getOrganisation($data)
+    {
+        $organisationObject = new stdClass();
+        $organisationObject->Identifier = new stdClass();
+        $organisationObject->Identifier->value = $data->id;
+
+        $organisationObject->OrganizationDescriptiveMetadata = new stdClass();
+        $organisationObject->OrganizationDescriptiveMetadata->Name = $data->name;
+        $organisationObject->OrganizationDescriptiveMetadata->LegalClassification = $data->legalClassification;
+
+        if ($data->address) {
+            $organisationObject->OrganizationDescriptiveMetadata->Address = $this->getAddress($data->address);
+        }
+
+        if ($data->communication) {
+            $organisationObject->OrganizationDescriptiveMetadata->Communication = $this->getCommunication($data->communication);
+        }
+
+        if ($data->contact) {
+            $organisationObject->OrganizationDescriptiveMetadata->Contact = $this->getContact($data->contact);
+        }
+
+        return $organisationObject;
+    }
+
+    private function getContact($data)
+    {
+        $listContact = [];
+        foreach ($data as $contact) {
+            $tmpContact =  new stdClass();
+            $tmpContact->DepartmentName = $contact->departmentName;
+            $tmpContact->PersonName = $contact->personName;
+
+            if ($contact->address){
+                $tmpContact->Address = [];
+                $tmpContact->Address = $this->getAddress($contact->address);
+            }
+
+            if ($contact->communication) {
+                $tmpContact->Communication = [];
+                $tmpContact->Communication = $this->getCommunication($contact->communication);
+            }
+            $listContact[] = $tmpContact;
+        }
+        return $listContact;
+    }
+
+    private function getAddress($data)
+    {
+        $listAddress = [];
+        foreach ($data as $address) {
+            $tmpAddress = new stdClass();
+            $tmpAddress->CityName = $address->cityName;
+            $tmpAddress->Country = $address->country;
+            $tmpAddress->PostCode = $address->postCode;
+            $tmpAddress->StreetName = $address->streetName;
+
+            $listAddress[] = $tmpAddress;
+        }
+        return $listAddress;
+    }
+
+    private function getCommunication($data)
+    {
+        $listCommunication = [];
+        foreach ($data as $communication) {
+            $tmpCommunication = new stdClass();
+            $tmpCommunication->Channel = $communication->channel;
+
+            if ($communication->completeNumber) {
+                $tmpCommunication->value = $communication->completeNumber;
+            } else {
+                $tmpCommunication->value = $communication->URIID;
+            }
+            $listCommunication[] = $tmpCommunication;
+        }
+        return $listCommunication;
+    }
 }

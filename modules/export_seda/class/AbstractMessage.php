@@ -75,10 +75,9 @@ Class AbstractMessage{
         $messageId = $messageObject->MessageIdentifier->value;
 
         foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-            $basename = basename($binaryDataObject->Uri);
-            $dest = __DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageId . DIRECTORY_SEPARATOR . $basename;
+            $dest = __DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageId . DIRECTORY_SEPARATOR . $binaryDataObject->Attachment->filename;
 
-            copy($binaryDataObject->Uri, $dest);
+            file_put_contents($dest,base64_decode($binaryDataObject->Attachment->value));
         }
     }
 
