@@ -224,18 +224,18 @@ class Database extends functions
     public function lastInsertId($sequenceName=null)
     {
         switch($_SESSION['config']['databasetype']) {
-        case 'MYSQL'        : return @mysqli_insert_id($this->_sqlLink);
-        case 'POSTGRESQL'   : 
-            $stmt_last_insert = $this->query("SELECT last_value as lastinsertid FROM " . $sequenceName);
-            $resultat_last = $stmt_last_insert->fetchObject();
-            return $resultat_last->lastinsertid;
-        case 'SQLSERVER'    : return '';
-        case 'ORACLE'       : 
-            //$stmt_last_insert = $this->query("SELECT " . $sequenceName . ".currval as lastinsertid FROM dual");
-            $stmt_last_insert = $this->query("SELECT to_char(Last_number) as lastinsertid FROM user_sequences where sequence_name = '" . $sequenceName . "'");
-            $resultat_last = $stmt_last_insert->fetchObject();
-            return $resultat_last->lastinsertid;
-        default             : return false;
+            case 'MYSQL'        : return @mysqli_insert_id($this->_sqlLink);
+            case 'POSTGRESQL'   : 
+                $stmt_last_insert = $this->query("SELECT last_value as lastinsertid FROM " . $sequenceName);
+                $resultat_last = $stmt_last_insert->fetchObject();
+                return $resultat_last->lastinsertid;
+            case 'SQLSERVER'    : return '';
+            case 'ORACLE'       : 
+                //$stmt_last_insert = $this->query("SELECT " . $sequenceName . ".currval as lastinsertid FROM dual");
+                $stmt_last_insert = $this->query("SELECT to_char(Last_number) as lastinsertid FROM user_sequences where upper(sequence_name) = upper('" . $sequenceName . "')");
+                $resultat_last = $stmt_last_insert->fetchObject();
+                return $resultat_last->lastinsertid;
+            default             : return false;
         }   
     }
 
