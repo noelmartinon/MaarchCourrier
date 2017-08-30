@@ -92,7 +92,7 @@ if (! empty($_SESSION['error'])) {
         $_SESSION['collection_id_choice'], 
         $resIdMaster
     );
-    $table = $sec->retrieve_table_from_coll($collId);
+    $table = $sec->retrieve_view_from_coll($collId);
     $stmt = $db->query(
         "SELECT res_id FROM " . $table . " WHERE res_id = ? ".$where2,array($resIdMaster));
 
