@@ -98,7 +98,7 @@ class ArchiveTransfer
                     $id = 'note_'.$note->id;
                     $filePath = $_SESSION['config']['tmppath']. DIRECTORY_SEPARATOR. $id. '.pdf';
 
-                    $this->abstractMessage->createPDF($id,$note->note_text);
+                    $this->abstractMessage->createPDF($id, $note->note_text);
                     $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject($filePath, $id);
                 }
             }
@@ -114,14 +114,14 @@ class ArchiveTransfer
 ' . 'objet : ' . $mail->email_object . '
 ' . 'corps : ' . strip_tags(html_entity_decode($body));
 
-                    $this->abstractMessage->createPDF($id,$data);
+                    $this->abstractMessage->createPDF($id, $data);
                     $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject($filePath, $id);
                 }
             }
 
             $format = 'Y-m-d H:i:s.u';
             $creationDate = DateTime::createFromFormat($format, $letterbox->creation_date);
-            if ($startDate == '' ) {
+            if ($startDate == '') {
                 $startDate = $creationDate;
             } else if ( date_diff($startDate,$creationDate) > 0 ) {
                 $startDate = $creationDate;
@@ -343,17 +343,16 @@ class ArchiveTransfer
             case 'RecordGrp' :
                 $content->DescriptionLevel = $type;
                 $content->Title = [];
-                $content->DocumentType = 'Folder';
+                $content->DocumentType = 'Dossier';
 
                 return $content;
                 break;
             case 'File' :
                 $content->DescriptionLevel = $type;
 
-                $content->ReceivedDate = $object->admission_date;
                 $sentDate = new DateTime($object->doc_date);
                 $receivedDate = new DateTime($object->admission_date);
-                $acquiredDate = new DateTime();
+                $acquiredDate = new DateTime($object->creaction_date);
                 $content->SentDate = $sentDate->format(DateTime::ATOM);
                 $content->ReceivedDate = $receivedDate->format(DateTime::ATOM);
                 $content->AcquiredDate = $acquiredDate->format(DateTime::ATOM);
@@ -362,19 +361,18 @@ class ArchiveTransfer
                 $content->Keyword = [];
 
                 if ($object->exp_contact_id) {
-
                     $contact = $this->db->getContact($object->exp_contact_id);
                     $entitie = $this->db->getEntitie($object->destination);
 
                     $content->Keyword[] = $this->getKeyword($contact);
                     $content->Addressee[] = $this->getAddresse($entitie, "entitie");
-                } else if ($object->dest_contact_id) {
+                } elseif ($object->dest_contact_id) {
                     $contact = $this->db->getContact($object->dest_contact_id);
                     $entitie = $this->db->getEntitie($object->destination);
 
                     $content->Addressee[] = $this->getAddresse($contact);
                     $content->Keyword[] = $this->getKeyword($entitie, "entitie");
-                } else if ($object->exp_user_id) {
+                } elseif ($object->exp_user_id) {
                     $user = $this->db->getUserInformation($object->exp_user_id);
                     $entitie = $this->db->getEntitie($object->initiator);
                     //$entitie = $this->getEntitie($letterbox->destination);
@@ -402,20 +400,31 @@ class ArchiveTransfer
                 $content->Title[] = $object->title;
 
                 if ($type == "Item") {
-                    $content->DocumentType = "Attachment";
-                } else {
-                    $content->DocumentType = $type;
+                    $content->DocumentType = "Pièce jointe";
+                    $content->CreatedDate = $object->creation_date;
+                } elseif ($type == "Note") {
+                    $content->DocumentType = "Note";
+                    $content->CreatedDate = $object->date_note;
+                } elseif ($type == "Email") {
+                    $content->DocumentType = "Courriel";
+                    $content->CreatedDate = $object->creation_date;
+                } elseif ($type == "Response") {
+                    $content->DocumentType = "Réponse";
+                    $content->CreatedDate = $object->creation_date;
                 }
+
                 break;
         }
 
-        if (isset($relatedObjectReference)) {
-            $content->RelatedObjectReference = new stdClass();
-            $content->RelatedObjectReference->References = [];
+        if ($type == 'Response') {
+            if (isset($relatedObjectReference)) {
+                $content->RelatedObjectReference = new stdClass();
+                $content->RelatedObjectReference->References = [];
 
-            $reference = new stdClass();
-            $reference->ArchiveUnitRefId = $relatedObjectReference;
-            $content->RelatedObjectReference->References[] = $reference;
+                $reference = new stdClass();
+                $reference->ArchiveUnitRefId = $relatedObjectReference;
+                $content->RelatedObjectReference->References[] = $reference;
+            }
         }
 
         if (isset($object->initiator)) {
@@ -468,7 +477,7 @@ class ArchiveTransfer
 
         $binaryDataObject->id = $id;
         $binaryDataObject->MessageDigest = new stdClass();
-        $binaryDataObject->MessageDigest->value = openssl_digest($data,'sha256');
+        $binaryDataObject->MessageDigest->value = hash('sha256', $data);
         $binaryDataObject->MessageDigest->algorithm = "sha256";
         $binaryDataObject->Size = filesize($filePath);
 
@@ -479,6 +488,9 @@ class ArchiveTransfer
 
         $binaryDataObject->FileInfo = new stdClass();
         $binaryDataObject->FileInfo->Filename = basename($filePath);
+
+        $binaryDataObject->FormatIdentification = new stdClass();
+        $binaryDataObject->FormatIdentification->MimeType = mime_content_type($filePath);
 
         return $binaryDataObject;
     }
@@ -491,7 +503,7 @@ class ArchiveTransfer
         if ($type == "entitie") {
             $keyword->KeywordType = "corpname";
             $keyword->KeywordContent->value = $informations->business_id;
-        } else if ($informations->is_corporate_person == "Y") {
+        } elseif ($informations->is_corporate_person == "Y") {
             $keyword->KeywordType = "corpname";
             $keyword->KeywordContent->value = $informations->society;
         } else {
@@ -508,7 +520,7 @@ class ArchiveTransfer
         if ($type == "entitie") {
             $addressee->Corpname = $informations->entity_label;
             $addressee->Identifier = $informations->business_id;
-        } else if ($informations->is_corporate_person == "Y") {
+        } elseif ($informations->is_corporate_person == "Y") {
             $addressee->Corpname = $informations->society;
             $addressee->Identifier = $informations->contact_id;
         } else {
@@ -522,10 +534,11 @@ class ArchiveTransfer
 
     private function getCustodialHistoryItem($history)
     {
-        $custodialHistoryItem = new stdClass();
+        $date = new DateTime($history->event_date);
 
+        $custodialHistoryItem = new stdClass();
         $custodialHistoryItem->value = $history->info;
-        $custodialHistoryItem->when = date('Y-m-d',$history->event_date);
+        $custodialHistoryItem->when = $date->format('Y-m-d');
 
         return $custodialHistoryItem;
     }

@@ -35,8 +35,10 @@ class Acknowledgement {
         $abstractMessage->saveXml($messageObject,"Acknowledgement", ".xml");
 
 		foreach ($resIds as $resId) {
-            $abstractMessage->addAttachment($messageObject->MessageIdentifier->value, $resId, $messageObject->MessageIdentifier->value.".xml", "xml", "Accusé de reception",1);
+            $abstractMessage->addAttachment($messageObject->MessageIdentifier->value, $resId, $messageObject->MessageIdentifier->value.".xml", "xml", "Accusé de réception",1);
         }
+
+        return $messageObject;
 	}
 
     private function getMessageObject($data)
