@@ -201,7 +201,7 @@ class SendMessageExchangeController
         }
 
         if (empty($_SESSION['adresses']['to'])) {
-            array_push($errors, 'no dest contact');
+            array_push($errors, _NO_RECIPIENT);
         }
 
         return $errors;

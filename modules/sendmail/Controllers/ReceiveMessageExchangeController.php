@@ -28,6 +28,7 @@ use Baskets\Models\BasketsModel;
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'modules/notes/Models/NotesModel.php';
 require_once __DIR__. DIRECTORY_SEPARATOR. '..' . DIRECTORY_SEPARATOR. '..' . DIRECTORY_SEPARATOR . 'export_seda' . DIRECTORY_SEPARATOR. 'Controllers'. DIRECTORY_SEPARATOR. 'ReceiveMessage.php';
+require_once "core/class/class_history.php";
 
 class ReceiveMessageExchangeController
 {
@@ -114,6 +115,11 @@ class ReceiveMessageExchangeController
         if(!empty($resAttachmentReturn['errors'])){
             return $response->withJson(["errors" => $resAttachmentReturn['errors']]);
         }
+
+        $hist = new \history();
+        $hist->add(
+                'res_letterbox', $resLetterboxReturn[0], "ADD", 'resadd', _NUMERIC_PACKAGE_IMPORTED, 'POSTGRESQL', 'sendmail'
+            );
 
         $basketRedirection = null;
         $userBaskets = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);

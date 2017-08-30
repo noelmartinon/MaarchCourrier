@@ -86,6 +86,8 @@ if (!defined("_NEW_NUMERIC_PACKAGE"))
     define("_NEW_NUMERIC_PACKAGE","Nouveau pli numérique");
 if (!defined("_NUMERIC_PACKAGE_ADDED"))
     define("_NUMERIC_PACKAGE_ADDED","Pli numérique ajouté");
+if (!defined("_NUMERIC_PACKAGE_IMPORTED"))
+    define("_NUMERIC_PACKAGE_IMPORTED","Pli numérique importé");
 if (!defined("_NUMERIC_PACKAGE_SENT"))
     define("_NUMERIC_PACKAGE_SENT","Plis numériques envoyés");
 if (!defined("_NUMERIC_PACKAGE"))
@@ -165,3 +167,5 @@ if (!defined("_ERROR_RECEIVE_FAIL"))
 
 if (!defined("_ERROR_CONTACT_UNKNOW"))
     define("_ERROR_CONTACT_UNKNOW", "Contact inconnu.");
+if (!defined("_NO_RECIPIENT"))
+    define("_NO_RECIPIENT", "Aucun destinataire");

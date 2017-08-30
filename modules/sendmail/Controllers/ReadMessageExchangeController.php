@@ -38,7 +38,7 @@ class ReadMessageExchangeController
 
         $ArchivalAgency                 = $messageExchangeData->ArchivalAgency;
         $ArchivalAgencyMetaData         = $ArchivalAgency->OrganizationDescriptiveMetadata;
-        $aDataForm['communicationType'] = $ArchivalAgencyMetaData->Communication[0]->value . ' (' . $ArchivalAgencyMetaData->Communication[0]->Channel . ')';
+        $aDataForm['communicationType'] = $ArchivalAgencyMetaData->Communication[0]->value;
         $aDataForm['contactInfo']       = $ArchivalAgencyMetaData->Name . ' - <b>' . $ArchivalAgency->Identifier->value . '</b> - ' . $ArchivalAgencyMetaData->Contact[0]->PersonName;
 
         $addressInfo = $ArchivalAgencyMetaData->Contact[0]->Address[0]->PostOfficeBox . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->StreetName . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->Postcode . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->CityName . ' ' . $ArchivalAgencyMetaData->Contact[0]->Address[0]->Country;
