@@ -27,11 +27,11 @@ $core_tools = new core_tools();
 $core_tools->test_user();
 $core_tools->load_lang();
 $core_tools->test_service('reports', 'reports');
-$db = new Database();
-$req = new request();
-$list = new list_show();
+$db    = new Database();
+$req   = new request();
+$list  = new list_show();
 $graph = new graphics();
-$sec = new security();
+$sec   = new security();
 
 $_ENV['date_pattern'] = "/^[0-3][0-9]-[0-1][0-9]-[1-2][0-9][0-9][0-9]$/";
 
@@ -43,10 +43,23 @@ $where_status = '';
 
 if (!empty($_POST['entities_chosen'])) {
     $entities_chosen = explode("#", $_POST['entities_chosen']);
+	if($_REQUEST['sub_entities'] == 'true'){
+	    $sub_entities = [];
+	    foreach($entities_chosen as $value){
+	        $sub_entities[] = users_entities_Abstract::getEntityChildren($value);
+	    }
+	    $sub_entities1 = "'";
+	    $countSubEntities = count($sub_entities);
+	    for( $i=0; $i< $countSubEntities; $i++){
+	        $sub_entities1 .= implode("','",$sub_entities[$i]);
+	        $sub_entities1 .= "','";
+	    }
+	    $sub_entities1 = substr($sub_entities1, 0, -2);
+	}
     $entities_chosen = "'" . join("','", $entities_chosen) . "'";
     $where_entities = ' AND destination in (' . $entities_chosen . ') ';
 	if($_REQUEST['sub_entities'] == 'true'){
-		$where_entities = 'AND (destination in (' . $entities_chosen . ') or destination in (select entity_id from entities where parent_entity_id IN ('.$entities_chosen.')))';
+		$where_entities = 'AND (destination in (' . $entities_chosen . ') or destination in ('.$sub_entities1.'))';
 	}
 }
 
@@ -705,7 +718,6 @@ else
 
 			$totalCourrier=array();
 			$totalEntities = count($entities);
-
 
 			foreach(array_keys($_SESSION['coll_categories']['letterbox_coll']) as $key)
 			{
