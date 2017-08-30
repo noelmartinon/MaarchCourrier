@@ -114,18 +114,16 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 function viewArchiveUnit($archiveUnit, $archiveUnitChildren = false) 
 {
     $frm_str = '';
-    $frm_str .= '<h4 align="center" onclick="new Effect.toggle(\''. $archiveUnit->id .'_fields\', \'blind\', {delay:0.2});'
+    $frm_str .= '<h4 onclick="new Effect.toggle(\''. $archiveUnit->id .'_fields\', \'blind\', {delay:0.2});'
         . 'whatIsTheDivStatus(\''. $archiveUnit->id .'_fields\', \'divStatus_'. $archiveUnit->id .'_fields\');" '
         . 'class="categorie" style="width:90%;" onmouseover="this.style.cursor=\'pointer\';">';
 
     if (!$archiveUnitChildren) {
         $frm_str .= ' <span id="divStatus_'. $archiveUnit->id .'_fields" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>&nbsp;'
             . _INFORMATION_ARCHIVE. ' "'. $archiveUnit->Content->Title[0];
-        //$frm_str .= '<h4 class="title">'._INFORMATION_ARCHIVE. ' "'. $archiveUnit->Content->Title[0].'"</h4>';
     } else {
-        $frm_str .= ' <span id="divStatus_'. $archiveUnit->id .'_fields" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>&nbsp;'
+        $frm_str .= ' <span style="margin-left:2%" id="divStatus_'. $archiveUnit->id .'_fields" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>&nbsp;'
             . _INFORMATION_ARCHIVE_CHILDREN. ' "'. $archiveUnit->Content->Title[0];
-        //$frm_str .= '<h5 class="title">'._INFORMATION_ARCHIVE_CHILDREN. ' "'. $archiveUnit->Content->Title[0].'"</h5>';
     }
 
     $frm_str .= '</h4>';

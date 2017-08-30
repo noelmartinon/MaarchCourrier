@@ -83,9 +83,10 @@ class TransferToSAE
             $abstractMessage->changeStatus($reference, 'SEND_SEDA');
             $acknowledgement = new Acknowledgement();
             $resIds = explode(',',$_REQUEST['resIds']);
-            $acknowledgement->receive($dataTransfer['content'], $resIds);
+            $acknowledgementObject = $acknowledgement->receive($dataTransfer['content'], $resIds);
             $abstractMessage->changeStatus($reference, 'ACK_SEDA');
-            $res['content'] .= $reference;
+
+            $res['content'] .= $acknowledgementObject->MessageIdentifier->value;
         }
         
         return $res;

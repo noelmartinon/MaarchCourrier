@@ -98,6 +98,12 @@ if (!defined("_ARCHIVAL_AGENCY_SIREN_COMPULSORY"))
 if (!defined("_VALIDATE_MANUAL_DELIVERY"))
     define("_VALIDATE_MANUAL_DELIVERY", "Valider l'envoi manuel du bordereau");
 
+if (!defined("_NO_LETTER_PURGE"))
+    define("_NO_LETTER_PURGE", "Aucun document à supprimer");
+
+if (!defined("_PURGE"))
+    define("_PURGE", "document(s) supprimé(s)");
+
 if (!defined("_ERROR_MESSAGE_ALREADY_SENT"))
     define("_ERROR_MESSAGE_ALREADY_SENT", "L'archivage d'un courrier sélectionné est déjà en cours, vous ne pouvez pas archiver deux fois le même courrier. Veuillez le désélectionner pour continuer. Numéro de courrier en cours d'archivage : ");
 

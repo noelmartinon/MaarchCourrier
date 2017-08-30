@@ -97,6 +97,12 @@ if (!defined("_ERROR_STATUS_SEDA"))
 if (!defined("_ERROR_NO_ACKNOWLEDGEMENT"))
     define("_ERROR_NO_ACKNOWLEDGEMENT", "No acknowledgement for this letter : ");
 
+if (!defined("_NO_LETTER_PURGE"))
+    define("_NO_LETTER_PURGE", "No letter to purge");
+
+if (!defined("_PURGE"))
+    define("_PURGE", "letters purge");
+
 if (!defined("_ERROR_NO_XML_ACKNOWLEDGEMENT"))
     define("_ERROR_NO_XML_ACKNOWLEDGEMENT", "The acknowledgement is malformed. Letter number : ");
 

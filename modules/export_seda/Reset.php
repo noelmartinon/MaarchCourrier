@@ -22,8 +22,7 @@ Class Reset{
         $fileName = $docServer->path_template. DIRECTORY_SEPARATOR . $dir . $reply->filename;
         $xml = simplexml_load_file($fileName);
 
-
-        if ((string) $xml->ReplyCode == "000") {
+        if (strpos($xml->ReplyCode, '000') !== false) {
             $_SESSION['error'] = _ERROR_LETTER_ARCHIVED. $resId;
             return false;
         }

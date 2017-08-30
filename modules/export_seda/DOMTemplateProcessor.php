@@ -17,9 +17,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with dependency xml.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * Process DOM XML Template documents
- * 
+ *
  * @author Cyril Vazquez <cyril.vazquez@maarch.org>
  */
 class DOMTemplateProcessor
@@ -69,7 +70,7 @@ class DOMTemplateProcessor
     {
         parent::__construct($document);
 
-        
+
         $this->xinclude();
         $this->xinclude();
         $this->xinclude();
@@ -91,12 +92,12 @@ class DOMTemplateProcessor
      * Process xinclude processing instructions
      * @param DOMNode $node The context node. If omitted the method processes the entire document tree.
      */
-    protected function xinclude($node=null)
+    protected function xinclude($node = null)
     {
         if ($pis = $this->query("descendant-or-self::processing-instruction('xinclude')", $node)) {
             foreach ($pis as $pi) {
                 $includeFragment = $this->document->createDocumentFragment();
-                $source = file_get_contents(__DIR__.trim($pi->data));
+                $source = file_get_contents(__DIR__ . trim($pi->data));
                 if (!$source) {
                     throw new \Exception("Error including Xml fragment: fragment '$pi->data' could not be parsed");
                 }
@@ -110,7 +111,7 @@ class DOMTemplateProcessor
 
     /**
      * Bind a variable
-     * @param string $name      The name of the variable
+     * @param string $name The name of the variable
      * @param string &$variable The reference of the value
      */
     public function bindVariable($name, &$variable)
@@ -120,7 +121,7 @@ class DOMTemplateProcessor
 
     /**
      * Set a source for merge
-     * @param string $name  The name of the data source
+     * @param string $name The name of the data source
      * @param string $value The value
      */
     public function setSource($name, $value)
@@ -130,7 +131,7 @@ class DOMTemplateProcessor
 
     /**
      * Remove empty elements and attributes
-     * @param DOMNode $node The context node. If omitted the entire document will be processed.
+     * @param DOMNode $node
      */
     public function removeEmptyNodes($node=null)
     {
@@ -141,7 +142,7 @@ class DOMTemplateProcessor
         switch($node->nodeType) {
             case \XML_ELEMENT_NODE:
                 $childNodeList = $node->childNodes;
-                for ($i=0, $l=$childNodeList->length; $i<$l; $i++) {
+                for ($i=$childNodeList->length-1; $i>=0; $i--) {
                     $this->removeEmptyNodes($childNodeList->item($i));
                 }
 
@@ -158,7 +159,7 @@ class DOMTemplateProcessor
                 break;
 
             case \XML_TEXT_NODE:
-                if (ctype_space($node->nodeValue) && $node->previousSibling && $node->previousSibling->nodeType == \XML_TEXT_NODE) {
+                if (ctype_space($node->nodeValue)) { //&& $node->previousSibling && $node->previousSibling->nodeType == \XML_TEXT_NODE) {
                     $node->nodeValue = trim($node->nodeValue);
                 }
                 break;
@@ -170,11 +171,11 @@ class DOMTemplateProcessor
     ------------------------------------------------------------------------- */
     /**
      * Merges the processing instructions on the given node and its chil nodes.
-     * 
-     * @param string $node   The context node. If omitted the entire document will be processed.
+     *
+     * @param string $node The context node. If omitted the entire document will be processed.
      * @param string $source The data source. If omitted, all merge instruction path must be existing sources
      */
-    public function merge($node=null, $source=null)
+    public function merge($node = null, $source = null)
     {
         // Avoid garbage nodes merge
         if (!isset($this->mergedNodes)) {
@@ -184,7 +185,7 @@ class DOMTemplateProcessor
         if (!isset($this->mergedForms)) {
             $this->mergedForms = new \SplObjectStorage();
         }
-        
+
         if ($node && $this->mergedNodes->contains($node)) {
             return;
         }
@@ -227,7 +228,7 @@ class DOMTemplateProcessor
         }
     }
 
-    protected function mergePi($pi, $instr, $source=null)
+    protected function mergePi($pi, $instr, $source = null)
     {
         // Get value by reference
         $value = &$this->getData($instr, $source);
@@ -235,7 +236,7 @@ class DOMTemplateProcessor
         // Use value with selected target
         if (isset($instr->params['var'])) {
             $this->addVar($instr->params['var'], $value);
-            
+
             $pi->parentNode->removeChild($pi);
 
             return false;
@@ -247,7 +248,7 @@ class DOMTemplateProcessor
         //if (isset($instr->params['source']))
         //    var_dump($instr->params['source']);
 
-        switch(true) {
+        switch (true) {
             // If value is scalar, merge text before Pi
             case $type == 'string':
             case $type == 'integer':
@@ -283,7 +284,7 @@ class DOMTemplateProcessor
 
                     // If value is an object but no form : merge string version if possible
                     case method_exists($value, '__toString'):
-                        return $this->mergeText($pi, $instr, (string) $value);                    
+                        return $this->mergeText($pi, $instr, (string)$value);
                 }
 
         }
@@ -317,17 +318,17 @@ class DOMTemplateProcessor
         }
     }
 
-    protected function mergeTextNodes($node=null, $source=null)
+    protected function mergeTextNodes($node = null, $source = null)
     {
         $textNodes = $this->query("descendant-or-self::text()[contains(., '[?merge')] | descendant-or-self::*/@*[contains(., '[?merge')]", $node);
 
-        for ($i=0, $l=$textNodes->length; $i<$l; $i++) {
+        for ($i = 0, $l = $textNodes->length; $i < $l; $i++) {
             $textNode = $textNodes->item($i);
             $this->mergeTextNode($textNode, $source);
         }
     }
 
-    protected function mergeTextNode($textNode, $source=null)
+    protected function mergeTextNode($textNode, $source = null)
     {
         //$nodeXml = $this->saveXml($textNode);
         $nodeValue = $textNode->nodeValue;
@@ -345,7 +346,7 @@ class DOMTemplateProcessor
         foreach ($instructions as $pi => $instr) {
             $value = $this->getData($instr, $source);
             if (is_scalar($value) || is_null($value) || (is_object($value) && method_exists($value, '__toString'))) {
-                $mergedValue = str_replace($pi, (string) $value, $textNode->nodeValue);
+                $mergedValue = str_replace($pi, (string)$value, $textNode->nodeValue);
                 $mergedValue = htmlentities($mergedValue);
                 $textNode->nodeValue = str_replace($pi, $value, $mergedValue);
             }
@@ -360,31 +361,31 @@ class DOMTemplateProcessor
     protected function mergeText($pi, $instr, $value)
     {
         $params = $instr->params;
-        switch(true) {
-        case isset($params['attr']):
-            if (!$targetNode = $this->query("following-sibling::*", $pi)->item(0)) {
-                return true;
-            }
-            $targetNode->setAttribute($params['attr'], $value);
-            break;
+        switch (true) {
+            case isset($params['attr']):
+                if (!$targetNode = $this->query("following-sibling::*", $pi)->item(0)) {
+                    return true;
+                }
+                $targetNode->setAttribute($params['attr'], $value);
+                break;
 
-        case isset($params['render']):
-            if (!$params['render']) {
-                $fragment = $value;
-            } else { 
-                $fragment = $params['render'];
-            }
-            if (!isset($this->fragments[$fragment])) {
-                return true;
-            }
-            $targetNode = $this->fragments[$fragment]->cloneNode(true);
-            $this->merge($targetNode);
-            $pi->parentNode->insertBefore($targetNode, $pi);
-            break;
+            case isset($params['render']):
+                if (!$params['render']) {
+                    $fragment = $value;
+                } else {
+                    $fragment = $params['render'];
+                }
+                if (!isset($this->fragments[$fragment])) {
+                    return true;
+                }
+                $targetNode = $this->fragments[$fragment]->cloneNode(true);
+                $this->merge($targetNode);
+                $pi->parentNode->insertBefore($targetNode, $pi);
+                break;
 
-        default:
-            $targetNode = $this->document->createTextNode($value);
-            $pi->parentNode->insertBefore($targetNode, $pi);
+            default:
+                $targetNode = $this->document->createTextNode($value);
+                $pi->parentNode->insertBefore($targetNode, $pi);
         }
 
         return true;
@@ -396,7 +397,7 @@ class DOMTemplateProcessor
 
         if (isset($params['include'])) {
             $filename = $params['include'];
-            $source = file_get_contents(__DIR__."/".$filename);
+            $source = file_get_contents(__DIR__ . "/" . $filename);
 
             $targetNode = $this->document->createDocumentFragment();
             $targetNode->appendXML($source);
@@ -407,9 +408,9 @@ class DOMTemplateProcessor
 
         reset($array);
         if ($count = count($array)) {
-            $i=0;
-            while ($i<$count) {
-            //do {
+            $i = 0;
+            while ($i < $count) {
+                //do {
                 $itemNode = $targetNode->cloneNode(true);
                 $itemData = current($array);
                 if (isset($params['source'])) {
@@ -421,9 +422,9 @@ class DOMTemplateProcessor
 
                 @next($array);
                 $i++;
-            /*} while (
-                @next($array) !== false
-            );*/
+                /*} while (
+                    @next($array) !== false
+                );*/
             }
         }
         // Remove targetNode (row template)
@@ -453,7 +454,7 @@ class DOMTemplateProcessor
         return true;
     }
 
-    protected function mergeObjectProperties($targetNode, $object, $params, $oname=false)
+    protected function mergeObjectProperties($targetNode, $object, $params, $oname = false)
     {
         foreach ($object as $pname => $pvalue) {
             if ($oname) {
@@ -474,12 +475,12 @@ class DOMTemplateProcessor
     protected function mergeObjectProperty($targetNode, $value, $params, $name)
     {
         $elements = $this->query("descendant-or-self::*[@name='$name']", $targetNode);
-        for ($i=0, $l=$elements->length; $i<$l; $i++) {
+        for ($i = 0, $l = $elements->length; $i < $l; $i++) {
             $element = $elements->item($i);
             switch (strtolower($element->nodeName)) {
                 // Form Input
                 case 'input':
-                    switch($element->getAttribute('type')) {
+                    switch ($element->getAttribute('type')) {
                         case 'checkbox':
                             if (is_bool($value)) {
                                 if ($value) {
@@ -494,7 +495,7 @@ class DOMTemplateProcessor
                                     $element->removeAttribute('checked');
                                 }
                             }
-                            
+
                             break;
 
                         case 'radio':
@@ -513,7 +514,7 @@ class DOMTemplateProcessor
                 // Select
                 case 'select':
                     $value = $this->quote($value);
-                    if ($option = $this->query(".//option[@value=".$value."]", $element)->item(0)) {
+                    if ($option = $this->query(".//option[@value=" . $value . "]", $element)->item(0)) {
                         $option->setAttribute('selected', 'true');
                         if ($optGroup = $this->query("parent::optgroup", $option)->item(0)) {
                             $optGroup->removeAttribute('disabled');
@@ -532,13 +533,13 @@ class DOMTemplateProcessor
     /**
      * Merge a boolean
      * @param DOMNode $pi
-     * @param string  $instr
+     * @param string $instr
      * @param boolean $bool
-     * 
+     *
      * @return bool
      */
     protected function mergeBool($pi, $instr, $bool)
-    { 
+    {
         $params = $instr->params;
         if (isset($params['include'])) {
             $res = $params['include'];
@@ -574,9 +575,9 @@ class DOMTemplateProcessor
     /**
      * Merge a node
      * @param DOMNode $pi
-     * @param string  $instr
+     * @param string $instr
      * @param DOMNode $DOMNode
-     * 
+     *
      * @return bool
      */
     public function mergeNode($pi, $instr, $DOMNode)
@@ -589,7 +590,7 @@ class DOMTemplateProcessor
     /* ------------------------------------------------------------------------
         Data sources management
     ------------------------------------------------------------------------ */
-    protected function &getData($instr, $source=null)
+    protected function &getData($instr, $source = null)
     {
         //var_dump("getData");
         //var_dump($instr);
@@ -601,7 +602,7 @@ class DOMTemplateProcessor
 
         // First step defines source
         $type = $steps[0][0];
-        switch($type) {
+        switch ($type) {
             case 'arg':
                 $value = &$source;
                 break;
@@ -630,7 +631,7 @@ class DOMTemplateProcessor
                 break;
         }
 
-        for ($i=1, $l=count($steps); $i<$l; $i++) {
+        for ($i = 1, $l = count($steps); $i < $l; $i++) {
             $value = &$this->stepData($steps[$i], $value);
         }
 
@@ -643,29 +644,29 @@ class DOMTemplateProcessor
         //var_dump($step);
         //var_dump("from " . gettype($source));
         $value = null;
-        switch($step[0]) {
-        case 'func':
-            $value = &$this->stepFunc($step[1], $step[2], $source);
-            break;
+        switch ($step[0]) {
+            case 'func':
+                $value = &$this->stepFunc($step[1], $step[2], $source);
+                break;
 
-        case 'offset':
-            $key = &$this->getParamValue($step[1], $source);
-            if (is_array($source) && isset($source[$key])) {
-                $value = &$source[$key];
-            }
-            break;
+            case 'offset':
+                $key = &$this->getParamValue($step[1], $source);
+                if (is_array($source) && isset($source[$key])) {
+                    $value = &$source[$key];
+                }
+                break;
 
-        case 'prop':
-            if (isset($source->{$step[1]})) {
-                $value = &$source->{$step[1]};
-            }
-            break;
+            case 'prop':
+                if (isset($source->{$step[1]})) {
+                    $value = &$source->{$step[1]};
+                }
+                break;
         }
-        
+
         return $value;
     }
 
-    protected function &stepFunc($name, $params=array(), $source=null)
+    protected function &stepFunc($name, $params = array(), $source = null)
     {
         $value = null;
         foreach ($params as $i => $param) {
@@ -678,7 +679,7 @@ class DOMTemplateProcessor
             return $value;
         }
         //var_dump($params);
-        switch($name) {
+        switch ($name) {
             // Callback functions
             case 'func':
                 $func = $params[0];
@@ -716,7 +717,7 @@ class DOMTemplateProcessor
                 break;
             case 'pos':
                 $pos = null;
-                foreach ((array) $source as $key => $value) {
+                foreach ((array)$source as $key => $value) {
                     $pos++;
                     if ($key == @key($source)) {
                         break;
@@ -727,7 +728,7 @@ class DOMTemplateProcessor
                 }
                 break;
             case 'islast':
-                $value = ((@key($source)+1) == @count($source));
+                $value = ((@key($source) + 1) == @count($source));
                 break;
             case 'slice':
                 $value = @array_slice($source, $params[0], $params[1]);
@@ -796,7 +797,7 @@ class DOMTemplateProcessor
                 $value = @strval($source);
                 break;
             case 'bool':
-                $value = @(bool) $source;
+                $value = @(bool)$source;
                 break;
             case 'array':
                 if (!is_array($source)) {
@@ -857,7 +858,7 @@ class DOMTemplateProcessor
                 $value = (strrpos($source, $params[0]) === (strlen($source) - strlen($params[0]) + 1));
                 break;
             case 'bit':
-                $value = ($source & (int) $params[0]) > 0;
+                $value = ($source & (int)$params[0]) > 0;
                 break;
 
             case 'then':
@@ -882,7 +883,7 @@ class DOMTemplateProcessor
                 $value = @sprintf($params[0], $source);
                 break;
             case 'match':
-                $value = (bool) @preg_match($params[0], $source);
+                $value = (bool)@preg_match($params[0], $source);
                 break;
             case 'upper':
                 $value = @strtoupper($source);
@@ -989,7 +990,7 @@ class DOMTemplateProcessor
         return $value;
     }
 
-    protected function &getParamValue($param, $source=null)
+    protected function &getParamValue($param, $source = null)
     {
         if ($param[0] == "'" || $param[0] == '"') {
             $value = substr($param, 1, -1);
@@ -999,14 +1000,14 @@ class DOMTemplateProcessor
             $instr = $this->parse($param);
             $value = &$this->getData($instr, $source);
         }
-        
+
         return $value;
     }
 
     /* ------------------------------------------------------------------------
         Merge instructions parser
     ------------------------------------------------------------------------ */
-    protected function parse($instructionString, $sep=" ")
+    protected function parse($instructionString, $sep = " ")
     {
         $args = $this->explode(trim($instructionString), $sep);
 
@@ -1027,17 +1028,17 @@ class DOMTemplateProcessor
         foreach ($args as $arg) {
             if (preg_match('#^(?<name>\w+)\s*(=(["\'])(?<value>(?:[^\3\\\\]|\\\\.)*)\3)$#', $arg, $pair)) {
                 $parser->params[$pair['name']] = isset($pair['value']) ? $pair['value'] : null;
-            } elseif ($arg[0]=="@") {
-                $parser->params["attr"]  = substr($arg, 1);
-            } elseif ($arg[0]=="$") {
-                $parser->params["var"]  = substr($arg, 1);
-            } elseif ($arg[0]=="/") {
-                $parser->params["include"]  = substr($arg, 1);
+            } elseif ($arg[0] == "@") {
+                $parser->params["attr"] = substr($arg, 1);
+            } elseif ($arg[0] == "$") {
+                $parser->params["var"] = substr($arg, 1);
+            } elseif ($arg[0] == "/") {
+                $parser->params["include"] = substr($arg, 1);
             } else {
-                $parser->params["source"]  = $arg;
+                $parser->params["source"] = $arg;
             }
         }
-        
+
         return $parser;
     }
 
@@ -1045,9 +1046,9 @@ class DOMTemplateProcessor
     {
         $source = array();
         $steps = $this->tokenize($data);
-        for ($i=0, $l=count($steps); $i<$l; $i++) {
+        for ($i = 0, $l = count($steps); $i < $l; $i++) {
             $step = $steps[$i];
-            switch(true) {
+            switch (true) {
                 case $step == "" :
                 case $step == false :
                     if ($i == 0) {
@@ -1084,14 +1085,14 @@ class DOMTemplateProcessor
                     break;
 
                 default:
-                    if ($i==0) {
+                    if ($i == 0) {
                         $source[] = array('source', $step);
                     } else {
                         $source[] = array('prop', $step);
                     }
             }
         }
-        
+
         return $source;
     }
 
@@ -1100,17 +1101,17 @@ class DOMTemplateProcessor
         $l = strlen($str);
         $o = 0;
         $esc = false;
-        $sq  = false;
-        $dq  = false;
-        $br  = 0;
+        $sq = false;
+        $dq = false;
+        $br = 0;
         $sbr = 0;
         $tok = array();
 
-        for ($i=0; $i<$l; $i++) {
+        for ($i = 0; $i < $l; $i++) {
             // Add token if separator found out of enclosures and brackets
             if ($str[$i] == $sep && !$dq && !$sq && !$br && !$sbr) {
-                $tok[] = trim(substr($str, $o, $i-$o));
-                $o = $i+1;
+                $tok[] = trim(substr($str, $o, $i - $o));
+                $o = $i + 1;
                 continue;
             }
 
@@ -1121,33 +1122,33 @@ class DOMTemplateProcessor
             }
 
             // Special characters that affect parsing
-            switch($str[$i]) {
-            case "'":
-                if (!$sq) $sq = true;
-                else $sq = false;
-                break;
-            case '"':
-                if (!$dq) $dq = true;
-                else $dq = false;
-                break;
-            case '(':
-                if (!$sq && !$dq) $br++;
-                break;
-            case ')':
-                if (!$sq && !$dq) $br--;
-                break;
-            case '[':
-                if (!$sq && !$dq) $sbr++;
-                break;
-            case ']':
-                if (!$sq && !$dq) $sbr--;
-                break;
-            case '\\':
-                $esc = true;
-                break;
+            switch ($str[$i]) {
+                case "'":
+                    if (!$sq) $sq = true;
+                    else $sq = false;
+                    break;
+                case '"':
+                    if (!$dq) $dq = true;
+                    else $dq = false;
+                    break;
+                case '(':
+                    if (!$sq && !$dq) $br++;
+                    break;
+                case ')':
+                    if (!$sq && !$dq) $br--;
+                    break;
+                case '[':
+                    if (!$sq && !$dq) $sbr++;
+                    break;
+                case ']':
+                    if (!$sq && !$dq) $sbr--;
+                    break;
+                case '\\':
+                    $esc = true;
+                    break;
             }
         }
-        $tail = trim(substr($str, $o, $i-$o));
+        $tail = trim(substr($str, $o, $i - $o));
         if ($tail !== "") {
             $tok[] = $tail;
         }
@@ -1164,36 +1165,36 @@ class DOMTemplateProcessor
         $l = strlen($str);
         $o = 0;
         $esc = false;
-        $sq  = false;
-        $dq  = false;
-        $br  = 0;
+        $sq = false;
+        $dq = false;
+        $br = 0;
         $sbr = false;
         $steps = array();
         $step = false;
 
         // Function
-        for ($i=0; $i<$l; $i++) {
+        for ($i = 0; $i < $l; $i++) {
             // Tokenize only of out of enclosures
             if (!$dq && !$sq && !$br) {
                 // Add token if dot found
                 if ($str[$i] == ".") {
-                    $steps[] = trim(substr($str, $o, $i-$o));
-                    $o = $i+1;
+                    $steps[] = trim(substr($str, $o, $i - $o));
+                    $o = $i + 1;
                     continue;
                 }
 
                 // Add token if opening square bracket
                 if ($str[$i] == "[") {
-                    $steps[] = trim(substr($str, $o, $i-$o));
-                    $o = $i+1;
+                    $steps[] = trim(substr($str, $o, $i - $o));
+                    $o = $i + 1;
                     $sbr = true;
                     continue;
                 }
 
                 // Add token enclosed by square brackets
                 if ($str[$i] == "]" && $sbr) {
-                    $steps[] = trim(substr($str, $o-1, $i-$o+2));
-                    $o = $i+1;
+                    $steps[] = trim(substr($str, $o - 1, $i - $o + 2));
+                    $o = $i + 1;
                     $sbr = false;
                     continue;
                 }
@@ -1206,27 +1207,27 @@ class DOMTemplateProcessor
             }
 
             // Special characters that affect parsing
-            switch($str[$i]) {
-            case "'":
-                if (!$sq) $sq = true;
-                else $sq = false;
-                break;
-            case '"':
-                if (!$dq) $dq = true;
-                else $dq = false;
-                break;
-            case '(':
-                if (!$sq && !$dq) $br++;
-                break;
-            case ')':
-                if (!$sq && !$dq) $br--;
-                break;
-            case '\\':
-                $esc = true;
-                break;
+            switch ($str[$i]) {
+                case "'":
+                    if (!$sq) $sq = true;
+                    else $sq = false;
+                    break;
+                case '"':
+                    if (!$dq) $dq = true;
+                    else $dq = false;
+                    break;
+                case '(':
+                    if (!$sq && !$dq) $br++;
+                    break;
+                case ')':
+                    if (!$sq && !$dq) $br--;
+                    break;
+                case '\\':
+                    $esc = true;
+                    break;
             }
         }
-        $tail = trim(substr($str, $o, $i-$o));
+        $tail = trim(substr($str, $o, $i - $o));
         if ($tail !== false)
             $steps[] = $tail;
 

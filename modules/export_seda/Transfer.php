@@ -12,7 +12,7 @@ class Transfer{
 
         if ($target == 'maarchrm') {
             $adapter = new AdapterMaarchRM();
-        } elseif ($target == 'maarchcourrier' ) {
+        } elseif ($target == 'maarchcourrier') {
             $adapter = new AdapterMaarchCourrier();
         } else {
             $_SESSION['error'] = _UNKNOWN_TARGET;

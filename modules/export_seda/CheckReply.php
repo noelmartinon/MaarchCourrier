@@ -39,7 +39,7 @@ Class CheckReply {
         $this->token = (string) $this->xml->CONFIG->token;
         $tokenEncode = urlencode($this->token);
         $this->token = "LAABS-AUTH=". $tokenEncode;
-        $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/ArchiveTransfer/history";
+        $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/message/reference/";
         $this->db = new RequestSeda();
 
     }
@@ -63,19 +63,18 @@ Class CheckReply {
         }
 
         foreach ($unitIdentifiers as $key => $value) {
-            $messageReplyIdentifier = $key. '_Reply';
-            $messageReply = $this->getReply($messageReplyIdentifier);
+            $messages = $this->getReply($key);
 
-            if (empty($messageReply)) {
+            if (!isset($messages->replyMessage)) {
                 continue;
             }
 
             //créer message reply & sauvegarder xml
-            $resIds = explode(',',$value);
-            $data = json_decode($messageReply[0]->data);
+            $resIds = explode(',', $value);
+            $data = json_decode($messages->replyMessage->data);
 
             $archiveTransferReply = new ArchiveTransferReply();
-            $archiveTransferReply->receive($data,$resIds);
+            $archiveTransferReply->receive($data, $resIds);
             $abstractMessage->changeStatus($key, 'REPLY_SEDA');
         }
 
@@ -129,8 +128,7 @@ Class CheckReply {
 
         try {
             $curl = curl_init();
-
-            curl_setopt($curl, CURLOPT_URL, $this->urlService . "?reference=". $reference);
+            curl_setopt($curl, CURLOPT_URL, $this->urlService . $reference);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
             curl_setopt($curl, CURLOPT_COOKIE, $this->token);
