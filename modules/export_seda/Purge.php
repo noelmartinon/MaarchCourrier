@@ -37,14 +37,15 @@ Class Purge{
         $this->deleteData = (string) $this->xml->CONFIG->deleteData;
     }
 
-    public function purge($resId) {
+    public function purge($resId)
+    {
         $reply = $this->db->getReply($resId);
         if (!$reply) {
             $_SESSION['error'] = _ERROR_NO_REPLY . $resId;
             return false;
         }
 
-        $tabDir = explode('#',$reply->path);
+        $tabDir = explode('#', $reply->path);
 
         $dir = '';
         for ($i = 0; $i < count($tabDir); $i++) {
@@ -55,10 +56,11 @@ Class Purge{
         $fileName = $docServer->path_template. DIRECTORY_SEPARATOR . $dir . $reply->filename;
         $xml = simplexml_load_file($fileName);
 
-        if ($xml->ReplyCode != "000") {
-            $_SESSION['error'] = _LETTER_NO_ARCHIVED. $resId;
+        if (strpos($xml->ReplyCode, '000') === false) {
+            $_SESSION['error'] = _ERROR_LETTER_ARCHIVED. $resId;
             return false;
         }
+
         $letter = $this->db->getLetter($resId);
         $message = $this->db->getMessageByReference($xml->MessageRequestIdentifier);
 
