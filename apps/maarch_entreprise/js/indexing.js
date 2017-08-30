@@ -1007,7 +1007,7 @@ function putInSessionContact(path_script){
 }
 
 function getContacts(path_script, id, mode){
-    new Ajax.Request(path_script,
+    /*new Ajax.Request(path_script,
     {
         method:'post',
         parameters: {
@@ -1026,7 +1026,7 @@ function getContacts(path_script, id, mode){
                 //$('contactSelect').innerHTML = answer.responseText;
             }
         }
-    });
+    });*/
 }
 
 /**
