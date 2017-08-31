@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>
-<!-- le nom du fichier doit etre config.xml ou config_{custom_id}.xml -->
+    <CONFIG>
+        <Lang>fr</Lang> <!-- fr, en-->
+        <MaarchDirectory>/var/www/MaarchCourrier/</MaarchDirectory>
+        <MaarchUrl>http://localhost/maarch/</MaarchUrl>
+        <MaarchApps>maarch_entreprise</MaarchApps>
+		<CustomId>cs_maarch_courrier</CustomId>
+    </CONFIG>
     <COLLECTION>
         <Id>letterbox_coll</Id>
         <Table>res_letterbox</Table>
@@ -13,8 +19,8 @@
         <databaseserver>127.0.0.1</databaseserver>
         <databaseserverport>5432</databaseserverport>
         <databasetype>POSTGRESQL</databasetype>
-        <databasename>maarch</databasename>
-        <databaseuser>postgres</databaseuser>
-        <databasepassword>postgres</databasepassword>
+        <databasename>maarchcourrier</databasename>
+        <databaseuser>maarch</databaseuser>
+        <databasepassword>maarch</databasepassword>
     </CONFIG_BASE>
 </ROOT>
