@@ -1,11 +1,11 @@
 <?php
+$batchPurge = new BatchPurge();
 
 require_once __DIR__ . '/../RequestSeda.php';
 require_once __DIR__ . '/../class/AbstractMessage.php';
 require_once __DIR__ . '/../Purge.php';
 
-new BatchPurge();
-
+$batchPurge->purge();
 
 Class BatchPurge {
     protected $db;
@@ -13,8 +13,6 @@ Class BatchPurge {
     public function __construct()
     {
         $this->initSession();
-        $this->db = new RequestSeda();
-        $this->purge();
     }
 
     private function initSession()
@@ -56,6 +54,7 @@ Class BatchPurge {
 
         $xml = simplexml_load_file($options['config']);
 
+        $_SESSION['config']['lang'] = $xml->CONFIG->Lang;
         $_SESSION['config']['corepath'] = $xml->CONFIG->MaarchDirectory;
         $_SESSION['config']['custom_override_id'] = $xml->CONFIG->CustomId;
         $_SESSION['config']['app_id'] = $xml->CONFIG->MaarchApps;
@@ -71,9 +70,10 @@ Class BatchPurge {
         $_SESSION['tablename']['docservers'] = 'docservers';
     }
 
-    private function purge()
+    public function purge()
     {
-        $letters = $this->db->getLettersByStatus('REPLY_SEDA');
+        $db = new RequestSeda();
+        $letters = $db->getLettersByStatus('REPLY_SEDA');
 
 
         $purge = new Purge();

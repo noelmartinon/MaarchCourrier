@@ -1,10 +1,10 @@
 <?php
+$checkAllReply = new CheckAllReply();
 
 require_once __DIR__ . '/../RequestSeda.php';
 require_once __DIR__ . '/../class/AbstractMessage.php';
 require_once __DIR__ . '/../CheckReply.php';
 
-$checkAllReply = new CheckAllReply();
 $CheckReply = new CheckReply();
 $CheckReply->checkAll();
 
@@ -57,6 +57,7 @@ Class CheckAllReply {
 
         $xml = simplexml_load_file($options['config']);
 
+        $_SESSION['config']['lang'] = $xml->CONFIG->Lang;
         $_SESSION['config']['corepath'] = $xml->CONFIG->MaarchDirectory;
         $_SESSION['config']['custom_override_id'] = $xml->CONFIG->CustomId;
         $_SESSION['config']['app_id'] = $xml->CONFIG->MaarchApps;
