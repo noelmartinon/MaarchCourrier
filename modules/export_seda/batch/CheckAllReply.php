@@ -20,29 +20,42 @@ Class CheckAllReply {
     }
 
     private function initSession() {
-        $getXml = false;
-        $path = '';
-        if (file_exists(
-            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
-            . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'batch'
-            . DIRECTORY_SEPARATOR . 'config'. DIRECTORY_SEPARATOR . 'config.xml'
-        ))
-        {
-            $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
-                . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'batch'
-                . DIRECTORY_SEPARATOR . 'config'. DIRECTORY_SEPARATOR . 'config.xml';
-            $getXml = true;
-        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config'. DIRECTORY_SEPARATOR . 'config.xml')) {
-            $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
-                . DIRECTORY_SEPARATOR . 'batch' . DIRECTORY_SEPARATOR . 'config'. DIRECTORY_SEPARATOR . 'config.xml';
-            $getXml = true;
+        try {
+            include('Maarch_CLITools/ArgsParser.php');;
+        } catch (IncludeFileError $e) {
+            echo 'Maarch_CLITools required ! \n (pear.maarch.org)\n';
+            exit(106);
         }
 
-        if ($getXml) {
-            $xml = simplexml_load_file($path);
+        // Defines scripts arguments
+        $argsparser = new ArgsParser();
+        // The config file
+                $argsparser->add_arg(
+                    'config',
+                    array(
+                        'short' => 'c',
+                        'long' => 'config',
+                        'mandatory' => true,
+                        'help' => 'Config file path is mandatory.',
+                    )
+                );
+
+        $options = $argsparser->parse_args($GLOBALS['argv']);
+        // If option = help then options = false and the script continues ...
+        if ($options == false) {
+            exit(0);
         }
+
+        $txt = '';
+        foreach (array_keys($options) as $key) {
+            if (isset($options[$key]) && $options[$key] == false) {
+                $txt .= $key . '=false,';
+            } else {
+                $txt .= $key . '=' . $options[$key] . ',';
+            }
+        }
+
+        $xml = simplexml_load_file($options['config']);
 
         $_SESSION['config']['databaseserver'] = $xml->CONFIG_BASE->databaseserver;
         $_SESSION['config']['databaseserverport'] = $xml->CONFIG_BASE->databaseserverport;
