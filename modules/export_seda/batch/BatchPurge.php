@@ -66,6 +66,7 @@ Class BatchPurge {
         $_SESSION['config']['databasepassword'] = $xml->CONFIG_BASE->databasepassword;
         $_SESSION['config']['databasename'] = $xml->CONFIG_BASE->databasename;
         $_SESSION['config']['databasetype'] = $xml->CONFIG_BASE->databasetype;
+        $_SESSION['custom_override_id'] = $xml->CONFIG->CustomId;
         $_SESSION['collection_id_choice'] = $xml->COLLECTION->Id;
         $_SESSION['tablename']['docservers'] = 'docservers';
     }
