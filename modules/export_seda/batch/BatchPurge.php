@@ -56,6 +56,10 @@ Class BatchPurge {
 
         $xml = simplexml_load_file($options['config']);
 
+        $_SESSION['config']['corepath'] = $xml->CONFIG->MaarchDirectory;
+        $_SESSION['config']['custom_override_id'] = $xml->CONFIG->CustomId;
+        $_SESSION['config']['app_id'] = $xml->CONFIG->MaarchApps;
+
         $_SESSION['config']['databaseserver'] = $xml->CONFIG_BASE->databaseserver;
         $_SESSION['config']['databaseserverport'] = $xml->CONFIG_BASE->databaseserverport;
         $_SESSION['config']['databaseuser'] = $xml->CONFIG_BASE->databaseuser;
