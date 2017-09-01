@@ -26,9 +26,11 @@ class AbstractMessage{
 
     public function saveXml($messageObject, $name, $extension)
     {
-        if ($messageObject->DataObjectPackage->BinaryDataObject) {
-            foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-                unset($binaryDataObject->Attachment->value);
+        if (isset($messageObject->DataObjectPackage)) {
+            if ($messageObject->DataObjectPackage->BinaryDataObject) {
+                foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
+                    unset($binaryDataObject->Attachment->value);
+                }
             }
         }
 

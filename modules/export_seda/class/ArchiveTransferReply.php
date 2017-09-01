@@ -34,7 +34,7 @@ class ArchiveTransferReply {
     {
         $messageObject = $this->getMessageObject($data);
         $abstractMessage = new AbstractMessage();
-        $this->db->insertMessage($data, "ArchiveTransferReply");
+        //$this->db->insertMessage($data, "ArchiveTransferReply");
         $abstractMessage->saveXml($messageObject,"ArchiveTransferReply", ".xml");
 
         foreach ($resIds as $resId) {
