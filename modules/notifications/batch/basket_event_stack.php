@@ -73,7 +73,11 @@ while ($state <> 'END') {
                         );
                     $whereClause = $entities->process_where_clause(
                             $whereClause, $line3->user_id
-                        );                    
+                        );
+$whereClause = str_replace("and item_id in ()", " ", $whereClause);
+//$whereClause = str_replace("()", "(1=-1)", $whereClause);
+//$whereClause = str_replace("and ()", "", $whereClause);
+//echo PHP_EOL . $whereClause . PHP_EOL;
                     $stmt4 = $db->query("select * from res_view_letterbox ".$whereClause);
         		    $logger->write($stmt4->rowCount() . " document(s) to process for ".$line3->user_id, 'INFO');
         		    $i=1;
@@ -189,7 +193,7 @@ while ($state <> 'END') {
             );
             $html = $templates_controler->merge($notification->template_id, $params, 'content');
            
-            if(strlen($html) === 0) {
+            if(strlen($html) === 0 && !empty($tmpNotif['events'])) {
                 foreach($tmpNotif['events'] as $event) {
                     $events_controler->commitEvent($event->event_stack_sid, "FAILED: Error when merging template");
                 }
@@ -258,6 +262,8 @@ while ($state <> 'END') {
                 }
                 //$logger->write('SQL query:' . $query, 'DEBUG');
                 $db2 = new Database();
+//echo PHP_EOL . $query . PHP_EOL;
+//var_dump($arrayPDO);
                 $db2->query($query, $arrayPDO);
             }
             foreach($basket_list['events'] as $event) {
