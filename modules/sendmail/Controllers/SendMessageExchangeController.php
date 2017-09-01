@@ -46,8 +46,18 @@ class SendMessageExchangeController
         }
 
         /***************** GET MAIL INFOS *****************/
-        $TransferringAgencyInformations    = \Entities\Models\EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']]);
-        $AllInfoMainMail                   = ResModel::getById(['resId' => $aArgs['identifier']]);
+        $AllUserEntities = \Entities\Models\EntitiesModel::getEntitiesByUserId(['user_id' => $_SESSION['user']['UserId']]);
+        foreach ($AllUserEntities as $value) {
+            if($value['entity_id'] == $aArgs['sender_email']){
+                $TransferringAgencyInformations = $value;
+            }
+        }
+
+        if(empty($TransferringAgencyInformations)){
+            return ['errors' => "no sender"];
+        }
+
+        $AllInfoMainMail = ResModel::getById(['resId' => $aArgs['identifier']]);
 
         $tmpMainExchangeDoc = explode("__", $aArgs['main_exchange_doc']);
         $MainExchangeDoc    = ['tablename' => $tmpMainExchangeDoc[0], 'res_id' => $tmpMainExchangeDoc[1]];
@@ -202,6 +212,10 @@ class SendMessageExchangeController
 
         if (empty($_SESSION['adresses']['to'])) {
             array_push($errors, _NO_RECIPIENT);
+        }
+
+        if (empty($aArgs['sender_email'])) {
+            array_push($errors, _NO_SENDER);
         }
 
         return $errors;

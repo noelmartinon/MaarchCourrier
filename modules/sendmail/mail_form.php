@@ -127,15 +127,15 @@ if ($mode == 'add') {
     $content .= '<tr>';
     $content .= '<td align="right" nowrap width="10%"><b>'.ucfirst(_FROM_SHORT).' </b></td><td>';
 
-    if($formContent != 'messageExchange'){
-        $userEntitiesMails = array();
+    $content .='<select name="sender_email" id="sender_email">';
+    $userEntitiesMails = array();
 
+    if($formContent != 'messageExchange'){
         if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
             $userEntitiesMails = $sendmail_tools->getAttachedEntitiesMails($_SESSION['user']['UserId']);
         }
 
-        $content .='<select name="sender_email" id="sender_email">
-                        <option value="'.$_SESSION['user']['Mail'].'" ';
+        $content .='<option value="'.$_SESSION['user']['Mail'].'" ';
         if(empty($userEntitiesMails)){
             $content .= 'selected="selected"';
         }
@@ -149,8 +149,22 @@ if ($mode == 'add') {
             }
         } 
     } else {
-        $content .= functions::xssafe($_SESSION['user']['FirstName']) . ' ' . functions::xssafe($_SESSION['user']['LastName']) . ' (' . \Entities\Models\EntitiesModel::getById(['entityId' => $_SESSION['user']['primaryentity']['id']])['short_label'] . ')';
+        $userEntitiesMails = \Entities\Models\EntitiesModel::getEntitiesByUserId(['user_id' => $_SESSION['user']['UserId']]);
+        if(empty($userEntitiesMails)){
+            $content .= '<option value="" >'._NO_SENDER.'</option>';
+        } else {
+            foreach ($userEntitiesMails as $value) {
+                if(!empty($value['business_id'])){
+                    if($value['entity_id'] == $_SESSION['user']['primaryentity']['id']){
+                        $content .= '<option value="'.$value['entity_id'].'" selected="selected" >' . $value['entity_label'] . ' ('.$value['business_id'].')</option>';
+                    }else{
+                        $content .= '<option value="'.$value['entity_id'].'" >' . $value['entity_label'] . ' ('.$value['business_id'].')</option>';
+                    }
+                }
+            } 
+        }
     }
+
     $content .='</select>';
     $content .='</td>';
     $content .= '</tr>';

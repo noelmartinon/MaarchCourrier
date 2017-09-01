@@ -141,7 +141,7 @@ if (!defined("_EMAIL_REMOVED"))
 
 
 if (!defined("_Label_ADD_TEMPLATE_MAIL"))
-    define("_Label_ADD_TEMPLATE_MAIL", "Modèle : ");
+    define("_Label_ADD_TEMPLATE_MAIL", "Modèle d'accompagnement : ");
 if (!defined("_ADD_TEMPLATE_MAIL"))
     define("_ADD_TEMPLATE_MAIL", "Sélectionnez le modèle désiré");
 
@@ -169,3 +169,5 @@ if (!defined("_ERROR_CONTACT_UNKNOW"))
     define("_ERROR_CONTACT_UNKNOW", "Contact inconnu.");
 if (!defined("_NO_RECIPIENT"))
     define("_NO_RECIPIENT", "Aucun destinataire");
+if (!defined("_NO_SENDER"))
+    define("_NO_SENDER", "Aucun expéditeur");

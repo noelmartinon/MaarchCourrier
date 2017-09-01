@@ -95,6 +95,22 @@ class EntitiesModelAbstract extends \Apps_Table_Service
         return $aReturn;
     }
 
+    public static function getEntitiesByUserId(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['user_id']);
+        static::checkString($aArgs, ['user_id']);
+
+        $aReturn = static::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['users_entities', 'entities'],
+            'left_join' => ['users_entities.entity_id = entities.entity_id'],
+            'where'     => ['user_id = ?', 'business_id <> \'\''],
+            'data'      => [$aArgs['user_id']]
+        ]);
+
+        return $aReturn;
+    }
+
     public static function getEntityRootById(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['entityId']);

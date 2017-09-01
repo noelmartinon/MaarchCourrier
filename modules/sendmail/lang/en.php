@@ -168,3 +168,5 @@ if (!defined("_ERROR_CONTACT_UNKNOW"))
     define("_ERROR_CONTACT_UNKNOW", "Contact unknow.");
 if (!defined("_NO_RECIPIENT"))
     define("_NO_RECIPIENT", "No recipient");
+if (!defined("_NO_SENDER"))
+    define("_NO_SENDER", "No sender");
