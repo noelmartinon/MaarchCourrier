@@ -51,12 +51,12 @@ $core_tools2->manage_location_bar($page_path, $page_label, $page_id, $init, $lev
 /***********************************************************/
 $db = new Database();
 
-$where = '';
+$where    = '';
 $arrayPDO = array();
-$label = '';
-$tab = array();
-$modules = array();
-$stmt = $db->query("SELECT DISTINCT id_module FROM ".$_SESSION['tablename']['history']);
+$label    = '';
+$tab      = array();
+$modules  = array();
+$stmt = $db->query("SELECT DISTINCT ON(lower(id_module)) id_module FROM history WHERE id_module NOT IN ('null') ORDER BY lower(id_module)");
 while ($res = $stmt->fetchObject()) {
     if ($res->id_module == 'admin') {
         array_push($modules, array('id' => 'admin', 'label' => _ADMIN));
@@ -124,7 +124,7 @@ if (isset($_REQUEST['search'])  ||
             $history_module=$_SESSION['m_admin']['history']['module'];
         }
         if (!empty($history_module)) {
-            $where .= "  ".$_SESSION['tablename']['history'].".id_module = ? and";
+            $where .= "  lower(".$_SESSION['tablename']['history'].".id_module) = lower(?) and";
             $arrayPDO = array_merge($arrayPDO, array($history_module));
         }
     }

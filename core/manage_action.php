@@ -435,6 +435,9 @@ else if(empty($_POST['values']) || !isset($_POST['action_id']) || empty($_POST['
                 }
                 $_SESSION['info'] = $what . ' ';
                 $_SESSION['cpt_info_basket'] = 0;
+                if($_POST['module'] == 'null'){
+                    $_POST['module'] = '';
+                }
                 $hist->add(
                     $_POST['table'],
                     $arr_res[$i],'ACTION#'.$id_action, $id_action,
