@@ -277,6 +277,27 @@ public class FileManager {
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\" + program,              //Key
                 "");
         
+        if (path != null && !"soffice.exe".equals(program.toLowerCase())) {
+            int index;
+            String olderVersion = null;
+            boolean isOlderOffice = false;
+
+            for (index = 7; index <= 12; ++index)
+            {
+                olderVersion =  WinRegistry.readString (
+                    WinRegistry.HKEY_LOCAL_MACHINE,                                                     //HKEY
+                    "Software\\Microsoft\\Office\\"+index+".0\\Word",              //Key
+                    "");
+                System.out.println("Older version of Office ? : " + olderVersion);
+                if(olderVersion != null){
+                    isOlderOffice = true;
+                }
+            }
+            if(isOlderOffice == true){
+                path = null;
+            }
+        }
+        
         return "\"" + path + "\"";
     }
     
