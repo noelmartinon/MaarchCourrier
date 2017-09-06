@@ -166,6 +166,7 @@ abstract class indexing_searching_app_Abstract extends Database
         require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_request.php");
         require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_history.php");
         require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_security.php");
+        
         $hist = new history();
         $func = new functions();
         $sec = new security();
@@ -225,6 +226,7 @@ abstract class indexing_searching_app_Abstract extends Database
                 }
                 else if ($_ENV['categories'][$cat_id][$key]['type_field'] == 'date' && $_ENV['categories'][$cat_id][$key]['table'] <> 'none' && !empty($post[$key]))
                 {
+                    
                     if ($_ENV['categories'][$cat_id][$key]['table'] == 'res')
                     {
                         array_push($data_res, array('column' => $key, 'value' => $func->format_date_db($post[$key]), 'type' => "date"));
@@ -293,7 +295,6 @@ abstract class indexing_searching_app_Abstract extends Database
             $_SESSION['error'] .= $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['label']." "._WRONG_FORMAT;
         }
         if (!empty($post['process_limit_date'])) {
-
         $processLimitDate = new datetime($post['process_limit_date']);
         $processLimitDate = date_add($processLimitDate,date_interval_create_from_date_string('23 hours + 59 minutes + 59 seconds'));
         $processLimitDate = (array) $processLimitDate; 
@@ -303,6 +304,17 @@ abstract class indexing_searching_app_Abstract extends Database
                 array(
                     'column' => 'process_limit_date', 
                     'value' => $func->format_date_db($processLimitDate['date'],'true','','true'), 
+                    'type' => "date"
+                )
+            );
+        }
+        else
+        {
+            array_push(
+                $data_ext, 
+                array(
+                    'column' => 'process_limit_date', 
+                    'value' => null, 
                     'type' => "date"
                 )
             );
