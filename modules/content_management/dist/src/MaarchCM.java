@@ -96,6 +96,8 @@ public class MaarchCM {
     public MyLogger logger;
     public FileManager fM;
     public String fileToEdit;
+    public String editMode;
+
     
     public List<String> fileToDelete = new ArrayList<String>();
     
@@ -323,6 +325,7 @@ public class MaarchCM {
 
     public void createPDF(String docxFile, String directory, boolean isUnix) {
         try {
+            System.out.println("mode ! : "+editMode);
             boolean conversion = true;
             String cmd = "";
             if (docxFile.contains(".odt") || docxFile.contains(".ods") || docxFile.contains(".ODT") || docxFile.contains(".ODS")) {
@@ -339,8 +342,12 @@ public class MaarchCM {
                 if (useExeConvert.equals("false")) {
                     if (isUnix) {
                         cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp+idApplet+"_conv\\ --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
-                    } else {
-                        cmd = "cmd /C c:\\Windows\\System32\\cscript \"" + vbsPath + "\" \"" + docxFile + "\" /nologo \r\n";
+                    } else if(editMode.equals("libreoffice")){
+                        String convertProgram;
+                        convertProgram = fM.findPathProgramInRegistry("soffice.exe");
+                        cmd = convertProgram + " \"-env:UserInstallation=file:///"+userLocalDirTmp.replace("\\", "/")+idApplet+"_conv/\" --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\" \r\n";
+                    }else{
+                        cmd = "cmd /C c:\\Windows\\System32\\cscript \"" + vbsPath + "\" \"" + docxFile + "\" /nologo \r\n";      
                     }
                 } else {
 
@@ -481,7 +488,7 @@ public class MaarchCM {
 
         System.out.println("----------BEGIN EDIT OBJECT---------- LGI by Maarch and DIS 22/01/2017");
         System.out.println("----------BEGIN LOCAL DIR TMP IF NOT EXISTS----------");
-        String os = System.getProperty("os.name").toLowerCase();
+        os = System.getProperty("os.name").toLowerCase();
         boolean isUnix = os.contains("nix") || os.contains("nux");
         boolean isWindows = os.contains("win");
         boolean isMac = os.contains("mac");
@@ -728,24 +735,51 @@ public class MaarchCM {
         Process proc;
 
         logger.log("LAUNCH THE EDITOR !", Level.INFO);
+        
         if ("linux".equals(os) || "mac".equals(os)) {
+            editMode = "libreoffice";
             proc = fM.launchApp(appPath);
         } else {
             logger.log("FILE TO EDIT : " + userLocalDirTmp + fileToEdit, Level.INFO);
 
             String programName;
             programName = fM.findGoodProgramWithExt(fileExtension);
-            logger.log("PROGRAM NAME TO EDIT : " + programName, Level.INFO);
             String pathProgram;
             pathProgram = fM.findPathProgramInRegistry(programName);
-            logger.log("PROGRAM PATH TO EDIT : " + pathProgram, Level.INFO);
             String options;
-            options = fM.findGoodOptionsToEdit(fileExtension);
-            logger.log("OPTION PROGRAM TO EDIT " + options, Level.INFO);
-            String pathCommand;
-            if("".equals(options)){
-                options = "\"-env:UserInstallation=file:///" + userLocalDirTmp.replace("\\", "/") + idApplet +"/\" ";
+            System.out.println("check prog name : "+programName);
+            System.out.println("check path : "+pathProgram);
+            if("soffice.exe".equals(programName)){   
+                if("\"null\"".equals(pathProgram)){
+                    System.out.println(programName+" not found! switch to microsoft office...");
+                    programName = "office.exe";
+                    pathProgram = fM.findPathProgramInRegistry(programName);
+                    options = fM.findGoodOptionsToEdit(fileExtension);
+                }else{
+                    options = "\"-env:UserInstallation=file:///" + userLocalDirTmp.replace("\\", "/") + idApplet +"/\" ";          
+                }
+            }else{
+                if("\"null\"".equals(pathProgram)){
+                    System.out.println(programName+" not found! switch to libreoffice...");
+                    programName = "soffice.exe";
+                    pathProgram = fM.findPathProgramInRegistry(programName);
+                    options = "\"-env:UserInstallation=file:///" + userLocalDirTmp.replace("\\", "/") + idApplet +"/\" ";
+                }else{
+                    options = fM.findGoodOptionsToEdit(fileExtension);
+                }
             }
+            
+            if("soffice.exe".equals(programName)){
+                editMode = "libreoffice";
+            }else{
+                editMode = "office"; 
+            }
+            logger.log("PROGRAM NAME TO EDIT : " + programName, Level.INFO);
+            logger.log("OPTION PROGRAM TO EDIT " + options, Level.INFO);
+            logger.log("PROGRAM PATH TO EDIT : " + pathProgram, Level.INFO);
+            
+            
+            String pathCommand;
             pathCommand = pathProgram + " " + options + "\"" + userLocalDirTmp + fileToEdit + "\"";
             logger.log("PATH COMMAND TO EDIT " + pathCommand, Level.INFO);
             proc = fM.launchApp(pathCommand);

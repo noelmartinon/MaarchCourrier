@@ -129,7 +129,7 @@ public class FileManager {
         AccessController.doPrivileged(new PrivilegedExceptionAction() {
                 public Object run() throws IOException {
                     if ("win".equals(os)) {
-                        if (fileToLaunch.contains(".odt") || fileToLaunch.contains(".ods")) {
+                        if ((fileToLaunch.contains(".odt") || fileToLaunch.contains(".ods")) || ("".equals(pathToFileToLaunch))) {
                             //out.write("start /WAIT SOFFICE.exe -env:UserInstallation=file:///" 
                             //    + pathToFileToLaunch.replace("\\", "/")  + " \"" + pathToFileToLaunch + fileToLaunch + "\"");
                             out.write("start /WAIT SOFFICE.exe \"-env:UserInstallation=file:///" + pathToFileToLaunch.replace("\\", "/") + idApplet +"/\" \"" + pathToFileToLaunch + fileToLaunch + "\"");
@@ -139,7 +139,8 @@ public class FileManager {
                     } else if ("mac".equals(os)) {
                         out.write("open -W " + pathToFileToLaunch + fileToLaunch);
                     } else if ("linux".equals(os)) {
-                        out.write("libreoffice -env:UserInstallation=file://" + pathToFileToLaunch + idApplet +"/ " + pathToFileToLaunch + fileToLaunch + " || ooffice " + pathToFileToLaunch + fileToLaunch +"& wait");
+                        //out.write("libreoffice -env:UserInstallation=file://" + pathToFileToLaunch + idApplet +"/ " + pathToFileToLaunch + fileToLaunch + " || ooffice " + pathToFileToLaunch + fileToLaunch +"&wait");
+                        out.write("libreoffice -env:UserInstallation=file://" + pathToFileToLaunch + idApplet +"/ " + pathToFileToLaunch + fileToLaunch + "&wait");
                     }
                     out.close();
                     File file = new File(pathToBatFile);
@@ -275,6 +276,7 @@ public class FileManager {
                 WinRegistry.HKEY_LOCAL_MACHINE,                                                     //HKEY
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\" + program,              //Key
                 "");
+        
         return "\"" + path + "\"";
     }
     
