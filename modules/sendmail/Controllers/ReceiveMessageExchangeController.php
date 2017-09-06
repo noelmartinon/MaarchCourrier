@@ -27,8 +27,10 @@ use Baskets\Models\BasketsModel;
 
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'modules/notes/Models/NotesModel.php';
-require_once __DIR__. DIRECTORY_SEPARATOR. '..' . DIRECTORY_SEPARATOR. '..' . DIRECTORY_SEPARATOR . 'export_seda' . DIRECTORY_SEPARATOR. 'Controllers'. DIRECTORY_SEPARATOR. 'ReceiveMessage.php';
+require_once __DIR__. '/../../export_seda/Controllers/ReceiveMessage.php';
 require_once "core/class/class_history.php";
+require_once "modules/sendmail/Controllers/SendMessageExchangeController.php";
+require_once 'modules/export_seda/RequestSeda.php';
 
 class ReceiveMessageExchangeController
 {
@@ -45,75 +47,56 @@ class ReceiveMessageExchangeController
 
         $data = $request->getParams();
 
-        if (!$this->checkNeededParameters(['data' => $data, 'needed' => ['base64', 'extension', 'size']])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
-        }
-
-        $file     = base64_decode($data['base64']);
-
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($file);
-        $size     = strlen($file);
-        $type     = explode('/', $mimeType);
-        $ext      = $data['extension'];
-        $tmpName  = 'tmp_file_' .$_SESSION['user']['UserId']. '_ArchiveTransfer_' .rand(). '.' . $ext;
-
-        if(!in_array(strtolower($ext), ['zip', 'tar'])){
-            return $response->withJson(["errors" => _WRONG_FILE_TYPE_M2M]);
-        }
-
-        if ($mimeType != "application/x-tar" && $mimeType != "application/zip" && $mimeType != "application/tar" && $mimeType != "application/x-gzip") {
-            return $response->withJson(['errors' => _WRONG_FILE_TYPE]);
-        }
-
-        file_put_contents($_SESSION['config']['tmppath'] . $tmpName, $file);
+        $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
 
         /********** EXTRACTION DU ZIP ET CONTROLE *******/
         $receiveMessage = new \ReceiveMessage();
         $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName);
 
         if ($res['status'] == 1) {
-            return $response->withJson(["errors" => _ERROR_RECEIVE_FAIL. ' ' . $res['content']]);
+            return $response->withStatus(400)->withJson(["errors" => _ERROR_RECEIVE_FAIL. ' ' . $res['content']]);
         }
 
         $sDataObject = $res['content'];
         $sDataObject = json_decode($sDataObject);
         
+        self::sendAcknowledgement(["dataObject" => $sDataObject]);
+
         $aDefaultConfig = self::readXmlConfig();
 
         /*************** RES LETTERBOX **************/
         $resLetterboxReturn = self::saveResLetterbox(["dataObject" => $sDataObject, "defaultConfig" => $aDefaultConfig]);
 
         if(!empty($resLetterboxReturn['errors'])){
-            return $response->withJson(["errors" => $resLetterboxReturn['errors']]);
+            return $response->withStatus(400)->withJson(["errors" => $resLetterboxReturn['errors']]);
         }
 
         /*************** CONTACT **************/
         $contactReturn = self::saveContact(["dataObject" => $sDataObject, "defaultConfig" => $aDefaultConfig]);
 
         if($contactReturn['returnCode'] <> 0){
-            return $response->withJson(["errors" => $contactReturn['errors']]);
+            return $response->withStatus(400)->withJson(["errors" => $contactReturn['errors']]);
         }
 
         /************** MLB COLL EXT **************/
         $return = self::saveExtensionTable(["contact" => $contactReturn, "resId" => $resLetterboxReturn[0]]);
 
         if(!empty($return['errors'])){
-            return $response->withJson(["errors" => $return['errors']]);
+            return $response->withStatus(400)->withJson(["errors" => $return['errors']]);
         }
 
         /************** NOTES *****************/
         $notesReturn = self::saveNotes(["dataObject" => $sDataObject, "resId" => $resLetterboxReturn[0]]);
 
         if(!empty($notesReturn['errors'])){
-            return $response->withJson(["errors" => $notesReturn['errors']]);
+            return $response->withStatus(400)->withJson(["errors" => $notesReturn['errors']]);
         }
 
         /************** RES ATTACHMENT *****************/
         $resAttachmentReturn = self::saveResAttachment(["dataObject" => $sDataObject, "resId" => $resLetterboxReturn[0], "defaultConfig" => $aDefaultConfig]);
 
         if(!empty($resAttachmentReturn['errors'])){
-            return $response->withJson(["errors" => $resAttachmentReturn['errors']]);
+            return $response->withStatus(400)->withJson(["errors" => $resAttachmentReturn['errors']]);
         }
 
         $hist = new \history();
@@ -142,6 +125,8 @@ class ReceiveMessageExchangeController
             $basketRedirection = 'index.php';
         }
 
+        self::sendReply(['dataObject' => $sDataObject, 'Comment' => ['Bien intégré'], 'replyCode' => '000 : OK', 'res_id_master' => $resLetterboxReturn[0]]);
+
         return $response->withJson([
             "resId"             => $resLetterboxReturn[0],
             'basketRedirection' => $basketRedirection
@@ -158,6 +143,34 @@ class ReceiveMessageExchangeController
         }
 
         return true;
+    }
+
+    protected function createFile($aArgs = [])
+    {
+        if (!$this->checkNeededParameters(['data' => $aArgs, 'needed' => ['base64', 'extension', 'size']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $file     = base64_decode($aArgs['base64']);
+
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($file);
+        $size     = strlen($file);
+        $type     = explode('/', $mimeType);
+        $ext      = $aArgs['extension'];
+        $tmpName  = 'tmp_file_' .$_SESSION['user']['UserId']. '_ArchiveTransfer_' .rand(). '.' . $ext;
+
+        if(!in_array(strtolower($ext), ['zip', 'tar'])){
+            return $response->withStatus(400)->withJson(["errors" => _WRONG_FILE_TYPE_M2M]);
+        }
+
+        if ($mimeType != "application/x-tar" && $mimeType != "application/zip" && $mimeType != "application/tar" && $mimeType != "application/x-gzip") {
+            return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE]);
+        }
+
+        file_put_contents($_SESSION['config']['tmppath'] . $tmpName, $file);
+
+        return $tmpName;
     }
 
     protected function readXmlConfig()
@@ -394,6 +407,115 @@ class ReceiveMessageExchangeController
             }
         }
         return null;
+    }
+
+    protected function sendAcknowledgement($aArgs = [])
+    {
+        $dataObject = $aArgs['dataObject'];
+        $date       = new \DateTime;
+
+        $acknowledgementObject                                   = new \stdClass();
+        $acknowledgementObject->Date                             = $date->format(\DateTime::ATOM);
+
+        $acknowledgementObject->MessageIdentifier                = new \stdClass();
+        $acknowledgementObject->MessageIdentifier->value         = $dataObject->MessageIdentifier->value . '_Ack';
+
+        $acknowledgementObject->MessageReceivedIdentifier        = new \stdClass();
+        $acknowledgementObject->MessageReceivedIdentifier->value = $dataObject->MessageIdentifier->value;
+
+        $acknowledgementObject->Sender                           = $dataObject->ArchivalAgency;
+        $acknowledgementObject->Receiver                         = $dataObject->TransferringAgency;
+
+        /***************** ENVOI ACCUSE DE RECEPTION A L EMETTEUR VIA ALEXANDRE ****************/
+
+$service_url = 'http://bblier:maarch@192.168.1.194/maarch_v2/rest/saveMessageExchangeReturn';
+$curl        = curl_init($service_url);
+$curl_post_data = array(
+        'type' => 'Acknowledgement',
+        'data' => json_encode($acknowledgementObject)
+);
+
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+$curl_response = curl_exec($curl);
+curl_close($curl);
+
+    }
+
+    protected function sendReply($aArgs = [])
+    {
+        $dataObject = $aArgs['dataObject'];
+        $date       = new \DateTime;
+
+        $replyObject                                    = new \stdClass();
+        $replyObject->Comment                           = $aArgs['Comment'];
+        $replyObject->Date                              = $date->format(\DateTime::ATOM);
+
+        $replyObject->MessageIdentifier                 = new \stdClass();
+        $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
+
+        $replyObject->ReplyCode                         = new \stdClass();
+        $replyObject->ReplyCode->value                  = $aArgs['replyCode'];
+
+        $replyObject->MessageRequestedIdentifier        = new \stdClass();
+        $replyObject->MessageRequestedIdentifier->value = $dataObject->MessageIdentifier->value;
+
+        $replyObject->TransferringAgency                = $dataObject->ArchivalAgency;
+        $replyObject->ArchivalAgency                    = $dataObject->TransferringAgency;
+
+        /*** SAUVEGARDE REPONSE ENVOYEE ****/
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReplySent']);
+
+        /***************** ENVOI REPONSE A L EMETTEUR VIA ALEXANDRE ****************/
+
+$service_url = 'http://bblier:maarch@192.168.1.194/maarch_v2/rest/saveMessageExchangeReturn';
+$curl        = curl_init($service_url);
+$curl_post_data = array(
+        'type' => 'ArchiveTransferReply',
+        'data' => json_encode($replyObject)
+);
+
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+$curl_response = curl_exec($curl);
+curl_close($curl);
+
+    }
+
+    public function saveMessageExchangeReturn(RequestInterface $request, ResponseInterface $response)
+    {
+
+        if (empty($_SESSION['user']['UserId'])) {
+            return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
+        }
+
+        $data = $request->getParams();
+
+        if (!$this->checkNeededParameters(['data' => $data, 'needed' => ['type']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        // $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
+
+        /********** EXTRACTION DU ZIP ET CONTROLE PAR ALEXANDRE*******/
+        
+        $dataObject = json_decode($data['data']); //TODO : A REMPLACER PAR EXTRACTION
+        $RequestSeda = new \RequestSeda();
+
+        if($data['type'] == 'ArchiveTransferReply'){
+            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestedIdentifier->value);
+        } else if ($data['type'] == 'Acknowledgement') {
+            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageReceivedIdentifier->value);
+        }
+
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => $data['type']]);
+
+        return $response->withJson([
+            "messageId" => $messageId
+        ]);
+
     }
 
 }

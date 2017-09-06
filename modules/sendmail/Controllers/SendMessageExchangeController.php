@@ -163,7 +163,7 @@ class SendMessageExchangeController
             $filePath = $sendMessage->generateMessageFile($dataObject, "ArchiveTransfer", $_SESSION['config']['tmppath']);
 
             /******** SAVE MESSAGE *********/
-            $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier'], 'file_path' => $filePath]);
+            $messageId = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $aArgs['identifier'], 'file_path' => $filePath, 'type' => 'ArchiveTransfer']);
             self::saveUnitIdentifier(['attachment' => $aMergeAttachment, 'notes' => $aArgs['notes'], 'messageId' => $messageId]);
 
             $hist->add(
@@ -493,10 +493,13 @@ class SendMessageExchangeController
         $oData->archivalAgreement                     = new stdClass();
         $oData->archivalAgreement->value              = ""; // TODO : ???
         
-        $oData->replyCode                             = new stdClass();
-        $oData->replyCode->value                      = ""; // TODO : ???
+        $replyCode = "";
+        if(!empty($dataObject->replyCode->value)){
+            $replyCode = $dataObject->replyCode->value;
+        }
 
-        $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
+        $oData->replyCode                             = new stdClass();
+        $oData->replyCode->value                      = $replyCode;
 
         $aDataExtension = [
             'status'            => 'W',
@@ -507,7 +510,7 @@ class SendMessageExchangeController
             'filePath'         => $aArgs['file_path'],
         ];
 
-        $messageId = $RequestSeda->insertMessage($oData, 'ArchiveTransfer', $aDataExtension);
+        $messageId = $RequestSeda->insertMessage($oData, $aArgs['type'], $aDataExtension);
 
         return $messageId;
     }

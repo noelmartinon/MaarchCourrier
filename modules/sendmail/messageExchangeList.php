@@ -12,6 +12,7 @@ $select["message_exchange"] = [];
     $where_tab = array();
     //
     $where_tab[] = " res_id_master = ? ";
+    $where_tab[] = " type in ('ArchiveTransfer', 'ArchiveTransferReplySent') ";
 
     //Build where
     $where = implode(' and ', $where_tab);

@@ -150,6 +150,7 @@ $app->delete('/currentUser/emailSignature/{id}', \Core\Controllers\UserControlle
 //$app->put('/user/{id}', \Core\Controllers\UserController::class . ':update');
 
 $app->post('/saveNumericPackage', \Sendmail\Controllers\ReceiveMessageExchangeController::class . ':saveMessageExchange');
+$app->post('/saveMessageExchangeReturn', \Sendmail\Controllers\ReceiveMessageExchangeController::class . ':saveMessageExchangeReturn');
 
 //contact
 $app->get('/contact/checkCommunication', \Core\Controllers\ContactController::class . ':getCheckCommunication');
