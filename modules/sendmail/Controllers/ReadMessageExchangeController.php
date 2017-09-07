@@ -27,12 +27,13 @@ class ReadMessageExchangeController
             return ['errors' => $errors];
         }
 
-        $RequestSeda         = new RequestSeda();
-        $messageExchangeData = $RequestSeda->getMessageByIdentifier($aArgs['id']);
-        $unitIdentifierData  = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
-        $messageExchangeData = json_decode($messageExchangeData->data);
-
         $aDataForm = [];
+        $RequestSeda            = new RequestSeda();
+        $messageExchangeData    = $RequestSeda->getMessageByIdentifier($aArgs['id']);
+        $unitIdentifierData     = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
+        $aDataForm['reference'] = $messageExchangeData->reference;
+        $messageExchangeData    = json_decode($messageExchangeData->data);
+
         $TransferringAgencyMetaData = $messageExchangeData->TransferringAgency->OrganizationDescriptiveMetadata;
         $aDataForm['from']          = $TransferringAgencyMetaData->Contact[0]->PersonName . ' (' . $TransferringAgencyMetaData->Name . ')';
 

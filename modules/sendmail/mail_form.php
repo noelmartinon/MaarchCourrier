@@ -1026,7 +1026,7 @@ if ($mode == 'add') {
                 $_SESSION['adresses']['to'] = $emailArray['to'];
             }
             $content .= '<tr>';
-            $content .= '<td align="right" nowrap width="10%"><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'
+            $content .= '<td align="right" nowrap width="10%"><label>'
                 ._SEND_TO_SHORT.'</label></td>';
             $content .= '<td width="90%" colspan="2"><div name="to" id="to" class="emailInput">';
             if($formContent == 'messageExchange'){
@@ -1064,10 +1064,13 @@ if ($mode == 'add') {
             } 
             //Object
             $content .= '<tr>';
-            $content .= '<td align="right" nowrap><span class="red_asterisk"><i class="fa fa-star"></i></span> <label>'._EMAIL_OBJECT.' </label></td>';
+            $content .= '<td align="right" nowrap><label>'._EMAIL_OBJECT.' </label></td>';
             $content .= '<td colspan="2"><div name="object" id="object" class="emailInput">'
                 .$emailArray['object'].'</div></td>';
             $content .= '</tr>';
+            if($formContent == 'messageExchange'){
+                $content .= '<tr><td width="10%" align="right" nowrap>'._IDENTIFIER.'</td><td><div class="emailInput">'.$emailArray['reference'].'</div></td></tr>';
+            }
             $content .= '</table><br />';
 
             $content .='<hr />';
