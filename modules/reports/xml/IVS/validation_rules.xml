@@ -24,6 +24,8 @@
 	<parameter name="the_month" type="mois" />
 	<parameter name="the_year" type="annee" />
 	<parameter name="dir" type="string"/>
+	<parameter name="date_start" type="string"/>
+	<parameter name="date_fin" type="string"/>
 	</validationRule>
 
 	<validationRule name="users_logs" extends="standardForm" mode="error">
