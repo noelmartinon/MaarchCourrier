@@ -378,11 +378,11 @@ class RequestSeda
 			$queryParams[] = $type; // Type
 			$queryParams[] = $status; // Status
 			$queryParams[] = $messageObject->date; // Date
-			$queryParams[] = $messageObject->messageIdentifier->value; // Reference
+			$queryParams[] = $messageObject->MessageIdentifier->value; // Reference
 			$queryParams[] = $_SESSION['user']['UserId']; // Account Id
-			$queryParams[] = $messageObject->transferringAgency->identifier->value; // Sender org identifier id
+			$queryParams[] = $messageObject->TransferringAgency->Identifier->value; // Sender org identifier id
 			$queryParams[] = $aArgs['SenderOrgNAme']; //SenderOrgNAme
-			$queryParams[] = $messageObject->archivalAgency->identifier->value; // Recipient org identifier id
+			$queryParams[] = $messageObject->ArchivalAgency->Identifier->value; // Recipient org identifier id
 			$queryParams[] = $aArgs['RecipientOrgNAme']; //RecipientOrgNAme
 			$queryParams[] = $messageObject->archivalAgreement->value; // Archival agreement reference
 			$queryParams[] = $messageObject->replyCode->value; //ReplyCode

@@ -479,16 +479,16 @@ class SendMessageExchangeController
         $oData->messageId                             = $RequestSeda->generateUniqueId();
         $oData->date                                  = $dataObject->Date;
 
-        $oData->messageIdentifier                     = new stdClass();
-        $oData->messageIdentifier->value              = $dataObject->MessageIdentifier->value;
+        $oData->MessageIdentifier                     = new stdClass();
+        $oData->MessageIdentifier->value              = $dataObject->MessageIdentifier->value;
         
-        $oData->transferringAgency                    = new stdClass();
-        $oData->transferringAgency->identifier        = new stdClass();
-        $oData->transferringAgency->identifier->value = $dataObject->TransferringAgency->Identifier->value;
+        $oData->TransferringAgency                    = new stdClass();
+        $oData->TransferringAgency->Identifier        = new stdClass();
+        $oData->TransferringAgency->Identifier->value = $dataObject->TransferringAgency->Identifier->value;
         
-        $oData->archivalAgency                        = new stdClass();
-        $oData->archivalAgency->identifier            = new stdClass();
-        $oData->archivalAgency->identifier->value     = $dataObject->ArchivalAgency->Identifier->value;
+        $oData->ArchivalAgency                        = new stdClass();
+        $oData->ArchivalAgency->Identifier            = new stdClass();
+        $oData->ArchivalAgency->Identifier->value     = $dataObject->ArchivalAgency->Identifier->value;
         
         $oData->archivalAgreement                     = new stdClass();
         $oData->archivalAgreement->value              = ""; // TODO : ???

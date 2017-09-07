@@ -507,7 +507,9 @@ curl_close($curl);
         if($data['type'] == 'ArchiveTransferReply'){
             $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestedIdentifier->value);
         } else if ($data['type'] == 'Acknowledgement') {
-            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageReceivedIdentifier->value);
+            $messageExchange                = $RequestSeda->getMessageByReference($dataObject->MessageReceivedIdentifier->value);
+            $dataObject->TransferringAgency = $dataObject->Sender;
+            $dataObject->ArchivalAgency     = $dataObject->Receiver;
         }
 
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => $data['type']]);
