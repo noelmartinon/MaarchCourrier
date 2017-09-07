@@ -504,12 +504,15 @@ curl_close($curl);
         $dataObject = json_decode($data['data']); //TODO : A REMPLACER PAR EXTRACTION
         $RequestSeda = new \RequestSeda();
 
-        if($data['type'] == 'ArchiveTransferReply'){
-            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestedIdentifier->value);
-        } else if ($data['type'] == 'Acknowledgement') {
+        if ($data['type'] == 'Acknowledgement') {
             $messageExchange                = $RequestSeda->getMessageByReference($dataObject->MessageReceivedIdentifier->value);
             $dataObject->TransferringAgency = $dataObject->Sender;
             $dataObject->ArchivalAgency     = $dataObject->Receiver;
+            $RequestSeda->updateReceptionDateMessage(['reception_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
+        } else if($data['type'] == 'ArchiveTransferReply'){
+            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestedIdentifier->value);
+            $RequestSeda->updateOperationDateMessage(['operation_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
+            
         }
 
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => $data['type']]);

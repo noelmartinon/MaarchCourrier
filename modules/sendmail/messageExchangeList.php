@@ -5,7 +5,7 @@ $select = [];
 $select["message_exchange"] = [];
     
 //Fields
-    array_push($select["message_exchange"], "message_id", "date", "reference", "sender_org_name", "account_id",
+    array_push($select["message_exchange"], "message_id", "date", "reference", "type", "sender_org_name", "account_id",
         "recipient_org_identifier", "recipient_org_name", "reception_date", "operation_date", "status", "data", "res_id_master");
     
 //Where clause
@@ -59,8 +59,18 @@ if(!empty($tab)){
                     $tab[$i][$j]["label_align"] = "left";
                     $tab[$i][$j]["align"]       = "left";
                     $tab[$i][$j]["valign"]      = "bottom";
-                    $tab[$i][$j]["show"]        = true;
+                    $tab[$i][$j]["show"]        = false;
                     $tab[$i][$j]["order"]       = 'reference';
+                }
+                if($tab[$i][$j][$value]=="type")
+                {
+                    $tab[$i][$j]["label"]       = _TYPE;
+                    $tab[$i][$j]["size"]        = "8";
+                    $tab[$i][$j]["label_align"] = "left";
+                    $tab[$i][$j]["align"]       = "left";
+                    $tab[$i][$j]["valign"]      = "bottom";
+                    $tab[$i][$j]["show"]        = true;
+                    $tab[$i][$j]["order"]       = 'type';
                 }
                 if($tab[$i][$j][$value]=="operation_date")
                 {

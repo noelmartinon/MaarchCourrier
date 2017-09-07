@@ -608,6 +608,38 @@ class RequestSeda
         return true;
     }
 
+    public function updateOperationDateMessage($aArgs = []){
+        $queryParams = [];
+        $queryParams[] = $aArgs['operation_date'];
+        $queryParams[] = $aArgs['message_id'];
+
+        try {
+            $query = "UPDATE message_exchange SET operation_date = ? WHERE message_id = ?";
+
+            $smtp = $this->db->query($query,$queryParams);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function updateReceptionDateMessage($aArgs = []){
+        $queryParams = [];
+        $queryParams[] = $aArgs['reception_date'];
+        $queryParams[] = $aArgs['message_id'];
+
+        try {
+            $query = "UPDATE message_exchange SET reception_date = ? WHERE message_id = ?";
+
+            $smtp = $this->db->query($query,$queryParams);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
 	public function updateStatusLetterbox($resId,$status) {
         $queryParams = [];
         $queryParams[] = $status;

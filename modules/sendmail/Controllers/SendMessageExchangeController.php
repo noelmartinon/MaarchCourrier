@@ -494,8 +494,8 @@ class SendMessageExchangeController
         $oData->archivalAgreement->value              = ""; // TODO : ???
         
         $replyCode = "";
-        if(!empty($dataObject->replyCode->value)){
-            $replyCode = $dataObject->replyCode->value;
+        if(!empty($dataObject->ReplyCode->value)){
+            $replyCode = $dataObject->ReplyCode->value;
         }
 
         $oData->replyCode                             = new stdClass();
@@ -507,7 +507,7 @@ class SendMessageExchangeController
             'resIdMaster'       => $aArgs['res_id_master'],
             'SenderOrgNAme'     => $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact[0]->DepartmentName,
             'RecipientOrgNAme'  => $dataObject->ArchivalAgency->OrganizationDescriptiveMetadata->Name,
-            'filePath'         => $aArgs['file_path'],
+            'filePath'          => $aArgs['file_path'],
         ];
 
         $messageId = $RequestSeda->insertMessage($oData, $aArgs['type'], $aDataExtension);
