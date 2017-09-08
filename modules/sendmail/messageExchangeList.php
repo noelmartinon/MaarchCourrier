@@ -6,7 +6,7 @@ $select["message_exchange"] = [];
     
 //Fields
     array_push($select["message_exchange"], "message_id", "date", "reference", "type", "sender_org_name", "account_id",
-        "recipient_org_identifier", "recipient_org_name", "reception_date", "operation_date", "status", "data", "res_id_master");
+        "recipient_org_identifier", "recipient_org_name", "reception_date", "operation_date", "status", "data", "res_id_master", "file_path");
     
 //Where clause
     $where_tab = array();
@@ -147,18 +147,18 @@ if(!empty($tab)){
     
     //List
     $listKey                        = 'message_id';                                       //Cle de la liste
-    $paramsTab                      = array();                                            //Initialiser le tableau de param�tres
+    $paramsTab                      = array();                                            //Initialiser le tableau de parametres
     $paramsTab['bool_sortColumn']   = false;                                              //Affichage Tri
-    $paramsTab['pageTitle']         ='<br><br>'._NUMERIC_PACKAGE_SENT;                    //Titre de la page
+    $paramsTab['pageTitle']         = '<br><br>'._NUMERIC_PACKAGE_SENT;                   //Titre de la page
     $paramsTab['bool_bigPageTitle'] = false;                                              //Affichage du titre en grand
-    $paramsTab['urlParameters']     = 'identifier='.$identifier."&origin=".$origin.'&display=true'.$parameters;                            //Parametres d'url supplementaires   
+    $paramsTab['urlParameters']     = 'identifier='.$identifier."&origin=".$origin.'&display=true'.$parameters;            //Parametres d'url supplementaires   
     $paramsTab['listHeight']        = '100%';                                             //Hauteur de la liste
     $paramsTab['listCss']           = $css;                                               //CSS
     
     //Action icons array
     $paramsTab['actionIcons'] = array();      
     $read = array(
-    "script"        => "showEmailForm('".$_SESSION['config']['businessappurl']
+        "script"    => "showEmailForm('".$_SESSION['config']['businessappurl']
                                 ."index.php?display=true&module=sendmail&page=sendmail_ajax_content"
                                 ."&mode=read&id=@@message_id@@&identifier=".$identifier."&origin=".$origin.'&formContent=messageExchange'
                                 . $parameters."');",
@@ -167,7 +167,15 @@ if(!empty($tab)){
     );
     array_push($paramsTab['actionIcons'], $read);  
 
-    array_push($paramsTab['actionIcons'], []);  
+    $download = array(
+        "script"    => "window.location = 'index.php?display=true&module=sendmail&page=sendmail_ajax_content"
+                                ."&mode=download&id=@@message_id@@&identifier=".$identifier."&origin=".$origin."&formContent=messageExchange"
+                                . $parameters."';",
+        "icon"      =>  'download',
+        "tooltip"   =>  _SIMPLE_DOWNLOAD,
+        "disabledRules" => "!file_exists(@@file_path@@)"
+    );
+    array_push($paramsTab['actionIcons'], $download);  
 
     //Output
     $status = 0;

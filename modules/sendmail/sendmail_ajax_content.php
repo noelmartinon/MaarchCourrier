@@ -572,6 +572,26 @@ switch ($mode) {
         $status = 1;
     }
     break;
+    case 'download':
+        require_once 'modules/export_seda/RequestSeda.php';
+        $RequestSeda         = new RequestSeda();
+        $messageExchangeData = $RequestSeda->getMessageByIdentifierAndResId(['message_id' => $_GET['id'], 'res_id_master' => $_GET['identifier']]);
+        $filePath = $messageExchangeData->file_path;
+        if(file_exists($messageExchangeData->file_path)){
+            header('Pragma: public');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Cache-Control: public');
+            header('Content-Description: File Transfer');
+            header('Content-Type: ' . strtolower(mime_content_type($filePath)));
+            header("Content-length: " . filesize($filePath));
+            header('Content-Disposition: attachment; filename=' . basename($messageExchangeData->reference.'.zip') . ';');
+            header("Content-Type: application/force-download");
+            header('Content-Transfer-Encoding: binary');
+            readfile($filePath);
+            exit();
+        }
+        exit();
 }
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes(_parse_error($error)) . "', exec_js : '".addslashes($js)."'}";
 exit ();

@@ -66,6 +66,21 @@ class RequestSeda
         return $message;
     }
 
+    public function getMessageByIdentifierAndResId($aArgs = [])
+    {
+        $queryParams = [];
+
+        $query = "SELECT * FROM message_exchange WHERE message_id = ? and res_id_master = ?";
+        $queryParams[] = $aArgs['message_id'];
+        $queryParams[] = $aArgs['res_id_master'];
+
+        $smtp = $this->db->query($query,$queryParams);
+
+        $message = $smtp->fetchObject();
+
+        return $message;
+    }
+
     public function getUnitIdentifierByMessageId($messageId)
     {
         $queryParams = [];

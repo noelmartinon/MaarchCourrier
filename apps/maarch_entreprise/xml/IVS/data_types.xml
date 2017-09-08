@@ -54,6 +54,7 @@
       <enumeration value="mass" />
       <enumeration value="search" />
       <enumeration value="destUser" />
+      <enumeration value="download" />
     </dataType>
     <dataType name="size" base="string">
       <enumeration value="full" />

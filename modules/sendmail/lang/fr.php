@@ -171,3 +171,5 @@ if (!defined("_NO_RECIPIENT"))
     define("_NO_RECIPIENT", "Aucun destinataire");
 if (!defined("_NO_SENDER"))
     define("_NO_SENDER", "Aucun expéditeur");
+if (!defined("_SIMPLE_DOWNLOAD"))
+    define("_SIMPLE_DOWNLOAD", "Télécharger");
