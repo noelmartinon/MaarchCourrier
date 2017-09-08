@@ -132,7 +132,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         }
     }
 
-    $frm_str .='<b>'._RECOMMENDATION_LIMIT_DATE.':</b><br/>';
+    $frm_str .='<b>'._RECOMMENDATION_LIMIT_DATE.' <span class="red_asterisk"><i class="fa fa-star"></i></span> :</b> <br/>';
     $frm_str .= '<input name="recommendation_limit_date_tr" type="text" '
         . 'id="recommendation_limit_date_tr" value="" placeholder="JJ-MM-AAAA" onfocus="checkRealDateAvis();" onChange="checkRealDateAvis();"  onclick="clear_error(\'frm_error_'
         . $actionId . '\');showCalender(this);"  onblur="document.getElementById(\'recommendation_limit_date\').value=document.getElementById(\'recommendation_limit_date_tr\').value;"/>';
@@ -178,25 +178,34 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     return addslashes($frm_str);
 }
 
- function check_form($form_id,$values)
- {
-    if (empty($_SESSION['redirect']['diff_list']['avis']['users'][0])) {
-        $_SESSION['action_error'] = _RECOMMENDATION_USER. " " . _MANDATORY;
-        return false;
-    }
-    $recommendation_limit_date = get_value_fields($values, 'recommendation_limit_date');
-    if ($recommendation_limit_date == null || $recommendation_limit_date == '') {
-        $_SESSION['action_error'] = _RECOMMENDATION_LIMIT_DATE. " " . _MANDATORY;
-        return false;
-    }
+function check_form($form_id,$values)
+{
+   if (empty($_SESSION['redirect']['diff_list']['avis']['users'][0])) {
+       $_SESSION['action_error'] = _RECOMMENDATION_USER. " " . _MANDATORY;
+       return false;
+   }
+   $recommendation_limit_date = get_value_fields($values, 'recommendation_limit_date');
+   if ($recommendation_limit_date == null || $recommendation_limit_date == '') {
+       $_SESSION['action_error'] = _RECOMMENDATION_LIMIT_DATE. " " . _MANDATORY;
+       return false;
+   }
 
-    $notes_content = get_value_fields($values, 'note_content_to_users');
-    if ($notes_content == null || $notes_content == '') {
-        $_SESSION['action_error'] = _NOTE. " " . _MANDATORY;
-        return false;
-    }
-    return true;
- }
+   $notes_content = get_value_fields($values, 'note_content_to_users');
+   if ($notes_content == null || $notes_content == '') {
+       $_SESSION['action_error'] = _NOTE. " " . _MANDATORY;
+       return false;
+   }
+
+   $d = DateTime::createFromFormat('d-m-Y', $recommendation_limit_date);
+
+   if ($d && $d->format('d-m-Y') === $recommendation_limit_date) {
+   } else {
+       $_SESSION['action_error'] = _RECOMMENDATION_LIMIT_DATE. " " . _WRONG_FORMAT;
+       return false;
+   }
+
+   return true;
+}
 
 function manage_form($arr_id, $history, $id_action, $label_action, $status, $coll_id, $table, $values_form )
 {
