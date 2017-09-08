@@ -20,6 +20,7 @@
  */
 
 require_once 'apps/maarch_entreprise/services/Table.php';
+require_once "core/class/class_history.php";
 
 class NotesModelAbstract extends Apps_Table_Service 
 {
@@ -129,6 +130,10 @@ class NotesModelAbstract extends Apps_Table_Service
             'coll_id'    => $aArgs['coll_id'],
         ], 'notes');
 
+        $hist = new history();
+        $hist->add(
+                'notes', $aArgs['identifier'], "ADD", 'noteadd', _NOTES_ADDED, 'POSTGRESQL', 'notes'
+            );
         return true;
     }
 

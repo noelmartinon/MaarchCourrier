@@ -34,6 +34,9 @@ require_once 'modules/export_seda/RequestSeda.php';
 
 class ReceiveMessageExchangeController
 {
+
+    private static $aComments = [];
+
     public function saveMessageExchange(RequestInterface $request, ResponseInterface $response)
     {
 
@@ -47,8 +50,13 @@ class ReceiveMessageExchangeController
 
         $data = $request->getParams();
 
+        self::$aComments[] = 'Réception de l\'archive';
         $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
-
+        if(!empty($tmpName['errors'])){
+            return $response->withStatus(400)->withJson($tmpName);
+        }
+        self::$aComments[] = 'Archive déposée sur le serveur';
+        self::$aComments[] = 'Validation de l\'archive';
         /********** EXTRACTION DU ZIP ET CONTROLE *******/
         $receiveMessage = new \ReceiveMessage();
         $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName);
@@ -56,6 +64,7 @@ class ReceiveMessageExchangeController
         if ($res['status'] == 1) {
             return $response->withStatus(400)->withJson(["errors" => _ERROR_RECEIVE_FAIL. ' ' . $res['content']]);
         }
+        self::$aComments[] = 'Archive validée';
 
         $sDataObject = $res['content'];
         $sDataObject = json_decode($sDataObject);
@@ -65,6 +74,7 @@ class ReceiveMessageExchangeController
         $aDefaultConfig = self::readXmlConfig();
 
         /*************** RES LETTERBOX **************/
+        self::$aComments[] = 'Enregistrement du message';
         $resLetterboxReturn = self::saveResLetterbox(["dataObject" => $sDataObject, "defaultConfig" => $aDefaultConfig]);
 
         if(!empty($resLetterboxReturn['errors'])){
@@ -72,11 +82,13 @@ class ReceiveMessageExchangeController
         }
 
         /*************** CONTACT **************/
+        self::$aComments[] = 'Selection ou création du contact';
         $contactReturn = self::saveContact(["dataObject" => $sDataObject, "defaultConfig" => $aDefaultConfig]);
 
         if($contactReturn['returnCode'] <> 0){
             return $response->withStatus(400)->withJson(["errors" => $contactReturn['errors']]);
         }
+        self::$aComments[] = 'Contact créé ou sélectionné';
 
         /************** MLB COLL EXT **************/
         $return = self::saveExtensionTable(["contact" => $contactReturn, "resId" => $resLetterboxReturn[0]]);
@@ -84,7 +96,7 @@ class ReceiveMessageExchangeController
         if(!empty($return['errors'])){
             return $response->withStatus(400)->withJson(["errors" => $return['errors']]);
         }
-
+        self::$aComments[] = 'Message enregistré';
         /************** NOTES *****************/
         $notesReturn = self::saveNotes(["dataObject" => $sDataObject, "resId" => $resLetterboxReturn[0]]);
 
@@ -125,7 +137,7 @@ class ReceiveMessageExchangeController
             $basketRedirection = 'index.php';
         }
 
-        self::sendReply(['dataObject' => $sDataObject, 'Comment' => ['Bien intégré'], 'replyCode' => '000 : OK', 'res_id_master' => $resLetterboxReturn[0]]);
+        self::sendReply(['dataObject' => $sDataObject, 'Comment' => self::$aComments, 'replyCode' => '000 : OK', 'res_id_master' => $resLetterboxReturn[0]]);
 
         return $response->withJson([
             "resId"             => $resLetterboxReturn[0],
@@ -148,7 +160,7 @@ class ReceiveMessageExchangeController
     protected function createFile($aArgs = [])
     {
         if (!$this->checkNeededParameters(['data' => $aArgs, 'needed' => ['base64', 'extension', 'size']])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+            return ['errors' => 'Bad Request'];
         }
 
         $file     = base64_decode($aArgs['base64']);
@@ -161,11 +173,11 @@ class ReceiveMessageExchangeController
         $tmpName  = 'tmp_file_' .$_SESSION['user']['UserId']. '_ArchiveTransfer_' .rand(). '.' . $ext;
 
         if(!in_array(strtolower($ext), ['zip', 'tar'])){
-            return $response->withStatus(400)->withJson(["errors" => _WRONG_FILE_TYPE_M2M]);
+            return ["errors" => _WRONG_FILE_TYPE_M2M];
         }
 
         if ($mimeType != "application/x-tar" && $mimeType != "application/zip" && $mimeType != "application/tar" && $mimeType != "application/x-gzip") {
-            return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE]);
+            return ['errors' => _WRONG_FILE_TYPE];
         }
 
         file_put_contents($_SESSION['config']['tmppath'] . $tmpName, $file);
@@ -333,6 +345,7 @@ class ReceiveMessageExchangeController
     protected static function saveNotes($aArgs = [])
     {
         $noteModel = new \NotesModel();
+        $countNote = 0;
         foreach ($aArgs['dataObject']->Comment as $value) {
             $aDataNote = [
                 "identifier" => $aArgs['resId'],
@@ -343,8 +356,9 @@ class ReceiveMessageExchangeController
             ];
 
             $noteModel->create($aDataNote);
+            $countNote++;
         }
-
+        self::$aComments[] = $countNote . ' note(s) enregistrée(s)';
         return true;
     }
 
@@ -360,7 +374,7 @@ class ReceiveMessageExchangeController
 
         // First one is the main document. Already added
         unset($attachments[0]);
-
+        $countAttachment = 0;
         if(!empty($attachments)){
             foreach ($attachments as $value) {
                 $attachmentContent      = $value->Content;
@@ -391,8 +405,10 @@ class ReceiveMessageExchangeController
                 ];
                 
                 $resId = $resController->storeResource($allDatas);
+                $countAttachment++;
             }
         }
+        self::$aComments[] = $countAttachment . ' attachement(s) enregistré(s)';
         return $resId;
     }
 
