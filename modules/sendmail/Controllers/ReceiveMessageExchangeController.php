@@ -50,13 +50,14 @@ class ReceiveMessageExchangeController
 
         $data = $request->getParams();
 
-        self::$aComments[] = 'Réception de l\'archive';
+
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Réception de l\'archive';
         $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
         if(!empty($tmpName['errors'])){
             return $response->withStatus(400)->withJson($tmpName);
         }
-        self::$aComments[] = 'Archive déposée sur le serveur';
-        self::$aComments[] = 'Validation de l\'archive';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Archive déposée sur le serveur';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Validation de l\'archive';
         /********** EXTRACTION DU ZIP ET CONTROLE *******/
         $receiveMessage = new \ReceiveMessage();
         $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName);
@@ -64,7 +65,7 @@ class ReceiveMessageExchangeController
         if ($res['status'] == 1) {
             return $response->withStatus(400)->withJson(["errors" => _ERROR_RECEIVE_FAIL. ' ' . $res['content']]);
         }
-        self::$aComments[] = 'Archive validée';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Archive validée';
 
         $sDataObject = $res['content'];
         $sDataObject = json_decode($sDataObject);
@@ -74,7 +75,7 @@ class ReceiveMessageExchangeController
         $aDefaultConfig = self::readXmlConfig();
 
         /*************** RES LETTERBOX **************/
-        self::$aComments[] = 'Enregistrement du message';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Enregistrement du message';
         $resLetterboxReturn = self::saveResLetterbox(["dataObject" => $sDataObject, "defaultConfig" => $aDefaultConfig]);
 
         if(!empty($resLetterboxReturn['errors'])){
@@ -82,13 +83,13 @@ class ReceiveMessageExchangeController
         }
 
         /*************** CONTACT **************/
-        self::$aComments[] = 'Selection ou création du contact';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Selection ou création du contact';
         $contactReturn = self::saveContact(["dataObject" => $sDataObject, "defaultConfig" => $aDefaultConfig]);
 
         if($contactReturn['returnCode'] <> 0){
             return $response->withStatus(400)->withJson(["errors" => $contactReturn['errors']]);
         }
-        self::$aComments[] = 'Contact créé ou sélectionné';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Contact créé ou sélectionné';
 
         /************** MLB COLL EXT **************/
         $return = self::saveExtensionTable(["contact" => $contactReturn, "resId" => $resLetterboxReturn[0]]);
@@ -96,7 +97,7 @@ class ReceiveMessageExchangeController
         if(!empty($return['errors'])){
             return $response->withStatus(400)->withJson(["errors" => $return['errors']]);
         }
-        self::$aComments[] = 'Message enregistré';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Message enregistré';
         /************** NOTES *****************/
         $notesReturn = self::saveNotes(["dataObject" => $sDataObject, "resId" => $resLetterboxReturn[0]]);
 
@@ -358,7 +359,7 @@ class ReceiveMessageExchangeController
             $noteModel->create($aDataNote);
             $countNote++;
         }
-        self::$aComments[] = $countNote . ' note(s) enregistrée(s)';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] '.$countNote . ' note(s) enregistrée(s)';
         return true;
     }
 
@@ -408,7 +409,7 @@ class ReceiveMessageExchangeController
                 $countAttachment++;
             }
         }
-        self::$aComments[] = $countAttachment . ' attachement(s) enregistré(s)';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] '.$countAttachment . ' attachement(s) enregistré(s)';
         return $resId;
     }
 
@@ -469,7 +470,7 @@ curl_close($curl);
         $replyObject->Date                              = $date->format(\DateTime::ATOM);
 
         $replyObject->MessageIdentifier                 = new \stdClass();
-        $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
+        $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_ReplySent';
 
         $replyObject->ReplyCode                         = new \stdClass();
         $replyObject->ReplyCode->value                  = $aArgs['replyCode'];
@@ -483,6 +484,7 @@ curl_close($curl);
         /*** SAUVEGARDE REPONSE ENVOYEE ****/
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReplySent']);
 
+        $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
         /***************** ENVOI REPONSE A L EMETTEUR VIA ALEXANDRE ****************/
 
 $service_url = 'http://bblier:maarch@192.168.1.194/maarch_v2/rest/saveMessageExchangeReturn';

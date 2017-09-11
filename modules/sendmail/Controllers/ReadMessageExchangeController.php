@@ -16,6 +16,7 @@
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'apps/maarch_entreprise/Models/ResModel.php';
 require_once 'modules/export_seda/RequestSeda.php';
+require_once "core/class/class_request.php";
 
 class ReadMessageExchangeController
 {
@@ -28,11 +29,30 @@ class ReadMessageExchangeController
         }
 
         $aDataForm = [];
-        $RequestSeda            = new RequestSeda();
-        $messageExchangeData    = $RequestSeda->getMessageByIdentifier($aArgs['id']);
-        $unitIdentifierData     = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
-        $aDataForm['reference'] = $messageExchangeData->reference;
-        $messageExchangeData    = json_decode($messageExchangeData->data);
+        $RequestSeda                 = new RequestSeda();
+        $messageExchangeData         = $RequestSeda->getMessageByIdentifier($aArgs['id']);
+        $unitIdentifierData          = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
+        $aDataForm['reference']      = $messageExchangeData->reference;
+
+        $request                    = new request();
+        $aDataForm['creationDate']  = $request->dateformat($messageExchangeData->date);
+        $aDataForm['receptionDate'] = $request->dateformat($messageExchangeData->reception_date);
+        $aDataForm['operationDate'] = $request->dateformat($messageExchangeData->operation_date);
+        $aDataForm['type']          = $messageExchangeData->type;
+
+        if (!empty($aDataForm['operationDate'])) {
+            $reference = $aDataForm['reference'].'_Reply';
+        } elseif ($aDataForm['type'] == 'ArchiveTransferReplySent') {
+            $reference = $aDataForm['reference'];
+        }
+
+        if (!empty($reference)) {
+            $replyData = $RequestSeda->getMessageByReference($reference);
+            $oReplyData = json_decode($replyData->data);
+            $aDataForm['operationComments'] = $aReplyComment = $oReplyData->Comment;
+        }
+
+        $messageExchangeData         = json_decode($messageExchangeData->data);
 
         $TransferringAgencyMetaData = $messageExchangeData->TransferringAgency->OrganizationDescriptiveMetadata;
         $aDataForm['from']          = $TransferringAgencyMetaData->Contact[0]->PersonName . ' (' . $TransferringAgencyMetaData->Name . ')';

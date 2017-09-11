@@ -173,3 +173,7 @@ if (!defined("_NO_SENDER"))
     define("_NO_SENDER", "Aucun expéditeur");
 if (!defined("_SIMPLE_DOWNLOAD"))
     define("_SIMPLE_DOWNLOAD", "Télécharger");
+if (!defined("_MORE_INFORMATIONS"))
+    define("_MORE_INFORMATIONS", "Plus d'informations");
+if (!defined("_REPLY_RESPONSE_SENT"))
+    define("_REPLY_RESPONSE_SENT", "Accusé de prise en charge envoyé le");

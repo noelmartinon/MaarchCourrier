@@ -996,7 +996,7 @@ if ($mode == 'add') {
         }
 
         //Check if mail exists
-        if (count($emailArray) > 0 ) {
+        if (count($emailArray) > 0 && $emailArray['type'] != 'ArchiveTransferReplySent') {
             $content .= '<div>';
             $content .= '<table border="0" align="left" width="100%" cellspacing="5">';
             $content .= '<tr>';
@@ -1307,15 +1307,45 @@ if ($mode == 'add') {
                     .$sendmail_tools->htmlToRaw($emailArray['body']).'</textarea>';
                 $content .='</div>';
             }
-                        
+
+            if(!empty($emailArray['receptionDate'])){
+                $content .='<br><hr style="margin-top:2px;" />';
+                $content .= '<b>'._RECEPTION_DATE.' : </b>' . $emailArray['receptionDate'].'<br><br>';
+            }
+            if(!empty($emailArray['operationDate'])){
+                $content .= '<b>'._OPERATION_DATE.' : </b>' . $emailArray['operationDate'].'<br>';
+
+                $content .= '<div onclick="new Effect.toggle(\'operationCommentsDiv\', \'blind\', {delay:0.2});" onmouseover="this.style.cursor=\'pointer\';">
+                                <span id="divStatus_operationComments" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>&nbsp;'._MORE_INFORMATIONS.'
+                            </div>';
+                $content .= '<div id="operationCommentsDiv" style="display:none">';
+                    foreach ($emailArray['operationComments'] as $value) {
+                        $content .= $value.'<br>';
+                    }
+                $content .= '</div>';
+            }
+                //Buttons
+                $content .='<br><hr style="margin-top:2px;" />';
+                $content .='<div align="center">';
+                //Close button
+                $content .='<input type="button" name="cancel" id="cancel" class="button" value="'
+                            ._CLOSE.'" onclick="window.parent.destroyModal(\'form_email\');"/>';
+                $content .='</div>';
+            $content .= '</div>';
+        } else if ($emailArray['type'] == 'ArchiveTransferReplySent'){
+            $content .= '<b>'._REPLY_RESPONSE_SENT.' : </b>' . $emailArray['creationDate'].'<br><br>';
+
+            foreach ($emailArray['operationComments'] as $value) {
+                $content .= $value.'<br>';
+            }
+
             //Buttons
-            $content .='<hr style="margin-top:2px;" />';
+            $content .='<br><hr style="margin-top:2px;" />';
             $content .='<div align="center">';
             //Close button
             $content .='<input type="button" name="cancel" id="cancel" class="button" value="'
                         ._CLOSE.'" onclick="window.parent.destroyModal(\'form_email\');"/>';
             $content .='</div>';
-            $content .= '</div>';
         } else {
             $content = $request->wash_html($id.': '._EMAIL_DONT_EXIST.'!','NONE');
         }

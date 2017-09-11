@@ -172,3 +172,7 @@ if (!defined("_NO_SENDER"))
     define("_NO_SENDER", "No sender");
 if (!defined("_SIMPLE_DOWNLOAD"))
     define("_SIMPLE_DOWNLOAD", "Download");
+if (!defined("_MORE_INFORMATIONS"))
+    define("_MORE_INFORMATIONS", "More informations");
+if (!defined("_REPLY_RESPONSE_SENT"))
+    define("_REPLY_RESPONSE_SENT", "Reply sent on");
