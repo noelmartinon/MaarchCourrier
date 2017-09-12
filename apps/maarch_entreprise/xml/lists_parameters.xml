@@ -91,6 +91,11 @@
             <LABEL>_PRIORITY</LABEL>
             <ENABLED>true</ENABLED>
         </FILTER>
+        <FILTER>
+            <ID>date_current_use</ID>
+            <LABEL>_DATE_CURRENT_USE</LABEL>
+            <ENABLED>true</ENABLED>
+        </FILTER>
     </FILTERS>
     <TEMPLATES>
         <TEMPLATE>

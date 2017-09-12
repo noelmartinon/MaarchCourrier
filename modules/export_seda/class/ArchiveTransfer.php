@@ -439,7 +439,9 @@ class ArchiveTransfer
 
             $histories = $this->db->getHistory($_SESSION['collections'][0]['view'],$object->res_id);
             foreach ($histories as $history) {
-                $content->CustodialHistory->CustodialHistoryItem[] = $this->getCustodialHistoryItem($history);
+                if ($history->event_type != 'VIEW') {
+                    $content->CustodialHistory->CustodialHistoryItem[] = $this->getCustodialHistoryItem($history);
+                }
             }
 
             if (count($content->CustodialHistory->CustodialHistoryItem) == 0) {

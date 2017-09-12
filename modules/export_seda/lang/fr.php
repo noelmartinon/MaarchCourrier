@@ -1,7 +1,10 @@
 <?php
 
-if (!defined("_EXPORTSEDA_COMMENT"))
+if (!defined("_EXPORT_SEDA_COMMENT"))
     define("_EXPORT_SEDA_COMMENT", "Export");
+if (!defined("_EXPORT_SEDA_LIST"))
+    define("_EXPORT_SEDA_LIST", "Liste des courriers à archiver");
+
 
 if (!defined("_EXPORT_SEDA"))
     define("_EXPORT_SEDA","Transferer vos courriers");

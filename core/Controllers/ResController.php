@@ -22,6 +22,7 @@ use Core\Models\DocserverModel;
 use Core\Models\DocserverTypeModel;
 use Core\Models\UserModel;
 use Core\Models\ResModel;
+use Core\Models\DoctypesModel;
 use Entities\Models\EntitiesModel;
 use Core\Controllers\DocserverController;
 use Core\Controllers\DocserverToolsController;
@@ -633,6 +634,32 @@ class ResController
                     $entity = $entityModel->getByEmail(['email' => $mail[count($mail) -1]]);
                     if (!empty($entity[0]['entity_id'])) {
                         $userPrimaryEntity = true;
+                    }
+                }
+            }
+        }
+
+        $countD = count($data);
+        for ($i = 0; $i < $countD; $i++) {
+            if ($data[$i]['column'] == 'type_id') {
+                $docTypes = DoctypesModel::getByTypeId([
+                    'type_id' => $aArgs['type_id']
+                ]);
+
+                if ($docTypes) {
+                    $duc = $docTypes[0]['duration_current_use'];
+                    if ($duc && is_int($duc) && $duc > 0) {
+                        $date = new DateTime();
+                        $date->add(new DateInterval('P' . $duc . 'M'));
+
+                        array_push(
+                            $data,
+                            array(
+                                'column' => 'date_current_use',
+                                'value' => $date->format('Y-m-d H:m:s.u'),
+                                'type' => "date"
+                            )
+                        );
                     }
                 }
             }

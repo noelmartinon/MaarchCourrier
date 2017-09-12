@@ -1977,3 +1977,5 @@ if (!defined('_UPDATE_DESC_END'))
     define('_UPDATE_DESC_END', 'Mise à jour réussi');
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE'))
     define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucun tag de disponible pour une mise à jour');
+if (!defined('_DATE_CURRENT_USE'))
+    define('_DATE_CURRENT_USE', 'Date limite d\'utilité courante');

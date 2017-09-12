@@ -432,6 +432,8 @@
       <parameter name="admission_date_to" type="string" />
       <parameter name="creation_date_from" type="string" />
       <parameter name="creation_date_to" type="string" />
+      <parameter name="date_current_use_from" type="string" />
+      <parameter name="date_current_use_to" type="string" />
       <parameter name="closing_date_from" type="string" />
       <parameter name="closing_date_to" type="string" />
       <parameter name="doc_date_from" type="string" />

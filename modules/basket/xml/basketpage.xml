@@ -72,4 +72,14 @@
             <COLL_ID>*</COLL_ID>
         </COLLECTIONS>
     </BASKETPAGE>
+    <BASKETPAGE>
+        <ID>export_seda_list</ID>
+        <LABEL>_EXPORT_SEDA_LIST</LABEL>
+        <NAME>export_seda_list</NAME>
+        <ORIGIN>module</ORIGIN>
+        <MODULE>export_seda</MODULE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </BASKETPAGE>
 </ROOT>

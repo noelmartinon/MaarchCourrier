@@ -2,6 +2,8 @@
 
 if (!defined("_EXPORT_SEDA_COMMENT"))
     define("_EXPORT_SEDA_COMMENT", "Export");
+if (!defined("_EXPORT_SEDA_LIST"))
+    define("_EXPORT_SEDA_LIST", "List of letter to archive");
 
 if (!defined("_EXPORT_SEDA"))
     define("_EXPORT_SEDA", "Export");

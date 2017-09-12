@@ -151,6 +151,34 @@
         array_push($data, array('column' => "path", 'value' => $path, 'type' => "string"));
         array_push($data, array('column' => "filename", 'value' => $filename, 'type' => "string"));
         array_push($data, array('column' => 'creation_date', 'value' => $db->current_datetime(), 'type' => "function"));
+
+        $countD = count($data);
+        for ($i = 0; $i < $countD; $i++) {
+            if ($data[$i]['column'] == 'type_id') {
+                $db = new Database();
+                $queryParams = [];
+                $queryParams[] = $data[$i]['value'];
+                $query = "SELECT duration_current_use FROM doctypes WHERE type_id = ?";
+                $smtp = $db->query($query, $queryParams);
+
+                $res = $smtp->fetchObject();
+                $duc = $res->duration_current_use;
+                if ($duc && is_int($duc) && $duc > 0) {
+                    $date = new DateTime();
+                    $date->add(new DateInterval('P'. $duc .'M'));
+
+                    array_push(
+                        $data,
+                        array(
+                            'column' => 'date_current_use',
+                            'value' => $date->format('Y-m-d H:m:s.u'),
+                            'type' => "date"
+                        )
+                    );
+                }
+            }
+        }
+
         if(!$this->check_basic_fields($data))
         {
             $_SESSION['error'] = $this->error;

@@ -1969,3 +1969,4 @@ if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE'))
     define('_NO_AVAILABLE_TAG_TO_UPDATE', 'No available tag to update');
 
 if (!defined("_ADDRESS_NB")) define("_ADDRESS_NB","Address number");
+if (!defined('_DATE_CURRENT_USE')) define('_DATE_CURRENT_USE', 'Date current use');
