@@ -151,6 +151,7 @@ $app->delete('/currentUser/emailSignature/{id}', \Core\Controllers\UserControlle
 
 $app->post('/saveNumericPackage', \Sendmail\Controllers\ReceiveMessageExchangeController::class . ':saveMessageExchange');
 $app->post('/saveMessageExchangeReturn', \Sendmail\Controllers\ReceiveMessageExchangeController::class . ':saveMessageExchangeReturn');
+$app->post('/saveMessageExchangeReview', \Sendmail\Controllers\MessageExchangeReviewController::class . ':saveMessageExchangeReview');
 
 //contact
 $app->get('/contact/checkCommunication', \Core\Controllers\ContactController::class . ':getCheckCommunication');

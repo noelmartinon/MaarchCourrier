@@ -401,6 +401,11 @@ else if(empty($_POST['values']) || !isset($_POST['action_id']) || empty($_POST['
             if(is_numeric($arr_res[$i])){
                 $docLocker = new docLocker($arr_res[$i]);
                 $docLocker->unlock(); 
+
+                // SEND MESSAGE EXCHANGE REVIEW M2M
+                require_once "modules/sendmail/Controllers/MessageExchangeReviewController.php";
+                \Sendmail\Controllers\MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $arr_res[$i]]);
+
             }
             // Save action in history if needed
             if($bool_history=='Y')

@@ -147,7 +147,7 @@ class ReceiveMessageExchangeController
 
     }
 
-    private function checkNeededParameters($aArgs = [])
+    public static function checkNeededParameters($aArgs = [])
     {
         foreach ($aArgs['needed'] as $value) {
             if (empty($aArgs['data'][$value])) {
@@ -160,7 +160,7 @@ class ReceiveMessageExchangeController
 
     protected function createFile($aArgs = [])
     {
-        if (!$this->checkNeededParameters(['data' => $aArgs, 'needed' => ['base64', 'extension', 'size']])) {
+        if (!self::checkNeededParameters(['data' => $aArgs, 'needed' => ['base64', 'extension', 'size']])) {
             return ['errors' => 'Bad Request'];
         }
 
@@ -511,7 +511,7 @@ curl_close($curl);
 
         $data = $request->getParams();
 
-        if (!$this->checkNeededParameters(['data' => $data, 'needed' => ['type']])) {
+        if (!self::checkNeededParameters(['data' => $data, 'needed' => ['type']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 

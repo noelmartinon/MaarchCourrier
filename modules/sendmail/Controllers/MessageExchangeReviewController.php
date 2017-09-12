@@ -8,7 +8,7 @@
 */
 
 /**
-* @brief Receive Message Exchange Controller
+* @brief Message Exchange Review Controller
 * @author dev@maarch.org
 * @ingroup core
 */
@@ -20,7 +20,6 @@ use Psr\Http\Message\ResponseInterface;
 use Core\Models\ResModel;
 use Core\Models\StatusModel;
 
-
 require_once __DIR__. '/../../export_seda/Controllers/ReceiveMessage.php';
 require_once "core/class/class_history.php";
 require_once "modules/sendmail/Controllers/SendMessageExchangeController.php";
@@ -28,55 +27,47 @@ require_once 'modules/export_seda/RequestSeda.php';
 
 class MessageExchangeReviewController
 {
-
-    private static $aComments = [];
-
     protected static function canSendMessageExchangeReview($aArgs = [])
     {
-
-        if(!ReceiveMessageExchangeController::checkNeededParameters(['data' => $aArgs, 'needed' => ['res_id']])){
+        if (empty($aArgs['res_id'])) {
             return false;
         }
 
-        $resLetterboxData = ResModelAbstract::getById([
-            'select' => ['nature_id, reference_number', 'entity_label', 'status', 'res_id', 'identifier'],
-            'table' => 'res_view_letterbox',
-            'resId' => $aArgs['res_id']]);
+        $resLetterboxData = ResModel::getById([
+            'select'  => ['nature_id, reference_number', 'entity_label', 'status', 'res_id', 'identifier'],
+            'table'   => 'res_view_letterbox',
+            'resId'   => $aArgs['res_id'],
+            'orderBy' => 'res_id']);
 
-        if ($resLetterboxData['nature_id'] == 'message_exchange' && substr($resLetterboxData['reference_number'], 0, 16) == 'ArchiveTransfer_') {
-            return $resLetterboxData;
+        if ($resLetterboxData[0]['nature_id'] == 'message_exchange' && substr($resLetterboxData[0]['reference_number'], 0, 16) == 'ArchiveTransfer_') {
+            return $resLetterboxData[0];
         } else {
             return false;
         }
-
     }
 
-    protected function sendMessageExchangeReview($aArgs = [])
+    public static function sendMessageExchangeReview($aArgs = [])
     {
         $messageExchangeData = self::canSendMessageExchangeReview(['res_id' => $aArgs['res_id']]);
         if ($messageExchangeData) {
-
             $statusInfo = StatusModel::getById(['id' => $messageExchangeData['status']]);
-
             $reviewObject                           = new \stdClass();
-            $reviewObject->Comment                  = '['.date("d/m/Y H:i:s") . '] Le courrier est passé au statut : '. $statusInfo[0]['label'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.';
+            $reviewObject->Comment                  = ['['.date("d/m/Y H:i:s") . '] Le courrier a été mis au statut : '. $statusInfo[0]['label'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.'];
             
             $date                                   = new \DateTime;
             $reviewObject->Date                     = $date->format(\DateTime::ATOM);
             
             $reviewObject->MessageIdentifier        = new \stdClass();
-            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'];
+            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'].'_Review';
             
             $reviewObject->CodeListVersions         = new \stdClass();
             $reviewObject->CodeListVersions->value  = '';
             
             $reviewObject->UnitIdentifier           = new \stdClass();
-            $reviewObject->UnitIdentifier->value    = $messageExchangeData['identifier'];
-            
+            $reviewObject->UnitIdentifier->value    = $messageExchangeData['reference_number'];
             $RequestSeda                            = new \RequestSeda();
-            $messageExchangeReply                   = $RequestSeda->getMessageByReference($resLetterboxData[0]['reference_number']);
+            $messageExchangeReply                   = $RequestSeda->getMessageByReference($messageExchangeData['reference_number'].'_ReplySent');
             $dataObject                             = json_decode($messageExchangeReply->data);
-            
             $reviewObject->TransferringAgency       = $dataObject->ArchivalAgency;
             $reviewObject->ArchivalAgency           = $dataObject->TransferringAgency;
 
@@ -93,9 +84,7 @@ class MessageExchangeReviewController
             curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
             $curl_response = curl_exec($curl);
             curl_close($curl);
-
         }
-
     }
 
     public function saveMessageExchangeReview(RequestInterface $request, ResponseInterface $response)
@@ -106,10 +95,20 @@ class MessageExchangeReviewController
 
         $data = $request->getParams();
 
-        $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
-        if(!empty($tmpName['errors'])){
-            return $response->withStatus(400)->withJson($tmpName);
-        }
-    }
+        // $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
+        // if(!empty($tmpName['errors'])){
+        //     return $response->withStatus(400)->withJson($tmpName);
+        // }
+        
+        /********** EXTRACTION DU ZIP ET CONTROLE PAR ALEXANDRE*******/
 
+        $dataObject = json_decode($data['data']); //TODO : A REMPLACER PAR EXTRACTION
+        $RequestSeda = new \RequestSeda();
+
+        $messageExchange = $RequestSeda->getMessageByReference($dataObject->UnitIdentifier->value);
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveTransferReview']);
+        return $response->withJson([
+            "messageId" => $messageId
+        ]);
+    }
 }
