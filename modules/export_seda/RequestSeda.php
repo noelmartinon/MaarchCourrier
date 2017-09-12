@@ -51,6 +51,17 @@ class RequestSeda
         return $message;
     }
 
+    public function getMessagesByReference($id)
+    {
+        $queryParams = [];
+
+        $queryParams[] = $id;
+
+        $query = "SELECT * FROM message_exchange WHERE reference = ?";
+
+        return $this->db->query($query,$queryParams);
+    }
+
     public function getMessageByIdentifier($id)
     {
         $queryParams = [];

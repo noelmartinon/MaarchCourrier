@@ -52,7 +52,7 @@ class MessageExchangeReviewController
         if ($messageExchangeData) {
             $statusInfo = StatusModel::getById(['id' => $messageExchangeData['status']]);
             $reviewObject                           = new \stdClass();
-            $reviewObject->Comment                  = ['['.date("d/m/Y H:i:s") . '] Le courrier a été mis au statut : '. $statusInfo[0]['label'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.'];
+            $reviewObject->Comment                  = ['['.date("d/m/Y H:i:s") . '] Le courrier a été mis au statut : '. $statusInfo[0]['label_status'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.'];
             
             $date                                   = new \DateTime;
             $reviewObject->Date                     = $date->format(\DateTime::ATOM);

@@ -29,11 +29,18 @@ class ReadMessageExchangeController
         }
 
         $aDataForm = [];
-        $RequestSeda                 = new RequestSeda();
-        $messageExchangeData         = $RequestSeda->getMessageByIdentifier($aArgs['id']);
-        $unitIdentifierData          = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
-        $aDataForm['reference']      = $messageExchangeData->reference;
-
+        $RequestSeda                = new RequestSeda();
+        $messageExchangeData        = $RequestSeda->getMessageByIdentifier($aArgs['id']);
+        $unitIdentifierData         = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
+        $aDataForm['reference']     = $messageExchangeData->reference;
+        $messageReview              = $RequestSeda->getMessagesByReference($aDataForm['reference'].'_Review');
+        if(!empty($messageReview)){
+            foreach ($messageReview as $value) {
+                $oMessageReview = json_decode($value['data']);
+                $aDataForm['messageReview'][] = $oMessageReview->Comment[0];
+            }
+        }
+        
         $request                    = new request();
         $aDataForm['creationDate']  = $request->dateformat($messageExchangeData->date);
         $aDataForm['receptionDate'] = $request->dateformat($messageExchangeData->reception_date);

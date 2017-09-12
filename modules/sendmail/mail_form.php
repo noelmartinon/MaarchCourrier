@@ -1322,6 +1322,15 @@ if ($mode == 'add') {
                     foreach ($emailArray['operationComments'] as $value) {
                         $content .= $value.'<br>';
                     }
+                $content .= '</div><br>';
+            }
+            if(!empty($emailArray['messageReview'])){
+
+                $content .= '<h4>Suivi de la demande</h4>';
+                $content .= '<div>';
+                    foreach ($emailArray['messageReview'] as $value) {
+                        $content .= $value.'<br>';
+                    }
                 $content .= '</div>';
             }
                 //Buttons
