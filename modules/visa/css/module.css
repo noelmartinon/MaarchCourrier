@@ -148,6 +148,7 @@
   opacity: 0.5 !important;
   color : #666 !important;
   border: solid 2px white !important;
+  text-decoration: line-through !important;
 }
 
 .droptarget input{
