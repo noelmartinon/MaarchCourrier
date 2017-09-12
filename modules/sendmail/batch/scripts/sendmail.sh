@@ -1,4 +1,5 @@
-#!/bin/sh cd /var/www/MaarchCourrier/modules/notifications/batch/
-emailStackPath='/var/www/MaarchCourrier/modules/notifications/batch/process_email_stack.php'
-php $emailStackPath -c /var/www/MaarchCourrier/modules/notifications/batch/config/config.xml
+#!/bin/sh
+cd /var/www/MaarchCourrier/modules/sendmail/batch/
+emailStackPath='/var/www/MaarchCourrier/modules/sendmail/batch/process_emails.php'
+php $emailStackPath -c /var/www/MaarchCourrier/modules/sendmail/batch/config/config.xml
 
