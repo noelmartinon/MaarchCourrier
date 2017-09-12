@@ -3009,6 +3009,7 @@ CREATE TABLE message_exchange
   "archived" boolean,
   
   "file_path" text default NULL,
+  "res_id_master" numeric default NULL,
 
   PRIMARY KEY ("message_id")
 )
