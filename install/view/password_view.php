@@ -74,7 +74,7 @@
             <h6>
                 <?php echo _PASSWORD_EXP;?>
             </h6>
-            <form action="scripts/password.php" method="post">
+            <form action="scripts/password.php" method="post" id="newAdminPassForm" name="newAdminPassForm">
                 <table>
                     <tr>
                         <td>
@@ -120,7 +120,7 @@
                     </a>
                 </div>
                 <div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=config');" id="okAdminPass" style="display: none;">
+                    <a href="#" onClick="document.getElementById('newAdminPassForm').submit();" id="okAdminPass" style="display: none;">
                         <?php echo _NEXT_INSTALL;?>
                     </a>
                 </div>

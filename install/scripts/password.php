@@ -34,7 +34,8 @@
     $Class_Install = new Install;
 
 //CONTROLLER
-    if (!isset($_REQUEST['newSuperadminPass']) || empty($_REQUEST['newSuperadminPass'])) {
+    $trimmedPassword = rtrim($_REQUEST['newSuperadminPass']);
+    if (!isset($_REQUEST['newSuperadminPass']) || empty($trimmedPassword)) {
         header("Location: ../error.php?error=badForm"); exit;
     }
 
@@ -42,4 +43,4 @@
         $_REQUEST['newSuperadminPass']
     );
 
-    header("Location: ../index.php?step=resume");
+    header("Location: ../index.php?step=config");
