@@ -176,3 +176,7 @@ if (!defined("_MORE_INFORMATIONS"))
     define("_MORE_INFORMATIONS", "More informations");
 if (!defined("_REPLY_RESPONSE_SENT"))
     define("_REPLY_RESPONSE_SENT", "Reply sent on");
+if (!defined("_M2M_ARCHIVETRANSFER"))
+    define("_M2M_ARCHIVETRANSFER", "Archive transfer");
+if (!defined("_M2M_ARCHIVETRANSFERREPLYSENT"))
+    define("_M2M_ARCHIVETRANSFERREPLYSENT", "Archive transfer reply");

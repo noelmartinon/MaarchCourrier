@@ -177,3 +177,7 @@ if (!defined("_MORE_INFORMATIONS"))
     define("_MORE_INFORMATIONS", "Plus d'informations");
 if (!defined("_REPLY_RESPONSE_SENT"))
     define("_REPLY_RESPONSE_SENT", "Accusé de prise en charge envoyé le");
+if (!defined("_M2M_ARCHIVETRANSFER"))
+    define("_M2M_ARCHIVETRANSFER", "Pli numérique");
+if (!defined("_M2M_ARCHIVETRANSFERREPLYSENT"))
+    define("_M2M_ARCHIVETRANSFERREPLYSENT", "Réponse envoyée");

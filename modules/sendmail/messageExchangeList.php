@@ -64,6 +64,7 @@ if(!empty($tab)){
                 }
                 if($tab[$i][$j][$value]=="type")
                 {
+                    $tab[$i][$j]["value"]       = constant('_M2M_'.strtoupper($tab[$i][$j]["value"]));
                     $tab[$i][$j]["label"]       = _TYPE;
                     $tab[$i][$j]["size"]        = "8";
                     $tab[$i][$j]["label_align"] = "left";
