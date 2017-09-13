@@ -89,7 +89,7 @@ class ReceiveMessageExchangeController
         if($contactReturn['returnCode'] <> 0){
             return $response->withStatus(400)->withJson(["errors" => $contactReturn['errors']]);
         }
-        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Contact créé ou sélectionné';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Contact sélectionné ou créé';
 
         /************** MLB COLL EXT **************/
         $return = self::saveExtensionTable(["contact" => $contactReturn, "resId" => $resLetterboxReturn[0]]);

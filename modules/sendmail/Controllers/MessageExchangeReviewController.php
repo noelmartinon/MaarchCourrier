@@ -18,7 +18,7 @@ namespace Sendmail\Controllers;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Core\Models\ResModel;
-use Core\Models\StatusModel;
+use Core\Models\ActionsModel;
 
 require_once __DIR__. '/../../export_seda/Controllers/ReceiveMessage.php';
 require_once "core/class/class_history.php";
@@ -29,12 +29,12 @@ class MessageExchangeReviewController
 {
     protected static function canSendMessageExchangeReview($aArgs = [])
     {
-        if (empty($aArgs['res_id'])) {
+        if (empty($aArgs['res_id']) || !is_numeric($aArgs['res_id'])) {
             return false;
         }
 
         $resLetterboxData = ResModel::getById([
-            'select'  => ['nature_id, reference_number', 'entity_label', 'status', 'res_id', 'identifier'],
+            'select'  => ['nature_id, reference_number', 'entity_label', 'res_id', 'identifier'],
             'table'   => 'res_view_letterbox',
             'resId'   => $aArgs['res_id'],
             'orderBy' => 'res_id']);
@@ -50,9 +50,9 @@ class MessageExchangeReviewController
     {
         $messageExchangeData = self::canSendMessageExchangeReview(['res_id' => $aArgs['res_id']]);
         if ($messageExchangeData) {
-            $statusInfo = StatusModel::getById(['id' => $messageExchangeData['status']]);
+            $actionInfo = ActionsModel::getById(['id' => $aArgs['action_id']]);
             $reviewObject                           = new \stdClass();
-            $reviewObject->Comment                  = ['['.date("d/m/Y H:i:s") . '] Le courrier a été mis au statut : '. $statusInfo[0]['label_status'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.'];
+            $reviewObject->Comment                  = ['['.date("d/m/Y H:i:s") . '] Action réalisée : '. $actionInfo['label_action'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.'];
             
             $date                                   = new \DateTime;
             $reviewObject->Date                     = $date->format(\DateTime::ATOM);
