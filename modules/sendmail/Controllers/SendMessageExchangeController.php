@@ -449,8 +449,8 @@ class SendMessageExchangeController
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->UserIdentifier      = $_SESSION['user']['UserId'];
 
         $traCommunicationObject          = new stdClass();
-        $traCommunicationObject->Channel = 'email';
-        $traCommunicationObject->value   = $aArgs['TransferringAgency']['EntitiesInformations']['email'];
+        $traCommunicationObject->Channel = 'url'; // TODO : get communication type of user or entities
+        $traCommunicationObject->value   = 'http://bblier:maarch@192.168.1.194/maarch_v2/'; // TODO : get communication type of user or entities
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Communication = [$traCommunicationObject];
 
