@@ -163,7 +163,7 @@
 
                 $res = $smtp->fetchObject();
                 $duc = $res->duration_current_use;
-                if ($duc && is_int($duc) && $duc > 0) {
+                if ($duc && is_int($duc) && $duc > 0 && $db->test_column('res_letterbox', 'date_current_use')) {
                     $date = new DateTime();
                     $date->add(new DateInterval('P'. $duc .'M'));
 

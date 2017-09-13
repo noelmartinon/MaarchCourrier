@@ -648,7 +648,8 @@ class ResController
 
                 if ($docTypes) {
                     $duc = $docTypes[0]['duration_current_use'];
-                    if ($duc && is_int($duc) && $duc > 0) {
+                    $db = new \Database();
+                    if ($duc && is_int($duc) && $duc > 0 && $db->test_column('res_letterbox', 'date_current_use')) {
                         $date = new DateTime();
                         $date->add(new DateInterval('P' . $duc . 'M'));
 
