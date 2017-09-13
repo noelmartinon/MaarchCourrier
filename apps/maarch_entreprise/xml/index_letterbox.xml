@@ -41,12 +41,12 @@
         <type>string</type>
         <img>arrow-right</img>
     </INDEX>
-    <INDEX>
+<!--     <INDEX>
         <column>date_current_use</column>
         <label>_DATE_CURRENT_USE</label>
         <type>date</type>
         <img>arrow-right</img>
-    </INDEX>
+    </INDEX> -->
 <!--
     <INDEX>
         <column>custom_t2</column>

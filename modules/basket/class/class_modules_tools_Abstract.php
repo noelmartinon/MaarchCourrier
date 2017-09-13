@@ -684,7 +684,6 @@ abstract class basket_Abstract extends Database
                         strtoupper($mode) == 'PAGE_USE' 
                         && $_SESSION['current_basket']['actions'][$i]['PAGE_USE'] == 'Y' 
                         && $testWhere && strtoupper($resId) != 'NONE'
-                        && ($_SESSION['current_basket']['actions'][$i]['id'] <> 'IndexingBasket')
                     ) {
                         $where = ' where res_id = ' . $resId;
                         if (!empty($_SESSION['current_basket']['actions'][$i]['WHERE'])) {
@@ -694,7 +693,7 @@ abstract class basket_Abstract extends Database
                         if ($stmt->rowCount() > 0) {
                             $arr[] = ['VALUE' => $_SESSION['current_basket']['actions'][$i]['ID'], 'LABEL' => $_SESSION['current_basket']['actions'][$i]['LABEL']];
                         }
-                    } else if (strtoupper($mode) == 'PAGE_USE' && $_SESSION['current_basket']['actions'][$i]['PAGE_USE'] == 'Y' && !$testWhere) {
+                    } else if (strtoupper($mode) == 'PAGE_USE' && $_SESSION['current_basket']['actions'][$i]['PAGE_USE'] == 'Y') {
                         $arr[] = ['VALUE' => $_SESSION['current_basket']['actions'][$i]['ID'], 'LABEL' => $_SESSION['current_basket']['actions'][$i]['LABEL']];
                     } else if (strtoupper($mode) == 'MASS_USE' && $_SESSION['current_basket']['actions'][$i]['MASS_USE'] == 'Y') {
                         // If "MASS_USE" adding the actions in the array

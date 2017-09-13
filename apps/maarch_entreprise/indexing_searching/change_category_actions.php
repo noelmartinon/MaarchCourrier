@@ -7,7 +7,7 @@ $b = new basket();
 $_SESSION['category_id'] = $_REQUEST['category_id'];
 
 $actions = $b->get_actions_from_current_basket(
-    $_REQUEST['resId'], $_REQUEST['collId'], 'PAGE_USE', false
+    $_REQUEST['resId'], $_REQUEST['collId'], 'PAGE_USE', true
 );
 if (count($actions) > 0) {
     //$frmStr .= '<b>' . _ACTIONS . ' : </b>';
