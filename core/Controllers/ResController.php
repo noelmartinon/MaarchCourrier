@@ -34,13 +34,35 @@ class ResController
 {
     public function create(RequestInterface $request, ResponseInterface $response, $aArgs)
     {
-        if (!empty($aArgs)) {
-            $aArgs = $aArgs;
-        } else {
+        if(empty($aArgs)) {
             $aArgs = $request->getQueryParams();
+
             $aArgs['data'] = json_decode($aArgs['data']);
+
             $aArgs['data'] = $this->object2array($aArgs['data']);
+
+            //FIX pb if data has parent
+            if (isset($aArgs['data']['data'])) {
+                $aArgs['data'] = $aArgs['data']['data'];
+            }
         }
+
+        //*****************************************************************************************
+        //LOG ONLY LOG FOR DEBUG
+        // $file = fopen('storeResourceLogs.log', a);
+        // fwrite($file, '[' . date('Y-m-d H:i:s') . '] new request' . PHP_EOL);
+        // foreach ($aArgs as $key => $value) {
+        //     if ($key <> 'encodedFile') {
+        //         fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $key . ' : ' . $value . PHP_EOL);
+        //     }
+        // }
+        // fclose($file);
+        // ob_flush();
+        // ob_start();
+        // print_r($aArgs['data']);
+        // file_put_contents("storeResourceLogs.log", ob_get_flush());
+        //END LOG FOR DEBUG ONLY
+        //*****************************************************************************************
 
         $return = $this->storeResource($aArgs);
 
@@ -51,8 +73,11 @@ class ResController
                     ['errors' => _NOT_CREATE . ' ' . $return['errors']]
                 );
         }
+
+        //standardize ws response for MaarchCapture
+        $wsReturn['resId'] = $return[0];
         
-        return $response->withJson($return);
+        return $response->withJson($wsReturn);
     }
 
     public function delete(RequestInterface $request, ResponseInterface $response, $aArgs)
@@ -160,7 +185,8 @@ class ResController
             
             $returnCode = 0;
             //copy sended file on tmp
-            $fileContent = base64_decode($encodedFile);
+            //$fileContent = base64_decode($encodedFile);
+            $fileContent = base64_decode(str_replace(array('-', '_'), array('+', '/'), $encodedFile));
             $random = rand();
             $fileName = 'tmp_file_' . $random . '.' . $fileFormat;
             $Fnm = $_SESSION['config']['tmppath'] . $fileName;

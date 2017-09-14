@@ -226,7 +226,7 @@ class ResControllerTest extends \PHPUnit_Framework_TestCase
         $response = new \Slim\Http\Response();
         $response = $action->create($request, $response, $aArgs);
         //print_r($response);exit;
-        $this->assertGreaterThan(1, json_decode($response->getBody())[0]);
+        $this->assertGreaterThan(1, json_decode($response->getBody())->resId);
     }
 
     public function testDeleteRes()
