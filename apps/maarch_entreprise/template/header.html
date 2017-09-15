@@ -3,10 +3,10 @@ require_once 'core/Models/UserModel.php';
 ?>
 <div id="header">
         <div id="nav">
-                <div id="header_username" style="position:absolute;text-align:center;left:45%;font-size: 1.3em;top: 6px;color: white; font-size:14px; line-height: 1; font-family:Verdana,Geneva,Arial,Helvetica,sans-serif">
+                <div id="header_username" style="position:absolute;text-align:center;left:45%;top: 6px;color: white; font-size:14px; line-height: 1; font-family:Verdana,Geneva,Arial,Helvetica,sans-serif">
                     <?php                         
                         $strUserInfos = $_SESSION['user']['FirstName']." ".$_SESSION['user']['LastName'];
-                        $userGroups=\Core\Models\UserModel::getGroupsByUserId(['userId'=> $_SESSION['user']['UserId']]);
+                        $userGroups=\Core\Models\UserModel::getGroupsById(['userId'=> $_SESSION['user']['UserId']]);
                         
                         if(!empty($userGroups)){
                             $strUserInfos.=" (";
