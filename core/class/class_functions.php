@@ -722,7 +722,7 @@ class functions
         <p>&nbsp;</p>
         <p>&nbsp;</p>
         <p>&nbsp;</p>
-        <?php functions::xecho($message);
+        <?php echo($message);
         if ($type <> '')
         {
             echo '</div>';

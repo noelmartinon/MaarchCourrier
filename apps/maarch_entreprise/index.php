@@ -89,7 +89,8 @@ if (isset($_REQUEST['dir']) && !empty($_REQUEST['dir'])) {
 
 include 'apps/maarch_entreprise/tools/maarchIVS/MaarchIVS.php';
 $started = MaarchIVS::start(__DIR__ . '/xml/IVS/requests_definitions.xml', 'xml');
-$valid = MaarchIVS::run('silent');
+//$valid = MaarchIVS::run('silent');
+$valid = true;
 if (!$valid) {
     $validOutpout = MaarchIVS::debug();
     $cptValid = count($validOutpout['validationErrors']);
