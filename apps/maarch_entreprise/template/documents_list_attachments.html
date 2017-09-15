@@ -189,7 +189,7 @@ Mods
                     <td width="15%" style="text-align:center">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" >
                             <tr>
-                                <td width="40%">##showIconDocument##</td>
+                                <td width="40%"></td>
                                 <td width="15%">
                                     <i style="font-size:10px;color:#16ADEB;" title="##defineLang|_VERSION##">##loadValue|relation##</i>
                                     <i style="color:#16ADEB;">##func_previous_version##</i>
@@ -217,8 +217,14 @@ Mods
                                 <!--<td style="text-align:center" width="10%">##loadValue|doc_date##</td>-->
                                 <td style="text-align:left;width:20%;" title="##defineLang|_BACK_DATE##"><i class="fa fa-calendar-times-o"></i>
  ##loadValue|validation_date##</td>
-                                <td style="text-align:right;width:200px;">##func_final_version##
- ##func_modify## ##func_delete##</td>
+                                <td style="text-align:right;width:200px;"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:30%;text-align:right;">##func_final_version##</td>
+                                            <td style="width:10%;text-align:center;">##func_modify## ##func_delete##</td>
+                                            <td style="width:1%;text-align:right;">##showIconDocument##</td>
+                                        </tr>
+                                    </tbody></table>  </td>
                                 <!--<td style="text-align:left" width="17%">##loadValue|updated_by##</td>-->
                             </tr>
                         </table>
