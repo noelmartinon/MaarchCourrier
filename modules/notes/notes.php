@@ -131,7 +131,6 @@ if (isset($_REQUEST['load'])) {
         $_SESSION['config']['databasetype'], "500", true, NOTES_TABLE, USERS_TABLE,
         "user_id"
     );
-        
     //LGI UPDATE
     $arrayToUnset = array();
 

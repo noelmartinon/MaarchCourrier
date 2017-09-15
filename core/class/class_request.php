@@ -151,6 +151,14 @@ class request extends dbquery
         }
         
         $query = $db->limit_select(0, $limit, $field_string, $table_string." ".$join, $where_string, $other, $dist);
+        
+        //TODO TEMPORARY FIX FOR INPI
+        if ($table_string == 'notes') {
+
+        $query = str_replace("SELECT * FROM (", "", $query);
+        $query = substr($query, 0, -22);
+        //echo $query;exit;
+        }
 
         if (preg_match('/_view/i', $query)) {
             $_SESSION['last_select_query'] = $query;
