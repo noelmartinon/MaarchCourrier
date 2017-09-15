@@ -186,7 +186,7 @@ class ReceiveMessageExchangeController
         return $tmpName;
     }
 
-    protected function readXmlConfig()
+    public static function readXmlConfig()
     {
         $customId = CoreConfigModel::getCustomId();
 
@@ -202,6 +202,12 @@ class ReceiveMessageExchangeController
             foreach ($loadedXml as $key => $value) {
                 $aDefaultConfig[$key] = (array)$value;
             }
+        }
+
+        if(filter_var($aDefaultConfig['m2m_communication'][0], FILTER_VALIDATE_EMAIL)){
+            $aDefaultConfig['m2m_communication_type'][0] = 'email';
+        } else if (filter_var($aDefaultConfig['m2m_communication'][0], FILTER_VALIDATE_URL)) {
+            $aDefaultConfig['m2m_communication_type'][0] = 'url';
         }
 
         return $aDefaultConfig;
@@ -445,7 +451,7 @@ class ReceiveMessageExchangeController
 
         /***************** ENVOI ACCUSE DE RECEPTION A L EMETTEUR VIA ALEXANDRE ****************/
 
-$service_url = 'http://bblier:maarch@192.168.1.194/maarch_v2/rest/saveMessageExchangeReturn';
+$service_url = $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Communication[0]->value.'/rest/saveMessageExchangeReturn';
 $curl        = curl_init($service_url);
 $curl_post_data = array(
         'type' => 'Acknowledgement',
@@ -487,7 +493,7 @@ curl_close($curl);
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
         /***************** ENVOI REPONSE A L EMETTEUR VIA ALEXANDRE ****************/
 
-$service_url = 'http://bblier:maarch@192.168.1.194/maarch_v2/rest/saveMessageExchangeReturn';
+$service_url = $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Communication[0]->value.'/rest/saveMessageExchangeReturn';
 $curl        = curl_init($service_url);
 $curl_post_data = array(
         'type' => 'ArchiveTransferReply',

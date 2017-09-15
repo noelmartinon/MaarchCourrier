@@ -68,12 +68,12 @@ class MessageExchangeReviewController
             $RequestSeda                            = new \RequestSeda();
             $messageExchangeReply                   = $RequestSeda->getMessageByReference($messageExchangeData['reference_number'].'_ReplySent');
             $dataObject                             = json_decode($messageExchangeReply->data);
-            $reviewObject->TransferringAgency       = $dataObject->ArchivalAgency;
-            $reviewObject->ArchivalAgency           = $dataObject->TransferringAgency;
+            $reviewObject->TransferringAgency       = $dataObject->TransferringAgency;
+            $reviewObject->ArchivalAgency           = $dataObject->ArchivalAgency;
 
             /***************** ENVOI SUIVI DEMANDE A L EMETTEUR VIA ALEXANDRE ****************/
 
-            $service_url = 'http://bblier:maarch@192.168.1.194/maarch_v2/rest/saveMessageExchangeReview';
+            $service_url = $dataObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value.'/rest/saveMessageExchangeReview';
             $curl        = curl_init($service_url);
             $curl_post_data = array(
                     'data' => json_encode($reviewObject)

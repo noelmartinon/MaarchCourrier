@@ -15,6 +15,7 @@
 
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'apps/maarch_entreprise/Models/ResModel.php';
+require_once 'modules/sendmail/Controllers/ReceiveMessageExchangeController.php';
 require_once 'modules/export_seda/RequestSeda.php';
 require_once 'modules/notes/Models/NotesModel.php';
 require_once 'modules/export_seda/Controllers/SendMessage.php';
@@ -449,8 +450,10 @@ class SendMessageExchangeController
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->UserIdentifier      = $_SESSION['user']['UserId'];
 
         $traCommunicationObject          = new stdClass();
-        $traCommunicationObject->Channel = 'url'; // TODO : get communication type of user or entities
-        $traCommunicationObject->value   = 'http://bblier:maarch@192.168.1.194/maarch_v2/'; // TODO : get communication type of user or entities
+
+        $aDefaultConfig = \Sendmail\Controllers\ReceiveMessageExchangeController::readXmlConfig();
+        $traCommunicationObject->Channel = $aDefaultConfig['m2m_communication_type'][0];
+        $traCommunicationObject->value   = $aDefaultConfig['m2m_communication'][0];
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Communication = [$traCommunicationObject];
 
