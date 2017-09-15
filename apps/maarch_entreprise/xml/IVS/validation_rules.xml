@@ -496,6 +496,7 @@
       <parameter name="department_number_available" type="string" />
       <parameter name="address_postal_code" type="string" />
       <parameter name="alt_identifier" type="string" />
+      <parameter name="res_valeur" type="string" />
       <parameter name="welcome" type="string" />
       <parameter name="Submit" type="identifier" />
     </validationRule>
