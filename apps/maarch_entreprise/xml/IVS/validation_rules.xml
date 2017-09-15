@@ -473,6 +473,8 @@
       <parameter name="identifier" type="string" />
       <parameter name="services_chosen" type="identifier" />
       <parameter name="services_available" type="identifier" />
+      <parameter name="initiatorServices_chosen" type="identifier" />
+      <parameter name="initiatorServices_available" type="identifier" />
       <parameter name="market" type="string" />
       <parameter name="status_chosen" type="identifier" />
       <parameter name="status_available" type="identifier" />

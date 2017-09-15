@@ -336,8 +336,19 @@ if($core_tools->is_module_loaded('entities'))
     }
 
     $param['destination_mu'] = array('label' => _DESTINATION_SEARCH, 'type' => 'select_multiple', 'param' => array('field_label' => _DESTINATION_SEARCH, 'label_title' => _CHOOSE_ENTITES_SEARCH_TITLE,
-'id' => 'services','options' => $arr_tmp));
+    'id' => 'services','options' => $arr_tmp));
+    //Initiator
+    $stmt = $conn->query("SELECT DISTINCT ".$table.".initiator, e.short_label FROM ".$table." join ".$_SESSION['tablename']['ent_entities']." e on e.entity_id = ".$table.".initiator 
+    ".$where." group by e.short_label, ".$table.".initiator order by e.short_label");
+    
+    $arr_tmp = array();
+    while($res = $stmt->fetchObject())
+    {
+    array_push($arr_tmp, array('VALUE' => $res->initiator, 'LABEL' => $res->short_label));
+    }
 
+    $param['initiator_mu'] = array('label' => _INITIATORS, 'type' => 'select_multiple', 'param' => array('field_label' => _INITIATORS, 'label_title' => _CHOOSE_ENTITES_SEARCH_TITLE,
+    'id' => 'initiatorServices','options' => $arr_tmp));
 }
 
 // Folder

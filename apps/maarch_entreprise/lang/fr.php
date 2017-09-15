@@ -1605,6 +1605,8 @@ if (!defined("_EMAIL_ACCOUNT")) define("_EMAIL_ACCOUNT", "Email compte");
 if (!defined("_HELP_KEYWORD_EMAIL")) define("_HELP_KEYWORD_EMAIL", "Email de l'utilisateur connecté");
 
 if (!defined("_INITIATOR")) define("_INITIATOR", "Service initiateur");
+if (!defined("_INITIATORS")) define("_INITIATORS", "Service(s) initiateur(s)");
+
 
 if (!defined("_QUALIF_BUSINESS")) define("_QUALIF_BUSINESS", "Qualification des documents de la collection business");
 if (!defined("_PROCESS_BUSINESS")) define("_PROCESS_BUSINESS", "Traitement des documents de la collection business");
