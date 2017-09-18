@@ -293,7 +293,8 @@ class ReceiveMessageExchangeController
         $aDataContact = [];
         array_push($aDataContact, ['column' => 'contact_type',        'value' => $defaultConfigContacts['contact_type'],           'type' => 'integer', 'table' => 'contacts_v2']);
         array_push($aDataContact, ['column' => 'society',             'value' => $transferringAgencyMetadata->LegalClassification, 'type' => 'string',  'table' => 'contacts_v2']);
-        array_push($aDataContact, ['column' => 'is_corporate_person', 'value' => 'Y',                                              'type' => 'string',  'table' => 'contacts_v2']);
+        array_push($aDataContact, ['column' => 'is_corporate_person', 'value' => 'Y', 'type' => 'string',  'table' => 'contacts_v2']);
+        array_push($aDataContact, ['column' => 'is_external_contact', 'value' => 'Y', 'type' => 'string',  'table' => 'contacts_v2']);
 
         array_push($aDataContact, ['column' => 'contact_purpose_id',  'value' => $defaultConfigAddress['contact_purpose_id'],      'type' => 'integer', 'table' => 'contact_addresses']);
         array_push($aDataContact, ['column' => 'external_contact_id', 'value' => $transferringAgency->Identifier->value,           'type' => 'string',  'table' => 'contact_addresses']);
