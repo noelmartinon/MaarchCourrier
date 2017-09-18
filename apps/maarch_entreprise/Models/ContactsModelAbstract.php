@@ -132,6 +132,41 @@ class ContactsModelAbstract extends Apps_Table_Service
         
     }
 
+    public static function getContactIdByCommunicationValue(array $aArgs = []){
+        static::checkRequired($aArgs, ['communicationValue']);
+
+        $aReturn = static::select([
+            'select'    => ['*'],
+            'table'     => ['contact_communication'],
+            'where'     => ['value = ?'],
+            'data'      => [$aArgs['communicationValue']],
+        ]);
+
+        if(empty($aReturn)){
+            return "";
+        } else {
+            return $aReturn[0];
+        }
+        
+    }
+
+    public static function getAddressByExternalContactId(array $aArgs = []){
+        static::checkRequired($aArgs, ['externalContactId']);
+        $aReturn = static::select([
+            'select'    => ['*'],
+            'table'     => ['view_contacts'],
+            'where'     => ['external_contact_id = ?'],
+            'data'      => [$aArgs['externalContactId']],
+        ]);
+
+        if(empty($aReturn)){
+            return "";
+        } else {
+            return $aReturn[0];
+        }
+        
+    }
+
     public static function createContactCommunication(array $aArgs = []){
         static::checkRequired($aArgs, ['contactId', 'type', 'value']);
         static::checkNumeric($aArgs, ['contactId']);
@@ -223,8 +258,6 @@ class ContactsModelAbstract extends Apps_Table_Service
         $queryContactValues = '(';
         $queryAddressFields = '(';
         $queryAddressValues = '(';
-        $iContact           = 0;
-        $iAddress           = 0;
         $currentContactId   = "0";
         $currentAddressId   = "0";
 
@@ -365,6 +398,143 @@ class ContactsModelAbstract extends Apps_Table_Service
         );
         
         return $returnResArray;
+    }
+
+    public static function CreateContactM2M($data, $contactCommunication){
+        $func               = new functions();
+        $data               = $func->object2array($data);
+        $db                 = new Database();
+        $queryContactFields = '(';
+        $queryContactValues = '(';
+        $queryAddressFields = '(';
+        $queryAddressValues = '(';
+        $currentContactId   = "0";
+        $currentAddressId   = "0";
+
+        $countData = count($data);
+
+        for ($i=0;$i<$countData;$i++) {
+
+            // On regarde si le contact existe déjà
+            if (strtoupper($data[$i]['column']) == strtoupper('external_contact_id') && ($data[$i]['value'] <> "" || $data[$i]['value'] <> null)) {
+                try {
+
+                    $stmt = $db->query("SELECT contact_id, ca_id FROM view_contacts WHERE external_contact_id = '" . $data[$i]['value'] . "' and enabled = 'Y'");
+                    $res = $stmt->fetchObject();
+
+                    if ($res->ca_id <> "") {
+                        $contact_exists = true;
+                        $currentContactId = $res->contact_id;
+                        $currentAddressId = $res->ca_id;
+                    } else {
+                        $contact_exists = false;
+                    }
+
+                } catch (Exception $e) {
+                    $returnResArray = array(
+                        'returnCode'  => (int) -1,
+                        'contactId'   => '',
+                        'addressId'   => '',
+                        'contactInfo' => '',
+                        'error'       => 'unknown error: ' . $e->getMessage(),
+                    );  
+                    return $returnResArray;
+                }
+            }
+
+            $data[$i]['column'] = strtolower($data[$i]['column']);
+
+            if ($data[$i]['table'] == "contacts_v2") {
+                //COLUMN
+                $queryContactFields .= $data[$i]['column'] . ',';
+                //VALUE
+                if ($data[$i]['type'] == 'string' || $data[$i]['type'] == 'date') {
+                    $queryContactValues .= "'" . $data[$i]['value'] . "',";
+                } else {
+                    $queryContactValues .= $data[$i]['value'] . ",";
+                }
+            } else if ($data[$i]['table'] == "contact_addresses") {
+                //COLUMN
+                $queryAddressFields .= $data[$i]['column'] . ',';
+                //VALUE
+                if ($data[$i]['type'] == 'string' || $data[$i]['type'] == 'date') {
+                    $queryAddressValues .= "'" . $data[$i]['value'] . "',";
+                } else {
+                    $queryAddressValues .= $data[$i]['value'] . ",";
+                }
+            }
+        }
+
+        $queryContactFields .= "user_id, entity_id, creation_date)";
+        $queryContactValues .= "'superadmin', 'SUPERADMIN', current_timestamp)";
+
+        // Si le contact existe pas, on le créé
+        if (!$contact_exists) {
+
+            $contactInfo = self::getContactIdByCommunicationValue(['communicationValue' => $contactCommunication]);
+            if(!empty($contactInfo)){
+                $currentContactId = $contactInfo['contact_id'];
+            } else {
+                try {
+                    $queryContact = " INSERT INTO contacts_v2 " . $queryContactFields
+                       . ' values ' . $queryContactValues ;
+
+                    $db->query($queryContact);
+
+                    $currentContactId = $db->lastInsertId('contact_v2_id_seq');
+                } catch (Exception $e) {
+                    $returnResArray = array(
+                        'returnCode'  => (int) -1,
+                        'contactId'   => 'ERROR',
+                        'addressId'   => 'ERROR',
+                        'contactInfo' => '',
+                        'error'       => 'contact creation error : '. $e->getMessage(),
+                    );
+                    
+                    return $returnResArray;
+                }
+            }
+            try {
+                $queryAddressFields .= "contact_id, user_id, entity_id)";
+                $queryAddressValues .=  $currentContactId . ", 'superadmin', 'SUPERADMIN')";
+
+                $queryAddress = " INSERT INTO contact_addresses " . $queryAddressFields
+                       . ' values ' . $queryAddressValues ;
+
+                $db->query($queryAddress);
+                $currentAddressId = $db->lastInsertId('contact_addresses_id_seq');
+            } catch (Exception $e) {
+                $returnResArray = array(
+                    'returnCode'  => (int) -1,
+                    'contactId'   => $currentContactId,
+                    'addressId'   => 'ERROR',
+                    'contactInfo' => '',
+                    'error'       => 'address creation error : '. $e->getMessage(),
+                );
+                
+                return $returnResArray;
+            }
+            $returnResArray = array(
+                'returnCode'  => (int) 0,
+                'contactId'   => $currentContactId,
+                'addressId'   => $currentAddressId,
+                'contactInfo' => 'contact created and attached to doc ... '.$queryContactValues,
+                'error'       => '',
+            );
+            
+            return $returnResArray;
+
+        }else{
+            $returnResArray = array(
+                'returnCode'  => (int) 0,
+                'contactId'   => $currentContactId,
+                'addressId'   => $currentAddressId,
+                'contactInfo' => 'contact already exist, attached to doc ... '.$queryContactValues,
+                'error'       => '',
+            );
+            
+            return $returnResArray;
+        }
     }
 
 }

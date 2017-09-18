@@ -68,7 +68,7 @@ class MessageExchangeReviewController
             $RequestSeda                            = new \RequestSeda();
             $messageExchangeReply                   = $RequestSeda->getMessageByReference($messageExchangeData['reference_number'].'_ReplySent');
             $dataObject                             = json_decode($messageExchangeReply->data);
-            $reviewObject->TransferringAgency       = $dataObject->TransferringAgency;
+            $reviewObject->OriginatingAgency        = $dataObject->TransferringAgency;
             $reviewObject->ArchivalAgency           = $dataObject->ArchivalAgency;
 
             /***************** ENVOI SUIVI DEMANDE A L EMETTEUR VIA ALEXANDRE ****************/
@@ -104,6 +104,8 @@ class MessageExchangeReviewController
 
         $dataObject = json_decode($data['data']); //TODO : A REMPLACER PAR EXTRACTION
         $RequestSeda = new \RequestSeda();
+
+        $dataObject->TransferringAgency = $dataObject->OriginatingAgency;
 
         $messageExchange = $RequestSeda->getMessageByReference($dataObject->UnitIdentifier->value);
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveTransferReview']);

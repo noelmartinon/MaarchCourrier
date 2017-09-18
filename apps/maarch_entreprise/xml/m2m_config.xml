@@ -15,5 +15,5 @@
         <contact_purpose_id>1</contact_purpose_id>
     </contact_addresses>
     <basketRedirection_afterUpload>InitBasket</basketRedirection_afterUpload><!--basketId-->
-    <m2m_communication>http://bblier:maarch@192.168.1.194/maarch_v2</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
+    <m2m_communication>http://bblier:maarch@192.168.1.202/maarch_v2</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
 </ROOT>

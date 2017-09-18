@@ -227,7 +227,7 @@ class SendMessageExchangeController
         $aReturn    = [];
 
         $entityRoot = \Entities\Models\EntitiesModel::getEntityRootById(['entityId' => $aArgs['TransferringAgencyInformations']['entity_id']]);
-        $headerNote = $_SESSION['user']['FirstName'] . ' ' . $_SESSION['user']['LastName'] . ' (' . $entityRoot[0]['entity_label'] . ' - ' . $aArgs['TransferringAgencyInformations']['entity_label'] . ') : ';
+        $headerNote = $_SESSION['user']['FirstName'] . ' ' . $_SESSION['user']['LastName'] . ' (' . $entityRoot[0]['entity_label'] . ' - ' . $aArgs['TransferringAgencyInformations']['entity_label'] . ' - ' .$_SESSION['user']['Mail'].') : ';
         $oBody        = new stdClass();
         $oBody->value = $headerNote . ' ' . $aArgs['body'];
         array_push($aReturn, $oBody);

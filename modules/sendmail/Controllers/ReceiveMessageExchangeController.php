@@ -50,7 +50,6 @@ class ReceiveMessageExchangeController
 
         $data = $request->getParams();
 
-
         self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Réception de l\'archive';
         $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
         if(!empty($tmpName['errors'])){
@@ -295,18 +294,18 @@ class ReceiveMessageExchangeController
         array_push($aDataContact, ['column' => 'contact_type',        'value' => $defaultConfigContacts['contact_type'],           'type' => 'integer', 'table' => 'contacts_v2']);
         array_push($aDataContact, ['column' => 'society',             'value' => $transferringAgencyMetadata->LegalClassification, 'type' => 'string',  'table' => 'contacts_v2']);
         array_push($aDataContact, ['column' => 'is_corporate_person', 'value' => 'Y',                                              'type' => 'string',  'table' => 'contacts_v2']);
-        array_push($aDataContact, ['column' => 'external_contact_id', 'value' => $transferringAgency->Identifier->value,           'type' => 'string',  'table' => 'contacts_v2']);
 
         array_push($aDataContact, ['column' => 'contact_purpose_id',  'value' => $defaultConfigAddress['contact_purpose_id'],      'type' => 'integer', 'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'firstname',           'value' => $aPersonName[0],                                  'type' => 'string',  'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'lastname',            'value' => $aPersonName[1],                                  'type' => 'string',  'table' => 'contact_addresses']);
+        array_push($aDataContact, ['column' => 'external_contact_id', 'value' => $transferringAgency->Identifier->value,           'type' => 'string',  'table' => 'contact_addresses']);
         array_push($aDataContact, ['column' => 'departement',         'value' => $transferringAgencyMetadata->Name,                'type' => 'string',  'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'phone',               'value' => $phone,                                           'type' => 'string',  'table' => 'contact_addresses']);
-        array_push($aDataContact, ['column' => 'email',               'value' => $email,                                           'type' => 'string',  'table' => 'contact_addresses']);
-
         $contactModel = new \ContactsModel();
-        $contact      = $contactModel->CreateContact($aDataContact);
-
+        $contactAlreadyCreated = $contactModel->getAddressByExternalContactId(['externalContactId' => $transferringAgency->Identifier->value]);
+        if(!empty($contactAlreadyCreated)){
+            $contact['contactId'] = $contactAlreadyCreated['contact_id'];
+            $contact['addressId'] = $contactAlreadyCreated['ca_id'];
+        } else {
+            $contact = $contactModel->CreateContactM2M($aDataContact, $transferringAgencyMetadata->Communication[0]->value);
+        }
         $contactCommunicationExisted = $contactModel->getContactCommunication([
             "contactId" => $contact['contactId']
         ]);
