@@ -1970,3 +1970,5 @@ if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE'))
 
 if (!defined("_ADDRESS_NB")) define("_ADDRESS_NB","Address number");
 if (!defined('_DATE_CURRENT_USE')) define('_DATE_CURRENT_USE', 'Date current use');
+if (!defined('_DOC_CREATED_WITH_STATUS'))
+    define('_DOC_CREATED_WITH_STATUS', 'Document created with status');
