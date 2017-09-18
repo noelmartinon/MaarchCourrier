@@ -3183,6 +3183,12 @@ function titleWithTooltipster(id){
     });
 }
 
+function titleWithTooltipsterClass(className){
+    $j(document).ready(function() {
+        $j('.'+className).tooltipster({delay :0});
+    });
+}
+
 /** Advanced Search **/
 
 /**

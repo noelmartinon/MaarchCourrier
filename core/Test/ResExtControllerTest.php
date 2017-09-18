@@ -110,7 +110,7 @@ class ResExtControllerTest extends \PHPUnit_Framework_TestCase
         $response = new \Slim\Http\Response();
         $response = $action->create($request, $response, $aArgs);
         
-        $this->assertTrue(json_decode($response->getBody())[0]);
+        $this->assertTrue(json_decode($response->getBody())->status);
 
         $this->deleteResArtefact($resId);
     }

@@ -26,13 +26,36 @@ class ResExtController
 {
     public function create(RequestInterface $request, ResponseInterface $response, $aArgs)
     {
-        if (!empty($aArgs)) {
-            $aArgs = $aArgs;
-        } else {
+        if(empty($aArgs)) {
+            
             $aArgs = $request->getQueryParams();
+
             $aArgs['data'] = json_decode($aArgs['data']);
+
             $aArgs['data'] = $this->object2array($aArgs['data']);
+
+            //FIX pb if data has parent
+            if (isset($aArgs['data']['data'])) {
+                $aArgs['data'] = $aArgs['data']['data'];
+            }
         }
+
+        //*****************************************************************************************
+        //LOG ONLY LOG FOR DEBUG
+        // $file = fopen('storeResourceLogs.log', a);
+        // fwrite($file, '[' . date('Y-m-d H:i:s') . '] new request' . PHP_EOL);
+        // foreach ($aArgs as $key => $value) {
+        //     if ($key <> 'encodedFile') {
+        //         fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $key . ' : ' . $value . PHP_EOL);
+        //     }
+        // }
+        // fclose($file);
+        // ob_flush();
+        // ob_start();
+        // print_r($aArgs['data']);
+        // file_put_contents("storeResourceLogs.log", ob_get_flush());
+        //END LOG FOR DEBUG ONLY
+        //*****************************************************************************************
 
         $return = $this->storeExtResource($aArgs);
 
@@ -44,7 +67,10 @@ class ResExtController
                 );
         }
         
-        return $response->withJson([$return]);
+        //standardize ws response for MaarchCapture
+        $wsReturn['status'] = $return;
+        
+        return $response->withJson($wsReturn);
     }
 
     public function delete(RequestInterface $request, ResponseInterface $response, $aArgs)

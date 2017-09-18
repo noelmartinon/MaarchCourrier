@@ -44,7 +44,14 @@ class ArchiveTransfer
         $messageObject = new stdClass();
         $messageObject = $this->initMessage($messageObject);
 
-        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[] = $this->getArchiveUnit("RecordGrp",null, null, 'folder_1', null, null);
+        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[] = $this->getArchiveUnit(
+            "RecordGrp",
+            null,
+            null,
+            'group_1',
+            null,
+            null
+        );
 
         $result = $startDate = $endDate = '';
         $i = 1;
@@ -58,8 +65,13 @@ class ArchiveTransfer
             $attachments = $this->db->getAttachments($letterbox->res_id);
             $notes = $this->db->getNotes($letterbox->res_id);
             $mails = $this->db->getMails($letterbox->res_id);
+            $links = $this->db->getLinks($letterbox->res_id);
 
-            $archiveUnitId = 'mail_'.$i;
+            if ($links && !array_search($links, $listResId)) {
+                $links = null;
+            }
+
+            $archiveUnitId = 'letterbox_' . $resId;
             if ($letterbox->filename) {
                 $docServers = $this->db->getDocServer($letterbox->docserver_id);
                 $uri = str_replace("##", DIRECTORY_SEPARATOR, $letterbox->path);
@@ -67,10 +79,27 @@ class ArchiveTransfer
                 $uri .= $letterbox->filename;
                 $filePath = $docServers->path_template . $uri;
 
-                $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit("File",$letterbox, $attachments, $archiveUnitId, $letterbox->res_id, 'folder_1');
-                $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject($filePath, $_SESSION['collections'][0]['table'] . '_' . $letterbox->res_id);
+                $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit(
+                    "File",
+                    $letterbox,
+                    $attachments,
+                    $archiveUnitId,
+                    $letterbox->res_id,
+                    $links
+                );
+
+                $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject(
+                    $filePath,
+                    $_SESSION['collections'][0]['table'] . '_' . $letterbox->res_id
+                );
             } else {
-                $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit("File", $letterbox);
+                $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit(
+                    "File",
+                    $letterbox,
+                    null,
+                    null,
+                    null,
+                    $links);
             }
 
             if ($attachments) {
@@ -84,11 +113,25 @@ class ArchiveTransfer
 
                     $filePath = $docServers->path_template . $uri;
                     if ($attachment->attachment_type == "signed_response") {
-                        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit("Response", $attachment, null, 'attachment_'. $i. '_'. $j, "response_" . $attachment->res_id, $archiveUnitId);
-                        $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject($filePath,$_SESSION['collections'][1]['table'] . '_'.  $attachment->res_id);
+                        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit(
+                            "Response",
+                            $attachment,
+                            null,
+                            'attachment_'. $i. '_'. $j,
+                            "response_" . $attachment->res_id,
+                            $archiveUnitId
+                        );
+
+                        $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject(
+                            $filePath,
+                            $_SESSION['collections'][1]['table'] . '_'.  $attachment->res_id
+                        );
                         $j++;
                     } else {
-                        $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject($filePath, $_SESSION['collections'][1]['table']. '_'.  $attachment->res_id);
+                        $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject(
+                            $filePath,
+                            $_SESSION['collections'][1]['table']. '_'.  $attachment->res_id
+                        );
                     }
                 }
             }
@@ -123,14 +166,14 @@ class ArchiveTransfer
             $creationDate = DateTime::createFromFormat($format, $letterbox->creation_date);
             if ($startDate == '') {
                 $startDate = $creationDate;
-            } else if ( date_diff($startDate,$creationDate) > 0 ) {
+            } elseif ( date_diff($startDate, $creationDate) > 0 ) {
                 $startDate = $creationDate;
             }
 
             $modificationDate = DateTime::createFromFormat($format, $letterbox->modification_date);
             if ($endDate == '') {
                 $endDate = $modificationDate;
-            } else if ( date_diff($endDate,$modificationDate) < 0) {
+            } elseif ( date_diff($endDate, $modificationDate) < 0) {
                 $endDate = $modificationDate;
             }
 
@@ -253,8 +296,14 @@ class ArchiveTransfer
         return $messageObject;
     }
 
-    private function getArchiveUnit($type, $object = null, $attachments = null, $archiveUnitId = null, $dataObjectReferenceId = null, $relatedObjectReference = null)
-    {
+    private function getArchiveUnit(
+        $type,
+        $object = null,
+        $attachments = null,
+        $archiveUnitId = null,
+        $dataObjectReferenceId = null,
+        $relatedObjectReference = null
+    ) {
         $archiveUnit = new stdClass();
 
         if ($archiveUnitId) {
@@ -270,7 +319,7 @@ class ArchiveTransfer
                 $archiveUnit->Content = $this->getContent($type, $object);
             }
 
-            if ($object->type_id != 0) {
+            if ($object->type_id && $object->type_id != 0) {
                 $archiveUnit->Management = $this->getManagement($object);
             }
         } else {
@@ -282,11 +331,11 @@ class ArchiveTransfer
             $archiveUnit->DataObjectReference = new stdClass();
             if ($type == 'File') {
                 $archiveUnit->DataObjectReference->DataObjectReferenceId = $_SESSION['collections'][0]['table'] . '_' .$dataObjectReferenceId;
-            } else if ($type == 'Note') {
+            } elseif ($type == 'Note') {
                 $archiveUnit->DataObjectReference->DataObjectReferenceId = 'note_' .$dataObjectReferenceId;
-            } else if ($type == 'Email') {
+            } elseif ($type == 'Email') {
                 $archiveUnit->DataObjectReference->DataObjectReferenceId = 'email_' .$dataObjectReferenceId;
-            } else  {
+            } else {
                 $archiveUnit->DataObjectReference->DataObjectReferenceId = $_SESSION['collections'][1]['table'] . '_' .$dataObjectReferenceId;
             }
 
@@ -298,35 +347,54 @@ class ArchiveTransfer
             foreach ($attachments as $attachment) {
                 if ($attachment->res_id_master == $object->res_id) {
                     if ($attachment->attachment_type != "signed_response") {
-                        $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit("Item",$attachment, null, $archiveUnitId. '_attachment_' . $i , $attachment->res_id);
+                        $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
+                            "Item",
+                            $attachment,
+                            null,
+                            $archiveUnitId. '_attachment_' . $i,
+                            $attachment->res_id
+                        );
                     }
                 }
                 $i++;
             }
         }
 
-        $notes = $this->db->getNotes($object->res_id);
-        if ($notes) {
-            $i = 1;
-            foreach ($notes as $note) {
-                $noteObject = new stdClass();
-                $noteObject->title = 'Note n° ' . $note->id;
-                $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit("Note", $noteObject, null, $archiveUnitId. '_note_' . $i,$note->id);
-                $i++;
+        if ($type != 'Note' && $type != 'Email') {
+            $notes = $this->db->getNotes($object->res_id);
+            if ($notes) {
+                $i = 1;
+                foreach ($notes as $note) {
+                    $note->title = 'Note n° ' . $note->id;
+                    $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
+                        "Note",
+                        $note,
+                        null,
+                        $archiveUnitId . '_note_' . $i,
+                        $note->id
+                    );
+                    $i++;
+                }
             }
         }
 
-        $emails = $this->db->getMails($object->res_id);
-        if ($emails) {
-            $i = 1;
-            foreach ($emails as $email) {
-                $emailObject = new stdClass();
-                $emailObject->title = 'Email n° ' . $email->email_id;
-                $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit("Email", $emailObject, null, $archiveUnitId. '_email_' . $i,$email->email_id);
-                $i++;
+        if ($type != 'Email' && $type != 'Note') {
+            $emails = $this->db->getMails($object->res_id);
+            if ($emails) {
+                $i = 1;
+                foreach ($emails as $email) {
+                    $email->title = 'Email n° ' . $email->email_id;
+                    $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
+                        "Email",
+                        $email,
+                        null,
+                        $archiveUnitId . '_email_' . $i,
+                        $email->email_id
+                    );
+                    $i++;
+                }
             }
         }
-
         if (count($archiveUnit->ArchiveUnit) == 0) {
             unset($archiveUnit->ArchiveUnit);
         }
@@ -340,14 +408,14 @@ class ArchiveTransfer
         $content = new stdClass();
 
         switch ($type) {
-            case 'RecordGrp' :
+            case 'RecordGrp':
                 $content->DescriptionLevel = $type;
                 $content->Title = [];
                 $content->DocumentType = 'Dossier';
 
                 return $content;
                 break;
-            case 'File' :
+            case 'File':
                 $content->DescriptionLevel = $type;
 
                 $sentDate = new DateTime($object->doc_date);
@@ -390,41 +458,52 @@ class ArchiveTransfer
                 $content->Title = [];
                 $content->Title[] = $object->subject;
                 break;
-            case 'Item'      :
+            case 'Item':
             case 'Attachment':
-            case 'Response'  :
-            case 'Note'      :
-            case 'Email'     :
+            case 'Response':
+            case 'Note':
+            case 'Email':
                 $content->DescriptionLevel = "Item";
                 $content->Title = [];
                 $content->Title[] = $object->title;
 
                 if ($type == "Item") {
                     $content->DocumentType = "Pièce jointe";
-                    $content->CreatedDate = $object->creation_date;
+                    $date = new DateTime($object->creation_date);
+                    $content->CreatedDate = $date->format('Y-m-d');
                 } elseif ($type == "Note") {
                     $content->DocumentType = "Note";
-                    $content->CreatedDate = $object->date_note;
+                    $date = new DateTime($object->date_note);
+                    $content->CreatedDate = $date->format('Y-m-d');
                 } elseif ($type == "Email") {
                     $content->DocumentType = "Courriel";
-                    $content->CreatedDate = $object->creation_date;
+                    $date = new DateTime($object->creation_date);
+                    $content->CreatedDate = $date->format('Y-m-d');
                 } elseif ($type == "Response") {
                     $content->DocumentType = "Réponse";
-                    $content->CreatedDate = $object->creation_date;
+                    $date = new DateTime($object->creation_date);
+                    $content->CreatedDate = $date->format('Y-m-d');
                 }
 
                 break;
         }
 
-        if ($type == 'Response') {
-            if (isset($relatedObjectReference)) {
-                $content->RelatedObjectReference = new stdClass();
-                $content->RelatedObjectReference->References = [];
+        if (isset($relatedObjectReference)) {
+            $content->RelatedObjectReference = new stdClass();
+            $content->RelatedObjectReference->References = [];
 
+            if (!is_array($relatedObjectReference)) {
                 $reference = new stdClass();
-                $reference->ArchiveUnitRefId = $relatedObjectReference;
+                $reference->ArchiveUnitRefId = 'letterbox_' . $relatedObjectReference;
                 $content->RelatedObjectReference->References[] = $reference;
+            } else {
+                foreach ($relatedObjectReference as $linkReference) {
+                    $reference = new stdClass();
+                    $reference->ArchiveUnitRefId = 'letterbox_' . $linkReference;
+                    $content->RelatedObjectReference->References[] =  $reference;
+                }
             }
+
         }
 
         if (isset($object->initiator)) {
@@ -437,7 +516,7 @@ class ArchiveTransfer
             $content->CustodialHistory = new stdClass();
             $content->CustodialHistory->CustodialHistoryItem = [];
 
-            $histories = $this->db->getHistory($_SESSION['collections'][0]['view'],$object->res_id);
+            $histories = $this->db->getHistory($_SESSION['collections'][0]['view'], $object->res_id);
             foreach ($histories as $history) {
                 if ($history->event_type != 'VIEW') {
                     $content->CustodialHistory->CustodialHistoryItem[] = $this->getCustodialHistoryItem($history);
@@ -545,7 +624,8 @@ class ArchiveTransfer
         return $custodialHistoryItem;
     }
 
-    private function getEntitie($entityId, $param) {
+    private function getEntitie($entityId, $param)
+    {
         $entitie = $this->db->getEntitie($entityId);
 
         if (!$entitie) {
@@ -553,7 +633,10 @@ class ArchiveTransfer
         }
 
         if (!$entitie->business_id) {
-            $businessId = $this->getEntitieParent($entitie->parent_entity_id,'business_id');
+            $businessId = $this->getEntitieParent(
+                $entitie->parent_entity_id,
+                'business_id'
+            );
 
             if (!$businessId) {
                 return false;
@@ -563,7 +646,10 @@ class ArchiveTransfer
         }
 
         if (!$entitie->archival_agreement) {
-            $archivalAgreement = $this->getEntitieParent($entitie->parent_entity_id,'archival_agreement');
+            $archivalAgreement = $this->getEntitieParent(
+                $entitie->parent_entity_id,
+                'archival_agreement'
+            );
 
             if (!$archivalAgreement) {
                 return false;
@@ -573,7 +659,10 @@ class ArchiveTransfer
         }
 
         if (!$entitie->archival_agency) {
-            $archivalAgency = $this->getEntitieParent($entitie->parent_entity_id,'archival_agency');
+            $archivalAgency = $this->getEntitieParent(
+                $entitie->parent_entity_id,
+                'archival_agency'
+            );
 
             if (!$archivalAgency) {
                 return false;
@@ -585,7 +674,8 @@ class ArchiveTransfer
         return $entitie;
     }
 
-    private function getEntitieParent($parentId,$param) {
+    private function getEntitieParent($parentId, $param)
+    {
         $entitie = $this->db->getEntitie($parentId);
 
         if (!$entitie) {
@@ -596,7 +686,10 @@ class ArchiveTransfer
 
         if ($param == 'business_id') {
             if (!$entitie->business_id) {
-                $res = $this->getEntitieParent($entitie->parent_entity_id,'business_id');
+                $res = $this->getEntitieParent(
+                    $entitie->parent_entity_id,
+                    'business_id'
+                );
             } else {
                 $res = $entitie->business_id;
             }
@@ -604,7 +697,10 @@ class ArchiveTransfer
 
         if ($param == 'archival_agreement') {
             if (!$entitie->archival_agreement) {
-                $res = $this->getEntitieParent($entitie->parent_entity_id,'archival_agreement');
+                $res = $this->getEntitieParent(
+                    $entitie->parent_entity_id,
+                    'archival_agreement'
+                );
             } else {
                 $res = $entitie->archival_agreement;
             }
@@ -612,7 +708,10 @@ class ArchiveTransfer
 
         if ($param == 'archival_agency') {
             if (!$entitie->archival_agency) {
-                $res = $this->getEntitieParent($entitie->parent_entity_id,'archival_agency');
+                $res = $this->getEntitieParent(
+                    $entitie->parent_entity_id,
+                    'archival_agency'
+                );
             } else {
                 $res = $entitie->archival_agency;
             }

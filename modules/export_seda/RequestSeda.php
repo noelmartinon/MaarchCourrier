@@ -25,18 +25,18 @@ require_once "core/class/docservers_controler.php";
 
 class RequestSeda
 {
-	private $db;
+    private $db;
 
-	public function __construct($db = null)
-	{
-	    if ($db) {
-	        $this->db = $db;
+    public function __construct($db = null)
+    {
+        if ($db) {
+            $this->db = $db;
         } else {
             $this->db = new Database();
         }
-	}
+    }
 
-	public function getMessageByReference($reference)
+    public function getMessageByReference($reference)
     {
         $queryParams = [];
 
@@ -44,7 +44,7 @@ class RequestSeda
 
         $query = "SELECT * FROM seda WHERE reference = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
         
         $message = $smtp->fetchObject();
 
@@ -59,7 +59,7 @@ class RequestSeda
 
         $query = "SELECT * FROM seda WHERE message_id = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $message = $smtp->fetchObject();
 
@@ -74,7 +74,7 @@ class RequestSeda
 
         $query = "SELECT res_id FROM unit_identifier WHERE message_id = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
         
         $unitIdentifier = [];
         while ($res = $smtp->fetchObject()) {
@@ -84,20 +84,20 @@ class RequestSeda
         return $unitIdentifier;
     }
 
-	public function getUnitIdentifierByResId($resId)
-	{
-		$queryParams = [];
+    public function getUnitIdentifierByResId($resId)
+    {
+        $queryParams = [];
 
-		$queryParams[] = $resId;
+        $queryParams[] = $resId;
 
-		$query = "SELECT * FROM unit_identifier WHERE res_id = ?";
+        $query = "SELECT * FROM unit_identifier WHERE res_id = ?";
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$unitIdentifier = $res = $smtp->fetchObject();
+        $smtp = $this->db->query($query, $queryParams);
 
-		return $unitIdentifier;
-	}
+        $unitIdentifier = $res = $smtp->fetchObject();
+
+        return $unitIdentifier;
+    }
 
     public function getLetter($resId)
     {
@@ -107,11 +107,29 @@ class RequestSeda
 
         $query = "SELECT * FROM res_view_letterbox WHERE res_id = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $letterbox = $smtp->fetchObject();
 
         return $letterbox;
+    }
+
+    public function getLinks($resId) {
+        $queryParams = [];
+
+        $queryParams[] = $resId;
+
+        $query =
+            "SELECT res_parent,res_child 
+            FROM res_linked 
+            WHERE coll_id = 'letterbox_coll' 
+            AND  res_child = ?";
+
+        $smtp = $this->db->query($query, $queryParams);
+
+        $links = $smtp->fetchObject()->res_parent;
+
+        return $links;
     }
 
     public function getLettersByStatus($status)
@@ -122,7 +140,7 @@ class RequestSeda
 
         $query = "SELECT * FROM res_letterbox WHERE status = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $letters = [];
         while ($res = $smtp->fetchObject()) {
@@ -132,53 +150,53 @@ class RequestSeda
         return $letters;
     }
 
-	public function getDocTypes($typeId)
-	{
-		$queryParams = [];
+    public function getDocTypes($typeId)
+    {
+        $queryParams = [];
 
-		$queryParams[] = $typeId;
+        $queryParams[] = $typeId;
 
-		$query = "SELECT * FROM doctypes WHERE type_id = ?";
+        $query = "SELECT * FROM doctypes WHERE type_id = ?";
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$docTypes = $smtp->fetchObject();
+        $smtp = $this->db->query($query, $queryParams);
 
-		return $docTypes;
-	}
+        $docTypes = $smtp->fetchObject();
 
-	public function getUserInformation($userId) 
-	{
-		$queryParams = [];
+        return $docTypes;
+    }
 
-		$queryParams[] = $userId;
+    public function getUserInformation($userId)
+    {
+        $queryParams = [];
 
-		$query = "SELECT * FROM users WHERE user_id = ?";
+        $queryParams[] = $userId;
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$user = $smtp->fetchObject();
+        $query = "SELECT * FROM users WHERE user_id = ?";
 
-		return $user;
-	}
+        $smtp = $this->db->query($query, $queryParams);
 
-	public function getNotes($letterboxId)
-	{
-		$queryParams = [];
+        $user = $smtp->fetchObject();
 
-		$queryParams[] = $letterboxId;
+        return $user;
+    }
 
-		$query = "SELECT * FROM notes WHERE identifier = ?";
+    public function getNotes($letterboxId)
+    {
+        $queryParams = [];
 
-		$smtp = $this->db->query($query,$queryParams);
+        $queryParams[] = $letterboxId;
 
-		$notes = [];
-		while ($res = $smtp->fetchObject()) {
-			$notes[] = $res;
-		}
+        $query = "SELECT * FROM notes WHERE identifier = ?";
 
-		return $notes;
-	}
+        $smtp = $this->db->query($query, $queryParams);
+
+        $notes = [];
+        while ($res = $smtp->fetchObject()) {
+            $notes[] = $res;
+        }
+
+        return $notes;
+    }
 
     public function getMails($letterboxId)
     {
@@ -188,7 +206,7 @@ class RequestSeda
 
         $query = "SELECT * FROM sendmail WHERE res_id = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $mails = [];
         while ($res = $smtp->fetchObject()) {
@@ -198,86 +216,86 @@ class RequestSeda
         return $mails;
     }
 
-	public function getEntitie($entityId)
-	{
-		$queryParams = [];
+    public function getEntitie($entityId)
+    {
+        $queryParams = [];
 
-		$queryParams[] = $entityId;
+        $queryParams[] = $entityId;
 
-		$query = "SELECT * FROM entities WHERE entity_id = ?";
+        $query = "SELECT * FROM entities WHERE entity_id = ?";
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$entitie = $smtp->fetchObject();
+        $smtp = $this->db->query($query, $queryParams);
 
-		return $entitie;
-	}
+        $entitie = $smtp->fetchObject();
 
-	public function getContact($contactId)
-	{
-		$queryParams = [];
+        return $entitie;
+    }
 
-		$queryParams[] = $contactId;
+    public function getContact($contactId)
+    {
+        $queryParams = [];
 
-		$query = "SELECT * FROM contacts_v2 WHERE contact_id = ?";
+        $queryParams[] = $contactId;
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$contact = $smtp->fetchObject();
+        $query = "SELECT * FROM contacts_v2 WHERE contact_id = ?";
 
-		return $contact;
-	}
+        $smtp = $this->db->query($query, $queryParams);
 
-	public function getDocServer($docServerId)
-	{
-		$queryParams = [];
+        $contact = $smtp->fetchObject();
 
-		$queryParams[] = $docServerId;
+        return $contact;
+    }
 
-		$query = "SELECT * FROM docservers WHERE docserver_id = ?";
+    public function getDocServer($docServerId)
+    {
+        $queryParams = [];
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$docServers = $smtp->fetchObject();
+        $queryParams[] = $docServerId;
 
-		return $docServers;
-	}
+        $query = "SELECT * FROM docservers WHERE docserver_id = ?";
 
-	public function getAttachments($resIdMaster)
-	{
-		$queryParams = [];
+        $smtp = $this->db->query($query, $queryParams);
 
-		$queryParams[] = $resIdMaster;
+        $docServers = $smtp->fetchObject();
 
-		$query = "SELECT * FROM res_attachments WHERE res_id_master = ? AND status != 'DEL'";
+        return $docServers;
+    }
 
-		$smtp = $this->db->query($query,$queryParams);
+    public function getAttachments($resIdMaster)
+    {
+        $queryParams = [];
 
-		$attachments = [];
-		while ($res = $smtp->fetchObject()) {
-			$attachments[] = $res;
-		}
+        $queryParams[] = $resIdMaster;
 
-		return $attachments;
-	}
+        $query = "SELECT * FROM res_attachments WHERE res_id_master = ? AND status != 'DEL'";
 
-	public function getUseContact($orgIdentifier)
-	{
-		$queryParams = [];
+        $smtp = $this->db->query($query, $queryParams);
 
-		$queryParams[] = $orgIdentifier;
-		$queryParams[] = $orgIdentifier;
+        $attachments = [];
+        while ($res = $smtp->fetchObject()) {
+            $attachments[] = $res;
+        }
 
-		$query = "SELECT COUNT(*) FROM seda WHERE sender_org_identifier = ? OR recipient_org_identifier = ?";
+        return $attachments;
+    }
 
-		$smtp = $this->db->query($query,$queryParams);
-		
-		$res = $smtp->fetchObject();
+    public function getUseContact($orgIdentifier)
+    {
+        $queryParams = [];
 
-		return $res;
-	}
+        $queryParams[] = $orgIdentifier;
+        $queryParams[] = $orgIdentifier;
 
-	public function getAcknowledgement($resIdMaster)
+        $query = "SELECT COUNT(*) FROM seda WHERE sender_org_identifier = ? OR recipient_org_identifier = ?";
+
+        $smtp = $this->db->query($query, $queryParams);
+
+        $res = $smtp->fetchObject();
+
+        return $res;
+    }
+
+    public function getAcknowledgement($resIdMaster)
     {
         $queryParams = [];
 
@@ -285,7 +303,7 @@ class RequestSeda
 
         $query = "SELECT * FROM res_attachments WHERE res_id_master = ? and type_id = 1 and status != 'DEL'";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $res = $smtp->fetchObject();
 
@@ -300,7 +318,7 @@ class RequestSeda
 
         $query = "SELECT * FROM res_attachments WHERE res_id_master = ? and type_id = 2 and status != 'DEL'";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $res = $smtp->fetchObject();
 
@@ -316,7 +334,7 @@ class RequestSeda
 
         $query = "SELECT * FROM history WHERE table_name = ? and record_id = ?";
 
-        $smtp = $this->db->query($query,$queryParams);
+        $smtp = $this->db->query($query, $queryParams);
 
         $history = [];
         while ($res = $smtp->fetchObject()) {
@@ -328,7 +346,8 @@ class RequestSeda
 
     /*** Generates a local unique identifier
     @return string The unique id*/
-    public function generateUniqueId(){
+    public function generateUniqueId()
+    {
         $parts = explode('.', microtime(true));
         $sec   = $parts[0];
         if (!isset($parts[1])) {
@@ -347,17 +366,17 @@ class RequestSeda
     {
         $queryParams = [];
 
-        if(empty($messageObject->messageId)){
+        if (empty($messageObject->messageId)) {
             $messageObject->messageId = $this->generateUniqueId();
         }
 
-        if(empty($aArgs['status'])){
+        if (empty($aArgs['status'])) {
             $status = "sent";
         } else {
             $status = $aArgs['status'];
         }
 
-        if(empty($aArgs['fullMessageObject'])){
+        if (empty($aArgs['fullMessageObject'])) {
             $messageObjectToSave = $messageObject;
         } else {
             $messageObjectToSave = $aArgs['fullMessageObject'];
@@ -402,7 +421,7 @@ class RequestSeda
             $queryParams[] = 1; // active
             $queryParams[] = 0; // archived
 
-            $res = $this->db->query($query,$queryParams);
+            $res = $this->db->query($query, $queryParams);
 
         } catch (Exception $e) {
             return false;
@@ -411,11 +430,11 @@ class RequestSeda
         return $messageObject->messageId;
     }
 
-	public function insertAttachment($data,$type)
+    public function insertAttachment($data, $type)
     {
         $docserverControler = new docservers_controler();
 
-	    $fileInfos = array(
+        $fileInfos = array(
             "tmpDir"      => $data->tmpDir,
             "size"        => $data->size,
             "format"      => $data->format,
@@ -583,23 +602,23 @@ class RequestSeda
         return true;
     }
 
-	public function insertUnitIdentifier($messageId, $tableName, $resId) 
-	{
-		try {
-			$query = ("INSERT INTO unit_identifier VALUES (?,?,?)");
-			$queryParams = [];
+    public function insertUnitIdentifier($messageId, $tableName, $resId)
+    {
+        try {
+            $query = ("INSERT INTO unit_identifier VALUES (?,?,?)");
+            $queryParams = [];
 
-			$queryParams[] = $messageId;
-			$queryParams[] = $tableName;
-			$queryParams[] = $resId;
+            $queryParams[] = $messageId;
+            $queryParams[] = $tableName;
+            $queryParams[] = $resId;
 
-			$res = $this->db->query($query,$queryParams);
-		} catch (Exception $e) {
-			return false;
-		}
-		
-		return true;
-	}
+            $res = $this->db->query($query, $queryParams);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
 
     public function updateDataMessage($reference, $data)
     {
@@ -611,7 +630,7 @@ class RequestSeda
         try {
             $query = "UPDATE seda SET data = ? WHERE reference = ?";
 
-            $smtp = $this->db->query($query,$queryParams);
+            $smtp = $this->db->query($query, $queryParams);
         } catch (Exception $e) {
             return false;
         }
@@ -619,7 +638,7 @@ class RequestSeda
         return true;
     }
 
-	public function updateStatusMessage($reference, $status)
+    public function updateStatusMessage($reference, $status)
     {
         $queryParams = [];
         $queryParams[] = $status;
@@ -628,7 +647,7 @@ class RequestSeda
         try {
             $query = "UPDATE seda SET status = ? WHERE reference = ?";
 
-            $smtp = $this->db->query($query,$queryParams);
+            $smtp = $this->db->query($query, $queryParams);
         } catch (Exception $e) {
             return false;
         }
@@ -636,7 +655,7 @@ class RequestSeda
         return true;
     }
 
-	public function updateStatusLetterbox($resId,$status)
+    public function updateStatusLetterbox($resId, $status)
     {
         $queryParams = [];
         $queryParams[] = $status;
@@ -645,7 +664,7 @@ class RequestSeda
         try {
             $query = "UPDATE res_letterbox SET status = ? WHERE res_id = ?";
 
-            $smtp = $this->db->query($query,$queryParams);
+            $smtp = $this->db->query($query, $queryParams);
         } catch (Exception $e) {
             return false;
         }
@@ -653,7 +672,7 @@ class RequestSeda
         return true;
     }
 
-    public function updateStatusAttachment($resId,$status)
+    public function updateStatusAttachment($resId, $status)
     {
         $queryParams = [];
         $queryParams[] = $status;
@@ -662,7 +681,7 @@ class RequestSeda
         try {
             $query = "UPDATE res_attachments SET status = ? WHERE res_id_master = ? AND type_id IN (1,2) ";
 
-            $smtp = $this->db->query($query,$queryParams);
+            $smtp = $this->db->query($query, $queryParams);
         } catch (Exception $e) {
             return false;
         }
@@ -670,35 +689,35 @@ class RequestSeda
         return true;
     }
 
-	public function deleteMessage($messageId)
-	{
-		$queryParams = [];
-		$queryParams[] = $messageId;
-		try {
-			$query = "DELETE FROM seda WHERE message_id = ?";
+    public function deleteMessage($messageId)
+    {
+        $queryParams = [];
+        $queryParams[] = $messageId;
+        try {
+            $query = "DELETE FROM seda WHERE message_id = ?";
 
-			$smtp = $this->db->query($query,$queryParams);
-		} catch (Exception $e) {
-			return false;
-		}
+            $smtp = $this->db->query($query, $queryParams);
+        } catch (Exception $e) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public function deleteUnitIdentifier($resId)
-	{
-		$queryParams = [];
+    public function deleteUnitIdentifier($resId)
+    {
+        $queryParams = [];
 
-		$queryParams[] = $resId;
-		try {
-			$query = "DELETE FROM unit_identifier WHERE res_id = ?";
+        $queryParams[] = $resId;
+        try {
+            $query = "DELETE FROM unit_identifier WHERE res_id = ?";
 
-			$smtp = $this->db->query($query,$queryParams);
-		} catch (Exception $e) {
-			return false;
-		}
+            $smtp = $this->db->query($query, $queryParams);
+        } catch (Exception $e) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 }

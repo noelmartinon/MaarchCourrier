@@ -1308,10 +1308,10 @@ abstract class lists_Abstract extends Database
         $href = $this->_buildMyLink($this->params['viewDocumentLink'], $resultTheLine, $listKey);
 		if ($core->is_module_loaded('thumbnails') === true && !$isAttachment){
             $return .= '<div align="center" class="iconDoc" onmouseover="showThumb(\'thumb_\',\'' . $res_id . '\', \'letterbox_coll\')"><a href="'.$href.'" target="_blank" title="'
-                    ._VIEW_DOC.'"><i class="fa fa-download fa-2x" title="' . _VIEW_DOC . '"></i><span id="thumb_' . $res_id . '" name="thumb_' . $res_id . '"></span></a></div>';			
+                    ._VIEW_DOC.'"><i class="tooltip fa fa-download fa-2x" title="' . _DOWNLOAD_LOCAL_DOC_COPY . '"></i><span id="thumb_' . $res_id . '" name="thumb_' . $res_id . '"></span></a></div>';			
 		}
-		else $return .= '<div align="center" class="iconDoc"><a href="'.$href.'" target="_blank" title="'
-					._VIEW_DOC.'"><i class="fa fa-download fa-2x" title="' . _VIEW_DOC . '"></i></a></div>';
+		else $return .= '<div align="right" class="iconDoc" style="" ><a href="'.$href.'" target="_blank" title="'
+                    ._VIEW_DOC.'"><i class="tooltip fa fa-download fa-2x" title="' . _DOWNLOAD_LOCAL_DOC_COPY . '"></i></a></div>';
            
         return $return;
     }
@@ -1652,10 +1652,11 @@ abstract class lists_Abstract extends Database
             $return = '<a href="' . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
                             . '&module=attachments&page=del_attachment&relation=' . $resultTheLine[1]['value'] . '&id=' . $resultTheLine[0]['value'].'&fromDetail='.$fromDetail.'" class="delete"'
                             . 'onclick="return(confirm(\'' . _REALLY_DELETE . ' ?\n\r\n\r'
-                            . _DEFINITIVE_ACTION . '\'));"><i class="fa fa-trash-o fa-lg" title="'._DELETE.'"></i></a>';
+                            . _DEFINITIVE_ACTION . '\'));"><i class="tooltip fa fa-trash-o fa-2x" title="'._DELETE.'"></i></a>';
         }else{
-            $return = '<a href="" class="delete" style="visibility:hidden;"><i class="fa fa-trash-o fa-lg" title="'._DELETE.'"></i></a>';
+            $return = '<a href="" class="delete" style="visibility:hidden;"><i class="tooltip fa fa-trash-o fa-2x" title="'._DELETE.'"></i></a>';
         }
+        $return .= '<script>titleWithTooltipsterClass("tooltip");</script>';
         return $return;
     }
 
@@ -1680,12 +1681,12 @@ abstract class lists_Abstract extends Database
 
         $core_tools = new core_tools();
         if (($core_tools->test_service('modify_attachments', 'attachments', false) || $typist == $_SESSION['user']['UserId']) && $status <> "TRA") {
-            $return = '<a href="javascript://" class="change" onclick="modifyAttachmentsForm(\'' . $_SESSION['config']['businessappurl']
+            $return = '<a style="padding-left:10px;" href="javascript://" class="change" onclick="modifyAttachmentsForm(\'' . $_SESSION['config']['businessappurl']
                             . 'index.php?display=true&module=attachments&page=attachments_content&id=' . $resultTheLine[0]['value'] . '&relation='.$relation.'&fromDetail='.$fromDetail.'\',\'98%\',\'auto\');">
-                                <i class="fa fa-pencil fa-lg" title="'._MODIFY.'"></i></a>';
+                                <i class="tooltip fa fa-pencil fa-2x fa-lg" title="'._MODIFY.'"></i></a>';
         }else{
             $return = '<a href="javascript://" disabled="disabled" class="change" style="visibility:hidden;">
-                                <i class="fa fa-pencil fa-lg" title="'._MODIFY.'"></i></a>';
+                                <i class="tooltip fa fa-pencil fa-2x" title="'._MODIFY.'"></i></a>';
         }
 
         return $return;

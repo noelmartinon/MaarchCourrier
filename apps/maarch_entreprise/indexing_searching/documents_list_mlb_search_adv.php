@@ -229,7 +229,7 @@ if($mode == 'normal') {
     array_push($select[$view],  "res_id", "res_id as is_labeled", "alt_identifier", "priority", "status", "subject", "category_id as category_img", 
                                 "contact_firstname", "contact_lastname", "contact_society", 
                                 "user_lastname", "user_firstname", "category_id", "dest_user", "type_label", 
-                                "creation_date", "entity_label", "address_id", "exp_user_id", "count_attachment", "is_multicontacts");
+                                "creation_date", "entity_label", "address_id", "exp_user_id", "count_attachment", "is_multicontacts","filename");
     //Cases
     if($core_tools->is_module_loaded("cases") == true) {
         array_push($select[$view], "case_id", "case_label", "case_description");
