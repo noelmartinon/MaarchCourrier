@@ -157,8 +157,8 @@ Mods
 
                <tr  class="##cssLine|col|white ##" >
                     <td width="15%" style="text-align:center">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" >
-                            <tr>
+                        <table width="85%" border="0" cellspacing="0" cellpadding="0" >
+                            <tr style="left: 5%;position: relative;">
                                 <!--<td style="text-align:center;width:25px"><b title="##defineLang|_VERSION##">##loadValue|relation##</b></td>-->
                                 <td style="text-align:center;width:100px">
                                 <b title="##defineLang|_CHRONO_NUMBER##">##loadValue|identifier##</b><br/>
@@ -186,15 +186,17 @@ Mods
                     </td>
                 </tr>
                 <tr class="##cssLineReload##">
-                    <td width="15%" style="text-align:center">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" >
-                            <tr>
-                                <td width="40%"></td>
-                                <td width="15%">
+                    <td width="15%" >
+                        <table width="85%" border="0" cellspacing="0" cellpadding="0" >
+                            <tr >
+                                <td width="40%" style="text-align:right">
                                     <i style="font-size:10px;color:#16ADEB;" title="##defineLang|_VERSION##">##loadValue|relation##</i>
                                     <i style="color:#16ADEB;">##func_previous_version##</i>
                                 </td>
-                                <td width="45%" style="text-align:center;font-size:13px;width:100px" title="##defineLang|_STATUS##"><i>##loadValue|status##</i></td>
+                                <td width="65%" style="text-align:left;" title="##defineLang|_STATUS##">
+                                    <i>##loadValue|status##</i>
+                                </td>
+                                <!--<td width="45%" style="text-align:center;font-size:13px;width:100px" title="##defineLang|_STATUS##"></td>-->
                             </tr>
                         </table>
                     </td>
@@ -221,7 +223,7 @@ Mods
                                     <tbody>
                                         <tr>
                                             <td style="width:30%;text-align:right;">##func_final_version##</td>
-                                            <td style="width:10%;text-align:center;">##func_modify## ##func_delete##</td>
+                                            <td style="width:10%;text-align:center;padding-bottom:5px;">##func_modify## ##func_delete##</td>
                                             <td style="width:1%;text-align:right;">##showIconDocument##</td>
                                         </tr>
                                     </tbody></table>  </td>
