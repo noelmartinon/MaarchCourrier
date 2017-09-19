@@ -224,6 +224,7 @@
       <parameter name="website" type="string" />
       <parameter name="mycontact" type="string" />
       <parameter name="dir" type="identifier" />
+      <parameter name="external_contact_id" type="string" />
     </validationRule>
 
     <validationRule name="admin_action" extends="standardForm" mode="error">
