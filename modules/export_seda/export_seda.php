@@ -86,10 +86,10 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
         $frm_str .= '</div>';
         $frm_str .='<div align="center">';
-        $frm_str .='<input type="button" name="generateMessage" id="generateMessage" class="button"  value="'._GENERATE_MESSAGE.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_generate_message&reference='.$messageObject->MessageIdentifier->value.'\',\'generateMessage\');"/>&nbsp&nbsp&nbsp';
-        $frm_str .='<input type="button" name="zip" id="zip" class="button" style="display: none "  value="'._ZIP.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_seda_zip&reference='.$messageObject->MessageIdentifier->value.'\',\'zip\');"/>&nbsp&nbsp&nbsp';
+        //$frm_str .='<input type="button" name="generateMessage" id="generateMessage" class="button"  value="'._GENERATE_MESSAGE.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_generate_message&reference='.$messageObject->MessageIdentifier->value.'\',\'generateMessage\');"/>&nbsp&nbsp&nbsp';
+        $frm_str .='<input type="button" name="zip" id="zip" class="button"  value="'._ZIP.'" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_generate_message&reference='.$messageObject->MessageIdentifier->value.'|'.$path_to_script.'&page=Ajax_seda_zip&reference='.$messageObject->MessageIdentifier->value.'\',\'zip\');"/>&nbsp&nbsp&nbsp';
         if (file_exists(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml")) {
-            $frm_str .= '<input type="button" name="sendMessage" id="sendMessage" style="display: none " class="button"  value="' . _SEND_MESSAGE . '" onclick="actionSeda(\'' . $path_to_script . '&page=Ajax_transfer_SAE&reference=' . $messageObject->MessageIdentifier->value . '&resIds=' . $result . '\',\'sendMessage\');"/>';
+            $frm_str .= '<input type="button" name="sendMessage" id="sendMessage" style="disabled: disabled " class="button"  value="' . _SEND_MESSAGE . '" onclick="actionSeda(\''.$path_to_script.'&page=Ajax_generate_message&reference='.$messageObject->MessageIdentifier->value.'|'. $path_to_script . '&page=Ajax_transfer_SAE&reference=' . $messageObject->MessageIdentifier->value . '&resIds=' . $result . '\',\'sendMessage\');"/>';
         }
             $frm_str .='</div>';
 

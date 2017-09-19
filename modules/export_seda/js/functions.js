@@ -1,62 +1,67 @@
-function actionSeda($path,$type) {
-    if ($type == 'zip') {
-        window.open($path);
-        $("validSend").style.display = 'block';
-    } else if ($type == 'generateMessage') {
-        $path += '&messageTitle=' + $('messageTitle').value;
-        new Ajax.Request($path,
-            {
-                method:'post',
-                parameters: { url : $path,
-                },
-                onSuccess: function(answer) {
-                    eval("response = "+answer.responseText);
+function actionSeda(path,type) {
+    var resPath = path.split('|');
 
-                    if(response.status == 0){
-                            $("zip").style.display = 'inline';
-                            $("sendMessage").style.display = 'inline';
-                            $('generateMessage').style.display = 'none';
-                            $('messageTitle').disabled = true;
-                    } else {
-                        alert(response.error);
-                    }
-                }
-            }
-        );
-    } else {
-    	new Ajax.Request($path,
-            {
-                method:'post',
-                parameters: { url : $path,
-                            },
-                onSuccess: function(answer) {
-                    eval("response = "+answer.responseText);
-                    if(response.status == 0){
-                        if ($type != "validateMessage") {
-                            $("valid").style.display = 'block';
-                            $("validSend").style.display = 'none';
-                            $("cancel").style.display = 'none';
-                            $("sendMessage").style.display = 'none';
-
-                            alert(response.content);
-                        } else {
-                            $("cancel").click();
-                            location.reload();
-                        }
-                    } else {
-                        alert(response.error);
-                    }
-                }
-            }
-        );
+    if (type == 'zip' || type == 'sendMessage') {
+        resPath[0] += '&messageTitle=' + $('messageTitle').value;
     }
+
+    new Ajax.Request(resPath[0],
+        {
+            method: 'post',
+            parameters: {
+                url: resPath[0]
+            },
+            onSuccess: function (answer) {
+                eval("response = " + answer.responseText);
+                if (response.status == 0) {
+                    if (type == "validateMessage") {
+                        $("cancel").click();
+                        location.reload();
+                    } else {
+                        $('messageTitle').disabled = true;
+
+                        if (type == 'zip') {
+                            window.open(resPath[1]);
+
+                            if ($("cancel").style.display != 'none') {
+                                $("validSend").style.display = 'block';
+                            }
+                        } else if (type == 'sendMessage') {
+                            new Ajax.Request(resPath[1],
+                                {
+                                    method:'post',
+                                    parameters: { url : resPath[1]
+                                    },
+                                    onSuccess: function(answer) {
+                                        eval("response = "+answer.responseText);
+                                        if(response.status == 0){
+                                            $("valid").style.display = 'block';
+                                            $("validSend").style.display = 'none';
+                                            $("cancel").style.display = 'none';
+                                            $("sendMessage").style.display = 'none';
+
+                                            alert(response.content);
+                                        } else {
+                                            alert(response.error);
+                                        }
+                                    }
+                                }
+                            );
+                        }
+                    }
+                } else {
+                    alert(response.error);
+                }
+            }
+        }
+    );
 }
 
-function actionValidation($path,$type) {
-    new Ajax.Request($path,
+function actionValidation(path,type) {
+    new Ajax.Request(path,
         {
             method:'post',
-            parameters: { url : $path},
+            parameters: { url : path},
             onSuccess: function(answer) {
                 eval("response = "+answer.responseText);
                 if(response.status == 0){

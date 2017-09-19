@@ -21,16 +21,18 @@
     require_once __DIR__ . '/RequestSeda.php';
     require_once __DIR__ . '/class/AbstractMessage.php';
 
-	$status = 0;
-	$error = $content = '';
+    $status = 0;
+    $error = $content = '';
     if (!$_REQUEST['messageTitle']) {
         $status = 1;
         $error = _MESSAGE_TITLE_EMPTY;
     } else {
         if ($_REQUEST['reference']) {
-            $abstractMessage = new AbstractMessage();
-            $abstractMessage->addTitleToMessage($_REQUEST['reference'],$_REQUEST['messageTitle']);
-            $abstractMessage->generatePackage($_REQUEST['reference'],'ArchiveTransfer');
+            if (!file_exists(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR. $_REQUEST['reference'] .DIRECTORY_SEPARATOR. $_REQUEST['reference'] . '.xml')) {
+                $abstractMessage = new AbstractMessage();
+                $abstractMessage->addTitleToMessage($_REQUEST['reference'],$_REQUEST['messageTitle']);
+                $abstractMessage->generatePackage($_REQUEST['reference'],'ArchiveTransfer');
+            }
 
             if ($status != 0) {
                 $error = $res['error'];
