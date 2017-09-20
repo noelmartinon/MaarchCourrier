@@ -980,9 +980,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                     if ($indexes[$key]['type_field'] == 'input')
                                     {
                                         ?>
-                                        <!--<input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($indexes[$key]['show_value']);?>" <?php if (!isset($indexes[$key]['readonly']) || $indexes[$key]['readonly'] == true){ echo 'readonly="readonly" class="readonly"';}else if ($indexes[$key]['type'] == 'date'){echo 'onclick="showCalender(this);"';}?> style="width: 99%; font-size:100%"  title="<?php functions::xecho($indexes[$key]['show_value']);?>" alt="<?php functions::xecho($indexes[$key]['show_value']);?>"   />-->
-                                        <textarea name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($indexes[$key]['show_value']);?>" <?php if (!isset($indexes[$key]['readonly']) || $indexes[$key]['readonly'] == true){ echo 'readonly="readonly" class="readonly"';}else if ($indexes[$key]['type'] == 'date'){echo 'onclick="showCalender(this);"';}?> style="width: 200px; "  title="<?php functions::xecho($indexes[$key]['show_value']);?>" alt="<?php functions::xecho($indexes[$key]['show_value']);?>" ></textarea>
-                                        
+                                        <input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($indexes[$key]['show_value']);?>" <?php if (!isset($indexes[$key]['readonly']) || $indexes[$key]['readonly'] == true){ echo 'readonly="readonly" class="readonly"';}else if ($indexes[$key]['type'] == 'date'){echo 'onclick="showCalender(this);"';}?> size="40"  title="<?php functions::xecho($indexes[$key]['show_value']);?>" alt="<?php functions::xecho($indexes[$key]['show_value']);?>"   />
                                         <?php
                                     }
                                     else
