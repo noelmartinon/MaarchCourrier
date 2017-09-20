@@ -74,6 +74,19 @@ class functions
         return utf8_encode($string);
     }
 
+    public function normalizeAccent($string)
+    {
+        $a = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ'
+            . 'ßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ°';
+        $b = 'aaaaaaaceeeeiiiidnoooooouuuuy'
+            . 'bsaaaaaaaceeeeiiiidnoooooouuuyybyRr ';
+        $string = utf8_decode($string);
+        $string = strtr($string, utf8_decode($a), $b);
+        //$string = strtolower($string);
+
+        return utf8_encode($string);
+    }
+
     /**
     * Cuts a string at the maximum number of char to displayed
     *

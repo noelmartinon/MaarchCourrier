@@ -332,6 +332,17 @@ class Database extends functions
                     /*if (empty($parameters[$value])) {
 
                     }*/
+                    if (
+                        $_SESSION['config']['databasetype'] == 'ORACLE' 
+                        /*&& 
+                        (
+                            stripos($queryString, 'insert') !== false ||
+                            stripos($queryString, 'update') !== false
+                        )*/
+                    ) {
+                        $parameters[$key] = $this->normalizeAccent($value);
+                        //echo $parameters[$key] . '<br/>';
+                    }
                 }
             }
         }
