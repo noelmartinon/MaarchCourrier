@@ -507,6 +507,8 @@ class SendMessageExchangeController
         $oData->replyCode                             = new stdClass();
         $oData->replyCode->value                      = $replyCode;
 
+        $dataObject = self::cleanBase64Value(['dataObject' => $dataObject]);
+
         $aDataExtension = [
             'status'            => 'W',
             'fullMessageObject' => $dataObject,
@@ -548,11 +550,13 @@ class SendMessageExchangeController
     {
         $dataObject = $aArgs['dataObject'];
         $aCleanDataObject = [];
-        foreach ($dataObject->DataObjectPackage->BinaryDataObject as $key => $value) {
-            $value->Attachment->value = "";
-            $aCleanDataObject[$key] = $value;
+        if(!empty($dataObject->DataObjectPackage->BinaryDataObject)){
+            foreach ($dataObject->DataObjectPackage->BinaryDataObject as $key => $value) {
+                $value->Attachment->value = "";
+                $aCleanDataObject[$key] = $value;
+            }
+            $dataObject->DataObjectPackage->BinaryDataObject = $aCleanDataObject;
         }
-        $dataObject->DataObjectPackage->BinaryDataObject = $aCleanDataObject;
         return $dataObject;
     }
 }

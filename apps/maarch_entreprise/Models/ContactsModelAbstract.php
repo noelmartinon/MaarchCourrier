@@ -26,7 +26,7 @@ class ContactsModelAbstract extends Apps_Table_Service
 
         $aReturn = static::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['contacts_v2'],
+            'table'     => empty($aArgs['table']) ? ['contacts_v2'] : $aArgs['table']    ,
             'where'     => ['contact_id = ?'],
             'data'      => [$aArgs['id']],
         ]);

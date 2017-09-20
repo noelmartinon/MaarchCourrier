@@ -251,7 +251,7 @@ if ($mode == 'add') {
         }
         if(!empty($contact_id)){
             $communicationTypeModel = ContactsModel::getContactCommunication(['contactId' => $contact_id]);
-            $contactInfo            = ContactsModel::getById(['id' => $contact_id]);
+            $contactInfo            = ContactsModel::getById(['id' => $contact_id, 'table' => ['view_contacts']]);
             if(!empty($communicationTypeModel) && !empty($contactInfo[0]['external_contact_id'])){
                 $adress_mail = ContactsModel::getContactFullLabel(['addressId' => $address_id]);
                 $adress_mail .= '. (' . _COMMUNICATION_TYPE . ' : '.$communicationTypeModel['value'] . ')';
