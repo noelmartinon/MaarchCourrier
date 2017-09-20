@@ -231,9 +231,15 @@ class Database extends functions
                 return $resultat_last->lastinsertid;
             case 'SQLSERVER'    : return '';
             case 'ORACLE'       : 
-                //$stmt_last_insert = $this->query("SELECT " . $sequenceName . ".currval as lastinsertid FROM dual");
-                $stmt_last_insert = $this->query("SELECT to_char(Last_number) as lastinsertid FROM user_sequences where upper(sequence_name) = upper('" . $sequenceName . "')");
+                $sequenceName = strtoupper($sequenceName);
+                $stmt_last_insert = $this->query("SELECT " . $sequenceName . ".currval as lastinsertid FROM dual");
                 $resultat_last = $stmt_last_insert->fetchObject();
+
+                if (empty($resultat_last->lastinsertid)) {
+                    $stmt_last_insert = $this->query("SELECT to_char(Last_number) as lastinsertid FROM user_sequences where upper(sequence_name) = upper('" . $sequenceName . "')");
+                    $resultat_last = $stmt_last_insert->fetchObject();
+                }
+
                 return $resultat_last->lastinsertid;
             default             : return false;
         }   
