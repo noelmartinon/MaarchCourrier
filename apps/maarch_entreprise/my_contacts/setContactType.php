@@ -57,6 +57,8 @@ while($res = $stmt->fetchObject()){
     
     $iCount++;
 }
-
+if($stmt->rowCount()==0){
+    echo "false";
+}
 echo $frmStr;
 exit;

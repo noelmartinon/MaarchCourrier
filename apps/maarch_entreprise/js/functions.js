@@ -1796,6 +1796,27 @@ function setContactType(mode, creation){
     });
 }
 
+function checkContactType(mode,creation){
+    var bool = false;
+    $j.ajax({
+        url: 'index.php?dir=my_contacts&page=setContactType&display=false',
+        type: 'POST',
+        async: false,
+        data: {
+            contact_target: mode,
+            can_add_contact: creation
+        },
+        success: function(answer){
+            if(answer.substring(0,5)=='false'){
+                bool =false;
+            } else{
+                bool =true;
+            }
+        }
+    });
+    return bool;
+}
+
 /**
  * Show or hide the data related to a person in the contacts admin
  *

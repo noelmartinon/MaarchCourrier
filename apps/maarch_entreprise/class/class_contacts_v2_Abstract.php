@@ -482,9 +482,13 @@ abstract class contacts_v2_Abstract extends Database
                 <table id="frmcontact_table">
                     <tr>
                         <td>&nbsp;</td>
-                        <td class="indexing_field">
-                            <input type="radio"  class="check" name="is_corporate"  value="Y" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'Y'){?> checked="checked"<?php } ?>/ onclick="javascript:show_admin_contacts( true, '<?php functions::xecho($display_value);?>');setContactType('corporate', '<?php echo ($can_add_contact);?>')" id="corpo_yes"><span onclick="$('corpo_yes').click();" onmouseover="this.style.cursor='pointer';"><?php echo _IS_CORPORATE_PERSON;?></span>
-                            <input type="radio"  class="check" name="is_corporate" value="N" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N'){?> checked="checked"<?php } ?> onclick="javascript:show_admin_contacts( false, '<?php functions::xecho($display_value);?>');setContactType('no_corporate', '<?php echo ($can_add_contact);?>')" id="corpo_no"><span onclick="$('corpo_no').click();" onmouseover="this.style.cursor='pointer';"><?php echo _INDIVIDUAL;?></span>
+                        <td class="indexing_field" style="text-align:center">
+                            <span id="span_corporate">
+                                <input type="radio"  class="check" name="is_corporate"  value="Y" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'Y'){?> checked="checked"<?php } ?>/ onclick="javascript:show_admin_contacts( true, '<?php functions::xecho($display_value);?>');setContactType('corporate', '<?php echo ($can_add_contact);?>')" id="corpo_yes"><span onclick="$j('#corpo_yes').click();" onmouseover="this.style.cursor='pointer';"><?php echo _IS_CORPORATE_PERSON;?></span>                        
+                            </span>
+                            <span id="span_no_corporate">
+                                <input type="radio"  class="check" name="is_corporate" value="N" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N'){?> checked="checked"<?php } ?> onclick="javascript:show_admin_contacts( false, '<?php functions::xecho($display_value);?>');setContactType('no_corporate', '<?php echo ($can_add_contact);?>')" id="corpo_no"><span onclick="$j('#corpo_no').click();" onmouseover="this.style.cursor='pointer';"><?php echo _INDIVIDUAL;?></span>
+                            </span>
                         </td>
                         <td>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </td>
                         <td>&nbsp;</td>
@@ -631,6 +635,24 @@ abstract class contacts_v2_Abstract extends Database
                 </form>
 
                 <script type="text/javascript">setContactType("<?php if(isset($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']) && $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N' ){ echo 'no_corporate'; } else { echo 'corporate'; }?>", '<?php echo ($can_add_contact);?>');</script>
+                <script type="text/javascript">
+                    if(!checkContactType('no_corporate','<?php echo ($can_add_contact);?>'))
+                    {
+                        $j('#span_no_corporate').css('display','none');
+                    } else {
+                        setContactType('no_corporate','<?php echo ($can_add_contact);?>');
+                        $j('#corpo_no').prop('checked',true);
+                    }
+                    if(!checkContactType('corporate','<?php echo ($can_add_contact);?>'))
+                    {
+                        $j('#span_corporate').css('display','none');
+                    } else {
+                        setContactType('corporate','<?php echo ($can_add_contact);?>');
+                        $j('#corpo_yes').prop('checked',true);
+                    }
+
+                    
+                </script>
 
             <?php
                 if($mode=="up" && $admin)
