@@ -231,7 +231,7 @@ class Database extends functions
                 return $resultat_last->lastinsertid;
             case 'SQLSERVER'    : return '';
             case 'ORACLE'       : 
-                $sequenceName = strtoupper($sequenceName);
+                //$sequenceName = strtoupper($sequenceName);
                 $stmt_last_insert = $this->query("SELECT " . $sequenceName . ".currval as lastinsertid FROM dual");
                 $resultat_last = $stmt_last_insert->fetchObject();
 
