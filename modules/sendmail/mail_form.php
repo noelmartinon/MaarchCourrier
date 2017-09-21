@@ -42,7 +42,9 @@ require_once 'modules/sendmail/sendmail_tables.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/class/class_email_signatures.php';
-    
+require_once 'apps/maarch_entreprise/services/Table.php'; 
+require_once 'core/Models/UserModel.php'; 
+
 $core_tools     = new core_tools();
 $request        = new request();
 $sec            = new security();
@@ -101,6 +103,19 @@ $core_tools->load_html();
 $core_tools->load_header('', true, false);           
 ?><body><?php
 $core_tools->load_js(); 
+
+$aUserEntities = \Core\Models\UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
+$userEntities = [];
+foreach ($aUserEntities as $value) {
+    $userEntities[] = $value['entity_id'];
+}
+$userTemplates = Apps_Table_Service::select(['select'   => ['t.template_id', 't.template_label', 't.template_content'],
+                                            'table'     => ['templates t', 'templates_association ta'],
+                                            'left_join' => ['t.template_id = ta.template_id'],
+                                            'where'     => ['t.template_target = \'sendmail\'', '(ta.value_field is null or value_field in (?))'],
+                                            'data'      => [$userEntities]
+                                        ]);
+
 //ADD
 if ($mode == 'add') {
     $content .= '<div class="block">';
@@ -424,10 +439,9 @@ if ($mode == 'add') {
                             . '&module=templates&page=templates_ajax_content_for_mails&id=' . $_REQUEST['identifier'] . '\');">';
 
     $content .= '<option value="">' . _ADD_TEMPLATE_MAIL . '</option>';
-    
-    $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail'");
-    while ( $result=$stmt->fetchObject()) {
-        $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
+
+    foreach ( $userTemplates as $result) {
+        $content .= "<option value='" . $result['template_id'] ."'>" . $result['template_label'] . "</option>";
     }
     $content .= '</select>';
     $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
@@ -803,10 +817,9 @@ if ($mode == 'add') {
                                     . '&module=templates&page=templates_ajax_content_for_mails&id=' . $_REQUEST['identifier'] . '\');">';
 
             $content .= '<option value="">' . _ADD_TEMPLATE_MAIL . '</option>';
-            
-            $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail'");
-            while ( $result=$stmt->fetchObject()) {
-                $content .= "<option value='" . $result->template_id ."'>" . $result->template_label . "</option>";
+
+            foreach ( $userTemplates as $result) {
+                $content .= "<option value='" . $result['template_id'] ."'>" . $result['template_label'] . "</option>";
             }
             $content .='</select>';
             $content .= '<label style="margin-left: 15%;padding-right:10px">' . 'Signature : ' . '</label>';
