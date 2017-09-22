@@ -125,18 +125,6 @@ if (count($_REQUEST['meta']) > 0) {
                 $arrayPDO = array_merge($arrayPDO, array(":serviceChosen" => $_REQUEST['services_chosen']));
                 $json_txt .= '],';
             } 
-            elseif ($tab_id_fields[$j] == 'initiatorServices_chosen' && isset($_REQUEST['initiatorServices_chosen'])) {
-                $json_txt .= " 'initiatorServices_chosen' : [";
-
-                for ($get_i = 0; $get_i <count($_REQUEST['initiatorServices_chosen']); $get_i++) {
-                    $json_txt .= "'".$_REQUEST['initiatorServices_chosen'][$get_i]."',";
-                }
-                $json_txt = substr($json_txt, 0, -1);
-                $where_request .= " initiator IN  (:initiatorServiceChosen) ";
-                $where_request .=" and  ";
-                $arrayPDO = array_merge($arrayPDO, array(":initiatorServiceChosen" => $_REQUEST['initiatorServices_chosen']));
-                $json_txt .= '],';
-            }
             elseif ($tab_id_fields[$j] == 'multifield' && !empty($_REQUEST['multifield'])) {
                 // MULTIFIELD : subject, title, doc_custom_t1, process notes
                 $json_txt .= "'multifield' : ['".addslashes(trim($_REQUEST['multifield']))."'],";

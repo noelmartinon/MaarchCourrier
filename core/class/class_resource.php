@@ -207,6 +207,16 @@
                     )
                 );
                 $res = $stmt->fetchObject();
+
+                 if($table_res == 'res_letterbox'){
+                    require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_history.php");
+                    $hist = new history();
+                    $hist->add(
+                        $table_res,
+                        $res->res_id, 'ADD', 'resadd',
+                        _DOC_CREATED, $_SESSION['config']['databasetype'], 'apps');
+                }
+
                 return $res->res_id;
             }
         }
