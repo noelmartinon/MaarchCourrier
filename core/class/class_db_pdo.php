@@ -172,7 +172,7 @@ class Database extends functions
                         . "(SERVICE_NAME = " . $this->database . ")"
                     . ")"
                 . ")";
-            $this->dsn = "oci:dbname=" . $tns;
+            $this->dsn = "oci:dbname=" . $tns . ";charset=utf8";
         } else
             $this->dsn = $this->driver
                 . ':host=' . $this->server
@@ -346,7 +346,7 @@ class Database extends functions
                             stripos($queryString, 'update') !== false
                         )*/
                     ) {
-                        $parameters[$key] = $this->normalizeAccent($value);
+                        //$parameters[$key] = $this->normalizeAccent($value);
                         //echo $parameters[$key] . '<br/>';
                     }
                 }
