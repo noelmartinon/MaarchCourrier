@@ -1579,7 +1579,7 @@ if (!defined("_SUBLIST"))                           define("_SUBLIST", "Sous-lis
 if (!defined("_TOGGLE"))                            define("_TOGGLE", "Afficher / Masquer");
 if (!defined("_HELP_LIST_KEYWORDS"))                define("_HELP_LIST_KEYWORDS", "Aide sur les clauses de verrouillage");
 if (!defined("_HELP_LIST_KEYWORD1"))                define("_HELP_LIST_KEYWORD1", "<b>Les opérateurs de comparaison</b> permettent de comparer deux valeurs: a == b :Egal, a <> b ou a != b :Différent, a < b : Plus petit que, a > b : Plus grand.");
-if (!defined("_HELP_LIST_KEYWORD2"))                define("_HELP_LIST_KEYWORD2", "<b>Les opérateurs logiques</b>: a && b: ET ( And )	Vrai si a ET b sont vrais, a || b OU ( Or )	Vrai si a OU b est vrai.");
+if (!defined("_HELP_LIST_KEYWORD2"))                define("_HELP_LIST_KEYWORD2", "<b>Les opérateurs logiques</b>: a && b: ET ( And )   Vrai si a ET b sont vrais, a || b OU ( Or ) Vrai si a OU b est vrai.");
 if (!defined("_HELP_LIST_KEYWORD_EXEMPLE_TITLE"))   define("_HELP_LIST_KEYWORD_EXEMPLE_TITLE", "Condition de verrouillage des lignes la liste/sous-liste.<br><br>L'ajout du paramètre <b>@@nom_du_champ@@</b> permet de faire référence à la valeur du champ de critère. Il est possible de mettre plusieurs @@nom_du_champ@@ différents dans la déclaration.");
 if (!defined("_HELP_LIST_KEYWORD_EXEMPLE"))         define("_HELP_LIST_KEYWORD_EXEMPLE", "Ex: @@status@@ <> 'NEW' || '@@type_id@@ <> '10'<br><br>Ex: (@@doctype_secon_level =='50' && @@dest_user@@=='bblier\") || doctype_secon_level == '10'");
 if (!defined("_SYNTAX_ERROR_LOCK_CLAUSE"))          define("_SYNTAX_ERROR_LOCK_CLAUSE", "Erreur dans la syntaxe de la clause de verrouillage");
@@ -1982,5 +1982,5 @@ if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE'))
     define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucun tag de disponible pour une mise à jour');
 if (!defined('_DATE_CURRENT_USE'))
     define('_DATE_CURRENT_USE', 'Date limite d\'utilité courante');
-if (!defined('_DOC_CREATED_WITH_STATUS'))
-    define('_DOC_CREATED_WITH_STATUS', 'Document créé avec le statut');
+if (!defined('_DOC_CREATED'))
+    define('_DOC_CREATED', 'Document créé');
