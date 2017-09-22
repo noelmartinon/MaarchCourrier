@@ -163,7 +163,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         $allowedTags .= '<table><tr><td><th><tbody><thead><tfooter><caption>'; // Tables
         $allowedTags .= '<form><input><textarea><select>'; // Forms
         $template->template_content = strip_tags($template->template_content, $allowedTags);
-        $template->template_content = $f->protect_string_db($template->template_content);
         
         $template->template_type = $f->protect_string_db(
             $f->wash($template->template_type, 'no', _TEMPLATE_TYPE.' ', 'yes', 0, 32)
