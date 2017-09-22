@@ -28,7 +28,7 @@
 * @version $Revision$
 * @ingroup admin
 */
-require "core" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR
+require_once "core" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR
     . "class_history.php";
 $core = new core_tools();
 $core->test_admin('admin_contacts', 'apps');
