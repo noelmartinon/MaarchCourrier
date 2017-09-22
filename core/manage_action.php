@@ -163,12 +163,6 @@ elseif(trim($_POST['req']) == 'change_status' && !empty($_POST['values']) && !em
                     echo "{status : 1, error_txt : '".addslashes(_ERROR_WITH_STATUS." ".functions::xssafe($query_str))."'}";
                     exit();
                 }
-                require_once("core".DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_history.php");
-                $hist = new history();
-                $hist->add(
-                    $_POST['table'],
-                    $arr_id[$i], 'ACTION#', 'resadd',
-                    _DOC_CREATED_WITH_STATUS . ' : '. $lineStatus->label_status, $_SESSION['config']['databasetype'], 'apps');
             }
         }
         echo json_encode(['status' => 0, 'error_txt' => _STATUS_UPDATED.' : '.functions::xssafe($_POST['new_status']) ]);
