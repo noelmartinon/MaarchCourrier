@@ -125,7 +125,7 @@ abstract class avis_controler_Abstract
                                 $dropZone = '';
                             }
                         } else {
-                            $dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>';
+                            $dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
                             $vised = '';
                             if ($bool_modif == true) {
                                 $modif = 'true';

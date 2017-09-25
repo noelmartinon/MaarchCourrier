@@ -575,7 +575,7 @@ abstract class visa_Abstract extends Database
                                 }
 								if($core->test_service('modify_visa_in_signatureBook', 'visa', false)){
 									$modif = 'true';
-									$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>';
+									$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
                                     $del_vis = '<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);" title="'._DELETE.'"></i>';
 								}else{
 									$modif = 'false';
@@ -584,7 +584,7 @@ abstract class visa_Abstract extends Database
 
 
                             }else{
-							   $dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>';
+							   $dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
                                $vised = ''; 
                                if($bool_modif == true){
                                    $modif = 'true';
@@ -672,14 +672,14 @@ abstract class visa_Abstract extends Database
                             }
 							if($core->test_service('modify_visa_in_signatureBook', 'visa', false)){
 								$modif = 'true';
-								$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>';
+								$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
 								$del_vis = '<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);" title="'._DELETE.'"></i>';
 							}else{
 								$modif = 'false';
 							}
 
                         }else{
-							$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>';
+							$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
                            $vised = ''; 
                            if($bool_modif == true){
                                $modif = 'true';

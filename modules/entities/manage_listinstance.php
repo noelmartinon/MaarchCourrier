@@ -787,19 +787,19 @@ $linkwithwhat =
 						<td class="action_entities" style="width:15%;"><!-- Switch copy to dest --><?php
 							//if($role_id == 'dest' && isset($roles['copy']) && ($role_id != 'dest' && $onlyCc)) { 
 							if($role_id == 'dest' && isset($roles['copy']) && !$onlyCc && $_SESSION[$origin]['diff_list']['copy']['users'][0]!='') {?>
-								<a href="<?php functions::xecho($linkwithwhat);?>&action=dest_to_copy&role=copy"><i class="fa fa-arrow-down"></i><?php echo _TO_CC;?></a><?php
+								<a href="<?php functions::xecho($linkwithwhat);?>&action=dest_to_copy&role=copy" title="<?php echo _GO_TO_CC;?>"><i class="fa fa-arrow-down"></i>&nbsp;<?php echo _TO_CC;?></a><?php
 							} elseif($role_id == 'copy' && !$onlyCc &&  isset($roles['dest'])) { ?>
-								<a href="<?php echo($linkwithwhat);?>&action=copy_to_dest&role=copy&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-up"></i><?php echo _TO_DEST;?></a><?php
+								<a href="<?php echo($linkwithwhat);?>&action=copy_to_dest&role=copy&rank=<?php functions::xecho($i);?>" title="<?php echo _GO_TO_DEST;?>"><i class="fa fa-arrow-up"></i>&nbsp;<?php echo _TO_DEST;?></a><?php
 							} else echo '&nbsp;'?>
 						</td>
 						<td class="action_entities" style="width:5%;"><!-- Move up in list --><?php 
 							if($i > 0) { ?>
-								<a href="<?php echo($linkwithwhat);?>&action=move_user_up&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-up"></i></a><?php
+								<a href="<?php echo($linkwithwhat);?>&action=move_user_up&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-up" title="<?php echo _UP_USER_ONE_ROW;?>"></i></a><?php
 							} ?>
 						</td>
 						<td class="action_entities" style="width:5%;"><!-- Move down in list --><?php 
 							if($i < $l-1) { ?>
-								<a href="<?php echo($linkwithwhat);?>&action=move_user_down&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-down"></i></a><?php
+								<a href="<?php echo($linkwithwhat);?>&action=move_user_down&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-down" title="<?php echo _DOWN_USER_ONE_ROW;?>"></i></a><?php
 							} ?>
 						</td>
 					</tr> <?php
@@ -842,12 +842,12 @@ $linkwithwhat =
 						<td class="action_entities" style="width:15%;">&nbsp;</td>
 						<td class="action_entities" style="width:5%;"><!-- Move up in list --><?php
 						if($i > 0) { ?>
-							<a href="<?php echo($linkwithwhat);?>&action=move_entity_up&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-up"></i></a><?php
+							<a href="<?php echo($linkwithwhat);?>&action=move_entity_up&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-up" title="<?php echo _UP_ENTITY_ONE_ROW;?>"></i></a><?php
 						} ?>
 						</td>
 						<td class="action_entities" style="width:5%;"><!-- Move down in list --><?php 
 						if($i < $l-1) { ?>
-							<a href="<?php echo($linkwithwhat);?>&action=move_entity_down&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-down"></i></a><?php
+							<a href="<?php echo($linkwithwhat);?>&action=move_entity_down&role=<?php functions::xecho($role_id); ?>&rank=<?php functions::xecho($i);?>"><i class="fa fa-arrow-down" title="<?php echo _DOWN_ENTITY_ONE_ROW;?>"></i></a><?php
 						} ?>
 						</td>
 					</tr> <?php
@@ -885,13 +885,13 @@ $linkwithwhat =
 				<input type="hidden" name="module" value="entities" />
 				<input type="hidden" name="page" value="manage_listinstance" />
 				<input type="hidden" name="origin" id="origin" value="<?php functions::xecho($origin);?>" />
-				<table cellpadding="2" cellspacing="2" border="0">
+				<table cellpadding="2" cellspacing="2" border="0" style="width:35%">
 					<tr>
 						<th>
 							<label for="what_users" class="bold"><?php echo _USER;?></label>
 						</th>
 						<th>
-							<input name="what_users" id="what_users" type="text" <?php if (isset($_GET["what_users"])) echo "value ='".functions::xssafe($_GET["what_users"])."'";?> />
+							<input name="what_users" id="what_users" type="text" <?php if (isset($_GET["what_users"])) echo "value ='".functions::xssafe($_GET["what_users"])."'";?> style="width:100%"/>
 						</th>
 					 </tr>
 					 <tr>
@@ -899,7 +899,7 @@ $linkwithwhat =
 							<label for="what_services" class="bold"><?php echo _DEPARTMENT;?></label>
 						</th>
 						<th>
-							<input name="what_services" id="what_services" type="text" <?php if (isset($_GET["what_services"])) echo "value ='".functions::xssafe($_GET["what_services"])."'";?>/>
+							<input name="what_services" id="what_services" type="text" <?php if (isset($_GET["what_services"])) echo "value ='".functions::xssafe($_GET["what_services"])."'";?> style="width:100%"/>
 						</th>
 					</tr>
                     <tr>

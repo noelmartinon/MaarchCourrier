@@ -443,3 +443,16 @@ if (!defined("_ARCHIVAL_AGREEMENT"))
     define("_ARCHIVAL_AGREEMENT", "Archival agreement");
 if (!defined("_ARCHIVAL_AGENCY"))
     define("_ARCHIVAL_AGENCY", "Archival agency");
+
+if (!defined("_GO_TO_CC"))
+    define("_GO_TO_CC", "Put the user in copy");
+if (!defined("_GO_TO_DEST"))
+    define("_GO_TO_DEST", "Put the user in recipient");
+if (!defined("_UP_USER_ONE_ROW"))
+    define("_UP_USER_ONE_ROW", "Move up the user for a row");
+if (!defined("_DOWN_USER_ONE_ROW"))
+    define("_DOWN_USER_ONE_ROW", "Move down the user for a row");
+if (!defined("_UP_ENTITY_ONE_ROW"))
+    define("_UP_ENTITY_ONE_ROW", "Move up the entity for a row");
+if (!defined("_DOWN_ENTITY_ONE_ROW"))
+    define("_DOWN_ENTITY_ONE_ROW", "Move down the entity for a row");
