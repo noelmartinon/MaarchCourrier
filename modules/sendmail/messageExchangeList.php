@@ -6,7 +6,7 @@ $select["message_exchange"] = [];
     
 //Fields
     array_push($select["message_exchange"], "message_id", "date", "reference", "type", "sender_org_name", "account_id",
-        "recipient_org_identifier", "recipient_org_name", "reception_date", "operation_date", "status", "data", "res_id_master", "file_path");
+        "recipient_org_identifier", "recipient_org_name", "reception_date", "operation_date", "status", "data", "res_id_master", "filename");
     
 //Where clause
     $where_tab = array();
@@ -174,7 +174,7 @@ if(!empty($tab)){
                                 . $parameters."';",
         "icon"      =>  'download',
         "tooltip"   =>  _SIMPLE_DOWNLOAD,
-        "disabledRules" => "!file_exists(@@file_path@@)"
+        "disabledRules" => "empty(@@filename@@)"
     );
     array_push($paramsTab['actionIcons'], $download);  
 

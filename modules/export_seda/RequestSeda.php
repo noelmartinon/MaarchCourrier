@@ -22,6 +22,10 @@
 require_once "core/class/class_request.php";
 require_once "core/class/class_resource.php";
 require_once "core/class/docservers_controler.php";
+require_once "core/Models/DocserverModel.php";
+require_once "core/Models/DocserverTypeModel.php";
+require_once "core/Controllers/DocserverController.php";
+require_once "core/Controllers/DocserverToolsController.php";
 
 class RequestSeda
 {
@@ -374,6 +378,35 @@ class RequestSeda
             $filePath = null;
         } else {
             $filePath = $aArgs['filePath'];
+            $pathInfo = pathinfo($filePath);
+            $filesize = filesize($filePath);
+
+            //Store resource on docserver
+            $aArgs = [
+                'collId' => 'archive_transfer_coll',
+                'fileInfos' =>
+                    [
+                        'tmpDir'        => $_SESSION['config']['tmppath'],
+                        'size'          => $filesize,
+                        'format'        => $pathInfo['extension'],
+                        'tmpFileName'   => $pathInfo['basename'],
+                    ]
+            ];
+            
+            $ds          = new \Core\Controllers\DocserverController();
+            $storeResult = $ds->storeResourceOnDocserver($aArgs);
+            $docserver_id = $storeResult['docserver_id'];
+            $filepath     = $storeResult['destination_dir'];
+            $filename     = $storeResult['file_destination_name'];
+
+            $docserver     = \Core\Models\DocserverModel::getById(['docserver_id' => $docserver_id]);
+            $docserverType = \Core\Models\DocserverTypeModel::getById(['docserver_type_id' => $docserver[0]['docserver_type_id']]);
+
+            $fingerprint = \Core\Controllers\DocserverToolsController::doFingerprint([
+                'path'            => $filePath,
+                'fingerprintMode' => $docserverType[0]['fingerprint_mode'],
+            ]);
+
         }
 
 		try {
@@ -396,8 +429,12 @@ class RequestSeda
 				active,
 				archived,
                 res_id_master,
-                file_path)
-				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                docserver_id,
+                path,
+                filename,
+                fingerprint,
+                filesize)
+				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
 			$queryParams[] = $messageObject->messageId; // Message Id
 			$queryParams[] = "2.1"; //Schema
@@ -417,7 +454,11 @@ class RequestSeda
 			$queryParams[] = 1; // active
             $queryParams[] = 0; // archived
 			$queryParams[] = $resIdMaster; // res_id_master
-            $queryParams[] = $filePath;
+            $queryParams[] = $docserver_id;
+            $queryParams[] = $filepath;
+            $queryParams[] = $filename;
+            $queryParams[] = $fingerprint['fingerprint'];
+            $queryParams[] = $filesize;
 
 			$res = $this->db->query($query,$queryParams);
 

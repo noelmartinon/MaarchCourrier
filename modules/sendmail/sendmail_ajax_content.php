@@ -44,6 +44,9 @@ require_once "modules" . DIRECTORY_SEPARATOR . "sendmail" . DIRECTORY_SEPARATOR
     . "class" . DIRECTORY_SEPARATOR . "class_modules_tools.php";
 require_once 'modules/sendmail/Controllers/SendMessageExchangeController.php';
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
+require_once "core/Models/DocserverModel.php";
+require_once "core/Models/DocserverTypeModel.php";
+require_once "core/Controllers/DocserverToolsController.php";
 
 
 $core_tools                = new core_tools();
@@ -576,8 +579,22 @@ switch ($mode) {
         require_once 'modules/export_seda/RequestSeda.php';
         $RequestSeda         = new RequestSeda();
         $messageExchangeData = $RequestSeda->getMessageByIdentifierAndResId(['message_id' => $_GET['id'], 'res_id_master' => $_GET['identifier']]);
-        $filePath = $messageExchangeData->file_path;
-        if(file_exists($messageExchangeData->file_path)){
+
+        $docserver     = \Core\Models\DocserverModel::getById(['docserver_id' => $messageExchangeData->docserver_id]);
+        $docserverType = \Core\Models\DocserverTypeModel::getById(['docserver_type_id' => $docserver[0]['docserver_type_id']]);
+
+        $pathDirectory = str_replace('#', DIRECTORY_SEPARATOR, $messageExchangeData->path);
+        $filePath      = $docserver[0]['path_template'] . $pathDirectory . $messageExchangeData->filename;
+        $fingerprint   = \Core\Controllers\DocserverToolsController::doFingerprint([
+            'path'            => $filePath,
+            'fingerprintMode' => $docserverType[0]['fingerprint_mode'],
+        ]);
+
+        if($fingerprint['fingerprint'] != $messageExchangeData->fingerprint){
+            echo _PB_WITH_FINGERPRINT_OF_DOCUMENT;exit;
+        }
+
+        if(file_exists($filePath)){
             header('Pragma: public');
             header('Expires: 0');
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');

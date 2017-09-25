@@ -148,14 +148,28 @@ while ($state <> 'END') {
 				$smtp = $stmt = Bt_doQuery($GLOBALS['db'], $query, array($email->message_exchange_id));
 				$messageExchange = $smtp->fetchObject();
 
+		        $docserver     = \Core\Models\DocserverModel::getById(['docserver_id' => $messageExchange->docserver_id]);
+		        $docserverType = \Core\Models\DocserverTypeModel::getById(['docserver_type_id' => $docserver[0]['docserver_type_id']]);
+
+		        $pathDirectory = str_replace('#', DIRECTORY_SEPARATOR, $messageExchange->path);
+		        $filePath      = $docserver[0]['path_template'] . $pathDirectory . $messageExchange->filename;
+		        $fingerprint   = \Core\Controllers\DocserverToolsController::doFingerprint([
+		            'path'            => $filePath,
+		            'fingerprintMode' => $docserverType[0]['fingerprint_mode'],
+		        ]);
+
+		        if($fingerprint['fingerprint'] != $messageExchange->fingerprint){
+		        	$GLOBALS['logger']->write(_PB_WITH_FINGERPRINT_OF_DOCUMENT.'. ResId master : ' . $email->res_id, 'ERROR');
+		        }
+
 				//Get file content
-				if(is_file($messageExchange->file_path)) {
+				if(is_file($filePath)) {
 					//Filename
 					$resFilename = $sendmail_tools->createFilename($messageExchange->reference, 'zip');
 					$GLOBALS['logger']->write("set attachment filename : " . $resFilename, 'INFO');
 
 					//File content
-					$file_content = $GLOBALS['mailer']->getFile($messageExchange->file_path);
+					$file_content = $GLOBALS['mailer']->getFile($filePath);
 					//Add file
 					$GLOBALS['mailer']->addAttachment($file_content, $resFilename);
 				}

@@ -202,6 +202,15 @@ try {
         . DIRECTORY_SEPARATOR . "class". DIRECTORY_SEPARATOR . "class_manage_entities.php"
     );
     Bt_myInclude(
+        $GLOBALS['maarchDirectory'] . "core" . DIRECTORY_SEPARATOR . "Models" . DIRECTORY_SEPARATOR . "DocserverModel.php"
+    );
+    Bt_myInclude(
+        $GLOBALS['maarchDirectory'] . "core" . DIRECTORY_SEPARATOR . "Models" . DIRECTORY_SEPARATOR . "DocserverTypeModel.php"
+    );
+    Bt_myInclude(
+        $GLOBALS['maarchDirectory'] . "core" . DIRECTORY_SEPARATOR . "Controllers" . DIRECTORY_SEPARATOR . "DocserverToolsController.php"
+    );
+    Bt_myInclude(
         $GLOBALS['maarchDirectory'] . $path_to_mailer
     );  
 

@@ -3008,8 +3008,13 @@ CREATE TABLE message_exchange
   "active" boolean,
   "archived" boolean,
   
-  "file_path" text default NULL,
   "res_id_master" numeric default NULL,
+
+  "docserver_id" character varying(32) NOT NULL
+  "path" character varying(255) DEFAULT NULL,
+  "filename" character varying(255) DEFAULT NULL,
+  "fingerprint" character varying(255) DEFAULT NULL,
+  "filesize" bigint,
 
   PRIMARY KEY ("message_id")
 )

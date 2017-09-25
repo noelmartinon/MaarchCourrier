@@ -52,3 +52,26 @@ CREATE OR REPLACE VIEW view_contacts AS
  
 ALTER TABLE sendmail DROP COLUMN IF EXISTS res_version_att_id_list; 
 ALTER TABLE sendmail ADD COLUMN res_version_att_id_list character varying(255); 
+
+ALTER TABLE message_exchange DROP COLUMN IF EXISTS docserver_id;
+ALTER TABLE message_exchange ADD docserver_id character varying(32) DEFAULT NULL;
+
+ALTER TABLE message_exchange DROP COLUMN IF EXISTS path;
+ALTER TABLE message_exchange ADD path character varying(255) DEFAULT NULL;
+
+ALTER TABLE message_exchange DROP COLUMN IF EXISTS filename;
+ALTER TABLE message_exchange ADD filename character varying(255) DEFAULT NULL;
+
+ALTER TABLE message_exchange DROP COLUMN IF EXISTS fingerprint;
+ALTER TABLE message_exchange ADD fingerprint character varying(255) DEFAULT NULL;
+
+ALTER TABLE message_exchange DROP COLUMN IF EXISTS filesize;
+ALTER TABLE message_exchange ADD filesize bigint;
+
+DELETE FROM docservers WHERE docserver_id = 'ARCHIVETRANSFER';
+INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, enabled, size_limit_number, actual_size_number, path_template, ext_docserver_info, chain_before, chain_after, creation_date, closing_date, coll_id, priority_number, docserver_location_id, adr_priority_number) 
+VALUES ('ARCHIVETRANSFER', 'ARCHIVETRANSFER', 'Fast internal disc bay for archive transfer', 'N', 'Y', 50000000000, 1, '/opt/maarch/docservers/archive_transfer/', NULL, NULL, NULL, '2017-01-13 14:47:49.197164', NULL, 'archive_transfer_coll', 10, 'NANTERRE', 2);
+
+DELETE FROM docserver_types WHERE docserver_type_id = 'ARCHIVETRANSFER';
+INSERT INTO docserver_types (docserver_type_id, docserver_type_label, enabled, is_container, container_max_number, is_compressed, compression_mode, is_meta, meta_template, is_logged, log_template, is_signed, fingerprint_mode) 
+VALUES ('ARCHIVETRANSFER', 'Archive Transfer', 'Y', 'N', 0, 'N', 'NONE', 'N', 'NONE', 'N', 'NONE', 'Y', 'SHA256');
