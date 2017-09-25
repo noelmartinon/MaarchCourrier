@@ -382,7 +382,7 @@ class RequestSeda
             $filesize = filesize($filePath);
 
             //Store resource on docserver
-            $aArgs = [
+            $aFileInfo = [
                 'collId' => 'archive_transfer_coll',
                 'fileInfos' =>
                     [
@@ -394,7 +394,7 @@ class RequestSeda
             ];
             
             $ds          = new \Core\Controllers\DocserverController();
-            $storeResult = $ds->storeResourceOnDocserver($aArgs);
+            $storeResult = $ds->storeResourceOnDocserver($aFileInfo);
             $docserver_id = $storeResult['docserver_id'];
             $filepath     = $storeResult['destination_dir'];
             $filename     = $storeResult['file_destination_name'];
