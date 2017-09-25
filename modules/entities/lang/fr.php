@@ -458,3 +458,16 @@ if (!defined("_ARCHIVAL_AGREEMENT"))
     define("_ARCHIVAL_AGREEMENT", "Convention d'archivage");
 if (!defined("_ARCHIVAL_AGENCY"))
     define("_ARCHIVAL_AGENCY", "Service d'archive");
+
+if (!defined("_GO_TO_CC"))
+    define("_GO_TO_CC", "Passer l'utilisateur en copie");
+if (!defined("_GO_TO_DEST"))
+    define("_GO_TO_DEST", "Passer l'utilisateur en destinataire");
+if (!defined("_UP_USER_ONE_ROW"))
+    define("_UP_USER_ONE_ROW", "Monter l'utilisateur d'un rang");
+if (!defined("_DOWN_USER_ONE_ROW"))
+    define("_DOWN_USER_ONE_ROW", "Descendre l'utilisateur d'un rang");
+if (!defined("_UP_ENTITY_ONE_ROW"))
+    define("_UP_ENTITY_ONE_ROW", "Monter l'entité d'un rang");
+if (!defined("_DOWN_ENTITY_ONE_ROW"))
+    define("_DOWN_ENTITY_ONE_ROW", "Descendre l'entité d'un rang");

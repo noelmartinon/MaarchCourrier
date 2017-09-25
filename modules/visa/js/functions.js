@@ -21,7 +21,7 @@ function addVisaUser(users) {
             +'<span class="visaUserConsigne">'
                 +'<input type="text" class="consigne" value=""/>'
             +'</span>'
-            +'<span id="dropZone">'
+            +'<span id="dropZone" title="Glisser/déposer pour modifier l\'ordre du circuit" style="cursor: pointer">'
                 +'<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>'
             +'</span>'
         +'</div>');
@@ -51,7 +51,7 @@ function addVisaUser(users) {
             +'<span class="visaUserConsigne">'
                 +'<input type="text" class="consigne" value="' + users.process_comment + '"/>'
             +'</span>'
-            +'<span id="dropZone">'
+            +'<span id="dropZone" title="Glisser/déposer pour modifier l\'ordre du circuit" style="cursor: pointer">'
                 +'<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true"></i>'
             +'</span>'
         +'</div>');

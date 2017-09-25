@@ -177,3 +177,6 @@ if (!defined('_DELETE_ATTACHMENT'))
 if (!defined('_DISPLAY_ATTACHMENTS'))
     define('_DISPLAY_ATTACHMENTS', 'Display attachments list');
 /***** Signature Book *****/
+
+if (!defined('_DRAG_N_DROP_CHANGE_ORDER'))
+    define('_DRAG_N_DROP_CHANGE_ORDER', 'Drag/Drop to change order');

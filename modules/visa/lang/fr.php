@@ -199,3 +199,6 @@ if (!defined('_DELETE_ATTACHMENT'))
 if (!defined('_DISPLAY_ATTACHMENTS'))
     define('_DISPLAY_ATTACHMENTS', 'Afficher la liste des pièces jointes');
 /***** Signature Book *****/
+
+if (!defined('_DRAG_N_DROP_CHANGE_ORDER'))
+    define('_DRAG_N_DROP_CHANGE_ORDER', 'Glisser/déposer pour modifier l\'ordre du circuit');
