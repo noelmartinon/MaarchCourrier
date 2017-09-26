@@ -67,7 +67,7 @@ while ($state <> 'END') {
 
 		            $GLOBALS['mailer']->setFrom($userInfo['firstname'].' '
 						. $userInfo['lastname'].' <'.$mailfrom_generic.'> ');
-
+		            $emailFrom = $mailfrom_generic;
 		            $email->email_body = 'Courriel envoyé par : ' . $userInfo['firstname'].' '
 						. $userInfo['lastname'] . ' ' . $email->sender_email . ' ' .  '.<br/><br/>' . $email->email_body;
 				} else {
@@ -76,6 +76,7 @@ while ($state <> 'END') {
 
 		            $GLOBALS['mailer']->setFrom($userInfo['firstname'].' '
 						. $userInfo['lastname'].' <'.$email->sender_email.'> ');
+		            $emailFrom = $email->sender_email;
 				}
 				$GLOBALS['mailer']->setReplyTo($email->sender_email);
 				
@@ -85,12 +86,14 @@ while ($state <> 'END') {
 					$entityShortLabel = substr($mailsEntities[$email->sender_email], 0, strrpos($mailsEntities[$email->sender_email], "("));
 						
 		            $GLOBALS['mailer']->setFrom($entityShortLabel . ' <' . $mailfrom_generic. '> ');
+		            $emailFrom = $mailfrom_generic;
 		            $email->email_body = 'Courriel envoyé par : ' . $entityShortLabel . ' ' . $sendmail_tools->explodeSenderEmail($email->sender_email) . ' ' .  '.<br/><br/>' . $email->email_body;
 				} else {
 					$mailsEntities = $sendmail_tools->getAttachedEntitiesMails();
 					$entityShortLabel = substr($mailsEntities[$email->sender_email], 0, strrpos($mailsEntities[$email->sender_email], "("));
 
 		            $GLOBALS['mailer']->setFrom($entityShortLabel . ' <' . $sendmail_tools->explodeSenderEmail($email->sender_email) . '> ');
+		            $emailFrom = $sendmail_tools->explodeSenderEmail($email->sender_email);
 				}
 				$GLOBALS['mailer']->setReplyTo($sendmail_tools->explodeSenderEmail($email->sender_email));
 			}
@@ -231,6 +234,23 @@ while ($state <> 'END') {
 				$exec_result = 'E';
 				$err++;
 				$errTxt = ' (Last Error : '.$return[0].')';
+
+                $query = "INSERT INTO notif_email_stack (sender, recipient, subject, html_body, charset, module) VALUES (?, ?, ?, ?, ?, 'notifications')";  
+
+                $html = "Message automatique : <br><br>
+                		L'email avec l'identifiant ".$email->email_id." dans la table 'sendmail' n'a pas été envoyé. <br>
+                		Pour plus d'informations, regardez les logs dans le dossier ".$GLOBALS['maarchDirectory']."/modules/sendmail/batch/logs/<br><br>
+                		Répertoire d'installation de l'application : ".$GLOBALS['maarchDirectory']."<br>
+                		Fichier de configuration de sendmail : " . $GLOBALS['configFile'] . "<br>
+                		IP de la base de données : " . $_SESSION['config']['databaseserver'] . "<br>
+                		Port de la base de données : " . $_SESSION['config']['databaseserverport'] . "<br>
+                		Type de base de données : " . $_SESSION['config']['databasetype'] . "<br>
+                		Nom de la base de données : " . $_SESSION['config']['databasename'] . "<br>";
+
+                $subject = "[Maarch Courrier] Problème avec l'envoi de courriel";
+
+            	Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $GLOBALS['adminmail'], $subject, $html, $GLOBALS['charset']));
+
 			}
 			//Update emails table
 			$query = "UPDATE " . EMAILS_TABLE 

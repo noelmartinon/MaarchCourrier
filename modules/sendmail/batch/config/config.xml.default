@@ -7,6 +7,7 @@
         <MaarchApps>maarch_entreprise</MaarchApps>
 		<CustomId></CustomId>
         <TmpDirectory>/var/www/MaarchCourrier/modules/sendmail/batch/tmp/</TmpDirectory>
+        <adminmail>dev@maarch.org</adminmail>
         <debugmode>
             <dontflag_mail>true</dontflag_mail>
             <verbose_mode>false</verbose_mode>

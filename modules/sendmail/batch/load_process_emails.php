@@ -147,6 +147,7 @@ $GLOBALS['TmpDirectory'] = $_SESSION['config']
 $GLOBALS['batchDirectory'] = $GLOBALS['maarchDirectory'] . 'modules' 
                            . DIRECTORY_SEPARATOR . 'sendmail' 
                            . DIRECTORY_SEPARATOR . 'batch';
+$GLOBALS['adminmail'] = (string)$config->adminmail;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['maarchDirectory']);
 
