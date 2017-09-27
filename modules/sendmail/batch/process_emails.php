@@ -32,8 +32,6 @@ while ($state <> 'END') {
 			$GLOBALS['emails'][] = $emailRecordset;
 		}
 		$state = 'SEND_AN_EMAIL';
-		$err = 0;
-        $errTxt = '';
     break;
 		
 	/**********************************************************************/
@@ -62,18 +60,17 @@ while ($state <> 'END') {
 			//echo 'userInfo : ' . $userInfo['mail'] . '==' . ' sender_email : ' . $email->sender_email . PHP_EOL;
 			if ($userInfo['mail'] == $email->sender_email) {
 				if (!empty($mailfrom_generic)) {
-
-					$GLOBALS['logger']->write('process e-mail '.($currentEmail+1)."/".$totalEmailsToProcess.' (FROM => '.$userInfo['firstname'].' '.$userInfo['lastname'].' <'.$mailfrom_generic.'>'.', TO => '.$email->to_list.', SUBJECT => '.$email->email_object.', CC =>'.$email->cc_list.', CCI => '.$email->cci_list.') ...', 'INFO');
-
+					$GLOBALS['logger']->write("Sending e-mail from : " 
+						. '"' . $userInfo['firstname'].' ' .$userInfo['lastname'] 
+						. '" <'.$mailfrom_generic.'>', 'INFO');
 		            $GLOBALS['mailer']->setFrom($userInfo['firstname'].' '
 						. $userInfo['lastname'].' <'.$mailfrom_generic.'> ');
-
 		            $email->email_body = 'Courriel envoyé par : ' . $userInfo['firstname'].' '
 						. $userInfo['lastname'] . ' ' . $email->sender_email . ' ' .  '.<br/><br/>' . $email->email_body;
 				} else {
-
-					$GLOBALS['logger']->write('process e-mail '.($currentEmail+1)."/".$totalEmailsToProcess.' (FROM => '.$userInfo['firstname'].' '.$userInfo['lastname'].' <'.$email->sender_email.'>'.', TO => '.$email->to_list.', SUBJECT => '.$email->email_object.', CC =>'.$email->cc_list.', CCI => '.$email->cci_list.') ...', 'INFO');
-
+					$GLOBALS['logger']->write("Sending e-mail from : " 
+						. '"' . $userInfo['firstname'].' ' .$userInfo['lastname'] 
+						. '" <'.$email->sender_email.'>', 'INFO');
 		            $GLOBALS['mailer']->setFrom($userInfo['firstname'].' '
 						. $userInfo['lastname'].' <'.$email->sender_email.'> ');
 				}
@@ -83,13 +80,16 @@ while ($state <> 'END') {
 				if (!empty($mailfrom_generic)) {
 					$mailsEntities = $sendmail_tools->getAttachedEntitiesMails();
 					$entityShortLabel = substr($mailsEntities[$email->sender_email], 0, strrpos($mailsEntities[$email->sender_email], "("));
+					$GLOBALS['logger']->write("Sending e-mail from : " . $entityShortLabel
+						. ' <' . $mailfrom_generic . '>', 'INFO');
 						
 		            $GLOBALS['mailer']->setFrom($entityShortLabel . ' <' . $mailfrom_generic. '> ');
 		            $email->email_body = 'Courriel envoyé par : ' . $entityShortLabel . ' ' . $sendmail_tools->explodeSenderEmail($email->sender_email) . ' ' .  '.<br/><br/>' . $email->email_body;
 				} else {
 					$mailsEntities = $sendmail_tools->getAttachedEntitiesMails();
 					$entityShortLabel = substr($mailsEntities[$email->sender_email], 0, strrpos($mailsEntities[$email->sender_email], "("));
-
+					$GLOBALS['logger']->write("Sending e-mail from : " . $entityShortLabel
+						. ' <' . $sendmail_tools->explodeSenderEmail($email->sender_email) . '>', 'INFO');
 		            $GLOBALS['mailer']->setFrom($entityShortLabel . ' <' . $sendmail_tools->explodeSenderEmail($email->sender_email) . '> ');
 				}
 				$GLOBALS['mailer']->setReplyTo($sendmail_tools->explodeSenderEmail($email->sender_email));
@@ -97,18 +97,16 @@ while ($state <> 'END') {
 
 			//echo $email->email_body . PHP_EOL;exit;
 
+			$GLOBALS['logger']->write("Sending e-mail to : " . $email->to_list, 'INFO');
 			if (!empty($email->cc_list))$GLOBALS['logger']->write("Copy e-mail to : " . $email->cc_list, 'INFO');
 			if (!empty($email->cci_list))$GLOBALS['logger']->write("Copy invisible e-mail to : " . $email->cci_list, 'INFO');
 			
 			//--> Set the return path
-			if (!empty($mailfrom_generic)) {
-				$GLOBALS['mailer']->setReturnPath(
-					$userInfo['firstname'] . ' ' .  $userInfo['lastname'] . ' <' . $mailfrom_generic . '> '
-				);
-			} else {
-				$GLOBALS['mailer']->setReturnPath($userInfo['mail']);
-			}
-
+			$GLOBALS['mailer']->setReturnPath($userInfo['mail']);
+			/*$GLOBALS['mailer']->setReturnPath(
+				$userInfo['firstname'] . ' ' .  $userInfo['lastname'] . ' <' . $mailfrom_generic . '> '
+			);*/
+			
 			//--> To
 			$to = array();
 			$to = explode(',', $email->to_list);
@@ -121,6 +119,7 @@ while ($state <> 'END') {
 				$GLOBALS['mailer']->setBcc($email->cci_list);
 			}
 			//--> Set subject
+			$GLOBALS['logger']->write("Subject : " . $email->email_object, 'INFO');
 			$GLOBALS['mailer']->setSubject($email->email_object);
 			//--> Set body: Is Html/raw text ?
 			if ($email->is_html == 'Y') {
@@ -140,7 +139,7 @@ while ($state <> 'END') {
 			//--> Set attachments
 				//Res master
 				if ($email->is_res_master_attached == 'Y') {
-					$GLOBALS['logger']->write("set attachment on res master : " . $email->res_id, 'INFO');
+					$GLOBALS['logger']->write("Set attachment on res master : " . $email->res_id, 'INFO');
 
 					//Get file from docserver
 					$resFile = $sendmail_tools->getResource($GLOBALS['collections'], $email->coll_id, $email->res_id);
@@ -148,7 +147,7 @@ while ($state <> 'END') {
 					if(is_file($resFile['file_path'])) {
 						//Filename
 						$resFilename = $sendmail_tools->createFilename($resFile['label'], $resFile['ext']);
-						$GLOBALS['logger']->write("set attachment filename : " . $resFilename, 'INFO');
+						$GLOBALS['logger']->write("Set attachment filename : " . $resFilename, 'INFO');
 
 						//File content
 						$file_content = $GLOBALS['mailer']->getFile($resFile['file_path']);
@@ -161,7 +160,7 @@ while ($state <> 'END') {
 				if (!empty($email->res_version_id_list)) {
                     $version = explode(',', $email->res_version_id_list);
 					foreach($version as $version_id) {
-						$GLOBALS['logger']->write("set attachment for version : " . $version_id, 'INFO');
+						$GLOBALS['logger']->write("Set attachment for version : " . $version_id, 'INFO');
 						$versionFile = $sendmail_tools->getVersion(
 								$GLOBALS['collections'],
 								$email->coll_id, 
@@ -171,7 +170,7 @@ while ($state <> 'END') {
 						if(is_file($versionFile['file_path'])) {
 							//Filename
 							$versionFilename = $sendmail_tools->createFilename($versionFile['label'], $versionFile['ext']);
-							$GLOBALS['logger']->write("set attachment filename for version : " . $versionFilename, 'INFO');
+							$GLOBALS['logger']->write("Set attachment filename for version : " . $versionFilename, 'INFO');
 
 							//File content
 							$file_content = $GLOBALS['mailer']->getFile($versionFile['file_path']);
@@ -185,7 +184,7 @@ while ($state <> 'END') {
 				if (!empty($email->res_attachment_id_list)) {
                     $attachments = explode(',', $email->res_attachment_id_list);
 					foreach($attachments as $attachment_id) {
-						$GLOBALS['logger']->write("set attachment on res attachment : " . $attachment_id, 'INFO');
+						$GLOBALS['logger']->write("Set attachment on res attachment : " . $attachment_id, 'INFO');
 						$attachmentFile = $sendmail_tools->getAttachment(
 								$email->coll_id, 
 								$email->res_id,
@@ -194,7 +193,7 @@ while ($state <> 'END') {
 						if(is_file($attachmentFile['file_path'])) {
 							//Filename
 							$attachmentFilename = $sendmail_tools->createFilename($attachmentFile['label'], $attachmentFile['ext']);
-							$GLOBALS['logger']->write("set attachment filename : " . $attachmentFilename, 'INFO');
+							$GLOBALS['logger']->write("Set attachment filename : " . $attachmentFilename, 'INFO');
 
 							//File content
 							$file_content = $GLOBALS['mailer']->getFile($attachmentFile['file_path']);
@@ -218,19 +217,14 @@ while ($state <> 'END') {
 			
 
 			//Now send the mail
-			$GLOBALS['logger']->write("sending e-mail ...", 'INFO');
 			$return = $GLOBALS['mailer']->send($to, (string)$mailerParams->type);
 
 			if( ($return == 1 && ((string)$mailerParams->type == "smtp" || (string)$mailerParams->type == "mail" )) || ($return == 0 && (string)$mailerParams->type == "sendmail")) {
 				$exec_result = 'S';
-				$GLOBALS['logger']->write("e-mail sent.", 'INFO');
 			} else {
 				//$GLOBALS['logger']->write("Errors when sending message through SMTP :" . implode(', ', $GLOBALS['mailer']->errors), 'ERROR');
-                $GLOBALS['logger']->write("SENDING EMAIL ERROR ! (" . $return[0].")", 'ERROR');
-                $GLOBALS['logger']->write("e-mail not sent !", 'ERROR');
+                $GLOBALS['logger']->write("Errors when sending message through SMTP :" . $GLOBALS['mailer']->errors[0].': '.$GLOBALS['mailer']->errors[1], 'ERROR');
 				$exec_result = 'E';
-				$err++;
-				$errTxt = ' (Last Error : '.$return[0].')';
 			}
 			//Update emails table
 			$query = "UPDATE " . EMAILS_TABLE 
@@ -247,19 +241,10 @@ while ($state <> 'END') {
 	}
 }
 
-$emailSent = $totalEmailsToProcess - $err;
-
-$GLOBALS['logger']->write($emailSent.' email(s) sent', 'INFO');
-$GLOBALS['logger']->write('end of process', 'INFO');
-
+$GLOBALS['logger']->write('End of process', 'INFO');
 Bt_logInDataBase(
-    $totalEmailsToProcess, $err, $emailSent.' email(s) sent'.$errTxt
+    $totalEmailsToProcess, 0, 'process without error'
 );
-Bt_updateWorkBatch();
-
-//clean tmp directory
-echo "clean tmp path ....\n";
-array_map('unlink', glob($_SESSION['config']['tmppath']."/*"));
 
 //unlink($GLOBALS['lckFile']);
 exit($GLOBALS['exitCode']);
