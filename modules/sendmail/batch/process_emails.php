@@ -239,7 +239,7 @@ while ($state <> 'END') {
 
                 $html = "Message automatique : <br><br>
                 		L'email avec l'identifiant ".$email->email_id." dans la table 'sendmail' n'a pas été envoyé. <br>
-                		Pour plus d'informations, regardez les logs dans le dossier ".$GLOBALS['maarchDirectory']."/modules/sendmail/batch/logs/<br><br>
+                		Pour plus d'informations, regardez les logs dans le fichier ".$GLOBALS['maarchDirectory']."/modules/sendmail/batch/".$logFile."<br><br>
                 		Répertoire d'installation de l'application : ".$GLOBALS['maarchDirectory']."<br>
                 		Fichier de configuration de sendmail : " . $GLOBALS['configFile'] . "<br>
                 		IP de la base de données : " . $_SESSION['config']['databaseserver'] . "<br>
@@ -247,9 +247,12 @@ while ($state <> 'END') {
                 		Type de base de données : " . $_SESSION['config']['databasetype'] . "<br>
                 		Nom de la base de données : " . $_SESSION['config']['databasename'] . "<br>";
 
-                $subject = "[Maarch Courrier] Problème avec l'envoi de courriel";
-
-            	Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $GLOBALS['adminmail'], $subject, $html, $GLOBALS['charset']));
+                $adminMails = explode(',', $GLOBALS['adminmail']);
+	            foreach($adminMails as $recipient){
+                	if(!empty($recipient)){
+	            		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $recipient, $GLOBALS['subjectmail'], $html, $GLOBALS['charset']));
+	                }
+                }
 
 			}
 			//Update emails table

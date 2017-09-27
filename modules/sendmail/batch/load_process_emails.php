@@ -147,7 +147,10 @@ $GLOBALS['TmpDirectory'] = $_SESSION['config']
 $GLOBALS['batchDirectory'] = $GLOBALS['maarchDirectory'] . 'modules' 
                            . DIRECTORY_SEPARATOR . 'sendmail' 
                            . DIRECTORY_SEPARATOR . 'batch';
-$GLOBALS['adminmail'] = (string)$config->adminmail;
+
+$notificationErrors = $xmlconfig->NOTIFICATION_ERROR;
+$GLOBALS['adminmail'] = (string)$notificationErrors->adminmail;
+$GLOBALS['subjectmail'] = (string)$notificationErrors->subjectmail;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['maarchDirectory']);
 
