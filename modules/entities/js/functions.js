@@ -295,3 +295,8 @@ function saveListDiff(mode, table, collId, resId, userId, concatList, onlyCC) {
         }
     );
 }
+
+function setNoteRedirect(){
+    $j('#note_content_to_dep').val($j('#notes').val().replace(/\n/g, "___"));
+    $j('#note_content_to_user').val($j('#notes').val().replace(/\n/g, "___"));
+}
