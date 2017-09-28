@@ -181,7 +181,7 @@ $_SESSION['doc_id'] = $s_id;
 $right = $security->test_right_doc($coll_id, $s_id);
 //$_SESSION['error'] = 'coll '.$coll_id.', res_id : '.$s_id;
 
-$stmt = $db->query("SELECT typist, creation_date FROM ".$table." WHERE res_id = ?", array($s_id));
+$stmt = $db->query("SELECT typist, creation_date, filename FROM ".$table." WHERE res_id = ?", array($s_id));
 $info_mail = $stmt->fetchObject();
 
 $date1 = new DateTime($info_mail->creation_date);
@@ -527,7 +527,6 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
             }
             $data = get_general_data($coll_id, $s_id, $mode_data, $param_data );
             //$data = array_merge($data, $indexes);
-            //$db->show_array($indexes);
             $detailsExport = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >';
             $detailsExport .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">';
             $detailsExport .= "<head><title>Maarch Details</title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><meta content='fr' http-equiv='Content-Language'/><meta http-equiv='cache-control' content='no-cache'/><meta http-equiv='pragma' content='no-cache'><meta http-equiv='Expires' content='0'></head>";
@@ -546,19 +545,11 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     ?>
                 </p>
                 <p id="viewdoc">
-                    <!--<a href="<?php
-                        echo $_SESSION['config']['businessappurl'];
-                        ?>index.php?page=view_baskets&module=basket&baskets=MyBasket&directLinkToAction&resid=<?php
-                        functions::xecho($s_id);
-                        ?>" target="_blank"><i class="fa fa-gears fa-2x" title="<?php 
-                        echo _PROCESS;?>"></i></a>&nbsp;-->
-                    <a href="<?php
-                        echo $_SESSION['config']['businessappurl'];
-                        ?>index.php?display=true&dir=indexing_searching&page=view_resource_controler&id=<?php
-                        functions::xecho($s_id);
-                        ?>" target="_blank"><i class="fa fa-download fa-2x" title="<?php
-                        echo _VIEW_DOC;
-                        ?>"></i></a>&nbsp;&nbsp;&nbsp;
+                    <?php if($info_mail->filename){?>
+                        <a href="index.php?display=true&dir=indexing_searching&page=view_resource_controler&id=<?php functions::xecho($s_id);?>" 
+                            target="_blank"><i class="fa fa-download fa-2x" title="<?php echo _VIEW_DOC; ?>"></i></a>
+                    <?php } ?>
+                    &nbsp;&nbsp;&nbsp;
                 </p>
                 </b>&nbsp;
             </div>
