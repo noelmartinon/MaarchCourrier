@@ -301,6 +301,19 @@ if (!defined("_ADMIN_GROUP")) define("_ADMIN_GROUP", "Groupe d'administration");
 if (!defined("_ADD_GROUP")) define("_ADD_GROUP", "Ajouter un groupe");
 if (!defined("_ALL_GROUPS")) define("_ALL_GROUPS", "Tous les groupes");
 if (!defined("_GROUPS")) define("_GROUPS", "groupes");
+if (!defined("_FOR_USER"))    define("_FOR_USER", "pour l'utilisateur");
+if (!defined("_BY_USER"))    define("_BY_USER", "par l'utilisateur");
+if (!defined("_ADDED_USER"))    define("_ADDED_USER", "a ajouté l'utilisateur");
+if (!defined("_REMOVED_USER"))    define("_REMOVED_USER", "a retiré l'utilisateur");
+if (!defined("_FROM_GROUP"))    define("_FROM_GROUP", "du groupe");
+if (!defined("_FROM_GROUPS"))    define("_FROM_GROUPS", "des groupes");
+if (!defined("_FROM_ENTITY"))    define("_FROM_ENTITY", "de l'entité");
+if (!defined("_FROM_ENTITIES"))    define("_FROM_ENTITIES", "des entités");
+if (!defined("_IN_GROUP"))    define("_IN_GROUP", "au groupe");
+if (!defined("_IN_GROUPS"))    define("_IN_GROUPS", "aux groupes");
+if (!defined("_IN_ENTITY"))    define("_IN_ENTITY", "à l'entité");
+if (!defined("_IN_ENTITIES"))    define("_IN_ENTITIES", "aux entités");
+
 
 if (!defined("_GROUP_ADDITION")) define("_GROUP_ADDITION", "Ajout d'un groupe");
 if (!defined("_GROUP_MODIFICATION")) define("_GROUP_MODIFICATION", "Modification d'un groupe");

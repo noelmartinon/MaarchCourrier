@@ -929,7 +929,87 @@ function validate_user_submit()
             }
         }
     }
+
+    $hist = new history();
+    $strList = "";
+    $toAdd = array();
+    $dbEntities = $ec->getUsersEntities($_REQUEST['user_id']);
+    $actualEntities= array();
+    $entitiesIdList = array();
+    for($i=0;$i<count($dbEntities);$i++){
+        array_push($actualEntities,$dbEntities[$i]['ENTITY_ID']);
+    }
+
+    for( $i=0 ; $i<count($_SESSION['m_admin']['entity']['entities']); $i++){
+        if(!in_array($_SESSION['m_admin']['entity']['entities'][$i]['ENTITY_ID'],$actualEntities))
+        {
+            array_push($toAdd,$_SESSION['m_admin']['entity']['entities'][$i]['SHORT_LABEL']);
+        }
+    }
+
+    if(!empty($toAdd)){
+        for($i=0;$i<count($toAdd);$i++){
+            if($i==count($toAdd)-1){
+                $strList.=$toAdd[$i];
+            } else {
+                $strList.=$toAdd[$i].', ';
+            }
+            
+        }
+        if(count($toAdd)>1){
+            $hist->add('users',
+            $_SESSION['m_admin']['users']['user_id'],
+            'ADD',
+            'entityadded',$_SESSION['user']['UserId'].' '._ADDED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._IN_ENTITIES.' '.$strList,
+            $_SESSION['config']['databasetype']);
+        } else {
+            $hist->add('users',
+            $_SESSION['m_admin']['users']['user_id'],
+            'ADD',
+            'entityadded',$_SESSION['user']['UserId'].' '._ADDED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._IN_ENTITY.' '.$strList,
+            $_SESSION['config']['databasetype']);
+        }
+        
+    }
     
+    $entitiesIdList = array();        
+    
+            for($i=0;$i<count($_SESSION['m_admin']['entity']['entities']);$i++){
+                array_push($entitiesIdList,$_SESSION['m_admin']['entity']['entities'][$i]['ENTITY_ID']);
+            }
+            $toDelete = array();
+            $strList = "";
+
+            for( $j=0 ; $j<count($actualEntities); $j++){
+                if(!in_array($actualEntities[$j],$entitiesIdList)){
+                        $stmt=$db->query('SELECT short_label FROM entities WHERE entity_id = ?',[$actualEntities[$j]]);
+                        $label=$stmt->fetchObject();
+                        array_push($toDelete, $label->short_label);
+                }
+            }
+            if(!empty($toDelete)){
+                for($i=0;$i<count($toDelete);$i++){
+                        if($i==count($toDelete)-1){
+                            $strList.=$toDelete[$i];
+                        } else {
+                            $strList.=$toDelete[$i].', ';
+                        };
+                }
+                if(count($toDelete)>1){
+                    $hist->add('users',
+                    $_SESSION['m_admin']['users']['user_id'],
+                    'DEL',
+                    'entityremoved',$_SESSION['user']['UserId'].' '._REMOVED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._FROM_ENTITIES.' '.$strList,
+                    $_SESSION['config']['databasetype']);
+                } else {
+                    $hist->add('users',
+                    $_SESSION['m_admin']['users']['user_id'],
+                    'DEL',
+                    'entityremoved',$_SESSION['user']['UserId'].' '._REMOVED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._FROM_ENTITY.' '.$strList,
+                    $_SESSION['config']['databasetype']);
+                }
+                
+            }
 
     $mode = $_REQUEST['mode'];
     $user = new users();
@@ -1054,6 +1134,93 @@ function validate_user_submit()
             } elseif(isset($user->{'signature_path'})) {
                 $db->query('INSERT INTO user_signatures (user_id, signature_label, signature_path, signature_file_name) VALUES (?, ?, ?, ?)', [$user->{'user_id'}, '', $user->{'signature_path'}, $user->{'signature_file_name'}]);
             }
+
+        $actualGroups=array();
+        $stmt=$db->query('SELECT group_id FROM usergroup_content WHERE user_id = ?',[$_SESSION['m_admin']['users']['user_id']]);
+        
+        while($dbGroup = $stmt->fetchObject()){
+            array_push($actualGroups,$dbGroup->group_id);
+        }
+
+        $toAdd = array();
+        $hist = new history();
+
+        //AJOUT
+        $strList = "";
+        //Recherche des groupes à ajouter
+        for( $i=0 ; $i<count($_SESSION['m_admin']['users']['groups']); $i++){
+            if(!in_array($_SESSION['m_admin']['users']['groups'][$i]['GROUP_ID'],$actualGroups))
+            {
+                array_push($toAdd,$_SESSION['m_admin']['users']['groups'][$i]['LABEL']);
+            }
+        }
+
+        if(!empty($toAdd)){
+            for($i=0;$i<count($toAdd);$i++){
+                if($i==count($toAdd)-1){
+                    $strList.=$toAdd[$i];
+                } else {
+                    $strList.=$toAdd[$i].', ';
+                }
+                
+            }
+            if(count($toAdd)>1){
+                $hist->add('users',
+                $_SESSION['m_admin']['users']['user_id'],
+                'ADD',
+                'groupadded',$_SESSION['user']['UserId'].' '._ADDED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._IN_GROUPS.' '.$strList,
+                $_SESSION['config']['databasetype']);
+            } else {
+                $hist->add('users',
+                $_SESSION['m_admin']['users']['user_id'],
+                'ADD',
+                'groupadded',$_SESSION['user']['UserId'].' '._ADDED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._IN_GROUP.' '.$strList,
+                $_SESSION['config']['databasetype']);
+            }
+            
+        }     
+        
+        //RETRAIT
+        $groupIdList = array();        
+
+        for($i=0;$i<count($_SESSION['m_admin']['users']['groups']);$i++){
+            array_push($groupIdList,$_SESSION['m_admin']['users']['groups'][$i]['GROUP_ID']);
+        }
+        $toDelete = array();
+        $strList = "";
+
+        //Recherche des groupes à retirer
+        for( $j=0 ; $j<count($actualGroups); $j++){
+            if(!in_array($actualGroups[$j],$groupIdList)){
+                    $stmt=$db->query('SELECT group_desc FROM usergroups WHERE group_id = ?',[$actualGroups[$j]]);
+                    $label=$stmt->fetchObject();
+                    array_push($toDelete, $label->group_desc);
+            }
+        }
+        if(!empty($toDelete)){
+            for($i=0;$i<count($toDelete);$i++){
+                    if($i==count($toDelete)-1){
+                        $strList.=$toDelete[$i];
+                    } else {
+                        $strList.=$toDelete[$i].', ';
+                    };
+            }
+            if(count($toDelete)>1){
+                $hist->add('users',
+                $_SESSION['m_admin']['users']['user_id'],
+                'DEL',
+                'groupremoved',$_SESSION['user']['UserId'].' '._REMOVED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._FROM_GROUPS.' '.$strList,
+                $_SESSION['config']['databasetype']);
+            } else {
+                $hist->add('users',
+                $_SESSION['m_admin']['users']['user_id'],
+                'DEL',
+                'groupremoved',$_SESSION['user']['UserId'].' '._REMOVED_USER.' '.$_SESSION['m_admin']['users']['user_id'].' '._FROM_GROUP.' '.$strList,
+                $_SESSION['config']['databasetype']);
+            }
+            
+        }        
+
         $control = $uc->save($user, $_SESSION['m_admin']['users']['groups'], $mode, $params);
     }
     if (!empty($entitiesUserToRedirect)) {
