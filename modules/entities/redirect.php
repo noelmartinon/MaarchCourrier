@@ -137,7 +137,7 @@ require_once('apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php'
             }
         $frm_str .= '</select><br />';
 
-        $frm_str .= '<textarea style="width:98%;height:60px;resize:none;" name="notes"  id="notes" onblur="document.getElementById(\'note_content_to_dep\').value=document.getElementById(\'notes\').value;document.getElementById(\'note_content_to_user\').value=document.getElementById(\'notes\').value;"></textarea>';
+        $frm_str .= '<textarea style="width:98%;height:60px;resize:none;" name="notes"  id="notes" onblur="setNoteRedirect()"></textarea>';
         //var_dump($allEntitiesTree);
         $frm_str .= '<hr />';
         $frm_str .='<div id="form2" style="border:none;">';
@@ -361,7 +361,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 $content_note = $formValues['note_content_to_user'];
                 $content_note = str_replace(";", ".", $content_note);
                 $content_note = str_replace("--", "-", $content_note);
-                $content_note = $content_note;
+                $content_note = str_replace("___", "\n", $content_note);
 
                 $stmt = $db->query(
                     "INSERT INTO notes (identifier, tablename, user_id, "
@@ -389,7 +389,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 $content_note = $formValues['note_content_to_dep'];
                 $content_note = str_replace(";", ".", $content_note);
                 $content_note = str_replace("--", "-", $content_note);
-                $content_note = $content_note;
+                $content_note = str_replace("___", "\n", $content_note);
                 
                 $stmt = $db->query(
                     "INSERT INTO notes (identifier, tablename, user_id, "
