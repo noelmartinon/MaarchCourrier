@@ -202,7 +202,7 @@ class Database extends functions
         } elseif ($this->error && $_SESSION['config']['debug'] == 'true') {
             print_r('SQL ERROR:' . $this->error);
         } elseif ($this->driver == 'oci') {
-            $this->query("alter session set nls_date_format='dd-mm-yyyy HH24:MI:SS'");
+            //$this->query("alter session set nls_date_format='dd-mm-yyyy HH24:MI:SS'");
         }
     }
 

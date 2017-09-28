@@ -260,7 +260,7 @@ $tns = "(DESCRIPTION = "
                     'UTF8'
                 );
             }
-            $this->query("alter session set nls_date_format='dd-mm-yyyy HH24:MI:SS'");
+            //$this->query("alter session set nls_date_format='dd-mm-yyyy HH24:MI:SS'");
             break;
             
         default :
