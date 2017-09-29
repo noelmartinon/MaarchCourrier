@@ -127,8 +127,6 @@ if (!defined("_EDIT_POSITION_SHORT"))
     define("_EDIT_POSITION_SHORT", "Modify");
 if (!defined("_EDIT_POSITION"))
     define("_EDIT_POSITION", "Modified la position");
-if (!defined("_SAVE_POSITION"))
-    define("_SAVE_POSITION", "Log");
 if (!defined("_POSITION_UPDATED"))
     define("_POSITION_UPDATED", "Modified position");
 	//ENABLE/DISABLE
