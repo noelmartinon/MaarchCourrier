@@ -180,7 +180,7 @@ if(count($indexes) > 0)
                     $opt_indexes .= '" onclick="clear_error(\'frm_error_' 
                         . $id_action . '\');showCalender(this);"/>';
                 } else {
-                    $opt_indexes .= '<input name="'.functions::xssafe($key).'" type="text" id="' 
+                    $opt_indexes .= '<textarea name="'.functions::xssafe($key).'" type="text" id="' 
                         . $key . '" value="';
                     if (isset($values_fields->{$key})) {
                         $opt_indexes .= functions::show_string(
@@ -192,7 +192,7 @@ if(count($indexes) > 0)
                         );
                     }
                     $opt_indexes .= '" onclick="clear_error(\'frm_error_' 
-                        . $id_action . '\');" />';
+                        . $id_action . '\');"></textarea>';
                 }
             } else {
                 $opt_indexes .= '<select name="'.functions::xssafe($key).'" id="'.functions::xssafe($key).'" >';
