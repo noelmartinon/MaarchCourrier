@@ -1972,3 +1972,5 @@ if (!defined("_ADDRESS_NB")) define("_ADDRESS_NB","Address number");
 if (!defined('_DATE_CURRENT_USE')) define('_DATE_CURRENT_USE', 'Date current use');
 if (!defined('_DOC_CREATED'))
     define('_DOC_CREATED', 'Document created');
+if (!defined("_SAVE_POSITION"))
+    define("_SAVE_POSITION", "Save");

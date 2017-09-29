@@ -1997,3 +1997,5 @@ if (!defined('_DATE_CURRENT_USE'))
     define('_DATE_CURRENT_USE', 'Date limite d\'utilité courante');
 if (!defined('_DOC_CREATED'))
     define('_DOC_CREATED', 'Document créé');
+if (!defined("_SAVE_POSITION"))
+    define("_SAVE_POSITION", "Enregistrer");
