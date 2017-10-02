@@ -540,8 +540,8 @@ abstract class types_Abstract extends database
                         }
                         $db->query(
                             "INSERT INTO " . DOCTYPES_INDEXES_TABLE
-                            . " (coll_id, type_id, field_name, mandator) "
-                            . "values(?, ?, ?, ?, ?, ?, ?)",
+                            . " (coll_id, type_id, field_name, mandatory) "
+                            . "values(?, ?, ?, ?)",
                             array($_SESSION['m_admin']['doctypes']['COLL_ID'], $_SESSION['m_admin']['doctypes']['TYPE_ID']
                                 , $_SESSION['m_admin']['doctypes']['indexes'][$i], $mandatory)
                         );
