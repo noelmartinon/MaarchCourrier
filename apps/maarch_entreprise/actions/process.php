@@ -328,24 +328,23 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
                 $frm_str .= '<td width="50%" align="left"><span class="form_title_process" >'
                           . $indexes[$key]['label'] . ' :</span></td>';
                 $frm_str .= '<td>';
-                $frm_str .= '<input type="text" name="' . $key . '" id="'
-                          . $key . '" readonly="readonly" class="readonly" style="border:none;" ';
-                if ($indexes[$key]['type_field'] == 'input') {
-                    $frm_str .= ' value="'.$values_fields->{$key}.'" ';
-                } else {
-                    $val = '';
-                    for ($i=0; count($indexes[$key]['values']); $i++) {
-                        if ($values_fields->{$key} == $indexes[$key]['values'][$i]['id']) {
-                            $val =     $indexes[$key]['values'][$i]['label'];
-                            break;
-                        }
-                    }
-                    $frm_str .= ' value="'.$val.'" ';
+                $frm_str .= '<textarea name="'.$key.'"';
+                $frm_str .= ' id="'.$key.'"';
+                if (!isset($indexes[$key]['readonly']) || $indexes[$key]['readonly'] == true)
+                { 
+                    $frm_str.='readonly="readonly" class="readonly"';
                 }
-                $frm_str .= ' />';
+                else if ($indexes[$key]['type'] == 'date')
+                {
+                    $frm_str.= 'onclick="showCalender(this);"';
+                }
+                $frm_str .= 'style="width: 200px; max-width: 150px; border: medium none; color: rgb(102, 102, 102); height: 60px;"';
+                $frm_str .=  'title="'.$indexes[$key]['show_value'].'" alt="'.$indexes[$key]['show_value'].'" >'.$values_fields->{$key};
+                $frm_str .= '</textarea>';
                 $frm_str .= '</td >';
             $frm_str .= '</tr>';
         }
+        //exit;
     }
     //extension
     $db = new Database();
