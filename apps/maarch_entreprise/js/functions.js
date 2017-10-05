@@ -2115,7 +2115,7 @@ function valid_report_by_period(url)
                 if(div_to_fill)
                 {
 
-                    if (type_report == 'array') {
+                    if (type_report == 'array') {                        
                         if(response.status == 2){
                             eval("response = "+answer.responseText);
                             //console.log($('main_error_popup'));

@@ -203,7 +203,7 @@ if ($period_type == 'period_year') {
     exit();
 }
 
-$has_data = false;
+$has_data = true;
 $db = new Database();
 
 if ($report_type == 'graph') {
@@ -237,11 +237,7 @@ for ($i=0; $i<$totalEntities;$i++) {
     } elseif ($report_type == 'array') {
         array_push($data, array('LABEL' => $entities[$i]['LABEL'], 'VALUE' => $res->total ));
         array_push($totalCourrier, $res->total);
-    }
-
-    if ($res->total<>0) {
-        $has_data = true;
-    }    
+    }  
 }
 
 if ($report_type == 'array') {
@@ -257,7 +253,7 @@ if ($report_type == 'graph') {
     }
 
     $src1 = $_SESSION['config']['businessappurl']."index.php?display=true&module=reports&page=graphs&type=histo&largeur=$largeur&hauteur=600&marge_bas=300&title=".$title;
-    $_SESSION['GRAPH']['VALUES']='';
+    $_SESSION['GRAPH']['VALUES']=array();
     for ($i=0;$i<count($vol_an);$i++) {
         $_SESSION['GRAPH']['VALUES'][$i]=$vol_an[$i];
     }
