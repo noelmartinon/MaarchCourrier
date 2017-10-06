@@ -404,7 +404,7 @@ abstract class visa_Abstract extends Database
 				users_entities.primary_entity = 'Y' and users.user_id = usergroup_content.user_id AND entities.entity_id = users_entities.entity_id AND group_id IN 
 				(SELECT group_id FROM usergroups_services WHERE service_id = ? AND group_id = ?)  order by users.lastname", array('visa_documents',$group_id));
 		}else{
-			$stmt = $db->query("SELECT users.user_id, users.firstname, users.lastname, usergroup_content.group_id,entities.entity_id from users, usergroup_content, users_entities,entities WHERE users_entities.user_id = users.user_id and users.status <> 'DEL' and 
+			$stmt = $db->query("SELECT users.user_id, users.firstname, users.lastname, usergroup_content.group_id,entities.entity_id, users.enabled from users, usergroup_content, users_entities,entities WHERE users_entities.user_id = users.user_id and users.status <> 'DEL' and 
 				users_entities.primary_entity = 'Y' and users.user_id = usergroup_content.user_id AND entities.entity_id = users_entities.entity_id AND group_id IN 
 				(SELECT group_id FROM usergroups_services WHERE service_id = ?)  
 				order by users.lastname", array('visa_documents'));
@@ -413,7 +413,7 @@ abstract class visa_Abstract extends Database
 		$tab_users = array();
 		
 		while($res = $stmt->fetchObject()){
-			array_push($tab_users,array('id'=>$res->user_id, 'firstname'=>$res->firstname,'lastname'=>$res->lastname,'group_id'=>$res->group_id,'entity_id'=>$res->entity_id));
+			array_push($tab_users,array('id'=>$res->user_id, 'firstname'=>$res->firstname,'lastname'=>$res->lastname,'group_id'=>$res->group_id,'entity_id'=>$res->entity_id, 'enabled'=>$res->enabled));
 		}
 		return $tab_users;
 	}
@@ -515,13 +515,15 @@ abstract class visa_Abstract extends Database
                 foreach ($tab_userentities as $key => $value) {
                     $str .= '<optgroup label="'.$tab_userentities[$key]['entity_id'].'">';
                     foreach($tab_users as $user){
-                        if($tab_userentities[$key]['entity_id'] == $user['entity_id']){
-                            $selected = " ";
-                            if ($user['id'] == $step['user_id']) {
-                                $selected = " selected";
-                            }
-                            $str .= '<option value="'.$user['id'].'" '.$selected.'>'.$user['lastname'].' '.$user['firstname'].'</option>';
-                        }
+						if($user['enabled'] == 'Y'){
+							if($tab_userentities[$key]['entity_id'] == $user['entity_id']){
+								$selected = " ";
+								if ($user['id'] == $step['user_id']) {
+									$selected = " selected";
+								}
+								$str .= '<option value="'.$user['id'].'" '.$selected.'>'.$user['lastname'].' '.$user['firstname'].'</option>';
+							}
+						}
                     }
                     $str .= '</optgroup>';
                 }
