@@ -153,7 +153,7 @@ class request extends dbquery
         $query = $db->limit_select(0, $limit, $field_string, $table_string." ".$join, $where_string, $other, $dist);
         
         //TODO TEMPORARY FIX FOR INPI
-        if ($table_string == 'notes') {
+        if ($table_string == 'notes' || $table_string == 'sendmail') {
 
         $query = str_replace("SELECT * FROM (", "", $query);
         $query = substr($query, 0, -22);
