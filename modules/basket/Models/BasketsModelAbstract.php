@@ -211,7 +211,7 @@ class BasketsModelAbstract extends \Apps_Table_Service
 
         parent::deleteFrom([
             'table' => 'user_abs',
-            'where' => ['(user_abs = ? || basket_owner = ?)', 'basket_id = ?'],
+            'where' => ['(user_abs = ? OR basket_owner = ?)', 'basket_id = ?'],
             'data'  => [$aArgs['userId'], $aArgs['userId'], $aArgs['basketId']]
         ]);
 
