@@ -23,7 +23,7 @@ use Respect\Validation\Validator;
 use Core\Models\UserModel;
 
 include_once 'core/class/docservers_controler.php';
-include_once 'modules/basket/class/class_modules_tools.php';
+//include_once 'modules/basket/class/class_modules_tools.php';
 
 class UserController
 {
@@ -33,17 +33,14 @@ class UserController
             return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
         }
 
-
         $user = UserModel::getById(['userId' => $_SESSION['user']['UserId'], 'select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'thumbprint']]);
         $user['signatures'] = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
         $user['emailSignatures'] = UserModel::getEmailSignaturesById(['userId' => $_SESSION['user']['UserId']]);
         $user['groups'] = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
         $user['entities'] = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
         $user['lang'] = LangModel::getProfileLang();
-
-        $basket = new \basket();
-        $user['absence'] = $basket->redirect_my_baskets_list($_SESSION['user']['baskets'], count($_SESSION['user']['baskets']), $_SESSION['user']['UserId'], 'listingbasket specsmall');
-        $user['countBasketsForAbsence'] = count($_SESSION['user']['baskets']);
+        $user['baskets'] = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['redirectedBaskets'] = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
 
         return $response->withJson($user);
     }
@@ -107,12 +104,53 @@ class UserController
         return $response->withJson(['success' => _UPDATED_PASSWORD]);
     }
 
-    public function getCurrentUserBasketsForAbsence(RequestInterface $request, ResponseInterface $response) {
+    public function setCurrentUserBasketsRedirectionForAbsence(RequestInterface $request, ResponseInterface $response) {
         if (empty($_SESSION['user']['UserId'])) {
             return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
         }
 
+        $data = $request->getParams();
 
+        foreach ($data as $key => $value) {
+            if (empty($value['newUser']) || empty($value['basketId']) || empty($value['basketOwner']) || empty($value['virtual'])) {
+                return $response->withStatus(400)->withJson(['errors' => _FORM_ERROR]);
+            }
+            $newUser = strrchr($value['newUser'], '(');
+            $newUser = str_replace(['(', ')'], '', $newUser);
+            if (!empty($newUser)) {
+                $check = UserModel::getById(['userId' => $newUser, 'select' => ['1']]);
+            }
+            if (empty($newUser) || empty($check)) {
+                return $response->withStatus(400)->withJson(['errors' => _UNDEFINED_USER]);
+            }
+            $data[$key]['newUser'] = $newUser;
+        }
+
+        if (!empty($data)) {
+            BasketsModel::setBasketsRedirection(['userId' => $_SESSION['user']['UserId'], 'data' => $data]);
+        }
+
+        return $response->withJson(['redirectedBaskets' => BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']])]);
+    }
+
+    public function deleteCurrentUserRedirectedBaskets(RequestInterface $request, ResponseInterface $response, $aArgs) {
+        if (empty($_SESSION['user']['UserId'])) {
+            return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
+        }
+
+        BasketsModel::deleteBasketRedirection(['userId' => $_SESSION['user']['UserId'], 'basketId' => $aArgs['id']]);
+
+        return $response->withJson(['redirectedBaskets' => BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']])]);
+    }
+
+    public function activateAbsence(RequestInterface $request, ResponseInterface $response) {
+        if (empty($_SESSION['user']['UserId'])) {
+            return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
+        }
+
+        UserModel::activateAbsenceById(['userId' => $_SESSION['user']['UserId']]);
+
+        return $response->withJson(['success' => 'success']);
     }
 
     public function createCurrentUserSignature(RequestInterface $request, ResponseInterface $response)
@@ -292,6 +330,30 @@ class UserController
             'success' => _DELETED_EMAIL_SIGNATURE,
             'emailSignatures' => UserModel::getEmailSignaturesById(['userId' => $_SESSION['user']['UserId']])
         ]);
+    }
+
+    public function setAbsence(RequestInterface $request, ResponseInterface $response)
+    {
+        $users = UserModel::get();
+
+        $formattedUsers = [];
+        foreach ($users as $value) {
+            $formattedUsers[] = "{$value['firstname']} {$value['lastname']} ({$value['user_id']})";
+        }
+
+        return $response->withJson($formattedUsers);
+    }
+
+    public function getUsersForAutocompletion(RequestInterface $request, ResponseInterface $response)
+    {
+        $users = UserModel::get();
+
+        $formattedUsers = [];
+        foreach ($users as $value) {
+            $formattedUsers[] = "{$value['firstname']} {$value['lastname']} ({$value['user_id']})";
+        }
+
+        return $response->withJson($formattedUsers);
     }
 
     private function checkNeededParameters($aArgs = [])

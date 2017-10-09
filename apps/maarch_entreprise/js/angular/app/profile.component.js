@@ -38,6 +38,7 @@ var ProfileComponent = (function () {
             htmlBody: "",
             title: "",
         };
+        this.basketsToRedirect = [];
         this.showPassword = false;
         this.selectedSignature = -1;
         this.selectedSignatureLabel = "";
@@ -106,6 +107,26 @@ var ProfileComponent = (function () {
             .map(function (res) { return res.json(); })
             .subscribe(function (data) {
             _this.user = data;
+            _this.user.baskets.forEach(function (value, index) {
+                _this.user.baskets[index]['disabled'] = false;
+                _this.user.redirectedBaskets.forEach(function (value2) {
+                    if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                        _this.user.baskets[index]['disabled'] = true;
+                    }
+                });
+            });
+            setTimeout(function () {
+                $j("#absenceUser").typeahead({
+                    order: "asc",
+                    source: {
+                        ajax: {
+                            type: "POST",
+                            dataType: "json",
+                            url: _this.coreUrl + "rest/users/autocompleter",
+                        }
+                    }
+                });
+            }, 0);
             _this.loading = false;
         });
     };
@@ -168,13 +189,95 @@ var ProfileComponent = (function () {
             this.mailSignatureModel.title = "";
         }
     };
-    ProfileComponent.prototype.getAbsenceInfos = function () {
+    ProfileComponent.prototype.addBasketRedirection = function () {
         var _this = this;
-        this.http.get(this.coreUrl + 'rest/currentUser/baskets/absence')
+        if (this.basketsToRedirect[0] && $j("#absenceUser")[0].value) {
+            var redirectModel = [];
+            console.log(this.basketsToRedirect);
+            this.basketsToRedirect.forEach(function (value) {
+                redirectModel.push({
+                    "basketId": _this.user.baskets[value].basket_id,
+                    "basketName": _this.user.baskets[value].basket_name,
+                    "virtual": _this.user.baskets[value].is_virtual,
+                    "basketOwner": _this.user.baskets[value].basket_owner,
+                    "newUser": $j("#absenceUser")[0].value,
+                });
+            });
+            this.http.post(this.coreUrl + 'rest/currentUser/baskets/absence', redirectModel)
+                .map(function (res) { return res.json(); })
+                .subscribe(function (data) {
+                $j('#selectBasketAbsenceUser option').prop('selected', false);
+                $j("#absenceUser")[0].value = "";
+                _this.basketsToRedirect = [];
+                _this.user.redirectedBaskets = data.redirectedBaskets;
+                _this.user.baskets.forEach(function (value, index) {
+                    _this.user.baskets[index]['disabled'] = false;
+                    _this.user.redirectedBaskets.forEach(function (value2) {
+                        if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                            _this.user.baskets[index]['disabled'] = true;
+                        }
+                    });
+                });
+            }, function (err) {
+                _this.resultInfo = JSON.parse(err._body).errors;
+                $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                    $j("#resultInfo").slideUp(500);
+                });
+            });
+        }
+        else {
+            this.resultInfo = "Veuillez sélectionner au moins une corbeille et un utilisateur";
+            $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+            $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                $j("#resultInfo").slideUp(500);
+            });
+        }
+    };
+    ProfileComponent.prototype.delBasketRedirection = function (basket) {
+        var _this = this;
+        this.http.delete(this.coreUrl + 'rest/currentUser/baskets/' + basket.basket_id + '/absence')
             .map(function (res) { return res.json(); })
             .subscribe(function (data) {
-            _this.loading = false;
+            _this.user.redirectedBaskets = data.redirectedBaskets;
+            _this.user.baskets.forEach(function (value, index) {
+                _this.user.baskets[index]['disabled'] = false;
+                _this.user.redirectedBaskets.forEach(function (value2) {
+                    if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                        _this.user.baskets[index]['disabled'] = true;
+                    }
+                });
+            });
+            _this.resultInfo = "Redirection supprimé";
+            $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
+            $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                $j("#resultInfo").slideUp(500);
+            });
+        }, function (err) {
+            _this.resultInfo = JSON.parse(err._body).errors;
+            $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+            $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                $j("#resultInfo").slideUp(500);
+            });
         });
+    };
+    ProfileComponent.prototype.activateAbsence = function () {
+        var _this = this;
+        var r = confirm('Voulez-vous vraiment activer votre absence ? Vous serez automatiquement déconnecté.');
+        if (r) {
+            this.http.put(this.coreUrl + 'rest/currentUser/absence', {})
+                .map(function (res) { return res.json(); })
+                .subscribe(function () {
+                location.hash = "";
+                location.search = "?display=true&page=logout&abs_mode";
+            }, function (err) {
+                _this.resultInfo = JSON.parse(err._body).errors;
+                $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                    $j("#resultInfo").slideUp(500);
+                });
+            });
+        }
     };
     ProfileComponent.prototype.updatePassword = function () {
         var _this = this;

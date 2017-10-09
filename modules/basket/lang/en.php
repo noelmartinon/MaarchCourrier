@@ -264,9 +264,9 @@ if (!defined("_BACK_FROM_VACATION"))
 if (!defined("_MISSING_ADVERT_TITLE"))
     define("_MISSING_ADVERT_TITLE","Absences management");
 if (!defined("_MISSING_ADVERT_01"))
-    define("_MISSING_ADVERT_01","This account is currently defined as absent and the mails are redirected to an other user.");
+    define("_MISSING_ADVERT_01","This account is currently defined as absent.");
 if (!defined("_MISSING_ADVERT_02"))
-    define("_MISSING_ADVERT_02","If you want to connect with this account, the 'absent' mode will be deleted then.<br/> The mails redirection will come at its end and the application will be reactivated");
+    define("_MISSING_ADVERT_02","If you want to connect with this account, the 'absent' mode will be deleted.");
 if (!defined("_MISSING_CHOOSE"))
     define("_MISSING_CHOOSE"," Do you want to continue ?");
 if (!defined("_CHOOSE_PERSON_TO_REDIRECT"))

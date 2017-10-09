@@ -102,18 +102,14 @@ class BasketsModelAbstract extends \Apps_Table_Service
         static::checkRequired($aArgs, ['userId']);
         static::checkString($aArgs, ['userId']);
 
-        $rawUserGroups = UserModel::getGroupsById(['userId' => $aArgs['userId']]);
-        $userGroups = [];
-        foreach ($rawUserGroups as $value) {
-            $userGroups[] = $value['group_id'];
-        }
+        $userGroup = UserModel::getPrimaryGroupById(['userId' => $aArgs['userId']]);
 
         $aRawBaskets = static::select(
             [
                 'select'    => ['DISTINCT basket_id'],
                 'table'     => ['groupbasket'],
-                'where'     => ['group_id in (?)'],
-                'data'      => [$userGroups]
+                'where'     => ['group_id = ?'],
+                'data'      => [$userGroup['group_id']]
             ]
         );
 
@@ -122,18 +118,126 @@ class BasketsModelAbstract extends \Apps_Table_Service
             $basketIds[] = $value['basket_id'];
         }
 
+        $aBaskets = [];
+        if (!empty($basketIds)) {
+            $aBaskets = static::select(
+                [
+                    'select'    => ['basket_id', 'basket_name'],
+                    'table'     => ['baskets'],
+                    'where'     => ['basket_id in (?)'],
+                    'data'      => [$basketIds],
+                    'order_by'  => 'basket_order, basket_name'
+                ]
+            );
+        }
+
+        $aBaskets = array_merge($aBaskets, self::getSecondaryBasketsByUserId(['userId' => $aArgs['userId']]));
+        foreach ($aBaskets as $key => $value) {
+            $aBaskets[$key]['is_virtual'] = 'N';
+            $aBaskets[$key]['basket_owner'] = $aArgs['userId'];
+        }
+        $aBaskets = array_merge($aBaskets, self::getAbsBasketsByUserId(['userId' => $aArgs['userId']]));
+
+        return $aBaskets;
+    }
+
+    public static function getSecondaryBasketsByUserId(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['userId']);
+        static::checkString($aArgs, ['userId']);
+
         $aBaskets = static::select(
             [
-                'select'    => ['basket_id','basket_name'],
-                'table'     => ['baskets'],
-                'where'     => ['basket_id in (?)'],
-                'data'      => [$basketIds],
-                'order_by'  => 'basket_order, basket_name'
+                'select'    => ['ba.basket_id', 'ba.basket_name'],
+                'table'     => ['baskets ba, user_baskets_secondary ubs'],
+                'where'     => ['ubs.user_id = ?', 'ubs.basket_id = ba.basket_id'],
+                'data'      => [$aArgs['userId']],
+                'order_by'  => 'ba.basket_order, ba.basket_name'
             ]
         );
 
-        if (empty($aBaskets)) {
-            return '';
+        return $aBaskets;
+    }
+
+    public static function getAbsBasketsByUserId(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['userId']);
+        static::checkString($aArgs, ['userId']);
+
+        $aBaskets = static::select(
+            [
+                'select'    => ['ba.basket_id', 'ba.basket_name', 'ua.user_abs', 'ua.basket_owner', 'ua.is_virtual'],
+                'table'     => ['baskets ba, user_abs ua'],
+                'where'     => ['ua.new_user = ?', 'ua.basket_id = ba.basket_id'],
+                'data'      => [$aArgs['userId']],
+                'order_by'  => 'ba.basket_order, ba.basket_name'
+            ]
+        );
+
+        foreach ($aBaskets as $key => $value) {
+            $aBaskets[$key]['userToDisplay'] = UserModel::getLabelledUserById(['id' => $value['user_abs']]);
+        }
+
+        return $aBaskets;
+    }
+
+    public static function setBasketsRedirection(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['userId', 'data']);
+        static::checkString($aArgs, ['userId']);
+        static::checkArray($aArgs, ['data']);
+
+
+        foreach ($aArgs['data'] as $value) {
+            parent::insertInto(
+                [
+                    'user_abs'      => $aArgs['userId'],
+                    'new_user'      => $value['newUser'],
+                    'basket_id'     => $value['basketId'],
+                    'basket_owner'  => $value['basketOwner'],
+                    'is_virtual'    => $value['virtual']
+                ],
+                'user_abs'
+            );
+        }
+
+        return true;
+    }
+
+    public static function deleteBasketRedirection(array $aArgs)
+    {
+        static::checkRequired($aArgs, ['userId', 'basketId']);
+        static::checkString($aArgs, ['userId', 'basketId']);
+
+        parent::deleteFrom([
+            'table' => 'user_abs',
+            'where' => ['(user_abs = ? || basket_owner = ?)', 'basket_id = ?'],
+            'data'  => [$aArgs['userId'], $aArgs['userId'], $aArgs['basketId']]
+        ]);
+
+        return true;
+    }
+
+    public static function getBasketsRedirectedByUserId(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['userId']);
+        static::checkString($aArgs, ['userId']);
+
+
+        $aBaskets = static::select(
+            [
+                'select'    => ['ba.basket_id', 'ba.basket_name', 'ua.new_user', 'ua.basket_owner'],
+                'table'     => ['baskets ba, user_abs ua'],
+                'where'     => ['ua.user_abs = ?', 'ua.basket_id = ba.basket_id'],
+                'data'      => [$aArgs['userId']],
+                'order_by'  => 'ua.system_id'
+            ]
+        );
+
+        foreach ($aBaskets as $key => $value) {
+            $user = UserModel::getById(['userId' => $value['new_user'], 'select' => ['firstname', 'lastname']]);
+            $aBaskets[$key]['userToDisplay'] = "{$user['firstname']} {$user['lastname']} ({$value['new_user']})" ;
+            $aBaskets[$key]['user'] = "{$user['firstname']} {$user['lastname']}" ;
         }
 
         return $aBaskets;

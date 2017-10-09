@@ -15,14 +15,14 @@
             </div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
-                    <!--<li>-->
-                        <!--<a data-toggle="modal" data-target="#manageAbs" (click)="getAbsenceInfos()"><i class="fa fa-user-times" title=""></i> {{user.lang.manageAbsences}} </a>-->
-                    <!--</li>-->
-                    <li style="cursor: pointer">
-                        <a (click)="absenceModal()" ><i class="fa fa-user-times"></i> {{user.lang.manageAbsences}} </a>
-                    </li>
                     <li style="cursor: pointer">
                         <a data-toggle="modal" data-target="#manageSign"><i class="fa fa-vcard-o"></i> {{user.lang.manageSignatures}} </a>
+                    </li>
+                    <li style="cursor: pointer">
+                        <a data-toggle="modal" data-target="#manageAbs"><i class="fa fa-share"></i> Rediriger mes corbeilles </a>
+                    </li>
+                    <li style="cursor: pointer">
+                        <a (click)="activateAbsence()" ><i class="fa fa-user-times"></i> Activer mon absence </a>
                     </li>
                 </ul>
             </div>
@@ -141,39 +141,49 @@
 </div>
 
 <div id="manageAbs" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">{{user.lang.manageAbsences}}</h4>
-      </div>
-        <div class="modal-body">
-            <div class="alert alert-danger" role="alert">Vous allez être <strong>automatiquement déconnecté</strong> après avoir défini vos redirections de bannettes</div>
-            <nav class="navbar navbar-default">
-               <div class="container-fluid">
-                     <form class="navbar-form navbar-left">
-                        <div class="form-group">
-                            <select class="form-control" placeholder="Bannette(s) à rediriger"><option>Courrier à signer</option></select>
-              
-                            <span>&nbsp;vers&nbsp;</span>
-                            <input type="text" class="form-control" placeholder="Utilisateur">
-                        </div>
-                    </form>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#" title="Sauvegarder la modification"><i class="fa fa-plus"></i></a></li>
-                    </ul>
-                </div>
-            </nav>
-            <ul class="list-group">
-                <li class="list-group-item"><i class="fa fa-tasks"></i> Mes courriers à traiter <span class="pull-right"><span class="label label-primary">Barbarain BAIN</span> <a href="#" title="Supprimer"><i class="fa fa-trash" style="color:red;"></i></a></span></li>
-                <li class="list-group-item"><i class="fa fa-tasks"></i> Mes courriers à viser <span class="pull-right"><span class="label label-primary">Patricia PETIT</span> <a href="#" title="Supprimer"><i class="fa fa-trash" style="color:red;"></i></a></span></li>
-            </ul>
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Rediriger mes corbeilles</h4>
+            </div>
+            <div class="modal-body">
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <form class="navbar-form navbar-left">
+                            <span style="margin-left: 130px;padding-top: 15px">Ctrl + Clic pour sélectionner plusieurs corbeilles</span>
+                            <div class="form-group" style="margin-left: 130px">
+                                <select style="height: 150px" id="selectBasketAbsenceUser" class="form-control" multiple name="basketsToRedirect" [(ngModel)]="basketsToRedirect">
+                                    <option *ngFor="let basket of user.baskets; let i = index" [disabled]="basket.disabled" [value]="i">
+                                        {{basket.basket_name}}
+                                        <span *ngIf="basket.userToDisplay">({{basket.userToDisplay}})</span>
+                                    </option>
+                                </select>
+                                <span style="margin-left: 12px; margin-right: 12px">vers</span>
+                            </div>
+                            <div class="form-group typeahead__container">
+                                <div class="typeahead__field">
+                                    <input id="absenceUser" type="text" class="form-control" placeholder="{{user.lang.user}}" autocomplete="off">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div style="padding: 15px;text-align: center">
+                        <button type="button" (click)="addBasketRedirection()" class="btn btn-success">Valider</button>
+                    </div>
+                </nav>
+                <ul class="list-group">
+                    <li class="list-group-item" *ngFor="let basket of user.redirectedBaskets">
+                        <i class="fa fa-tasks" title="{{basket.basket_id}}"></i> {{basket.basket_name}}
+                        <span class="pull-right">
+                            <span class="label label-primary">{{basket.userToDisplay}}</span>
+                            <a (click)="delBasketRedirection(basket)" style="cursor: pointer" title="Supprimer la redirection"><i class="fa fa-trash fa-lg" style="color:red;"></i></a>
+                        </span>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default">Activer mon absence</button>
-      </div>
     </div>
-  </div>
 </div>
 
 <div id="manageSign" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">

@@ -75,6 +75,7 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                 <h2><?php echo _MY_BASKETS;?> : </h2>
             
             <?php
+            $redirectedBaskets = \Baskets\Models\BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
             $countColl = count($collWithUserBaskets);
             $currentGroup = '';
             for ($cpt=0;$cpt<$countColl;$cpt++) {
@@ -120,30 +121,46 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                             $nb = '';
                         }
                         if ($_SESSION['user']['baskets'][$i]['id_page'] <> 'redirect_to_action') {
-                            if (
-                                $core_tools->is_module_loaded('folder') 
-                                && $_SESSION['user']['baskets'][$i]['is_folder_basket'] == 'Y'
-                            ) {
-                                echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'" href="'
-                                    . $_SESSION['config']['businessappurl']
-                                    . 'index.php?page=view_baskets&amp;module=basket&amp;baskets='
-                                    . $_SESSION['user']['baskets'][$i]['id']
-                                    . '"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id'] 
+                            $redirectedTo = '';
+                            foreach ($redirectedBaskets as $redirectBasketValue) {
+                                if ($redirectBasketValue['basket_owner'] == $_SESSION['user']['UserId']) {
+                                    if ($redirectBasketValue['basket_id'] == $_SESSION['user']['baskets'][$i]['id']) {
+                                        $redirectedTo = $redirectBasketValue['user'];
+                                    }
+                                } elseif ($_SESSION['user']['baskets'][$i]['id'] == $redirectBasketValue['basket_id'] . '_' . $redirectBasketValue['basket_owner']) {
+                                    $redirectedTo = $redirectBasketValue['user'];
+                                }
+                            }
+                            if (empty($redirectedTo)) {
+                                if ($core_tools->is_module_loaded('folder') && $_SESSION['user']['baskets'][$i]['is_folder_basket'] == 'Y') {
+                                    echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'" href="'
+                                        . $_SESSION['config']['businessappurl']
+                                        . 'index.php?page=view_baskets&amp;module=basket&amp;baskets='
+                                        . $_SESSION['user']['baskets'][$i]['id']
+                                        . '"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id']
+                                        . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
+                                        . '"><i class="fa-li fa fa-spinner fa-spin" style="margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
+                                        . '</span></b> <i class="fa-li fa fa-folder" style="padding-top: 5px;padding-bottom: 5px;"></i>'
+                                        . functions::xssafe($_SESSION['user']['baskets'][$i]['name'])
+                                        . ' </a></li>';
+                                } else {
+                                    echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'" href="'
+                                        . $_SESSION['config']['businessappurl']
+                                        . 'index.php?page=view_baskets&amp;module=basket&amp;baskets='
+                                        . $_SESSION['user']['baskets'][$i]['id']
+                                        . '"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id']
+                                        . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
+                                        . '"><i class="fa-li fa fa-spinner fa-spin" style=";margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
+                                        . '</span></b> <i class="fa-li fa fa-tasks" style="padding-top: 5px;padding-bottom: 5px;"></i> '
+                                        . functions::xssafe($_SESSION['user']['baskets'][$i]['name'])
+                                        . ' </a></li>';
+                                }
+                            } else {
+                                echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '"><i class="fa-li fa fa-spinner fa-spin" style="margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
-                                    . '</span></b> <i class="fa-li fa fa-folder" style="padding-top: 5px;padding-bottom: 5px;"></i>'
-                                    . functions::xssafe($_SESSION['user']['baskets'][$i]['name'])
-                                    . ' </a></li>';
-                            } else {
-                                echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'" href="'
-                                    . $_SESSION['config']['businessappurl']
-                                    . 'index.php?page=view_baskets&amp;module=basket&amp;baskets='
-                                    . $_SESSION['user']['baskets'][$i]['id']
-                                    . '"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id'] 
-                                    . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
-                                    . '"><i class="fa-li fa fa-spinner fa-spin" style=";margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
-                                    . '</span></b> <i class="fa-li fa fa-tasks" style="padding-top: 5px;padding-bottom: 5px;"></i> '
-                                    . functions::xssafe($_SESSION['user']['baskets'][$i]['name'])
+                                    . '</span></b> <i class="fa-li fa fa-share" style="padding-top: 5px;padding-bottom: 5px;color: #c62b62"></i>'
+                                    . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . ' (redirigé vers ' . $redirectedTo . ')'
                                     . ' </a></li>';
                             }
                         }

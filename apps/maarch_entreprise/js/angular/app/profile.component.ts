@@ -41,6 +41,7 @@ export class ProfileComponent implements OnInit {
         htmlBody                : "",
         title                   : "",
     };
+    basketsToRedirect           : string[]  = [];
 
     showPassword                : boolean   = false;
     selectedSignature           : number    = -1;
@@ -122,6 +123,28 @@ export class ProfileComponent implements OnInit {
             .subscribe((data) => {
                 this.user = data;
 
+                this.user.baskets.forEach((value: any, index: number) => {
+                    this.user.baskets[index]['disabled'] = false;
+                    this.user.redirectedBaskets.forEach((value2: any) => {
+                        if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                            this.user.baskets[index]['disabled'] = true;
+                        }
+                    });
+                });
+
+                setTimeout(() => {
+                    $j("#absenceUser").typeahead({
+                        order: "asc",
+                        source: {
+                            ajax: {
+                                type: "POST",
+                                dataType: "json",
+                                url: this.coreUrl + "rest/users/autocompleter",
+                            }
+                        }
+                    });
+                }, 0);
+
                 this.loading = false;
             });
     }
@@ -195,12 +218,95 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    getAbsenceInfos() {
-        this.http.get(this.coreUrl + 'rest/currentUser/baskets/absence')
-            .map(res => res.json())
-            .subscribe((data) => {
-                this.loading = false;
+    addBasketRedirection() {
+        if (this.basketsToRedirect[0] && $j("#absenceUser")[0].value) {
+            var redirectModel :any[] = [];
+                console.log(this.basketsToRedirect);
+            this.basketsToRedirect.forEach((value: any) => {
+                redirectModel.push({
+                    "basketId"      : this.user.baskets[value].basket_id,
+                    "basketName"    : this.user.baskets[value].basket_name,
+                    "virtual"       : this.user.baskets[value].is_virtual,
+                    "basketOwner"   : this.user.baskets[value].basket_owner,
+                    "newUser"       : $j("#absenceUser")[0].value,
+                });
             });
+
+            this.http.post(this.coreUrl + 'rest/currentUser/baskets/absence', redirectModel)
+                .map(res => res.json())
+                .subscribe((data: any) => {
+                    $j('#selectBasketAbsenceUser option').prop('selected', false);
+                    $j("#absenceUser")[0].value = "";
+                    this.basketsToRedirect = [];
+                    this.user.redirectedBaskets =  data.redirectedBaskets;
+                    this.user.baskets.forEach((value: any, index: number) => {
+                        this.user.baskets[index]['disabled'] = false;
+                        this.user.redirectedBaskets.forEach((value2: any) => {
+                            if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                                this.user.baskets[index]['disabled'] = true;
+                            }
+                        });
+                    });
+                }, (err) => {
+                    this.resultInfo = JSON.parse(err._body).errors;
+                    $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                    $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                        $j("#resultInfo").slideUp(500);
+                    });
+                });
+        } else {
+            this.resultInfo = "Veuillez sélectionner au moins une corbeille et un utilisateur";
+            $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+            $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                $j("#resultInfo").slideUp(500);
+            });
+        }
+    }
+
+    delBasketRedirection(basket: any) {
+        this.http.delete(this.coreUrl + 'rest/currentUser/baskets/' + basket.basket_id + '/absence')
+            .map(res => res.json())
+            .subscribe((data: any) => {
+                this.user.redirectedBaskets =  data.redirectedBaskets;
+                this.user.baskets.forEach((value: any, index: number) => {
+                    this.user.baskets[index]['disabled'] = false;
+                    this.user.redirectedBaskets.forEach((value2: any) => {
+                        if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                            this.user.baskets[index]['disabled'] = true;
+                        }
+                    });
+                });
+                this.resultInfo = "Redirection supprimé";
+                $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
+                $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                    $j("#resultInfo").slideUp(500);
+                });
+            }, (err) => {
+                this.resultInfo = JSON.parse(err._body).errors;
+                $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                    $j("#resultInfo").slideUp(500);
+                });
+            });
+    }
+
+    activateAbsence() {
+        let r = confirm('Voulez-vous vraiment activer votre absence ? Vous serez automatiquement déconnecté.');
+
+        if (r) {
+            this.http.put(this.coreUrl + 'rest/currentUser/absence', {})
+                .map(res => res.json())
+                .subscribe(() => {
+                        location.hash = "";
+                        location.search = "?display=true&page=logout&abs_mode";
+                }, (err) => {
+                        this.resultInfo = JSON.parse(err._body).errors;
+                        $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                        $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                            $j("#resultInfo").slideUp(500);
+                        });
+                });
+        }
     }
 
     updatePassword() {

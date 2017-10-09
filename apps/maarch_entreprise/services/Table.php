@@ -187,7 +187,7 @@ class Apps_Table_Service extends Core_Abstract_Service {
     /**
      * Ajoute un row dans la base de données
      * @param array $aData donnée a ajouter
-     * @param array $table table de l'ajout
+     * @param string $table table de l'ajout
      * @param string $getLastId
      * @return type        [description]
      */
