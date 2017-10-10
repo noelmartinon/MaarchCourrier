@@ -18,6 +18,7 @@
       <parameter name="collection" type="collection_list" />
       <parameter name="basketId" type="identifier" />
       <parameter name="basketname" type="string" />
+      <parameter name="color" type="string" />
       <parameter name="basketdesc" type="string" />
       <parameter name="basketclause" type="string" />
       <parameter name="Submit" type="string" />

@@ -132,6 +132,7 @@ abstract class admin_basket_Abstract extends Database
         
         if ($mode == "add") {
             $_SESSION['m_admin']['basket']['coll_id'] = $_SESSION['collections'][0]['id'];
+            $_SESSION['m_admin']['basket']['color'] = '#666666';
         }
         
         // If mode "Up", Loading the informations of the basket in session
@@ -154,6 +155,11 @@ abstract class admin_basket_Abstract extends Database
                     $line = $stmt->fetchObject();
                     $_SESSION['m_admin']['basket']['desc'] = functions::show_string($line->basket_desc);
                     $_SESSION['m_admin']['basket']['name'] = functions::show_string($line->basket_name);
+                    if (empty($line->color)) {
+                        $_SESSION['m_admin']['basket']['color'] = '#666666';
+                    } else {
+                        $_SESSION['m_admin']['basket']['color'] = functions::show_string($line->color);
+                    }
                     $_SESSION['m_admin']['basket']['clause'] = functions::show_string($line->basket_clause);
                     $_SESSION['m_admin']['basket']['is_generic'] = functions::show_string($line->is_generic);
                     $_SESSION['m_admin']['basket']['is_visible'] = functions::show_string($line->is_visible);
@@ -247,6 +253,11 @@ abstract class admin_basket_Abstract extends Database
                                 <p>
                                     <label><?php echo _BASKET;?> : </label>
                                     <input name="basketname"  type="text" id="basketname" value="<?php functions::xecho($_SESSION['m_admin']['basket']['name']);?>" />
+                                </p>
+                                <p>
+                                    <label>Couleur : </label>
+                                    <input name="color" type="color" id="color" style="width: 38%;" value="<?php functions::xecho($_SESSION['m_admin']['basket']['color']);?>" />
+                                    <a title="Réinitialiser la couleur" style="cursor: pointer" onclick="$j('#color')[0].value = '#666666'"><i class="fa fa-magic"></i></a>
                                 </p>
                                 <p>
                                     <label><?php echo _DESC;?> : </label>
@@ -446,6 +457,10 @@ abstract class admin_basket_Abstract extends Database
         {
             $_SESSION['m_admin']['basket']['name'] = $this->wash($_REQUEST['basketname'], "no", _THE_BASKET, 'yes', 0, 255);
         }
+        if(!empty($_REQUEST['color']))
+        {
+            $_SESSION['m_admin']['basket']['color'] = $this->wash($_REQUEST['color'], "no", _THE_BASKET, 'yes', 0, 255);
+        }
         if (isset($_REQUEST['basketdesc']) && !empty($_REQUEST['basketdesc']))
         {
             $_SESSION['m_admin']['basket']['desc'] = $this->wash($_REQUEST['basketdesc'], "no", _THE_DESC, 'yes', 0, 255);
@@ -544,8 +559,8 @@ abstract class admin_basket_Abstract extends Database
                         exit();
                     }
                     $db->query(
-                        "INSERT INTO ".$_SESSION['tablename']['bask_baskets']." ( coll_id, basket_id, basket_name, basket_desc , basket_clause, is_visible, is_folder_basket, flag_notif ) "
-                        ."VALUES (?,?,?,?,?,?,?,?)", array($_SESSION['m_admin']['basket']['coll_id'],$_SESSION['m_admin']['basket']['basketId'],$_SESSION['m_admin']['basket']['name'],$_SESSION['m_admin']['basket']['desc'],$tmp,$_SESSION['m_admin']['basket']['is_visible'],$_SESSION['m_admin']['basket']['is_folder_basket'],$_SESSION['m_admin']['basket']['flag_notif']));
+                        "INSERT INTO ".$_SESSION['tablename']['bask_baskets']." ( coll_id, basket_id, basket_name, basket_desc , basket_clause, is_visible, is_folder_basket, flag_notif, color) "
+                        ."VALUES (?,?,?,?,?,?,?,?,?)", array($_SESSION['m_admin']['basket']['coll_id'],$_SESSION['m_admin']['basket']['basketId'],$_SESSION['m_admin']['basket']['name'],$_SESSION['m_admin']['basket']['desc'],$tmp,$_SESSION['m_admin']['basket']['is_visible'],$_SESSION['m_admin']['basket']['is_folder_basket'],$_SESSION['m_admin']['basket']['flag_notif'], $_SESSION['m_admin']['basket']['color']));
                     $this->load_db();
 
                     // Log in database if required
@@ -594,7 +609,7 @@ abstract class admin_basket_Abstract extends Database
                     exit();
                 }
 
-                $db->query("UPDATE ".$_SESSION['tablename']['bask_baskets']." set basket_name = ? , coll_id = ? , basket_desc = ? ,basket_clause = ?, is_folder_basket = ?, is_visible = ?, flag_notif = ? where basket_id = ?",array($name,$_SESSION['m_admin']['basket']['coll_id'],$desc, $tmp, $_SESSION['m_admin']['basket']['is_folder_basket'], $_SESSION['m_admin']['basket']['is_visible'], $_SESSION['m_admin']['basket']['flag_notif'], $_SESSION['m_admin']['basket']['basketId']));
+                $db->query("UPDATE baskets set basket_name = ? , coll_id = ? , basket_desc = ? ,basket_clause = ?, is_folder_basket = ?, is_visible = ?, flag_notif = ?, color = ? where basket_id = ?",array($name,$_SESSION['m_admin']['basket']['coll_id'],$desc, $tmp, $_SESSION['m_admin']['basket']['is_folder_basket'], $_SESSION['m_admin']['basket']['is_visible'], $_SESSION['m_admin']['basket']['flag_notif'], $_SESSION['m_admin']['basket']['color'], $_SESSION['m_admin']['basket']['basketId']));
                 $this->load_db();
 
                 // Log in database if required

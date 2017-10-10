@@ -800,7 +800,7 @@ abstract class basket_Abstract extends Database
         $secCtrl = new SecurityControler();
         $stmt = $db->query(
             "select basket_id, coll_id, basket_name, basket_desc, "
-            . "basket_clause, is_visible, is_generic, is_folder_basket from "
+            . "basket_clause, is_visible, is_generic, is_folder_basket, color from "
             . BASKET_TABLE . " where basket_id = ? and enabled = 'Y'",array($basketId));
         $res = $stmt->fetchObject();
         $tab['id'] = $res->basket_id;
@@ -816,6 +816,7 @@ abstract class basket_Abstract extends Database
         $tab['is_generic'] = $res->is_generic;
         $tab['desc'] = $this->show_string($res->basket_desc);
         $tab['name'] = $this->show_string($res->basket_name);
+        $tab['color'] = $this->show_string($res->color);
         $tab['clause'] = $res->basket_clause;
         $tab['is_visible'] = $res->is_visible;
         $tab['is_folder_basket'] = $res->is_folder_basket;
