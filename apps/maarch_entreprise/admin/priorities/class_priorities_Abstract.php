@@ -39,7 +39,7 @@ abstract class PrioritiesAbstract extends Database
                 . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
                 . 'entreprise.xml';
         }
-
+        
         return $path;
     }
 
@@ -121,7 +121,7 @@ abstract class PrioritiesAbstract extends Database
     }
 
     public function updatePriorities() {
-        $priorities = [];
+        $priorities = [];        
        
         for ($i = 0; isset($_REQUEST[('label_' . $i)]) && isset($_REQUEST[('priority_' . $i)]) && isset($_REQUEST[('working_' . $i)]) && isset($_REQUEST[('color_' . $i)]); $i++) {
             $priorities[] = ['label' => $_REQUEST[('label_' . $i)], 'number' => $_REQUEST[('priority_' . $i)], 'wdays' => $_REQUEST[('working_' . $i)], 'color' => $_REQUEST[('color_' . $i)]];
@@ -130,9 +130,15 @@ abstract class PrioritiesAbstract extends Database
             $priorities[] = ['add' => 'add', 'label' => $_REQUEST[('label_new' . $i)], 'number' => $_REQUEST[('priority_new' . $i)], 'wdays' => $_REQUEST[('working_new' . $i)], 'color' => $_REQUEST[('color_new' . $i)]];
         }
         if ($this->checkPriorities($priorities)) {
-            $this->setXML($priorities);
-            $this->updateSession();
-            $_SESSION['info'] = _PRIORITIES_UPDATED;
+            $path = $this->getXMLPath();
+            if(!is_readable($path)||!is_writable($path)){
+                $_SESSION['error'] = _NO_RIGHTS_ON.' '.$path;
+            } else {
+                $this->setXML($priorities);
+                $this->updateSession();
+                $_SESSION['info'] = _PRIORITIES_UPDATED;
+            }
+            
         } else {
             $_SESSION['error'] = _PRIORITIES_ERROR;
         }
@@ -160,7 +166,7 @@ abstract class PrioritiesAbstract extends Database
                     fwrite($fp,$res);
                 }
                 $this->updateSession();
-            } else {
+            } else {                
                 $_SESSION['error'] = _PRIORITIES_ERROR_TAKEN;
             }
 
