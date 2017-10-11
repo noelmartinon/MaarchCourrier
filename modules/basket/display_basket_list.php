@@ -141,7 +141,7 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                         . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                         . '"><i class="fa-li fa fa-spinner fa-spin" style="margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
                                         . '</span></b> <i class="fa-li fa fa-folder" style="padding-top: 5px;padding-bottom: 5px;"></i>'
-                                        . '<span>' . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . '</span>'
+                                        . '<span style="color: ' .$_SESSION['user']['baskets'][$i]['color'] . '">' . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . '</span>'
                                         . ' </a></li>';
                                 } else {
                                     echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'" href="'
