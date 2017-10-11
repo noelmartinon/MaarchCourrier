@@ -157,7 +157,7 @@ abstract class entity_Abstract extends functions
                         <input name="short_label"  type="text" id="short_label" value="<?php if(isset($_SESSION['m_admin']['entity']['short_label'])){ functions::xecho($_SESSION['m_admin']['entity']['short_label']);} ?>" /><span class="red_asterisk"><i class="fa fa-star"></i></span>
                     </p>
                     <p style="text-align:right;">
-                        <label><?php echo _FULL_NAME;?> : </label>
+                        <label><?php echo _ENTITY_FULL_NAME;?> : </label>
                         <textarea name="entity_full_name" style="margin-right: 7px" type="text" id="entity_full_name"><?php if(isset($_SESSION['m_admin']['entity']['entity_full_name'])){ functions::xecho($_SESSION['m_admin']['entity']['entity_full_name']);}?></textarea>
                     </p>
                     <p style="text-align:right;">
@@ -945,7 +945,7 @@ abstract class entity_Abstract extends functions
         $_SESSION['m_admin']['entity']['entity_full_name'] = '';
         if(isset($_REQUEST['entity_full_name']) && !empty($_REQUEST['entity_full_name']))
         {
-            $_SESSION['m_admin']['entity']['entity_full_name'] = functions::wash(utf8_decode($_REQUEST['entity_full_name']), "no", _FULL_NAME, 'yes', 0);
+            $_SESSION['m_admin']['entity']['entity_full_name'] = functions::wash(utf8_decode($_REQUEST['entity_full_name']), "no", _ENTTIY_FULL_NAME, 'yes', 0);
             $_SESSION['m_admin']['entity']['entity_full_name'] = utf8_encode($_SESSION['m_admin']['entity']['entity_full_name']);
         }
         $_SESSION['m_admin']['entity']['adrs1'] = '';
