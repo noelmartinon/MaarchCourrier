@@ -70,6 +70,7 @@
 		<parameter name="mode" type="mode" />
 		<parameter name="parententity" type="identifier" />
 		<parameter name="short_label" type="string" />
+		<parameter name="entity_full_name" type="string" />
 		<parameter name="type" type="string" />
 		<parameter name="archival_agreement" type="string" />
 		<parameter name="archival_agency" type="string" />
