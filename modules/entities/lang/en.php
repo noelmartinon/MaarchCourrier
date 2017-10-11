@@ -118,6 +118,8 @@ if (!defined("_ENTITY_LABEL"))
     define("_ENTITY_LABEL", "Name");
 if (!defined("_SHORT_LABEL"))
     define("_SHORT_LABEL", "Short name");
+if (!defined("_ENTITY_FULL_NAME"))
+    define("_ENTITY_FULL_NAME", "Full name");
 if (!defined("_ENTITY_ADR_1"))
     define("_ENTITY_ADR_1", "Address 1");
 if (!defined("_ENTITY_ADR_2"))
