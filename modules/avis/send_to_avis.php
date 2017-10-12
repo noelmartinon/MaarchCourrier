@@ -40,6 +40,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $servicesCompare = array();
     $db = new Database();
     $labelAction = '';
+    $sec = new security();
     if ($id_action <> '') {
         $stmt = $db->query("select label_action from actions where id = ?", array($id_action));
         $resAction = $stmt->fetchObject();
@@ -91,29 +92,24 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
         $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
     );
+    //Collection
+    if (isset($_REQUEST['coll_id']) && ! empty($_REQUEST['coll_id'])) {
+        $collId = trim($_REQUEST['coll_id']);
+        $parameters .= '&coll_id='.$_REQUEST['coll_id'];
+        $view = $sec->retrieve_view_from_coll_id($collId);
+        $table = $sec->retrieve_table_from_coll($collId);
+        //retrieve the process entity of document
+        $stmt = $db->query(
+            "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($values_str)
+        );
+        $resultDest = $stmt->fetchObject();
+        $destination = $resultDest->destination;
+    }
     if ($destination <> '') {
         $templates = $templatesControler->getAllTemplatesForProcess($destination);
     } else {
         $templates = $templatesControler->getAllTemplatesForSelect();
     }
-    //Collection
-        if (isset($_REQUEST['coll_id']) && ! empty($_REQUEST['coll_id'])) {
-            $collId = trim($_REQUEST['coll_id']);
-            $parameters .= '&coll_id='.$_REQUEST['coll_id'];
-            $view = $sec->retrieve_view_from_coll_id($collId);
-            $table = $sec->retrieve_table_from_coll($collId);
-            //retrieve the process entity of document
-            $stmt = $db->query(
-                "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($values_str)
-            );
-            $resultDest = $stmt->fetchObject();
-            $destination = $resultDest->destination;
-        }
-        if ($destination <> '') {
-            $templates = $templatesControler->getAllTemplatesForProcess($destination);
-        } else {
-            $templates = $templatesControler->getAllTemplatesForSelect();
-        } 
     $frm_str .='<b>' . _RECOMMENDATION_LIMIT_DATE . ':</b><br/>';
     $frm_str .= '<input name="recommendation_limit_date_tr" type="text" '
             . 'id="recommendation_limit_date_tr" value="" placeholder="JJ-MM-AAAA" onfocus="checkRealDateAvis();" onChange="checkRealDateAvis();"  onclick="clear_error(\'frm_error_'

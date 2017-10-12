@@ -23,6 +23,7 @@ require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
     $services = array();
     $servicesCompare = array();
     $db = new Database();
+    $sec = new security();
     $labelAction = '';
     if ($id_action <> '') {
         $stmt = $db->query("select label_action from actions where id = ?",array($id_action));
@@ -77,11 +78,6 @@ require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
         $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
             $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
         );
-        if ($destination <> '') {
-            $templates = $templatesControler->getAllTemplatesForProcess($destination);
-        } else {
-            $templates = $templatesControler->getAllTemplatesForSelect();
-        }
         //Collection
         if (isset($_REQUEST['coll_id']) && ! empty($_REQUEST['coll_id'])) {
             $collId = trim($_REQUEST['coll_id']);
@@ -99,7 +95,8 @@ require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
             $templates = $templatesControler->getAllTemplatesForProcess($destination);
         } else {
             $templates = $templatesControler->getAllTemplatesForSelect();
-        } 
+        }
+
         $frm_str .='<br/><b>'._RECOMMENDATION_NOTE.':</b><br/>';
         $frm_str .= '<select name="templateNotes" id="templateNotes" style="width:98%;margin-bottom: 10px;background-color: White;border: 1px solid #999;color: #666;text-align: left;" '
                     . 'onchange="addTemplateToNote($(\'templateNotes\').value, \''

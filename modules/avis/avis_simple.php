@@ -23,6 +23,7 @@ require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
     $services = array();
     $servicesCompare = array();
     $db = new Database();
+    $sec = new security();
     $labelAction = '';
     if ($id_action <> '') {
         $stmt = $db->query("select label_action from actions where id = ?",array($id_action));
