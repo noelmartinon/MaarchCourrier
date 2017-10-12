@@ -526,12 +526,11 @@ abstract class visa_Abstract extends Database
 						}
                     }
                     $str .= '</optgroup>';
-                }
-                $str .= '</select>';
+		}				
+		$str .= '</select>';
                 $str .= '<script>';
                 $str .= 'new Chosen($(\'visaUserList\'),{width: "250px", disable_search_threshold: 10});';
                 $str .= '</script>';
-
                 require_once("modules/entities/class/class_manage_listdiff.php");
                 $diff_list = new diffusion_list();
                 $listModels = $diff_list->select_listmodels($typeList);
@@ -614,7 +613,7 @@ abstract class visa_Abstract extends Database
                             
                             
                             $disabled = ' disabled="disabled"';
-							if(preg_match("/[DEL]/", $info_userVis['process_comment'])){
+							if(preg_match("/\[DEL\]/", $info_userVis['process_comment'])){
 								$info_vised = '';
 								$link_vis = 'times';
 								$vised = ' moved vised';
@@ -701,7 +700,7 @@ abstract class visa_Abstract extends Database
                         
                     }else{
 						$modif = 'false';
-                        if (preg_match("/[DEL]/", $info_userSign['process_comment'])) {
+                        if (preg_match("/\[DEL\]/", $info_userSign['process_comment'])) {
 							$info_vised = '';
 							$link_vis = 'times';
 							$vised = ' moved vised';

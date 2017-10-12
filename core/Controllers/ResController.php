@@ -34,18 +34,22 @@ class ResController
 {
     public function create(RequestInterface $request, ResponseInterface $response, $aArgs)
     {
-        if(empty($aArgs)) {
-            $aArgs = $request->getQueryParams();
 
-            $aArgs['data'] = json_decode($aArgs['data']);
-
-            $aArgs['data'] = $this->object2array($aArgs['data']);
-
-            //FIX pb if data has parent
-            if (isset($aArgs['data']['data'])) {
-                $aArgs['data'] = $aArgs['data']['data'];
-            }
+        if (empty($aArgs)) {
+            $aArgs = $request->getParsedBody();
         }
+
+        // if(empty($aArgs)) {
+        //     $aArgs = $request->getQueryParams();
+        //     $aArgs['data'] = json_decode($aArgs['data']);
+        //     $aArgs['data'] = $this->object2array($aArgs['data']);
+        //     //FIX pb if data has parent
+        //     if (isset($aArgs['data']['data'])) {
+        //         $aArgs['data'] = $aArgs['data']['data'];
+        //     }
+        // }
+
+        $aArgs['data'] = $this->object2array($aArgs['data']);
 
         //*****************************************************************************************
         //LOG ONLY LOG FOR DEBUG

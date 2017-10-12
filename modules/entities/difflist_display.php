@@ -39,7 +39,7 @@
                 if ($color == ' class="col"') $color = ' ';
                 else $color = ' class="col"';
                 
-                if (preg_match("/[DEL]/", $difflist[$role_id]['users'][$i]['process_comment'])) {
+                if (preg_match("/\[DEL\]/", $difflist[$role_id]['users'][$i]['process_comment'])) {
                     $styleMoved=" style='text-decoration: line-through;opacity:0.5;' ";
                     $descMoved=$difflist[$role_id]['users'][$i]['process_comment'];
                 } else {
