@@ -3681,3 +3681,21 @@ function change3(id){
         ouvre3(id);
     }
 }
+
+function duplicateTemplate(id) {
+    var r = confirm("Voulez-vous vraiment dupliquer le modèle ?");
+
+    if (r) {
+        $j.ajax({
+            url      : '../../rest/templates/' + id + '/duplicate',
+            type     : 'POST',
+            dataType : 'json',
+            data: {},
+            success: function(answer) {
+                location.href = "index.php?page=templates_management_controler&mode=up&module=templates&id=" + answer.id + "&start=0&order=asc&order_field=&what=";
+            }, error: function(err) {
+                alert(err);
+            }
+        });
+    }
+}

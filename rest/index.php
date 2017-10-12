@@ -151,4 +151,7 @@ $app->put('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::
 $app->delete('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::class . ':deleteCurrentUserEmailSignature');
 $app->post('/users/autocompleter', \Core\Controllers\UserController::class . ':getUsersForAutocompletion');
 
+//Templates
+$app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateController::class . ':duplicate');
+
 $app->run();
