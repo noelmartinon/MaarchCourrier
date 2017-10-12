@@ -615,7 +615,7 @@ abstract class visa_Abstract extends Database
                             
                             
                             $disabled = ' disabled="disabled"';
-							if(preg_match("/[DEL]/", $info_userVis['process_comment'])){
+							if(preg_match("/\[DEL\]/", $info_userVis['process_comment'])){
 								$info_vised = '';
 								$link_vis = 'times';
 								$vised = ' moved vised';
@@ -702,7 +702,7 @@ abstract class visa_Abstract extends Database
                         
                     }else{
 						$modif = 'false';
-                        if (preg_match("/[DEL]/", $info_userSign['process_comment'])) {
+                        if (preg_match("/\[DEL\]/", $info_userSign['process_comment'])) {
 							$info_vised = '';
 							$link_vis = 'times';
 							$vised = ' moved vised';
