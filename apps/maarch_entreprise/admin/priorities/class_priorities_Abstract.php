@@ -130,9 +130,14 @@ abstract class PrioritiesAbstract extends Database
             $priorities[] = ['add' => 'add', 'label' => $_REQUEST[('label_new' . $i)], 'number' => $_REQUEST[('priority_new' . $i)], 'wdays' => $_REQUEST[('working_new' . $i)], 'color' => $_REQUEST[('color_new' . $i)]];
         }
         if ($this->checkPriorities($priorities)) {
-            $this->setXML($priorities);
-            $this->updateSession();
-            $_SESSION['info'] = _PRIORITIES_UPDATED;
+            $path = $this->getXMLPath();
+            if(!is_readable($path)||!is_writable($path)){
+                $_SESSION['error'] = _NO_RIGHTS_ON.' '.$path;
+            } else {
+                $this->setXML($priorities);
+                $this->updateSession();
+                $_SESSION['info'] = _PRIORITIES_UPDATED;
+            }
         } else {
             $_SESSION['error'] = _PRIORITIES_ERROR;
         }
