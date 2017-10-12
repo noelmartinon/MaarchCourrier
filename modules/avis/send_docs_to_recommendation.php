@@ -16,6 +16,8 @@ $frm_height = '90%';
 require "modules/entities/entities_tables.php";
 require_once "modules/entities/class/EntityControler.php";
 require_once "modules/entities/class/class_manage_entities.php";
+require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR
+        ."class".DIRECTORY_SEPARATOR."class_lists.php";
 
 
 function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
@@ -23,6 +25,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     include_once 'apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php';
     $cr7 = new chrono();
     $ent = new entity();
+    $sec = new security();
     $entity_ctrl = new EntityControler();
     $services = array();
     $servicesCompare = array();
@@ -131,7 +134,24 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
             $_SESSION['redirect']['diff_list']['avis_info'] = $_SESSION['indexing']['diff_list']['avis_info'];
         }
     }
-
+        //Collection
+        if (isset($_REQUEST['coll_id']) && ! empty($_REQUEST['coll_id'])) {
+            $collId = trim($_REQUEST['coll_id']);
+            $parameters .= '&coll_id='.$_REQUEST['coll_id'];
+            $view = $sec->retrieve_view_from_coll_id($collId);
+            $table = $sec->retrieve_table_from_coll($collId);
+            //retrieve the process entity of document
+            $stmt = $db->query(
+                "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($values_str)
+            );
+            $resultDest = $stmt->fetchObject();
+            $destination = $resultDest->destination;
+        }
+        if ($destination <> '') {
+            $templates = $templatesControler->getAllTemplatesForProcess($destination);
+        } else {
+            $templates = $templatesControler->getAllTemplatesForSelect();
+        }
     $frm_str .='<b>'._RECOMMENDATION_LIMIT_DATE.' <span class="red_asterisk"><i class="fa fa-star"></i></span> :</b> <br/>';
     $frm_str .= '<input name="recommendation_limit_date_tr" type="text" '
         . 'id="recommendation_limit_date_tr" value="" placeholder="JJ-MM-AAAA" onfocus="checkRealDateAvis();" onChange="checkRealDateAvis();"  onclick="clear_error(\'frm_error_'
