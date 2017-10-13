@@ -89,6 +89,7 @@ if ($datasources['res_letterbox_contact'][0]['contact_id'] <> '') {
     $datasources['contact'][] = $myContact;
 }
 
+
 if (isset($datasources['contact'][0]['title']) && $datasources['contact'][0]['title'] == '')
     $datasources['contact'][0]['title'] = $datasources['contact'][0]['contact_title'];
 if (isset($datasources['contact'][0]['firstname']) && $datasources['contact'][0]['firstname'] == '')
@@ -99,6 +100,18 @@ if (isset($datasources['contact'][0]['function']) && $datasources['contact'][0][
     $datasources['contact'][0]['function'] = $datasources['contact'][0]['contact_function'];
 if (isset($datasources['contact'][0]['other_data']) && $datasources['contact'][0]['other_data'] == '')
     $datasources['contact'][0]['other_data'] = $datasources['contact'][0]['contact_other_data'];
+
+if (!isset($datasources['contact'][0]['title']))
+    $datasources['contact'][0]['title'] = $datasources['contact'][0]['contact_title'];
+if (!isset($datasources['contact'][0]['firstname']))
+    $datasources['contact'][0]['firstname'] = $datasources['contact'][0]['contact_firstname'];
+if (!isset($datasources['contact'][0]['lastname']))
+    $datasources['contact'][0]['lastname'] = $datasources['contact'][0]['contact_lastname'];
+if (!isset($datasources['contact'][0]['function']))
+    $datasources['contact'][0]['function'] = $datasources['contact'][0]['contact_function'];
+if (!isset($datasources['contact'][0]['other_data']))
+    $datasources['contact'][0]['other_data'] = $datasources['contact'][0]['contact_other_data'];
+
 
 // Notes
 $datasources['notes'] = array();
