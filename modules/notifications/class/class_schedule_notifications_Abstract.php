@@ -49,7 +49,6 @@ abstract class ScheduleNotifications_Abstract
                 $data[$id]['state'] = 'hidden';
             }
         }
-
         return $data;
     }
 
@@ -180,6 +179,7 @@ abstract class ScheduleNotifications_Abstract
 
         $crontabBeforeSave = $this->getCrontab();
         $error = 0;
+        
         foreach ($crontabToSave as $id => $e) {
             if ($e['state'] == "deleted") {
                 // nothing to do
@@ -204,7 +204,6 @@ abstract class ScheduleNotifications_Abstract
                 break;
             }
         }
-
         return $error;
     }
 

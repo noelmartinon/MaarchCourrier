@@ -4,19 +4,26 @@ $confirm = false;
 $etapes = array('form');
 $frm_width='400px';
 $frm_height = '90%';
+
+$destination = '';
+
 require("modules/entities/entities_tables.php");
 require_once("modules/entities/class/EntityControler.php");
 require_once('modules/entities/class/class_manage_entities.php');
 require_once('apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php');
+require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR
+        ."class".DIRECTORY_SEPARATOR."class_lists.php";
 
  function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
  {
+
     $ent = new entity();
     $entity_ctrl = new EntityControler();
     $services = array();
     $servicesCompare = array();
     $cr7 = new chrono();
     $db = new Database();
+    $sec = new security();
     $labelAction = '';
     if ($id_action <> '') {
         $stmt = $db->query("select label_action from actions where id = ?",array($id_action));
@@ -115,6 +122,19 @@ require_once('apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php'
         $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
             $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
         );
+        //Collection
+        if (isset($_REQUEST['coll_id']) && ! empty($_REQUEST['coll_id'])) {
+            $collId = trim($_REQUEST['coll_id']);
+            $parameters .= '&coll_id='.$_REQUEST['coll_id'];
+            $view = $sec->retrieve_view_from_coll_id($collId);
+            $table = $sec->retrieve_table_from_coll($collId);
+            //retrieve the process entity of document
+            $stmt = $db->query(
+                "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($values_str)
+            );
+            $resultDest = $stmt->fetchObject();
+            $destination = $resultDest->destination;
+        }
         if ($destination <> '') {
             $templates = $templatesControler->getAllTemplatesForProcess($destination);
         } else {
@@ -126,8 +146,10 @@ require_once('apps/' . $_SESSION['config']['app_id'] . '/class/class_chrono.php'
                     . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
                     . '&module=templates&page=templates_ajax_content_for_notes\');document.getElementById(\'notes\').focus();">';
         $frm_str .= '<option value="">' . _SELECT_NOTE_TEMPLATE . '</option>';
+        //var_dump($templates);
             for ($i=0;$i<count($templates);$i++) {
                 if ($templates[$i]['TYPE'] == 'TXT' && ($templates[$i]['TARGET'] == 'notes' || $templates[$i]['TARGET'] == '')) {
+                    // var_dump($templates[$i]['LABEL']);
                     $frm_str .= '<option value="';
                     $frm_str .= $templates[$i]['ID'];
                     $frm_str .= '">';

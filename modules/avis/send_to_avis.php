@@ -19,6 +19,8 @@ require_once 'modules/entities/class/class_manage_entities.php';
 require_once "modules" . DIRECTORY_SEPARATOR . "avis" . DIRECTORY_SEPARATOR
         . "class" . DIRECTORY_SEPARATOR
         . "avis_controler.php";
+require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR
+        ."class".DIRECTORY_SEPARATOR."class_lists.php";
 
 function get_form_txt($values, $path_manage_action, $id_action, $table, $module, $coll_id, $mode)
 {
@@ -38,6 +40,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $servicesCompare = array();
     $db = new Database();
     $labelAction = '';
+    $sec = new security();
     if ($id_action <> '') {
         $stmt = $db->query("select label_action from actions where id = ?", array($id_action));
         $resAction = $stmt->fetchObject();
@@ -89,6 +92,19 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
         $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
     );
+    //Collection
+    if (isset($_REQUEST['coll_id']) && ! empty($_REQUEST['coll_id'])) {
+        $collId = trim($_REQUEST['coll_id']);
+        $parameters .= '&coll_id='.$_REQUEST['coll_id'];
+        $view = $sec->retrieve_view_from_coll_id($collId);
+        $table = $sec->retrieve_table_from_coll($collId);
+        //retrieve the process entity of document
+        $stmt = $db->query(
+            "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($values_str)
+        );
+        $resultDest = $stmt->fetchObject();
+        $destination = $resultDest->destination;
+    }
     if ($destination <> '') {
         $templates = $templatesControler->getAllTemplatesForProcess($destination);
     } else {
