@@ -96,9 +96,12 @@ while ($state <> 'END') {
             $myDoc->process_limit_date = str_replace("-", "/", $db->format_date($myDoc->process_limit_date));
             $logger->write("Processing document #" . $myDoc->res_id, 'INFO');
                 
+//var_dump($myDoc->type_id);
+//var_dump($GLOBALS['doctypes']);
+
             $myDoctype = $GLOBALS['doctypes'][$myDoc->type_id];
             if(!$myDoctype) {
-                Bt_exitBatch(1, 'Unknown document type ' . $myDoc->type_id);
+//                Bt_exitBatch(1, 'Unknown document type ' . $myDoc->type_id);
             }
             $logger->write("Document type id is #" . $myDoc->type_id, 'INFO');
             
