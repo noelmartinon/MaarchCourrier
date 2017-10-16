@@ -40,11 +40,11 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         }
     }
 
+    $result = $archiveTransfer->deleteMessage($values);
+
+    $result = $archiveTransfer->receive($values);
+
     if (!$_SESSION['error']) {
-        $result = $archiveTransfer->deleteMessage($values);
-
-        $result = $archiveTransfer->receive($values);
-
         $db = new Database();
         $stmt = $db->query("select message_id from unit_identifier where res_id = ?", array($values[0]));
         $unitIdentifier = $stmt->fetchObject();
