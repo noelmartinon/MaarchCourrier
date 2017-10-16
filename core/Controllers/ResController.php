@@ -669,7 +669,7 @@ class ResController
             }
         }
 
-        $countD = count($data);
+        /*$countD = count($data);
         for ($i = 0; $i < $countD; $i++) {
             if ($data[$i]['column'] == 'type_id') {
                 $docTypes = DoctypesModel::getByTypeId([
@@ -694,7 +694,7 @@ class ResController
                     }
                 }
             }
-        }
+        }*/
 
         if (!$typistFound && !$toAddressFound) {
             array_push(

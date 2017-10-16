@@ -152,7 +152,7 @@
         array_push($data, array('column' => "filename", 'value' => $filename, 'type' => "string"));
         array_push($data, array('column' => 'creation_date', 'value' => $db->current_datetime(), 'type' => "function"));
 
-        $countD = count($data);
+        /*$countD = count($data);
         for ($i = 0; $i < $countD; $i++) {
             if ($data[$i]['column'] == 'type_id') {
                 $db = new Database();
@@ -177,7 +177,7 @@
                     );
                 }
             }
-        }
+        }*/
 
         if(!$this->check_basic_fields($data))
         {

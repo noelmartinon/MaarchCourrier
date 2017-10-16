@@ -684,7 +684,7 @@ abstract class lists_Abstract extends Database
                     .$this->modeReturn.');" value="'.$date_end.'" size="15" />&nbsp;';
             break;
 
-            case 'date_current_use':
+            /*case 'date_current_use':
                 if(isset($_SESSION['filters']['date_current_use_start']['VALUE']) && !empty($_SESSION['filters']['date_current_use_start']['VALUE'])) {
                     $date_start = $_SESSION['filters']['date_current_use_start']['VALUE'];
                 }
@@ -702,7 +702,7 @@ abstract class lists_Abstract extends Database
                     .'onKeyPress="if(event.keyCode == 9 || event.keyCode == 13)loadList(\''.$this->link
                     .'&filter=date_current_use_end&value=\' + this.value, \''.$this->divListId.'\', '
                     .$this->modeReturn.');" value="'.$date_end.'" size="15" />&nbsp;';
-            break;
+            break;*/
       
             case 'identifier':
                 if(isset($_SESSION['filters']['identifier']['VALUE']) && !empty($_SESSION['filters']['identifier']['VALUE'])) {
@@ -943,37 +943,37 @@ abstract class lists_Abstract extends Database
                         }
                         
                         $_SESSION['filters']['creation_date']['CLAUSE'] = join(' and ', $creation_date);
-                    } else if ($_REQUEST['filter'] == 'date_current_use_start' || $_REQUEST['filter'] == 'date_current_use_end') {
+                    /*} else if ($_REQUEST['filter'] == 'date_current_use_start' || $_REQUEST['filter'] == 'date_current_use_end') {
 
-                        //Pattern
-                        $pattern = "/^[0-3][0-9]-[0-1][0-9]-[1-2][0-9][0-9][0-9]$/";
-                        //Keep the date
-                        $date_current_use = array();
-                        //date start
-                        if ($_REQUEST['filter'] == 'date_current_use_start') {
-                            if (preg_match($pattern, $_SESSION['filters']['date_current_use_start']['VALUE']) == false) {
+                            //Pattern
+                            $pattern = "/^[0-3][0-9]-[0-1][0-9]-[1-2][0-9][0-9][0-9]$/";
+                            //Keep the date
+                            $date_current_use = array();
+                            //date start
+                            if ($_REQUEST['filter'] == 'date_current_use_start') {
+                                if (preg_match($pattern, $_SESSION['filters']['date_current_use_start']['VALUE']) == false) {
 
-                                $_SESSION['error'] = _DATE . ' ' . _WRONG_FORMAT;
+                                    $_SESSION['error'] = _DATE . ' ' . _WRONG_FORMAT;
 
-                            } else {
+                                } else {
 
-                                $date_current_use['start'] = "(date_current_use >= '"
-                                    . $_SESSION['filters']['date_current_use_start']['VALUE'] . "')";
+                                    $date_current_use['start'] = "(date_current_use >= '"
+                                        . $_SESSION['filters']['date_current_use_start']['VALUE'] . "')";
+                                }
                             }
-                        }
-                        //date end
-                        if ($_REQUEST['filter'] == 'date_current_use_end') {
-                            if (preg_match($pattern, $_SESSION['filters']['date_current_use_end']['VALUE']) == false) {
+                            //date end
+                            if ($_REQUEST['filter'] == 'date_current_use_end') {
+                                if (preg_match($pattern, $_SESSION['filters']['date_current_use_end']['VALUE']) == false) {
 
-                                $_SESSION['error'] = _DATE . ' ' . _WRONG_FORMAT;
-                            } else {
+                                    $_SESSION['error'] = _DATE . ' ' . _WRONG_FORMAT;
+                                } else {
 
-                                $date_current_use['end'] = "(date_current_use <= '"
-                                    . $_SESSION['filters']['date_current_use_end']['VALUE'] . "')";
+                                    $date_current_use['end'] = "(date_current_use <= '"
+                                        . $_SESSION['filters']['date_current_use_end']['VALUE'] . "')";
+                                }
                             }
-                        }
 
-                        $_SESSION['filters']['date_current_use']['CLAUSE'] = join(' and ', $date_current_use);
+                            $_SESSION['filters']['date_current_use']['CLAUSE'] = join(' and ', $date_current_use);*/
                     } else if($_REQUEST['filter'] == 'priority' && isset($_REQUEST['value'])) {
                         $_SESSION['filters']['priority']['CLAUSE'] = "priority = '".$_REQUEST['value']."'";
 
