@@ -118,6 +118,7 @@ $app->get('/docserverType/{id}', \Core\Controllers\DocserverTypeController::clas
 $app->get('/attachments', \Attachments\Controllers\AttachmentsController::class . ':getList');
 $app->get('/attachments/{id}', \Attachments\Controllers\AttachmentsController::class . ':getById');
 $app->post('/attachments', \Attachments\Controllers\AttachmentsController::class . ':create');
+$app->put('/attachments/{id}/inSignatureBook', \Attachments\Controllers\AttachmentsController::class . ':setInSignatureBook');
 
 //visa
 $app->get('/{basketId}/signatureBook/resList', \Visa\Controllers\VisaController::class . ':getResList');

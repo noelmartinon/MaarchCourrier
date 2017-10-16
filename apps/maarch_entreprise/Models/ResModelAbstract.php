@@ -106,7 +106,7 @@ class ResModelAbstract extends Apps_Table_Service
         $select = [
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['res_view_attachments'],
-            'where'     => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')"],
+            'where'     => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE'],
             'data'      => [$aArgs['resIdMaster'], $aArgs['notIn']],
         ];
         if (!empty($aArgs['orderBy'])) {

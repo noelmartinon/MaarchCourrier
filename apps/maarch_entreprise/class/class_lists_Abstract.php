@@ -1714,16 +1714,25 @@ abstract class lists_Abstract extends Database
             if($resultTheLine[$iresults]['fromDetail']){
                 $fromDetail = $resultTheLine[$iresults]['fromDetail'];
             }
+            if ($resultTheLine[$iresults]['column'] == 'in_signature_book') {
+                $inSignatureBook = $resultTheLine[$iresults]['value'];
+            }
         }
         $return = '<input type="checkbox" name="final" id="final" ';
 
-        if ($resultTheLine[2]['value_bis'] == "TRA") {
+        if (!empty($inSignatureBook)) {
             $return .= 'checked ';
         }
 
-        $return .= 'onclick="setFinalVersion(\'' . $_SESSION['config']['businessappurl']
-                        . 'index.php?display=true&module=attachments&page=setFinalVersion&relation='.$resultTheLine[1]['value'].'&id=' . $resultTheLine[0]['value'] . '&relation='.$relation.'&fromDetail='.$fromDetail.'\');"/>'
-                            . _FINAL_VERSION;
+//        $return .= 'onclick="setFinalVersion(\'' . $_SESSION['config']['businessappurl']
+//                        . 'index.php?display=true&module=attachments&page=setFinalVersion&relation='.$resultTheLine[1]['value'].'&id=' . $resultTheLine[0]['value'] . '&relation='.$relation.'&fromDetail='.$fromDetail.'\');"/>'
+//                            . _FINAL_VERSION;
+        $isVersion = 'false';
+        if ($resultTheLine[1]['value'] > 1) {
+            $isVersion = 'true';
+        }
+        $return .= 'onclick="setAttachmentInSignatureBook(' . $resultTheLine[0]['value'] . ', ' . $isVersion . ');"/>Intégrer dans le parapheur';
+
         return $return;
     }
 	
