@@ -231,7 +231,7 @@ $flag_notif = false;
 							<?php
 							for($iHours=0;$iHours<24;$iHours++){?>
 								<option value='<?php functions::xecho($iHours);?>'
-								<?php if ($iHours == $e['h']) { ?>
+								<?php if ((string)$iHours == $e['h']) { ?>
 									selected="selected"
 								<?php } ?>
 								>
@@ -246,7 +246,7 @@ $flag_notif = false;
 							<?php
 							for($iMinutes=0;$iMinutes<60;$iMinutes++){ ?>
 								<option value='<?php functions::xecho($iMinutes);?>'
-								<?php if ($iMinutes == $e['m']) { ?>
+								<?php if ((string)$iMinutes == $e['m']) { ?>
 									selected="selected"
 								<?php } ?>
 								>
