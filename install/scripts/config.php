@@ -8,7 +8,12 @@
         $xmlconfig = simplexml_load_file(realpath('.').'/custom/maarch_courrier/modules/notifications/batch/config/config.xml');
         $CONFIG = $xmlconfig->CONFIG;
         $CONFIG->MaarchDirectory = realpath('.')."/";
-        $chemin = $_SERVER['SERVER_ADDR'] . dirname($_SERVER['PHP_SELF']);
+        if ($_SERVER['REMOTE_ADDR'] == '::1'){
+            $REMOTE_ADDR = 'localhost';
+        }else{
+            $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
+        }
+        $chemin = $REMOTE_ADDR . dirname($_SERVER['PHP_SELF']);
         $maarchUrl = rtrim($chemin, "install");
         $maarchUrl = $maarchUrl . 'cs_'.$_SESSION['config']['databasename'].'/';
         $CONFIG->MaarchUrl = $maarchUrl;
