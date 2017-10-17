@@ -92,11 +92,14 @@ if (!defined("_RECEIVED_MESSAGE"))
 if (!defined("_ERROR_MESSAGE"))
     define("_ERROR_MESSAGE", "Bordereau non-reçu");
 
-if (!defined("_TRANSFERRING_AGENCY_SIREN_COMPULSORY"))
-    define("_TRANSFERRING_AGENCY_SIREN_COMPULSORY", "Numéro SIREN service versant obligatoire");
+if (!defined("_TRANSFERRING_AGENCY_SIREN_REQUIRED"))
+    define("_TRANSFERRING_AGENCY_SIREN_REQUIRED", "Numéro SIREN service versant obligatoire");
 
-if (!defined("_ARCHIVAL_AGENCY_SIREN_COMPULSORY"))
-    define("_ARCHIVAL_AGENCY_SIREN_COMPULSORY", "Numéro SIREN service d'archive obligatoire");
+if (!defined("_ARCHIVAL_AGENCY_SIREN_REQUIRED"))
+    define("_ARCHIVAL_AGENCY_SIREN_REQUIRED", "Numéro SIREN service d'archive obligatoire");
+
+if (!defined("_ARCHIVAL_AGREEMENT_REQUIRED"))
+    define("_ARCHIVAL_AGREEMENT_REQUIRED", "Convention d'archivage obligatoire");
 
 if (!defined("_VALIDATE_MANUAL_DELIVERY"))
     define("_VALIDATE_MANUAL_DELIVERY", "Valider l'envoi manuel du bordereau");
@@ -142,3 +145,9 @@ if (!defined("_LETTER_NO_ARCHIVED"))
 
 if (!defined("_ERROR_LETTER_ARCHIVED"))
     define("_ERROR_LETTER_ARCHIVED", "Vous ne pouvez pas remettre à zéro un courrier archivé. Numéro du courrier : ");
+
+if (!defined("_ERROR_ORIGINATOR_EMPTY"))
+    define("_ERROR_ORIGINATOR_EMPTY", "Au moins un producteur doit être renseigné");
+
+if (!defined("_ERROR_FILE_NOT_EXIST"))
+    define("_ERROR_FILE_NOT_EXIST", "Tous les documents doivent être présent dans les zones de stockage");

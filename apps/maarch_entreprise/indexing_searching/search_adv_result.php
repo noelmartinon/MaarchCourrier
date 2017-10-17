@@ -139,8 +139,9 @@ if (count($_REQUEST['meta']) > 0) {
             }
             elseif ($tab_id_fields[$j] == 'multifield' && !empty($_REQUEST['multifield'])) {
                 // MULTIFIELD : subject, title, doc_custom_t1, process notes
-                $multifield = trim($_REQUEST['subject']);
-                $json_txt .= "'multifield' : ['".addslashes($multifield)."'],";
+                $multifield = trim($_REQUEST['multifield']);
+                $json_txt .= "'multifield' : ['".addslashes(trim($multifield))."'],";
+
                 $where_request .= "(lower(translate(subject,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) like lower(:multifield) "
                     ."or (lower(translate(alt_identifier,'/','')) like lower(:multifield) OR lower(alt_identifier) like lower(:multifield)) "
                     ."or lower(title) LIKE lower(:multifield) "
@@ -150,7 +151,7 @@ if (count($_REQUEST['meta']) > 0) {
                 if (ctype_digit($_REQUEST['multifield']))
                 {
                     $where_request .= "or res_id = :multifield2 ";
-                    $arrayPDO = array_merge($arrayPDO, array(":multifield2" => $_REQUEST['multifield']));
+                    $arrayPDO = array_merge($arrayPDO, array(":multifield2" => $multifield)); 
                 }
 
                 $multifield = $func->normalize($multifield);
@@ -323,10 +324,10 @@ if (count($_REQUEST['meta']) > 0) {
             // SUBJECT
             elseif ($tab_id_fields[$j] == 'subject' && !empty($_REQUEST['subject']))
             {
-                //var_dump($_REQUEST['subject']);exit();
                 $subject = trim($_REQUEST['subject']);
                 $subject = $func->normalize($subject);
-                $json_txt .= " 'subject' : ['".addslashes($subject)."'],";
+                $json_txt .= " 'subject' : ['".addslashes(trim($subject))."'],";
+
                 $where_request .= " (lower(translate(subject,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) like lower(:subject) "
                     ."or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE coll_id = 'letterbox_coll' AND lower(translate(title,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))  like lower(:subject) ))) and ";
                 $arrayPDO = array_merge($arrayPDO, array(":subject" => "%".$subject."%"));

@@ -98,8 +98,8 @@ WITH (
   OIDS=FALSE
 );
 
-ALTER TABLE res_letterbox DROP COLUMN IF EXISTS date_current_use;
-ALTER TABLE res_letterbox ADD COLUMN date_current_use timestamp without time zone;
+-- ALTER TABLE res_letterbox DROP COLUMN IF EXISTS date_current_use;
+-- ALTER TABLE res_letterbox ADD COLUMN date_current_use timestamp without time zone;
 
 ALTER TABLE doctypes DROP COLUMN IF EXISTS retention_final_disposition;
 ALTER TABLE doctypes ADD COLUMN retention_final_disposition character varying(255) NOT NULL DEFAULT 'destruction';
@@ -125,6 +125,8 @@ VALUES ('FASTHD_ATTACH', 'FASTHD', 'Fast internal disc bay for attachments', 'N'
 ALTER TABLE basket_persistent_mode ALTER COLUMN user_id TYPE character varying(128);
 ALTER TABLE res_mark_as_read ALTER COLUMN user_id TYPE character varying(128);
 
+
+--  r.date_current_use
 DROP VIEW IF EXISTS view_postindexing;
 -- view for letterbox
 DROP VIEW IF EXISTS res_view_letterbox;
@@ -134,7 +136,7 @@ CREATE VIEW res_view_letterbox AS
     dfl.doctypes_first_level_label, dfl.css_style as doctype_first_level_style,
     d.doctypes_second_level_id, dsl.doctypes_second_level_label,
     dsl.css_style as doctype_second_level_style, r.format, r.typist,
-    r.creation_date, r.modification_date, r.date_current_use, r.relation, r.docserver_id, r.folders_system_id,
+    r.creation_date, r.modification_date, r.relation, r.docserver_id, r.folders_system_id,
     f.folder_id, f.destination as folder_destination, f.is_frozen as folder_is_frozen, r.path, r.filename, r.fingerprint, r.offset_doc, r.filesize,
     r.status, r.work_batch, r.arbatch_id, r.arbox_id, r.page_count, r.is_paper,
     r.doc_date, r.scan_date, r.scan_user, r.scan_location, r.scan_wkstation,

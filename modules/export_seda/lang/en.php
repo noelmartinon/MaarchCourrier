@@ -81,11 +81,14 @@ if (!defined("_ERROR_MESSAGE"))
 if (!defined("_ACKNOWLEDGEMENT_REFERENCE"))
     define("_ACKNOWLEDGEMENT_REFERENCE", "Acknowledgement reference");
 
-if (!defined("_TRANSFERRING_AGENCY_SIREN_COMPULSORY"))
-    define("_TRANSFERRING_AGENCY_SIREN_COMPULSORY", "Transferring agency SIREN compulsory");
+if (!defined("_TRANSFERRING_AGENCY_SIREN_REQUIRED"))
+    define("_TRANSFERRING_AGENCY_SIREN_REQUIRED", "Transferring agency SIREN required");
 
-if (!defined("_ARCHIVAL_AGENCY_SIREN_COMPULSORY"))
-    define("_ARCHIVAL_AGENCY_SIREN_COMPULSORY", "Archive agency SIREN compulsory");
+if (!defined("_ARCHIVAL_AGENCY_SIREN_REQUIRED"))
+    define("_ARCHIVAL_AGENCY_SIREN_REQUIRED", "Archive agency SIREN required");
+
+if (!defined("_ARCHIVAL_AGREEMENT_REQUIRED"))
+    define("_ARCHIVAL_AGREEMENT_REQUIRED", "Archival agreement required");
 
 if (!defined("_VALIDATE_MANUAL_DELIVERY"))
     define("_VALIDATE_MANUAL_DELIVERY", "Validate manual delivery");
@@ -131,3 +134,9 @@ if (!defined("_LETTER_NO_ARCHIVED"))
 
 if (!defined("_ERROR_LETTER_ARCHIVED"))
     define("_ERROR_LETTER_ARCHIVED", "You can not reset an archived letter. Letter number : ");
+
+if (!defined("_ERROR_ORIGINATOR_EMPTY"))
+    define("_ERROR_ORIGINATOR_EMPTY", "At least one originator must be retained");
+
+if (!defined("_ERROR_FILE_NOT_EXIST"))
+    define("_ERROR_FILE_NOT_EXIST", "All the documents must be present in the storage areas");
