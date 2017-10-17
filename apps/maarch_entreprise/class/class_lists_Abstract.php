@@ -783,7 +783,6 @@ abstract class lists_Abstract extends Database
                 } else {
                     //Keep value
                     $_SESSION['filters'][$_REQUEST['filter']]['VALUE'] = $_REQUEST['value'];
-                    //var_dump($_REQUEST['filter']);
                     //Build where clause
                     if ($_REQUEST['filter'] == 'status') {
 
@@ -1174,7 +1173,7 @@ abstract class lists_Abstract extends Database
                             return "false";
                     } else {
                         // return $this->_highlightWords($resultTheLine[$i]['value'], $this->whatSearch); //highlight mode
-                        return $resultTheLine[$i]['value'];
+                        return str_replace(" ", "&nbsp;", $resultTheLine[$i]['value']);
                     }
                 }
             }
@@ -1204,40 +1203,33 @@ abstract class lists_Abstract extends Database
             if($_SESSION['stockCheckbox'] != null){
                 $key = in_array($keyValue, $_SESSION['stockCheckbox']);
             
-            //If disable or checkbox
-            if($key == true){            
-                if ($lineIsDisabled === true || empty($keyValue)) {
-                    $return .= '<div align="center"><i class="fa fa-lock fa-2x" title="'._LOCKED.'"></i></div>';
-                } else {
-                    $return .= '<div align="center"><input type="checkbox" checked="yes" name="field[]" id="field" class="check" onclick="stockCheckbox(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=multiLink\','.$keyValue.');" value="'
-                                .$keyValue.'" /></div>';
+                //If disable or checkbox
+                if($key == true){            
+                    if ($lineIsDisabled === true || empty($keyValue)) {
+                        $return .= '<div align="center"><i class="fa fa-lock fa-2x" title="'._LOCKED.'"></i></div>';
+                    } else {
+                        $return .= '<div align="center"><input type="checkbox" checked="yes" name="field[]" id="field" class="check" onclick="stockCheckbox(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=multiLink\','.$keyValue.');" value="'
+                                    .$keyValue.'" /></div>';
+                    }
+                }else{ 
+                    if ($lineIsDisabled === true || empty($keyValue)) {
+                        $return .= '<div align="center"><i class="fa fa-lock fa-2x" title="'._LOCKED.'"></i></div>';
+                    } else {
+                        $return .= '<div align="center"><input type="checkbox" name="field[]" id="field" class="check" onclick="stockCheckbox(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=multiLink\','.$keyValue.');" value="'
+                                    .$keyValue.'" /></div>';
+                    }
                 }
-            }else{ 
+            } else { 
+
+                //If disable or checkbox
                 if ($lineIsDisabled === true || empty($keyValue)) {
                     $return .= '<div align="center"><i class="fa fa-lock fa-2x" title="'._LOCKED.'"></i></div>';
                 } else {
                     $return .= '<div align="center"><input type="checkbox" name="field[]" id="field" class="check" onclick="stockCheckbox(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=multiLink\','.$keyValue.');" value="'
                                 .$keyValue.'" /></div>';
                 }
-            }
-                            }else{ 
-
-                            //If disable or checkbox
-            if ($lineIsDisabled === true || empty($keyValue)) {
-                $return .= '<div align="center"><i class="fa fa-lock fa-2x" title="'._LOCKED.'"></i></div>';
-            } else {
-                $return .= '<div align="center"><input type="checkbox" name="field[]" id="field" class="check" onclick="stockCheckbox(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=multiLink\','.$keyValue.');" value="'
-                            .$keyValue.'" /></div>';
-            }
-
-
 
             }
-
-
-
-
-        
 
         }
         return $return;
@@ -1360,7 +1352,6 @@ abstract class lists_Abstract extends Database
     }
 
     protected function _tmplt_showActionFA($parameter, $resultTheLine) {
-    //var_dump($parameter);exit;
         $my_explode= explode ("|", $parameter);
         
         if (!$my_explode[1]) {
@@ -2184,7 +2175,6 @@ abstract class lists_Abstract extends Database
                 if(@eval($rules)) {
                     $disabled = true;
                 }
-                //var_dump($disabled);
             }
         }
         return $disabled;
@@ -2895,7 +2885,6 @@ abstract class lists_Abstract extends Database
            $found  = false;
 
             for ($i =0; $i<count($this->params['filters']); $i++) {
-                //var_dump($this->params['filters'][$i]);
                 if (isset($_SESSION['filters'][$this->params['filters'][$i]])) {
                     $filtersControl .= $this->_buildFilter($this->params['filters'][$i]);
                     $found  = true;
