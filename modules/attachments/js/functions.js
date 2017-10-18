@@ -64,8 +64,6 @@ function saveContactToSession(size, prePath) {
   setTimeout(function() {
     var contactId = $("transmissionContactidAttach" + size).value;
     var addressId = $("transmissionAddressidAttach" + size).value;
-    console.log(contactId);
-    console.log(addressId);
 
     if (contactId) {
       new Ajax.Request(prePath + "index.php?display=true&module=attachments&page=saveTransmissionContact",
@@ -296,6 +294,7 @@ function showAttachmentsForm(path, width, height) {
             if(response.status == 0){
                 var modal_content = convertToTextVisibleNewLine(response.content);
                 createModalinAttachmentList(modal_content, 'form_attachments', height, width, 'fullscreen');
+                eval(response.exec_js);
             } else {
                 window.top.$('main_error').innerHTML = response.error;
             }
@@ -398,6 +397,7 @@ function modifyAttachmentsForm(path, width, height) {
             if(response.status == 0){
                 var modal_content = convertToTextVisibleNewLine(response.content);
                 createModalinAttachmentList(modal_content, 'form_attachments', height, width, 'fullscreen'); 
+                eval(response.exec_js);
             } else {
                 window.top.$('main_error').innerHTML = response.error;
             }
@@ -499,4 +499,27 @@ function cleanTitle(str) {
     //permet de supprimer les # dans le titre qui bloque l'ouverture de l'applet java
     var res = str.replace(/#/g, " ");
     return(res);
+}
+
+function activeOngletAttachement() {
+  $j('#viewframevalid_attachment').css('display', 'inline');
+  $j('#viewframevalid_main').css('display', 'none');
+  $j('#viewframevalid_attachment').addClass('activeOngletAttachement');
+  $j('#viewframevalid_main').removeClass('activeOngletAttachement');
+  $j('#liAttachement').css('background-color', 'white');
+  $j('#liAttachement').css('height', '23px');
+  $j('#liAttachement').css('display', 'inline');
+  $j('#liMainDocument').css('background-color', 'rgb(197, 197, 197)');
+  $j('#liMainDocument').css('height', '21px');
+}
+
+function activeOngletMainDocument() {
+  $j('#viewframevalid_attachment').css('display', 'none');
+  $j('#viewframevalid_main').css('display', 'inline');
+  $j('#viewframevalid_attachment').removeClass('activeOngletAttachement');
+  $j('#viewframevalid_main').addClass('activeOngletAttachement');
+  $j('#liAttachement').css('background-color', 'rgb(197, 197, 197)');
+  $j('#liAttachement').css('height', '21px');
+  $j('#liMainDocument').css('background-color', 'white');
+  $j('#liMainDocument').css('height', '23px');
 }

@@ -1994,15 +1994,42 @@ $content .= '</div>';
                 . '</iframe>';
     $content .= '</div>';
 $content .= '<div style="float: right; width: 65%">';
-$content .= '<iframe src="'.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='
-    . functions::xssafe($_SESSION['doc_id']) . '&coll_id=' . $coll_id .
-    '" name="viewframevalid_attachment" id="viewframevalid_attachment"  scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;" onmouseover="this.focus()"></iframe>';
+
+$content .= '<div id="menuOnglet">
+              <ul id="ongletAttachement">
+                <li id="liAttachement" ';
+if(empty($_REQUEST['id'])){
+    $content .= ' style="display:none"';
+    $js = 'setTimeout(function(){window.parent.document.getElementById(\'liMainDocument\').click()}, 1000)';
+}
+
+$content .= ' onclick="activeOngletAttachement()"><a href="#"> Attachement </a></li>';
+
+    $content .= '<li id="liMainDocument" onclick="activeOngletMainDocument()"><a href="#"> Document principal </a></li>';
+
+$content .= '</ul>
+            </div>';
+
+// ATTACHEMENT //
+if(empty($_REQUEST['id'])){
+    $displayAttachment = 'display:none';
+    $srcAttachment = '';
+} else {
+    $srcAttachment = 'index.php?display=true&module=attachments&page=view_attachment&res_id_master='.functions::xssafe($_SESSION['doc_id']).'&id='.functions::xssafe($_REQUEST['id']);
+}
+
+$content .= '<iframe src="'.$srcAttachment.'" name="viewframevalid_attachment" id="viewframevalid_attachment" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;'.$displayAttachment.'" onmouseover="this.focus()"></iframe>';
+
+// DOCUMENT PRINCIPAL //
+$content .= '<iframe src="index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='. functions::xssafe($_SESSION['doc_id']).'" name="viewframevalid_main" id="viewframevalid_main" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;';
+
+if(!empty($_REQUEST['id'])){
+    $content .= 'display:none';
+}
+
+$content .= '" onmouseover="this.focus()"></iframe>';
+    
 $content .= '</div>';
-/*if(!isset($_REQUEST['id'])){
-    $content .= '<script>var height = (parseInt($(\'form_attachments\').style.height.replace(/px/,""))-40)+"px";$(\'formAttachment\').style.height = height;$(\'viewframevalid_attachment\').style.height = height;$(\'formAttachment\').style.overflow = "auto";</script>';
-}else{
-    $content .= '<script>var height = (parseInt(window.top.window.$(\'form_attachments\').style.height.replace(/px/,""))-40)+"px";window.top.window.$(\'formAttachment\').style.height = height;window.top.window.$(\'viewframevalid_attachment\').style.height = height;window.top.window.$(\'formAttachment\').style.overflow = "auto";</script>';
-}*/
 
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
