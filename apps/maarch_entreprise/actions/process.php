@@ -501,7 +501,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         $frm_str .= '<span onclick="loadTab(\''.$res_id.'\',\''.$coll_id.'\',\''._DOC_HISTORY.'\',\''.$pathScriptTab.'\',\'history\');return false;" '
             . 'onmouseover="this.style.cursor=\'pointer\';" class="categorie" style="width:90%;">';
         $frm_str .= '<span id="history_tab" class="tab_module" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>'
-            . '&nbsp;<i class="fa fa-line-chart fa-2x" title="'._DOC_HISTORY.'"></i> <sup><span style="display:none;"></span></sup>';
+            . '&nbsp;<i class="fa fa-history fa-2x" title="'._DOC_HISTORY.'"></i> <sup><span style="display:none;"></span></sup>';
         $frm_str .= '</span>';
         $frm_str .= '</td>';
     }
@@ -558,7 +558,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         $frm_str .= '<span onclick="loadTab(\''.$res_id.'\',\''.$coll_id.'\',\''._DIFF_LIST_COPY.'\',\''.$pathScriptTab.'\',\'difflist\');return false;" '
             . 'onmouseover="this.style.cursor=\'pointer\';" class="categorie" style="width:90%;">';
         $frm_str .= '<span id="difflist_tab" class="tab_module" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>'
-            . '&nbsp;<i class="fa fa-gear fa-2x" title="'._DIFF_LIST_COPY.'"></i> <sup><span style="display:none;"></span></sup>';
+            . '&nbsp;<i class="fa fa-share-alt fa-2x" title="'._DIFF_LIST_COPY.'"></i> <sup><span style="display:none;"></span></sup>';
         $frm_str .= '</span>';
         $frm_str .= '</td>';
     }
@@ -638,7 +638,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
             $frm_str .= '<span onclick="loadTab(\''.$res_id.'\',\''.$coll_id.'\',\''._VISA_WORKFLOW.'\',\''.$pathScriptTab.'\',\'visa\');return false;" '
                 . 'onmouseover="this.style.cursor=\'pointer\';" class="categorie" style="width:90%;">';
             $frm_str .= '<span id="visa_tab" class="tab_module" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span><b>&nbsp;'
-                . '<i id="visa_tab_img" class="fa fa-certificate fa-2x" title="'._VISA_WORKFLOW.'"></i><span id="visa_tab_badge"></span>';
+                . '<i id="visa_tab_img" class="fa fa-list-ol fa-2x" title="'._VISA_WORKFLOW.'"></i><span id="visa_tab_badge"></span>';
             $frm_str .= '</span>';
             $frm_str .= '</td>';
             
@@ -661,7 +661,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
             $frm_str .= '<span onclick="loadTab(\''.$res_id.'\',\''.$coll_id.'\',\''.urlencode(_AVIS_WORKFLOW).'\',\''.$pathScriptTab.'\',\'avis\');return false;" '
                 . 'onmouseover="this.style.cursor=\'pointer\';" class="categorie" style="width:90%;">';
             $frm_str .= '<span id="avis_tab" class="tab_module" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span><b>&nbsp;'
-                . '<i id="avis_tab_img" class="fa fa-check-square fa-2x" title="'._AVIS_WORKFLOW.'"></i><span id="avis_tab_badge"></span>';
+                . '<i id="avis_tab_img" class="fa fa-commenting fa-2x" title="'._AVIS_WORKFLOW.'"></i><span id="avis_tab_badge"></span>';
             $frm_str .= '</span>';   
             $frm_str .= '</td>';
             

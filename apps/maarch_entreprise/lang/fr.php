@@ -928,7 +928,7 @@ if (!defined("_CONTACT_MODIFIED")) define("_CONTACT_MODIFIED", "Contact modifié
 if (!defined("_CONTACT_DELETED")) define("_CONTACT_DELETED", "Contact supprimé");
 if (!defined("_MODIFY_CONTACT")) define("_MODIFY_CONTACT", "Modifier un contact");
 if (!defined("_IS_CORPORATE_PERSON")) define("_IS_CORPORATE_PERSON", "Personne morale");
-if (!defined("_INDIVIDUAL")) define("_INDIVIDUAL", "Particulier");
+if (!defined("_INDIVIDUAL")) define("_INDIVIDUAL", "Personne physique");
 if (!defined("_CONTACT_TARGET")) define("_CONTACT_TARGET", "Pour quel contact est il possible d'utiliser ce type ?");
 if (!defined("_CONTACT_TARGET_LIST")) define("_CONTACT_TARGET_LIST", "Cible du type de contact");
 if (!defined("_CONTACT_TYPE_CREATION")) define("_CONTACT_TYPE_CREATION", "Possibilité de créer un contact de ce type hors panneau d'administration ?");
@@ -1993,8 +1993,8 @@ if (!defined('_UPDATE_DESC_END'))
     define('_UPDATE_DESC_END', 'Mise à jour réussi');
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE'))
     define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucun tag de disponible pour une mise à jour');
-if (!defined('_DATE_CURRENT_USE'))
-    define('_DATE_CURRENT_USE', 'Date limite d\'utilité courante');
+/*if (!defined('_DATE_CURRENT_USE'))
+    define('_DATE_CURRENT_USE', 'Date limite d\'utilité courante');*/
 if (!defined('_DOC_CREATED'))
     define('_DOC_CREATED', 'Document créé');
 if (!defined("_SAVE_POSITION"))

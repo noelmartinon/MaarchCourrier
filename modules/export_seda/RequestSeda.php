@@ -216,7 +216,7 @@ class RequestSeda
         return $mails;
     }
 
-    public function getEntitie($entityId)
+    public function getEntity($entityId)
     {
         $queryParams = [];
 
@@ -226,9 +226,9 @@ class RequestSeda
 
         $smtp = $this->db->query($query, $queryParams);
 
-        $entitie = $smtp->fetchObject();
+        $entity = $smtp->fetchObject();
 
-        return $entitie;
+        return $entity;
     }
 
     public function getContact($contactId)

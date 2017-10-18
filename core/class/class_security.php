@@ -233,7 +233,11 @@ class security extends Database
                 if ($_SESSION['history']['userlogin'] == 'true') {
                     //add new instance in history table for the user's connexion
                     $hist = new history();
-                    $ip = $_SERVER['REMOTE_ADDR'];
+                    if ($_SERVER['REMOTE_ADDR'] == '::1'){
+                        $ip = 'localhost';
+                    }else{
+                        $ip = $_SERVER['REMOTE_ADDR'];
+                    }
                     $navigateur = addslashes($_SERVER['HTTP_USER_AGENT']);
                     $_SESSION['user']['UserId']       = $s_login;
                     $_SESSION['user']['department']   = $array['department'];
@@ -291,8 +295,11 @@ class security extends Database
 
     public function test_allowed_ip(){
         $db = new Database();
-        $current_ip = $_SERVER['REMOTE_ADDR'];
-        
+        if ($_SERVER['REMOTE_ADDR'] == '::1'){
+            $current_ip = 'localhost';
+        }else{
+            $current_ip = $_SERVER['REMOTE_ADDR'];
+        }
         $list_ip = "SELECT ip from allowed_ip";
         $stmt = $db->query($list_ip,array());
         while ($res = $stmt->fetchObject()){

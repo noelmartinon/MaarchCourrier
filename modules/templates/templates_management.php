@@ -403,6 +403,7 @@ if ($mode == 'list') {
                     <?php
                     if ($mode == "up") {
                         ?>
+                        <input class="button" type="button" id="duplicateTemplateButton" onclick="duplicateTemplate(<?php functions::xecho($_SESSION['m_admin']['templates']['template_id']); ?>)" value="Dupliquer" />
                         <input class="button" type="submit" name="submit" id="add" onclick="selectall($('entities_chosen'));" value="<?php
                             echo _MODIFY;
                         ?>" />

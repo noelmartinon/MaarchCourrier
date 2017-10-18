@@ -84,10 +84,18 @@ $_SESSION['collection_id_choice'] = $_SESSION['current_basket']['coll_id'];//Col
 $select[$table]= array();
 
 //Fields
-array_push(
+/*array_push(
     $select[$table], "res_id", "status", "category_id as category_img",
     "contact_firstname", "contact_lastname", "contact_society", "user_lastname",
     "user_firstname", "priority", "creation_date", 'modification_date', "admission_date", "date_current_use", "subject",
+    "process_limit_date", 'recommendation_limit_date', "entity_label", "dest_user", "category_id", "type_label",
+    "exp_user_id", "count_attachment", "alt_identifier", "is_multicontacts", "locker_user_id", "locker_time", "address_id"
+);*/
+
+array_push(
+    $select[$table], "res_id", "status", "category_id as category_img",
+    "contact_firstname", "contact_lastname", "contact_society", "user_lastname",
+    "user_firstname", "priority", "creation_date", 'modification_date', "admission_date", "subject",
     "process_limit_date", 'recommendation_limit_date', "entity_label", "dest_user", "category_id", "type_label",
     "exp_user_id", "count_attachment", "alt_identifier", "is_multicontacts", "locker_user_id", "locker_time", "address_id"
 );
@@ -238,7 +246,7 @@ for ($i=0;$i<$tabI;$i++) {
                 $tab[$i][$j]["show"]=true;
                 $tab[$i][$j]["order"]='modification_date';
             }
-            if ($tab[$i][$j][$value]=="date_current_use") {
+            /*if ($tab[$i][$j][$value]=="date_current_use") {
 
                 $tab[$i][$j]["value"] = $core_tools->format_date_db($tab[$i][$j]["value"], false, '', true);
                 $tab[$i][$j]["label"] = _DATE_CURRENT_USE;
@@ -248,7 +256,7 @@ for ($i=0;$i<$tabI;$i++) {
                 $tab[$i][$j]["valign"]="bottom";
                 $tab[$i][$j]["show"]=true;
                 $tab[$i][$j]["order"]='date_current_use';
-            }
+            }*/
             if ($tab[$i][$j][$value]=="admission_date") {
 
                 $tab[$i][$j]["value"]=$core_tools->format_date_db($tab[$i][$j]["value"], false);
@@ -500,7 +508,8 @@ $paramsTab['bool_showIconDocument'] = true;                                     
 $paramsTab['bool_showIconDetails'] = true;                                          //Affichage de l'icone de la page de details
 $paramsTab['urlParameters'] = 'baskets='.$_SESSION['current_basket']['id']
             .$urlParameters;                                                        //Parametres d'url supplementaires
-$paramsTab['filters'] = array('entity', 'entity_subentities', 'category', 'priority', 'identifier','date_current_use');          //Filtres
+//$paramsTab['filters'] = array('entity', 'entity_subentities', 'category', 'priority', 'identifier','date_current_use');          //Filtres
+$paramsTab['filters'] = array('entity', 'entity_subentities', 'category', 'priority', 'identifier');          //Filtres
 if (count($template_list) > 0 ) {                                                   //Templates
     $paramsTab['templates'] = array();
     $paramsTab['templates'] = $template_list;

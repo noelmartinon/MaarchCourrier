@@ -419,4 +419,20 @@ class AttachmentsController
         return $transmissionDataPdf;
     }
 
+    public function setInSignatureBook(RequestInterface $request, ResponseInterface $response, $aArgs)
+    {
+        //TODO Controle de droit de modification de cet attachment
+
+        $data = $request->getParams();
+
+        $attachment = AttachmentsModel::getById(['id' => $aArgs['id'], 'isVersion' => $data['isVersion']]);
+
+        if (empty($attachment)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment not found']);
+        }
+
+        AttachmentsModel::setInSignatureBook(['id' => $aArgs['id'], 'isVersion' => $data['isVersion'], 'inSignatureBook' => !$attachment['in_signature_book']]);
+
+        return $response->withJson(['success' => 'success']);
+    }
 }

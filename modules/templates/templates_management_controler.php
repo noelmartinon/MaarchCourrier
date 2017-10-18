@@ -263,6 +263,7 @@ function validate_cs_submit($mode)
  */
 function display_up($templateId)
 {
+    init_session();
     $state=true;
     $templatesControler = new templates_controler();
     $stylesArray = array();

@@ -37,7 +37,11 @@ if ($_SESSION['history']['userlogout'] == "true"
     && isset($_SESSION['user']['UserId'])
 ) {
     $hist = new history();
-    $ip = $_SERVER['REMOTE_ADDR'];
+    if ($_SERVER['REMOTE_ADDR'] == '::1'){
+        $ip = 'localhost';
+    }else{
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
     $navigateur = addslashes($_SERVER['HTTP_USER_AGENT']);
     //$host = gethostbyaddr($_SERVER['REMOTE_ADDR']);
     $host = $_SERVER['REMOTE_ADDR'];

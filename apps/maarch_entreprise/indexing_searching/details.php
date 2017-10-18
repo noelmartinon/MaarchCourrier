@@ -563,7 +563,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                             }
                 ?>
                 <?php $detailsExport .= "<h1><center>"._DETAILS_PRINT." : ".$s_id."</center></h1><hr>";?>
-                <dt class="fa fa-tachometer" style="font-size:2em;padding-left: 15px;<?php if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){echo 'padding-right: 0px;';}else{echo 'padding-right: 15px;';}?>" title="<?php echo _PROPERTIES;?>"> <sup><span style="font-size: 10px;<?php echo $style; ?>" class="nbResZero">0</span></sup></dt>
+                <dt class="fa fa-info-circle" style="font-size:2em;padding-left: 15px;<?php if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){echo 'padding-right: 0px;';}else{echo 'padding-right: 15px;';}?>" title="<?php echo _PROPERTIES;?>"> <sup><span style="font-size: 10px;<?php echo $style; ?>" class="nbResZero">0</span></sup></dt>
                 <dd>
                     
                     <br/>
@@ -1178,7 +1178,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     $pathScriptTab = $_SESSION['config']['businessappurl']
                         . 'index.php?display=true&page=show_diffList_tab&module=entities&resId='.$s_id.'&collId='.$coll_id.'&fromDetail=true&category='.$category.'&roles='.urlencode($roles_str).$onlyCC;    
                     
-                    $diffList_frame .= '<dt class="fa fa-gear" style="font-size:2em;padding-left: 15px;';
+                    $diffList_frame .= '<dt class="fa fa-share-alt" style="font-size:2em;padding-left: 15px;';
                     if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){
                         $diffList_frame .=  'padding-right: 0px;';
                     }else{
@@ -1237,7 +1237,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     $visa_frame = '';
                     $pathScriptTab = $_SESSION['config']['businessappurl']
                         . 'index.php?display=true&page=show_visa_tab&module=visa&resId='.$s_id.'&collId='.$coll_id.'&destination='.$destination.'&fromDetail=true';
-                    $visa_frame .= '<dt id="visa_tab" class="fa fa-certificate" style="font-size:2em;padding-left: 15px;';
+                    $visa_frame .= '<dt id="visa_tab" class="fa fa-list-ol" style="font-size:2em;padding-left: 15px;';
 
                     $visa_frame .='padding-right: 15px;" title="'._VISA_WORKFLOW.'" onclick="loadSpecificTab(\'visa_iframe\',\''.$pathScriptTab.'\');return false;"> <sup id="visa_tab_badge"></sup></dt><dd id="page_circuit" style="overflow-x: hidden;">';
                     $visa_frame .= '<h2>'._VISA_WORKFLOW.'</h2>';
@@ -1257,7 +1257,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     $avis_frame = '';
                     $pathScriptTab = $_SESSION['config']['businessappurl']
                         . 'index.php?display=true&page=show_avis_tab&module=avis&resId='.$s_id.'&collId='.$coll_id.'&fromDetail=true';
-                    $avis_frame .= '<dt id="avis_tab" class="fa fa-check-square" style="font-size:2em;padding-left: 15px;padding-right: 15px;" title="'._AVIS_WORKFLOW.'" onclick="loadSpecificTab(\'avis_iframe\',\''.$pathScriptTab.'\');return false;"> <sup id="avis_tab_badge"></sup></dt><dd id="page_circuit_avis" style="overflow-x: hidden;">';
+                    $avis_frame .= '<dt id="avis_tab" class="fa fa-commenting" style="font-size:2em;padding-left: 15px;padding-right: 15px;" title="'._AVIS_WORKFLOW.'" onclick="loadSpecificTab(\'avis_iframe\',\''.$pathScriptTab.'\');return false;"> <sup id="avis_tab_badge"></sup></dt><dd id="page_circuit_avis" style="overflow-x: hidden;">';
                     $avis_frame .= '<h2>'._AVIS_WORKFLOW.'</h2>';
          
                     $avis_frame .= '<iframe src="" name="avis_iframe" width="100%" align="left" scrolling="yes" frameborder="0" id="avis_iframe" style="height:95%;"></iframe>';
@@ -1320,7 +1320,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     $pathScriptTab = $_SESSION['config']['businessappurl']
                         . 'index.php?display=true&page=show_history_tab&resId='
                         . $s_id . '&collId=' . $coll_id;
-                    $history_frame .= '<dt class="fa fa-line-chart" style="font-size:2em;padding-left: 15px;';
+                    $history_frame .= '<dt class="fa fa-history" style="font-size:2em;padding-left: 15px;';
                     if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){
                         $history_frame .=  'padding-right: 0px;';
                     }else{

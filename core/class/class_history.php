@@ -102,7 +102,12 @@ class history
     )
     {
         $db = new Database();
-        $remote_ip = $_SERVER['REMOTE_ADDR'];
+        if ($_SERVER['REMOTE_ADDR'] == '::1'){
+            $REMOTE_ADDR = 'localhost';
+        }else{
+            $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
+        }
+        $remote_ip = $REMOTE_ADDR;
 
         $user = '';
         if (isset($_SESSION['user']['UserId'])) {

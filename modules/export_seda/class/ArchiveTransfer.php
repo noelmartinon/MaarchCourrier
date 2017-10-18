@@ -44,6 +44,10 @@ class ArchiveTransfer
         $messageObject = new stdClass();
         $messageObject = $this->initMessage($messageObject);
 
+        if (!empty($_SESSION['error'])) {
+            return;
+        }
+
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[] = $this->getArchiveUnit(
             "RecordGrp",
             null,
@@ -79,6 +83,11 @@ class ArchiveTransfer
                 $uri .= $letterbox->filename;
                 $filePath = $docServers->path_template . $uri;
 
+                if (!file_exists($filePath)) {
+                    $_SESSION['error'] = _ERROR_FILE_NOT_EXIST;
+                    return;
+                }
+
                 $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[] = $this->getArchiveUnit(
                     "File",
                     $letterbox,
@@ -99,7 +108,8 @@ class ArchiveTransfer
                     null,
                     null,
                     null,
-                    $links);
+                    $links
+                );
             }
 
             if ($attachments) {
@@ -180,9 +190,21 @@ class ArchiveTransfer
             $i++;
         }
 
-        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency = new stdClass();
-        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency->Identifier = new stdClass();
-        $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency->Identifier->value = $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[0]->Content->OriginatingAgency->Identifier->value;
+        $originator = "";
+        foreach ($messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit as $archiveUnit) {
+            if (!empty($archiveUnit->Content->OriginatingAgency->Identifier->value)) {
+                $originator = $archiveUnit->Content->OriginatingAgency->Identifier->value;
+                break;
+            }
+        }
+
+        if (!empty($originator)) {
+            $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency = new stdClass();
+            $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency->Identifier = new stdClass();
+            $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingAgency->Identifier->value = $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->ArchiveUnit[0]->Content->OriginatingAgency->Identifier->value;
+        } else {
+            $_SESSION['error'] = _ERROR_ORIGINATOR_EMPTY;
+        }
 
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->StartDate = $startDate->format('Y-m-d');
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->EndDate = $endDate->format('Y-m-d');
@@ -268,21 +290,25 @@ class ArchiveTransfer
 
         $messageObject->ArchivalAgreement = new stdClass();
 
-        foreach ($_SESSION['user']['entities'] as $entitie) {
-            $entitie = $this->db->getEntitie($entitie['ENTITY_ID']);
-            if ($entitie) {
-                $messageObject->TransferringAgency->Identifier->value = $entitie->business_id;
-                $messageObject->ArchivalAgency->Identifier->value = $entitie->archival_agency;
+        foreach ($_SESSION['user']['entities'] as $entity) {
+            $entity = $this->db->getEntity($entity['ENTITY_ID']);
 
-                if (!$entitie->business_id) {
-                    $_SESSION['error'] .= _TRANSFERRING_AGENCY_SIREN_COMPULSORY;
+            if ($entity) {
+                $messageObject->TransferringAgency->Identifier->value = $entity->business_id;
+                $messageObject->ArchivalAgency->Identifier->value = $entity->archival_agency;
+                $messageObject->ArchivalAgreement->value = $entity->archival_agreement;
+
+                if (!$entity->business_id) {
+                    $_SESSION['error'] .= _TRANSFERRING_AGENCY_SIREN_REQUIRED;
                 }
 
-                if (!$entitie->archival_agency) {
-                    $_SESSION['error'] .= _ARCHIVAL_AGENCY_SIREN_COMPULSORY;
+                if (!$entity->archival_agency) {
+                    $_SESSION['error'] .= _ARCHIVAL_AGENCY_SIREN_REQUIRED;
                 }
 
-                $messageObject->ArchivalAgreement->value = $entitie->archival_agreement;
+                if (!$entity->archival_agreement) {
+                    $_SESSION['error'] .= _ARCHIVAL_AGREEMENT_REQUIRED;
+                }
             } else {
                 $_SESSION['error'] .= _NO_ENTITIES;
             }
@@ -428,25 +454,33 @@ class ArchiveTransfer
                 $content->Addressee = [];
                 $content->Keyword = [];
 
+                $keyword = $addressee = "";
                 if ($object->exp_contact_id) {
                     $contact = $this->db->getContact($object->exp_contact_id);
-                    $entitie = $this->db->getEntitie($object->destination);
+                    $entity = $this->db->getEntity($object->destination);
 
-                    $content->Keyword[] = $this->getKeyword($contact);
-                    $content->Addressee[] = $this->getAddresse($entitie, "entitie");
+                    $keyword = $this->getKeyword($contact);
+                    $addressee = $this->getAddresse($entity, "entity");
                 } elseif ($object->dest_contact_id) {
                     $contact = $this->db->getContact($object->dest_contact_id);
-                    $entitie = $this->db->getEntitie($object->destination);
+                    $entity = $this->db->getEntity($object->destination);
 
-                    $content->Addressee[] = $this->getAddresse($contact);
-                    $content->Keyword[] = $this->getKeyword($entitie, "entitie");
+                    $addressee = $this->getAddresse($contact);
+                    $keyword = $this->getKeyword($entity, "entity");
                 } elseif ($object->exp_user_id) {
                     $user = $this->db->getUserInformation($object->exp_user_id);
-                    $entitie = $this->db->getEntitie($object->initiator);
-                    //$entitie = $this->getEntitie($letterbox->destination);
+                    $entity = $this->db->getEntity($object->destination);
 
-                    $content->Keyword[] = $this->getKeyword($user);
-                    $content->Addressee[] = $this->getAddresse($entitie, "entitie");
+                    $keyword = $this->getKeyword($user);
+                    $addressee = $this->getAddresse($entity, "entity");
+                }
+
+                if (!empty($keyword)) {
+                    $content->Keyword[] = $keyword;
+                }
+
+                if (!empty($addressee)) {
+                    $content->Addressee[] = $addressee;
                 }
 
                 $content->Source = $_SESSION['mail_nature'][$object->nature_id];
@@ -506,10 +540,14 @@ class ArchiveTransfer
 
         }
 
-        if (isset($object->initiator)) {
+        if (isset($object->destination)) {
             $content->OriginatingAgency = new stdClass();
             $content->OriginatingAgency->Identifier = new stdClass();
-            $content->OriginatingAgency->Identifier->value = $this->db->getEntitie($object->initiator)->business_id;
+            $content->OriginatingAgency->Identifier->value = $this->db->getEntity($object->destination)->business_id;
+
+            if (empty($content->OriginatingAgency->Identifier->value)) {
+                unset($content->OriginatingAgency);
+            }
         }
 
         if (isset($object->res_id)) {
@@ -581,7 +619,7 @@ class ArchiveTransfer
         $keyword = new stdClass();
         $keyword->KeywordContent = new stdClass();
 
-        if ($type == "entitie") {
+        if ($type == "entity") {
             $keyword->KeywordType = "corpname";
             $keyword->KeywordContent->value = $informations->business_id;
         } elseif ($informations->is_corporate_person == "Y") {
@@ -592,13 +630,17 @@ class ArchiveTransfer
             $keyword->KeywordContent->value = $informations->lastname . " " . $informations->firstname;
         }
 
+        if (empty($keyword->KeywordContent->value)) {
+            return null;
+        }
+
         return $keyword;
     }
 
     private function getAddresse($informations, $type = null)
     {
         $addressee = new stdClass();
-        if ($type == "entitie") {
+        if ($type == "entity") {
             $addressee->Corpname = $informations->entity_label;
             $addressee->Identifier = $informations->business_id;
         } elseif ($informations->is_corporate_person == "Y") {
@@ -609,6 +651,9 @@ class ArchiveTransfer
             $addressee->BirthName = $informations->lastname;
         }
 
+        if ((empty($addressee->Identifier) || empty($addressee->Corpname)) && (empty($addressee->FirstName) || empty($addressee->BirthName))) {
+            return null;
+        }
 
         return $addressee;
     }
@@ -624,17 +669,17 @@ class ArchiveTransfer
         return $custodialHistoryItem;
     }
 
-    private function getEntitie($entityId, $param)
+    private function getEntity($entityId, $param)
     {
-        $entitie = $this->db->getEntitie($entityId);
+        $entity = $this->db->getEntity($entityId);
 
-        if (!$entitie) {
+        if (!$entity) {
             return false;
         }
 
-        if (!$entitie->business_id) {
-            $businessId = $this->getEntitieParent(
-                $entitie->parent_entity_id,
+        if (!$entity->business_id) {
+            $businessId = $this->getEntityParent(
+                $entity->parent_entity_id,
                 'business_id'
             );
 
@@ -642,12 +687,12 @@ class ArchiveTransfer
                 return false;
             }
 
-            $entitie->business_id = $businessId;
+            $entity->business_id = $businessId;
         }
 
-        if (!$entitie->archival_agreement) {
-            $archivalAgreement = $this->getEntitieParent(
-                $entitie->parent_entity_id,
+        if (!$entity->archival_agreement) {
+            $archivalAgreement = $this->getEntityParent(
+                $entity->parent_entity_id,
                 'archival_agreement'
             );
 
@@ -655,12 +700,12 @@ class ArchiveTransfer
                 return false;
             }
 
-            $entitie->archival_agreement = $archivalAgreement;
+            $entity->archival_agreement = $archivalAgreement;
         }
 
-        if (!$entitie->archival_agency) {
-            $archivalAgency = $this->getEntitieParent(
-                $entitie->parent_entity_id,
+        if (!$entity->archival_agency) {
+            $archivalAgency = $this->getEntityParent(
+                $entity->parent_entity_id,
                 'archival_agency'
             );
 
@@ -668,52 +713,52 @@ class ArchiveTransfer
                 return false;
             }
 
-            $entitie->archival_agency = $archivalAgency;
+            $entity->archival_agency = $archivalAgency;
         }
 
-        return $entitie;
+        return $entity;
     }
 
-    private function getEntitieParent($parentId, $param)
+    private function getEntityParent($parentId, $param)
     {
-        $entitie = $this->db->getEntitie($parentId);
+        $entity = $this->db->getEntity($parentId);
 
-        if (!$entitie) {
+        if (!$entity) {
             return false;
         }
 
         $res = false;
 
         if ($param == 'business_id') {
-            if (!$entitie->business_id) {
-                $res = $this->getEntitieParent(
-                    $entitie->parent_entity_id,
+            if (!$entity->business_id) {
+                $res = $this->getEntityParent(
+                    $entity->parent_entity_id,
                     'business_id'
                 );
             } else {
-                $res = $entitie->business_id;
+                $res = $entity->business_id;
             }
         }
 
         if ($param == 'archival_agreement') {
-            if (!$entitie->archival_agreement) {
-                $res = $this->getEntitieParent(
-                    $entitie->parent_entity_id,
+            if (!$entity->archival_agreement) {
+                $res = $this->getEntityParent(
+                    $entity->parent_entity_id,
                     'archival_agreement'
                 );
             } else {
-                $res = $entitie->archival_agreement;
+                $res = $entity->archival_agreement;
             }
         }
 
         if ($param == 'archival_agency') {
-            if (!$entitie->archival_agency) {
-                $res = $this->getEntitieParent(
-                    $entitie->parent_entity_id,
+            if (!$entity->archival_agency) {
+                $res = $this->getEntityParent(
+                    $entity->parent_entity_id,
                     'archival_agency'
                 );
             } else {
-                $res = $entitie->archival_agency;
+                $res = $entity->archival_agency;
             }
         }
 

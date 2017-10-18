@@ -90,7 +90,7 @@ $select['res_view_attachments'] = array();
 
 // Important de laisser cet ordre : 'res_id', 'res_id_version', 'relation', 'status'
 array_push(
-    $select['res_view_attachments'], 'res_id', 'res_id_version', 'relation', 'status', 'identifier', 'attachment_type', 'title', 'dest_user', 'dest_contact_id', 'creation_date', 'typist', 'doc_date', 'updated_by', 'validation_date', 'format');
+    $select['res_view_attachments'], 'res_id', 'res_id_version', 'relation', 'status', 'identifier', 'attachment_type', 'title', 'dest_user', 'dest_contact_id', 'creation_date', 'typist', 'doc_date', 'updated_by', 'validation_date', 'format', 'in_signature_book');
 
 $where = " (res_id_master = ? and coll_id = ? and status <> 'DEL' and status <> 'OBS' and (status <> 'TMP' or (typist = ? and status = 'TMP')))";
 $arrayPDO = array($resId, $_SESSION['collection_id_choice'], $_SESSION['user']['UserId']);	   
