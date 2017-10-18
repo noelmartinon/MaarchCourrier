@@ -27,3 +27,15 @@ CREATE VIEW res_view_attachments AS
     envelop_id, status, destination, approver, validation_date, effective_date, work_batch, origin, is_ingoing, priority, initiator, dest_user,
     coll_id, dest_contact_id, dest_address_id, updated_by, is_multicontacts, is_multi_docservers, res_id_master, attachment_type, '0', in_signature_book
   FROM res_attachments;
+
+DROP TABLE IF EXISTS users_baskets;
+CREATE TABLE users_baskets
+(
+  id serial NOT NULL,
+  user_serial_id integer NOT NULL,
+  basket_id character varying(32) NOT NULL,
+  group_id character varying(32) NOT NULL,
+  color character varying(16),
+  CONSTRAINT users_baskets_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE);

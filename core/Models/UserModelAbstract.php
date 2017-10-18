@@ -19,13 +19,13 @@ require_once 'apps/maarch_entreprise/services/Table.php';
 
 class UserModelAbstract extends \Apps_Table_Service
 {
-    public static function get()
+    public static function get(array $aArgs = [])
     {
-        $aUsers = static::select([
-            'select'    => ['firstname', 'lastname', 'user_id'],
+        $aUsers = DatabaseModel::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users'],
-            'where'     => ['enabled = ?'],
-            'data'      => ['Y'],
+            'where'     => empty($aArgs['where']) ? [] : $aArgs['where'],
+            'data'      => empty($aArgs['data']) ? [] : $aArgs['data']
         ]);
 
         return $aUsers;
@@ -421,4 +421,42 @@ class UserModelAbstract extends \Apps_Table_Service
         return true;
     }
 
+    public static function updateBasketColor(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['id', 'groupId', 'basketId', 'color']);
+        ValidatorModel::intVal($aArgs, ['id']);
+        ValidatorModel::stringType($aArgs, ['groupId', 'basketId', 'color']);
+
+        $isPresent = DatabaseModel::select([
+            'select'    => ['1'],
+            'table'     => ['users_baskets'],
+            'where'     => ['user_serial_id = ?', 'group_id = ?', 'basket_id = ?'],
+            'data'      => [$aArgs['id'], $aArgs['groupId'], $aArgs['basketId']]
+        ]);
+
+        if (empty($isPresent)) {
+            DatabaseModel::insert(
+                [
+                    'table'         => 'users_baskets',
+                    'columnsValues' => [
+                        'user_serial_id'    => $aArgs['id'],
+                        'basket_id'         => $aArgs['basketId'],
+                        'group_id'          => $aArgs['groupId'],
+                        'color'             => $aArgs['color']
+                    ]
+                ]
+            );
+        } else {
+            DatabaseModel::update([
+                'table'     => 'users_baskets',
+                'set'       => [
+                    'color'    => $aArgs['color']
+                ],
+                'where'     => ['user_serial_id = ?', 'group_id = ?', 'basket_id = ?'],
+                'data'      => [$aArgs['id'], $aArgs['groupId'], $aArgs['basketId']]
+            ]);
+        }
+
+        return true;
+    }
 }

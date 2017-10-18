@@ -15,7 +15,9 @@
 
 namespace Baskets\Models;
 
+use Core\Models\DatabaseModel;
 use Core\Models\UserModel;
+use Core\Models\ValidatorModel;
 
 require_once 'apps/maarch_entreprise/services/Table.php';
 require_once 'core/class/SecurityControler.php';
@@ -124,8 +126,8 @@ class BasketsModelAbstract extends \Apps_Table_Service
                 [
                     'select'    => ['basket_id', 'basket_name'],
                     'table'     => ['baskets'],
-                    'where'     => ['basket_id in (?)'],
-                    'data'      => [$basketIds],
+                    'where'     => ['basket_id in (?)', 'is_visible = ?'],
+                    'data'      => [$basketIds, 'Y'],
                     'order_by'  => 'basket_order, basket_name'
                 ]
             );
@@ -179,6 +181,69 @@ class BasketsModelAbstract extends \Apps_Table_Service
         }
 
         return $aBaskets;
+    }
+
+    public static function getRegroupedBasketsByUserId(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId']);
+        ValidatorModel::stringType($aArgs, ['userId']);
+
+        $regroupedBaskets = [];
+
+        $user = UserModel::getById(['userId' => $aArgs['userId'], 'select' => ['id']]);
+
+        $groups = UserModel::getGroupsById(['userId' => $aArgs['userId']]);
+        foreach ($groups as $group) {
+            $baskets = DatabaseModel::select([
+                'select'    => ['baskets.basket_id', 'baskets.basket_name', 'baskets.color'],
+                'table'     => ['groupbasket, baskets'],
+                'where'     => ['groupbasket.basket_id = baskets.basket_id', 'groupbasket.group_id = ?', 'baskets.is_visible = ?'],
+                'data'      => [$group['group_id'], 'Y'],
+                'order_by'  => ['baskets.basket_order', 'baskets.basket_name']
+            ]);
+            $coloredBaskets = DatabaseModel::select([
+                'select'    => ['basket_id', 'color'],
+                'table'     => ['users_baskets'],
+                'where'     => ['user_serial_id = ?', 'group_id = ?', 'color is not null'],
+                'data'      => [$user['id'], $group['group_id']]
+            ]);
+
+            foreach ($baskets as $kBasket => $basket) {
+                foreach ($coloredBaskets as $coloredBasket) {
+                    if ($basket['basket_id'] == $coloredBasket['basket_id']) {
+                        $baskets[$kBasket]['color'] = $coloredBasket['color'];
+                    }
+                }
+                if (empty($baskets[$kBasket]['color'])) {
+                    $baskets[$kBasket]['color'] = '#666666';
+                }
+            }
+
+            $regroupedBaskets[] = [
+              'groupId'     => $group['group_id'],
+              'groupDesc'   => $group['group_desc'],
+              'baskets'     => $baskets
+            ];
+        }
+
+        return $regroupedBaskets;
+    }
+
+    public static function getColoredBasketsByUserId(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId']);
+        ValidatorModel::stringType($aArgs, ['userId']);
+
+        $user = UserModel::getById(['userId' => $aArgs['userId'], 'select' => ['id']]);
+
+        $coloredBaskets = DatabaseModel::select([
+            'select'    => ['basket_id', 'group_id', 'color'],
+            'table'     => ['users_baskets'],
+            'where'     => ['user_serial_id = ?', 'color is not null'],
+            'data'      => [$user['id']]
+        ]);
+
+        return $coloredBaskets;
     }
 
     public static function setBasketsRedirection(array $aArgs = [])

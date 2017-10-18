@@ -16,6 +16,9 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav navbar-right">
                     <li style="cursor: pointer">
+                        <a data-toggle="modal" data-target="#managePreferences"><i class="fa fa-cog"></i> Préférences </a>
+                    </li>
+                    <li style="cursor: pointer">
                         <a data-toggle="modal" data-target="#manageSign"><i class="fa fa-vcard-o"></i> {{user.lang.manageSignatures}} </a>
                     </li>
                     <li style="cursor: pointer">
@@ -136,6 +139,36 @@
                     <span *ngIf="entity.primary_entity != 'Y'" class="label label-default">{{user.lang.secondaryEntity}}</span>
                 </li>
             </ul>
+        </div>
+    </div>
+</div>
+
+<div id="managePreferences" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Préférences</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#manageBaskets" aria-controls="manageBaskets" role="tab" data-toggle="tab">Gérer mes corbeilles</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="manageBaskets">
+                        <ul class="list-group" *ngFor="let regroupedBasket of user.regroupedBaskets; let i = index">
+                            <h4 *ngIf="regroupedBasket.baskets[0]">{{regroupedBasket.groupDesc}}</h4>
+                            <li class="list-group-item" *ngFor="let basket of regroupedBasket.baskets; let y = index">
+                                <i class="fa fa-tasks" title="{{basket.basket_id}}"></i> {{basket.basket_name}}
+                                <span class="pull-right">
+                                    <input name="color" type="color" style="background: none;border: none;height: 20px;width:20px;padding: 0;margin-right: 15px" [(ngModel)]="user.regroupedBaskets[i].baskets[y].color" (change)="updateBasketColor(i, y)"/>
+                                    <a (click)="user.regroupedBaskets[i].baskets[y].color = '#666666'; updateBasketColor(i, y)" title="Réinitialiser la couleur" style="cursor: pointer;color: #666666"><i class="fa fa-magic"></i></a>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

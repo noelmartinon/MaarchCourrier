@@ -41,6 +41,7 @@ class UserController
         $user['lang'] = LangModel::getProfileLang();
         $user['baskets'] = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['redirectedBaskets'] = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['regroupedBaskets'] = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
 
         return $response->withJson($user);
     }
@@ -344,9 +345,28 @@ class UserController
         return $response->withJson($formattedUsers);
     }
 
+    public function updateBasketPreference(RequestInterface $request, ResponseInterface $response, $aArgs)
+    {
+        $data = $request->getParams();
+
+        $user = UserModel::getById(['userId' => $_SESSION['user']['UserId'], 'select' => ['id']]);
+
+        if (!empty($data['color'])) {
+            UserModel::updateBasketColor(['id' => $user['id'], 'groupId' => $aArgs['groupId'], 'basketId' => $aArgs['basketId'], 'color' => $data['color']]);
+        }
+
+        return $response->withJson(['success' => 'success']);
+    }
+
     public function getUsersForAutocompletion(RequestInterface $request, ResponseInterface $response)
     {
-        $users = UserModel::get();
+        $excludedUsers = ['superadmin'];
+
+        $users = UserModel::get([
+            'select'    => ['user_id', 'firstname', 'lastname'],
+            'where'     => ['enabled = ?', 'status != ?', 'user_id not in (?)'],
+            'data'      => ['Y', 'DEL', $excludedUsers]
+        ]);
 
         $formattedUsers = [];
         foreach ($users as $value) {

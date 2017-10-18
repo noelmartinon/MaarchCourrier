@@ -261,6 +261,19 @@ var ProfileComponent = (function () {
             });
         });
     };
+    ProfileComponent.prototype.updateBasketColor = function (i, y) {
+        var _this = this;
+        this.http.put(this.coreUrl + "rest/currentUser/groups/" + this.user.regroupedBaskets[i].groupId + "/baskets/" + this.user.regroupedBaskets[i].baskets[y].basket_id, { "color": this.user.regroupedBaskets[i].baskets[y].color })
+            .map(function (res) { return res.json(); })
+            .subscribe(function (data) {
+        }, function (err) {
+            _this.resultInfo = JSON.parse(err._body).errors;
+            $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+            $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                $j("#resultInfo").slideUp(500);
+            });
+        });
+    };
     ProfileComponent.prototype.activateAbsence = function () {
         var _this = this;
         var r = confirm('Voulez-vous vraiment activer votre absence ? Vous serez automatiquement déconnecté.');

@@ -290,6 +290,19 @@ export class ProfileComponent implements OnInit {
             });
     }
 
+    updateBasketColor(i: number, y: number) {
+        this.http.put(this.coreUrl + "rest/currentUser/groups/" + this.user.regroupedBaskets[i].groupId + "/baskets/" + this.user.regroupedBaskets[i].baskets[y].basket_id, {"color" : this.user.regroupedBaskets[i].baskets[y].color})
+            .map(res => res.json())
+            .subscribe((data) => {
+            }, (err) => {
+                this.resultInfo = JSON.parse(err._body).errors;
+                $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                    $j("#resultInfo").slideUp(500);
+                });
+            });
+    }
+
     activateAbsence() {
         let r = confirm('Voulez-vous vraiment activer votre absence ? Vous serez automatiquement déconnecté.');
 
