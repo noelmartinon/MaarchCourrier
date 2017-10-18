@@ -268,15 +268,20 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     {
         $this->set_foolish_ids(array('template_id'));
         $this->set_specific_id('template_id');
-        $template = $this->advanced_get($template_id, _TEMPLATES_TABLE_NAME);
-        $template->template_content = str_replace('###', ';', $template->template_content);
-        $template->template_content = str_replace('___', '--', $template->template_content);
-        if (get_class($template) <> 'templates') {
-            return null;
+        if (!empty($template_id) && $template_id <> '' && $template_id <> 'empty') {
+            $template = $this->advanced_get($template_id, _TEMPLATES_TABLE_NAME);
+            $template->template_content = str_replace('###', ';', $template->template_content);
+            $template->template_content = str_replace('___', '--', $template->template_content);
+            if (get_class($template) <> 'templates') {
+                return null;
+            } else {
+                //var_dump($template);
+                return $template;
+            }
         } else {
-            //var_dump($template);
-            return $template;
+            return null;
         }
+        
     }
 
     /**

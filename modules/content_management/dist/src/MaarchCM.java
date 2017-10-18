@@ -68,6 +68,8 @@ public class MaarchCM {
     protected String clientSideCookies;
     protected String uniqueId;
     protected String convertPdf;
+    protected String onlyConvert;
+
     protected String domain;
     protected String userLocalDirTmp;
     protected String userMaarch;
@@ -96,7 +98,9 @@ public class MaarchCM {
     public MyLogger logger;
     public FileManager fM;
     public String fileToEdit;
-    public String editMode;
+    public String editMode;    
+    public String programName;
+
 
     
     public List<String> fileToDelete = new ArrayList<String>();
@@ -131,6 +135,7 @@ public class MaarchCM {
         idApplet = args[7];
         userMaarch = args[8];
         convertPdf = args[9];
+        onlyConvert = args[10];
         
         System.out.println("URL : " + url);
         System.out.println("OBJECT TYPE : " + objectType);
@@ -141,7 +146,8 @@ public class MaarchCM {
         System.out.println("COOKIE : " + cookie);
         System.out.println("CLIENTSIDECOOKIES : " + clientSideCookies);
         System.out.println("USERMAARCH : " + userMaarch);
-        System.out.println("CONVERPDF : " + convertPdf);
+        System.out.println("CONVERTPDF : " + convertPdf);
+        System.out.println("ONLYCONVERT : " + onlyConvert);
         System.out.println("----------CONTROL PARAMETERS----------");
         
         if (
@@ -324,8 +330,21 @@ public class MaarchCM {
     }
 
     public void createPDF(String docxFile, String directory, boolean isUnix) {
+        logger.log("createPDF ", Level.INFO);
         try {
-            System.out.println("mode ! : "+editMode);
+            System.out.println("mode ! : " + editMode);
+            //patch onlyConvert
+            if (onlyConvert.equals("true")) {
+                if ("linux".equals(os) || "mac".equals(os)) {
+                    editMode = "libreoffice";
+                } else {
+                    if("soffice.exe".equals(programName)){
+                        editMode = "libreoffice";
+                    }else{
+                        editMode = "office"; 
+                    }
+                }
+            }
             boolean conversion = true;
             String cmd = "";
             if (docxFile.contains(".odt") || docxFile.contains(".ods") || docxFile.contains(".ODT") || docxFile.contains(".ODS")) {
@@ -339,6 +358,7 @@ public class MaarchCM {
                 }
 
             } else if (docxFile.contains(".doc") || docxFile.contains(".docx") || docxFile.contains(".DOC") || docxFile.contains(".DOCX")) {
+                logger.log("This is MSOffice document ", Level.INFO);
                 if (useExeConvert.equals("false")) {
                     if (isUnix) {
                         cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp+idApplet+"_conv\\ --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
@@ -486,7 +506,7 @@ public class MaarchCM {
      */
     public String editObject() throws Exception, InterruptedException, JSException {
 
-        System.out.println("----------BEGIN EDIT OBJECT---------- LGI by Maarch and DIS 22/01/2017");
+        System.out.println("----------BEGIN EDIT OBJECT---------- LGI by Maarch 02/10/2017");
         System.out.println("----------BEGIN LOCAL DIR TMP IF NOT EXISTS----------");
         os = System.getProperty("os.name").toLowerCase();
         boolean isUnix = os.contains("nix") || os.contains("nux");
@@ -552,11 +572,17 @@ public class MaarchCM {
         logger.log("COOKIE : " + cookie, Level.INFO);
         logger.log("CLIENTSIDECOOKIES : " + clientSideCookies, Level.INFO);
         logger.log("USERMAARCH : " + userMaarch, Level.INFO);
+        logger.log("ONLYCONVERT : " + onlyConvert, Level.INFO);
 
         logger.log("----------BEGIN OPEN REQUEST----------", Level.INFO);
-        String urlToSend = url + "?action=editObject&objectType=" + objectType
-                + "&objectTable=" + objectTable + "&objectId=" + objectId
-                + "&uniqueId=" + uniqueId;
+        String urlToSend;
+        
+        urlToSend = url + "?action=editObject&objectType=" + objectType
+            + "&objectTable=" + objectTable + "&objectId=" + objectId
+            + "&uniqueId=" + uniqueId;
+        
+        
+        logger.log("FIRST URL CALL : " + urlToSend, Level.INFO);
         sendHttpRequest(urlToSend, "none", false);
         logger.log("MESSAGE STATUS : " + messageStatus, Level.INFO);
         logger.log("MESSAGE RESULT : ", Level.INFO);
@@ -598,35 +624,41 @@ public class MaarchCM {
             fM.createFile(fileContent, userLocalDirTmp + fileToEdit);
             fileToDelete.add(userLocalDirTmp + fileToEdit);
             
-            Thread theThread;
-            theThread = new Thread(new ProcessLoop(this));
-
-            theThread.start();
-            
-            String actualContent;
             fileContentTosend = "";
-            do {
-                theThread.sleep(3000);
-                File fileTotest = new File(userLocalDirTmp + fileToEdit);
-                if (fileTotest.canRead()) {
-                    actualContent = FileManager.encodeFile(userLocalDirTmp + fileToEdit);
-                    if (!fileContentTosend.equals(actualContent)) {
-                        fileContentTosend = actualContent;
-                        logger.log("----------[SECURITY BACKUP] BEGIN SEND OF THE OBJECT----------", Level.INFO);
-                        String urlToSave = url + "?action=saveObject&objectType=" + objectType
-                                + "&objectTable=" + objectTable + "&objectId=" + objectId
-                                + "&uniqueId=" + uniqueId + "&step=backup&userMaarch=" + userMaarch;
-                        logger.log("[SECURITY BACKUP] URL TO SAVE : " + urlToSave, Level.INFO);
-                        sendHttpRequest(urlToSave, fileContentTosend, false);
-                        logger.log("[SECURITY BACKUP] MESSAGE STATUS : " + messageStatus, Level.INFO);
-                    }
-                } else {
-                    logger.log(userLocalDirTmp + fileToEdit + " FILE NOT READABLE !!!!!!", Level.INFO);
-                }
-            }
-            while (theThread.isAlive());
+            
+            if (onlyConvert.equals("false")) {
+                Thread theThread;
+                theThread = new Thread(new ProcessLoop(this));
 
-            theThread.interrupt();
+                theThread.start();
+
+                String actualContent;
+                
+                do {
+                    theThread.sleep(3000);
+                    File fileTotest = new File(userLocalDirTmp + fileToEdit);
+                    if (fileTotest.canRead()) {
+                        actualContent = FileManager.encodeFile(userLocalDirTmp + fileToEdit);
+                        if (!fileContentTosend.equals(actualContent)) {
+                            fileContentTosend = actualContent;
+                            logger.log("----------[SECURITY BACKUP] BEGIN SEND OF THE OBJECT----------", Level.INFO);
+                            String urlToSave = url + "?action=saveObject&objectType=" + objectType
+                                    + "&objectTable=" + objectTable + "&objectId=" + objectId
+                                    + "&uniqueId=" + uniqueId + "&step=backup&userMaarch=" + userMaarch;
+                            logger.log("[SECURITY BACKUP] URL TO SAVE : " + urlToSave, Level.INFO);
+                            sendHttpRequest(urlToSave, fileContentTosend, false);
+                            logger.log("[SECURITY BACKUP] MESSAGE STATUS : " + messageStatus, Level.INFO);
+                        }
+                    } else {
+                        logger.log(userLocalDirTmp + fileToEdit + " FILE NOT READABLE !!!!!!", Level.INFO);
+                    }
+                }
+                while (theThread.isAlive());
+            
+                theThread.interrupt();
+            }
+
+            
 
             logger.log("----------END EXECUTION OF THE EDITOR----------", Level.INFO);
 
@@ -635,10 +667,13 @@ public class MaarchCM {
             fileContentTosend = FileManager.encodeFile(userLocalDirTmp + fileToEdit);
 
             logger.log("----------END RETRIEVE CONTENT OF THE OBJECT----------", Level.INFO);
+            
+            logger.log("conversion pdf ? " + convertPdf , Level.INFO);
 
             if ("true".equals(convertPdf)) {
                 if ((fileExtension.equalsIgnoreCase("docx") || fileExtension.equalsIgnoreCase("doc") || fileExtension.equalsIgnoreCase("docm") || fileExtension.equalsIgnoreCase("odt") || fileExtension.equalsIgnoreCase("ott"))) {
                     logger.log("----------CONVERSION PDF----------", Level.INFO);
+                    
                     createPDF(userLocalDirTmp + fileToEdit, userLocalDirTmp, isUnix);
 
                     String pdfFile = userLocalDirTmp + "thefile_" + idApplet + ".pdf";
@@ -664,7 +699,8 @@ public class MaarchCM {
 
             String urlToSave = url + "?action=saveObject&objectType=" + objectType
                     + "&objectTable=" + objectTable + "&objectId=" + objectId
-                    + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch;
+                    + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch
+                    + "&onlyConvert=" + onlyConvert;
             logger.log("----------BEGIN SEND OF THE OBJECT----------", Level.INFO);
             logger.log("URL TO SAVE : " + urlToSave, Level.INFO);
             sendHttpRequest(urlToSave, fileContentTosend, true);
@@ -742,7 +778,6 @@ public class MaarchCM {
         } else {
             logger.log("FILE TO EDIT : " + userLocalDirTmp + fileToEdit, Level.INFO);
 
-            String programName;
             programName = fM.findGoodProgramWithExt(fileExtension);
             String pathProgram;
             pathProgram = fM.findPathProgramInRegistry(programName);

@@ -42,6 +42,7 @@ $the_ext = $extension[$count_level];
 $_SESSION['upfile']['format'] = $the_ext;
 
 $extList = $is->filetypes_showed_indexation();
+
 if (isset($_SESSION['upfile']['format'])) {
     $showFile = $is->show_index_frame($_SESSION['upfile']['format']);
     $ext = strtolower($_SESSION['upfile']['format']);
@@ -74,6 +75,27 @@ if ($_SESSION['origin'] == "scan") {
 		echo "<br/>PROBLEM DURING FILE SEND";
 	}
 	exit();
+}else if (!empty($_SESSION['upfile']['fileNamePdfOnTmp'])) {
+	$mimeType = $is->get_mime_type('pdf');
+	//print_r($_SESSION['upfile']);exit;
+	header("Pragma: public");
+	header("Expires: 0");
+	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+	header("Cache-Control: public");
+	header("Content-Description: File Transfer");
+	header("Content-Type: ".$mimeType);
+	header(
+		"Content-Disposition: inline; filename=" . basename('maarch') . "."
+		. $ext . ";"
+	);
+	header("Content-Transfer-Encoding: binary");
+	$ext = strtolower('pdf');
+	if (file_exists($_SESSION['upfile']['local_path'])) {
+		$loc = $_SESSION['config']['tmppath'] . $_SESSION['upfile']['fileNamePdfOnTmp'];
+		readfile($loc);
+	}
+	exit();
+
 } else if (isset($_SESSION['upfile']['mime'])
     && ! empty($_SESSION['upfile']['mime'])
     && isset($_SESSION['upfile']['format'])

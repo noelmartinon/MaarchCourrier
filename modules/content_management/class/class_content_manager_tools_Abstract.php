@@ -352,7 +352,8 @@ abstract class content_management_tools_Abstract
         $cookieKey,
         $user,
         $clientSideCookies,
-        $convertPdf = "false"
+        $convertPdf = "false",
+        $onlyConvert = "false"
     ) {
         $docXML = new DomDocument('1.0', "UTF-8");
 
@@ -389,6 +390,7 @@ abstract class content_management_tools_Abstract
             fwrite($inF, "clientSideCookies : " . $clientSideCookies . PHP_EOL);
             fwrite($inF, "user : " . $user . PHP_EOL);
             fwrite($inF, "convertPdf : " . $convertPdf . PHP_EOL);
+            fwrite($inF, "onlyConvert : " . $onlyConvert . PHP_EOL);
             $listArguments = '?url=' . urlencode($maarchcm_url)
                 . '&objectType=' . $objectType
                 . '&objectTable=' . $objectTable
@@ -398,7 +400,8 @@ abstract class content_management_tools_Abstract
                 . '&clientSideCookies=' . $clientSideCookies
                 . '&idApplet=' . $uid_applet_name
                 . '&userMaarch=' . $user
-                . '&convertPdf=' . $convertPdf;
+                . '&convertPdf=' . $convertPdf
+                . '&onlyConvert=' . $onlyConvert;
             fwrite($inF, "listArguments : " . $listArguments . PHP_EOL);
             fclose($inF);
         }
@@ -541,6 +544,12 @@ abstract class content_management_tools_Abstract
         }
         $param10_balise=$docXML->createElement("argument", htmlentities($convertPdf));
 
+        if (empty($onlyConvert)) {
+            $onlyConvert = 'false';
+        }
+        $param11_balise=$docXML->createElement("argument", htmlentities($onlyConvert));
+        
+
         $jnlp_balise->appendChild($info_balise); 
         $info_balise->appendChild($title_balise); 
         $info_balise->appendChild($vendor_balise); 
@@ -573,6 +582,7 @@ abstract class content_management_tools_Abstract
         $applet_balise->appendChild($param8_balise);
         $applet_balise->appendChild($param9_balise);
         $applet_balise->appendChild($param10_balise);
+        $applet_balise->appendChild($param11_balise);
 
         $docXML->appendChild($jnlp_balise);  
 
@@ -588,7 +598,6 @@ abstract class content_management_tools_Abstract
 
         //echo '<a id="jnlp_file" href="'.$file.'" onclick="window.location.href=\''.$file.'\';self.close();"></a>';
         echo '<script>window.location.href=\''.$file.'\';if($(\'CMApplet\')) {destroyModal(\'CMApplet\');};if($(\'CMApplet\')) {destroyModal(\'CMApplet\');};</script>';
-        exit();
         /*echo '<a id="jnlp_file" href="'.$_SESSION['config']['businessappurl'].'index.php?page=get_jnlp_file&module=content_management&display=true&filename='.$_SESSION['user']['UserId'].'_maarchCM"></a>';
         echo '<script>setTimeout(function() {this.window.close();}, 5000);document.getElementById("jnlp_file").click();</script>';
         exit();*/

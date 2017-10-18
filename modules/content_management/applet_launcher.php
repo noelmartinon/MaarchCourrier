@@ -191,6 +191,7 @@ $_SESSION['error'] = '';
     }else{
         $path_appli = implode('/', $path_appli);
     }
+    $onlyConvert = "false";
     $cM->generateJNLP(
         $path_appli,
         $path_appli . '/' . $path,
@@ -201,7 +202,8 @@ $_SESSION['error'] = '';
         $cookieKey,
         $_SESSION['user']['UserId'],
         $_SESSION['clientSideCookies'], 
-        $_SESSION['modules_loaded']['attachments']['convertPdf']
+        $_SESSION['modules_loaded']['attachments']['convertPdf'],
+        $onlyConvert
     );
     exit();
     ?>

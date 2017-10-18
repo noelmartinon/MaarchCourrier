@@ -567,6 +567,15 @@ if (isset($_POST['add']) && $_POST['add']) {
                         unset($_SESSION['transmissionContacts']);
                         
                         //copie de la version PDF de la pièce si mode de conversion sur le client
+                        if (
+                            $_SESSION['upfile']['fileNamePdfOnTmp'] != '' &&
+                            empty($_REQUEST['templateOffice'])
+                        ) {
+                            //case onlyConvert
+                            $query = "select template_id from templates where template_type = 'OFFICE' and template_target = 'attachments'";
+                            $stmt = $db->query($query);
+                            $_REQUEST['templateOffice'] = $stmt->fetchObject()->template_id;
+                        }
                         if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == true && $_SESSION['upfile']['fileNamePdfOnTmp'] != '' && isset($_REQUEST['templateOffice'])){
 							$_SESSION['new_id'] = $id;
                             $file    = $_SESSION['config']['tmppath'].$_SESSION['upfile']['fileNamePdfOnTmp'];
@@ -753,9 +762,10 @@ if (isset($_POST['add']) && $_POST['add']) {
                     }
                     else {
                         if($attachment_types == 'response_project' || $attachment_types == 'outgoing_mail' || $attachment_types == 'signed_response' || $attachment_types == 'aihp'){
-                            $js .= 'loadSpecificTab(\'responses_iframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&view_only=true&load&fromDetail=response&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp\');';
+                            $js .= 'loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&view_only=true&load&fromDetail=response&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp\');';
                         }else{
-                            $js .= 'loadSpecificTab(\'attachments_iframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&page=show_attachments_details_tab&module=attachments&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll&fromDetail=attachments&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp\');';
+                            $js .= 'loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&page=show_attachments_details_tab&module=attachments&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll&fromDetail=attachments&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp\');';
+
                         }
                         
                     }
@@ -1522,6 +1532,7 @@ if (isset($_REQUEST['id'])) {
     $_SESSION['upfile']['format']        = $viewResourceArr['ext'];
     $fileNameOnTmp                       = str_replace($viewResourceArr['tmp_path'].DIRECTORY_SEPARATOR, '', $viewResourceArr['file_path']);
     $_SESSION['upfile']['fileNameOnTmp'] = $fileNameOnTmp;
+    $_SESSION['upfile']['fileNamePdfOnTmp'] = $viewResourceArr['filenamePdf'];
 
 } else {
     $_SESSION['targetAttachment'] = 'add';

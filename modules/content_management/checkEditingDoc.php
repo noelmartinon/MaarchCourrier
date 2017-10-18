@@ -12,5 +12,5 @@
 if (!empty($_SESSION['cm_applet'][$_SESSION['user']['UserId']])) {
     echo "{\"status\" : 1, \"status_txt\" : \"LCK FOUND !\"}";
 } else {
-    echo "{\"status\" : 0, \"status_txt\" : \"LCK NOT FOUND !\"}";
+    echo "{\"status\" : 0, \"status_txt\" : \"LCK NOT FOUND !\", \"pdf_version\" : \"".$_SESSION['config']['tmppath'].$_SESSION['upfile']['fileNamePdfOnTmp']."\"}";
 }

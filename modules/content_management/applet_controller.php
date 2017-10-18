@@ -153,6 +153,7 @@ if (!empty($_REQUEST['action'])
             && $objectType <> 'attachmentVersion'
             && $objectType <> 'outgoingMail'
             && $objectType <> 'attachmentUpVersion'
+            && $objectType <> 'newAttachment'
             && $objectType != 'transmission'
         ) {
             //case of res -> master or version
@@ -160,6 +161,9 @@ if (!empty($_REQUEST['action'])
         } elseif ($objectType == 'attachment' || $objectType == 'attachmentUpVersion') {
             //case of res -> update attachment
             include 'modules/content_management/retrieve_attachment_from_cm.php';
+        } elseif ($objectType == 'newAttachment') {
+            //case of res -> new attachment with only conversion
+            include 'modules/content_management/retrieve_new_attachment_from_cm.php';
         } else {
             //case of template, templateStyle, or new attachment generation
             include 'modules/content_management/retrieve_template_from_cm.php';
@@ -252,7 +256,15 @@ if (!empty($_REQUEST['action'])
 				'END_MESSAGE' => '',
 			);
 		}
-        unlink($filePathOnTmp);
+        // $file = fopen('cm_xml_begin.log', a);
+        // fwrite($file, '[' . date('Y-m-d H:i:s') . '] ------BEGIN------- ' . PHP_EOL);
+        // foreach ($result as $key => $value) {
+        //     $resultQuery = "key " . $key . " value " . $value;
+        //     fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $resultQuery . PHP_EOL);
+        // }
+        // fwrite($file, '[' . date('Y-m-d H:i:s') . '] ------END------- ' . PHP_EOL);
+        // fclose($file);
+        //unlink($filePathOnTmp);
         createXML('SUCCESS', $result);
     } elseif ($_REQUEST['action'] == 'saveObject') {
         if (
@@ -278,7 +290,7 @@ if (!empty($_REQUEST['action'])
             fclose($inF);
 			
 			//Récupération de la version pdf du document
-			if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == "true" && ($objectType == 'attachmentFromTemplate' || $objectType == 'attachment' || $objectType == 'attachmentUpVersion' || $objectType == 'attachmentVersion' || $objectType == 'outgoingMail' || $objectType == 'resourceEdit' || $objectType == 'transmission') && isset($_REQUEST['pdfContent'])){
+			if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == "true" && ($objectType == 'attachmentFromTemplate' || $objectType == 'attachment' || $objectType == 'attachmentUpVersion' || $objectType == 'attachmentVersion' || $objectType == 'outgoingMail' || $objectType == 'resourceEdit' || $objectType == 'transmission' || $objectType == 'newAttachment') && isset($_REQUEST['pdfContent'])){
 				$pdfEncodedContent = str_replace(
 					' ',
 					'+',
@@ -310,7 +322,7 @@ if (!empty($_REQUEST['action'])
                 }
                 if ($objectType == 'resourceEdit') {
                     include 'modules/content_management/save_editRes_from_cm.php';
-                } elseif ($objectType == 'attachmentFromTemplate') {
+                } elseif ($objectType == 'attachmentFromTemplate' || $objectType == 'newAttachment') {
                     include 'modules/content_management/save_attach_res_from_cm.php';
                 } elseif ($objectType == 'attachment') {
                     include 'modules/content_management/save_attach_from_cm.php';

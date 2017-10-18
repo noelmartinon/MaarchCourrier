@@ -226,6 +226,8 @@ function checkEditingDoc(userId) {
 
                 //END OF CHECKING APPLET
                 console.log('clearInterval');
+                document.getElementById('viewframevalid_attachment').src='index.php?display=true&dir=indexing_searching&page=file_iframe&#navpanes=0'+response.pdf_version;
+                //console.log(response.pdf_version);
                 clearInterval(editing);
             } else {
                 console.log('lck found! Editing in progress !');
