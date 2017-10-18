@@ -418,6 +418,10 @@ class Core_CoreConfigAbstract_Service extends Core_Abstract_Service {
                 //Loads log keywords of the module
             }
 
+            if (!isset($_SESSION['history_keywords'])) {
+                $_SESSION['history_keywords'] = array();
+            }
+
             foreach ($xmlconfig->KEYWORDS as $keyword) {
                 $tmp = (string) $keyword->label;
                 if ( !empty($tmp) && defined($tmp) && constant($tmp) <> NULL ) {
