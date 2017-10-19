@@ -739,6 +739,19 @@ if(isset($_REQUEST['nodetails']))
                     </td>
                     <td><em><?php echo "";?></em></td>
                 </tr>
+                <tr>
+                    <td width="70%"><label for="visa_user" class="bold"><?php echo _VISA_USER_SEARCH;?>:</label>
+                        <input type="text" name="visa_user" id="visa_user" onkeyup="erase_contact_external_id('visa_user', 'user_visa');"/>
+                        <input type="hidden" name="meta[]" value="visa_user#visa_user#input_text" />
+                        <div id="visaUserListByName" class="autocomplete"></div>
+                        <script type="text/javascript">
+                            initList_hidden_input('visa_user', 'visaUserListByName', '<?php 
+                                echo $_SESSION['config']['businessappurl'];?>index.php?display=true&dir=indexing_searching&page=users_list_by_name_search', 'what', '2', 'user_visa');
+                        </script>
+                        <input id="user_visa" name="user_visa" type="hidden" />
+                    </td>
+                    <td><em><?php echo "";?></em></td>
+                </tr>
             </table>
             </div>
         </td>

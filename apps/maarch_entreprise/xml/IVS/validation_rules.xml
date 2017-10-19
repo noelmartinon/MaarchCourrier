@@ -410,6 +410,8 @@
       <parameter name="contactid_external" type="identifier" />
       <parameter name="contact_type" type="identifier" />
       <parameter name="contactid_internal" type="keyword_id" />
+      <parameter name="visa_user" type="string" />
+      <parameter name="user_visa" type="string" />
       <parameter name="descriptioncase" type="string" />
       <parameter name="dir" type="identifier" />
       <parameter name="fulltext" type="string" />
