@@ -1996,23 +1996,20 @@ $content .= '</div>';
 $content .= '<div style="float: right; width: 65%">';
 
 $content .= '<div id="menuOnglet">
-              <ul id="ongletAttachement">
-                <li id="liAttachement" ';
-if(empty($_REQUEST['id'])){
-    $content .= ' style="display:none"';
-    $js = 'setTimeout(function(){window.parent.document.getElementById(\'liMainDocument\').click()}, 1000)';
-}
+                <ul id="ongletAttachement">
+                    <li id="liAttachement" ';
 
-$content .= ' onclick="activeOngletAttachement()"><a href="#"> Attachement </a></li>';
+                if(empty($_REQUEST['id'])){
+                    $content .= ' style="display:none" ';
+                }
 
-    $content .= '<li id="liMainDocument" onclick="activeOngletMainDocument()"><a href="#"> Document principal </a></li>';
-
-$content .= '</ul>
+                    $content .= 'onclick="activeOngletAttachement()"><a href="#"> Attachement </a></li>
+                    <li id="liMainDocument" onclick="activeOngletMainDocument()"><a href="#"> Document principal </a></li>
+                </ul>
             </div>';
 
 // ATTACHEMENT //
 if(empty($_REQUEST['id'])){
-    $displayAttachment = 'display:none';
     $srcAttachment = '';
 } else {
     $srcAttachment = 'index.php?display=true&module=attachments&page=view_attachment&res_id_master='.functions::xssafe($_SESSION['doc_id']).'&id='.functions::xssafe($_REQUEST['id']);
@@ -2021,15 +2018,15 @@ if(empty($_REQUEST['id'])){
 $content .= '<iframe src="'.$srcAttachment.'" name="viewframevalid_attachment" id="viewframevalid_attachment" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;'.$displayAttachment.'" onmouseover="this.focus()"></iframe>';
 
 // DOCUMENT PRINCIPAL //
-$content .= '<iframe src="index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='. functions::xssafe($_SESSION['doc_id']).'" name="viewframevalid_main" id="viewframevalid_main" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;';
-
-if(!empty($_REQUEST['id'])){
-    $content .= 'display:none';
-}
-
-$content .= '" onmouseover="this.focus()"></iframe>';
+$content .= '<iframe src="index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='. functions::xssafe($_SESSION['doc_id']).'" name="viewframevalid_main" id="viewframevalid_main" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh" onmouseover="this.focus()"></iframe>';
     
 $content .= '</div>';
+
+if(empty($_REQUEST['id'])){
+    $js = 'setTimeout(function(){window.parent.document.getElementById(\'liMainDocument\').click()}, 1000)';
+} else {
+    $js = 'setTimeout(function(){window.top.document.getElementById(\'liAttachement\').click()}, 1000)';
+}
 
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
