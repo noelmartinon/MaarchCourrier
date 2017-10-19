@@ -12,7 +12,7 @@ class AdapterEmail{
         $this->xml = simplexml_load_file(__DIR__. DIRECTORY_SEPARATOR. '..' .DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml");
     }
 
-    public function send($messageObject)
+    public function send($messageObject, $messageId)
     {
         $res['status'] = 0;
         $res['content'] = '';
@@ -33,8 +33,7 @@ class AdapterEmail{
             $sendmail->email_status           = 'W';
             $sendmail->sender_email           = $messageObject->TransferringAgency->OrganizationDescriptiveMetadata->Contact[0]->Communication[1]->value;
 
-            $message = $this->db->getMessageByReference($messageObject->MessageIdentifier->value);
-            $sendmail->message_exchange_id = $message->message_id;
+            $sendmail->message_exchange_id = $messageId;
 
             $date = new DateTime;
             $sendmail->creation_date = $date->format(DateTime::ATOM);

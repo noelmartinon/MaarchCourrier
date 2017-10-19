@@ -11,20 +11,17 @@ class AdapterWS{
         $this->db = new RequestSeda();
     }
 
-    public function send($messageObject)
+    public function send($messageObject, $messageId, $type)
     {
         $transfer = new Transfer();
 
-        $res = $transfer->transfer('maarchcourrier',$messageObject->MessageIdentifier->value);
+        $res = $transfer->transfer('maarchcourrier', $messageId, $type);
 
         if ($res['status'] == 1) {
-            $this->db->updateStatusMessage($messageObject->MessageIdentifier->value,'E');
+            $this->db->updateStatusMessage($messageObject->MessageIdentifier->value, 'E');
             return $res;
         }
 
-        $this->db->updateStatusMessage($messageObject->MessageIdentifier->value,'S');
-
-        /***** TODO save acknowledgement **/
-
+        $this->db->updateStatusMessage($messageObject->MessageIdentifier->value, 'S');
     }
 }

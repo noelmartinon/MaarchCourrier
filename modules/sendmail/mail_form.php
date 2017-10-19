@@ -1320,7 +1320,7 @@ if ($mode == 'add') {
                             </div>';
                 $content .= '<div id="operationCommentsDiv" style="display:none">';
                     foreach ($emailArray['operationComments'] as $value) {
-                        $content .= $value.'<br>';
+                        $content .= $value->value.'<br>';
                     }
                 $content .= '</div><br>';
             }

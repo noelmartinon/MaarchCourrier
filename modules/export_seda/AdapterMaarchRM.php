@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__. DIRECTORY_SEPARATOR. 'RequestSeda.php';
+
 class AdapterMaarchRM{
     private $xml;
 
@@ -8,7 +10,7 @@ class AdapterMaarchRM{
         $this->xml = simplexml_load_file(__DIR__.DIRECTORY_SEPARATOR. 'xml' . DIRECTORY_SEPARATOR . "config.xml");
     }
 
-    public function getInformations($reference) {
+    public function getInformations($messageId) {
         $res = []; // [0] = url, [1] = header, [2] = cookie, [3] = data
 
         $res[0] =  (string) $this->xml->CONFIG->urlSAEService. "/medona/Archivetransfer";
@@ -20,6 +22,10 @@ class AdapterMaarchRM{
 
         $token = urlencode((string)$this->xml->CONFIG->token);
         $res[2] = "LAABS-AUTH=".$token;
+
+        $db = new RequestSeda();
+        $message = $db->getMessageByIdentifier($messageId);
+        $reference = $message->reference;
 
         $data = new stdClass();
         $messageDirectory = __DIR__.DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$reference;

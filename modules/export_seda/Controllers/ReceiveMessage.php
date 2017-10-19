@@ -30,7 +30,7 @@ class ReceiveMessage
      * @param $messageObject
      * @return bool|mixed
      */
-    public function receive($tmpPath, $tmpName)
+    public function receive($tmpPath, $tmpName, $type)
     {
         $res['status'] = 0;
         $res['content'] = '';
@@ -47,7 +47,7 @@ class ReceiveMessage
 
         foreach (glob($messageDirectory. DIRECTORY_SEPARATOR. '*.xml') as $filename) {
             $pathParts = pathinfo($filename);
-            if(strpos($pathParts['filename'],'ArchiveTransfer') === false) {
+            if (strpos($pathParts['filename'], 'ArchiveTransfer') === false) {
                 break;
             } else {
                 $messageFileName = $filename;
@@ -72,7 +72,7 @@ class ReceiveMessage
             $res['status'] = 1;
             $res['content'] = _ERROR_MESSAGE_STRUCTURE_WRONG;
 
-            $this->libxml_display_errors();
+            $this->libxmlDisplayErrors();
 
             return $res;
         }*/
@@ -80,44 +80,49 @@ class ReceiveMessage
         // TEST ATTACHMENT
         $listFiles = scandir($messageDirectory);
         $dataObject = simplexml_load_file($messageFileName);
-        foreach ($dataObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-            $filename = '';
-            // ATTACHMENT FILENAME
-            $filename = $binaryDataObject->Attachment->attributes();
-            if (!array_search($filename, $listFiles)) {
-                $res['status'] = 1;
-                $res['content'] = _ERROR_ATTACHMENT_FILE_MISSING . ' : ' . $filename;
+        if ($dataObject->DataObjectPackage) {
+            foreach ($dataObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
+                $filename = '';
+                // ATTACHMENT FILENAME
+                $filename = $binaryDataObject->Attachment->attributes();
+                if (!array_search($filename, $listFiles)) {
+                    $res['status'] = 1;
+                    $res['content'] = _ERROR_ATTACHMENT_FILE_MISSING . ' : ' . $filename;
 
-                return $res;
-            }
+                    return $res;
+                }
 
-            // ATTACHMENT BASE 64
-            $data = file_get_contents($messageDirectory. DIRECTORY_SEPARATOR . $filename);
-            $dataBase64 = base64_encode($data);
+                // ATTACHMENT BASE 64
+                $data = file_get_contents($messageDirectory . DIRECTORY_SEPARATOR . $filename);
+                $dataBase64 = base64_encode($data);
 
-            if ($dataBase64 != $binaryDataObject->Attachment) {
-                $res['status'] = 1;
-                $res['content'] = _ERROR_ATTACHMENT_WRONG_BASE64 . ' : ' . $filename;
+                if ($dataBase64 != $binaryDataObject->Attachment) {
+                    $res['status'] = 1;
+                    $res['content'] = _ERROR_ATTACHMENT_WRONG_BASE64 . ' : ' . $filename;
 
-                return $res;
+                    return $res;
+                }
             }
         }
 
         // ARCHIVER AGENCY CONTACT
-        if(!$this->db->getEntitiesByBusinessId($dataObject->ArchivalAgency->Identifier)) {
-            $res['status'] = 1;
-            $res['content'] = _ERROR_CONTACT_UNKNOW . ' : ' . $dataObject->ArchivalAgency->Identifier;
+        if ($dataObject->ArchivalAgency) {
+            if (!$this->db->getEntitiesByBusinessId($dataObject->ArchivalAgency->Identifier)) {
+                $res['status'] = 1;
+                $res['content'] = _ERROR_CONTACT_UNKNOW . ' : ' . $dataObject->ArchivalAgency->Identifier;
 
-            return $res;
+                return $res;
+            }
         }
 
-        $res['content'] = json_encode($this->getMessageObject($dataObject));
+        $res['content'] = json_encode($this->getMessageObject($dataObject, $type));
 
         return $res;
     }
 
 
-    private function getMessageObject($dataObject) {
+    private function getMessageObject($dataObject, $type)
+    {
         $messageObject = new stdClass();
 
         $listComment= array();
@@ -133,17 +138,47 @@ class ReceiveMessage
         $messageObject->MessageIdentifier = new stdClass();
         $messageObject->MessageIdentifier->value = (string) $dataObject->MessageIdentifier;
 
+        if ($dataObject->MessageReceivedIdentifier) {
+            $messageObject->MessageReceivedIdentifier = new stdClass();
+            $messageObject->MessageReceivedIdentifier->value = (string) $dataObject->MessageReceivedIdentifier;
+        }
+
+        if ($dataObject->MessageRequestIdentifier) {
+            $messageObject->MessageRequestIdentifier = new stdClass();
+            $messageObject->MessageRequestIdentifier->value = (string) $dataObject->MessageRequestIdentifier;
+        }
+
         $messageObject->Date = (string) $dataObject->Date;
 
-        $messageObject->DataObjectPackage = $this->getDataObjectPackage($dataObject->DataObjectPackage);
-        $messageObject->ArchivalAgency = $this->getOrganization($dataObject->ArchivalAgency);
-        $messageObject->TransferringAgency = $this->getOrganization($dataObject->TransferringAgency);
+        if ($dataObject->DataObjectPackage) {
+            $messageObject->DataObjectPackage = $this->getDataObjectPackage($dataObject->DataObjectPackage);
+        }
+
+        if ($dataObject->ArchivalAgency) {
+            $messageObject->ArchivalAgency = $this->getOrganization($dataObject->ArchivalAgency);
+        }
+
+        if ($dataObject->TransferringAgency) {
+            $messageObject->TransferringAgency = $this->getOrganization($dataObject->TransferringAgency);
+        }
+
+        if ($dataObject->Sender) {
+            $messageObject->Sender = $this->getOrganization($dataObject->Sender);
+        }
+
+        if ($dataObject->Receiver) {
+            $messageObject->Receiver = $this->getOrganization($dataObject->Receiver);
+        }
+
+        if ($type) {
+            $messageObject->type = $type;
+        }
 
         return $messageObject;
     }
 
-    private function getDataObjectPackage($dataObject) {
-
+    private function getDataObjectPackage($dataObject)
+    {
         $dataObjectPackage = new stdClass();
         $dataObjectPackage->BinaryDataObject = new stdClass();
         $dataObjectPackage->BinaryDataObject = $this->getBinaryDataObject($dataObject->BinaryDataObject);
@@ -155,7 +190,8 @@ class ReceiveMessage
         return $dataObjectPackage;
     }
 
-    private function getBinaryDataObject($dataObject) {
+    private function getBinaryDataObject($dataObject)
+    {
         $listBinaryDataObject = array();
         $i = 0;
         foreach ($dataObject as $BinaryDataObject) {
@@ -187,7 +223,8 @@ class ReceiveMessage
         return $listBinaryDataObject;
     }
     
-    private function getArchiveUnit($dataObject) {
+    private function getArchiveUnit($dataObject)
+    {
         $listArchiveUnit = array();
         foreach ($dataObject as $ArchiveUnit) {
             $tmpArchiveUnit = new stdClass();
@@ -236,7 +273,8 @@ class ReceiveMessage
         return $listArchiveUnit;
     }
 
-    private function getOrganization($dataObject) {
+    private function getOrganization($dataObject)
+    {
         $organization= new stdClass();
 
         $organization->Identifier = new stdClass();
@@ -263,7 +301,8 @@ class ReceiveMessage
         return $organization;
     }
 
-    private function getCommunication($dataObject) {
+    private function getCommunication($dataObject)
+    {
         $listCommunication = array();
         foreach ($dataObject as $Communication) {
             $tmpCommunication = new stdClass();
@@ -276,7 +315,8 @@ class ReceiveMessage
         return $listCommunication;
     }
 
-    private function getAddress($dataObject) {
+    private function getAddress($dataObject)
+    {
         $listAddress = array();
         foreach ($dataObject as $Address) {
             $tmpAddress = new stdClass();
@@ -292,7 +332,8 @@ class ReceiveMessage
         return $listAddress;
     }
 
-    private function getContact($dataObject) {
+    private function getContact($dataObject)
+    {
         $listContact = array();
         foreach ($dataObject as $Contact) {
             $tmpContact = new stdClass();
@@ -312,7 +353,7 @@ class ReceiveMessage
         return $listContact;
     }
 
-    private function libxml_display_error($error)
+    private function libxmlDisplayError($error)
     {
         $return = "<br/>\n";
         switch ($error->level) {
@@ -335,12 +376,12 @@ class ReceiveMessage
         return $return;
     }
 
-    private function libxml_display_errors()
+    private function libxmlDisplayErrors()
     {
         $errors = libxml_get_errors();
         foreach ($errors as $error) {
-            //var_dump($this->libxml_display_error($error));
+            //var_dump($this->libxmlDisplayError($error));
         }
-        libxml_clear_errors();
+        libxmlDisplayErrors();
     }
 }

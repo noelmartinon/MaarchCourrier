@@ -13,11 +13,11 @@ class AdapterMaarchCourrier{
         $this->db = new RequestSeda();
     }
 
-    public function getInformations($reference)
+    public function getInformations($messageId, $type)
     {
         $res = []; // [0] = url, [1] = header, [2] = cookie, [3] = data
 
-        $message = $this->db->getMessageByReference($reference);
+        $message = $this->db->getMessageByIdentifier($messageId);
 
         $messageObject = json_decode($message->data);
 
@@ -39,7 +39,8 @@ class AdapterMaarchCourrier{
         $res[0] =  $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value
             . '?base64='. urlencode(base64_encode(file_get_contents($filePath)))
             . '&extension='. $pathParts['extension']
-            . '&size='. filesize($filePath);
+            . '&size='. filesize($filePath)
+            . '&type='. $type;
 
         $res[1] = [
             'accept:application/json',

@@ -5,7 +5,8 @@ require_once __DIR__ . '/AdapterMaarchCourrier.php';
 class Transfer{
     public function __construct(){}
 
-    public function transfer($target, $reference, $communicationType = 'url') {
+    public function transfer($target, $messageId, $type, $communicationType = 'url')
+    {
         $adapter = '';
         $res['status'] = 0;
         $res['content'] = '';
@@ -18,8 +19,7 @@ class Transfer{
             $_SESSION['error'] = _UNKNOWN_TARGET;
             return false;
         }
-
-        $param = $adapter->getInformations($reference); // [0] = url, [1] = header, [2] = cookie, [3] = data
+        $param = $adapter->getInformations($messageId, $type); // [0] = url, [1] = header, [2] = cookie, [3] = data
 
         try {
             $curl = curl_init();
@@ -36,7 +36,12 @@ class Transfer{
 
             if (!$data) {
                 $res['status'] = 1;
-                $res['content'] = curl_error($curl);
+                if (curl_error($curl)) {
+                    $res['content'] = curl_error($curl);
+                } else {
+                    $res['content'] = $exec;
+                }
+
             } else {
                 $res['content'] = $data;
             }

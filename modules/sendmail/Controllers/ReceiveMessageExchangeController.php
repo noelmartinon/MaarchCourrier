@@ -27,7 +27,8 @@ use Baskets\Models\BasketsModel;
 
 require_once 'apps/maarch_entreprise/Models/ContactsModel.php';
 require_once 'modules/notes/Models/NotesModel.php';
-require_once __DIR__. '/../../export_seda/Controllers/ReceiveMessage.php';
+require_once 'modules/export_seda/Controllers/ReceiveMessage.php';
+require_once 'modules/export_seda/Controllers/SendMessage.php';
 require_once "core/class/class_history.php";
 require_once "modules/sendmail/Controllers/SendMessageExchangeController.php";
 require_once 'modules/export_seda/RequestSeda.php';
@@ -59,7 +60,7 @@ class ReceiveMessageExchangeController
         self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Validation de l\'archive';
         /********** EXTRACTION DU ZIP ET CONTROLE *******/
         $receiveMessage = new \ReceiveMessage();
-        $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName);
+        $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName, 'ArchiveTransfer');
 
         if ($res['status'] == 1) {
             return $response->withStatus(400)->withJson(["errors" => _ERROR_RECEIVE_FAIL. ' ' . $res['content']]);
@@ -441,7 +442,7 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->Date                             = $date->format(\DateTime::ATOM);
 
         $acknowledgementObject->MessageIdentifier                = new \stdClass();
-        $acknowledgementObject->MessageIdentifier->value         = $dataObject->MessageIdentifier->value . '_Ack';
+        $acknowledgementObject->MessageIdentifier->value         = $dataObject->MessageIdentifier->value . '_AckSent';
 
         $acknowledgementObject->MessageReceivedIdentifier        = new \stdClass();
         $acknowledgementObject->MessageReceivedIdentifier->value = $dataObject->MessageIdentifier->value;
@@ -449,21 +450,22 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->Sender                           = $dataObject->ArchivalAgency;
         $acknowledgementObject->Receiver                         = $dataObject->TransferringAgency;
 
-        /***************** ENVOI ACCUSE DE RECEPTION A L EMETTEUR VIA ALEXANDRE ****************/
+        if ($acknowledgementObject->Receiver->OrganizationDescriptiveMetadata->Communication[0]->Channel == 'url') {
+            $acknowledgementObject->Receiver->OrganizationDescriptiveMetadata->Communication[0]->value .= '/rest/saveMessageExchangeReturn';
+        }
 
-$service_url = $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Communication[0]->value.'/rest/saveMessageExchangeReturn';
-$curl        = curl_init($service_url);
-$curl_post_data = array(
-        'type' => 'Acknowledgement',
-        'data' => json_encode($acknowledgementObject)
-);
+        $sendMessage = new \SendMessage();
 
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_POST, true);
-curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
-$curl_response = curl_exec($curl);
-curl_close($curl);
+        $acknowledgementObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Ack';
+        $filePath = $sendMessage->generateMessageFile($acknowledgementObject, 'Acknowledgement', $_SESSION['config']['tmppath']);
 
+        $acknowledgementObject->ArchivalAgency = $acknowledgementObject->Receiver;
+        $acknowledgementObject->TransferringAgency = $acknowledgementObject->Sender;
+
+        $acknowledgementObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_AckSent';
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'AcknowledgementSent', 'file_path' => $filePath]);
+
+        $sendMessage->send($acknowledgementObject,$messageId, 'Acknowledgement');
     }
 
     protected function sendReply($aArgs = [])
@@ -481,31 +483,22 @@ curl_close($curl);
         $replyObject->ReplyCode                         = new \stdClass();
         $replyObject->ReplyCode->value                  = $aArgs['replyCode'];
 
-        $replyObject->MessageRequestedIdentifier        = new \stdClass();
-        $replyObject->MessageRequestedIdentifier->value = $dataObject->MessageIdentifier->value;
+        $replyObject->MessageRequestIdentifier        = new \stdClass();
+        $replyObject->MessageRequestIdentifier->value = $dataObject->MessageIdentifier->value;
 
         $replyObject->TransferringAgency                = $dataObject->ArchivalAgency;
         $replyObject->ArchivalAgency                    = $dataObject->TransferringAgency;
 
-        /*** SAUVEGARDE REPONSE ENVOYEE ****/
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReplySent']);
+        $sendMessage = new \SendMessage();
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
-        /***************** ENVOI REPONSE A L EMETTEUR VIA ALEXANDRE ****************/
+        $filePath = $sendMessage->generateMessageFile($replyObject, "ArchiveTransferReply", $_SESSION['config']['tmppath']);
 
-$service_url = $dataObject->TransferringAgency->OrganizationDescriptiveMetadata->Communication[0]->value.'/rest/saveMessageExchangeReturn';
-$curl        = curl_init($service_url);
-$curl_post_data = array(
-        'type' => 'ArchiveTransferReply',
-        'data' => json_encode($replyObject)
-);
+        $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_ReplySent';
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReplySent', 'file_path' => $filePath]);
 
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_POST, true);
-curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
-$curl_response = curl_exec($curl);
-curl_close($curl);
-
+        $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
+        $sendMessage->send($replyObject,$messageId, 'ArchiveTransferReply');
     }
 
     public function saveMessageExchangeReturn(RequestInterface $request, ResponseInterface $response)
@@ -521,20 +514,23 @@ curl_close($curl);
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        // $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
+        $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
 
-        /********** EXTRACTION DU ZIP ET CONTROLE PAR ALEXANDRE*******/
-        
-        $dataObject = json_decode($data['data']); //TODO : A REMPLACER PAR EXTRACTION
+        $receiveMessage = new \ReceiveMessage();
+        $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName, $data['type']);
+
+        $sDataObject = $res['content'];
+        $dataObject = json_decode($sDataObject);
+
         $RequestSeda = new \RequestSeda();
 
-        if ($data['type'] == 'Acknowledgement') {
+        if ($dataObject->type == 'Acknowledgement') {
             $messageExchange                = $RequestSeda->getMessageByReference($dataObject->MessageReceivedIdentifier->value);
             $dataObject->TransferringAgency = $dataObject->Sender;
             $dataObject->ArchivalAgency     = $dataObject->Receiver;
             $RequestSeda->updateReceptionDateMessage(['reception_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
-        } else if($data['type'] == 'ArchiveTransferReply'){
-            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestedIdentifier->value);
+        } else if($dataObject->type == 'ArchiveTransferReply'){
+            $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestIdentifier->value);
             $RequestSeda->updateOperationDateMessage(['operation_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
             
         }

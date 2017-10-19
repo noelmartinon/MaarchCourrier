@@ -28,11 +28,7 @@ class SendMessage {
         $this->db = new RequestSeda();
     }
 
-    /**
-     * @param $messageObject
-     * @return bool|mixed
-     */
-    public function send($messageObject)
+    public function send($messageObject, $messageId, $type)
     {
         $channel = $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->Channel;
 
@@ -44,8 +40,7 @@ class SendMessage {
         } else {
             return false;
         }
-
-        $res = $adapter->send($messageObject);
+        $res = $adapter->send($messageObject, $messageId, $type);
 
         return $res;
     }
@@ -61,13 +56,15 @@ class SendMessage {
 
         file_put_contents($tmpPath . $messageObject->MessageIdentifier->value . ".xml", $DOMTemplate->saveXML());
 
-        foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-            $base64_decoded = base64_decode($binaryDataObject->Attachment->value);
-            $file = fopen($tmpPath . $binaryDataObject->Attachment->filename, 'w');
-            fwrite($file,$base64_decoded);
-            fclose($file);
+        if ($messageObject->DataObjectPackage) {
+            foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
+                $base64_decoded = base64_decode($binaryDataObject->Attachment->value);
+                $file = fopen($tmpPath . $binaryDataObject->Attachment->filename, 'w');
+                fwrite($file, $base64_decoded);
+                fclose($file);
+            }
         }
-        $filename = $this->generateZip($messageObject,$tmpPath);
+        $filename = $this->generateZip($messageObject, $tmpPath);
 
         return $filename;
     }
@@ -81,8 +78,10 @@ class SendMessage {
 
         $zip->addFile($tmpPath . $messageObject->MessageIdentifier->value . ".xml", $messageObject->MessageIdentifier->value . ".xml");
 
-        foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-            $zip->addFile($tmpPath . $binaryDataObject->Attachment->filename, $binaryDataObject->Attachment->filename);
+        if ($messageObject->DataObjectPackage) {
+            foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
+                $zip->addFile($tmpPath . $binaryDataObject->Attachment->filename, $binaryDataObject->Attachment->filename);
+            }
         }
 
         return $filename;

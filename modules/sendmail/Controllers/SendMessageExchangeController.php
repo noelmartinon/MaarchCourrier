@@ -178,7 +178,7 @@ class SendMessageExchangeController
             );
 
             /******** ENVOI *******/
-            $res = $sendMessage->send($dataObject);
+            $res = $sendMessage->send($dataObject, $messageId, 'ArchiveTransfer');
 
             if ($res['status'] == 1) {
                 $errors = [];

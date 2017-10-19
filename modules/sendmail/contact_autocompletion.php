@@ -35,7 +35,7 @@ $subQuery[1]=
         . ' %d AS confidence, ca_id'
     . " FROM view_contacts left join contact_communication cc on view_contacts.contact_id = cc.contact_id"
     . " WHERE  "
-        . " enabled = 'Y' AND cc.value <> '' AND external_contact_id <> ''"
+        . " enabled = 'Y' AND cc.value <> '' AND external_contact_id <> '' AND external_contact_id IS NOT NULL"
         . " AND ("
             . " (LOWER(contact_lastname) LIKE LOWER('%s') OR LOWER(lastname) LIKE LOWER('%s'))"
             . " OR (LOWER(contact_firstname) LIKE LOWER('%s') OR LOWER(firstname) LIKE LOWER('%s'))"
