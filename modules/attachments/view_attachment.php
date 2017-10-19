@@ -125,22 +125,35 @@ if (! empty($_SESSION['error'])) {
             exit();
         } else {
             $line = $stmt->fetchObject();
+
+            if(!empty($_GET['editingMode'])){
+                $stmtPdf = $db->query(
+                    "SELECT docserver_id, path, filename, format, title
+                     FROM res_view_attachments
+                     WHERE filename=? AND status = 'TRA'", array(substr($line->filename, 0, -4).'.pdf')
+                );
+                $linePdf = $stmtPdf->fetchObject();
+                if(!empty($linePdf)){
+                    $line = $linePdf;
+                }
+            }
+
             $docserver = $line->docserver_id;
-            $path = $line->path;
-            $filename = $line->filename;
-	    $nameShow = $function->normalize($line->title);
-	    $nameShow = preg_replace('/([^.a-z0-9]+)/i', '_', $nameShow);
-	    $nameShow .= '_'. date("j_m_Y__G_i");
-            $format = $line->format;
+            $path      = $line->path;
+            $filename  = $line->filename;
+            $nameShow  = $function->normalize($line->title);
+            $nameShow  = preg_replace('/([^.a-z0-9]+)/i', '_', $nameShow);
+            $nameShow  .= '_'. date("j_m_Y__G_i");
+            $format    = $line->format;
             $stmt = $db->query(
                 "select path_template from " . _DOCSERVERS_TABLE_NAME
                 . " where docserver_id = ?",array($docserver)
             );
             //$db->show();
-            $lineDoc = $stmt->fetchObject();
+            $lineDoc   = $stmt->fetchObject();
             $docserver = $lineDoc->path_template;
-            $file = $docserver . $path . $filename;
-            $file = str_replace("#", DIRECTORY_SEPARATOR, $file);
+            $file      = $docserver . $path . $filename;
+            $file      = str_replace("#", DIRECTORY_SEPARATOR, $file);
 
             if (strtoupper($format) == "MAARCH") {
                 if (file_exists($file)) {

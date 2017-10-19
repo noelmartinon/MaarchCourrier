@@ -2012,7 +2012,7 @@ $content .= '<div id="menuOnglet">
 if(empty($_REQUEST['id'])){
     $srcAttachment = '';
 } else {
-    $srcAttachment = 'index.php?display=true&module=attachments&page=view_attachment&res_id_master='.functions::xssafe($_SESSION['doc_id']).'&id='.functions::xssafe($_REQUEST['id']);
+    $srcAttachment = 'index.php?display=true&module=attachments&page=view_attachment&editingMode=true&res_id_master='.functions::xssafe($_SESSION['doc_id']).'&id='.functions::xssafe($_REQUEST['id']);
 }
 
 $content .= '<iframe src="'.$srcAttachment.'" name="viewframevalid_attachment" id="viewframevalid_attachment" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;'.$displayAttachment.'" onmouseover="this.focus()"></iframe>';
