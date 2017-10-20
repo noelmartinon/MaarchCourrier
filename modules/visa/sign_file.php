@@ -107,8 +107,9 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
 		$fileExtension = "pdf";
 		
 		include 'modules/visa/save_attach_res_from_cm.php';
-		
-		echo "{\"status\": 0, \"new_id\": $id}";
+        $db->query('UPDATE listinstance set signatory = TRUE WHERE listinstance_id = (SELECT listinstance_id WHERE res_id = ? AND item_id = ? AND difflist_type = ? AND process_date is null ORDER BY listinstance_id LIMIT 1)', [$objectResIdMaster, $_SESSION['user']['UserId'], 'VISA_CIRCUIT']);
+
+        echo "{\"status\": 0, \"new_id\": $id}";
 		exit;
 	}
 } else {

@@ -3701,7 +3701,6 @@ function duplicateTemplate(id) {
 }
 
 function setAttachmentInSignatureBook(id, isVersion) {
-    console.log(isVersion);
     $j.ajax({
         url      : '../../rest/attachments/' + id + '/inSignatureBook',
         type     : 'PUT',
@@ -3710,7 +3709,6 @@ function setAttachmentInSignatureBook(id, isVersion) {
             isVersion   : isVersion
         },
         success: function(answer) {
-            console.log(answer);
         }, error: function(err) {
             alert("Une erreur s'est produite");
         }
