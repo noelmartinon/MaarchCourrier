@@ -14,6 +14,7 @@
 namespace Visa\Controllers;
 
 use Attachments\Models\AttachmentsModel;
+use Core\Models\ListinstanceModel;
 use Core\Models\UserModel;
 use Core\Models\LangModel;
 use Baskets\Models\BasketsModel;
@@ -87,20 +88,17 @@ class VisaController
 
     public function unsignFile(RequestInterface $request, ResponseInterface $response, $aArgs)
     {
-        $resId = $aArgs['resId'];
-        $collId = $aArgs['collId'];
+        \ResModel::put(['collId' => $aArgs['collId'], 'set' => ['status' => 'A_TRA', 'signatory_user_serial_id' => NULL], 'where' => ['res_id = ?'], 'data' => [$aArgs['resId']]]);
+        \ResModel::put(['collId' => $aArgs['collId'], 'set' => ['status' => 'DEL'], 'where' => ['origin = ?', 'status != ?'], 'data' => [$aArgs['resId'] . ',' .$aArgs['collId'], 'DEL']]);
 
-        $bReturnSnd = false;
-        $bReturnFirst = \ResModel::put(['collId' => $collId, 'set' => ['status' => 'A_TRA'], 'where' => ['res_id = ?'], 'data' => [$resId]]);
-        if ($bReturnFirst) {
-            $bReturnSnd = \ResModel::put(['collId' => $collId, 'set' => ['status' => 'DEL'], 'where' => ['origin = ?', 'status != ?'], 'data' => [$resId . ',' .$collId, 'DEL']]);
+        $isVersion = ($aArgs['collId'] == 'res_attachments' ? 'false' : 'true');
+        $user = UserModel::getById(['userId' => $_SESSION['user']['UserId'], 'select' => ['id']]);
+        if (!AttachmentsModel::hasAttachmentsSignedForUserById(['id' => $aArgs['resId'], 'isVersion' => $isVersion, 'user_serial_id' => $user['id']])) {
+            $attachment = AttachmentsModel::getById(['id' => $aArgs['resId'], 'isVersion' => $isVersion, 'select' => ['res_id_master']]);
+            ListinstanceModel::setSignatory(['resId' => $attachment['res_id_master'], 'signatory' => 'false', 'userId' => $_SESSION['user']['UserId']]);
         }
 
-        if ($bReturnFirst && $bReturnSnd) {
-            return $response->withJson(['status' => 'OK']);
-        } else {
-            return $response->withJson(['status' => 'KO']);
-        }
+        return $response->withJson(['status' => 'OK']);
     }
 
     public function getIncomingMailAndAttachmentsById(RequestInterface $request, ResponseInterface $response, $aArgs)
