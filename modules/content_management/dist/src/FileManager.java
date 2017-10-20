@@ -278,8 +278,8 @@ public class FileManager {
                 "");
         
         if (path != null && !"soffice.exe".equals(program.toLowerCase())) {
-            String sOfficeVersion = path.substring(path.length() - 3);
-            sOfficeVersion = sOfficeVersion.substring(0,2);
+            path = path.substring(0, path.lastIndexOf("\\"));
+            String sOfficeVersion = path.substring(path.length() - 2);
             int iOfficeVersion = Integer.parseInt(sOfficeVersion);
             System.out.println("Check version of Office ? : " + iOfficeVersion);
             if (iOfficeVersion < 12.0) {
