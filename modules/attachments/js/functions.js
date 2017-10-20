@@ -509,8 +509,10 @@ function activeOngletAttachement() {
   $j('#liAttachement').css('background-color', 'white');
   $j('#liAttachement').css('height', '23px');
   $j('#liAttachement').css('display', 'inline');
-  $j('#liMainDocument').css('background-color', 'rgb(197, 197, 197)');
-  $j('#liMainDocument').css('height', '21px');
+  if(typeof($j('#liMainDocument')) != 'undefined'){
+    $j('#liMainDocument').css('background-color', 'rgb(197, 197, 197)');
+    $j('#liMainDocument').css('height', '21px');
+  }
 }
 
 function activeOngletMainDocument() {
@@ -520,6 +522,8 @@ function activeOngletMainDocument() {
   $j('#viewframevalid_main').addClass('activeOngletAttachement');
   $j('#liAttachement').css('background-color', 'rgb(197, 197, 197)');
   $j('#liAttachement').css('height', '21px');
-  $j('#liMainDocument').css('background-color', 'white');
-  $j('#liMainDocument').css('height', '23px');
+  if(typeof($j('#liMainDocument')) != 'undefined'){
+    $j('#liMainDocument').css('background-color', 'white');
+    $j('#liMainDocument').css('height', '23px');
+  }
 }
