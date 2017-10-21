@@ -226,8 +226,12 @@ if ($mode == 'list') {
                 </div>
                 <div id="office_div" name="office_div">
                     <p>
-                        <label for="template_style"><?php echo _TEMPLATE_STYLE;?> : </label>
-                        <?php
+                        <?php 
+                        echo '<label for="template_style">'._TEMPLATE_STYLE.' : '; 
+                        if ($mode == 'add') {
+                            echo '<i id="template_style_icon" class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" onclick="$j(\'#addTemplateFile\').click();$(\'template_style_icon\').setStyle({color: \'#009DC5\'});$(\'template_style_icon2\').setStyle({color: \'#666\'});"></i> <i id="template_style_icon2" class="fa fa-file-text-o fa-lg" title="'._GENERATED_FILE.'" onclick="$j(\'#template_style\').show();$j(\'#addTemplate\').hide();$(\'template_style_icon\').setStyle({color: \'#666\'});$(\'template_style_icon2\').setStyle({color: \'#009DC5\'});" style="color:#009DC5"></i>';
+                        }
+                        echo '</label>';
                         if ($mode == 'up') {
                             ?>
                             <input name="template_style" type="text" id="template_style" value="<?php
@@ -238,6 +242,8 @@ if ($mode == 'list') {
                             <?php
                         } else {
                             ?>
+                            <input class="button" name="addTemplate" id="addTemplate" onclick="$j('#addTemplateFile').click();" style="display:none;" value="+" title="Importer une nature de modèle" type="button"/>
+                            <input id="addTemplateFile" type="file" onchange="addTemplateBase(this);" style="display:none;" accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessing‌​ml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml‌​.slideshow,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.presentation,application/vnd.oasis.opendocument.spreadsheet"/>
                             <select name="template_style" id="template_style" onChange="javascript:changeStyle($('template_style'), '<?php
                                 echo $_SESSION['config']['businessappurl'] . 'index.php?display=false&module=templates&page=change_template_style';?>');">
                                 <?php
@@ -294,7 +300,7 @@ if ($mode == 'list') {
                                     . $objectId
                                     . '&objectTable='
                                     . $objectTable
-                                    . '\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';setInterval(function() {checkEditingDoc(\''.$_SESSION['user']['UserId'].'\')}, 5000);$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';';
+                                    . '\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';';
                                 ?>
                                 <a href="#" onClick="<?php functions::xecho($strAction);?>">
                                 

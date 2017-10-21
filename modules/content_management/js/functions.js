@@ -226,8 +226,15 @@ function checkEditingDoc(userId) {
 
                 //END OF CHECKING APPLET
                 console.log('clearInterval');
-                window.top.document.getElementById('liAttachement').click();
-                document.getElementById('viewframevalid_attachment').src='index.php?display=true&dir=indexing_searching&page=file_iframe&#navpanes=0'+response.pdf_version;
+
+                if($j('#liAttachement', window.top.document).length) {
+                	window.top.document.getElementById('liAttachement').click();
+                }
+                
+                if($j('#viewframevalid_attachment').length) {
+                    document.getElementById('viewframevalid_attachment').src='index.php?display=true&dir=indexing_searching&page=file_iframe&#navpanes=0'+response.pdf_version;                    
+                }
+                //console.log(response.pdf_version);
                 clearInterval(editing);
             } else {
                 console.log('lck found! Editing in progress !');

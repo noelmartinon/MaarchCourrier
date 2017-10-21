@@ -186,18 +186,18 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 'value' => $template, 
                 'error' => $error,
             );
-        } else {
+        } else {            
             if ($template->template_type == 'OFFICE') {
-                if ($mode == 'add' && !$_SESSION['m_admin']['templates']['applet']) {
+                /*if ($mode == 'add' && !$_SESSION['m_admin']['templates']['applet']) {
                     $return = array(
                         'status' => 'ko', 
                         'value' => $template, 
                         'error' => _EDIT_YOUR_TEMPLATE,
                     );
                     return $return;
-                }
-                if (($mode == 'up' || $mode == 'add') 
-                    && $_SESSION['m_admin']['templates']['applet']
+                }*/
+                if ((($mode == 'up' && $_SESSION['m_admin']['templates']['applet']) || $mode == 'add') 
+                  /*  && $_SESSION['m_admin']['templates']['applet'] */
                 ) {
                     $storeInfos = array();
                     $storeInfos = $this->storeTemplateFile();
@@ -211,6 +211,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                         //print_r($storeInfos);exit;
                         $template->template_path = $storeInfos['destination_dir'];
                         $template->template_file_name = $storeInfos['file_destination_name'];
+                        $template->template_style = $storeInfos['template_style'];
                         $return = array(
                             'status' => 'ok', 
                             'value' => $template,
@@ -728,6 +729,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     
     function storeTemplateFile()
     {
+        
         if (!$_SESSION['m_admin']['templates']['applet']) {
             $tmpFileName = 'cm_tmp_file_' . $_SESSION['user']['UserId']
                 . '_' . rand() . '.' 
@@ -772,6 +774,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     'templates',
                     $fileTemplateInfos
                 );
+                $storeInfos['template_style'] = $_SESSION['m_admin']['templates']['template_style'];
                 if (!file_exists($storeInfos['path_template'] . str_replace("#", DIRECTORY_SEPARATOR, $storeInfos['destination_dir']) . $storeInfos['file_destination_name'])) {
 
                     $_SESSION['error'] = $storeInfos['error'];

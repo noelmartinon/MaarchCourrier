@@ -100,3 +100,42 @@ function select_template(path_to_script, attachment_type)
         }
     });
 }
+
+function addTemplateBase(file)
+{
+    if (confirm('Voulez-vous l\'ajouter à la liste des modèles ?')) {
+        saveTemplateBase = "yes";
+    }else{
+        saveTemplateBase = "no";
+    }
+    var reader = new FileReader();
+    reader.readAsDataURL(file.files[0]);
+    reader.onload = function () {
+      base64File = reader.result.replace(/^[^,]*,/, '');
+      $j.ajax({
+        url: 'index.php?display=true&module=templates&page=addTemplateBase',
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            fileName: file.files[0].name,
+            fileMimeType : file.files[0].type,
+            fileContent: base64File,
+            saveTemplateBase : saveTemplateBase,
+        },
+        success: function (response) {
+            if (response.status == 0) {
+                $j('#template_style').hide();
+                $j('#addTemplate').val(file.files[0].name);
+                $j('#addTemplate').show();
+            } else {
+                alert(response.error_txt);
+            }
+        },
+        error: function (error) {
+            console.log(error);
+            alert(error);
+        }
+
+    });
+    };
+}

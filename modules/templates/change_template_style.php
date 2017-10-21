@@ -12,6 +12,7 @@ if (isset($_REQUEST['template_style']) && !empty($_REQUEST['template_style'])) {
         ) {
             $_SESSION['m_admin']['templates']['current_style'] 
                 = $_SESSION['m_admin']['templatesStyles'][$cptStyle]['filePath'];
+            $_SESSION['m_admin']['templates']['template_style'] = $_REQUEST['template_style'];
         }
     }
     
