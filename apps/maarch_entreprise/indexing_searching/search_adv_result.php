@@ -821,14 +821,14 @@ if (count($_REQUEST['meta']) > 0) {
                     $arrayPDO = array_merge($arrayPDO, array(":contactIdInternal" => "%".$contactid_internal."%"));
             }
             //VISA USER
-            elseif ($tab_id_fields[$j] == 'visa_user' && !empty($_REQUEST['user_visa']))
+            elseif ($tab_id_fields[$j] == 'visa_user' && !empty($_REQUEST['ac_visa_user']))
             {
-                $json_txt .= " 'visa_user' : ['".addslashes(trim($_REQUEST['visa_user']))."'], 'user_visa' : ['".addslashes(trim($_REQUEST['user_visa']))."']";
-                    $userVisa = $_REQUEST['user_visa'];
+                $json_txt .= " 'visa_user' : ['".addslashes(trim($_REQUEST['visa_user']))."'], 'user_visa' : ['".addslashes(trim($_REQUEST['ac_visa_user']))."']";
+                    $userVisa = $_REQUEST['ac_visa_user'];
                     $where_request .= " (res_id in (select res_id from listinstance where difflist_type = 'VISA_CIRCUIT' and process_date is not null and signatory = false and item_id in (select user_id from users where user_id = :user_visa))) and  ";
                     $arrayPDO = array_merge($arrayPDO, array(":user_visa" => $userVisa));
             }
-            elseif ($tab_id_fields[$j] == 'visa_user' && empty($_REQUEST['user_visa']) && !empty($_REQUEST['visa_user']))
+            elseif ($tab_id_fields[$j] == 'visa_user' && empty($_REQUEST['ac_visa_user']) && !empty($_REQUEST['visa_user']))
             {
                 $json_txt .= " 'visa_user' : ['".addslashes(trim($_REQUEST['visa_user']))."'], 'user_visa' : ['".addslashes(trim($_REQUEST['visa_user']))."']";
                     $visaUser = pg_escape_string($_REQUEST['visa_user']);

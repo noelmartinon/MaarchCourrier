@@ -3371,7 +3371,7 @@ function add_criteria(elem_comp, id_form, ie_browser, error_txt_ie)
             node.innerHTML = tmp;
             form.appendChild(node);
             var label = $(elem_comp);
-            if(elem_comp=='option_signatory_name'){
+            if(elem_comp=='option_signatory_name' || elem_comp=='option_visa_user'){
                 loadAutocompletionScript(elem_comp);
             }
             

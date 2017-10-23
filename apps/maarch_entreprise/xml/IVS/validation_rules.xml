@@ -411,7 +411,6 @@
       <parameter name="contact_type" type="identifier" />
       <parameter name="contactid_internal" type="keyword_id" />
       <parameter name="visa_user" type="string" />
-      <parameter name="user_visa" type="string" />
       <parameter name="descriptioncase" type="string" />
       <parameter name="dir" type="identifier" />
       <parameter name="fulltext" type="string" />
@@ -434,7 +433,7 @@
       <parameter name="admission_date_to" type="string" />
       <parameter name="creation_date_from" type="string" />
       <parameter name="creation_date_to" type="string" />
-      <parameter name="user_visa" type="string" />
+      <parameter name="ac_visa_user" type="string" />
       <parameter name="signatoryNameId" type="string" />
       <parameter name="ac_signatory_name" type="string" />
       <!--<parameter name="date_current_use_from" type="string" />
