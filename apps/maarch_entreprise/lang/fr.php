@@ -1131,6 +1131,7 @@ if (!defined("_FILE_PROPERTIES")) define("_FILE_PROPERTIES", "Propriétés du fi
 if (!defined("_FILE_DATA")) define("_FILE_DATA", "Informations sur le document");
 if (!defined("_VIEW_DOC")) define("_VIEW_DOC", "Voir le document");
 if (!defined("_DOWNLOAD_LOCAL_DOC_COPY")) define("_DOWNLOAD_LOCAL_DOC_COPY", "Télécharger une copie locale");
+if (!defined("_VISUALIZE")) define("_VISUALIZE", "Visualiser");
 if (!defined("_TYPIST")) define("_TYPIST", "Opérateur");
 if (!defined("_LOT")) define("_LOT", "Lot");
 if (!defined("_ARBOX")) define("_ARBOX", "Boite");
