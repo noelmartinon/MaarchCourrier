@@ -3371,12 +3371,20 @@ function add_criteria(elem_comp, id_form, ie_browser, error_txt_ie)
             node.innerHTML = tmp;
             form.appendChild(node);
             var label = $(elem_comp);
+            if(elem_comp=='option_signatory_name'){
+                loadAutocompletionScript(elem_comp);
+            }
+            
             label.parentNode.selectedIndex = 0;
             label.style.display = 'none';
         }
     }
 }
 
+function loadAutocompletionScript(optionId){
+    infos = $j('#'+optionId).data('load');
+    initList_hidden_input(infos.id,infos.idList,infos.config+'index.php?display=true&dir=indexing_searching&page=users_list_by_name_search','what',"2",infos.autocompleteId);
+}
 /**
  * Deletes a criteria in the search form
  *

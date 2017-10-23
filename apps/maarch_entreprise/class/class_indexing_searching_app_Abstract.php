@@ -563,7 +563,13 @@ abstract class indexing_searching_app_Abstract extends Database
             $json_tab .= "'".$key."' : {";
             //echo 'key '.$key."<br/>val ";
             //$this->show_array($value);
-            $options_criteria_list .= '<option id="option_'.$key.'" value="'.$value['label'].'"> '.$value['label'].'</option>';
+            if($value['param']['autocompletion']){
+                $idListByName = $key.'ListByName';
+                $autocompleteId = 'ac_'.$key;
+                $options_criteria_list .= '<option id="option_'.$key.'" value="'.$value['label'].'" data-load={"id":"'.$key.'","idList":"'.$idListByName.'","autocompleteId":"'.$autocompleteId.'","config":"'.$_SESSION['config']['businessappurl'].'"} > '.$value['label'].'</option>';
+            } else {
+                $options_criteria_list .= '<option id="option_'.$key.'" value="'.$value['label'].'"> '.$value['label'].'</option>';
+            }
             $json_tab .= $this->json_line($key,$value['type'],$value['param']);
             $json_tab .= '}
             ,';
@@ -583,7 +589,18 @@ abstract class indexing_searching_app_Abstract extends Database
         //$hidden = '<input type="hidden" name="meta[]" value="" />';
         if ($field_type == 'input_text')
         {
-            $str = $init.'<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text" /><input name="'.$id.'"  id="'.$id.'" type="text" '.$param['other'].' value="" />'.$end;
+            if($param['autocompletion']){
+                $idListByName = $id.'ListByName';
+                $autocompleteId = 'ac_'.$id;
+                $str = $init.'<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text"/>';
+                $str .= '<input name="'.$id.'"  id="'.$id.'" type="text" '.$param['other'].' value="" onkeyup="erase_contact_external_id('."\'".$id."\'".','."\'".$autocompleteId."\'".')"/>';
+                $str .='<div id="'.$idListByName.'" class="autocomplete"></div>';
+                $str .= '<script type="text/javascript">';
+                $str .= 'initList_hidden_input("'.$id.'", "'.$idListByName.'","'.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=users_list_by_name_search", "what", "2", "'.$autocompleteId.'");</script>';
+                $str .= '<input id="'.$autocompleteId.'" name="'.$autocompleteId.'" type="hidden" />'.$end;
+            } else {
+                $str = $init.'<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text" /><input name="'.$id.'"  id="'.$id.'" type="text" '.$param['other'].' value="" />'.$end;
+            }
         }
         else if ($field_type == 'textarea')
         {

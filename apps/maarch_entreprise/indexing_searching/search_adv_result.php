@@ -828,23 +828,21 @@ if (count($_REQUEST['meta']) > 0) {
                     $where_request .= " (res_id in (select res_id from listinstance where difflist_type = 'VISA_CIRCUIT' and process_date is not null and signatory = false and item_id in (select user_id from users where user_id = :user_visa))) and  ";
                     $arrayPDO = array_merge($arrayPDO, array(":user_visa" => $userVisa));
             }
-            //signatory = false et difflist_type = ‘VISA_CIRCUIT' et process_date != null
             elseif ($tab_id_fields[$j] == 'visa_user' && empty($_REQUEST['user_visa']) && !empty($_REQUEST['visa_user']))
             {
                 $json_txt .= " 'visa_user' : ['".addslashes(trim($_REQUEST['visa_user']))."'], 'user_visa' : ['".addslashes(trim($_REQUEST['visa_user']))."']";
                     $visaUser = pg_escape_string($_REQUEST['visa_user']);
-                    //var_dump($visaUser);exit;
                     //$where_request .= " ((user_firstname = '".$contactid_internal."' or user_lastname = '".$contactid_internal."') or ";
                     $where_request .= " (res_id in (select res_id from listinstance where difflist_type = 'VISA_CIRCUIT' and process_date is not null and signatory = false and item_id in (select user_id from users where firstname ilike :visa_user or lastname ilike :visa_user))) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":visa_user" => "%".$visaUser."%"));
             }
             // Nom du signataire
-            elseif ($tab_id_fields[$j] == 'signatory_name' && !empty($_REQUEST['signatory_name_id']))
+            elseif ($tab_id_fields[$j] == 'signatory_name' && !empty($_REQUEST['ac_signatory_name']))
             {
-                $json_txt .= " 'signatory_name' : ['".addslashes(trim($_REQUEST['signatory_name']))."'], 'signatory_name_id' : ['".addslashes(trim($_REQUEST['signatory_name_id']))."']";
-                    $signatory_name = $_REQUEST['signatory_name_id'];
-                    $where_request .= " (res_id in (select res_id from listinstance where item_id = :signatoryNameId and coll_id = '" . $coll_id . "' and item_mode = 'sign' and difflist_type = 'VISA_CIRCUIT')) and ";
-                    $arrayPDO = array_merge($arrayPDO, array(":signatoryNameId" => $signatory_name));
+                $json_txt .= " 'signatory_name' : ['".addslashes(trim($_REQUEST['signatory_name']))."'], 'signatory_name_id' : ['".addslashes(trim($_REQUEST['ac_signatory_name']))."']";
+                    $signatory_name = $_REQUEST['ac_signatory_name'];
+                    $where_request .= " (res_id in (select res_id_master from res_attachments where coll_id = '" . $coll_id . "' and signatory_user_serial_id in (select id from users where user_id = :signatory_name_id))) and ";
+                    $arrayPDO = array_merge($arrayPDO, array(":signatory_name_id" => $signatory_name));
             }
             //recherche sur les signataires en fonction de ce que la personne a saisi
             elseif ($tab_id_fields[$j] == 'signatory_name' && empty($_REQUEST['signatory_name_id']) && !empty($_REQUEST['signatory_name']))

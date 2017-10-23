@@ -450,7 +450,7 @@ $arr_tmp2 = array('label' => _SIGNATORY_GROUP, 'type' => 'select_simple', 'param
 $param['signatory_group'] = $arr_tmp2;
 
 // signatory name
-$arr_tmp2 = array('label' => _SIGNATORY_NAME, 'type' => 'input_text', 'param' => array('field_label' => _SIGNATORY_NAME, 'other' => $size));
+$arr_tmp2 = array('label' => _SIGNATORY_NAME, 'type' => 'input_text', 'param' => array('field_label' => _SIGNATORY_NAME, 'other' => $size, 'autocompletion' => true));
 $param['signatory_name'] = $arr_tmp2;
 
 
@@ -476,10 +476,8 @@ function cmp($a, $b)
 uasort($param, "cmp");
 
 $tab = $search_obj->send_criteria_data($param);
-
 // criteria list options
 $src_tab = $tab[0];
-
 //$core_tools->show_array($param);
 ?>
 <script type="text/javascript" src="<?php echo $_SESSION['config']['businessappurl'];?>static.php?filename=search_adv.js" ></script>
