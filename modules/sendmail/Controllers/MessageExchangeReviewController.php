@@ -51,39 +51,45 @@ class MessageExchangeReviewController
         $messageExchangeData = self::canSendMessageExchangeReview(['res_id' => $aArgs['res_id']]);
         if ($messageExchangeData) {
             $actionInfo = ActionsModel::getById(['id' => $aArgs['action_id']]);
-            $reviewObject                           = new \stdClass();
-            $reviewObject->Comment                  = ['['.date("d/m/Y H:i:s") . '] Action réalisée : '. $actionInfo['label_action'].'. Le service traitant est : '.$messageExchangeData['entity_label'].'.'];
-            
-            $date                                   = new \DateTime;
-            $reviewObject->Date                     = $date->format(\DateTime::ATOM);
-            
-            $reviewObject->MessageIdentifier        = new \stdClass();
-            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'].'_Review';
-            
-            $reviewObject->CodeListVersions         = new \stdClass();
-            $reviewObject->CodeListVersions->value  = '';
-            
-            $reviewObject->UnitIdentifier           = new \stdClass();
-            $reviewObject->UnitIdentifier->value    = $messageExchangeData['reference_number'];
-            $RequestSeda                            = new \RequestSeda();
-            $messageExchangeReply                   = $RequestSeda->getMessageByReference($messageExchangeData['reference_number'].'_ReplySent');
-            $dataObject                             = json_decode($messageExchangeReply->data);
-            $reviewObject->OriginatingAgency        = $dataObject->TransferringAgency;
-            $reviewObject->ArchivalAgency           = $dataObject->ArchivalAgency;
+            $reviewObject = new \stdClass();
+            $reviewObject->Comment = new \stdClass();
+            $reviewObject->Comment->value = '[' . date("d/m/Y H:i:s") . '] Action réalisée : ' . $actionInfo['label_action'] . '. Le service traitant est : ' . $messageExchangeData['entity_label'];
 
-            /***************** ENVOI SUIVI DEMANDE A L EMETTEUR VIA ALEXANDRE ****************/
+            $date = new \DateTime;
+            $reviewObject->Date = $date->format(\DateTime::ATOM);
 
-            $service_url = $dataObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value.'/rest/saveMessageExchangeReview';
-            $curl        = curl_init($service_url);
-            $curl_post_data = array(
-                    'data' => json_encode($reviewObject)
-            );
+            $reviewObject->MessageIdentifier = new \stdClass();
+            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'] . '_NotificationSent';
 
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
-            $curl_response = curl_exec($curl);
-            curl_close($curl);
+            $reviewObject->CodeListVersions = new \stdClass();
+            $reviewObject->CodeListVersions->value = '';
+
+            $reviewObject->UnitIdentifier = new \stdClass();
+            $reviewObject->UnitIdentifier->value = $messageExchangeData['reference_number'];
+
+            $RequestSeda = new \RequestSeda();
+            $messageExchangeReply = $RequestSeda->getMessageByReference($messageExchangeData['reference_number'] . '_ReplySent');
+            $dataObject = json_decode($messageExchangeReply->data);
+            $reviewObject->OriginatingAgency = $dataObject->TransferringAgency;
+            $reviewObject->ArchivalAgency = $dataObject->ArchivalAgency;
+
+            if ($reviewObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->Channel == 'url') {
+                $tab = explode('saveMessageExchangeReturn', $reviewObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value);
+                $reviewObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value = $tab[0] . 'saveMessageExchangeReview';
+            }
+
+            $sendMessage = new \SendMessage();
+
+            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'] . '_Notification';
+
+            $filePath = $sendMessage->generateMessageFile($reviewObject, "ArchiveModificationNotification", $_SESSION['config']['tmppath']);
+
+            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'] . '_NotificationSent';
+            $reviewObject->TransferringAgency = $reviewObject->OriginatingAgency;
+            $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $reviewObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveModificationNotification', 'file_path' => $filePath]);
+
+            $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'] . '_Notification';
+            $sendMessage->send($reviewObject, $messageId, 'ArchiveModificationNotification');
         }
     }
 
@@ -95,20 +101,26 @@ class MessageExchangeReviewController
 
         $data = $request->getParams();
 
-        // $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
-        // if(!empty($tmpName['errors'])){
-        //     return $response->withStatus(400)->withJson($tmpName);
-        // }
-        
-        /********** EXTRACTION DU ZIP ET CONTROLE PAR ALEXANDRE*******/
+        if (!\Sendmail\Controllers\ReceiveMessageExchangeController::checkNeededParameters(['data' => $data, 'needed' => ['type']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
 
-        $dataObject = json_decode($data['data']); //TODO : A REMPLACER PAR EXTRACTION
+        $tmpName = \Sendmail\Controllers\ReceiveMessageExchangeController::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
+        if (!empty($tmpName['errors'])) {
+            return $response->withStatus(400)->withJson($tmpName);
+        }
+
+        $receiveMessage = new \ReceiveMessage();
+        $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName, $data['type']);
+
+        $sDataObject = $res['content'];
+        $dataObject = json_decode($sDataObject);
         $RequestSeda = new \RequestSeda();
 
         $dataObject->TransferringAgency = $dataObject->OriginatingAgency;
 
         $messageExchange = $RequestSeda->getMessageByReference($dataObject->UnitIdentifier->value);
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveTransferReview']);
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveModificationNotification']);
         return $response->withJson([
             "messageId" => $messageId
         ]);

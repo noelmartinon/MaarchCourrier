@@ -158,6 +158,10 @@ class ReceiveMessage
             $messageObject->ArchivalAgency = $this->getOrganization($dataObject->ArchivalAgency);
         }
 
+        if ($dataObject->OriginatingAgency) {
+            $messageObject->OriginatingAgency = $this->getOrganization($dataObject->OriginatingAgency);
+        }
+
         if ($dataObject->TransferringAgency) {
             $messageObject->TransferringAgency = $this->getOrganization($dataObject->TransferringAgency);
         }
@@ -168,6 +172,11 @@ class ReceiveMessage
 
         if ($dataObject->Receiver) {
             $messageObject->Receiver = $this->getOrganization($dataObject->Receiver);
+        }
+
+        if ($dataObject->UnitIdentifier) {
+            $messageObject->UnitIdentifier = new stdClass();
+            $messageObject->UnitIdentifier->value = (string) $dataObject->UnitIdentifier;
         }
 
         if ($type) {

@@ -158,7 +158,7 @@ class ReceiveMessageExchangeController
         return true;
     }
 
-    protected function createFile($aArgs = [])
+    public function createFile($aArgs = [])
     {
         if (!self::checkNeededParameters(['data' => $aArgs, 'needed' => ['base64', 'extension', 'size']])) {
             return ['errors' => 'Bad Request'];
@@ -463,7 +463,7 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->TransferringAgency = $acknowledgementObject->Sender;
 
         $acknowledgementObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_AckSent';
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'AcknowledgementSent', 'file_path' => $filePath]);
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'Acknowledgement', 'file_path' => $filePath]);
 
         $sendMessage->send($acknowledgementObject,$messageId, 'Acknowledgement');
     }
@@ -495,7 +495,7 @@ class ReceiveMessageExchangeController
         $filePath = $sendMessage->generateMessageFile($replyObject, "ArchiveTransferReply", $_SESSION['config']['tmppath']);
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_ReplySent';
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReplySent', 'file_path' => $filePath]);
+        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReply', 'file_path' => $filePath]);
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
         $sendMessage->send($replyObject,$messageId, 'ArchiveTransferReply');
