@@ -1114,6 +1114,7 @@ if (!defined("_TO")) define("_TO", "To");
 if (!defined("_FILE_PROPERTIES")) define("_FILE_PROPERTIES", "File properties");
 if (!defined("_FILE_DATA")) define("_FILE_DATA", "Information on the document");
 if (!defined("_VIEW_DOC")) define("_VIEW_DOC", "See the document");
+if (!defined("_VISUALIZE")) define("_VISUALIZE", "Visualiser");
 if (!defined("_TYPIST")) define("_TYPIST", "Operator");
 if (!defined("_LOT")) define("_LOT", "Batch");
 if (!defined("_ARBOX")) define("_ARBOX", "Box");
