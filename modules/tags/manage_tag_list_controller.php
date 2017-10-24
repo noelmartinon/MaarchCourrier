@@ -192,7 +192,7 @@ function display_list()
         $where = '';
         $where_what = array();
     } else {
-        $where = 'entity_id_owner = ? OR entity_id_owner IS NULL';
+        $where = '(entity_id_owner = ? OR entity_id_owner IS NULL)';
         $where_what = array($_SESSION['user']['primaryentity']['id']);   
     }
     $what = '';
