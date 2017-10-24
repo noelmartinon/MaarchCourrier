@@ -134,7 +134,7 @@ class SendMessageExchangeController
             $aMergeAttachment = array_merge($firstAttachment, $fileInfo, $aAllAttachment);
         }
 
-        $mainDocument[0]['Title'] = $aArgs['object'];
+        $mainDocument[0]['Title'] = '[CAPTUREM2M]'.$aArgs['object'];
 
         $sendMessage = new SendMessage();
         $hist    = new history();

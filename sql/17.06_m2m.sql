@@ -75,3 +75,5 @@ VALUES ('ARCHIVETRANSFER', 'ARCHIVETRANSFER', 'Fast internal disc bay for archiv
 DELETE FROM docserver_types WHERE docserver_type_id = 'ARCHIVETRANSFER';
 INSERT INTO docserver_types (docserver_type_id, docserver_type_label, enabled, is_container, container_max_number, is_compressed, compression_mode, is_meta, meta_template, is_logged, log_template, is_signed, fingerprint_mode) 
 VALUES ('ARCHIVETRANSFER', 'Archive Transfer', 'Y', 'N', 0, 'N', 'NONE', 'N', 'NONE', 'N', 'NONE', 'Y', 'SHA256');
+
+ALTER TABLE sendmail ALTER COLUMN res_id DROP NOT NULL;

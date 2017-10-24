@@ -52,8 +52,9 @@ class MessageExchangeReviewController
         if ($messageExchangeData) {
             $actionInfo = ActionsModel::getById(['id' => $aArgs['action_id']]);
             $reviewObject = new \stdClass();
-            $reviewObject->Comment = new \stdClass();
-            $reviewObject->Comment->value = '[' . date("d/m/Y H:i:s") . '] Action réalisée : ' . $actionInfo['label_action'] . '. Le service traitant est : ' . $messageExchangeData['entity_label'];
+            $reviewObject->Comment = array();
+            $reviewObject->Comment[0] = new \stdClass();
+            $reviewObject->Comment[0]->value = '[' . date("d/m/Y H:i:s") . '] Action réalisée : ' . $actionInfo['label_action'] . '. Le service traitant est : ' . $messageExchangeData['entity_label'];
 
             $date = new \DateTime;
             $reviewObject->Date = $date->format(\DateTime::ATOM);
@@ -89,6 +90,17 @@ class MessageExchangeReviewController
             $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $reviewObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveModificationNotification', 'file_path' => $filePath]);
 
             $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'] . '_Notification';
+
+            $reviewObject->DataObjectPackage = new \stdClass();
+            $reviewObject->DataObjectPackage->DescriptiveMetadata = new \stdClass();
+            $reviewObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit = array();
+            $reviewObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0] = new \stdClass();
+            $reviewObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content = new \stdClass();
+            $reviewObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingSystemId = $aArgs['res_id_master'];
+            $reviewObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_NOTIFICATION]';
+
+            $reviewObject->TransferringAgency->OrganizationDescriptiveMetadata = new \stdClass();
+            $reviewObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $_SESSION['user']['UserId'];
             $sendMessage->send($reviewObject, $messageId, 'ArchiveModificationNotification');
         }
     }

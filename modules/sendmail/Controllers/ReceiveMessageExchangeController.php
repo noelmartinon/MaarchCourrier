@@ -464,8 +464,17 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->ArchivalAgency = $acknowledgementObject->Receiver;
         $acknowledgementObject->TransferringAgency = $acknowledgementObject->Sender;
 
+        $acknowledgementObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $_SESSION['user']['UserId'];
+
         $acknowledgementObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_AckSent';
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'Acknowledgement', 'file_path' => $filePath]);
+
+        $acknowledgementObject->DataObjectPackage = new \stdClass();
+        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata = new \stdClass();
+        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit = array();
+        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0] = new \stdClass();
+        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content = new \stdClass();
+        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_ACK]';
 
         $sendMessage->send($acknowledgementObject,$messageId, 'Acknowledgement');
     }
@@ -489,6 +498,7 @@ class ReceiveMessageExchangeController
         $replyObject->MessageRequestIdentifier->value = $dataObject->MessageIdentifier->value;
 
         $replyObject->TransferringAgency                = $dataObject->ArchivalAgency;
+        $replyObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $_SESSION['user']['UserId'];
         $replyObject->ArchivalAgency                    = $dataObject->TransferringAgency;
 
         $sendMessage = new \SendMessage();
@@ -500,6 +510,16 @@ class ReceiveMessageExchangeController
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReply', 'file_path' => $filePath]);
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
+
+        $replyObject->DataObjectPackage = new \stdClass();
+        $replyObject->DataObjectPackage->DescriptiveMetadata = new \stdClass();
+        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit = array();
+        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0] = new \stdClass();
+        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content = new \stdClass();
+        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingSystemId = $aArgs['res_id_master'];
+
+        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_REPLY]';
+
         $sendMessage->send($replyObject,$messageId, 'ArchiveTransferReply');
     }
 
