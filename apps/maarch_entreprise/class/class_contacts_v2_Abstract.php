@@ -634,25 +634,7 @@ abstract class contacts_v2_Abstract extends Database
                     </p>
                 </form>
 
-                <!--<script type="text/javascript">setContactType("<?php if(isset($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']) && $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N' ){ echo 'no_corporate'; } else { echo 'corporate'; }?>", '<?php echo ($can_add_contact);?>');</script>-->
-                <script type="text/javascript">
-                    if(!checkContactType('no_corporate','<?php echo ($can_add_contact);?>'))
-                    {
-                        $j('#span_no_corporate').css('display','none');
-                    } else {
-                        setContactType('no_corporate','<?php echo ($can_add_contact);?>');
-                        $j('#corpo_no').prop('checked',true);
-                    }
-                    if(!checkContactType('corporate','<?php echo ($can_add_contact);?>'))
-                    {
-                        $j('#span_corporate').css('display','none');
-                    } else {
-                        setContactType('corporate','<?php echo ($can_add_contact);?>');
-                        $j('#corpo_yes').prop('checked',true);
-                    }
-
-                    
-                </script>
+                <script type="text/javascript">setContactType("<?php if(isset($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']) && $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N' ){ echo 'no_corporate'; } else { echo 'corporate'; }?>", '<?php echo ($can_add_contact);?>');</script>
 
             <?php
                 if($mode=="up" && $admin)
