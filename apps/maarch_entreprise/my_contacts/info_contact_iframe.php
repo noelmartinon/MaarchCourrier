@@ -111,6 +111,7 @@ if ($core_tools2->test_admin('update_contacts', 'apps', false) && $mode <> "view
 	}
 
 	if (isset($_GET['seeAllAddresses'])) {
+		$core_tools2->load_js();
 		unset($_SESSION['fromContactTree']);
 		include_once 'apps/' . $_SESSION['config']['app_id'] . '/my_contacts/my_contact_up.php';
 	} else {
