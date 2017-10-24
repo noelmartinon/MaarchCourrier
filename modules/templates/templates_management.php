@@ -229,7 +229,7 @@ if ($mode == 'list') {
                         <?php 
                         echo '<label for="template_style">'._TEMPLATE_STYLE.' : '; 
                         if ($mode == 'add') {
-                            echo '<i id="template_style_icon" class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" onclick="$j(\'#addTemplateFile\').click();$(\'template_style_icon\').setStyle({color: \'#009DC5\'});$(\'template_style_icon2\').setStyle({color: \'#666\'});"></i> <i id="template_style_icon2" class="fa fa-file-text-o fa-lg" title="'._GENERATED_FILE.'" onclick="$j(\'#template_style\').show();$j(\'#addTemplate\').hide();$(\'template_style_icon\').setStyle({color: \'#666\'});$(\'template_style_icon2\').setStyle({color: \'#009DC5\'});" style="color:#009DC5"></i>';
+                            echo '<i id="template_style_icon" class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" onclick="$j(\'#templateEditTr\').hide();$j(\'#addTemplateFile\').click();$(\'template_style_icon\').setStyle({color: \'#009DC5\'});$(\'template_style_icon2\').setStyle({color: \'#666\'});"></i> <i id="template_style_icon2" class="fa fa-file-text-o fa-lg" title="'._GENERATED_FILE.'" onclick="$j(\'#templateEditTr\').show();$j(\'#template_style\').show();$j(\'#addTemplate\').hide();$(\'template_style_icon\').setStyle({color: \'#666\'});$(\'template_style_icon2\').setStyle({color: \'#009DC5\'});" style="color:#009DC5"></i>';
                         }
                         echo '</label>';
                         if ($mode == 'up') {
@@ -288,9 +288,9 @@ if ($mode == 'list') {
                     }
                     $objectTable = _TEMPLATES_TABLE_NAME;
                     ?>
-                    <p>
+                    <p id="templateEditTr">
                         <label><?php echo _EDIT_TEMPLATE;?> :</label>
-                        <div style="text-align:center;">
+                  
                                 <?php
                                 $strAction .= 'showAppletLauncher(\''
                                     . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
@@ -306,8 +306,7 @@ if ($mode == 'list') {
                                 
                                     <i class="fa fa-pencil fa-2x"></i>
                                 <?php echo _EDIT_TEMPLATE;?>
-                            </a>
-                        </div>
+                            </a>   
                     </p>
                 </div>
                 <div id="txt_div" name="txt_div">

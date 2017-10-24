@@ -103,7 +103,7 @@ function select_template(path_to_script, attachment_type)
 
 function addTemplateBase(file)
 {
-    if (confirm('Voulez-vous l\'ajouter à la liste des modèles ?')) {
+    if (confirm('En cliquant sur ok, le modèle sera ajouté dans la liste des natures de modèle.')) {
         saveTemplateBase = "yes";
     }else{
         saveTemplateBase = "no";
