@@ -33,11 +33,11 @@ class ReadMessageExchangeController
         $messageExchangeData        = $RequestSeda->getMessageByIdentifier($aArgs['id']);
         $unitIdentifierData         = $RequestSeda->getUnitIdentifierByMessageId($aArgs['id']);
         $aDataForm['reference']     = $messageExchangeData->reference;
-        $messageReview              = $RequestSeda->getMessagesByReference($aDataForm['reference'].'_Review');
+        $messageReview              = $RequestSeda->getMessagesByReference($aDataForm['reference'].'_Notification');
         if(!empty($messageReview)){
             foreach ($messageReview as $value) {
                 $oMessageReview = json_decode($value['data']);
-                $aDataForm['messageReview'][] = $oMessageReview->Comment[0];
+                $aDataForm['messageReview'][] = $oMessageReview->Comment[0]->value;
             }
         }
         
