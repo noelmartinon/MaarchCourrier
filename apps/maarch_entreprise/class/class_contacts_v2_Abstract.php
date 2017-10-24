@@ -642,6 +642,7 @@ abstract class contacts_v2_Abstract extends Database
                     } else {
                         setContactType('no_corporate','<?php echo ($can_add_contact);?>');
                         $j('#corpo_no').prop('checked',true);
+                        $j('#corpo_no').click();
                     }
                     if(!checkContactType('corporate','<?php echo ($can_add_contact);?>'))
                     {
@@ -649,6 +650,7 @@ abstract class contacts_v2_Abstract extends Database
                     } else {
                         setContactType('corporate','<?php echo ($can_add_contact);?>');
                         $j('#corpo_yes').prop('checked',true);
+                        $j('#corpo_yes').click();;
                     }
 
                     
