@@ -95,7 +95,7 @@
             <label>_PRINT_FOLDER</label>
             <process_mode/>
         </type>
-        <type show="true" with_chrono="false" icon="VA" sign="false">
+        <type show="true" with_chrono="false" icon="VA" sign="true">
             <id>sva</id>
             <label>_SVA</label>
             <process_mode>SVA</process_mode>
