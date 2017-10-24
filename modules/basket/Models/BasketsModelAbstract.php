@@ -124,35 +124,39 @@ class BasketsModelAbstract extends \Apps_Table_Service
         static::checkString($aArgs, ['userId']);
 
         $rawUserGroups = UserModel::getGroupsById(['userId' => $aArgs['userId']]);
-        $userGroups = [];
-        foreach ($rawUserGroups as $value) {
-            $userGroups[] = $value['group_id'];
-        }
 
-        $aRawBaskets = static::select(
-            [
-                'select'    => ['DISTINCT basket_id'],
-                'table'     => ['groupbasket'],
-                'where'     => ['group_id in (?)'],
-                'data'      => [$userGroups]
-            ]
-        );
+        $userGroups = [];
+        if (!empty($rawUserGroups)) {
+            foreach ($rawUserGroups as $value) {
+                $userGroups[] = $value['group_id'];
+            }
+
+            $aRawBaskets = static::select(
+                [
+                    'select'    => ['DISTINCT basket_id'],
+                    'table'     => ['groupbasket'],
+                    'where'     => ['group_id in (?)'],
+                    'data'      => [$userGroups]
+                ]
+            );
+        }
 
         $basketIds = [];
-        foreach ($aRawBaskets as $value) {
-            $basketIds[] = $value['basket_id'];
+        if (!empty($aRawBaskets)) {
+            foreach ($aRawBaskets as $value) {
+                $basketIds[] = $value['basket_id'];
+            }
+
+            $aBaskets = static::select(
+                [
+                    'select' => ['basket_id', 'basket_name'],
+                    'table' => ['baskets'],
+                    'where' => ['basket_id in (?)'],
+                    'data' => [$basketIds],
+                    'order_by' => 'basket_order, basket_name'
+                ]
+            );
         }
-
-        $aBaskets = static::select(
-            [
-                'select'    => ['basket_id','basket_name'],
-                'table'     => ['baskets'],
-                'where'     => ['basket_id in (?)'],
-                'data'      => [$basketIds],
-                'order_by'  => 'basket_order, basket_name'
-            ]
-        );
-
         if (empty($aBaskets)) {
             return '';
         }

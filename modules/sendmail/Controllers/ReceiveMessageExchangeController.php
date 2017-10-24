@@ -119,18 +119,20 @@ class ReceiveMessageExchangeController
 
         $basketRedirection = null;
         $userBaskets = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
-        foreach ($userBaskets as $value) {
-            if($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]){
-                $userGroups = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
-                foreach ($userGroups as $userGroupValue) {
-                    if($userGroupValue['primary_group'] == 'Y'){
-                        $userPrimaryGroup = $userGroupValue['group_id'];
-                        break;
+        if (!empty($userBaskets)) {
+            foreach ($userBaskets as $value) {
+                if ($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]) {
+                    $userGroups = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
+                    foreach ($userGroups as $userGroupValue) {
+                        if ($userGroupValue['primary_group'] == 'Y') {
+                            $userPrimaryGroup = $userGroupValue['group_id'];
+                            break;
+                        }
                     }
+                    $defaultAction = BasketsModel::getDefaultActionIdByBasketId(['basketId' => $value['basket_id'], 'groupId' => $userPrimaryGroup]);
+                    $basketRedirection = 'index.php?page=view_baskets&module=basket&baskets=' . $value['basket_id'] . '&resId=' . $resLetterboxReturn[0] . '&defaultAction=' . $defaultAction;
+                    break;
                 }
-                $defaultAction     = BasketsModel::getDefaultActionIdByBasketId(['basketId' => $value['basket_id'], 'groupId' => $userPrimaryGroup]);
-                $basketRedirection = 'index.php?page=view_baskets&module=basket&baskets='.$value['basket_id'].'&resId='.$resLetterboxReturn[0].'&defaultAction='.$defaultAction;
-                break;
             }
         }
 
