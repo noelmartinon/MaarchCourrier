@@ -157,6 +157,17 @@ if ($core_tools2->test_admin('update_contacts', 'apps', false) && $mode <> "view
 	$_SESSION['m_admin']['address']['EXTERNAL_CONTACT_ID']= $request->show_string($line->external_contact_id);
 
 	$core_tools2->load_js();
+
+    $query = "SELECT * FROM ".$_SESSION['tablename']['contact_communication']." WHERE contact_id = ?";
+    $stmt = $db->query($query, array($line->contact_id));
+
+    $_SESSION['m_admin']['communication'] = array();
+    $contactCommunication = $stmt->fetchObject();
+    $_SESSION['m_admin']['communication']['ID']              = $contactCommunication->id;
+    $_SESSION['m_admin']['communication']['CONTACT_ID']      = $contactCommunication->contact_id;
+    $_SESSION['m_admin']['communication']['TYPE']            = functions::show_string($contactCommunication->type);
+    $_SESSION['m_admin']['communication']['VALUE']           = functions::show_string($contactCommunication->value);
+
 	?>
 	    <div id="inner_content" class="clearfix" align="center" style="padding:0px;width:100% !important;">
 	    	<div class="block">
