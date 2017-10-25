@@ -479,7 +479,7 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit = array();
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0] = new \stdClass();
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content = new \stdClass();
-        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_ACK]'.date("Ymd_his");
+        $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_ACK]';
 
         $sendMessage->send($acknowledgementObject,$messageId, 'Acknowledgement');
     }
@@ -523,7 +523,7 @@ class ReceiveMessageExchangeController
         $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content = new \stdClass();
         $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingSystemId = $aArgs['res_id_master'];
 
-        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_REPLY]'.date("Ymd_his");
+        $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_REPLY]';
 
         $sendMessage->send($replyObject,$messageId, 'ArchiveTransferReply');
     }
