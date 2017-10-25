@@ -1321,7 +1321,7 @@ CREATE TABLE contacts_v2
   lastname character varying(255),
   title character varying(255),
   function character varying(255),
-  other_data character varying(255),
+  other_data text,
   user_id character varying(255) NOT NULL,
   entity_id character varying(32) NOT NULL,
   creation_date timestamp without time zone NOT NULL,
