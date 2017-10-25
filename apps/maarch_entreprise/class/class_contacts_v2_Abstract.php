@@ -2347,6 +2347,14 @@ abstract class contacts_v2_Abstract extends Database
                         <td class="indexing_field" align="left"><textarea disabled name="comp_data"   id="comp_data"><?php if(isset($_SESSION['m_admin']['contact']['OTHER_DATA'])){functions::xecho($func->show_str($_SESSION['m_admin']['contact']['OTHER_DATA'])); }?></textarea></td>
                         <td>&nbsp;</td>
                     </tr>
+                    <?php if($_SESSION['m_admin']['contact']['IS_EXTERNAL_CONTACT'] == 'Y'){?>
+                        <tr>
+                            <td><?php echo _COMMUNICATION_TYPE;?>&nbsp;: </td>
+                            <td>&nbsp;</td>
+                            <td class="indexing_field" align="left"><textarea disabled name="is_external_contact_id" id="is_external_contact_id"><?php if(isset($_SESSION['m_admin']['communication']['VALUE'])){functions::xecho($func->show_str($_SESSION['m_admin']['communication']['VALUE'])); }?></textarea></td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    <?php } ?>
                 </table>
             </div>
         </form>

@@ -95,6 +95,7 @@ $_SESSION['m_admin']['contact']['SOCIETY_SHORT']       = $request->show_string($
 $_SESSION['m_admin']['contact']['FUNCTION']            = $request->show_string($line->function);
 $_SESSION['m_admin']['contact']['OTHER_DATA']          = $request->show_string($line->other_data);
 $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] = $request->show_string($line->is_corporate_person);
+$_SESSION['m_admin']['contact']['IS_EXTERNAL_CONTACT'] = $request->show_string($line->is_external_contact);
 $_SESSION['m_admin']['contact']['CONTACT_TYPE']        = $line->contact_type;
 $_SESSION['m_admin']['contact']['OWNER']               = $line->user_id;
 
@@ -153,6 +154,7 @@ if ($core_tools2->test_admin('update_contacts', 'apps', false) && $mode <> "view
 	$_SESSION['m_admin']['address']['IS_PRIVATE']         = $request->show_string($line->is_private);
 	$_SESSION['m_admin']['address']['SALUTATION_HEADER']  = $request->show_string($line->salutation_header);
 	$_SESSION['m_admin']['address']['SALUTATION_FOOTER']  = $request->show_string($line->salutation_footer);
+	$_SESSION['m_admin']['address']['EXTERNAL_CONTACT_ID']= $request->show_string($line->external_contact_id);
 
 	$core_tools2->load_js();
 	?>
