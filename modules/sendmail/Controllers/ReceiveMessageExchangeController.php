@@ -317,10 +317,15 @@ class ReceiveMessageExchangeController
         $contactCommunication = $transferringAgencyMetadata->Communication;
         if(empty($contactCommunicationExisted) && !empty($contactCommunication)){
             foreach ( $contactCommunication as $value) {
+                if(strrpos($value->value, "/rest/") !== false){
+                    $contactCommunicationValue = substr($value->value, 0, strrpos($value->value, "/rest/")+1);
+                } else {
+                    $contactCommunicationValue = $value->value;
+                }
                 $contactModel->createContactCommunication([
                     "contactId" => $contact['contactId'], 
                     "type"      => $value->Channel, 
-                    "value"     => $value->value
+                    "value"     => $contactCommunicationValue
                 ]);
             }
         }
