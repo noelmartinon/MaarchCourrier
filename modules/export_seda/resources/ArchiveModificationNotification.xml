@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ArchiveModificationNotification xmlns="fr:gouv:culture:archivesdefrance:seda:v2.0">
-    <Comment><?merge ArchiveModificationNotification.Comment.value ?></Comment>
+    <?merge ArchiveModificationNotification.Comment ?><Comment><?merge .value ?></Comment>
     <Date><?merge ArchiveModificationNotification.Date ?></Date>
     <?merge ArchiveModificationNotification.MessageIdentifier $messageIdentifier ?><?xinclude /resources/MessageIdentifier.xml ?>
     <?xinclude /resources/CodeListVersions.xml ?>
@@ -14,3 +14,4 @@
         <?xinclude /resources/Organization.xml ?>
     </OriginatingAgency>
 </ArchiveModificationNotification>
+s
