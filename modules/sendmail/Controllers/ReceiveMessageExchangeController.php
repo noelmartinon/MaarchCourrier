@@ -248,7 +248,7 @@ class ReceiveMessageExchangeController
         $dataValue = [];
         array_push($dataValue, ['column' => 'typist',           'value' => 'superadmin',                        'type' => 'string']);
         array_push($dataValue, ['column' => 'type_id',          'value' => $defaultConfig['type_id'],           'type' => 'integer']);
-        array_push($dataValue, ['column' => 'subject',          'value' => $mainDocumentMetaData->Title[0],     'type' => 'string']);
+        array_push($dataValue, ['column' => 'subject',          'value' => str_replace("[CAPTUREM2M]", "", $mainDocumentMetaData->Title[0]),     'type' => 'string']);
         array_push($dataValue, ['column' => 'doc_date',         'value' => $mainDocumentMetaData->CreatedDate,  'type' => 'date']);
         array_push($dataValue, ['column' => 'destination',      'value' => $destination[0]['entity_id'],        'type' => 'string']);
         array_push($dataValue, ['column' => 'initiator',        'value' => $destination[0]['entity_id'],        'type' => 'string']);
