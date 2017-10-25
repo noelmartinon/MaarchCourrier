@@ -186,6 +186,10 @@ ALTER TABLE sendmail ALTER COLUMN cci_list TYPE text;
 -- ************************************************************************* --
 ALTER TABLE notifications ALTER COLUMN diffusion_properties TYPE text;
 
+-- ************************************************************************* --
+--                   CHANGE COLUMNS TYPE FOR CONTACTS_V2                   --
+-- ************************************************************************* --
+ALTER TABLE contacts_v2 ALTER COLUMN other_data TYPE text;
 
 -- ************************************************************************* --
 --                      NOUVEAU STATUS TRANSMISSION                          --
