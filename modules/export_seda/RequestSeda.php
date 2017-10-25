@@ -66,6 +66,17 @@ class RequestSeda
         return $this->db->query($query,$queryParams);
     }
 
+    public function getMessagesByReferenceByDate($id)
+    {
+        $queryParams = [];
+
+        $queryParams[] = $id;
+
+        $query = "SELECT * FROM message_exchange WHERE reference = ? ORDER BY date asc";
+
+        return $this->db->query($query,$queryParams);
+    }
+
     public function getMessageByIdentifier($id)
     {
         $queryParams = [];

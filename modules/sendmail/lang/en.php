@@ -180,3 +180,9 @@ if (!defined("_M2M_ARCHIVETRANSFER"))
     define("_M2M_ARCHIVETRANSFER", "Archive transfer");
 if (!defined("_M2M_ARCHIVETRANSFERREPLYSENT"))
     define("_M2M_ARCHIVETRANSFERREPLYSENT", "Archive transfer reply");
+if (!defined("_M2M_ACTION_DONE"))
+    define("_M2M_ACTION_DONE", "Action done");
+if (!defined("_M2M_ENTITY_DESTINATION"))
+    define("_M2M_ENTITY_DESTINATION", "Processing department is");
+if (!defined("_M2M_FOLLOWUP_REQUEST"))
+    define("_M2M_FOLLOWUP_REQUEST", "Follow-up of the request");

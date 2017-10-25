@@ -1326,7 +1326,7 @@ if ($mode == 'add') {
             }
             if(!empty($emailArray['messageReview'])){
 
-                $content .= '<h4>Suivi de la demande</h4>';
+                $content .= '<h4>'._M2M_FOLLOWUP_REQUEST.'</h4>';
                 $content .= '<div>';
                     foreach ($emailArray['messageReview'] as $value) {
                         $content .= $value.'<br>';

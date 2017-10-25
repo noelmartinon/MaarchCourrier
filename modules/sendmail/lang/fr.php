@@ -28,7 +28,7 @@ if (!defined("_EMAIL_LIST"))
 if (!defined("_EMAIL_LIST_DESC"))
     define("_EMAIL_LIST_DESC", "Liste des courriels");
 if (!defined("_SENDED_EMAILS"))
-    define("_SENDED_EMAILS", "Courriels");
+    define("_SENDED_EMAILS", "Eléments envoyés");
  
 //STATUS
 if (!defined("_EMAIL_DRAFT"))
@@ -181,3 +181,9 @@ if (!defined("_M2M_ARCHIVETRANSFER"))
     define("_M2M_ARCHIVETRANSFER", "Pli numérique");
 if (!defined("_M2M_ARCHIVETRANSFERREPLYSENT"))
     define("_M2M_ARCHIVETRANSFERREPLYSENT", "Réponse envoyée");
+if (!defined("_M2M_ACTION_DONE"))
+    define("_M2M_ACTION_DONE", "Action réalisée");
+if (!defined("_M2M_ENTITY_DESTINATION"))
+    define("_M2M_ENTITY_DESTINATION", "Le service traitant est");
+if (!defined("_M2M_FOLLOWUP_REQUEST"))
+    define("_M2M_FOLLOWUP_REQUEST", "Suivi de la demande");

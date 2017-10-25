@@ -51,13 +51,13 @@ class ReceiveMessageExchangeController
 
         $data = $request->getParams();
 
-        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Réception de l\'archive';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Réception du pli numérique';
         $tmpName = self::createFile(['base64' => $data['base64'], 'extension' => $data['extension'], 'size' => $data['size']]);
         if(!empty($tmpName['errors'])){
             return $response->withStatus(400)->withJson($tmpName);
         }
-        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Archive déposée sur le serveur';
-        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Validation de l\'archive';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Pli numérique déposé sur le serveur';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Validation du pli numérique';
         /********** EXTRACTION DU ZIP ET CONTROLE *******/
         $receiveMessage = new \ReceiveMessage();
         $res = $receiveMessage->receive($_SESSION['config']['tmppath'], $tmpName, 'ArchiveTransfer');
@@ -65,7 +65,7 @@ class ReceiveMessageExchangeController
         if ($res['status'] == 1) {
             return $response->withStatus(400)->withJson(["errors" => _ERROR_RECEIVE_FAIL. ' ' . $res['content']]);
         }
-        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Archive validée';
+        self::$aComments[] = '['.date("d/m/Y H:i:s") . '] Pli numérique validé';
 
         $sDataObject = $res['content'];
         $sDataObject = json_decode($sDataObject);
