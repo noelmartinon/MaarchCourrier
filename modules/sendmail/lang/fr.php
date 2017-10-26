@@ -174,7 +174,7 @@ if (!defined("_NO_SENDER"))
 if (!defined("_SIMPLE_DOWNLOAD"))
     define("_SIMPLE_DOWNLOAD", "Télécharger");
 if (!defined("_MORE_INFORMATIONS"))
-    define("_MORE_INFORMATIONS", "Plus d'informations");
+    define("_MORE_INFORMATIONS", "Informations sur le transfert");
 if (!defined("_REPLY_RESPONSE_SENT"))
     define("_REPLY_RESPONSE_SENT", "Accusé de prise en charge envoyé le");
 if (!defined("_M2M_ARCHIVETRANSFER"))
@@ -182,8 +182,8 @@ if (!defined("_M2M_ARCHIVETRANSFER"))
 if (!defined("_M2M_ARCHIVETRANSFERREPLYSENT"))
     define("_M2M_ARCHIVETRANSFERREPLYSENT", "Réponse envoyée");
 if (!defined("_M2M_ACTION_DONE"))
-    define("_M2M_ACTION_DONE", "Action réalisée");
+    define("_M2M_ACTION_DONE", "actionné par");
 if (!defined("_M2M_ENTITY_DESTINATION"))
-    define("_M2M_ENTITY_DESTINATION", "Le service traitant est");
+    define("_M2M_ENTITY_DESTINATION", "Le courrier est dans le service");
 if (!defined("_M2M_FOLLOWUP_REQUEST"))
     define("_M2M_FOLLOWUP_REQUEST", "Suivi de la demande");

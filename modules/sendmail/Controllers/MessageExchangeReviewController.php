@@ -54,7 +54,7 @@ class MessageExchangeReviewController
             $reviewObject = new \stdClass();
             $reviewObject->Comment = array();
             $reviewObject->Comment[0] = new \stdClass();
-            $reviewObject->Comment[0]->value = '[' . date("d/m/Y H:i:s") . '] '._M2M_ACTION_DONE.' : ' . $actionInfo['label_action'] . '. '._M2M_ENTITY_DESTINATION.' : ' . $messageExchangeData['entity_label'];
+            $reviewObject->Comment[0]->value = '[' . date("d/m/Y H:i:s") . '] "' . $actionInfo['label_action'] . '" ' . _M2M_ACTION_DONE . ' ' . $_SESSION['user']['entities'][0]['ENTITY_LABEL'] . '. '. _M2M_ENTITY_DESTINATION.' : ' . $messageExchangeData['entity_label'];
 
             $date = new \DateTime;
             $reviewObject->Date = $date->format(\DateTime::ATOM);

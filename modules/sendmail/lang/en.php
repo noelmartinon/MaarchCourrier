@@ -173,7 +173,7 @@ if (!defined("_NO_SENDER"))
 if (!defined("_SIMPLE_DOWNLOAD"))
     define("_SIMPLE_DOWNLOAD", "Download");
 if (!defined("_MORE_INFORMATIONS"))
-    define("_MORE_INFORMATIONS", "More informations");
+    define("_MORE_INFORMATIONS", "Informations about the transfer");
 if (!defined("_REPLY_RESPONSE_SENT"))
     define("_REPLY_RESPONSE_SENT", "Reply sent on");
 if (!defined("_M2M_ARCHIVETRANSFER"))
@@ -181,8 +181,8 @@ if (!defined("_M2M_ARCHIVETRANSFER"))
 if (!defined("_M2M_ARCHIVETRANSFERREPLYSENT"))
     define("_M2M_ARCHIVETRANSFERREPLYSENT", "Archive transfer reply");
 if (!defined("_M2M_ACTION_DONE"))
-    define("_M2M_ACTION_DONE", "Action done");
+    define("_M2M_ACTION_DONE", "done by");
 if (!defined("_M2M_ENTITY_DESTINATION"))
-    define("_M2M_ENTITY_DESTINATION", "Processing department is");
+    define("_M2M_ENTITY_DESTINATION", "Mail is in the department");
 if (!defined("_M2M_FOLLOWUP_REQUEST"))
     define("_M2M_FOLLOWUP_REQUEST", "Follow-up of the request");
