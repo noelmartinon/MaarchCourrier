@@ -636,8 +636,8 @@ abstract class diffusion_list_Abstract extends functions
         # OTHER ROLES USERS
         #**********************************************************************
         $stmt = $db->query(
-            "select l.item_id, u.firstname, u.lastname, e.entity_id, "
-            . "e.entity_label, l.visible, l.viewed, l.item_mode, l.difflist_type, l.process_date, l.process_comment  from "
+            "select l.listinstance_id ,l.item_id, u.firstname, u.lastname, e.entity_id, e.entity_label,"
+            . " l.visible, l.viewed, l.item_mode, l.difflist_type, l.process_date, l.process_comment, l.signatory, l.requested_signature from "
             . ENT_LISTINSTANCE . " l, " . USERS_TABLE
             . " u, " . ENT_ENTITIES . " e, " . ENT_USERS_ENTITIES
             . " ue where l.coll_id = '" . $collId . "' "
@@ -652,23 +652,24 @@ abstract class diffusion_list_Abstract extends functions
             else 
                 $role_id = $res->item_mode;
                 
-            if(!isset($listinstance[$role_id]['users']))
-                $listinstance[$role_id]['users'] = array();
-            array_push(
-                $listinstance[$role_id]['users'],
-                array(
-                    'user_id'         => functions::show_string($res->item_id),
-                    'lastname'        => functions::show_string($res->lastname),
-                    'firstname'       => functions::show_string($res->firstname),
-                    'entity_id'       => functions::show_string($res->entity_id),
-                    'entity_label'    => functions::show_string($res->entity_label),
-                    'visible'         => functions::show_string($res->visible),
-                    'viewed'          => functions::show_string($res->viewed),
-                    'difflist_type'   => functions::show_string($res->difflist_type),
-                    'process_date'    => functions::show_string($res->process_date),
-                    'process_comment' => functions::show_string($res->process_comment)
-                )
-            );
+            if(!isset($listinstance[$role_id]['users'])) {
+                $listinstance[$role_id]['users'] = [];
+            }
+            $listinstance[$role_id]['users'][] = [
+                'listinstance_id'       => $res->listinstance_id,
+                'user_id'               => functions::show_string($res->item_id),
+                'lastname'              => functions::show_string($res->lastname),
+                'firstname'             => functions::show_string($res->firstname),
+                'entity_id'             => functions::show_string($res->entity_id),
+                'entity_label'          => functions::show_string($res->entity_label),
+                'visible'               => functions::show_string($res->visible),
+                'viewed'                => functions::show_string($res->viewed),
+                'difflist_type'         => functions::show_string($res->difflist_type),
+                'process_date'          => functions::show_string($res->process_date),
+                'process_comment'       => functions::show_string($res->process_comment),
+                'signatory'             => (empty($res->signatory) ? false : true),
+                'requested_signature'   => (empty($res->requested_signature) ? false : true)
+            ];
         }
 
         # OTHER ROLES ENTITIES

@@ -15,6 +15,7 @@ namespace Visa\Controllers;
 
 use Attachments\Models\AttachmentsModel;
 use Core\Models\ListinstanceModel;
+use Core\Models\ServiceModel;
 use Core\Models\UserModel;
 use Core\Models\LangModel;
 use Baskets\Models\BasketsModel;
@@ -400,4 +401,21 @@ class VisaController
         return $response->withJson(['resList' => $resList]);
     }
 
+    public function setRequestedSignature(RequestInterface $request, ResponseInterface $response, $aArgs)
+    {
+        if (!ServiceModel::hasService(['id' => 'config_visa_workflow', 'userId' => $_SESSION['user']['UserId'], 'location' => 'visa', 'type' => 'use'])
+            && !ServiceModel::hasService(['id' => 'config_visa_workflow_in_detail', 'userId' => $_SESSION['user']['UserId'], 'location' => 'visa', 'type' => 'use'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $listinstance = ListinstanceModel::getById(['id' => $aArgs['id'], 'select' => ['requested_signature']]);
+
+        if (empty($listinstance)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Listinstance not found']);
+        }
+
+        ListinstanceModel::setRequestedSignature(['id' => $aArgs['id'], 'requestedSignature' => !$listinstance['requested_signature']]);
+
+        return $response->withJson(['success' => 'success']);
+    }
 }

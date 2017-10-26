@@ -3722,3 +3722,16 @@ function setAttachmentInSignatureBook(id, isVersion) {
         }
     });
 }
+
+function setRequestedSignature(id) {
+    $j.ajax({
+        url      : '../../rest/listinstance/' + id + '/requestedSignature',
+        type     : 'PUT',
+        dataType : 'json',
+        data: {},
+        success: function(answer) {
+        }, error: function(err) {
+            alert("Une erreur s'est produite");
+        }
+    });
+}

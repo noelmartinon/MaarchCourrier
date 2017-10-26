@@ -501,7 +501,7 @@ abstract class visa_Abstract extends Database
 			$core = new core_tools();      
             $circuit = $this->getWorkflow($res_id, $coll_id, $typeList);
             
-            $str .= '<div class="error" id="divErrorVisa" onclick="this.hide();"></div>';
+            $str = '<div class="error" id="divErrorVisa" onclick="this.hide();"></div>';
             $str .= '<div class="info" id="divInfoVisa" onclick="this.hide();"></div>';
                         
             //VISA USER LIST
@@ -635,8 +635,17 @@ abstract class visa_Abstract extends Database
                         $str .= '<span class="visaUserInfo">';
 							$str .= '<sup class="visaUserPos nbResZero">'.$i.'</sup>&nbsp;&nbsp;';
                         	$str .= '<i class="fa fa-user fa-2x" aria-hidden="true"></i> '.$info_userVis['lastname'].' '.$info_userVis['firstname'].' <sup class="nbRes">'.$info_userVis['entity_id'].'</sup>';
-							$str .= '&nbsp;&nbsp; <i title="'._SIGN_USER.'" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;visibility:hidden;"></i>'.$info_vised;	
-						$str .= '</span>';
+							$str .= '&nbsp;&nbsp; <i title="'._SIGN_USER.'" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;';
+							if (empty($info_userVis['signatory'])) {
+                                $str .= 'visibility:hidden';
+                            }
+							$str .= '"></i>'.$info_vised;
+                            $str .= 'Signature demandée <input type="checkbox" onclick="setRequestedSignature(' .$info_userVis['listinstance_id']. ')"';
+                            if (!empty($info_userVis['requested_signature'])) {
+                                $str .= 'checked="true" ';
+                            }
+                            $str .= '>';
+                        $str .= '</span>';
 						$str .= '<span class="visaUserAction">';
                     		$str .= $del_vis;
                     	$str .= '</span>';
@@ -697,7 +706,7 @@ abstract class visa_Abstract extends Database
                            $info_vised = '';
                            $link_vis = 'hourglass-half';
                         }
-                        
+
                     }else{
 						$modif = 'false';
                         if (preg_match("/\[DEL\]/", $info_userSign['process_comment'])) {
@@ -720,8 +729,17 @@ abstract class visa_Abstract extends Database
                     $str .= '<span class="visaUserInfo">';
 						$str .= '<sup class="visaUserPos nbResZero">'.$i.'</sup>&nbsp;&nbsp;';
                     	$str .= '<i class="fa fa-user fa-2x" aria-hidden="true"></i> '.$info_userSign['lastname'].' '.$info_userSign['firstname'].' <sup class="nbRes">'.$info_userSign['entity_id'].'</sup>';
-						$str .= '&nbsp;&nbsp; <i title="'._SIGN_USER.'" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C"></i>'.$info_vised;
-					$str .= '</span>';
+                        $str .= '&nbsp;&nbsp; <i title="'._SIGN_USER.'" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;';
+                        if (empty($info_userSign['signatory'])) {
+                            $str .= 'visibility:hidden';
+                        }
+                        $str .= '"></i>'.$info_vised;
+					    $str .= 'Signature demandée <input type="checkbox" onclick="setRequestedSignature(' .$info_userSign['listinstance_id']. ')"';
+                        if (!empty($info_userSign['requested_signature'])) {
+                            $str .= 'checked="true" ';
+                        }
+                        $str .= '>';
+                    $str .= '</span>';
 					$str .= '<span class="visaUserAction">';
                 		$str .= $del_vis;
                 	$str .= '</span>';

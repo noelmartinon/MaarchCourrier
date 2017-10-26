@@ -404,6 +404,21 @@ class UserModelAbstract extends \Apps_Table_Service
         return $aEntities;
     }
 
+    public static function getServicesById(array $aArgs = [])
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId']);
+        ValidatorModel::stringType($aArgs, ['userId']);
+
+        $aServices = DatabaseModel::select([
+            'select'    => ['usergroups_services.service_id'],
+            'table'     => ['usergroup_content, usergroups_services'],
+            'where'     => ['usergroup_content.group_id = usergroups_services.group_id', 'usergroup_content.user_id = ?'],
+            'data'      => [$aArgs['userId']]
+        ]);
+
+        return $aServices;
+    }
+
     public static function activateAbsenceById(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['userId']);

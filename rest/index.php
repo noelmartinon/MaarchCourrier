@@ -127,6 +127,7 @@ $app->get('/{basketId}/signatureBook/{resId}', \Visa\Controllers\VisaController:
 $app->get('/signatureBook/{resId}/attachments', \Visa\Controllers\VisaController::class . ':getAttachmentsById');
 $app->get('/signatureBook/{resId}/incomingMailAttachments', \Visa\Controllers\VisaController::class . ':getIncomingMailAndAttachmentsById');
 $app->put('/{collId}/{resId}/unsign', \Visa\Controllers\VisaController::class . ':unsignFile');
+$app->put('/listinstance/{id}/requestedSignature', \Visa\Controllers\VisaController::class . ':setRequestedSignature');
 
 //resource
 $app->post('/res', \Core\Controllers\ResController::class . ':create');

@@ -14,6 +14,8 @@ ALTER TABLE res_version_attachments DROP COLUMN IF EXISTS signatory_user_serial_
 ALTER TABLE res_version_attachments ADD signatory_user_serial_id int;
 ALTER TABLE listinstance DROP COLUMN IF EXISTS signatory;
 ALTER TABLE listinstance ADD signatory boolean default false;
+ALTER TABLE listinstance DROP COLUMN IF EXISTS requested_signature;
+ALTER TABLE listinstance ADD requested_signature boolean default false;
 
 DROP VIEW IF EXISTS res_view_attachments;
 CREATE VIEW res_view_attachments AS
