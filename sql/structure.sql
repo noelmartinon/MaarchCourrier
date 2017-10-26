@@ -1323,7 +1323,6 @@ CREATE TABLE contacts_v2
   other_data character varying(255),
   user_id character varying(255) NOT NULL,
   entity_id character varying(32) NOT NULL,
-  external_contact_id character varying(128) NOT NULL,
   creation_date timestamp without time zone NOT NULL,
   update_date timestamp without time zone,
   enabled character varying(1) NOT NULL DEFAULT 'Y'::bpchar,
@@ -3010,7 +3009,7 @@ CREATE TABLE message_exchange
   
   "res_id_master" numeric default NULL,
 
-  "docserver_id" character varying(32) NOT NULL
+  "docserver_id" character varying(32) NOT NULL,
   "path" character varying(255) DEFAULT NULL,
   "filename" character varying(255) DEFAULT NULL,
   "fingerprint" character varying(255) DEFAULT NULL,
