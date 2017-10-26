@@ -132,6 +132,11 @@ class MessageExchangeReviewController
         $dataObject->TransferringAgency = $dataObject->OriginatingAgency;
 
         $messageExchange = $RequestSeda->getMessageByReference($dataObject->UnitIdentifier->value);
+
+        if(empty($messageExchange->operation_date)){
+            $RequestSeda->updateOperationDateMessage(['operation_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
+        }
+
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveModificationNotification']);
         return $response->withJson([
             "messageId" => $messageId

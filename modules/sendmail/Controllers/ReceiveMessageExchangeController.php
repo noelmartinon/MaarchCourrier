@@ -558,8 +558,6 @@ class ReceiveMessageExchangeController
             $RequestSeda->updateReceptionDateMessage(['reception_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
         } else if($dataObject->type == 'ArchiveTransferReply'){
             $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestIdentifier->value);
-            $RequestSeda->updateOperationDateMessage(['operation_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
-            
         }
 
         $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => $data['type']]);

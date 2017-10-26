@@ -1313,7 +1313,6 @@ if ($mode == 'add') {
                 $content .= '<b>'._RECEPTION_DATE.' : </b>' . $emailArray['receptionDate'].'<br><br>';
             }
             if(!empty($emailArray['operationDate'])){
-                $content .= '<b>'._OPERATION_DATE.' : </b>' . $emailArray['operationDate'].'<br>';
 
                 $content .= '<div onclick="new Effect.toggle(\'operationCommentsDiv\', \'blind\', {delay:0.2});" onmouseover="this.style.cursor=\'pointer\';">
                                 <span id="divStatus_operationComments" style="color:#1C99C5;"><i class="fa fa-plus-square-o"></i></span>&nbsp;'._MORE_INFORMATIONS.'
@@ -1323,6 +1322,7 @@ if ($mode == 'add') {
                         $content .= $value->value.'<br>';
                     }
                 $content .= '</div><br>';
+                $content .= '<b>'._OPERATION_DATE.' : </b>' . $emailArray['operationDate'].'<br><br>';
             }
             if(!empty($emailArray['messageReview'])){
 
