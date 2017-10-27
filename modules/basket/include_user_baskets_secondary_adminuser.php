@@ -70,7 +70,7 @@ if (!empty($arrBasketsSecondProfile)) {
             var modal_content_secondary = '<?php echo preg_replace("/'/", "\'",$modalContentSecondary);?>';
         </script>
         <div class="h2_title">
-            <a href="javascript://" onclick="createModal(modal_content_secondary, 'modal_secondary_baskets', <?php 
+            <a id="manage_secondary_baskets" href="javascript://" onclick="createModal(modal_content_secondary, 'modal_secondary_baskets', <?php 
                 if(count($arrBasketsSecondProfile) >0) {
                     ?>'600px', '1000px'<?php 
                 }else{

@@ -53,6 +53,7 @@
     </validationRule>
 
     <validationRule name="ajax_usergroups_ids" mode="error">
+      <parameter name="user_id" type="login" />
       <parameter name="usergroups" type="ajax_ids" />
       <parameter name="display" type="identifier" />
       <parameter name="admin" type="identifier" />

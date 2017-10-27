@@ -43,7 +43,7 @@ function checkGroup(current_form_id, url_check, url_manage, url_display_access, 
 	});	
 }
 
-function doActionGroup( url_action, url_display_access)
+function doActionGroup( url_action, url_display_access, user_id)
 {
 	var groups = document.getElementsByName('groups[]');
 	var val = '';
@@ -63,7 +63,8 @@ function doActionGroup( url_action, url_display_access)
 	{
 		    method:'post',
 		    parameters: { 
-							usergroups : val
+							usergroups : val,
+							user_id	   : user_id
 						},
 		        onSuccess: function(answer){
 				eval("response = "+answer.responseText);

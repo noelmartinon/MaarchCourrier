@@ -58,7 +58,7 @@ header("Content-Type: text/html", true);
 				<input type="checkbox"  class="check" name="groups[]" value="<?php echo  $_SESSION['m_admin']['users']['groups'][$theline]['GROUP_ID'];?>" /><?php functions::xecho($_SESSION['m_admin']['users']['groups'][$theline]['LABEL'] );?><br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i><?php functions::xecho($_SESSION['m_admin']['users']['groups'][$theline]['ROLE']);?></i><br/></input>
 				<?php
 		}
-		 ?> <div style="position: absolute;bottom: 10px;"><input class="button" type="button" name="removeUsergroup" id="removeUsergroup" value="<?php echo _DELETE_GROUPS;?>" onclick="doActionGroup('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=remove_group', '<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=ugc_form')"/><br/><br/>
+		 ?> <div style="position: absolute;bottom: 10px;"><input class="button" type="button" name="removeUsergroup" id="removeUsergroup" value="<?php echo _DELETE_GROUPS;?>" onclick="doActionGroup('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=remove_group', '<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=ugc_form');$j('#manage_secondary_baskets').css('color','#b2b2b2');$j('#manage_secondary_baskets').attr('onclick','');$j('#abs').css('color','#b2b2b2');"/><br/><br/>
 <?php 	}
 
 	if (count($_SESSION['m_admin']['users']['groups']) < $_SESSION['m_admin']['nbgroups']  || empty($_SESSION['m_admin']['users']['groups']))
@@ -73,7 +73,7 @@ header("Content-Type: text/html", true);
 	<?php  if (count($_SESSION['m_admin']['users']['groups']) > 0)
 	{
 	?>
-		<input type="button" class="button" name="setPrimary" id="setPrimary" value="<?php echo _CHOOSE_PRIMARY_GROUP;?>"  onclick="doActionGroup('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=set_primary_group', '<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=ugc_form');"/>
+		<input type="button" class="button" name="setPrimary" id="setPrimary" value="<?php echo _CHOOSE_PRIMARY_GROUP;?>"  onclick="doActionGroup('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=set_primary_group', '<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=ugc_form');$j('#manage_secondary_baskets').css('color','#b2b2b2');$j('#manage_secondary_baskets').attr('onclick','');$j('#abs').css('color','#b2b2b2');"/>
 	<?php
 	}
 	?>
