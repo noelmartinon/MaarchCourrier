@@ -77,3 +77,6 @@ INSERT INTO docserver_types (docserver_type_id, docserver_type_label, enabled, i
 VALUES ('ARCHIVETRANSFER', 'Archive Transfer', 'Y', 'N', 0, 'N', 'NONE', 'N', 'NONE', 'N', 'NONE', 'Y', 'SHA256');
 
 ALTER TABLE sendmail ALTER COLUMN res_id DROP NOT NULL;
+
+DELETE FROM usergroups_services where service_id = 'save_numeric_package' and group_id = 'COURRIER';
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'save_numeric_package');
