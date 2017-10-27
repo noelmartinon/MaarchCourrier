@@ -37,8 +37,7 @@ class AdapterMaarchCourrier{
 
         $pathParts = pathinfo($filePath);
         $res[0] =  $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->value
-            . '?base64='. urlencode(base64_encode(file_get_contents($filePath)))
-            . '&extension='. $pathParts['extension']
+            . '?extension='. $pathParts['extension']
             . '&size='. filesize($filePath)
             . '&type='. $type;
 
@@ -49,7 +48,10 @@ class AdapterMaarchCourrier{
 
         $res[2] = '';
 
-        $res[3] = '';
+        $postData = new stdClass();
+        $postData->base64 = base64_encode(file_get_contents($filePath));
+
+        $res[3] = json_encode($postData);
 
         return $res;
     }
