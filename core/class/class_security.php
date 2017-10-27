@@ -252,7 +252,7 @@ class security extends Database
                     );
                 }
 
-                if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url'])) {
+                if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url']) && empty($_SESSION['ozwillo']['userId'])) {
                     return array(
                         'user'  => $array,
                         'error' => $error,

@@ -13,6 +13,7 @@
     "require": {
         "slim/slim": "^3",
         "respect/validation": "^1.1",
-        "m4tthumphrey/php-gitlab-api": "dev-master"
+        "m4tthumphrey/php-gitlab-api": "dev-master",
+        "jumbojett/openid-connect-php": "^0.3.0"
     }
 }

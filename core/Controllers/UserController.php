@@ -16,6 +16,7 @@
 namespace Core\Controllers;
 
 use Baskets\Models\BasketsModel;
+use Core\Models\CoreConfigModel;
 use Core\Models\LangModel;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -42,6 +43,12 @@ class UserController
         $user['baskets'] = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['redirectedBaskets'] = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['regroupedBaskets'] = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['canModifyPassword'] = true;
+
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        if ($loggingMethod['id'] == 'ozwillo') {
+            $user['canModifyPassword'] = false;
+        }
 
         return $response->withJson($user);
     }

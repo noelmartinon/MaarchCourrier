@@ -69,11 +69,15 @@ if(isset($_SESSION['web_sso_url'])){
     $webSSOurl = $_SESSION['web_cas_url'];
 }
 
+if(!empty($_SESSION['ozwillo']['accessToken'])){
+    $accessToken = $_SESSION['ozwillo']['accessToken'];
+}
+
 session_unset();
 session_destroy(); // Suppression physique de la session
 unset($_SESSION['sessionName']);
 
-$_SESSION = array();
+$_SESSION = [];
 $_SESSION['custom_override_id'] = $custom;
 $_SESSION['config']['corepath'] = $corePath ;
 $_SESSION['config']['app_id'] = $appId ;
@@ -87,6 +91,10 @@ if (isset($_GET['logout']) && $_GET['logout']) {
 if(isset($webSSOurl) && $webSSOurl <> ''){
     header("location: " . $webSSOurl );
     exit();
+} else if (!empty($accessToken)) {
+    $ozwilloConfig = \Core\Models\CoreConfigModel::getOzwilloConfiguration();
+    $oidc = new OpenIDConnectClient($ozwilloConfig['uri'], $ozwilloConfig['clientId'], $ozwilloConfig['clientSecret']);
+    $oidc->signOut($accessToken, null);
 } else {
     header(
      "location: " . $appUrl . "index.php?display=true&page=login"

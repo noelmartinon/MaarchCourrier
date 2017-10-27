@@ -168,12 +168,12 @@ if (
         . $_SESSION['user']['UserId'] . '%' . $_SESSION['user']['UserId']
         . '%' . date('dmYHmi') . '%'
     );
+}
 
-    // $db->query(
-    //     'UPDATE ' . $_SESSION['tablename']['users'] 
-    //         . " SET cookie_key = ?, cookie_date = CURRENT_TIMESTAMP WHERE user_id = ? and mail = ?", 
-    //     array($key, $_SESSION['user']['UserId'], $_SESSION['user']['Mail']),1
-    // );
+//Ozwillo
+if (!empty($_REQUEST['code']) && !empty($_REQUEST['state'])) {
+    $_SESSION['ozwillo']['code'] = $_REQUEST['code'];
+    $_SESSION['ozwillo']['state'] = $_REQUEST['state'];
 }
 
 if (

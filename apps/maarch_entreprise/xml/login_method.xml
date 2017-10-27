@@ -24,4 +24,10 @@
         <SCRIPT>cas_connect.php</SCRIPT>
         <ENABLED>true</ENABLED>
     </METHOD> -->
+     <!--<METHOD>-->
+        <!--<ID>ozwillo</ID>-->
+        <!--<NAME>Ozwillo</NAME>-->
+        <!--<SCRIPT>ozwillo_connect.php</SCRIPT>-->
+        <!--<ENABLED>true</ENABLED>-->
+    <!--</METHOD>-->
 </ROOT>

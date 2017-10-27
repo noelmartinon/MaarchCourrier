@@ -61,7 +61,7 @@
                          <div class="input-group">
                              <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
                              <input type="text" class="form-control" id="userId" title="{{user.lang.userId}}" value="{{user.user_id}}" disabled>
-                             <span class="input-group-btn">
+                             <span class="input-group-btn" *ngIf="user.canModifyPassword">
                                 <button (click)="displayPassword()" class="btn btn-success" type="button" title="{{user.lang.changePsw}}"><i class="fa fa-key" aria-hidden="true"></i></button>
                             </span>
                          </div>
