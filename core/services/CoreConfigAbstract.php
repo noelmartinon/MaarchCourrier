@@ -427,6 +427,9 @@ class Core_CoreConfigAbstract_Service extends Core_Abstract_Service {
                 $id = (string) $keyword->id;
 
                 if (!$coreTools->is_var_in_history_keywords_tab($id)) {
+                    if (empty($_SESSION['history_keywords'])) {
+                        $_SESSION['history_keywords'] = [];
+                    }
                     array_push(
                         $_SESSION['history_keywords'],
                         array(

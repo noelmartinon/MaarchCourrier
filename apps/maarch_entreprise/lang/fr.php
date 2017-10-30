@@ -2001,3 +2001,8 @@ if (!defined('_DOC_CREATED'))
     define('_DOC_CREATED', 'Document créé');
 if (!defined("_SAVE_POSITION"))
     define("_SAVE_POSITION", "Enregistrer");
+
+/***** History *****/
+if (!defined('_UPDATE_STATUS'))
+    define('_UPDATE_STATUS', 'Modification du status');
+/***** History *****/

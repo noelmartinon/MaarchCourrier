@@ -21,31 +21,50 @@ class ResModelAbstract extends \Apps_Table_Service
 {
     /**
      * Retrieve info of resId
-     * @param  $resId integer
-     * @param  $table string
-     * @param  $select string
+     * @param  $aArgs array
+     *
      * @return array $res
      */
-    public static function getById(array $aArgs = [])
+    public static function getById(array $aArgs)
     {
-        static::checkRequired($aArgs, ['resId']);
-        static::checkNumeric($aArgs, ['resId']);
+        ValidatorModel::notEmpty($aArgs, ['resId']);
+        ValidatorModel::intVal($aArgs, ['resId']);
+        ValidatorModel::stringType($aArgs, ['table']);
 
-        if (!empty($aArgs['table'])) {
-            $table = $aArgs['table'];
-        } else {
-            $table = 'res_letterbox';
+        if (empty($aArgs['table'])) {
+            $aArgs['table'] = 'res_letterbox';
         }
 
-        $aReturn = static::select([
+        $aReturn = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => [$table],
+            'table'     => [$aArgs['table']],
             'where'     => ['res_id = ?'],
-            'data'      => [$aArgs['resId']],
-            'order_by'  => [$aArgs['orderBy']]
+            'data'      => [$aArgs['resId']]
         ]);
 
-        return $aReturn;
+        if (empty($aReturn[0])) {
+            return [];
+        }
+
+        return $aReturn[0];
+    }
+
+    public static function updateStatus(array $aArgs = [])
+    {
+        ValidatorModel::notEmpty($aArgs, ['resId', 'status']);
+        ValidatorModel::intVal($aArgs, ['resId']);
+        ValidatorModel::stringType($aArgs, ['status']);
+
+        DatabaseModel::update([
+            'table'     => 'res_letterbox',
+            'set'       => [
+                'status'    => $aArgs['status']
+            ],
+            'where'     => ['res_id = ?'],
+            'data'      => [$aArgs['resId']]
+        ]);
+
+        return true;
     }
 
     /**

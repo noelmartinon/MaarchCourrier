@@ -298,6 +298,42 @@ class ResController
         return $response->withJson($datas);
     }
 
+    public function updateStatus(RequestInterface $request, ResponseInterface $response, $aArgs)
+    {
+        $data = $request->getParams();
+
+        if (empty($data['status'])) {
+            $data['status'] = 'COU';
+        }
+        if (empty($data['historyMessage'])) {
+            $data['historyMessage'] = _UPDATE_STATUS;
+        }
+
+        $check = Validator::stringType()->notEmpty()->validate($data['status']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['historyMessage']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $document = ResModel::getById(['resId' => $aArgs['resId']]);
+        if (empty($document)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document not found']);
+        }
+
+        ResModel::updateStatus(['resId' => $aArgs['resId'], 'status' => $data['status']]);
+
+        HistoryController::add([
+            'tableName' => 'res_letterbox',
+            'recordId'  => $aArgs['resId'],
+            'eventType' => 'UP',
+            'info'      => $data['historyMessage'],
+            'moduleId'  => 'apps',
+            'eventId'   => 'resup',
+        ]);
+
+        return $response->withJson(['success' => true]);
+    }
+
     public function updateResource($aArgs)
     {
         $data = $aArgs['data'];
