@@ -17,7 +17,6 @@ namespace Core\Controllers;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Respect\Validation\Validator;
 
 include_once 'core/class/class_portal.php';
 
