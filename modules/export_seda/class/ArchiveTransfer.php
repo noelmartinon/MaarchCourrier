@@ -27,6 +27,7 @@ class ArchiveTransfer
 {
     private $db;
     private $abstractMessage;
+    private $externalLink;
 
     public function __construct()
     {
@@ -60,6 +61,8 @@ class ArchiveTransfer
         $result = $startDate = $endDate = '';
         $i = 1;
         foreach ($listResId as $resId) {
+            $this->externalLink = false;
+
             if (!empty($result)) {
                 $result .= ',';
             }
@@ -71,8 +74,21 @@ class ArchiveTransfer
             $mails = $this->db->getMails($letterbox->res_id);
             $links = $this->db->getLinks($letterbox->res_id);
 
-            if ($links && !array_search($links, $listResId)) {
-                $links = null;
+            $relatedObjectReference = [];
+            if (is_array($links)) {
+                foreach ($links as $link) {
+                    if (!array_search($link, $listResId)) {
+                        $relatedObjectReference[$link] = false;
+                    } else {
+                        $relatedObjectReference[$link] = true;
+                    }
+                }
+            } else {
+                if (!array_search($links, $listResId)) {
+                    $relatedObjectReference[$links] = false;
+                } else {
+                    $relatedObjectReference[$links] = true;
+                }
             }
 
             $archiveUnitId = 'letterbox_' . $resId;
@@ -94,7 +110,7 @@ class ArchiveTransfer
                     $attachments,
                     $archiveUnitId,
                     $letterbox->res_id,
-                    $links
+                    $relatedObjectReference
                 );
 
                 $messageObject->DataObjectPackage->BinaryDataObject[] = $this->getBinaryDataObject(
@@ -108,7 +124,7 @@ class ArchiveTransfer
                     null,
                     null,
                     null,
-                    $links
+                    $relatedObjectReference
                 );
             }
 
@@ -526,15 +542,18 @@ class ArchiveTransfer
             $content->RelatedObjectReference = new stdClass();
             $content->RelatedObjectReference->References = [];
 
-            if (!is_array($relatedObjectReference)) {
+            foreach ($relatedObjectReference as $key => $value) {
                 $reference = new stdClass();
-                $reference->ArchiveUnitRefId = 'letterbox_' . $relatedObjectReference;
-                $content->RelatedObjectReference->References[] = $reference;
-            } else {
-                foreach ($relatedObjectReference as $linkReference) {
-                    $reference = new stdClass();
-                    $reference->ArchiveUnitRefId = 'letterbox_' . $linkReference;
-                    $content->RelatedObjectReference->References[] =  $reference;
+                if ($value) {
+                    $reference->ArchiveUnitRefId = 'letterbox_' . $key;
+                    $content->RelatedObjectReference->References[] = $reference;
+                } else {
+                    $letterbox = $this->db->getLetter($key);
+                    if (isset($letterbox->destination)) {
+                        $entity = $this->db->getEntity($letterbox->destination);
+                        $reference->RepositoryArchiveUnitPID = 'originator:' . $entity->business_id . ':' . $key;
+                        $content->RelatedObjectReference->References[] = $reference;
+                    }
                 }
             }
 

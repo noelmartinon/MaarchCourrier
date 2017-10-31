@@ -118,16 +118,24 @@ class RequestSeda
         $queryParams = [];
 
         $queryParams[] = $resId;
+        $queryParams[] = $resId;
 
         $query =
             "SELECT res_parent,res_child 
             FROM res_linked 
             WHERE coll_id = 'letterbox_coll' 
-            AND  res_child = ?";
+            AND  (res_child = ? OR res_parent = ?)";
 
         $smtp = $this->db->query($query, $queryParams);
 
-        $links = $smtp->fetchObject()->res_parent;
+        $links = [];
+        while ($res = $smtp->fetchObject()) {
+            if ($resId == $res->res_parent) {
+                $links[] = $res->res_child;
+            } else {
+                $links[] = $res->res_parent;
+            }
+        }
 
         return $links;
     }
