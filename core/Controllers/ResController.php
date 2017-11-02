@@ -22,66 +22,33 @@ use Core\Models\DocserverModel;
 use Core\Models\DocserverTypeModel;
 use Core\Models\UserModel;
 use Core\Models\ResModel;
-use Core\Models\DoctypesModel;
-use Entities\Models\EntitiesModel;
-use Core\Controllers\DocserverController;
-use Core\Controllers\DocserverToolsController;
 
 require_once 'core/class/class_db_pdo.php';
 require_once 'modules/notes/Models/NotesModel.php';
 
 class ResController
 {
-    public function create(RequestInterface $request, ResponseInterface $response, $aArgs)
+    public function create(RequestInterface $request, ResponseInterface $response)
     {
+        $data = $request->getParams();
 
-        if (empty($aArgs)) {
-            $aArgs = $request->getParsedBody();
+        $check = Validator::notEmpty()->validate($data['encodedFile']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['fileFormat']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['status']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['collId']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['table']);
+        $check = $check && Validator::arrayType()->notEmpty()->validate($data['data']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        // if(empty($aArgs)) {
-        //     $aArgs = $request->getQueryParams();
-        //     $aArgs['data'] = json_decode($aArgs['data']);
-        //     $aArgs['data'] = $this->object2array($aArgs['data']);
-        //     //FIX pb if data has parent
-        //     if (isset($aArgs['data']['data'])) {
-        //         $aArgs['data'] = $aArgs['data']['data'];
-        //     }
-        // }
+        $resId = StoreController::storeResource($data);
 
-        $aArgs['data'] = $this->object2array($aArgs['data']);
-
-        //*****************************************************************************************
-        //LOG ONLY LOG FOR DEBUG
-        // $file = fopen('storeResourceLogs.log', a);
-        // fwrite($file, '[' . date('Y-m-d H:i:s') . '] new request' . PHP_EOL);
-        // foreach ($aArgs as $key => $value) {
-        //     if ($key <> 'encodedFile') {
-        //         fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $key . ' : ' . $value . PHP_EOL);
-        //     }
-        // }
-        // fclose($file);
-        // ob_flush();
-        // ob_start();
-        // print_r($aArgs['data']);
-        // file_put_contents("storeResourceLogs.log", ob_get_flush());
-        //END LOG FOR DEBUG ONLY
-        //*****************************************************************************************
-
-        $return = $this->storeResource($aArgs);
-
-        if ($return['errors']) {
-            return $response
-                ->withStatus(500)
-                ->withJson(
-                    ['errors' => _NOT_CREATE . ' ' . $return['errors']]
-                );
+        if (empty($resId) || !empty($resId['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => '[ResController create] ' . $resId['errors']]);
         }
 
-        //standardize ws response for MaarchCapture
-        $wsReturn['resId'] = $return[0];
-        
-        return $response->withJson($wsReturn);
+        return $response->withJson(['resId' => $resId]);
     }
 
     public function delete(RequestInterface $request, ResponseInterface $response, $aArgs)

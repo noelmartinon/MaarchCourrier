@@ -42,6 +42,23 @@ class AttachmentsModelAbstract extends \Apps_Table_Service
         return $aAttachment[0];
     }
 
+    public static function create(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['format', 'typist', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'filesize', 'status']);
+        ValidatorModel::stringType($aArgs, ['format', 'typist', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'filesize', 'status']);
+        ValidatorModel::intVal($aArgs, ['filesize']);
+
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
+        $aArgs['res_id'] = $nextSequenceId;
+
+        DatabaseModel::insert([
+            'table'         => 'res_attachments',
+            'columnsValues' => $aArgs
+        ]);
+
+        return $nextSequenceId;
+    }
+
     public static function getAttachmentsTypesByXML()
     {
         if (file_exists('custom/' .$_SESSION['custom_override_id']. '/apps/maarch_entreprise/xml/entreprise.xml')) {

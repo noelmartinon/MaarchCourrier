@@ -15,6 +15,7 @@
 
 namespace Core\Controllers;
 
+use Attachments\Models\AttachmentsModel;
 use Core\Models\CoreConfigModel;
 use Core\Models\DocserverModel;
 use Core\Models\DocserverTypeModel;
@@ -27,16 +28,21 @@ use Psr\Http\Message\ResponseInterface;
 
 class StoreController
 {
-    public function storeResource(array $aArgs)
+    public static function storeResource(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['encodedFile', 'data', 'collId', 'table', 'fileFormat', 'status']);
         ValidatorModel::stringType($aArgs, ['collId', 'table', 'fileFormat', 'status']);
         ValidatorModel::arrayType($aArgs, ['data']);
 
+        if (!in_array($aArgs['table'], ['res_letterbox', 'res_attachments'])) {
+            return ['errors' => '[storeResource] Table not valid'];
+        }
+
         try {
-            $fileContent = base64_decode(str_replace(['-', '_'], ['+', '/'], $aArgs['encodedFile']));
-            $fileName = 'tmp_file_' . rand() . '.' . $aArgs['fileFormat'];
-            $tmpFilepath = CoreConfigModel::getTmpPath() . $fileName;
+            $fileContent    = base64_decode(str_replace(['-', '_'], ['+', '/'], $aArgs['encodedFile']));
+            $fileName       = 'tmp_file_' . rand() . '.' . $aArgs['fileFormat'];
+            $tmpFilepath    = CoreConfigModel::getTmpPath() . $fileName;
+
             $file = fopen($tmpFilepath, 'w');
             fwrite($file, $fileContent);
             fclose($file);
@@ -56,46 +62,26 @@ class StoreController
             unlink($tmpFilepath);
 
             $data = StoreController::prepareStorage([
-                'data'        => $aArgs['data'],
-                'docserverId' => $storeResult['docserver_id'],
-                'status'      => $aArgs['status'],
-                'fileFormat'  => $aArgs['fileFormat'],
-            ]);
-
-
-
-
-            $this->loadIntoDb([
-                'table'         => $aArgs['table'],
-                'path'          => $storeResult['destination_dir'],
-                'filename'      => $storeResult['file_destination_name'],
-                'docserverPath' => $storeResult['path_template'],
+                'data'          => $aArgs['data'],
                 'docserverId'   => $storeResult['docserver_id'],
-                'data'          => $data,
+                'status'        => $aArgs['status'],
+                'fileName'      => $storeResult['file_destination_name'],
+                'fileFormat'    => $aArgs['fileFormat'],
+                'fileSize'      => $storeResult['fileSize'],
+                'path'          => $storeResult['destination_dir'],
+                'fingerPrint'   => $storeResult['fingerPrint']
             ]);
 
-            $resDetails = ResModel::getByPath([
-                'docserverId' => $storeResult['docserver_id'],
-                'path'        => $storeResult['destination_dir'],
-                'filename'    => $storeResult['file_destination_name'],
-                'table'       => $aArgs['table'],
-                'select'      => ['res_id']
-            ]);
-
-            $resId = $resDetails[0]['res_id'];
-
-
-            if (!is_numeric($resId)) {
-                return ['errors' => 'Pb with SQL insertion : ' .$resId];
+            $resId = false;
+            if ($aArgs['table'] == 'res_letterbox') {
+                $resId = ResModel::create($data);
+            } elseif ($aArgs['table'] == 'res_attachments') {
+                $resId = AttachmentsModel::create($data);
             }
 
-            if ($resId == 0) {
-                $resId = '';
-            }
-
-            return [$resId];
-        } catch (Exception $e) {
-            return ['errors' => 'unknown error' . $e->getMessage()];
+            return $resId;
+        } catch (\Exception $e) {
+            return ['errors' => '[storeResource] ' . $e->getMessage()];
         }
     }
 
@@ -115,7 +101,7 @@ class StoreController
             return ['errors' => '[storeRessourceOnDocserver] FileInfos.tmpFileName does not exist'];
         }
 
-        $docserver = DocserverModel::getDocserverToInsert([['collId' => $aArgs['collId']]])[0];
+        $docserver = DocserverModel::getDocserverToInsert(['collId' => $aArgs['collId']])[0];
         if (empty($docserver)) {
             return ['errors' => '[storeRessourceOnDocserver] No available Docserver'];
         }
@@ -156,6 +142,11 @@ class StoreController
             'destination_dir'       => $destinationDir,
             'docserver_id'          => $docserver['docserver_id'],
             'file_destination_name' => $copyResult['copyOnDocserver']['fileDestinationName'],
+            'fileSize'              => $copyResult['copyOnDocserver']['fileSize'],
+            'fingerPrint'           => StoreController::getFingerPrint([
+                'filePath'  => $docinfo['destinationDir'] . $docinfo['fileDestinationName'],
+                'mode'      => $docserverTypeObject['fingerprint_mode']
+            ])
         ];
     }
 
@@ -343,7 +334,7 @@ class StoreController
                 [
                     'destinationDir'        => $aArgs['destinationDir'],
                     'fileDestinationName'   => $aArgs['fileDestinationName'],
-                    'fileSize'              => filesize($aArgs['sourceFilePath']),
+                    'fileSize'              => filesize(str_replace('#', '/', $aArgs['destinationDir']) . $aArgs['fileDestinationName']),
                 ]
         ];
 
@@ -366,12 +357,8 @@ class StoreController
             return ['errors' => '[controlFingerprint] PathTarget does not exist'];
         }
 
-        if (empty($aArgs['fingerprintMode']) || $aArgs['fingerprintMode'] == 'NONE') {
-            return true;
-        } else {
-            $fingerprint1 = hash_file(strtolower($aArgs['fingerprintMode']), $aArgs['pathInit']);
-            $fingerprint2 = hash_file(strtolower($aArgs['fingerprintMode']), $aArgs['pathTarget']);
-        }
+        $fingerprint1 = StoreController::getFingerPrint(['filePath' => $aArgs['pathInit'], 'mode' => $aArgs['fingerprintMode']]);
+        $fingerprint2 = StoreController::getFingerPrint(['filePath' => $aArgs['pathTarget'], 'mode' => $aArgs['fingerprintMode']]);
 
         if ($fingerprint1 != $fingerprint2) {
             return ['errors' => '[controlFingerprint] Fingerprints do not match: ' . $aArgs['pathInit'] . ' and ' . $aArgs['pathTarget']];
@@ -380,7 +367,19 @@ class StoreController
         return true;
     }
 
-    public static function directoryWasher(array $aArgs)
+    public static function getFingerPrint(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['filePath']);
+        ValidatorModel::stringType($aArgs, ['filePath', 'mode']);
+
+        if (empty($aArgs['mode']) || $aArgs['mode'] == 'NONE') {
+            return '0';
+        }
+
+        return hash_file(strtolower($aArgs['mode']), $aArgs['filePath']);
+    }
+
+    private static function directoryWasher(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['path']);
         ValidatorModel::stringType($aArgs, ['path']);
@@ -407,9 +406,10 @@ class StoreController
 
     public static function prepareStorage(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['data', 'docserverId', 'status', 'fileFormat']);
-        ValidatorModel::stringType($aArgs, ['docserverId', 'status', 'fileFormat']);
+        ValidatorModel::notEmpty($aArgs, ['data', 'docserverId', 'status', 'fileName', 'fileFormat', 'fileSize', 'path', 'fingerPrint']);
+        ValidatorModel::stringType($aArgs, ['docserverId', 'status', 'fileName', 'fileFormat', 'path', 'fingerPrint']);
         ValidatorModel::arrayType($aArgs, ['data']);
+        ValidatorModel::intVal($aArgs, ['fileSize']);
 
         $statusFound        = false;
         $typistFound        = false;
@@ -528,11 +528,6 @@ class StoreController
         }
 
         $aArgs['data'][] = [
-            'column'    => 'format',
-            'value'     => $aArgs['fileFormat'],
-            'type'      => 'string'
-        ];
-        $aArgs['data'][] = [
             'column'    => 'offset_doc',
             'value'     => '',
             'type'      => 'string'
@@ -547,8 +542,42 @@ class StoreController
             'value'     => $aArgs['docserverId'],
             'type'      => 'string'
         ];
+        $aArgs['data'][] = [
+            'column'    => 'creation_date',
+            'value'     => 'CURRENT_TIMESTAMP',
+            'type'      => 'function'
+        ];
+        $aArgs['data'][] = [
+            'column'    => 'path',
+            'value'     => $aArgs['path'],
+            'type'      => 'string'
+        ];
+        $aArgs['data'][] = [
+            'column'    => 'fingerprint',
+            'value'     => $aArgs['fingerPrint'],
+            'type'      => 'string'
+        ];
+        $aArgs['data'][] = [
+            'column'    => 'filename',
+            'value'     => $aArgs['fileName'],
+            'type'      => 'string'
+        ];
+        $aArgs['data'][] = [
+            'column'    => 'format',
+            'value'     => $aArgs['fileFormat'],
+            'type'      => 'string'
+        ];
+        $aArgs['data'][] = [
+            'column'    => 'filesize',
+            'value'     => $aArgs['fileSize'],
+            'type'      => 'int'
+        ];
 
-        return $aArgs['data'];
+        $formatedData = [];
+        foreach ($aArgs['data'] as $value) {
+            $formatedData[$value['column']] = $value['value'];
+        }
+
+        return $formatedData;
     }
-
 }

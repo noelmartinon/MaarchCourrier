@@ -19,25 +19,14 @@ require_once 'apps/maarch_entreprise/services/Table.php';
 
 class ResModelAbstract extends \Apps_Table_Service
 {
-    /**
-     * Retrieve info of resId
-     * @param  $aArgs array
-     *
-     * @return array $res
-     */
     public static function getById(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['resId']);
         ValidatorModel::intVal($aArgs, ['resId']);
-        ValidatorModel::stringType($aArgs, ['table']);
-
-        if (empty($aArgs['table'])) {
-            $aArgs['table'] = 'res_letterbox';
-        }
 
         $aReturn = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => [$aArgs['table']],
+            'table'     => ['res_letterbox'],
             'where'     => ['res_id = ?'],
             'data'      => [$aArgs['resId']]
         ]);
@@ -124,22 +113,21 @@ class ResModelAbstract extends \Apps_Table_Service
         return $aReturn;
     }
 
-    /**
-     * insert into a resTable
-     * @param  $resId integer
-     * @param  $table string
-     * @param  $data array
-     * @return boolean $status
-     */
-    public static function create(array $aArgs = [])
+    public static function create(array $aArgs)
     {
-        if (empty($aArgs['table'])) {
-            $aArgs['table'] = 'res_letterbox';
-        }
+        ValidatorModel::notEmpty($aArgs, ['format', 'typist', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'filesize', 'status']);
+        ValidatorModel::stringType($aArgs, ['format', 'typist', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'status']);
+        ValidatorModel::intVal($aArgs, ['filesize']);
 
-        $aReturn = static::insertInto($aArgs['data'], $aArgs['table']);
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_id_mlb_seq']);
+        $aArgs['res_id'] = $nextSequenceId;
 
-        return $aReturn;
+        DatabaseModel::insert([
+            'table'         => 'res_letterbox',
+            'columnsValues' => $aArgs
+        ]);
+
+        return $nextSequenceId;
     }
 
     /**
