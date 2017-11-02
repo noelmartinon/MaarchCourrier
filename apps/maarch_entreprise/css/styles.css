@@ -3599,3 +3599,7 @@ width:auto;
 #frmsearch2 .autocomplete, #frmcontact .autocomplete{
     top:auto !important;
 }
+
+.attachmentIcon .iconDoc a i {
+    color:#16ADEB;
+}
