@@ -69,7 +69,8 @@ abstract class contacts_controler_Abstract extends ObjectControler implements Ob
         return true;
     }
 
-    public function CreateContact($data){
+    public function CreateContact($data)
+    {
 
         //try {
             $func = new functions();
@@ -112,7 +113,9 @@ abstract class contacts_controler_Abstract extends ObjectControler implements Ob
                     $mail = explode("<", $theString);
                     $mail[0] = trim($mail[0]);
                     try {
-                        $stmt = $db->query("SELECT contact_id, ca_id FROM view_contacts WHERE email = '" . $mail[0] . "' and enabled = '".$enabled."'");
+                        $stmt = $db->query("SELECT contact_id, ca_id FROM view_contacts WHERE email = ? and enabled = ?", 
+                            array($mail[0], $enabled)
+                        );
                         $res = $stmt->fetchObject();
                         if ($res->ca_id <> "") {
                             $contact_exists = true;
@@ -134,6 +137,7 @@ abstract class contacts_controler_Abstract extends ObjectControler implements Ob
                 }
 
                 $data[$i]['column'] = strtolower($data[$i]['column']);
+                $data[$i]['value'] = str_replace("'", "''", $data[$i]['value']);
 
                 if ($data[$i]['table'] == "contacts_v2") {
                     //COLUMN

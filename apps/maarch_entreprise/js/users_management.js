@@ -47,6 +47,7 @@ function doActionGroup( url_action, url_display_access, user_id)
 {
 	var groups = document.getElementsByName('groups[]');
 	var val = '';
+	
 	if(groups)
 	{
 		for(var i=0; i< groups.length;i++)

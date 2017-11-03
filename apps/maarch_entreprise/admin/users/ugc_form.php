@@ -73,7 +73,7 @@ header("Content-Type: text/html", true);
 	<?php  if (count($_SESSION['m_admin']['users']['groups']) > 0)
 	{
 	?>
-		<input type="button" class="button" name="setPrimary" id="setPrimary" value="<?php echo _CHOOSE_PRIMARY_GROUP;?>"  onclick="doActionGroup('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=set_primary_group', '<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=ugc_form');$j('#manage_secondary_baskets').css('color','#b2b2b2');$j('#manage_secondary_baskets').attr('onclick','');$j('#abs').css('color','#b2b2b2');"/>
+		<input type="button" class="button" name="setPrimary" id="setPrimary" value="<?php echo _CHOOSE_PRIMARY_GROUP;?>"  onclick="doActionGroup('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=set_primary_group', '<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&amp;admin=users&amp;page=ugc_form','<?php echo $_SESSION['m_admin']['users']['user_id'];?>') ;$j('#manage_secondary_baskets').css('color','#b2b2b2');$j('#manage_secondary_baskets').attr('onclick','');$j('#abs').css('color','#b2b2b2');"/>
 	<?php
 	}
 	?>
