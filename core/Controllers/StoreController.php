@@ -23,8 +23,6 @@ use Core\Models\ResModel;
 use Core\Models\UserModel;
 use Core\Models\ValidatorModel;
 use Entities\Models\EntitiesModel;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 class StoreController
 {

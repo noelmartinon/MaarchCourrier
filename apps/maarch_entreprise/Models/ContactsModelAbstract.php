@@ -34,6 +34,88 @@ class ContactsModelAbstract extends Apps_Table_Service
         return $aReturn;
     }
 
+    public static function create(array $aArgs)
+    {
+        \Core\Models\ValidatorModel::notEmpty($aArgs, ['firstname', 'lastname', 'contactType', 'isCorporatePerson', 'email', 'userId', 'entityId']);
+        \Core\Models\ValidatorModel::intVal($aArgs, ['contactType']);
+        \Core\Models\ValidatorModel::stringType($aArgs, [
+            'firstname', 'lastname', 'isCorporatePerson', 'email', 'society',
+            'societyShort', 'title', 'function', 'otherData', 'userId', 'entityId'
+        ]);
+
+        $nextSequenceId = \Core\Models\DatabaseModel::getNextSequenceValue(['sequenceId' => 'contact_v2_id_seq']);
+
+        \Core\Models\DatabaseModel::insert([
+            'table'         => 'contacts_v2',
+            'columnsValues' => [
+                'contact_id'            => $nextSequenceId,
+                'contact_type'          => $aArgs['contactType'],
+                'is_corporate_person'   => $aArgs['isCorporatePerson'],
+                'society'               => $aArgs['society'],
+                'society_short'         => $aArgs['societyShort'],
+                'firstname'             => $aArgs['firstname'],
+                'lastname'              => $aArgs['lastname'],
+                'title'                 => $aArgs['title'],
+                'function'              => $aArgs['function'],
+                'other_data'            => $aArgs['otherData'],
+                'user_id'               => $aArgs['userId'],
+                'entity_id'             => $aArgs['entityId'],
+                'creation_date'         => 'CURRENT_TIMESTAMP',
+                'enabled'               => 'Y'
+
+            ]
+        ]);
+
+        return $nextSequenceId;
+    }
+
+    public static function createAddress(array $aArgs)
+    {
+        \Core\Models\ValidatorModel::notEmpty($aArgs, ['contactId', 'contactPurposeId', 'userId', 'entityId', 'isPrivate']);
+        \Core\Models\ValidatorModel::intVal($aArgs, ['contactId', 'contactPurposeId']);
+        \Core\Models\ValidatorModel::stringType($aArgs, [
+            'departement', 'addressFirstname', 'addressLastname', 'addressTitle', 'addressFunction', 'occupancy', 'addressNum', 'addressStreet', 'addressComplement',
+            'addressTown', 'addressZip', 'addressCountry', 'phone', 'addressEmail', 'website', 'salutationHeader', 'salutationFooter', 'addressOtherData',
+            'userId', 'entityId', 'isPrivate'
+        ]);
+
+        $nextSequenceId = \Core\Models\DatabaseModel::getNextSequenceValue(['sequenceId' => 'contact_addresses_id_seq']);
+
+        \Core\Models\DatabaseModel::insert([
+            'table'         => 'contact_addresses',
+            'columnsValues' => [
+                'id'                    => $nextSequenceId,
+                'contact_id'            => $aArgs['contactId'],
+                'contact_purpose_id'    => $aArgs['contactPurposeId'],
+                'departement'           => $aArgs['departement'],
+                'firstname'             => $aArgs['addressFirstname'],
+                'lastname'              => $aArgs['addressLastname'],
+                'title'                 => $aArgs['addressTitle'],
+                'function'              => $aArgs['addressFunction'],
+                'occupancy'             => $aArgs['occupancy'],
+                'address_num'           => $aArgs['addressNum'],
+                'address_street'        => $aArgs['addressStreet'],
+                'address_complement'    => $aArgs['addressComplement'],
+                'address_town'          => $aArgs['addressTown'],
+                'address_postal_code'   => $aArgs['addressZip'],
+                'address_country'       => $aArgs['addressCountry'],
+                'phone'                 => $aArgs['phone'],
+                'email'                 => $aArgs['addressEmail'],
+                'website'               => $aArgs['website'],
+                'salutation_header'     => $aArgs['salutationHeader'],
+                'salutation_footer'     => $aArgs['salutationFooter'],
+                'other_data'            => $aArgs['otherData'],
+                'user_id'               => $aArgs['userId'],
+                'entity_id'             => $aArgs['entityId'],
+                'is_private'            => $aArgs['isPrivate'],
+                'enabled'               => 'Y'
+
+            ]
+        ]);
+
+        return $nextSequenceId;
+    }
+
     public static function getWithAddress(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['contactId', 'addressId']);

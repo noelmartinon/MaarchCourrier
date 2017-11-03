@@ -129,7 +129,7 @@ $app->get('/signatureBook/{resId}/incomingMailAttachments', \Visa\Controllers\Vi
 $app->put('/{collId}/{resId}/unsign', \Visa\Controllers\VisaController::class . ':unsignFile');
 $app->put('/listinstance/{id}/requestedSignature', \Visa\Controllers\VisaController::class . ':setRequestedSignature');
 
-//resource
+//Res
 $app->post('/res', \Core\Controllers\ResController::class . ':create');
 $app->put('/res', \Core\Controllers\ResController::class . ':update');
 $app->put('/res/{resId}/status', \Core\Controllers\ResController::class . ':updateStatus');
@@ -154,6 +154,9 @@ $app->post('/currentUser/emailSignature', \Core\Controllers\UserController::clas
 $app->put('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::class . ':updateCurrentUserEmailSignature');
 $app->delete('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::class . ':deleteCurrentUserEmailSignature');
 $app->post('/users/autocompleter', \Core\Controllers\UserController::class . ':getUsersForAutocompletion');
+
+//Contacts
+$app->post('/contacts', \Core\Controllers\ContactController::class . ':create');
 
 //Templates
 $app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateController::class . ':duplicate');
