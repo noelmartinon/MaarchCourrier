@@ -143,3 +143,9 @@ if (!defined("_RETRIEVE_BACK_UP"))
 
 if (!defined("_DEST_USER_PJ"))
     define( "_DEST_USER_PJ", "Destinataire");
+
+if (!defined("_NO_PREVIEW_AVAILABLE"))
+    define( "_NO_PREVIEW_AVAILABLE", "Aucun aperçu disponible");
+
+if (!defined("_FILE_HAS_NO_PDF"))
+    define( "_FILE_HAS_NO_PDF", "La version PDF du fichier n'existe pas.");

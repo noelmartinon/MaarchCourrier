@@ -177,6 +177,12 @@ if (! empty($_SESSION['error'])) {
                     $_SESSION['error'] = _NO_DOC_OR_NO_RIGHTS . "...";
                     ?><script type="text/javascript">window.opener.top.location.href='index.php';self.close();</script><?php
                 }
+            } else if(!empty($_GET['editingMode']) && $format != 'pdf'){
+                ?>
+                <div style="border: dashed;font-weight: bold;opacity: 0.5;font-size: 30px;height: 96%;text-align: center">
+                    <div style="padding-top: 25%;"><?php echo _NO_PREVIEW_AVAILABLE;?><br><sub><?php echo _FILE_HAS_NO_PDF;?></sub></div>
+                </div>
+                <?php
             } else {
                 require_once 'core/docservers_tools.php';
                 $arrayIsAllowed = array();
