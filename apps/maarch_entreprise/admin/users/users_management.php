@@ -130,7 +130,7 @@ elseif($mode == "up" || $mode == "add")
                          <img src="<?php 
                             echo $_SESSION['config']['businessappurl'] 
                                 . '/tmp/' . $fileNameOnTmp;
-                            ?>" alt="signature" id="signFromDs"/> 
+                            ?>" alt="signature" id="signFromDs" style="max-width:100%"/> 
                         <?php
                     } else {
                         echo _COPY_ERROR;
