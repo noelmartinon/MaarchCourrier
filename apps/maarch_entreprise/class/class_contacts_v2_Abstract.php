@@ -41,8 +41,16 @@ abstract class contacts_v2_Abstract extends Database
         //  return the user information in sessions vars
         $func = new functions();
         $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] =
-            $_REQUEST['is_corporate'];
+        $_REQUEST['is_corporate'];
+        $controlTarget = "SELECT id FROM contact_types WHERE contact_target = ? or contact_target = 'both' or contact_target is null";
+        $db = new Database();
         if ($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'Y') {
+
+            $stmt = $db->query($controlTarget, array('corporate'));
+            if($stmt->rowCount()==0){
+                $_SESSION['error'] = 'No contact type set for corporate contact.';
+            }
+
             $_SESSION['m_admin']['contact']['SOCIETY'] = $func->wash(
                 $_REQUEST['society'], 'no', _STRUCTURE_ORGANISM . ' ', 'yes', 0, 255
             );
@@ -51,6 +59,12 @@ abstract class contacts_v2_Abstract extends Database
             $_SESSION['m_admin']['contact']['FUNCTION'] = '';
             $_SESSION['m_admin']['contact']['TITLE'] = '';
         } else {
+
+            $stmt = $db->query($controlTarget, array('no_corporate'));
+            if($stmt->rowCount()==0){
+                $_SESSION['error'] = 'No contact type set for no corporate contact.';
+            }
+
             $_SESSION['m_admin']['contact']['LASTNAME'] = $func->wash(
                 $_REQUEST['lastname'], 'no', _LASTNAME, 'yes', 0, 255
             );
