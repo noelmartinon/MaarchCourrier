@@ -63,7 +63,7 @@ $upFileOK = false;
                 $_SESSION['upfile']['format'] = $the_ext;
                 $upFileOK = true;
 
-                if (strtolower($_SESSION['upfile']['format']) == 'pdf') {
+                if (in_array(strtolower($_SESSION['upfile']['format']), ['pdf', 'jpg', 'jpeg', 'png'])) {
                     echo '<script>window.parent.document.getElementById(\'viewframevalid_attachment\').src=\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=file_iframe&#navpanes=0'.$_SESSION['upfile']['local_path'].'\';window.parent.document.getElementById(\'liAttachement\').click()</script>';
                 }
             }

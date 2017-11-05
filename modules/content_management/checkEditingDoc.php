@@ -11,6 +11,8 @@
 
 if (!empty($_SESSION['cm_applet'][$_SESSION['user']['UserId']])) {
     echo "{\"status\" : 1, \"status_txt\" : \"LCK FOUND !\"}";
+} else if (strpos($_SESSION['upfile']['format'], 'xl') !== false || strpos($_SESSION['upfile']['format'], 'ppt') !== false) {
+    echo "{\"status\" : 0, \"status_txt\" : \"LCK NOT FOUND !\", \"pdf_version\" : \"\"}";
 } else {
     echo "{\"status\" : 0, \"status_txt\" : \"LCK NOT FOUND !\", \"pdf_version\" : \"".$_SESSION['config']['tmppath'].$_SESSION['upfile']['fileNamePdfOnTmp']."\"}";
 }

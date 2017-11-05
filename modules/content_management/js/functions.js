@@ -227,11 +227,11 @@ function checkEditingDoc(userId) {
                 //END OF CHECKING APPLET
                 console.log('clearInterval');
 
-                if($j('#liAttachement', window.top.document).length) {
+                if($j('#liAttachement', window.top.document).length && response.pdf_version != '') {
                 	window.top.document.getElementById('liAttachement').click();
                 }
                 
-                if($j('#viewframevalid_attachment').length) {
+                if($j('#viewframevalid_attachment').length && response.pdf_version != '') {
                     document.getElementById('viewframevalid_attachment').src='index.php?display=true&dir=indexing_searching&page=file_iframe&#navpanes=0'+response.pdf_version;                    
                 }
                 //console.log(response.pdf_version);
