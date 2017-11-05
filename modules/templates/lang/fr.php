@@ -143,3 +143,6 @@ if (!defined("_TEMPLATE_TARGET"))
 
 if (!defined("_NO_TARGET"))
     define("_NO_TARGET", "Pas de cible");
+
+if (!defined("_EXTENSION_NOT_ALLOWED"))
+    define("_EXTENSION_NOT_ALLOWED", "Extension non autorisée");

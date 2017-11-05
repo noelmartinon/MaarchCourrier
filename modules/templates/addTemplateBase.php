@@ -1,8 +1,8 @@
 <?php 
 require 'modules/templates/class/templates_controler.php';
 $templatesControler = new templates_controler();
-if (!in_array($_REQUEST['fileMimeType'],array('application/msword','application/vnd.openxmlformats-officedocument.wordprocessing‌​ml.document','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-excel','application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml‌​.slideshow','application/vnd.oasis.opendocument.text','application/vnd.oasis.opendocument.presentation','application/vnd.oasis.opendocument.spreadsheet'))) {
-    echo "{\"status\":1,\"error_txt\":\"EXTENSION_NOT_ALLOWED\"}";
+if (!in_array($_REQUEST['fileMimeType'],array('application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-excel','application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml‌​.slideshow','application/vnd.oasis.opendocument.text','application/vnd.oasis.opendocument.presentation','application/vnd.oasis.opendocument.spreadsheet'))) {
+    echo "{\"status\":1,\"error_txt\":\""._EXTENSION_NOT_ALLOWED."\"}";
     exit();
 }
 if (isset($_REQUEST['fileContent'])) {
