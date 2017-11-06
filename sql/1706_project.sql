@@ -49,3 +49,13 @@ CREATE TABLE users_baskets
   CONSTRAINT users_baskets_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
+
+UPDATE res_attachments SET in_signature_book = TRUE;
+UPDATE res_version_attachments SET in_signature_book = TRUE;
+
+DO $$ BEGIN
+  IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'users') AND attname = 'id') = 0 THEN
+    ALTER TABLE users ADD COLUMN id serial;
+    ALTER TABLE users ADD UNIQUE (id);
+  END IF;
+END$$;
