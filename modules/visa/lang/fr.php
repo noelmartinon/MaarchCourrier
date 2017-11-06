@@ -202,3 +202,14 @@ if (!defined('_DISPLAY_ATTACHMENTS'))
 
 if (!defined('_DRAG_N_DROP_CHANGE_ORDER'))
     define('_DRAG_N_DROP_CHANGE_ORDER', 'Glisser/déposer pour modifier l\'ordre du circuit');
+
+if (!defined('_NO_USER_SIGNED_DOC'))
+    define('_NO_USER_SIGNED_DOC', "vous n'avez PAS signé de pièce jointe!");
+
+if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO'))
+    define('_IS_ALL_ATTACHMENT_SIGNED_INFO', "Vous ne pourrez pas demander de signature aux utilisateurs, aucune pièce jointe présente dans le parapheur");
+
+if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO2'))
+    define('_IS_ALL_ATTACHMENT_SIGNED_INFO2', "Vous ne pourrez pas demander de signature aux utilsateurs,  toutes les pièces jointes présentes dans le parapheur ont été signées.");
+
+

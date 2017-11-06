@@ -237,9 +237,9 @@ abstract class visa_Abstract extends Database
 
 		$db = new Database();
 		if (empty($noSignableAttachments)) {
-			$stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP')", [$res_id, $coll_id]);
+			$stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP') IN in_signature_book = ?", [$res_id, $coll_id, true]);
 		} else {
-			$stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN (?) ", [$res_id, $coll_id, $noSignableAttachments]);
+			$stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN (?) AND in_signature_book = ? ", [$res_id, $coll_id, $noSignableAttachments, true]);
 		}
 		if ($stmt->rowCount() <= 0) {
 			$this->errorMessageVisa = _NO_RESPONSE_PROJECT_VISA;
@@ -353,6 +353,13 @@ abstract class visa_Abstract extends Database
 			$result[] = $res->item_id;
 		}	
 		return $result;
+	}
+
+	public function getCurrentUserStep($res_id){
+		$db = new Database();
+		$stmt = $db->query("SELECT item_id from listinstance WHERE res_id= ? and coll_id = ? and difflist_type = ? and process_date ISNULL ORDER BY listinstance_id ASC LIMIT 1", array($res_id, 'letterbox_coll', 'VISA_CIRCUIT'));
+		$res = $stmt->fetchObject();
+		return $res->item_id;
 	}
 
 	public function getStepDetails($res_id, $coll_id, $listDiffType, $sequence)
@@ -499,9 +506,22 @@ abstract class visa_Abstract extends Database
 	}
 	public function getList($res_id, $coll_id, $bool_modif=false, $typeList, $isVisaStep = false, $fromDetail = ""){
 			$core = new core_tools();      
-            $circuit = $this->getWorkflow($res_id, $coll_id, $typeList);
+			$circuit = $this->getWorkflow($res_id, $coll_id, $typeList);
+			if ($this->isAllAttachementSigned($res_id) == 'noAttachment') {
+				$str = '<input type="hidden" id="isAllAttachementSigned" value="true"/>';
+				$isAllAttachementSigned = " disabled='disabled'";
+				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO;
+
+			} else if ($this->isAllAttachementSigned($res_id) == 'yes') {
+				$str = '<input type="hidden" id="isAllAttachementSigned" value="true"/>';
+				$isAllAttachementSigned = " disabled='disabled'";
+				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO2;				
+			}else{
+				$str = '<input type="hidden" id="isAllAttachementSigned" value="false"/>';
+				$isAllAttachementSigned = "";
+			}	
             
-            $str = '<div class="error" id="divErrorVisa" onclick="this.hide();"></div>';
+            $str .= '<div class="error" id="divErrorVisa" onclick="this.hide();"></div>';
             $str .= '<div class="info" id="divInfoVisa" onclick="this.hide();"></div>';
                         
             //VISA USER LIST
@@ -548,7 +568,9 @@ abstract class visa_Abstract extends Database
                 $str .= '</script>';
                 $str .= '<br/><br/>';
             }
-            
+            if (!empty($isAllAttachementSigned)) {
+				$str .= '<b style="color:red;">'.$isAllAttachementSignedInfo.'</b>';
+			}
             $str .= '<div id="visa_content">';
             //VISA USER IN DOCUMENT
             $i = 1;
@@ -599,7 +621,14 @@ abstract class visa_Abstract extends Database
                                }
 
 
-                               $info_vised = '';
+                               $info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
+							   if (!empty($info_userVis['requested_signature'])) {
+								   $info_vised .= 'checked="true" ';
+							   }
+							   if (!empty($info_userVis['signatory'])) {
+									$info_vised .= 'disabled="disabled" ';
+								}
+							   $info_vised .= '></sub>';
                                $link_vis = 'hourglass-half';
                             }
                             
@@ -614,12 +643,32 @@ abstract class visa_Abstract extends Database
                             
                             $disabled = ' disabled="disabled"';
 							if(preg_match("/\[DEL\]/", $info_userVis['process_comment'])){
-								$info_vised = '';
+								
+								$info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
+								if (!empty($info_userVis['requested_signature'])) {
+									$info_vised .= 'checked="true" ';
+								}
+								if (!empty($info_userVis['signatory'])) {
+									$info_vised .= 'disabled="disabled" ';
+								}
+								$info_vised .= '></sub>';
 								$link_vis = 'times';
 								$vised = ' moved vised';
 								$del_vis = '<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);" title="'._DELETE.'"></i>';
 							}else{
-								$info_vised = '<br/><sub>visé le : '.functions::format_date_db($info_userVis['process_date'],'','',true).'</sub>';
+								if (!empty($info_userVis['signatory'])) {
+									$info_vised = '<br/><sub>signé le : '.functions::format_date_db($info_userVis['process_date'],'','',true).'</sub>';
+									$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;
+									$info_vised .= 'checked="true" ';
+									$info_vised .= 'disabled="disabled" ';
+									$info_vised .= '>';
+								}else{
+									$info_vised = '<br/><sub>visé le : '.functions::format_date_db($info_userVis['process_date'],'','',true).'</sub>';									
+									$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;									
+									$info_vised .= 'disabled="disabled" ';
+									$info_vised .= '>';
+								}
+								
 								$link_vis = 'check';
 								$vised = ' vised';
 								$del_vis = '';
@@ -635,16 +684,11 @@ abstract class visa_Abstract extends Database
                         $str .= '<span class="visaUserInfo">';
 							$str .= '<sup class="visaUserPos nbResZero">'.$i.'</sup>&nbsp;&nbsp;';
                         	$str .= '<i class="fa fa-user fa-2x" aria-hidden="true"></i> '.$info_userVis['lastname'].' '.$info_userVis['firstname'].' <sup class="nbRes">'.$info_userVis['entity_id'].'</sup>';
-							$str .= '&nbsp;&nbsp; <i title="'._SIGN_USER.'" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;';
+							$str .= '&nbsp;&nbsp; <sub><i id="signedUser_'.$i.'" title="au moins un document a été signé par cet utilisateur" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;';
 							if (empty($info_userVis['signatory'])) {
                                 $str .= 'visibility:hidden';
                             }
 							$str .= '"></i>'.$info_vised;
-                            $str .= 'Signature demandée <input type="checkbox" onclick="setRequestedSignature(' .$info_userVis['listinstance_id']. ')"';
-                            if (!empty($info_userVis['requested_signature'])) {
-                                $str .= 'checked="true" ';
-                            }
-                            $str .= '>';
                         $str .= '</span>';
 						$str .= '<span class="visaUserAction">';
                     		$str .= $del_vis;
@@ -703,21 +747,46 @@ abstract class visa_Abstract extends Database
                            }
 
 
-                           $info_vised = '';
+                           $info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
+						   if (!empty($info_userSign['requested_signature'])) {
+							   $info_vised .= 'checked="true" ';
+						   }
+						   if (!empty($info_userSign['signatory'])) {
+								$info_vised .= 'disabled="disabled" ';
+							}
+						   $info_vised .= '></sub>';
                            $link_vis = 'hourglass-half';
                         }
 
                     }else{
 						$modif = 'false';
                         if (preg_match("/\[DEL\]/", $info_userSign['process_comment'])) {
-							$info_vised = '';
+							$info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
+							if (!empty($info_userSign['requested_signature'])) {
+								$info_vised .= 'checked="true" ';
+							}
+							if (!empty($info_userSign['signatory'])) {
+								$info_vised .= 'disabled="disabled" ';
+							}
+							$info_vised .= '></sub>';
 							$link_vis = 'times';
 							$vised = ' moved vised';
 							$del_vis = '<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);" title="'._DELETE.'"></i>';
 						}else{
                         	$vised = ' vised';
                         	$link_vis = 'check';
-                        	$info_vised = '<br/><sub>signé le : '.functions::format_date_db($info_userSign['process_date'],'','',true).'</sub>';
+                        	if (!empty($info_userVis['signatory'])) {
+								$info_vised = '<br/><sub>signé le : '.functions::format_date_db($info_userSign['process_date'],'','',true).'</sub>';
+								$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;
+								$info_vised .= 'checked="true" ';
+								$info_vised .= 'disabled="disabled" ';
+								$info_vised .= '>';
+							}else{
+								$info_vised = '<br/><sub>visé le : '.functions::format_date_db($info_userSign['process_date'],'','',true).'</sub>';									
+								$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;
+								$info_vised .= 'disabled="disabled" ';
+								$info_vised .= '>';
+							}
 						}
                         
                     }
@@ -729,16 +798,11 @@ abstract class visa_Abstract extends Database
                     $str .= '<span class="visaUserInfo">';
 						$str .= '<sup class="visaUserPos nbResZero">'.$i.'</sup>&nbsp;&nbsp;';
                     	$str .= '<i class="fa fa-user fa-2x" aria-hidden="true"></i> '.$info_userSign['lastname'].' '.$info_userSign['firstname'].' <sup class="nbRes">'.$info_userSign['entity_id'].'</sup>';
-                        $str .= '&nbsp;&nbsp; <i title="'._SIGN_USER.'" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;';
+                        $str .= '&nbsp;&nbsp; <sub><i id="signedUser_'.$i.'" title="au moins un document a été signé par cet utilisateur" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;';
                         if (empty($info_userSign['signatory'])) {
                             $str .= 'visibility:hidden';
                         }
                         $str .= '"></i>'.$info_vised;
-					    $str .= 'Signature demandée <input type="checkbox" onclick="setRequestedSignature(' .$info_userSign['listinstance_id']. ')"';
-                        if (!empty($info_userSign['requested_signature'])) {
-                            $str .= 'checked="true" ';
-                        }
-                        $str .= '>';
                     $str .= '</span>';
 					$str .= '<span class="visaUserAction">';
                 		$str .= $del_vis;
@@ -1067,8 +1131,38 @@ abstract class visa_Abstract extends Database
 		
 		return $str;
 	}
-	
-	
+
+	public function isAllAttachementSigned($res_id){
+		
+		$db = new Database();
+		$stmt = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = false AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder') AND res_id_master = ?", array($res_id));
+		$res = $stmt->fetchObject();
+		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder') AND res_id_master = ?", array($res_id));
+		$res2 = $stmt2->fetchObject();
+		$stmt3 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder') AND res_id_master = ?", array($res_id));
+		$res3 = $stmt3->fetchObject();
+		if ($res3->nb == 0) {
+			return 'noAttachment';
+		} else if ($res2->nb == 0) {
+			return 'yes';
+		}else{
+			return false;
+		}
+	}
+	public function currentUserSignRequired($res_id){
+		$user_id = $this->getCurrentUserStep($res_id);
+		$db = new Database();
+		$stmt = $db->query("SELECT count(listinstance_id) as nb from listinstance l where l.res_id=? AND l.item_id=? AND l.difflist_type='VISA_CIRCUIT' AND l.requested_signature='true'", array($res_id,$user_id));
+		$res = $stmt->fetchObject();
+		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments r where r.res_id_master=? AND r.signatory_user_serial_id = (select id from users where user_id = ?) AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder')", array($res_id,$user_id));
+		$res2 = $stmt2->fetchObject();
+		
+		if ($res->nb > 0 && $res2->nb == 0) {
+			return 'true';
+		} else {
+			return 'false';
+		}
+	}
 }
 
 

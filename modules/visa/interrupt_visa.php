@@ -1,15 +1,24 @@
 <?php
-
-
 /**
- * $confirm  bool true
- */
-$confirm = true;
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 
+* @brief   interrupt_visa
+* @author  dev <dev@maarch.org>
+* @ingroup visa
+*/
+
+require_once 'modules/visa/class/class_modules_tools.php';
+$visa = new visa();
+
+if ($visa->currentUserSignRequired($_SESSION['doc_id']) == 'true') {
+    $confirm = true;
+    $label_action .=" (".NO_USER_SIGNED_DOC.")";
+} else {
+    $confirm = false;
+}
 $etapes = ['empty_error'];
-
-require_once('modules/visa/class/class_modules_tools.php');
-
 
 function manage_empty_error($arr_id, $history, $id_action, $label_action, $status)
 {
@@ -23,16 +32,22 @@ function manage_empty_error($arr_id, $history, $id_action, $label_action, $statu
 
     // Person who ends the workflow
     if ($stepDetails['listinstance_id']) {
-        $db->query('UPDATE listinstance SET process_date = CURRENT_TIMESTAMP, process_comment = ? WHERE listinstance_id = ? AND item_id = ? AND res_id = ? AND difflist_type = ?',
-                    ["A terminé le circuit avec l'action {$label_action}", $stepDetails['listinstance_id'], $stepDetails['item_id'], $res_id, 'VISA_CIRCUIT']);
+        $db->query(
+            'UPDATE listinstance SET process_date = CURRENT_TIMESTAMP, process_comment = ? WHERE listinstance_id = ? AND item_id = ? AND res_id = ? AND difflist_type = ?',
+            ["A terminé le circuit avec l'action {$label_action}", $stepDetails['listinstance_id'], $stepDetails['item_id'], $res_id, 'VISA_CIRCUIT']
+        );
     } else {
-        $db->query('UPDATE listinstance SET process_date = CURRENT_TIMESTAMP, process_comment = ? WHERE res_id = ? AND difflist_type = ? AND item_mode = ?',
-            ["A terminé le circuit avec l'action {$label_action}", $res_id, 'VISA_CIRCUIT', 'sign']);
+        $db->query(
+            'UPDATE listinstance SET process_date = CURRENT_TIMESTAMP, process_comment = ? WHERE res_id = ? AND difflist_type = ? AND item_mode = ?',
+            ["A terminé le circuit avec l'action {$label_action}", $res_id, 'VISA_CIRCUIT', 'sign']
+        );
     }
 
     // People remaining in the workflow
-    $db->query('UPDATE listinstance SET process_date = CURRENT_TIMESTAMP, process_comment = ? WHERE res_id = ? AND difflist_type = ? AND process_date IS NULL',
-                ['Circuit Interrompu', $res_id, 'VISA_CIRCUIT']);
+    $db->query(
+        'UPDATE listinstance SET process_date = CURRENT_TIMESTAMP, process_comment = ? WHERE res_id = ? AND difflist_type = ? AND process_date IS NULL',
+        ['Circuit Interrompu', $res_id, 'VISA_CIRCUIT']
+    );
     return array('result' => $res_id.'#', 'history_msg' => '');
 }
 ?>

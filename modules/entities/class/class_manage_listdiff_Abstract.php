@@ -408,13 +408,18 @@ abstract class diffusion_list_Abstract extends functions
             
             $cptUsers = count($diffList[$role_id]['users']);
             for ($i=0;$i<$cptUsers;$i++) {
-                $userFound      = false;
-                $userId         = trim($diffList[$role_id]['users'][$i]['user_id']);
-                $processComment = trim($diffList[$role_id]['users'][$i]['process_comment']);
-                $processDate    = trim($diffList[$role_id]['users'][$i]['process_date']);
-                $visible        = $diffList[$role_id]['users'][$i]['visible'];
-                $viewed         = (integer)$diffList[$role_id]['users'][$i]['viewed'];
-                $cptOldUsers    = count($oldListInst[$role_id]['users']);
+                $userFound              = false;
+                $userId                 = trim($diffList[$role_id]['users'][$i]['user_id']);
+                $processComment         = trim($diffList[$role_id]['users'][$i]['process_comment']);
+                $processDate            = trim($diffList[$role_id]['users'][$i]['process_date']);
+                $visible                = $diffList[$role_id]['users'][$i]['visible'];
+                $viewed                 = (integer)$diffList[$role_id]['users'][$i]['viewed'];
+
+                $signatory = ($diffList[$role_id]['users'][$i]['signatory'] ? 'true' : 'false');
+                $requested_signature = ($diffList[$role_id]['users'][$i]['requested_signature'] ? 'true' : 'false');
+                
+
+                $cptOldUsers            = count($oldListInst[$role_id]['users']);
                 for ($h=0;$h<$cptOldUsers;$h++) {
                     if ($userId == $oldListInst[$role_id]['users'][$h]['user_id']) {
                         $userFound = true;
@@ -430,7 +435,7 @@ abstract class diffusion_list_Abstract extends functions
                 if ($processDate != '') {
                     $stmt = $db->query(
                         "insert into " . ENT_LISTINSTANCE
-                            . " (coll_id, res_id, listinstance_type, sequence, item_id, item_type, item_mode, added_by_user, added_by_entity, visible, viewed, difflist_type, process_comment, process_date) "
+                            . " (coll_id, res_id, listinstance_type, sequence, item_id, item_type, item_mode, added_by_user, added_by_entity, visible, viewed, difflist_type, process_comment, process_date, signatory, requested_signature) "
                         . "values ("
                             . "?, ?, "
                             . "'DOC', ?, "
@@ -442,13 +447,15 @@ abstract class diffusion_list_Abstract extends functions
                             . "?, ?, "
                             . "?, "
                             . "?, "
+                            . "?, "
+                            . "?, "
                             . "?"
-                        . " )", array($collId,$resId,$i,$userId,$item_mode,$creatorUser,$creatorEntity,$visible,$viewed,$difflistType,$processComment,$processDate)
+                        . " )", array($collId,$resId,$i,$userId,$item_mode,$creatorUser,$creatorEntity,$visible,$viewed,$difflistType,$processComment,$processDate,$signatory,$requested_signature)
                     );
                 } else {
                     $stmt = $db->query(
                         "insert into " . ENT_LISTINSTANCE
-                            . " (coll_id, res_id, listinstance_type, sequence, item_id, item_type, item_mode, added_by_user, added_by_entity, visible, viewed, difflist_type, process_comment) "
+                            . " (coll_id, res_id, listinstance_type, sequence, item_id, item_type, item_mode, added_by_user, added_by_entity, visible, viewed, difflist_type, process_comment, signatory, requested_signature) "
                         . "values ("
                             . "?, ?, "
                             . "'DOC', ?, "
@@ -459,8 +466,10 @@ abstract class diffusion_list_Abstract extends functions
                             . "?, "
                             . "?, ?, "
                             . "?, "
+                            . "?, "
+                            . "?, "
                             . "?"
-                        . " )", array($collId,$resId,$i,$userId,$item_mode,$creatorUser,$creatorEntity,$visible,$viewed,$difflistType,$processComment)
+                        . " )", array($collId,$resId,$i,$userId,$item_mode,$creatorUser,$creatorEntity,$visible,$viewed,$difflistType,$processComment,$signatory,$requested_signature)
                     );
                 }
                 

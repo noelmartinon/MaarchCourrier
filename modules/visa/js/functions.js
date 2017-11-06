@@ -5,6 +5,12 @@ function addVisaUser(users) {
         if(nb_visa == 0){
             $j("#emptyVisa").hide();      
         }
+        if ($j("#isAllAttachementSigned").val() == 'false') {
+            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" checked="true"></sub>'
+        } else {
+            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" disabled="disabled"></sub>'
+        }
+
         $j("#visa_content").append('<div class="droptarget" id="visa_' + next_visa + '" draggable="true">'
             +'<span class="visaUserStatus">'
                 +'<i class="fa fa-hourglass-half" aria-hidden="true"></i>'
@@ -13,7 +19,8 @@ function addVisaUser(users) {
                 +'<sup class="visaUserPos nbResZero">'+next_visa+'</sup>&nbsp;&nbsp;'
                 +'<i class="fa fa-user fa-2x" aria-hidden="true"></i> '+ $j("select#visaUserList option:selected").text() +' <sup class="nbRes">'+$j("select#visaUserList option:selected").parent().get( 0 ).label+'</sup>'
                 +'<input class="userId" type="hidden" value="' + $j("select#visaUserList option:selected").val() + '"/><input class="visaDate" type="hidden" value=""/>'
-                +'&nbsp;&nbsp; <i title="Personne signataire" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;visibility:hidden;"></i>'
+                +'&nbsp;&nbsp; <i id="signedUser_'+next_visa+'" title="Personne signataire" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;visibility:hidden;"></i>'
+                + signRequest      
             +'</span>'
             +'<span class="visaUserAction">'
                 +'<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);"></i>'
@@ -35,6 +42,11 @@ function addVisaUser(users) {
         if(nb_visa == 0){
             $j("#emptyVisa").hide();      
         }
+        if ($j("#isAllAttachementSigned").val() == 'false') {
+            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" checked="true"></sub>'
+        } else {
+            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" disabled="disabled"></sub>'
+        }
         $j("#visa_content").append('<div class="droptarget" id="visa_' + next_visa + '" draggable="true">'
             +'<span class="visaUserStatus">'
                 +'<i class="fa fa-hourglass-half" aria-hidden="true"></i>'
@@ -43,8 +55,9 @@ function addVisaUser(users) {
                 +'<sup class="visaUserPos nbResZero">'+next_visa+'</sup>&nbsp;&nbsp;'
                 +'<i class="fa fa-user fa-2x" aria-hidden="true"></i> ' + users.lastname + ' ' + users.firstname + ' <sup class="nbRes">'+users.entity_id+'</sup>'
                 +'<input class="userId" type="hidden" value="' + users.user_id + '"/><input class="visaDate" type="hidden" value=""/>'
-                +'&nbsp;&nbsp; <i title="Personne signataire" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;visibility:hidden;"></i>'
-            +'</span>'
+                +'&nbsp;&nbsp; <i id="signedUser_'+next_visa+'" title="Personne signataire" class="visaUserSign fa fa-certificate" aria-hidden="true" style="color:#FDD16C;visibility:hidden;"></i>'
+                + signRequest 
+                +'</span>'
             +'<span class="visaUserAction">'
                 +'<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);"></i>'
             +'</span>'
@@ -71,7 +84,7 @@ function delVisaUser(target) {
 
 }
 function resetPosVisa () {
-    $j(".visaUserSign").css("visibility","hidden");
+    //$j(".visaUserSign").css("visibility","hidden");
     i = 1;
     $j(".droptarget").each(function() {
         this.id = 'visa_' + i;
@@ -79,48 +92,65 @@ function resetPosVisa () {
         i++;
     });
     i--;
-    $j("#visa_" + i).find(".visaUserSign").css("visibility","visible");
+
+    //$j("#visa_" + i).find(".visaUserSign").css("visibility","visible");
+
 }
 function updateVisaWorkflow(resId) {
     var $i = 0;
     var userList = [];
-    if ($j(".droptarget").length) {
-        $j(".droptarget").each(function () {
-            //console.log('viseur : '+$j("#"+this.id+" .userdId").val());
-            userId = $j("#" + this.id).find(".userId").val();
-            userConsigne = $j("#" + this.id).find(".consigne").val();
-            userVisaDate = $j("#" + this.id).find(".visaDate").val();
-            userPos = $i;
-            userList.push({userId: userId, userPos: userPos, userConsigne: userConsigne, userVisaDate: userVisaDate});
-            $i++;
+    if (($j("input[id^=signRequest_]:checked").length == 0) && $j(".droptarget").length != 0) {
+        alert("Veuillez demander au moins à une personne de signer")
+    } else {
+        if ($j(".droptarget").length) {
+            $j(".droptarget").each(function () {
+                if ($j("#signRequest_"+($i+1)+":checked").length) {
+                    userRequestSign=true;
+                } else {
+                    userRequestSign=false;
+                }
+                if ($j("#signedUser_"+($i+1)).css('visibility') == 'visible') {
+                    userSignatory=true;
+                } else {
+                    userSignatory=false;
+                }
+
+                userId = $j("#" + this.id).find(".userId").val();
+                userConsigne = $j("#" + this.id).find(".consigne").val();
+                userVisaDate = $j("#" + this.id).find(".visaDate").val();
+                userPos = $i;
+                userList.push({userId: userId, userPos: userPos, userConsigne: userConsigne, userVisaDate: userVisaDate, userRequestSign: userRequestSign, userSignatory: userSignatory});
+                $i++;
+            });
+        }
+        $j.ajax({
+           url : 'index.php?display=true&module=visa&page=updateVisaWF',
+           type : 'POST',
+           dataType : 'JSON',
+           data: {
+               resId: resId,
+                userList: JSON.stringify(userList)
+           },
+           success : function(response){
+                if (response.status == 0) {
+                    parent.$('main_info').innerHTML = 'Mise à jour du circuit effectuée';
+                    parent.$('main_info').style.display = 'table-cell';
+                    parent.Element.hide.delay(5, 'main_info');
+                    eval(response.exec_js);
+                    if(parent.$j('.contentShow iframe').length){
+                        parent.$j('.contentShow iframe')[0].contentWindow.location.reload(true);
+                    }
+                } else if (response.status != 1) {
+                    alert(response.error_txt)
+                }
+           },
+           error : function(error){
+               alert(error);
+           }
+    
         });
     }
-    $j.ajax({
-       url : 'index.php?display=true&module=visa&page=updateVisaWF',
-       type : 'POST',
-       dataType : 'JSON',
-       data: {
-           resId: resId,
-            userList: JSON.stringify(userList)
-       },
-       success : function(response){
-            if (response.status == 0) {
-                parent.$('main_info').innerHTML = 'Mise à jour du circuit effectuée';
-                parent.$('main_info').style.display = 'table-cell';
-                parent.Element.hide.delay(5, 'main_info');
-                eval(response.exec_js);
-                if(parent.$j('.contentShow iframe').length){
-                    parent.$j('.contentShow iframe')[0].contentWindow.location.reload(true);
-                }
-            } else if (response.status != 1) {
-                alert(response.error_txt)
-            }
-       },
-       error : function(error){
-           alert(error);
-       }
-
-    });
+    
 }
 function saveVisaWorkflowAsModel () {
     var $i = 0;

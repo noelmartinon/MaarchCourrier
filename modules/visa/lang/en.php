@@ -180,3 +180,12 @@ if (!defined('_DISPLAY_ATTACHMENTS'))
 
 if (!defined('_DRAG_N_DROP_CHANGE_ORDER'))
     define('_DRAG_N_DROP_CHANGE_ORDER', 'Drag/Drop to change order');
+
+if (!defined('_NO_USER_SIGNED_DOC'))
+    define('_NO_USER_SIGNED_DOC', "you have NOT signed any attachment!");
+
+    if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO'))
+    define('_IS_ALL_ATTACHMENT_SIGNED_INFO', "You can't request a signed document to users, no attachment in signature book");
+
+if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO2'))
+    define('_IS_ALL_ATTACHMENT_SIGNED_INFO2', "You can't request a signed document to users, all attachments in signature book are signed.");
