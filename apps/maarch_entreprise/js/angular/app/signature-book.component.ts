@@ -268,9 +268,7 @@ export class SignatureBookComponent implements OnInit {
     displayAttachmentPanel() {
         this.showAttachmentPanel = !this.showAttachmentPanel;
         this.rightSelectedThumbnail = 0;
-        if (this.signatureBook.attachments[0]) {
-            this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
-        }
+        this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
     }
 
     refreshAttachments(mode: string) {
@@ -473,43 +471,62 @@ export class SignatureBookComponent implements OnInit {
 
     validForm() {
         if ($j("#signatureBookActions option:selected")[0].value != "") {
-            unlockDocument(this.resId);
-
-            if (this.signatureBook.resList.length == 0) {
-                this.http.get(this.coreUrl + 'rest/' + this.basketId + '/signatureBook/resList')
+            if (this.signatureBook['listinstance']['requested_signature'] == true) {
+                this.http.get(this.coreUrl + 'rest/listinstance/' + this.signatureBook['listinstance']['listinstance_id'])
                     .map(res => res.json())
                     .subscribe((data) => {
-                        this.signatureBook.resList = data.resList;
+                        var r = true;
+                        if (data['signatory'] == true) {
+                            r = confirm("Vous n’avez signé aucun document. Êtes-vous sûr de vouloir continuer ?");
+                        }
 
-                        valid_action_form(
-                            'empty',
-                            'index.php?display=true&page=manage_action&module=core',
-                            this.signatureBook.currentAction.id,
-                            this.resId,
-                            'res_letterbox',
-                            'null',
-                            'letterbox_coll',
-                            'page',
-                            false,
-                            [$j("#signatureBookActions option:selected")[0].value]
-                        );
+                        if (r) {
+                            this.sendActionForm();
+                        }
                     });
             } else {
-                valid_action_form(
-                    'empty',
-                    'index.php?display=true&page=manage_action&module=core',
-                    this.signatureBook.currentAction.id,
-                    this.resId,
-                    'res_letterbox',
-                    'null',
-                    'letterbox_coll',
-                    'page',
-                    false,
-                    [$j("#signatureBookActions option:selected")[0].value]
-                );
+                this.sendActionForm();
             }
         } else {
             alert("Aucune action choisie");
+        }
+    }
+
+    sendActionForm() {
+        unlockDocument(this.resId);
+
+        if (this.signatureBook.resList.length == 0) {
+            this.http.get(this.coreUrl + 'rest/' + this.basketId + '/signatureBook/resList')
+                .map(res => res.json())
+                .subscribe((data) => {
+                    this.signatureBook.resList = data.resList;
+
+                    valid_action_form(
+                        'empty',
+                        'index.php?display=true&page=manage_action&module=core',
+                        this.signatureBook.currentAction.id,
+                        this.resId,
+                        'res_letterbox',
+                        'null',
+                        'letterbox_coll',
+                        'page',
+                        false,
+                        [$j("#signatureBookActions option:selected")[0].value]
+                    );
+                });
+        } else {
+            valid_action_form(
+                'empty',
+                'index.php?display=true&page=manage_action&module=core',
+                this.signatureBook.currentAction.id,
+                this.resId,
+                'res_letterbox',
+                'null',
+                'letterbox_coll',
+                'page',
+                false,
+                [$j("#signatureBookActions option:selected")[0].value]
+            );
         }
     }
 }

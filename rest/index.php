@@ -155,6 +155,9 @@ $app->put('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::
 $app->delete('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::class . ':deleteCurrentUserEmailSignature');
 $app->post('/users/autocompleter', \Core\Controllers\UserController::class . ':getUsersForAutocompletion');
 
+//Listinstance
+$app->get('/listinstance/{id}', \Core\Controllers\ListinstanceController::class . ':getById');
+
 //Contacts
 $app->post('/contacts', \Core\Controllers\ContactController::class . ':create');
 

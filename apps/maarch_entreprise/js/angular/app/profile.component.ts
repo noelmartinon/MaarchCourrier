@@ -276,7 +276,7 @@ export class ProfileComponent implements OnInit {
                         }
                     });
                 });
-                this.resultInfo = "Redirection supprimé";
+                this.resultInfo = "Redirection supprimée";
                 $j('#resultInfo').removeClass().addClass('alert alert-success alert-dismissible');
                 $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
                     $j("#resultInfo").slideUp(500);

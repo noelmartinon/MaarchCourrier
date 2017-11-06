@@ -80,6 +80,7 @@ class VisaController
         $datas['signatures']    = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
         $datas['consigne']      = UserModel::getCurrentConsigneById(['resId' => $resId]);
         $datas['hasWorkflow']   = \VisaModel::hasVisaWorkflowByResId(['resId' => $resId]);
+        $datas['listinstance']  = ListinstanceModel::getCurrentStepByResId(['resId' => $resId]);
         $datas['canSign']       = $coreTools->test_service('sign_document', 'visa', false);
         $datas['lang']          = LangModel::getSignatureBookLang();
 

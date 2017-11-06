@@ -37,6 +37,28 @@ class ListinstanceModelAbstract
         return $aListinstance[0];
     }
 
+    public static function getCurrentStepByResId(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['resId']);
+        ValidatorModel::intVal($aArgs, ['resId']);
+        ValidatorModel::arrayType($aArgs, ['select']);
+
+        $aListinstance = DatabaseModel::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['listinstance'],
+            'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
+            'data'      => [$aArgs['resId'], 'VISA_CIRCUIT'],
+            'order_by'  => ['listinstance_id ASC'],
+            'limit'     => 1
+        ]);
+
+        if (empty($aListinstance[0])) {
+            return [];
+        }
+
+        return $aListinstance[0];
+    }
+
     public static function setSignatory(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['resId', 'signatory', 'userId']);

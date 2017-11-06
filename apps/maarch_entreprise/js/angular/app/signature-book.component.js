@@ -261,9 +261,7 @@ var SignatureBookComponent = (function () {
     SignatureBookComponent.prototype.displayAttachmentPanel = function () {
         this.showAttachmentPanel = !this.showAttachmentPanel;
         this.rightSelectedThumbnail = 0;
-        if (this.signatureBook.attachments[0]) {
-            this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
-        }
+        this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
     };
     SignatureBookComponent.prototype.refreshAttachments = function (mode) {
         var _this = this;
@@ -465,21 +463,40 @@ var SignatureBookComponent = (function () {
     SignatureBookComponent.prototype.validForm = function () {
         var _this = this;
         if ($j("#signatureBookActions option:selected")[0].value != "") {
-            unlockDocument(this.resId);
-            if (this.signatureBook.resList.length == 0) {
-                this.http.get(this.coreUrl + 'rest/' + this.basketId + '/signatureBook/resList')
+            if (this.signatureBook['listinstance']['requested_signature'] == true) {
+                this.http.get(this.coreUrl + 'rest/listinstance/' + this.signatureBook['listinstance']['listinstance_id'])
                     .map(function (res) { return res.json(); })
                     .subscribe(function (data) {
-                    _this.signatureBook.resList = data.resList;
-                    valid_action_form('empty', 'index.php?display=true&page=manage_action&module=core', _this.signatureBook.currentAction.id, _this.resId, 'res_letterbox', 'null', 'letterbox_coll', 'page', false, [$j("#signatureBookActions option:selected")[0].value]);
+                    var r = true;
+                    if (data['signatory'] == true) {
+                        r = confirm("Vous n’avez signé aucun document. Êtes-vous sûr de vouloir continuer ?");
+                    }
+                    if (r) {
+                        _this.sendActionForm();
+                    }
                 });
             }
             else {
-                valid_action_form('empty', 'index.php?display=true&page=manage_action&module=core', this.signatureBook.currentAction.id, this.resId, 'res_letterbox', 'null', 'letterbox_coll', 'page', false, [$j("#signatureBookActions option:selected")[0].value]);
+                this.sendActionForm();
             }
         }
         else {
             alert("Aucune action choisie");
+        }
+    };
+    SignatureBookComponent.prototype.sendActionForm = function () {
+        var _this = this;
+        unlockDocument(this.resId);
+        if (this.signatureBook.resList.length == 0) {
+            this.http.get(this.coreUrl + 'rest/' + this.basketId + '/signatureBook/resList')
+                .map(function (res) { return res.json(); })
+                .subscribe(function (data) {
+                _this.signatureBook.resList = data.resList;
+                valid_action_form('empty', 'index.php?display=true&page=manage_action&module=core', _this.signatureBook.currentAction.id, _this.resId, 'res_letterbox', 'null', 'letterbox_coll', 'page', false, [$j("#signatureBookActions option:selected")[0].value]);
+            });
+        }
+        else {
+            valid_action_form('empty', 'index.php?display=true&page=manage_action&module=core', this.signatureBook.currentAction.id, this.resId, 'res_letterbox', 'null', 'letterbox_coll', 'page', false, [$j("#signatureBookActions option:selected")[0].value]);
         }
     };
     return SignatureBookComponent;
