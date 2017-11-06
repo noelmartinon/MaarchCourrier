@@ -12,3 +12,4 @@ xdelete.sh
 core/Test/build/
 apps/maarch_entreprise/tmp/*
 /nbproject/private/
+apps/maarch_entreprise/js/angular/main.bundle.js
