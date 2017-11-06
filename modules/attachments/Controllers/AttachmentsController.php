@@ -415,6 +415,11 @@ class AttachmentsController
             'value' => $_SESSION['doc_id'],
             'type' => 'integer'
         ];
+        $transmissionDataPdf[] = [
+            'column' => 'in_signature_book',
+            'value' => 1,
+            'type' => 'bool'
+        ];
         
         return $transmissionDataPdf;
     }
