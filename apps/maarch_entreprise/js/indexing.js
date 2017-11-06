@@ -239,10 +239,7 @@ function checkRealDate(arg) {
 			var date1 = new Date();
 			date1.setFullYear(admissionDate.substr(6,4));
 			date1.setMonth(admissionDate.substr(3,2) - 1, admissionDate.substr(0,2));
-			//date1.setMonth(admissionDate.substr(3,2));
-			//date1.setDate(admissionDate.substr(0,2));
-			date1.setHours(0);
-			date1.setMinutes(0);
+			date1.setHours(0, 0, 0, 0);
 
 			var d1_admissionDate=date1.getTime();
         }
@@ -252,10 +249,7 @@ function checkRealDate(arg) {
 			var date2 = new Date();
 			date2.setFullYear(docDate.substr(6,4));
 			date2.setMonth(docDate.substr(3,2) - 1, docDate.substr(0,2));
-			//date2.setMonth(docDate.substr(3,2));
-			//date2.setDate(docDate.substr(0,2));
-			date2.setHours(0);
-			date2.setMinutes(0);
+			date2.setHours(0, 0, 0, 0);
 			var d2_docDate=date2.getTime();
         }
 
@@ -1276,7 +1270,7 @@ function changeCycle(path_manage_script)
 
 function getIframeContent(path_manage_script)
 {
-    if ($('choose_file_div') && document.getElementById("file_iframe").contentDocument) {
+    if ($j('#choose_file_div') && $j("#file_iframe").contentDocument) {
         var choose_file_div = $('choose_file_div');
         if (choose_file_div.style.display == 'none') {
             var iframe = document.getElementById("file_iframe");

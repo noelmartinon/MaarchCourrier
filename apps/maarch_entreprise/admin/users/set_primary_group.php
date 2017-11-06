@@ -1,7 +1,10 @@
 <?php
 
-if(isset($_REQUEST['usergroups']) && $_REQUEST['usergroups'] >= 0)
+if(isset($_REQUEST['usergroups']) && $_REQUEST['usergroups'] >= 0 && isset($_REQUEST['user_id']))
 {
+	$db = new Database();
+	$basketOwner = $_REQUEST['user_id'];
+	$stmt = $db->query("delete from user_baskets_secondary where user_id = ?",array($basketOwner));
 	$group_ind = explode('#', $_REQUEST['usergroups']);
 	$group_id =$group_ind[0];
 	for($i=0; $i < count($_SESSION['m_admin']['users']['groups']); $i++)

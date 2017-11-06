@@ -175,6 +175,7 @@
             <?merge .Content.RelatedObjectReference.References ?>
             <References>
                 <ArchiveUnitRefId><?merge .ArchiveUnitRefId ?></ArchiveUnitRefId>
+                <RepositoryArchiveUnitPID><?merge .RepositoryArchiveUnitPID ?></RepositoryArchiveUnitPID>
             </References>
         </RelatedObjectReference>
         <CreatedDate><?merge .Content.CreatedDate ?></CreatedDate>
