@@ -51,6 +51,29 @@ class ResController
         return $response->withJson(['resId' => $resId]);
     }
 
+    public function createExt(RequestInterface $request, ResponseInterface $response)
+    {
+        $data = $request->getParams();
+
+        $check = Validator::intVal()->notEmpty()->validate($data['resId']);
+        $check = $check && Validator::arrayType()->notEmpty()->validate($data['data']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $document = ResModel::getById(['resId' => $data['resId']]);
+        if (empty($document)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document with resId does not exist']);
+        }
+        $resId = StoreController::storeResource($data);
+
+        if (empty($resId) || !empty($resId['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => '[ResController create] ' . $resId['errors']]);
+        }
+
+        return $response->withJson(['resId' => $resId]);
+    }
+
     public function delete(RequestInterface $request, ResponseInterface $response, $aArgs)
     {
         if (isset($aArgs['id'])) {
