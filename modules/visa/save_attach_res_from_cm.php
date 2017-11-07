@@ -190,6 +190,14 @@ if (empty($docserver)) {
                     'type' => 'int',
                 )
             );
+            array_push(
+                $_SESSION['data'],
+                array(
+                    'column' => 'in_signature_book',
+                    'value' => 1,
+                    'type' => 'bool',
+                )
+            );
             $_SESSION['data'][] = [
                 'column' => 'dest_user',
                 'value' => $_SESSION['visa']['last_resId_signed']['dest_user'],
