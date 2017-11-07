@@ -6,7 +6,7 @@ function addVisaUser(users) {
             $j("#emptyVisa").hide();      
         }
         if ($j("#isAllAttachementSigned").val() == 'false') {
-            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" checked="true"></sub>'
+            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox"></sub>'
         } else {
             signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" disabled="disabled"></sub>'
         }
@@ -43,7 +43,7 @@ function addVisaUser(users) {
             $j("#emptyVisa").hide();      
         }
         if ($j("#isAllAttachementSigned").val() == 'false') {
-            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" checked="true"></sub>'
+            signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox"></sub>'
         } else {
             signRequest = '<br/><sub><label for="signRequest_'+next_visa+'">Signature demandée</label> <input id="signRequest_'+next_visa+'" style="width:auto;" type="checkbox" disabled="disabled"></sub>'
         }
