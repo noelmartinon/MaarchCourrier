@@ -261,7 +261,9 @@ var SignatureBookComponent = (function () {
     SignatureBookComponent.prototype.displayAttachmentPanel = function () {
         this.showAttachmentPanel = !this.showAttachmentPanel;
         this.rightSelectedThumbnail = 0;
-        this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
+        if (this.signatureBook.attachments[0]) {
+            this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
+        }
     };
     SignatureBookComponent.prototype.refreshAttachments = function (mode) {
         var _this = this;

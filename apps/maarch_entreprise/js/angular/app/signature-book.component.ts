@@ -268,7 +268,9 @@ export class SignatureBookComponent implements OnInit {
     displayAttachmentPanel() {
         this.showAttachmentPanel = !this.showAttachmentPanel;
         this.rightSelectedThumbnail = 0;
-        this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
+        if (this.signatureBook.attachments[0]) {
+            this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
+        }
     }
 
     refreshAttachments(mode: string) {
