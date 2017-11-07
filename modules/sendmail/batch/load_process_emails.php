@@ -151,6 +151,7 @@ $GLOBALS['batchDirectory'] = $GLOBALS['maarchDirectory'] . 'modules'
 $notificationErrors = $xmlconfig->NOTIFICATION_ERROR;
 $GLOBALS['adminmail'] = (string)$notificationErrors->adminmail;
 $GLOBALS['subjectmail'] = (string)$notificationErrors->subjectmail;
+$GLOBALS['bodymail'] = (string)$notificationErrors->body;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['maarchDirectory']);
 

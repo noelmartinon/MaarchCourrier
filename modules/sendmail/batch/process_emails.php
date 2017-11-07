@@ -248,10 +248,16 @@ while ($state <> 'END') {
                 		Nom de la base de données : " . $_SESSION['config']['databasename'] . "<br>";
 
                 $adminMails = explode(',', $GLOBALS['adminmail']);
-	            foreach($adminMails as $recipient){
-                	if(!empty($recipient)){
-	            		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $recipient, $GLOBALS['subjectmail'], $html, $GLOBALS['charset']));
-	                }
+                if(!empty($adminMails)){
+		            foreach($adminMails as $recipient){
+	                	if(!empty($recipient)){
+		            		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $recipient, $GLOBALS['subjectmail'], $html, $GLOBALS['charset']));
+		                }
+	                }                	
+                }
+
+            	if(!empty($userInfo['mail'])){
+            		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $userInfo['mail'], $GLOBALS['subjectmail'], $GLOBALS['bodymail'].'<br><br>'.$return[0], $GLOBALS['charset']));
                 }
 
 			}
