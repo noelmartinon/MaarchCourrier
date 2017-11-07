@@ -39,6 +39,7 @@ require_once "core/class/docservers_controler.php";
 require_once 'modules/attachments/attachments_tables.php';
 require_once "core/class/class_history.php";
 require_once 'modules/attachments/class/attachments_controler.php';
+require_once 'modules/attachments/Models/AttachmentsModel.php';
 
 
 $core               = new core_tools();
@@ -428,6 +429,21 @@ if (isset($_POST['add']) && $_POST['add']) {
                                 'type' => "string",
                             )
                         );
+
+                        $attachmentTypesList = \Attachments\Models\AttachmentsModel::getAttachmentsTypesByXML();
+                        foreach ($attachmentTypesList as $keyAttachment => $valueAttachment) {
+                            if ($keyAttachment == $attachment_types && $valueAttachment['sign']) {
+                                array_push(
+                                    $_SESSION['data'],
+                                    array(
+                                        'column' => "in_signature_book",
+                                        'value' => 1,
+                                        'type' => "bool",
+                                    )
+                                );
+                            }
+                        }
+
                         array_push(
                             $_SESSION['data'],
                             array(
@@ -918,6 +934,19 @@ if (isset($_POST['add']) && $_POST['add']) {
                         'type' => "string",
                     )
                 );
+                $attachmentTypesList = \Attachments\Models\AttachmentsModel::getAttachmentsTypesByXML();
+                foreach ($attachmentTypesList as $keyAttachment => $valueAttachment) {
+                    if ($keyAttachment == $previous_attachment->attachment_type && $valueAttachment['sign']) {
+                        array_push(
+                            $_SESSION['data'],
+                            array(
+                                'column' => "in_signature_book",
+                                'value' => 1,
+                                'type' => "bool",
+                            )
+                        );
+                    }
+                }
                 array_push(
                     $_SESSION['data'],
                     array(
