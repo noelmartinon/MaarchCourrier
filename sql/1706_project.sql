@@ -60,3 +60,5 @@ DO $$ BEGIN
     ALTER TABLE users ADD UNIQUE (id);
   END IF;
 END$$;
+
+UPDATE parameters SET param_value_int = '1711', param_value_string = '17.11.0' WHERE id = 'database_version';
