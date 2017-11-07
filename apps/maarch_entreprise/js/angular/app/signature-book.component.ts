@@ -478,7 +478,7 @@ export class SignatureBookComponent implements OnInit {
                     .map(res => res.json())
                     .subscribe((data) => {
                         var r = true;
-                        if (data['signatory'] == true) {
+                        if (data['signatory'] == false) {
                             r = confirm("Vous n’avez signé aucun document. Êtes-vous sûr de vouloir continuer ?");
                         }
 

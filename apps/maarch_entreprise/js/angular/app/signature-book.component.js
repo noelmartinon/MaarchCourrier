@@ -470,7 +470,7 @@ var SignatureBookComponent = (function () {
                     .map(function (res) { return res.json(); })
                     .subscribe(function (data) {
                     var r = true;
-                    if (data['signatory'] == true) {
+                    if (data['signatory'] == false) {
                         r = confirm("Vous n’avez signé aucun document. Êtes-vous sûr de vouloir continuer ?");
                     }
                     if (r) {
