@@ -130,7 +130,7 @@ if (! empty($_SESSION['error'])) {
                 $stmtPdf = $db->query(
                     "SELECT docserver_id, path, filename, format, title
                      FROM res_view_attachments
-                     WHERE filename=? AND status = 'TRA'", array(substr($line->filename, 0, strrpos($line->filename, ".")).'.pdf')
+                     WHERE filename=? AND (status = 'TRA' or status = 'A_TRA')", array(substr($line->filename, 0, strrpos($line->filename, ".")).'.pdf')
                 );
                 $linePdf = $stmtPdf->fetchObject();
                 if(!empty($linePdf)){

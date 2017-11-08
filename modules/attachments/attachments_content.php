@@ -2075,7 +2075,7 @@ if(empty($_REQUEST['id'])){
 $content .= '<iframe src="'.$srcAttachment.'" name="viewframevalid_attachment" id="viewframevalid_attachment" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;display:none" onmouseover="this.focus()"></iframe>';
 
 // DOCUMENT PRINCIPAL //
-$content .= '<iframe src="index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='. functions::xssafe($_SESSION['doc_id']).'" name="viewframevalid_main" id="viewframevalid_main" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;display:none" onmouseover="this.focus()"></iframe>';
+$content .= '<iframe src="index.php?display=true&editingMode=true&dir=indexing_searching&page=view_resource_controler&id='. functions::xssafe($_SESSION['doc_id']).'" name="viewframevalid_main" id="viewframevalid_main" scrolling="auto" frameborder="0" style="width:100% !important;height:90vh;display:none" onmouseover="this.focus()"></iframe>';
     
 $content .= '</div>';
 
