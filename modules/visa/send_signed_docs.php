@@ -28,7 +28,7 @@ $visa = new visa();
 
 if ($visa->currentUserSignRequired($_SESSION['doc_id']) == 'true') {
     $confirm = true;
-    $label_action .=" (".NO_USER_SIGNED_DOC.")";
+    $label_action .=" ("._NO_USER_SIGNED_DOC.")";
 } else {
     $confirm = false;
 }
