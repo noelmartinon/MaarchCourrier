@@ -39,7 +39,7 @@ if (!defined("_VISA_ANSWERS_DESC"))
 if (!defined("_NO_VISA"))
     define("_NO_VISA", "No designed person on visa");
 if (!defined("_NO_RESPONSE_PROJECT_VISA"))
-    define("_NO_RESPONSE_PROJECT_VISA", "Please, create one attachment at least and edit it.");
+    define("_NO_RESPONSE_PROJECT_VISA", "Please, integrate at least one attachment to signature book");
 if (!defined("_NO_CONVERTED_PDF_VISA"))
     define("_NO_CONVERTED_PDF_VISA", "Please edit your attachment(s)");
 if (!defined("_PLEASE_CONVERT_PDF_VISA"))

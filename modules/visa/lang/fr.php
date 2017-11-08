@@ -40,7 +40,7 @@ if (!defined("_VISA_ANSWERS_DESC"))
 if (!defined("_NO_VISA"))
     define("_NO_VISA", "Aucune personne désignée en visa");
 if (!defined("_NO_RESPONSE_PROJECT_VISA"))
-    define("_NO_RESPONSE_PROJECT_VISA", "Veuillez au moins créer une pièce jointe et l'éditer");
+    define("_NO_RESPONSE_PROJECT_VISA", "Veuillez intégrer au moins une pièce jointe au parapheur.");
 if (!defined("_NO_CONVERTED_PDF_VISA"))
     define("_NO_CONVERTED_PDF_VISA", "Veuillez éditer votre/vos pièce(s) jointe(s)");
 if (!defined("_PLEASE_CONVERT_PDF_VISA"))
@@ -211,5 +211,4 @@ if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO'))
 
 if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO2'))
     define('_IS_ALL_ATTACHMENT_SIGNED_INFO2', "Vous ne pourrez pas demander de signature aux utilsateurs, toutes les pièces jointes présentes dans le parapheur ont été signées.");
-
 
