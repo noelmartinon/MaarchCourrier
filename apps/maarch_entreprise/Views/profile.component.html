@@ -155,7 +155,7 @@
                     <li role="presentation" class="active"><a href="#manageBaskets" aria-controls="manageBaskets" role="tab" data-toggle="tab">Gérer mes corbeilles</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="manageBaskets">
+                    <div role="tabpanel" class="tab-pane active" id="manageBaskets" style="max-height: calc(100vh - 200px);overflow-y: auto;">
                         <ul class="list-group" *ngFor="let regroupedBasket of user.regroupedBaskets; let i = index">
                             <h4 *ngIf="regroupedBasket.baskets[0]">{{regroupedBasket.groupDesc}}</h4>
                             <li class="list-group-item" *ngFor="let basket of regroupedBasket.baskets; let y = index">
