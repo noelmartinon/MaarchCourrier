@@ -20,7 +20,7 @@
  */
 
 
-if (!defined("_MEP_VERSION")) define("_MEP_VERSION", "Maarch v17.06");
+if (!defined("_MEP_VERSION")) define("_MEP_VERSION", "Maarch v17.11");
 
 //if (!defined("_ID_TO_DISPAY")) define("_ID_TO_DISPAY", "res_id"); // value res_id || chrono_number
 if (!defined("_ID_TO_DISPLAY")) define("_ID_TO_DISPLAY", "res_id"); // value res_id || chrono_number
