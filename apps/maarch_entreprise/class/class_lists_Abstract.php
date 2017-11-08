@@ -1996,7 +1996,7 @@ abstract class lists_Abstract extends Database
                     
                     // echo '<- '.$output[1][$i].'<br><br>';
 
-                    if (empty($parameters) || empty($parameters['noModification']) || ($output[1][$i] != 'func_modify' && $output[1][$i] != 'func_delete' && $output[1][$i] != 'func_final_version')) {
+                    if (empty($parameters) || empty($parameters['noModification']) || ($output[1][$i] != 'func_modify' && $output[1][$i] != 'func_delete')) {
                         $remplacement = $this->_tmplt_loadVarSys($output[1][$i], $resultArray[$theLine], $listKey, $lineIsDisabled);
                     } else {
                         $remplacement = '';
