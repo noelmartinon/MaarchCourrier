@@ -2160,6 +2160,21 @@ abstract class contacts_v2_Abstract extends Database
 
         $func = new functions();
         $business = new business_app_tools();
+
+        $db             = new Database();
+        $stmt           = $db->query("SELECT contact_target FROM contact_types", array());
+        $hasCorporate   = false;
+        $hasNoCorporate = false;
+
+        while($contactType = $stmt->fetchObject()){
+            if(in_array($contactType->contact_target, ['both', 'corporate']) || empty($contactType->contact_target)){
+                $hasCorporate = true;
+            }
+            if(in_array($contactType->contact_target, ['both', 'no_corporate']) || empty($contactType->contact_target)){
+                $hasNoCorporate = true;
+            }
+        }
+
         ?>
         <form class="forms">
             <table width="65%">
@@ -2178,8 +2193,12 @@ abstract class contacts_v2_Abstract extends Database
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td class="indexing_field" align="left">
-                            <input disabled type="radio"  class="check" name="is_corporate"  value="Y" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'Y'){?> checked="checked"<?php } ?> /><?php echo _IS_CORPORATE_PERSON;?>
-                            <input disabled type="radio"  class="check" name="is_corporate" value="N" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N'){?> checked="checked"<?php } ?> /><?php echo _INDIVIDUAL;?>
+                        <span <?php if(!$hasCorporate){?> style="display:none"<?php } ?>>
+                            <input disabled type="radio"  class="check" name="is_corporate"  value="Y" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'Y'){?> checked="checked"<?php } ?>/><?php echo _IS_CORPORATE_PERSON;?>
+                        </span>
+                        <span <?php if(!$hasNoCorporate){?> style="display:none"<?php } ?>>
+                            <input disabled type="radio"  class="check" name="is_corporate" value="N" <?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N'){?> checked="checked"<?php } ?>/><?php echo _INDIVIDUAL;?>
+                        </span>
                         </td>
                         <td>&nbsp;&nbsp;&nbsp;</td>
                     </tr>
