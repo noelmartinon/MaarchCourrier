@@ -50,6 +50,7 @@ while ($state <> 'END') {
         $stmt = $db->query("select * from baskets WHERE flag_notif = 'Y'"
         );
 
+
         while ($line = $stmt->fetchObject()) {
 	    $logger->write("BASKET: " . $line->basket_id . " in progess ...", 'INFO');
             $exceptUsers[$line->basket_id] = array();
@@ -62,7 +63,7 @@ while ($state <> 'END') {
             $u=1;
             while ($line2 = $stmt2->fetchObject()) {
                 //echo "_".$line2->group_id."\n";
-                $stmt3 = $db->query("select usergroup_content.user_id from usergroup_content,users WHERE group_id = '".$line2->group_id."' and users.status='OK' and usergroup_content.user_id=users.user_id");
+                $stmt3 = $db->query("select usergroup_content.user_id,users.status from usergroup_content,users WHERE group_id = '".$line2->group_id."' and usergroup_content.user_id=users.user_id");
                 $baskets_notif = array();
 		          $logger->write("GROUP: " . $line2->group_id . " ... " . $stmt3->rowCount() . " user(s) to notify", 'INFO');
                 $z=1;
@@ -73,7 +74,16 @@ while ($state <> 'END') {
                         );
                     $whereClause = $entities->process_where_clause(
                             $whereClause, $line3->user_id
-                        );                    
+                        );
+                        $user_id = $line3->user_id;    
+                        if($line3->status == 'ABS'){
+                            $query= "SELECT * FROM user_abs WHERE user_abs = ?";
+                            $db2 = new Database();
+                            $testStmt = $db2->query($query,array($line3->user_id));
+                            $abs_user = $testStmt->fetchObject();
+                            $user_id = $abs_user->new_user;
+                        }
+                        
                     $stmt4 = $db->query("select * from res_view_letterbox ".$whereClause);
         		    $logger->write($stmt4->rowCount() . " document(s) to process for ".$line3->user_id, 'INFO');
         		    $i=1;
@@ -85,7 +95,7 @@ while ($state <> 'END') {
                             # code...
                         }else{
                             $info = "Notification [".$line->basket_id."] pour ".$line3->user_id;
-                            $stmt5 = $db->query("INSERT INTO notif_event_stack(table_name,notification_sid,record_id,user_id,event_info,event_date) VALUES('res_letterbox','500','".$line4->res_id."','".$line3->user_id."','".$info."',CURRENT_DATE)");                       
+                            $stmt5 = $db->query("INSERT INTO notif_event_stack(table_name,notification_sid,record_id,user_id,event_info,event_date) VALUES('res_letterbox','500','".$line4->res_id."','".$user_id."','".$info."',CURRENT_DATE)");                       
                             preg_match_all( '#\[(\w+)]#', $info, $result );
                             $basket_id = $result[1];
                             if(!in_array($basket_id[0], $baskets_notif)){
@@ -117,6 +127,7 @@ while ($state <> 'END') {
     /**********************************************************************/
     case 'SCAN_EVENT' :
         $i = 1;
+        
         foreach($events as $event) {
             $logger->write("scanning EVENT : " .$i."/".$totalEventsToProcess." (BASKET => ".$basket_id[0].", DOCUMENT => ".$res_id.", RECIPIENT => ".$user_id.")", 'INFO');
             preg_match_all( '#\[(\w+)]#', $event->event_info, $result );
@@ -134,6 +145,7 @@ while ($state <> 'END') {
         
                     //$logger->write('Document => ' . $res_id, 'INFO');
                     $user_id = $event->user_id;
+                    
                     //$logger->write('Recipient => ' . $user_id, 'INFO');
 
 
@@ -199,6 +211,7 @@ while ($state <> 'END') {
             // Prepare e-mail for stack
             $sender = (string)$mailerParams->mailfrom;
             $recipient_mail = $tmpNotif['recipient']->mail;
+
             //$subject = $notification->description;
             $html = $func->protect_string_db($html, '', 'no');
             $html = str_replace('&amp;', '&', $html);
@@ -206,7 +219,7 @@ while ($state <> 'END') {
             
             // Attachments
             $attachments = array();
-            if($tmpNotif['attach']) {   
+            if($tmpNotif['attach']) {
                 $logger->write('Adding attachments', 'INFO');
                 foreach($tmpNotif['events'] as $event) {
                     // Check if event is related to document in collection
@@ -229,8 +242,7 @@ while ($state <> 'END') {
             }
             if(in_array($user_id, $exceptUsers[$basketId])){
                 $logger->write('Notification disabled for '.$user_id, 'WARNING');
-            }else{
-
+            }else{                
                 $logger->write('... adding e-mail to email stack', 'INFO');
                 if ($_SESSION['config']['databasetype'] == 'ORACLE') {
                     $query = "DECLARE
