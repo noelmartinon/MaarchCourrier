@@ -914,6 +914,8 @@ if (!defined("_CONTACT_MODIFIED")) define("_CONTACT_MODIFIED", "Modified contact
 if (!defined("_CONTACT_DELETED")) define("_CONTACT_DELETED", "Deleted contact");
 if (!defined("_MODIFY_CONTACT")) define("_MODIFY_CONTACT", "Modify a contact");
 if (!defined("_IS_CORPORATE_PERSON")) define("_IS_CORPORATE_PERSON", "Corporate body");
+if (!defined("_NO_ADDRESS_GIVEN")) define("_NO_ADDRESS_GIVEN", "No address given");
+if (!defined("_NO_RESULTS_AUTOCOMPLETE_CONTACT_INFO")) define("_NO_RESULTS_AUTOCOMPLETE_CONTACT_INFO", "If you want search on firstname AND lastname, you must write your search in this order.");
 if (!defined("_INDIVIDUAL")) define("_INDIVIDUAL", "Private individual");
 if (!defined("_CONTACT_TARGET")) define("_CONTACT_TARGET", "For what contact is that possible to use this type?");
 if (!defined("_CONTACT_TARGET_LIST")) define("_CONTACT_TARGET_LIST", "Target of the contact type");
