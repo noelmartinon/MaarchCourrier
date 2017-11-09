@@ -52,7 +52,9 @@ WITH (OIDS=FALSE);
 
 UPDATE res_attachments SET in_signature_book = TRUE;
 UPDATE res_version_attachments SET in_signature_book = TRUE;
-UPDATE listinstance SET signatory = TRUE WHERE item_mode = 'sign';
+
+UPDATE listinstance SET signatory = TRUE, requested_signature = TRUE WHERE item_mode = 'sign' and process_date is not null;
+UPDATE listinstance SET signatory = FALSE, requested_signature = TRUE WHERE item_mode = 'sign' and process_date is null;
 
 DO $$ BEGIN
   IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'users') AND attname = 'id') = 0 THEN
