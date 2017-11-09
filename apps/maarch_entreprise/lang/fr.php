@@ -918,6 +918,7 @@ if (!defined("_UPDATE_CONTACT")) define("_UPDATE_CONTACT", "Modification des con
 if (!defined("_PHONE")) define("_PHONE", "Téléphone");
 if (!defined("_ADDRESS")) define("_ADDRESS", "Adresse");
 if (!defined("_NO_ADDRESS_GIVEN")) define("_NO_ADDRESS_GIVEN", "Aucune information sur l'adresse");
+if (!defined("_NO_RESULTS_AUTOCOMPLETE_CONTACT_INFO")) define("_NO_RESULTS_AUTOCOMPLETE_CONTACT_INFO", "Si vous voulez faire une recherche sur le prénom ET le nom, assurez-vous de l'avoir écrit dans cet ordre.");
 if (!defined("_STREET")) define("_STREET", "Voie");
 if (!defined("_COMPLEMENT")) define("_COMPLEMENT", "Complément");
 if (!defined("_TOWN")) define("_TOWN", "Ville");
