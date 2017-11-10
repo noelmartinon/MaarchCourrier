@@ -741,7 +741,7 @@ abstract class entity_Abstract extends functions
     {
         $entities = array();
         $db = new Database();
-        $stmt = $db->query("select e.entity_id,e.entity_label,e.short_label,e.entity_full_name ue.primary_entity, ue.user_role from ".ENT_ENTITIES." e, ".ENT_USERS_ENTITIES." ue where ue.entity_id = e.entity_id and ue.user_id = ? order by e.entity_label",array(trim($user_id)));
+        $stmt = $db->query("select e.entity_id,e.entity_label,e.short_label,e.entity_full_name, ue.primary_entity, ue.user_role from ".ENT_ENTITIES." e, ".ENT_USERS_ENTITIES." ue where ue.entity_id = e.entity_id and ue.user_id = ? order by e.entity_label",array(trim($user_id)));
         while($res = $stmt->fetchObject())
         {
             array_push($entities, array('ID' => $res->entity_id, 'LABEL' => $res->entity_label, 'SHORT_LABEL' => $res->short_label,'ENTITY_FULL_NAME' => $res->entity_full_name, 'PRIMARY' => $res->entity_label, 'ROLE' => $res->user_role ));
