@@ -3499,7 +3499,7 @@ abstract class lists_Abstract extends Database
         if (!isset($parameters['searchBoxAutoCompletionMinChars'])){ $parameters['searchBoxAutoCompletionMinChars']= 1; }
         if (!isset($parameters['searchBoxAutoCompletionUpdate'])){ $parameters['searchBoxAutoCompletionUpdate']= false; }
         if (!isset($parameters['viewDocumentLink'])){ $parameters['viewDocumentLink'] = $_SESSION['config']['businessappurl']
-            .'index.php?display=true&dir=indexing_searching&page=view_resource_controler';}
+            .'index.php?display=true&editingMode=true&dir=indexing_searching&page=view_resource_controler';}
         if (!isset($parameters['viewDetailsLink'])){ $parameters['viewDetailsLink'] = $_SESSION['config']['businessappurl']
             .'index.php?page=details&dir=indexing_searching';}
         if (!isset($parameters['bool_changeLinesToShow'])){ $parameters['bool_changeLinesToShow'] =  true;}

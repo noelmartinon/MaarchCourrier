@@ -546,7 +546,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                 </p>
                 <p id="viewdoc">
                     <?php if($info_mail->filename){?>
-                        <a href="index.php?display=true&dir=indexing_searching&page=view_resource_controler&id=<?php functions::xecho($s_id);?>" 
+                        <a href="index.php?display=true&editingMode=true&dir=indexing_searching&page=view_resource_controler&id=<?php functions::xecho($s_id);?>" 
                             target="_blank"><i class="fa fa-download fa-2x" title="<?php echo _VIEW_DOC; ?>"></i></a>
                     <?php } ?>
                     &nbsp;&nbsp;&nbsp;

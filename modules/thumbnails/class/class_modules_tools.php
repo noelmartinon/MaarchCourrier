@@ -175,20 +175,29 @@ class thumbnails
 
 		$catId = $stmt->fetchObject()->category_id;
 
-		$query = "select count(*) as total from res_view_attachments"
-			   . " where res_id_master = ? AND status NOT IN ('DEL','OBS','TMP') AND attachment_type = ?";
+		$query = "SELECT res_id, filename FROM res_view_attachments WHERE status <> 'DEL' and status <> 'OBS' "
+                    . "and res_id_master = ? and attachment_type = 'outgoing_mail' order by res_id desc";
 			   
-		$stmt = $db->query($query, array($res_id,'outgoing_mail'));
+		$stmt = $db->query($query, array($res_id));
 
-		$isOutgoingPj = $stmt->fetchObject()->total;
+		$isOutgoingPj = $stmt->fetchObject();
 
-		if($catId == 'outgoing' && $isOutgoingPj > 0){
-			$stmt = $db->query("SELECT tnl_path, tnl_filename FROM res_attachments WHERE res_id_master = ? AND status NOT IN ('DEL','OBS','TMP') AND type_id = '1'", array($res_id));
+		if($catId == 'outgoing' && !empty($isOutgoingPj)){
+			// $stmt = $db->query("SELECT tnl_path, tnl_filename FROM res_attachments WHERE res_id_master = ? AND status NOT IN ('DEL','OBS','TMP') AND type_id = '1'", array($res_id));
+				$stmtPdf = $db->query(
+                    "SELECT tnl_path, tnl_filename
+                     FROM res_attachments
+                     WHERE filename=? AND (status = 'TRA' or status = 'A_TRA')", array(substr($isOutgoingPj->filename, 0, strrpos($isOutgoingPj->filename, ".")).'.pdf')
+                );
+
+                $linePdf = $stmtPdf->fetchObject();
+                if(!empty($linePdf)){
+                    $data = $linePdf;
+                }
 		}else{
 			$stmt = $db->query("SELECT tnl_path, tnl_filename FROM $table WHERE res_id = ?", array($res_id));
+			$data = $stmt->fetchObject();
 		}
-
-		$data = $stmt->fetchObject();
 		
 		$tnlPath = str_replace("#", DIRECTORY_SEPARATOR , $data->tnl_path);
 		$tnlFilename = $data->tnl_filename;
