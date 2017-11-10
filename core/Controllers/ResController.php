@@ -869,7 +869,7 @@ class ResController
         foreach ($resList as $doc) {
             $infos = ResModel::getById(
             [
-                'resId' => $doc['res_id']
+                'resId' => $doc['res_id'] 
             ]);
 
             $result_infos = array();
