@@ -653,21 +653,19 @@ abstract class contacts_v2_Abstract extends Database
                     if(!checkContactType('no_corporate','<?php echo ($can_add_contact);?>'))
                     {
                         $j('#span_no_corporate').css('display','none');
-                    } else {
-                        setContactType('no_corporate','<?php echo ($can_add_contact);?>');
-                        $j('#corpo_no').prop('checked',true);
-                        $j('#corpo_no').click();
-                    }
-                    if(!checkContactType('corporate','<?php echo ($can_add_contact);?>'))
-                    {
-                        $j('#span_corporate').css('display','none');
-                    } else {
                         setContactType('corporate','<?php echo ($can_add_contact);?>');
                         $j('#corpo_yes').prop('checked',true);
                         $j('#corpo_yes').click();
                     }
+                    if(!checkContactType('corporate','<?php echo ($can_add_contact);?>'))
+                    {
+                        $j('#span_corporate').css('display','none');
+                        setContactType('no_corporate','<?php echo ($can_add_contact);?>');
+                        $j('#corpo_no').prop('checked',true);
+                        $j('#corpo_no').click();
 
-                    
+                    }
+
                 </script>
 
             <?php
