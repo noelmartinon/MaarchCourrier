@@ -71,6 +71,25 @@ class ResModelAbstract
         return $aReturn;
     }
 
+    public static function getDocsByClause(array $aArgs = []){
+		ValidatorModel::notEmpty($aArgs, ['clause']);
+
+        if (!empty($aArgs['table'])) {
+            $table = $aArgs['table'];
+        } else {
+            $table = 'res_view_letterbox';
+        }
+
+        $aReturn = DatabaseModel::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => [$table],
+            'where'     => [$aArgs['clause']],
+            'order_by'  => ['res_id']
+        ]);
+
+        return $aReturn;
+    }
+
     /**
      * Retrieve info of resId by path
      * @param  $aArgs array

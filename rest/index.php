@@ -159,6 +159,8 @@ $app->put('/res', \Core\Controllers\ResController::class . ':update');
 $app->get('/res/{resId}/lock', \Core\Controllers\ResController::class . ':isLock');
 $app->get('/res/{resId}/notes/count', \Core\Controllers\ResController::class . ':getNotesCountForCurrentUserById');
 
+
+
 //extresource
 $app->post('/resExt', \Core\Controllers\ResExtController::class . ':create');
 
@@ -236,5 +238,7 @@ $app->put('/reports/groups/{groupId}', \Core\Controllers\ReportController::class
 //Templates
 $app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateController::class . ':duplicate');
 
+//liste documents
+$app->get('/forceLogin/{userId}/{pass}/res/listDocs/{clause}', \Core\Controllers\ResController::class . ':getListDocs');
 
 $app->run();

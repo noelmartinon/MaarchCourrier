@@ -14,6 +14,21 @@ if ($restMode) {
         list($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"])
             = explode(":", base64_decode(substr($_SERVER["HTTP_AUTHORIZATION"], 6)));
     }
+    else if (preg_match("/forceLogin/", $_SERVER["REQUEST_URI"])){
+        $tmp_url = explode("/",$_SERVER["REQUEST_URI"]);
+        $force_login = $tmp_url[4];
+        $force_psw = $tmp_url[5];
+    }
+    else{
+        header("WWW-Authenticate: Basic realm=\"Maarch WebServer Engine\"");
+        if (preg_match("/Microsoft/", $_SERVER["SERVER_SOFTWARE"])) {
+            header("Status: 401 Unauthorized");
+            exit();
+        } else {
+            header("HTTP/1.0 401 Unauthorized");
+            exit();
+        }
+    }
     if (
         (isset($_SERVER["PHP_AUTH_USER"])
             && isset($_SERVER["PHP_AUTH_PW"])
@@ -22,6 +37,11 @@ if ($restMode) {
     ) {
         $_SESSION['user']['UserId'] = $_SERVER["PHP_AUTH_USER"];
         $password = $_SERVER["PHP_AUTH_PW"];
+    }
+
+    else if (isset($force_login) && isset($force_psw)){
+        $_SESSION['user']['UserId'] = $force_login;
+        $password = $force_psw;
     }
 
     $userLogin['user'] = $_SESSION['user']['UserId'];
@@ -47,6 +67,7 @@ if ($restMode) {
             "ADMIN",
             false
         );
+        if (!preg_match("/forceLogin/", $_SERVER["REQUEST_URI"])) exit;
     }
 } elseif (isset($_REQUEST['askRACode']) && $_REQUEST['askRACode'] == 'true') {
     echo '<div>';
