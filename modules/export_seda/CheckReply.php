@@ -39,7 +39,7 @@ Class CheckReply {
         $this->token = (string) $this->xml->CONFIG->token;
         $tokenEncode = urlencode($this->token);
         $this->token = "LAABS-AUTH=". $tokenEncode;
-        $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/message/reference/";
+        $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/message/reference";
         $this->db = new RequestSeda();
 
     }
@@ -126,9 +126,10 @@ Class CheckReply {
             'content-type:application/json'
         ];
 
+        $url = str_replace('.', '%2E', $this->urlService .'?reference=' .urlencode($reference));
         try {
             $curl = curl_init();
-            curl_setopt($curl, CURLOPT_URL, $this->urlService . $reference);
+            curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
             curl_setopt($curl, CURLOPT_COOKIE, $this->token);
