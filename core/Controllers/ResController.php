@@ -859,6 +859,7 @@ class ResController
         $clause = implode(" AND ", $tab_where);
         if (empty($clause)) $clause = ' 1=1 ';
         $result = array();
+        
         $resList = ResModel::getDocsByClause(
             [
                 'select'  => ['res_id'],

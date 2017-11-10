@@ -68,6 +68,7 @@ if ($restMode) {
             false
         );
         if (!preg_match("/forceLogin/", $_SERVER["REQUEST_URI"])) exit;
+        
     }
 } elseif (isset($_REQUEST['askRACode']) && $_REQUEST['askRACode'] == 'true') {
     echo '<div>';

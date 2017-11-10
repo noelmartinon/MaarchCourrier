@@ -241,4 +241,5 @@ $app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateControlle
 //liste documents
 $app->get('/forceLogin/{userId}/{pass}/res/listDocs/{clause}', \Core\Controllers\ResController::class . ':getListDocs');
 
+
 $app->run();
