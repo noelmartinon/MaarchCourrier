@@ -25,7 +25,9 @@ class CoreConfigModel
         }
 
         $explodeUrl = explode('/', $_SERVER['SCRIPT_NAME']);
-        if (strpos($_SERVER['SCRIPT_NAME'], 'apps/maarch_entreprise') === false) {
+        if (strpos($_SERVER['SCRIPT_NAME'], 'ws_server') !== false) {
+            $path = $explodeUrl[count($explodeUrl) - 2];
+        } elseif (strpos($_SERVER['SCRIPT_NAME'], 'apps/maarch_entreprise') === false) {
             $path = $explodeUrl[count($explodeUrl) - 3];
         } else {
             $path = $explodeUrl[count($explodeUrl) - 4];
