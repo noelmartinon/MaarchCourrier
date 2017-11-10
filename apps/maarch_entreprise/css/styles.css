@@ -3603,3 +3603,8 @@ width:auto;
 .attachmentIcon .iconDoc a i {
     color:#16ADEB;
 }
+
+.typeahead__list {
+    width: auto !important;
+    min-width: 150px !important;
+}
