@@ -648,8 +648,8 @@ abstract class contacts_v2_Abstract extends Database
                     </p>
                 </form>
 
-                <!--<script type="text/javascript">setContactType("<?php if(isset($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON']) && $_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N' ){ echo 'no_corporate'; } else { echo 'corporate'; }?>", '<?php echo ($can_add_contact);?>');</script>-->
                 <script type="text/javascript">
+                    setContactType("<?php if($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == 'N' ){ echo 'no_corporate'; } else { echo 'corporate'; }?>", '<?php echo ($can_add_contact);?>');
                     if(!checkContactType('no_corporate','<?php echo ($can_add_contact);?>'))
                     {
                         $j('#span_no_corporate').css('display','none');
