@@ -13,11 +13,10 @@ require_once 'modules/visa/class/class_modules_tools.php';
 $visa = new visa();
 
 if ($visa->currentUserSignRequired($_SESSION['doc_id']) == 'true') {
-    $confirm = true;
     $label_action .=" ("._NO_USER_SIGNED_DOC.")";
-} else {
-    $confirm = false;
 }
+
+$confirm = true;
 $etapes = ['empty_error'];
 
 function manage_empty_error($arr_id, $history, $id_action, $label_action, $status)

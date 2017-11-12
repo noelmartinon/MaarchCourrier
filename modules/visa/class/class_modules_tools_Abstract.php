@@ -589,13 +589,19 @@ abstract class visa_Abstract extends Database
                                 $disabled = '';
                                 $link_vis = 'arrow-right ';
                                 $del_vis = '<div class="delete_visa"></div>';
-                                if($info_userVis['user_id'] <> $_SESSION['user']['UserId']){
-                                    $info_vised = '<p style="color:red;">'._VISA_USER_COU_DESC.' '.$info_userVis['firstname'].' '.$info_userVis['lastname'].'</p>';
+	                            if($info_userVis['requested_signature'] && $info_userVis['user_id'] <> $_SESSION['user']['UserId']){
+	                                $info_vised = '<p style="color:red;">'._SIGN_USER_COU_DESC.' '.$info_userVis['firstname'].' '.$info_userVis['lastname'].'</p>';
 									$dropZone = '';
-								}else{
-                                    $info_vised = '<p style="font-weight:normal;">'._VISA_USER_COU.'</p>';
+	                            }else if($info_userVis['requested_signature'] && $info_userVis['user_id'] == $_SESSION['user']['UserId']){
+	                                $info_vised = '<p style="font-weight:normal;">'._SIGN_USER_COU.'</p>';
 									$dropZone = '';
-                                }
+	                            }else if(!$info_userVis['requested_signature'] && $info_userVis['user_id'] <> $_SESSION['user']['UserId']){
+	                                $info_vised = '<p style="color:red;">'._VISA_USER_COU_DESC.' '.$info_userVis['firstname'].' '.$info_userVis['lastname'].'</p>';
+									$dropZone = '';
+	                            }else {
+	                                $info_vised = '<p style="font-weight:normal;">'._VISA_USER_COU.'</p>';
+									$dropZone = '';
+	                            }
 								if($core->test_service('modify_visa_in_signatureBook', 'visa', false)){
 									$modif = 'true';
 									$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
@@ -717,12 +723,18 @@ abstract class visa_Abstract extends Database
                             $disabled = '';
                             $del_vis = '';
                             $link_vis = 'arrow-right ';
-                            if($info_userSign['user_id'] <> $_SESSION['user']['UserId']){
+                            if($info_userSign['requested_signature'] && $info_userSign['user_id'] <> $_SESSION['user']['UserId']){
 								$dropZone = '';
                                 $info_vised = '<p style="color:red;">'._SIGN_USER_COU_DESC.' '.$info_userSign['firstname'].' '.$info_userSign['lastname'].'</p>';
-                            }else{
+                            }else if($info_userSign['requested_signature'] && $info_userSign['user_id'] == $_SESSION['user']['UserId']){
 								$dropZone = '';
                                 $info_vised = '<p style="font-weight:normal;">'._SIGN_USER_COU.'</p>';
+                            }else if(!$info_userSign['requested_signature'] && $info_userSign['user_id'] <> $_SESSION['user']['UserId']){
+								$dropZone = '';
+                                $info_vised = '<p style="color:red;">'._VISA_USER_COU_DESC.' '.$info_userSign['firstname'].' '.$info_userSign['lastname'].'</p>';
+                            }else {
+								$dropZone = '';
+                                $info_vised = '<p style="font-weight:normal;">'._VISA_USER_COU.'</p>';
                             }
 							if($core->test_service('modify_visa_in_signatureBook', 'visa', false)){
 								$modif = 'true';
