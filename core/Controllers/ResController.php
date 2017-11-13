@@ -61,17 +61,20 @@ class ResController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $document = ResModel::getById(['resId' => $data['resId']]);
+        $document = ResModel::getById(['resId' => $data['resId'], 'select' => ['1']]);
         if (empty($document)) {
-            return $response->withStatus(404)->withJson(['errors' => 'Document with resId does not exist']);
+            return $response->withStatus(404)->withJson(['errors' => 'Document does not exist']);
         }
-        $resId = StoreController::storeResource($data);
-
-        if (empty($resId) || !empty($resId['errors'])) {
-            return $response->withStatus(500)->withJson(['errors' => '[ResController create] ' . $resId['errors']]);
+        $documentExt = ResModel::getExtById(['resId' => $data['resId'], 'select' => ['1']]);
+        if (!empty($documentExt)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document already exists in mlb_coll_ext']);
         }
 
-        return $response->withJson(['resId' => $resId]);
+        $formatedData = StoreController::prepareExtStorage(['resId' => $data['resId'], 'data' => $data['data']]);
+
+        ResModel::createExt($formatedData);
+
+        return $response->withJson(['resId' => $data['resId']]);
     }
 
     public function delete(RequestInterface $request, ResponseInterface $response, $aArgs)

@@ -79,7 +79,7 @@ class ResExtModelAbstract extends \Apps_Table_Service
      * @param  $calendarType sring => calendar or workingDay
      * @return integer $processLimitDate
      */
-    public function retrieveProcessLimitDate($aArgs)
+    public static function retrieveProcessLimitDate($aArgs)
     {
         static::checkRequired($aArgs, ['resId']);
         static::checkNumeric($aArgs, ['resId']);

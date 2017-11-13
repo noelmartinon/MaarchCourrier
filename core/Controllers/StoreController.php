@@ -16,9 +16,11 @@
 namespace Core\Controllers;
 
 use Attachments\Models\AttachmentsModel;
+use Core\Models\ChronoModel;
 use Core\Models\CoreConfigModel;
 use Core\Models\DocserverModel;
 use Core\Models\DocserverTypeModel;
+use Core\Models\ResExtModel;
 use Core\Models\ResModel;
 use Core\Models\UserModel;
 use Core\Models\ValidatorModel;
@@ -575,6 +577,75 @@ class StoreController
         foreach ($aArgs['data'] as $value) {
             $formatedData[$value['column']] = $value['value'];
         }
+
+        return $formatedData;
+    }
+
+    public static function prepareExtStorage(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['data', 'resId']);
+        ValidatorModel::arrayType($aArgs, ['data']);
+        ValidatorModel::intVal($aArgs, ['resId']);
+
+        $processLimitDateFound  = false;
+
+        foreach ($aArgs['data'] as $key => $value) {
+            $aArgs['data'][$key]['column'] = strtolower($value['column']);
+        }
+
+        foreach ($aArgs['data'] as $value) {
+            if ($value['column'] == 'process_limit_date') {
+                $processLimitDateFound = true;
+            }
+            if ($value['column'] == 'category_id') {
+                $categoryId = $value['value'];
+            }
+        }
+
+        if (!$processLimitDateFound) {
+            $processLimitDate = ResExtModel::retrieveProcessLimitDate(['resId' => $aArgs['resId']]);
+
+            $aArgs['data'][] = [
+                'column'    => 'process_limit_date',
+                'value'     => $processLimitDate,
+                'type'      => 'date'
+            ];
+        }
+
+        foreach ($aArgs['data'] as $key => $value) {
+            if (strtolower($value['type']) == 'integer' || strtolower($value['type']) == 'float') {
+                if ($value['value'] == '') {
+                    $aArgs['data'][$key]['value'] = '0';
+                }
+                $aArgs['data'][$key]['value'] = str_replace(',', '.', $value['value']);
+            }
+            if ($value['column'] == 'alt_identifier' && empty($value['value']) && !empty($categoryId)) {
+                $document = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['destination, type_id']]);
+                $aArgs['data'][$key]['value'] = ChronoModel::getChrono(['id' => $categoryId, 'entityId' => $document['destination'], 'typeId' => $document['type_id']]);
+            } elseif ($value['column'] == 'exp_contact_id' && !empty($value['value']) && !is_numeric($value['value'])) {
+                $mail = explode('<', str_replace('>', '', $value['value']));
+                $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_id']]);
+                if (!empty($contact[0]['contact_id'])) {
+                    $aArgs['data'][$key]['value'] = $contact[0]['contact_id'];
+                } else {
+                    $aArgs['data'][$key]['value'] = 0;
+                }
+            } elseif ($value['column'] == 'address_id' && !empty($value['value']) && !is_numeric($value['value'])) {
+                $mail = explode('<', str_replace('>', '', $value['value']));
+                $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['ca_id']]);
+                if (!empty($contact[0]['ca_id'])) {
+                    $aArgs['data'][$key]['value'] = $contact[0]['ca_id'];
+                } else {
+                    $aArgs['data'][$key]['value'] = 0;
+                }
+            }
+        }
+
+        $formatedData = [];
+        foreach ($aArgs['data'] as $value) {
+            $formatedData[$value['column']] = $value['value'];
+        }
+        $formatedData['res_id'] = $aArgs['resId'];
 
         return $formatedData;
     }

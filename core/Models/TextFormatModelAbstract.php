@@ -32,7 +32,7 @@ class TextFormatModelAbstract
         return utf8_encode($string);
     }
 
-    public static function format_date($date)
+    public static function formatDate($date)
     {
         $last_date = '';
 

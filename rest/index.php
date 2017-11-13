@@ -131,13 +131,11 @@ $app->put('/listinstance/{id}/requestedSignature', \Visa\Controllers\VisaControl
 
 //Res
 $app->post('/res', \Core\Controllers\ResController::class . ':create');
+$app->post('/resExt', \Core\Controllers\ResController::class . ':createExt');
 $app->put('/res', \Core\Controllers\ResController::class . ':update');
 $app->put('/res/{resId}/status', \Core\Controllers\ResController::class . ':updateStatus');
 $app->get('/res/{resId}/lock', \Core\Controllers\ResController::class . ':isLock');
 $app->get('/res/{resId}/notes/count', \Core\Controllers\ResController::class . ':getNotesCountForCurrentUserById');
-
-//extresource
-$app->post('/resExt', \Core\Controllers\ResExtController::class . ':create');
 
 //Users
 $app->get('/user/profile', \Core\Controllers\UserController::class . ':getCurrentUserInfos');
