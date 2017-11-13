@@ -126,7 +126,9 @@ Class CheckReply {
             'content-type:application/json'
         ];
 
-        $url = str_replace('.', '%2E', $this->urlService .'?reference=' .urlencode($reference));
+        $refEncode = str_replace('.', '%2E', urlencode($reference));
+        $url = $this->urlService .'?reference=' . $refEncode;
+
         try {
             $curl = curl_init();
             curl_setopt($curl, CURLOPT_URL, $url);
