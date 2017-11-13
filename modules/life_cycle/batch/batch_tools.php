@@ -20,18 +20,18 @@
  */
 
 /**
- * @brief API to manage batchs
+ * @brief API to manage batchs 
  *
  * @file
- * @author Laurent Giovannoni
+ * @author Laurent Giovannoni <dev@maarch.org>
  * @date $date$
  * @version $Revision$
- * @ingroup core
+ * @ingroup life_cycle
  */
 
 /**
  * Execute a sql query
- *
+ * 
  * @param object $dbConn connection object to the database
  * @param string $queryTxt path of the file to include
  * @param boolean $transaction for rollback if error
@@ -44,21 +44,24 @@ function Bt_doQuery($dbConn, $queryTxt, $param=array(), $transaction=false)
     } else {
         $stmt = $dbConn->query($queryTxt);
     }
+
     if (!$stmt) {
         if ($transaction) {
             $GLOBALS['logger']->write('ROLLBACK', 'INFO');
             $dbConn->query('ROLLBACK');
         }
-        $GLOBALS['logger']->write('SQL query error:' . $queryTxt, 'WARNING');
+        Bt_exitBatch(
+            104, 'SQL Query error:' . $queryTxt
+        );
     }
     $GLOBALS['logger']->write('SQL query:' . $queryTxt, 'DEBUG');
     return $stmt;
 }
 
 /**
- * Exit the batch with a return code, message in the log and
+ * Exit the batch with a return code, message in the log and 
  * in the database if necessary
- *
+ * 
  * @param int $returnCode code to exit (if > O error)
  * @param string $message message to the log and the DB
  * @return nothing exit the program
@@ -82,13 +85,12 @@ function Bt_exitBatch($returnCode, $message='')
             fclose($semaphore);
         }
         $GLOBALS['logger']->write($message, 'ERROR', $returnCode);
-        Bt_logInDataBase($GLOBALS['totalProcessedResources'], 1, 'return code:'
-                         . $returnCode . ', ' . $message);
+        Bt_logInDataBase($GLOBALS['totalProcessedResources'], 1, $message.' (return code: '. $returnCode.')');
     } elseif ($message <> '') {
         $GLOBALS['logger']->write($message, 'INFO', $returnCode);
-        Bt_logInDataBase($GLOBALS['totalProcessedResources'], 0, 'return code:'
-                         . $returnCode . ', ' . $message);
+        Bt_logInDataBase($GLOBALS['totalProcessedResources'], 0, $message.' (return code: '. $returnCode.')');
     }
+    Bt_updateWorkBatch();
     exit($returnCode);
 }
 
@@ -100,59 +102,50 @@ function Bt_exitBatch($returnCode, $message='')
 */
 function Bt_logInDataBase($totalProcessed=0, $totalErrors=0, $info='')
 {
-    $query = "insert into history_batch(module_name, batch_id, event_date, "
-           . "total_processed, total_errors, info) values(?, ?, "
-           . $GLOBALS['db']->current_datetime() . ", ?, ?, ?)";
-    $stmt = $GLOBALS['dbLog']->query(
-        $query, 
-        array(
-            $GLOBALS['batchName'],
-            $GLOBALS['wb'],
-            $totalProcessed,
-            $totalErrors,
-            substr(str_replace('\\', '\\\\', str_replace("'", "`", $info)), 0, 999)
-        )
-    );
+    $query = "INSERT INTO history_batch (module_name, batch_id, event_date, "
+           . "total_processed, total_errors, info) values(?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
+    $arrayPDO = array($GLOBALS['batchName'], $GLOBALS['wb'], $totalProcessed, $totalErrors, substr(str_replace('\\', '\\\\', str_replace("'", "`", $info)), 0, 999));
+    $GLOBALS['db']->query($query, $arrayPDO);
 }
 
 /**
  * Get the batch if of the batch
- *
+ * 
  * @return nothing
  */
-function Bt_getWorkBatch()
+function Bt_getWorkBatch() 
 {
-    $req = "select param_value_int from parameters where id = ?";
-    $stmt = $GLOBALS['db']->query($req, array($GLOBALS['batchName'] . "_id"));
+    $req = "SELECT param_value_int FROM parameters WHERE id = ? ";
+    $stmt = $GLOBALS['db']->query($req, array($GLOBALS['batchName']."_id"));
+    
     while ($reqResult = $stmt->fetchObject()) {
-        $GLOBALS['wbCompute'] = $reqResult->param_value_int + 1;
+        $GLOBALS['wb'] = $reqResult->param_value_int + 1;
     }
-    if ($GLOBALS['wbCompute'] == '') {
-        $req = "insert into parameters(id, param_value_int) values "
-             . "(?, 1)";
-        $stmt = $GLOBALS['db']->query($req, array($GLOBALS['batchName'] . "_id"));
-        $GLOBALS['wbCompute'] = 1;
+    if ($GLOBALS['wb'] == '') {
+        $req = "INSERT INTO parameters(id, param_value_int) VALUES (?, 1)";
+        $GLOBALS['db']->query($req, array($GLOBALS['batchName']."_id"));
+        $GLOBALS['wb'] = 1;
     }
 }
 
 /**
  * Update the database with the new batch id of the batch
- *
+ * 
  * @return nothing
  */
 function Bt_updateWorkBatch()
 {
-    $req = "update parameters set param_value_int = ? where id = ?";
-    $stmt = $GLOBALS['db']->query($req, array($GLOBALS['wbCompute'], $GLOBALS['batchName'] . "_id"));
+    $req = "UPDATE parameters SET param_value_int = ? WHERE id = ?";
+    $GLOBALS['db']->query($req, array($GLOBALS['wb'], $GLOBALS['batchName']."_id"));
 }
 
 /**
  * Include the file requested if exists
- *
+ * 
  * @param string $file path of the file to include
  * @return nothing
  */
-function Bt_myInclude($file)
+function Bt_myInclude($file) 
 {
     if (file_exists($file)) {
         include_once ($file);
