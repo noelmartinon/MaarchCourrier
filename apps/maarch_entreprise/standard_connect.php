@@ -1,7 +1,18 @@
 <?php
+function getHeaders() 
+{
+
+    foreach ($_SERVER as $h => $v ) 
+    {      
+      if( preg_match( '/HTTP_(.+)/', $h, $hp ) )
+        $headers[$hp[1]] = $v ;
+    }
+    return $headers;
+}
 
 if ($restMode) {
     $userLogin = [];
+    $http_header = getHeaders();
     //HTTP AUTH
     if (
         (isset($_SERVER["PHP_AUTH_USER"])
@@ -14,10 +25,9 @@ if ($restMode) {
         list($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"])
             = explode(":", base64_decode(substr($_SERVER["HTTP_AUTHORIZATION"], 6)));
     }
-    else if (preg_match("/forceLogin/", $_SERVER["REQUEST_URI"])){
-        $tmp_url = explode("/",$_SERVER["REQUEST_URI"]);
-        $force_login = $tmp_url[4];
-        $force_psw = $tmp_url[5];
+    else if (isset($http_header['LOGIN']) && isset($http_header['PASSWORD'])){
+        $force_login = $http_header['LOGIN'];
+        $force_psw = $http_header['PASSWORD'];
     }
     else{
         header("WWW-Authenticate: Basic realm=\"Maarch WebServer Engine\"");
@@ -67,7 +77,6 @@ if ($restMode) {
             "ADMIN",
             false
         );
-        if (!preg_match("/forceLogin/", $_SERVER["REQUEST_URI"])) exit;
         
     }
 } elseif (isset($_REQUEST['askRACode']) && $_REQUEST['askRACode'] == 'true') {
