@@ -31,16 +31,16 @@ for ($i=0;$i<count($_SESSION['user']['baskets']);$i++) {
     if ($_SESSION['user']['baskets'][$i]['id'] == $basketId) {
         if (!empty($_SESSION['user']['baskets'][$i]['table'])) {
             if (trim($_SESSION['user']['baskets'][$i]['clause']) <> '') {
-                $stmt = $db->query('select * from '
+                $stmt = $db->query('select count(1) as nb from '
                     . $_SESSION['user']['baskets'][$i]['view']
                     . ' where ' . $_SESSION['user']['baskets'][$i]['clause']);
-                $nb = $stmt->rowCount();
+                $res = $stmt->fetchObject();
             }
         }
     }
 }
 
-echo json_encode(['status'=>1, 'nb'=>$nb, 'idSpan'=> functions::xssafe($_REQUEST['id_basket']), 'id_basket'=> functions::xssafe($basketId)]);
+echo json_encode(['status'=>1, 'nb'=>$res->nb, 'idSpan'=> functions::xssafe($_REQUEST['id_basket']), 'id_basket'=> functions::xssafe($basketId)]);
 exit;
 
 $sessionTemplateContent = trim(str_replace(
