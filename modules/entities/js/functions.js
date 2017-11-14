@@ -300,3 +300,32 @@ function setNoteRedirect(){
     $j('#note_content_to_dep').val($j('#notes').val().replace(/\n/g, "___"));
     $j('#note_content_to_user').val($j('#notes').val().replace(/\n/g, "___"));
 }
+
+function loadToolbarEntities(where)
+{
+    var path_manage_script = 'index.php?display=true&module=entities&page=load_toolbarEntities';
+    $j.ajax({
+        url : path_manage_script,
+        //dataType: "json",
+        type : 'POST',
+        data: {
+            where : where,
+        },
+        beforeSend: function() {
+            //alert('beforesend');
+            $j("#entity_id").html('<option value="">chargement en cours ...</option>');
+            Event.fire($('entity_id'), "chosen:updated");
+            //show loading image in toolbar
+        },
+        success: function(answer){
+            eval("response = " + answer);
+            if(response.status == 0 ) {
+                $j("#entity_id").html(response.resultContent);
+                Event.fire($('entity_id'), "chosen:updated");
+            }
+        },
+        error: function(){
+            //alert('erreur');
+        }
+    });
+}
