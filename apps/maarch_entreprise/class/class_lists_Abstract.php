@@ -1423,7 +1423,7 @@ abstract class lists_Abstract extends Database
     protected function _tmplt_func_isConfidential($resultTheLine) {
 
             $db = new Database();
-            $stmt = $db->query("SELECT confidentiality FROM res_view_letterbox WHERE res_id = ?",
+            $stmt = $db->query("SELECT confidentiality FROM res_letterbox WHERE res_id = ?",
                                 [$resultTheLine[0]['res_id']]);
             $color = '';
             $result = $stmt->fetchObject();
