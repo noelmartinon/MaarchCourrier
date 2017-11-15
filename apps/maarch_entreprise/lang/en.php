@@ -715,6 +715,8 @@ if (!defined("_CHOOSE_ONE_OBJECT")) define("_CHOOSE_ONE_OBJECT", "Choose an elem
 if (!defined("_CLICK_LINE_TO_CHECK_INVOICE")) define("_CLICK_LINE_TO_CHECK_INVOICE", "Click on a lign to check a bill");
 if (!defined("_FOUND_INVOICES")) define("_FOUND_INVOICES", " Found bill(s)");
 if (!defined("_SIMPLE_CONFIRM")) define("_SIMPLE_CONFIRM", "Simple confirmation");
+if (!defined("_SEND_FILE_WS")) define("_SEND_FILE_WS", "Send file via Web Service");
+if (!defined("_SEND_DATA_WS")) define("_SEND_DATA_WS", "Send data via Web Service");
 if (!defined("_CHECK_INVOICE")) define("_CHECK_INVOICE", "Check bill");
 
 if (!defined("_REDIRECT_TO")) define("_REDIRECT_TO", "Redirected to");

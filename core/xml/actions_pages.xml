@@ -148,6 +148,28 @@ An action page is described in a ACTIONPAGE tag :
         </COLLECTIONS>
     </ACTIONPAGE>
     <ACTIONPAGE>
+        <ID>sendFileWS</ID>
+        <LABEL>_SEND_FILE_WS</LABEL>
+        <NAME>sendFileWS</NAME>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>sendDataWS</ID>
+        <LABEL>_SEND_DATA_WS</LABEL>
+        <NAME>sendDataWS</NAME>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
         <ID>confirm_folder_status</ID>
         <LABEL>_CONFIRM_FOLDER_STATUS</LABEL>
         <NAME>confirm_folder_status</NAME>
