@@ -43,12 +43,21 @@ $_SESSION[$origin]['diff_list'] = $diffList->get_listmodel($objectType, $objectI
 //Permet de bloquer la liste diffusion avec celle de l'utilisateur qui enregistre le courrier.
 if($category == 'outgoing' && $origin == 'indexing' && $objectId == $_SESSION['user']['primaryentity']['id']){
     $_SESSION[$origin]['diff_list']['dest']['users'] = array();
+
+    //Get the right primary entity
+    $primaryEntityId = $_SESSION['user']['primaryentity']['id'];
+    foreach($_SESSION['user']['entities'] as $entity){
+        if($entity['ENTITY_ID']==$primaryEntityId){
+            $primaryEntityLabel = $entity['ENTITY_LABEL'];
+        }
+    }
+
     $diffListOutgoing = array(
         'user_id'         => $_SESSION['user']['UserId'],
         'lastname'        => $_SESSION['user']['LastName'],
         'firstname'       => $_SESSION['user']['FirstName'],
-        'entity_id'       => $_SESSION['user']['entities'][0]['ENTITY_ID'],
-        'entity_label'    => $_SESSION['user']['entities'][0]['ENTITY_LABEL'],
+        'entity_id'       => $primaryEntityId,
+        'entity_label'    => $primaryEntityLabel,
         'visible'         => 'Y',
         'process_comment' => ''
     );
