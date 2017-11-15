@@ -339,7 +339,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
                     $frm_str.= 'onclick="showCalender(this);"';
                 }
                 $frm_str .= 'style="width: 200px; max-width: 150px; border: medium none; color: rgb(102, 102, 102); height: 60px;"';
-                $frm_str .=  'title="'.$indexes[$key]['show_value'].'" alt="'.$indexes[$key]['show_value'].'" >'.$values_fields->{$key};
+                $frm_str .=  '>'.str_replace(array("\n", "\r"), " ", $values_fields->{$key});
                 $frm_str .= '</textarea>';
                 $frm_str .= '</td >';
             $frm_str .= '</tr>';
