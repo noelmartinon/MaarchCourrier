@@ -119,7 +119,7 @@ if (!defined("_ENTITY_LABEL"))
 if (!defined("_SHORT_LABEL"))
     define("_SHORT_LABEL", "Nom court");
 if (!defined("_ENTITY_FULL_NAME"))
-    define("_ENTITY_FULL_NAME", "Nom complet");
+    define("_ENTITY_FULL_NAME", "Bloc arborescence");
 if (!defined("_ENTITY_ADR_1"))
     define("_ENTITY_ADR_1", "Adresse 1");
 if (!defined("_ENTITY_ADR_2"))
