@@ -36,8 +36,9 @@ $db = new Database();
 $stmt = $db->query(
     "SELECT ir.record_id as res_id, ir.subject, ir.doc_date, ir.event_date, ir.creation_date, ir.alt_identifier"
     ." FROM"
-    ." (SELECT DISTINCT ON (h.record_id) h.record_id, h.event_date, r.subject, r.doc_date, r.creation_date, r.alt_identifier FROM history h, res_view_letterbox r"
+    ." (SELECT DISTINCT ON (h.record_id) h.record_id, h.event_date, r.subject, r.doc_date, r.creation_date, m.alt_identifier FROM history h, res_letterbox r, mlb_coll_ext m"
     ." WHERE h.user_id = ?" 
+    ." AND r.res_id = m.res_id"
     ." AND event_id !='linkup' AND event_id NOT LIKE 'attach%'"
     ." AND (h.table_name='res_letterbox' OR h.table_name='res_view_letterbox')"
     ." AND h.record_id <> 'none'"
