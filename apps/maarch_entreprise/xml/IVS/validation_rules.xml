@@ -515,6 +515,7 @@
       <parameter name="original" type="boolean" />
       <parameter name="aVersion" type="boolean" />
       <parameter name="dir" type="identifier" />
+      <parameter name="editingMode" type="string" />
     </validationRule>
 
     <validationRule name="multi_contacts" extends="standardForm" mode="error">  
