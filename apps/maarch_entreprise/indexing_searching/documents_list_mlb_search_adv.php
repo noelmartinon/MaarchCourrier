@@ -318,8 +318,8 @@ if($mode == 'normal') {
         }
     } else {
         $list->setOrder();
-        $list->setOrderField('creation_date');
-        $orderstr = "order by creation_date desc";
+        $list->setOrderField('res_id');
+        $orderstr = "order by res_id desc";
     }
     
 //URL extra Parameters  

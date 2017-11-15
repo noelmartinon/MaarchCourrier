@@ -135,8 +135,8 @@ if (!empty($order_field) && !empty($order)) {
     $_SESSION['last_order_basket'] = $orderstr;
 } else {
     $list->setOrder();
-    $list->setOrderField('creation_date');
-    $orderstr = "order by creation_date desc";
+    $list->setOrderField('res_id');
+    $orderstr = "order by res_id desc";
     $_SESSION['last_order_basket'] = $orderstr;
 }
 
