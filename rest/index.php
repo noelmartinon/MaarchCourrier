@@ -239,7 +239,7 @@ $app->put('/reports/groups/{groupId}', \Core\Controllers\ReportController::class
 $app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateController::class . ':duplicate');
 
 //liste documents
-$app->get('/res/listDocs/{clause}', \Core\Controllers\ResController::class . ':getListDocs');
+$app->get('/res/listDocs/{clause}/{select}', \Core\Controllers\ResController::class . ':getListDocs');
 
 
 $app->run();

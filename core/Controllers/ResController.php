@@ -858,30 +858,46 @@ class ResController
 
         $clause = implode(" AND ", $tab_where);
         if (empty($clause)) $clause = ' 1=1 ';
-        $result = array();
-        
+
+        $colSelect = $aArgs['select'];
+        $select_elem = explode(",",$colSelect);
+        $tab_tables = array();
+
+        foreach ($select_elem as $col) {
+            $c_elem=explode(".",$col);
+            if (!in_array($c_elem[0], $tab_tables)){
+                //ajout de la table
+                array_push($tab_tables,$c_elem[0]);
+
+                //ajout de la jointure
+                if ($c_elem[0] == "mlb_coll_ext")
+                    $clause .= " AND res_letterbox.res_id = mlb_coll_ext.res_id ";
+                elseif ($c_elem[0] == "doctypes")
+                    $clause .= " AND res_letterbox.type_id = doctypes.type_id ";
+                elseif ($c_elem[0] == "entities")
+                    $clause .= " AND res_letterbox.destination=entities.entity_id ";
+            }
+        }
+
+        $result = array();        
         $resList = ResModel::getDocsByClause(
             [
-                'select'  => ['res_id'],
+                'select'  => [$colSelect],
+                'table'  => implode(",",$tab_tables),
                 'clause'   => $clause
             ]
         );
 
         foreach ($resList as $doc) {
-            $infos = ResModel::getById(
-            [
-                'resId' => $doc['res_id'] 
-            ]);
-
             $result_infos = array();
-            foreach ($infos as $key => $value) {
+            foreach ($doc as $key => $value) {
                 if (empty($value)) $result_infos[$key] = '';
-                elseif ($key=='creation_date' || ($key=='closing_date' && !empty($value)) || ($key=='process_limit_date' && !empty($value))) {
+                elseif ($key=='creation_date' || ($key=='closing_date' && !empty($value)) || ($key=='process_limit_date' && !empty($value)) || ($key=='admission_date' && !empty($value))) {
                     $result_infos[$key] = str_replace("-","/",\functions::format_date_db($value, false, '', false));
                 }
                 else $result_infos[$key] = $value;
             }
-            array_push($result,$result_infos);
+            array_push($result,$result_infos);            
         }
         return $response->withJson(['docs' => $result, 'nb_docs' => count($resList)]);
     }
