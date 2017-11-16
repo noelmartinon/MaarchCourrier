@@ -197,8 +197,8 @@ class BasketsModelAbstract extends \Apps_Table_Service
             $baskets = DatabaseModel::select([
                 'select'    => ['baskets.basket_id', 'baskets.basket_name', 'baskets.color'],
                 'table'     => ['groupbasket, baskets'],
-                'where'     => ['groupbasket.basket_id = baskets.basket_id', 'groupbasket.group_id = ?', 'baskets.is_visible = ?'],
-                'data'      => [$group['group_id'], 'Y'],
+                'where'     => ['groupbasket.basket_id = baskets.basket_id', 'groupbasket.group_id = ?', 'baskets.is_visible = ?', 'baskets.basket_id != ?'],
+                'data'      => [$group['group_id'], 'Y', 'IndexingBasket'],
                 'order_by'  => ['baskets.basket_order', 'baskets.basket_name']
             ]);
             $coloredBaskets = DatabaseModel::select([
