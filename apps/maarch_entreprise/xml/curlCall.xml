@@ -2,12 +2,12 @@
 <ROOT>
     <call>
         <id>sendFile</id>
-        <url>http://bbain:maarch@127.0.0.1/maarch_trunk/rest/status</url>
+        <url></url>
         <method>POST</method>
     </call>
     <call>
         <id>sendData</id>
-        <url>http://bbain:maarch@127.0.0.1/maarch_trunk/rest/status</url>
+        <url></url>
         <method>PUT</method>
         <data>
             <key>publikId</key>
