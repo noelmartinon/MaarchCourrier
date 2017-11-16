@@ -281,16 +281,6 @@ if (isset($_REQUEST['id']) && !empty($_REQUEST['id']))
                     $tab[$i][$j]["value"] = $tab[$i][$j]['value'];
                     $tab[$i][$j]["order"]="category_id";
                 }
-                if($tab[$i][$j][$value]=="count_attachment")
-                {
-                    $tab[$i][$j]["label"]=_ATTACHMENTS;
-                    $tab[$i][$j]["size"]="12";
-                    $tab[$i][$j]["label_align"]="left";
-                    $tab[$i][$j]["align"]="left";
-                    $tab[$i][$j]["valign"]="bottom";
-                    $tab[$i][$j]["show"]=false;
-                    $tab[$i][$j]["order"]='count_attachment';
-                }
                 if($tab[$i][$j][$value]=="case_id" && $core_tools->is_module_loaded("cases") == true)
                 {
                     $tab[$i][$j]["label"]=_CASE_NUM;

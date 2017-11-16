@@ -89,7 +89,7 @@ array_push(
     "contact_firstname", "contact_lastname", "contact_society", "user_lastname", 
     "user_firstname", "priority", "creation_date", "admission_date", "subject", 
     "process_limit_date", "entity_label", "dest_user", "category_id", "type_label", 
-    "exp_user_id", "count_attachment", "alt_identifier", "is_multicontacts", "locker_user_id", "locker_time", "viewed", "address_id"
+    "address_id", "exp_user_id", "doc_custom_n1 as count_attachment", "alt_identifier", "is_multicontacts", "locker_user_id", "locker_time", "viewed"
 );
                         
 if ($core_tools->is_module_loaded("cases") == true) {
@@ -168,7 +168,7 @@ $extension_icon = '';
 if($selectedTemplate <> 'none') $extension_icon = "_big"; 
 
 $db = new Database();
-
+$addressId = 0;
 //Result Array
 for ($i=0;$i<count($tab);$i++) {
 
@@ -226,6 +226,10 @@ for ($i=0;$i<count($tab);$i++) {
                 $stmt = $db->query($query, $arrayPDOnotes);
                 $tab[$i][$j]['hasNotes'] = $stmt->fetchObject();
                 $tab[$i][$j]['res_multi_contacts'] = $_SESSION['mlb_search_current_res_id'];
+            }
+            if ($tab[$i][$j][$value]=="address_id") {
+                $addressId = $tab[$i][$j]["value"];
+                $tab[$i][$j]["show"] = false;
             }
             if ($tab[$i][$j][$value]=="creation_date") {
 
@@ -349,9 +353,9 @@ for ($i=0;$i<count($tab);$i++) {
             }
             if ($tab[$i][$j][$value]=="exp_user_id") {
 
-                if (empty($contact_lastname) && empty($contact_firstname) && empty($user_lastname) && empty($user_firstname) && !empty($tab[$i][25]['value'])) {
+                if (empty($contact_lastname) && empty($contact_firstname) && empty($user_lastname) && empty($user_firstname) && !empty($addressId)) {
                     $query = "SELECT ca.firstname, ca.lastname FROM contact_addresses ca WHERE ca.id = ?";
-                    $arrayPDO = array($tab[$i][25]['value']);
+                    $arrayPDO = array($addressId);
                     $stmt2 = $db->query($query, $arrayPDO);
                     $return_contact = $stmt2->fetchObject();
                     

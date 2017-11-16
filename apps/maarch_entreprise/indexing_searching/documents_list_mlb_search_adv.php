@@ -229,12 +229,11 @@ if($mode == 'normal') {
     array_push($select[$view],  "res_id", "res_id as is_labeled", "alt_identifier", "status", "subject", "category_id as category_img", 
                                 "contact_firstname", "contact_lastname", "contact_society", 
                                 "user_lastname", "user_firstname", "dest_user", "type_label", 
-                                "creation_date", "entity_label", "category_id, exp_user_id", "count_attachment", "is_multicontacts", "priority", "address_id");
+                                "creation_date", "entity_label", "category_id, exp_user_id", "doc_custom_n1 as count_attachment", "is_multicontacts", "priority", "address_id");
     //Cases
     if($core_tools->is_module_loaded("cases") == true) {
         array_push($select[$view], "case_id", "case_label", "case_description");
     }
-    
     //Folder
     if ($core_tools->is_module_loaded("folder")) {
         array_push($select[$view], "folders_system_id", "folder_name");
