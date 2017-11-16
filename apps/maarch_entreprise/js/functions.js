@@ -3717,19 +3717,9 @@ function setAttachmentInSignatureBook(id, isVersion) {
             isVersion   : isVersion
         },
         success: function(answer) {
-        }, error: function(err) {
-            alert("Une erreur s'est produite");
-        }
-    });
-}
-
-function setRequestedSignature(id) {
-    $j.ajax({
-        url      : '../../rest/listinstance/' + id + '/requestedSignature',
-        type     : 'PUT',
-        dataType : 'json',
-        data: {},
-        success: function(answer) {
+            if (typeof window.parent['angularSignatureBookComponent'] !== "undefined") {
+                window.parent.angularSignatureBookComponent.componentAfterAttach("left");
+            }
         }, error: function(err) {
             alert("Une erreur s'est produite");
         }
