@@ -1264,7 +1264,7 @@ class list_show_Abstract extends functions
                                     }
                                     else
                                     {
-                                        echo functions::show_str(self::thisword($result[$theline][$count_column]['value'],$expr, TRUE));
+                                        echo functions::show_str($result[$theline][$count_column]['value']);
                                     }
 
                                 }
