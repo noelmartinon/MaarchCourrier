@@ -241,11 +241,7 @@ while ($state <> 'END') {
                 		L'email avec l'identifiant ".$email->email_id." dans la table 'sendmail' n'a pas été envoyé. <br>
                 		Pour plus d'informations, regardez les logs dans le fichier ".$GLOBALS['maarchDirectory']."/modules/sendmail/batch/".$logFile."<br><br>
                 		Répertoire d'installation de l'application : ".$GLOBALS['maarchDirectory']."<br>
-                		Fichier de configuration de sendmail : " . $GLOBALS['configFile'] . "<br>
-                		IP de la base de données : " . $_SESSION['config']['databaseserver'] . "<br>
-                		Port de la base de données : " . $_SESSION['config']['databaseserverport'] . "<br>
-                		Type de base de données : " . $_SESSION['config']['databasetype'] . "<br>
-                		Nom de la base de données : " . $_SESSION['config']['databasename'] . "<br>";
+                		Fichier de configuration de sendmail : " . $GLOBALS['configFile'];
 
                 $adminMails = explode(',', $GLOBALS['adminmail']);
                 if(!empty($adminMails)){
@@ -257,7 +253,12 @@ while ($state <> 'END') {
                 }
 
             	if(!empty($userInfo['mail'])){
-            		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $userInfo['mail'], $GLOBALS['subjectmail'], $GLOBALS['bodymail'].'<br><br>'.$return[0], $GLOBALS['charset']));
+            		$queryMlb = "SELECT alt_identifier FROM mlb_coll_ext WHERE res_id = ? ";
+					$stmt = Bt_doQuery($GLOBALS['db'], $queryMlb, array($email->res_id));
+					$mlbRecordSet = $stmt->fetchObject();
+            		$bodyMailError = "Message automatique : <br><br>
+            						 Votre envoi de courriel dont l'objet est \"". $email->email_object . "\" avec le numéro chrono \"" . $mlbRecordSet->alt_identifier . "\" n'a pas été envoyé. Veuillez réessayer ou contacter votre administreur.";
+            		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $userInfo['mail'], $GLOBALS['subjectmail'], $bodyMailError, $GLOBALS['charset']));
                 }
 
 			}
