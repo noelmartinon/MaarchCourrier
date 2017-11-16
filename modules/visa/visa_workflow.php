@@ -10,13 +10,15 @@
 */
 require_once 'modules/visa/class/class_modules_tools.php';
 $visa = new visa();
+$confirm = true;
 
-if ($visa->currentUserSignRequired($_SESSION['doc_id']) == 'true') {
-    $confirm = true;
+$error_visa_workflow_signature_book = false;
+if($visa->isAllAttachementSigned($_SESSION['doc_id']) == 'noAttachment'){
+    $error_visa_workflow_signature_book = true;
+} else if ($visa->currentUserSignRequired($_SESSION['doc_id']) == 'true') {
     $label_action .=" ("._NO_USER_SIGNED_DOC.")";
-} else {
-    $confirm = false;
-}
+} 
+
 $etapes = ['empty_error'];
 
 function manage_empty_error($arr_id, $history, $id_action, $label_action, $status)

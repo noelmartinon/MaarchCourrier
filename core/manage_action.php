@@ -292,6 +292,11 @@ else if(empty($_POST['values']) || !isset($_POST['action_id']) || empty($_POST['
                 "</div><p class=\"buttons\"><input type=\"button\" class=\"button\" value=\""._CANCEL."\" onclick=\"destroyModal(\'modal_" .$id_action . "\')\" id=\"submit\" name=\"submit\"></p>', height : '250px', width : '300px', 'mode_frm' : '', validate : 'OK', 'action_status' : '".functions::xssafe($status)."'}";
             exit();
         }
+        elseif( $_POST['req'] == 'first_request' && $error_visa_workflow_signature_book == true)
+        {
+            echo "{status : 4, error : '".addslashes(_NO_RESPONSE_PROJECT_VISA)."', validate : 'OK', 'action_status' : '".functions::xssafe($status)."'}";
+            exit();
+        }
 		elseif( $_POST['req'] == 'first_request' && $error_visa == true)
         {
             echo "{status : 4, error : '".addslashes(_NO_VISA)."', validate : 'OK', 'action_status' : '".functions::xssafe($status)."'}";
