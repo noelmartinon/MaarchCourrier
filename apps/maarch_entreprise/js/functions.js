@@ -1647,7 +1647,7 @@ function action_change_status(path_manage_script, mode_req, res_id_values, table
                     }
                     
                     do_nothing = false;
-                }, 200);
+                }, 500);
             }
         });
     }
