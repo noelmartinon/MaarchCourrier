@@ -229,12 +229,11 @@ if($mode == 'normal') {
     array_push($select[$view],  "res_id", "res_id as is_labeled", "alt_identifier", "priority", "status", "subject", "category_id as category_img", 
                                 "contact_firstname", "contact_lastname", "contact_society", 
                                 "user_lastname", "user_firstname", "category_id", "dest_user", "type_label", 
-                                "creation_date", "entity_label", "address_id", "exp_user_id", "count_attachment", "is_multicontacts","filename");
+                                "creation_date", "entity_label", "address_id", "exp_user_id", "doc_custom_n1 as count_attachment", "is_multicontacts","filename");
     //Cases
     if($core_tools->is_module_loaded("cases") == true) {
         array_push($select[$view], "case_id", "case_label", "case_description");
     }
-    
     //Folder
     if ($core_tools->is_module_loaded("folder")) {
         array_push($select[$view], "folders_system_id", "folder_name");
@@ -769,7 +768,7 @@ if($mode == 'normal') {
                     $tab[$i][$j]["value_export"] = $tab[$i][$j]['value'];
                     $tab[$i][$j]["value"] = $contact->get_contact_information_from_view($_SESSION['mlb_search_current_category_id'], $contact_lastname, $contact_firstname, $contact_society, $user_lastname, $user_firstname);
                     $tab[$i][$j]["order"]=false;
-                }
+                }                
                 
             }
         }
