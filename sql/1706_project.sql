@@ -3,13 +3,12 @@ ALTER TABLE baskets ADD color character varying(16);
 ALTER TABLE entities DROP COLUMN IF EXISTS entity_full_name;
 ALTER TABLE entities ADD entity_full_name text;
 
+DROP VIEW IF EXISTS res_view_attachments;
+
 ALTER TABLE res_attachments DROP COLUMN IF EXISTS in_signature_book;
 ALTER TABLE res_attachments ADD in_signature_book boolean default false;
 ALTER TABLE res_version_attachments DROP COLUMN IF EXISTS in_signature_book;
 ALTER TABLE res_version_attachments ADD in_signature_book boolean default false;
-
-DROP VIEW IF EXISTS res_view_attachments;
-
 ALTER TABLE res_attachments DROP COLUMN IF EXISTS signatory_user_serial_id;
 ALTER TABLE res_attachments ADD signatory_user_serial_id int;
 ALTER TABLE res_version_attachments DROP COLUMN IF EXISTS signatory_user_serial_id;
