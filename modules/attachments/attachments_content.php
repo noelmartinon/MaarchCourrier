@@ -1445,6 +1445,16 @@ if (isset($_POST['add']) && $_POST['add']) {
 							'type' => "int",
 						)
 					);
+
+                    array_push(
+                        $_SESSION['data_pdf'],
+                        array(
+                            'column' => "in_signature_book",
+                            'value' => 1,
+                            'type' => "bool",
+                        )
+                    );
+                    
 					$resAttach = new resource();
 					$id_up = $resAttach->load_into_db(
 						RES_ATTACHMENTS_TABLE,
