@@ -474,4 +474,22 @@ class UserModelAbstract extends \Apps_Table_Service
 
         return true;
     }
+
+    public static function eraseBasketColor(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['id', 'groupId', 'basketId']);
+        ValidatorModel::intVal($aArgs, ['id']);
+        ValidatorModel::stringType($aArgs, ['groupId', 'basketId']);
+
+        DatabaseModel::delete(
+            [
+                'table' => 'users_baskets',
+                'where' => ['user_serial_id = ?', 'group_id = ?', 'basket_id = ?'],
+                'data'  => [$aArgs['id'], $aArgs['groupId'], $aArgs['basketId']]
+            ]
+        );
+
+        return true;
+    }
+
 }

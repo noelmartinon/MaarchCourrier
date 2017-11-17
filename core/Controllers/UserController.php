@@ -358,11 +358,15 @@ class UserController
 
         $user = UserModel::getById(['userId' => $_SESSION['user']['UserId'], 'select' => ['id']]);
 
-        if (!empty($data['color'])) {
+        if(isset($data['color']) && $data['color'] == ''){
+            UserModel::eraseBasketColor(['id' => $user['id'], 'groupId' => $aArgs['groupId'], 'basketId' => $aArgs['basketId']]);
+        } else if (!empty($data['color'])) {
             UserModel::updateBasketColor(['id' => $user['id'], 'groupId' => $aArgs['groupId'], 'basketId' => $aArgs['basketId'], 'color' => $data['color']]);
         }
 
-        return $response->withJson(['success' => 'success']);
+        return $response->withJson([
+            'userBaskets' => BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']])
+        ]);
     }
 
     public function getUsersForAutocompletion(RequestInterface $request, ResponseInterface $response)

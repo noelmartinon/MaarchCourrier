@@ -266,6 +266,7 @@ var ProfileComponent = (function () {
         this.http.put(this.coreUrl + "rest/currentUser/groups/" + this.user.regroupedBaskets[i].groupId + "/baskets/" + this.user.regroupedBaskets[i].baskets[y].basket_id, { "color": this.user.regroupedBaskets[i].baskets[y].color })
             .map(function (res) { return res.json(); })
             .subscribe(function (data) {
+            _this.user.regroupedBaskets = data.userBaskets;
         }, function (err) {
             _this.resultInfo = JSON.parse(err._body).errors;
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');

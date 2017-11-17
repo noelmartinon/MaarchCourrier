@@ -294,6 +294,7 @@ export class ProfileComponent implements OnInit {
         this.http.put(this.coreUrl + "rest/currentUser/groups/" + this.user.regroupedBaskets[i].groupId + "/baskets/" + this.user.regroupedBaskets[i].baskets[y].basket_id, {"color" : this.user.regroupedBaskets[i].baskets[y].color})
             .map(res => res.json())
             .subscribe((data) => {
+                this.user.regroupedBaskets = data.userBaskets;
             }, (err) => {
                 this.resultInfo = JSON.parse(err._body).errors;
                 $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
