@@ -610,7 +610,17 @@ abstract class visa_Abstract extends Database
 									$modif = 'false';
 								}
 
-
+								$info_vised .= '<select style="display:none;" id="signRequest_'.$i.'" '.$isAllAttachementSigned;
+								$info_vised .= ' disabled="disabled" ';
+								$info_vised .= '>';
+								$info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+	 
+								$info_vised .= '<option value="true"';
+								if (!empty($info_userVis['requested_signature'])) {
+									$info_vised .= ' selected="selected" ';
+								}
+								$info_vised .= '>'._SIGNATORY.'</option>';
+								$info_vised .= '</select>';
 
                             }else{
 							   $dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
@@ -625,16 +635,20 @@ abstract class visa_Abstract extends Database
                                     $del_vis = '';
                                     $disabled = ' disabled="disabled"';
                                }
-
-
-                               $info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
-							   if (!empty($info_userVis['requested_signature'])) {
-								   $info_vised .= 'checked="true" ';
-							   }
-							   if (!empty($info_userVis['signatory'])) {
-									$info_vised .= 'disabled="disabled" ';
+							   
+							   	$info_vised = '<br/><select id="signRequest_'.$i.'" '.$isAllAttachementSigned;
+							   	if (!empty($info_userVis['signatory'])) {
+									$info_vised .= ' disabled="disabled" ';
 								}
-							   $info_vised .= '></sub>';
+								$info_vised .= '>';
+							   $info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+
+							   $info_vised .= '<option value="true"';
+							   if (!empty($info_userVis['requested_signature'])) {
+									$info_vised .= ' selected="selected" ';
+								}
+							   $info_vised .= '>'._SIGNATORY.'</option>';
+							   $info_vised .= '</select>';
                                $link_vis = 'hourglass-half';
                             }
                             
@@ -649,30 +663,42 @@ abstract class visa_Abstract extends Database
                             
                             $disabled = ' disabled="disabled"';
 							if(preg_match("/\[DEL\]/", $info_userVis['process_comment'])){
-								
-								$info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
-								if (!empty($info_userVis['requested_signature'])) {
-									$info_vised .= 'checked="true" ';
-								}
+								$info_vised = '<br/><select id="signRequest_'.$i.'" '.$isAllAttachementSigned;
 								if (!empty($info_userVis['signatory'])) {
-									$info_vised .= 'disabled="disabled" ';
+									$info_vised .= ' disabled="disabled" ';
 								}
-								$info_vised .= '></sub>';
+								$info_vised .= '>';
+								$info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+
+								$info_vised .= '<option value="true"';
+								if (!empty($info_userVis['requested_signature'])) {
+									$info_vised .= ' selected="selected" ';
+								}
+								$info_vised .= '>'._SIGNATORY.'</option>';
+								$info_vised .= '</select>';
 								$link_vis = 'times';
 								$vised = ' moved vised';
 								$del_vis = '<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);" title="'._DELETE.'"></i>';
 							}else{
 								if (!empty($info_userVis['signatory'])) {
 									$info_vised = '<br/><sub>signé le : '.functions::format_date_db($info_userVis['process_date'],'','',true).'</sub>';
-									$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;
-									$info_vised .= 'checked="true" ';
-									$info_vised .= 'disabled="disabled" ';
+									$info_vised .= '<br/><select id="signRequest_'.$i.'" style="width:auto;display:none;" disabled="disabled" '.$isAllAttachementSigned;
 									$info_vised .= '>';
+									$info_vised .= '<option value="false" selected="selected">'._VISA_USER_SEARCH.'</option>';
+	
+									$info_vised .= '<option value="true"';
+									$info_vised .= '>'._SIGNATORY.'</option>';
+									$info_vised .= '</select>';
 								}else{
 									$info_vised = '<br/><sub>visé le : '.functions::format_date_db($info_userVis['process_date'],'','',true).'</sub>';									
-									$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;									
-									$info_vised .= 'disabled="disabled" ';
+
+									$info_vised .= '<br/><select id="signRequest_'.$i.'" style="width:auto;display:none;" disabled="disabled" '.$isAllAttachementSigned;
 									$info_vised .= '>';
+									$info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+	
+									$info_vised .= '<option value="true" selected="selected"';
+									$info_vised .= '>'._SIGNATORY.'</option>';
+									$info_vised .= '</select>';
 								}
 								
 								$link_vis = 'check';
@@ -743,6 +769,17 @@ abstract class visa_Abstract extends Database
 							}else{
 								$modif = 'false';
 							}
+							$info_vised .= '<select style="display:none;" id="signRequest_'.$i.'" '.$isAllAttachementSigned;
+							$info_vised .= ' disabled="disabled" ';
+							$info_vised .= '>';
+							$info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+ 
+							$info_vised .= '<option value="true"';
+							if (!empty($info_userSign['requested_signature'])) {
+								$info_vised .= ' selected="selected" ';
+							}
+							$info_vised .= '>'._SIGNATORY.'</option>';
+							$info_vised .= '</select>';
 
                         }else{
 							$dropZone = '<i class="fa fa-exchange fa-2x fa-rotate-90" aria-hidden="true" title="'._DRAG_N_DROP_CHANGE_ORDER.'" style="cursor: pointer"></i>';
@@ -758,29 +795,41 @@ abstract class visa_Abstract extends Database
                                 $disabled = ' disabled="disabled"';
                            }
 
-
-                           $info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
-						   if (!empty($info_userSign['requested_signature'])) {
-							   $info_vised .= 'checked="true" ';
-						   }
+						   $info_vised = '<br/><select id="signRequest_'.$i.'" '.$isAllAttachementSigned;
 						   if (!empty($info_userSign['signatory'])) {
-								$info_vised .= 'disabled="disabled" ';
-							}
-						   $info_vised .= '></sub>';
+							   $info_vised .= ' disabled="disabled" ';
+						   }
+						   $info_vised .= '>';
+						   $info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+
+						   $info_vised .= '<option value="true"';
+						   if (!empty($info_userSign['requested_signature'])) {
+							   $info_vised .= ' selected="selected" ';
+						   }
+						   $info_vised .= '>'._SIGNATORY.'</option>';
+						   $info_vised .= '</select>';
                            $link_vis = 'hourglass-half';
                         }
 
                     }else{
 						$modif = 'false';
                         if (preg_match("/\[DEL\]/", $info_userSign['process_comment'])) {
-							$info_vised = '<br/><sub><label for="signRequest_'.$i.'">Signature demandée</label> <input id="signRequest_'.$i.'" style="width:auto;" type="checkbox" '.$isAllAttachementSigned;
-							if (!empty($info_userSign['requested_signature'])) {
-								$info_vised .= 'checked="true" ';
-							}
+
+							$info_vised = '<br/><select id="signRequest_'.$i.'" '.$isAllAttachementSigned;
 							if (!empty($info_userSign['signatory'])) {
-								$info_vised .= 'disabled="disabled" ';
+								$info_vised .= ' disabled="disabled" ';
 							}
-							$info_vised .= '></sub>';
+							$info_vised .= '>';
+							$info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+ 
+							$info_vised .= '<option value="true"';
+							if (!empty($info_userSign['requested_signature'])) {
+								$info_vised .= ' selected="selected" ';
+							}
+							$info_vised .= '>'._SIGNATORY.'</option>';
+							$info_vised .= '</select>';
+
+							$link_vis = 'hourglass-half';
 							$link_vis = 'times';
 							$vised = ' moved vised';
 							$del_vis = '<i class="fa fa-trash" aria-hidden="true" onclick="delVisaUser(this.parentElement.parentElement);" title="'._DELETE.'"></i>';
@@ -789,15 +838,25 @@ abstract class visa_Abstract extends Database
                         	$link_vis = 'check';
                         	if (!empty($info_userVis['signatory'])) {
 								$info_vised = '<br/><sub>signé le : '.functions::format_date_db($info_userSign['process_date'],'','',true).'</sub>';
-								$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;
-								$info_vised .= 'checked="true" ';
-								$info_vised .= 'disabled="disabled" ';
+
+								$info_vised = '<br/><select id="signRequest_'.$i.'" style="width:auto;display:none;" '.$isAllAttachementSigned;
+								$info_vised .= ' disabled="disabled" ';
 								$info_vised .= '>';
+								$info_vised .= '<option value="false">'._VISA_USER_SEARCH.'</option>';
+								$info_vised .= '<option value="true"';
+								$info_vised .= ' selected="selected" ';
+								$info_vised .= '>'._SIGNATORY.'</option>';
+								$info_vised .= '</select>';
 							}else{
 								$info_vised = '<br/><sub>visé le : '.functions::format_date_db($info_userSign['process_date'],'','',true).'</sub>';									
-								$info_vised .= '<input id="signRequest_'.$i.'" style="width:auto;display:none;" type="checkbox" '.$isAllAttachementSigned;
-								$info_vised .= 'disabled="disabled" ';
+
+								$info_vised = '<br/><select id="signRequest_'.$i.'" style="width:auto;display:none;" '.$isAllAttachementSigned;
+								$info_vised .= ' disabled="disabled" ';
 								$info_vised .= '>';
+								$info_vised .= '<option value="false" selected="selected">'._VISA_USER_SEARCH.'</option>';
+								$info_vised .= '<option value="true"';
+								$info_vised .= '>'._SIGNATORY.'</option>';
+								$info_vised .= '</select>';
 							}
 						}
                         
