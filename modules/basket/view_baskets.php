@@ -223,8 +223,21 @@ if (count($_SESSION['user']['baskets']) > 0) {
             <select name="baskets"id="baskets" onchange="cleanSessionBasket('<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&module=basket&page=cleanSessionBasket','ok'); this.form.submit();" class="listext_big" >
                 <option value=""><?php echo _CHOOSE_BASKET;?></option>
                 <?php
+                $redirectedBaskets = \Baskets\Models\BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
     for ($i = 0; $i < count($_SESSION['user']['baskets']); $i ++) {
-        if($_SESSION['user']['baskets'][$i]['is_visible'] === 'Y') {
+
+        foreach ($redirectedBaskets as $redirectBasketValue) {
+            if ($redirectBasketValue['basket_owner'] == $_SESSION['user']['UserId']) {
+                if ($redirectBasketValue['basket_id'] == $_SESSION['user']['baskets'][$i]['id']) {
+                    $redirectedTo = $redirectBasketValue['user'];
+                }
+            } elseif ($_SESSION['user']['baskets'][$i]['id'] == $redirectBasketValue['basket_id'] . '_' . $redirectBasketValue['basket_owner']) {
+                $redirectedTo = $redirectBasketValue['user'];
+            }
+        }
+
+        if(($_SESSION['user']['baskets'][$i]['is_visible'] === 'Y' &&  $_SESSION['user']['baskets'][$i]['abs_basket'] == false) 
+            || $_SESSION['user']['baskets'][$i]['abs_basket'] == true && empty($redirectedTo)) {
         ?>
         <option value="<?php
         if (isset($_SESSION['user']['baskets'][$i]['id'])) {

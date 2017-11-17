@@ -126,10 +126,7 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                             }
                             if (empty($redirectedTo)) {
 
-                                if (
-                                    $_SESSION['user']['baskets'][$i]['abs_basket'] == true
-                                    && !$abs_basket
-                                ) {
+                                if ($_SESSION['user']['baskets'][$i]['abs_basket'] == true && !$abs_basket) {
                                     echo '</ul><br /><h3>' . _OTHER_BASKETS
                                         . ' :</h3><ul class="fa-ul">';
                                     $abs_basket = true;
@@ -164,7 +161,7 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                         . '<span style="color: ' .$color . '">' . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . '</span>'
                                         . ' </a></li>';
                                 }
-                            } else if(!$abs_basket){
+                            } else if(!$_SESSION['user']['baskets'][$i]['abs_basket']){
                                 echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '"><i class="fa-li fa fa-spinner fa-spin" style="margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
