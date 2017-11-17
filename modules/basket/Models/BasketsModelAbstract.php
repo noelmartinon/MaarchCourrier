@@ -99,21 +99,27 @@ class BasketsModelAbstract extends \Apps_Table_Service
         return $aAction[0]['id_action'];
     }
 
-    public static function getBasketsByUserId(array $aArgs = [])
+    public static function getBasketsByUserId(array $aArgs)
     {
-        static::checkRequired($aArgs, ['userId']);
-        static::checkString($aArgs, ['userId']);
+        ValidatorModel::notEmpty($aArgs, ['userId']);
+        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::arrayType($aArgs, ['rejectedBaskets']);
+
 
         $userGroup = UserModel::getPrimaryGroupById(['userId' => $aArgs['userId']]);
 
-        $aRawBaskets = static::select(
-            [
-                'select'    => ['DISTINCT basket_id'],
-                'table'     => ['groupbasket'],
-                'where'     => ['group_id = ?'],
-                'data'      => [$userGroup['group_id']]
-            ]
-        );
+        $select = [
+            'select'    => ['DISTINCT basket_id'],
+            'table'     => ['groupbasket'],
+            'where'     => ['group_id = ?'],
+            'data'      => [$userGroup['group_id']]
+        ];
+        if (!empty($aArgs['rejectedBaskets'])) {
+            $select['where'][] = 'basket_id not in (?)';
+            $select['data'][] = $aArgs['rejectedBaskets'];
+        }
+
+        $aRawBaskets = DatabaseModel::select($select);
 
         $basketIds = [];
         foreach ($aRawBaskets as $value) {

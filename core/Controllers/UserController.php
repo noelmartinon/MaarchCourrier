@@ -40,7 +40,7 @@ class UserController
         $user['groups'] = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
         $user['entities'] = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
         $user['lang'] = LangModel::getProfileLang();
-        $user['baskets'] = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['baskets'] = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId'], 'rejectedBaskets' => ['IndexingBasket']]);
         $user['redirectedBaskets'] = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['regroupedBaskets'] = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['canModifyPassword'] = true;
