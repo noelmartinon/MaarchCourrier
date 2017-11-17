@@ -48,7 +48,7 @@ if ($watermarkTab['text'] == '') {
     $watermark = 'watermark by ' . $_SESSION['user']['UserId'];
 } elseif ($watermarkTab['text'] <> '') {
 	$watermark = $watermarkTab['text'];
-	preg_match_all('/\[(.*?)\]/i', $watermarkTab['text'], $matches);
+    preg_match_all('/\[(.*?)\]/i', $watermarkTab['text'], $matches);
     $date_now = '';
     $sqlArr = array();
     for ($z=0;$z<count($matches[1]);$z++) {
@@ -57,7 +57,14 @@ if ($watermarkTab['text'] == '') {
     		$currentText = date('d-m-Y');
     	} elseif ($matches[1][$z] == 'hour_now') {
     		$currentText = date('H:m:i');
-    	} else {
+        } elseif($matches[1][$z] == 'alt_identifier'){
+            $dbView = new Database();
+		    $query = " select " . $matches[1][$z] 
+		        . " as thecolumn from mlb_coll_ext where res_id = ?";
+		    $stmt = $dbView->query($query, array($_REQUEST['res_id_master']));
+            $returnQuery = $stmt->fetchObject();
+            $currentText = $returnQuery->thecolumn;
+        } else {
 		    $dbView = new Database();
 		    $query = " select " . $matches[1][$z] 
 		        . " as thecolumn from " . $table . " where res_id = ?";
@@ -72,6 +79,7 @@ if ($watermarkTab['text'] == '') {
     	);
     }  
 }
+
 $positionDefault = array();
 $position = array();
 $positionDefault['X'] = 50;

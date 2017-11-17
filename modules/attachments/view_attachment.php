@@ -141,7 +141,6 @@ if (! empty($_SESSION['error'])) {
             $docserver = $lineDoc->path_template;
             $file = $docserver . $path . $filename;
             $file = str_replace("#", DIRECTORY_SEPARATOR, $file);
-
             if (strtoupper($format) == "MAARCH") {
                 if (file_exists($file)) {
                     $myfile = fopen($file, "r");
@@ -178,6 +177,9 @@ if (! empty($_SESSION['error'])) {
                     }
                     //WATERMARK
                     if (strtoupper($format) == 'PDF') {
+                        if($_REQUEST['watermark_outgoing'] == 'true'){
+                            $_SESSION['modules_loaded']['attachments']['watermark']['enabled'] = 'true';
+                        }
                         if ($_SESSION['modules_loaded']['attachments']['watermark']['enabled'] == 'true') {
                             $table = 'res_attachments';
                             $watermarkForAttachments = true;

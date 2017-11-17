@@ -124,13 +124,23 @@ if ($s_id == '') {
                 array($s_id, $_SESSION['collection_id_choice']));
             $res_att = $stmt->fetchObject();
             if ($stmt->rowCount() > 0) {
-                ?>
-                <script type="text/javascript">
-                window.location.href = '<?php
-                    echo $_SESSION['config']['businessappurl'];
-                    ?>index.php?display=true&module=attachments&page=view_attachment&res_id_master=<?php echo $s_id;?>&id=<?php echo $res_att->res_id;?>'
-                </script>
+                if($_REQUEST['watermark_outgoing']=='true'){ ?>
+                    <script type="text/javascript">
+                    window.location.href = '<?php
+                        echo $_SESSION['config']['businessappurl'];
+                        ?>index.php?display=true&module=attachments&page=view_attachment&res_id_master=<?php echo $s_id;?>&id=<?php echo $res_att->res_id;?>&watermark_outgoing=true'
+                    </script>
                 <?php
+                    
+                } else {
+                ?>
+                    <script type="text/javascript">
+                    window.location.href = '<?php
+                        echo $_SESSION['config']['businessappurl'];
+                        ?>index.php?display=true&module=attachments&page=view_attachment&res_id_master=<?php echo $s_id;?>&id=<?php echo $res_att->res_id;?>'
+                    </script>
+                <?php
+                }
                 exit();
             }  else {
             	$stmt = $db->query("SELECT res_id FROM res_view_attachments WHERE status <> 'DEL' and status <> 'OBS' "
@@ -139,12 +149,12 @@ if ($s_id == '') {
                     . "OR (attachment_type = 'signed_response' and format = 'pdf')) order by res_id desc",
                     array($s_id, $_SESSION['collection_id_choice']));
             	$res_att = $stmt->fetchObject();
-            	if ($stmt->rowCount() > 0) {
+            	if ($stmt->rowCount() > 0) {                              
 	            ?>
 	            <script type="text/javascript">
 	                window.location.href = '<?php
 	                echo $_SESSION['config']['businessappurl'];
-	                ?>index.php?display=true&module=attachments&page=view_attachment&res_id_master=<?php 
+                    ?>index.php?display=true&module=attachments&page=view_attachment&res_id_master=<?php                        
                         echo $s_id;?>&id=<?php echo $res_att->res_id;?>'
 	            </script>
 	            <?php
@@ -187,7 +197,7 @@ if ($s_id == '') {
 	}else{
 		$_SESSION['origin'] = '';
 	}	
-    if (!$right) {
+    if (!$right) {        
         $_SESSION['error'] = _NO_RIGHT_TXT;
         ?>
         <script type="text/javascript">
@@ -235,7 +245,6 @@ if ($s_id == '') {
         ) {
             $viewResourceArr['mime_type'] = "text/html";
         }
-
         //WATERMARK
         if (strtoupper($viewResourceArr['ext']) == 'PDF') {
             if ($_SESSION['features']['watermark']['enabled'] == 'true') {
