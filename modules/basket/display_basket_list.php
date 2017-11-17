@@ -97,14 +97,6 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                             echo '<li style="padding-top: 5px;padding-bottom: 5px;"><i class="fa-li fa fa-users" style="padding-top: 5px;padding-bottom: 5px;"></i>'
                                 . '<small>' . functions::xssafe($currentGroup) . '</small></li>';
                         }
-                        if (
-                            $_SESSION['user']['baskets'][$i]['abs_basket'] == true
-                            && !$abs_basket
-                        ) {
-                            echo '</ul><br /><h3>' . _OTHER_BASKETS
-                                . ' :</h3><ul class="fa-ul">';
-                            $abs_basket = true;
-                        }
                         $nb = '';
                         if (
                             preg_match('/^CopyMailBasket/', $_SESSION['user']['baskets'][$i]['id'])
@@ -133,6 +125,16 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                 }
                             }
                             if (empty($redirectedTo)) {
+
+                                if (
+                                    $_SESSION['user']['baskets'][$i]['abs_basket'] == true
+                                    && !$abs_basket
+                                ) {
+                                    echo '</ul><br /><h3>' . _OTHER_BASKETS
+                                        . ' :</h3><ul class="fa-ul">';
+                                    $abs_basket = true;
+                                }
+                                
                                 $color = $_SESSION['user']['baskets'][$i]['color'];
                                 foreach ($coloredBaskets as $coloredBasket) {
                                     if ($coloredBasket['basket_id'] == $_SESSION['user']['baskets'][$i]['id'] && $coloredBasket['group_id'] == $_SESSION['user']['baskets'][$i]['group_id']) {
@@ -162,7 +164,7 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                         . '<span style="color: ' .$color . '">' . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . '</span>'
                                         . ' </a></li>';
                                 }
-                            } else {
+                            } else if(!$abs_basket){
                                 echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '"><i class="fa-li fa fa-spinner fa-spin" style="margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
