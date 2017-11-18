@@ -507,12 +507,13 @@ abstract class visa_Abstract extends Database
 	public function getList($res_id, $coll_id, $bool_modif=false, $typeList, $isVisaStep = false, $fromDetail = ""){
 			$core = new core_tools();      
 			$circuit = $this->getWorkflow($res_id, $coll_id, $typeList);
-			if ($this->isAllAttachementSigned($res_id) == 'noAttachment') {
+			$sAllAttachmentSigned = $this->isAllAttachementSigned($res_id);
+			if ($sAllAttachmentSigned == 'noAttachment') {
 				$str = '<input type="hidden" id="isAllAttachementSigned" value="true"/>';
 				$isAllAttachementSigned = " disabled='disabled'";
 				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO;
 
-			} else if ($this->isAllAttachementSigned($res_id) == 'yes') {
+			} else if ($sAllAttachmentSigned == 'yes') {
 				$str = '<input type="hidden" id="isAllAttachementSigned" value="true"/>';
 				$isAllAttachementSigned = " disabled='disabled'";
 				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO2;				
@@ -1206,11 +1207,9 @@ abstract class visa_Abstract extends Database
 	public function isAllAttachementSigned($res_id){
 		
 		$db = new Database();
-		$stmt = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = false AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder') AND res_id_master = ?", array($res_id));
-		$res = $stmt->fetchObject();
-		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder') AND res_id_master = ?", array($res_id));
+		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
 		$res2 = $stmt2->fetchObject();
-		$stmt3 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder') AND res_id_master = ?", array($res_id));
+		$stmt3 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
 		$res3 = $stmt3->fetchObject();
 		if ($res3->nb == 0) {
 			return 'noAttachment';
@@ -1275,7 +1274,7 @@ abstract class PdfNotes_Abstract extends FPDI
 			}
 			$data[] = array(utf8_decode($user),$date,utf8_decode($notes));
 		}
-                //var_dump(utf8_decode($notes));
+
 		return $data;
 	}
 
