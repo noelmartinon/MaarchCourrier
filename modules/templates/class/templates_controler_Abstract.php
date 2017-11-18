@@ -196,7 +196,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     );
                     return $return;
                 }*/
-                if ((($mode == 'up' && $_SESSION['m_admin']['templates']['applet']) || $mode == 'add') 
+                if (($mode == 'up' || $mode == 'add') 
                   /*  && $_SESSION['m_admin']['templates']['applet'] */
                 ) {
                     $storeInfos = array();
