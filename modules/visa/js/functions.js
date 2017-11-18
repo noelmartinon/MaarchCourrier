@@ -119,6 +119,7 @@ function resetPosVisa () {
 function updateVisaWorkflow(resId) {
     var i = 0;
     var userList = [];
+    var hasSignatory = false;
     if (($j("select[id^=signRequest_] option:selected[value=true]").length == 0) && $j(".droptarget").length != 0) {
         $j('#signRequest_'+i).val("true");
     }
@@ -139,6 +140,14 @@ function updateVisaWorkflow(resId) {
             userConsigne = $j("#" + this.id).find(".consigne").val();
             userVisaDate = $j("#" + this.id).find(".visaDate").val();
             userPos = i;
+            // last one is signatory if no one selected
+            if(userRequestSign || userSignatory){
+                hasSignatory = true;
+            }
+            if ($j("#signRequest_"+(i+2)).length == 0 && !hasSignatory) {
+                userRequestSign=true;
+                $j('#signRequest_'+(i+1)).val("true");
+            }
             userList.push({userId: userId, userPos: userPos, userConsigne: userConsigne, userVisaDate: userVisaDate, userRequestSign: userRequestSign, userSignatory: userSignatory});
             i++;
         });
