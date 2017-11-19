@@ -187,7 +187,7 @@
                             <div style="margin-left: 16%;padding-top: 15px">Ctrl + Clic pour sélectionner plusieurs corbeilles</div>
                             <div class="form-group" style="margin-left: 16%;max-width: 51%;">
                                 <select style="height: 150px;max-width: 87%;" id="selectBasketAbsenceUser" class="form-control" multiple name="basketsToRedirect" [(ngModel)]="basketsToRedirect">
-                                    <option *ngFor="let basket of user.baskets; let i = index" [disabled]="basket.disabled" [value]="i" title="{{basket.basket_name}}">
+                                    <option *ngFor="let basket of user.baskets; let i = index" [disabled]="basket.disabled" [value]="i" title="{{basket.basket_name}} {{basket.userToDisplay ? '('+basket.userToDisplay+')' : ''}}">
                                         {{basket.basket_name}}
                                         <span *ngIf="basket.userToDisplay">({{basket.userToDisplay}})</span>
                                     </option>
