@@ -1065,6 +1065,14 @@ function destroyModal(id_mod){
     document.getElementsByTagName('body')[0].removeChild($j("#" + id_mod)[0]);
     document.getElementsByTagName('body')[0].removeChild($j("#" + id_layer)[0]);
     $j("input[type='button']").prop("disabled", false).css("opacity", "1");
+
+    // FIX IE 11
+    if($j('#leftPanelShowDocumentIframe')){
+       $j('#leftPanelShowDocumentIframe').show(); 
+    }
+    if($j('#rightPanelShowDocumentIframe')){
+       $j('#rightPanelShowDocumentIframe').show(); 
+    }
 }
 
 /**
