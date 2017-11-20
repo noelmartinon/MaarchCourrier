@@ -89,7 +89,8 @@ array_push(
     "contact_firstname", "contact_lastname", "contact_society", "user_lastname", 
     "user_firstname", "priority", "creation_date", "admission_date", "subject", 
     "process_limit_date", "entity_label", "dest_user", "category_id", "type_label", 
-    "address_id", "exp_user_id", "doc_custom_n1 as count_attachment", "alt_identifier", "is_multicontacts", "locker_user_id", "locker_time", "viewed"
+    "address_id", "exp_user_id", "doc_custom_n1 as count_attachment", "alt_identifier", 
+    "is_multicontacts", "locker_user_id", "locker_time", "doc_custom_n2 as viewed"
 );
                         
 if ($core_tools->is_module_loaded("cases") == true) {
