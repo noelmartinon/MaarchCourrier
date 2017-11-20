@@ -2061,16 +2061,16 @@ $content .= '</div>';
 $content .= '<div style="float: right; width: 65%">';
 
 $content .= '<div id="menuOnglet">
-                <ul id="ongletAttachement">
+                <ul id="ongletAttachement" style="cursor:pointer">
                     <li id="liAttachement" ';
 
                 if(empty($_REQUEST['id'])){
                     $content .= ' style="display:none" ';
                 }
 
-                    $content .= 'onclick="activeOngletAttachement()"><a href="#"> Pièce jointe </a></li>';
+                    $content .= 'onclick="activeOngletAttachement()"> Pièce jointe </li>';
                     if($_GET['cat'] != 'outgoing' && $data_attachment->attachment_type != 'outgoing_mail'){
-                        $content .='<li id="liMainDocument" onclick="activeOngletMainDocument()"><a href="#"> Document principal </a></li>';
+                        $content .='<li id="liMainDocument" onclick="activeOngletMainDocument()"> Document principal </li>';
                     }
                 $content .='</ul>
             </div>';
