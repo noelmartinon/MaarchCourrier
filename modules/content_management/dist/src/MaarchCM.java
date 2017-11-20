@@ -338,6 +338,22 @@ public class MaarchCM {
                 if ("linux".equals(os) || "mac".equals(os)) {
                     editMode = "libreoffice";
                 } else {
+                    programName = fM.findGoodProgramWithExt(fileExtension);
+                    String pathProgram;
+                    pathProgram = fM.findPathProgramInRegistry(programName);
+                    System.out.println("check prog name : "+programName);
+                    System.out.println("check path : "+pathProgram);
+                    if("soffice.exe".equals(programName)){   
+                        if("\"null\"".equals(pathProgram)){
+                            System.out.println(programName+" not found! switch to microsoft office...");
+                            programName = "office.exe";
+                        }
+                    }else{
+                        if("\"null\"".equals(pathProgram)){
+                            System.out.println(programName+" not found! switch to libreoffice...");
+                            programName = "soffice.exe";
+                        }
+                    }
                     if("soffice.exe".equals(programName)){
                         editMode = "libreoffice";
                     }else{
@@ -964,4 +980,3 @@ public class MaarchCM {
         }
     }
 }
-
