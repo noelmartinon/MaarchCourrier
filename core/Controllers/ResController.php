@@ -15,6 +15,7 @@
 
 namespace Core\Controllers;
 
+use Core\Models\StatusModel;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Respect\Validation\Validator;
@@ -297,6 +298,9 @@ class ResController
 
         if (empty($data['status'])) {
             $data['status'] = 'COU';
+        }
+        if (empty(StatusModel::getById(['id' => $data['status']]))) {
+            return $response->withStatus(400)->withJson(['errors' => 'Status not found']);
         }
         if (empty($data['historyMessage'])) {
             $data['historyMessage'] = _UPDATE_STATUS;

@@ -36,10 +36,10 @@ class ContactsModelAbstract extends Apps_Table_Service
 
     public static function create(array $aArgs)
     {
-        \Core\Models\ValidatorModel::notEmpty($aArgs, ['firstname', 'lastname', 'contactType', 'isCorporatePerson', 'email', 'userId', 'entityId']);
+        \Core\Models\ValidatorModel::notEmpty($aArgs, ['firstname', 'lastname', 'contactType', 'isCorporatePerson', 'userId', 'entityId']);
         \Core\Models\ValidatorModel::intVal($aArgs, ['contactType']);
         \Core\Models\ValidatorModel::stringType($aArgs, [
-            'firstname', 'lastname', 'isCorporatePerson', 'email', 'society',
+            'firstname', 'lastname', 'isCorporatePerson', 'society',
             'societyShort', 'title', 'function', 'otherData', 'userId', 'entityId'
         ]);
 
@@ -71,11 +71,11 @@ class ContactsModelAbstract extends Apps_Table_Service
 
     public static function createAddress(array $aArgs)
     {
-        \Core\Models\ValidatorModel::notEmpty($aArgs, ['contactId', 'contactPurposeId', 'userId', 'entityId', 'isPrivate']);
+        \Core\Models\ValidatorModel::notEmpty($aArgs, ['contactId', 'contactPurposeId', 'userId', 'entityId', 'isPrivate', 'email']);
         \Core\Models\ValidatorModel::intVal($aArgs, ['contactId', 'contactPurposeId']);
         \Core\Models\ValidatorModel::stringType($aArgs, [
             'departement', 'addressFirstname', 'addressLastname', 'addressTitle', 'addressFunction', 'occupancy', 'addressNum', 'addressStreet', 'addressComplement',
-            'addressTown', 'addressZip', 'addressCountry', 'phone', 'addressEmail', 'website', 'salutationHeader', 'salutationFooter', 'addressOtherData',
+            'addressTown', 'addressZip', 'addressCountry', 'phone', 'email', 'website', 'salutationHeader', 'salutationFooter', 'addressOtherData',
             'userId', 'entityId', 'isPrivate'
         ]);
 
@@ -100,7 +100,7 @@ class ContactsModelAbstract extends Apps_Table_Service
                 'address_postal_code'   => $aArgs['addressZip'],
                 'address_country'       => $aArgs['addressCountry'],
                 'phone'                 => $aArgs['phone'],
-                'email'                 => $aArgs['addressEmail'],
+                'email'                 => $aArgs['email'],
                 'website'               => $aArgs['website'],
                 'salutation_header'     => $aArgs['salutationHeader'],
                 'salutation_footer'     => $aArgs['salutationFooter'],
