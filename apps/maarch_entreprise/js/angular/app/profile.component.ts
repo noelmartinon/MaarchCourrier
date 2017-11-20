@@ -255,7 +255,7 @@ export class ProfileComponent implements OnInit {
                     });
                 });
         } else {
-            this.resultInfo = "Veuillez sélectionner au moins une corbeille et un utilisateur";
+            this.resultInfo = "Veuillez sélectionner au moins une bannette et un utilisateur";
             $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
             $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
                 $j("#resultInfo").slideUp(500);

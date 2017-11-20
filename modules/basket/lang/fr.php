@@ -21,21 +21,21 @@
 
 /*********************** SERVICES ***********************************/
 if (!defined("_ADMIN_BASKETS"))
-    define("_ADMIN_BASKETS", "Corbeilles");
+    define("_ADMIN_BASKETS", "Bannettes");
 if (!defined("_ADMIN_BASKETS_DESC"))
-    define("_ADMIN_BASKETS_DESC", "Définir le contenu des corbeilles et les affecter à des groupes d'utilisateurs. Enumérer les redirections possibles lors de l'utilisation de la corbeille par un groupe donné. Attribuer un format d'affichage de la corbeille par ce groupe.");
+    define("_ADMIN_BASKETS_DESC", "Définir le contenu des bannettes et les affecter à des groupes d'utilisateurs. Enumérer les redirections possibles lors de l'utilisation de la bannette par un groupe donné. Attribuer un format d'affichage de la bannette par ce groupe.");
 if (!defined("_USE_BASKETS"))
-    define("_USE_BASKETS", "Utiliser les corbeilles");
+    define("_USE_BASKETS", "Utiliser les bannettes");
 if (!defined("_DIFFUSION_LIST"))
     define("_DIFFUSION_LIST", "Liste de diffusion");
 
 //class basket
 if (!defined("_BASKET"))
-    define("_BASKET", "Corbeille");
+    define("_BASKET", "Bannette");
 if (!defined("_BASKETS_COMMENT"))
-    define("_BASKETS_COMMENT", "Corbeilles");
+    define("_BASKETS_COMMENT", "Bannettes");
 if (!defined("_THE_BASKET"))
-    define("_THE_BASKET", "La corbeille ");
+    define("_THE_BASKET", "La bannette ");
 if (!defined("_THE_ID"))
     define("_THE_ID", "L'identifiant ");
 if (!defined("_THE_DESC"))
@@ -43,85 +43,85 @@ if (!defined("_THE_DESC"))
 if (!defined("_BELONGS_TO_NO_GROUP"))
     define("_BELONGS_TO_NO_GROUP", "n'appartient à aucun groupe");
 if (!defined("_SYSTEM_BASKET_MESSAGE"))
-    define("_SYSTEM_BASKET_MESSAGE", "Cette corbeille est une corbeille système, vous ne pouvez pas modifier la table et la where clause. Elles sont affichées à titre indicatif");
+    define("_SYSTEM_BASKET_MESSAGE", "Cette bannette est une bannette système, vous ne pouvez pas modifier la table et la where clause. Elles sont affichées à titre indicatif");
 if (!defined("_BASKET_MISSING"))
-    define("_BASKET_MISSING", "La Corbeille n'existe pas");
+    define("_BASKET_MISSING", "La bannette n'existe pas");
 if (!defined("_BASKET_UPDATED"))
-    define("_BASKET_UPDATED", "Corbeille modifiée");
+    define("_BASKET_UPDATED", "Bannette modifiée");
 if (!defined("_BASKET_UPDATE"))
-    define("_BASKET_UPDATE", "Modification de la corbeille");
+    define("_BASKET_UPDATE", "Modification de la bannette");
 if (!defined("_BASKET_ADDED"))
-    define("_BASKET_ADDED", "Nouvelle corbeille ajoutée");
+    define("_BASKET_ADDED", "Nouvelle bannette ajoutée");
 if (!defined("_DELETED_BASKET"))
-    define("_DELETED_BASKET", "Corbeille supprimée");
+    define("_DELETED_BASKET", "Bannette supprimée");
 if (!defined("_BASKET_DELETION"))
-    define("_BASKET_DELETION", "Suppression de la corbeille");
+    define("_BASKET_DELETION", "Suppression de la bannette");
 if (!defined("_BASKET_AUTORIZATION"))
-    define("_BASKET_AUTORIZATION", "Autorisation de la corbeille");
+    define("_BASKET_AUTORIZATION", "Autorisation de la bannette");
 if (!defined("_BASKET_SUSPENSION"))
-    define("_BASKET_SUSPENSION", "Suspension de la corbeille");
+    define("_BASKET_SUSPENSION", "Suspension de la bannette");
 if (!defined("_AUTORIZED_BASKET"))
-    define("_AUTORIZED_BASKET", "Corbeille autorisée");
+    define("_AUTORIZED_BASKET", "Bannette autorisée");
 if (!defined("_SUSPENDED_BASKET"))
-    define("_SUSPENDED_BASKET", "Corbeille suspendue");
+    define("_SUSPENDED_BASKET", "Bannette suspendue");
 if (!defined("_NO_BASKET_DEFINED_FOR_YOU"))
-    define("_NO_BASKET_DEFINED_FOR_YOU", "Aucune corbeille définie pour cet utilisateur");
+    define("_NO_BASKET_DEFINED_FOR_YOU", "Aucune bannette définie pour cet utilisateur");
 if (!defined("_BASKET_VISIBLE"))
-    define("_BASKET_VISIBLE", "Corbeille visible");
+    define("_BASKET_VISIBLE", "Bannette visible");
 if (!defined("_BASKETS_LIST"))
-    define("_BASKETS_LIST", "Liste des corbeilles");
+    define("_BASKETS_LIST", "Liste des bannettes");
 
-/////// frame corbeilles
+/////// frame bannettes
 if (!defined("_BASKETS"))
-    define("_BASKETS", "Corbeilles");
+    define("_BASKETS", "Bannettes");
 if (!defined("_CHOOSE_BASKET"))
-    define("_CHOOSE_BASKET", "Choisissez une corbeille");
+    define("_CHOOSE_BASKET", "Choisissez une bannette");
 if (!defined("_PROCESS_BASKET"))
     define("_PROCESS_BASKET", "Votre courrier à traiter");
 if (!defined("_VALIDATION_BASKET"))
     define("_VALIDATION_BASKET", "Votre courrier à valider");
 if (!defined("_MANAGE_BASKETS"))
-    define("_MANAGE_BASKETS", "Gérer les corbeilles");
+    define("_MANAGE_BASKETS", "Gérer les bannettes");
 if (!defined("_MANAGE_BASKETS_APP"))
-    define("_MANAGE_BASKETS_APP", "Gérer les corbeilles de l'application");
+    define("_MANAGE_BASKETS_APP", "Gérer les bannettes de l'application");
 
-/************** Corbeille : Liste + Formulaire**************/
+/************** Bannette : Liste + Formulaire**************/
 if (!defined("_ALL_BASKETS"))
-    define("_ALL_BASKETS", "Toutes les corbeilles");
+    define("_ALL_BASKETS", "Toutes les bannettes");
 if (!defined("_BASKET_LIST"))
-    define("_BASKET_LIST", "Liste des corbeilles");
+    define("_BASKET_LIST", "Liste des bannettes");
 if (!defined("_ADD_BASKET"))
-    define("_ADD_BASKET", "Ajouter une corbeille");
+    define("_ADD_BASKET", "Ajouter une bannette");
 if (!defined("_BASKET_ADDITION"))
-    define("_BASKET_ADDITION", "Ajout d'une corbeille");
+    define("_BASKET_ADDITION", "Ajout d'une bannette");
 if (!defined("_BASKET_MODIFICATION"))
-    define("_BASKET_MODIFICATION", "Modification d'une corbeille");
+    define("_BASKET_MODIFICATION", "Modification d'une bannette");
 if (!defined("_BASKET_VIEW"))
     define("_BASKET_VIEW", "Vue sur la table");
 if (!defined("_MODIFY_BASKET"))
-    define("_MODIFY_BASKET", "Modifier la corbeille");
+    define("_MODIFY_BASKET", "Modifier la bannette");
 if (!defined("_ADD_A_NEW_BASKET"))
-    define("_ADD_A_NEW_BASKET", "Créer une nouvelle corbeille");
+    define("_ADD_A_NEW_BASKET", "Créer une nouvelle bannette");
 if (!defined("_ADD_A_GROUP_TO_BASKET"))
-    define("_ADD_A_GROUP_TO_BASKET", "Associer un nouveau groupe à la corbeille");
+    define("_ADD_A_GROUP_TO_BASKET", "Associer un nouveau groupe à la bannette");
 if (!defined("_DEL_GROUPS"))
     define("_DEL_GROUPS", "Supprimer groupe(s)");
 if (!defined("_BASKET_NOT_USABLE"))
-    define("_BASKET_NOT_USABLE", "Aucun groupe associé (la corbeille est inutilisable pour l'instant)");
+    define("_BASKET_NOT_USABLE", "Aucun groupe associé (la bannette est inutilisable pour l'instant)");
 if (!defined("_ASSOCIATED_GROUP"))
-    define("_ASSOCIATED_GROUP", "Liste des groupes associés à la corbeille");
+    define("_ASSOCIATED_GROUP", "Liste des groupes associés à la bannette");
 if (!defined("_TITLE_GROUP_BASKET"))
-    define("_TITLE_GROUP_BASKET", "Associer la corbeille à un groupe");
+    define("_TITLE_GROUP_BASKET", "Associer la bannette à un groupe");
 if (!defined("_ADD_TO_BASKET"))
-    define("_ADD_TO_BASKET", "Associer la corbeille");
+    define("_ADD_TO_BASKET", "Associer la bannette");
 if (!defined("_TO_THE_GROUP"))
     define("_TO_THE_GROUP", "à un groupe");
 if (!defined("_ALLOWED_ACTIONS"))
     define("_ALLOWED_ACTIONS", "Actions autorisées");
 if (!defined("_SERVICES_BASKETS"))
-    define("_SERVICES_BASKETS", "Corbeilles de services");
+    define("_SERVICES_BASKETS", "Bannettes de services");
 if (!defined("_USERGROUPS_BASKETS"))
-    define("_USERGROUPS_BASKETS", "Corbeilles des groupes d'utilisateurs");
+    define("_USERGROUPS_BASKETS", "Bannettes des groupes d'utilisateurs");
 if (!defined("_BASKET_RESULT_PAGE"))
     define("_BASKET_RESULT_PAGE", "Liste de résultats");
 if (!defined("_ADD_THIS_GROUP"))
@@ -144,7 +144,7 @@ if (!defined("_WAITING_QUAL_LIST"))
 if (!defined("_WAITING_DISTRIB_LIST"))
     define("_WAITING_DISTRIB_LIST", "Liste des courriers en attente de distribution");
 if (!defined("_NO_REDIRECT_RIGHT"))
-    define("_NO_REDIRECT_RIGHT", "Vous n'avez pas le droit de redirection dans cette corbeille");
+    define("_NO_REDIRECT_RIGHT", "Vous n'avez pas le droit de redirection dans cette bannette");
 if (!defined("_CLICK_LINE_BASKET1"))
     define("_CLICK_LINE_BASKET1", "Cliquez sur une ligne pour qualifier un document");
 
@@ -230,7 +230,7 @@ if (!defined("_ENTITY_UPDATE"))
 if (!defined("_MY_ABS"))
     define("_MY_ABS", "Gérer mes absences");
 if (!defined("_MY_ABS_TXT"))
-    define("_MY_ABS_TXT", "Permet de rediriger vos corbeilles en cas de départ en congé.");
+    define("_MY_ABS_TXT", "Permet de rediriger vos bannettes en cas de départ en congé.");
 if (!defined("_MY_ABS_REDIRECT"))
     define("_MY_ABS_REDIRECT", "Vos courriers sont actuellement redirigés vers");
 if (!defined("_MY_ABS_DEL"))
@@ -320,27 +320,27 @@ if (!defined("_REDIRECT_TO_USER_OK"))
 if (!defined("_SAVE_CHANGES"))
     define("_SAVE_CHANGES", "Enregistrer les modifications");
 if (!defined("_VIEW_BASKETS"))
-    define("_VIEW_BASKETS", "Mes corbeilles");
+    define("_VIEW_BASKETS", "Mes bannettes");
 if (!defined("_VIEW_BASKETS_DESC"))
-    define("_VIEW_BASKETS_DESC", "Mes corbeilles");
+    define("_VIEW_BASKETS_DESC", "Mes bannettes");
 if (!defined("_VIEW_BASKETS_TITLE"))
-    define("_VIEW_BASKETS_TITLE", "Mes corbeilles");
+    define("_VIEW_BASKETS_TITLE", "Mes bannettes");
 if (!defined("_INVOICE_LIST_TO_VAL"))
     define("_INVOICE_LIST_TO_VAL", "Factures à valider");
 if (!defined("_POSTINDEXING_LIST"))
     define("_POSTINDEXING_LIST", "Documents à vidéocoder");
 if (!defined("_MY_BASKETS"))
-    define("_MY_BASKETS", "Mes corbeilles");
+    define("_MY_BASKETS", "Mes bannettes");
 if (!defined("_REDIRECT_MY_BASKETS"))
-    define("_REDIRECT_MY_BASKETS", "Rediriger les corbeilles");
+    define("_REDIRECT_MY_BASKETS", "Rediriger les bannettes");
 if (!defined("_NAME"))
     define("_NAME", "Nom");
 if (!defined("_CHOOSE_USER_TO_REDIRECT"))
-    define("_CHOOSE_USER_TO_REDIRECT", "Vous devez rediriger au moins une des corbeilles vers un utilisateur.");
+    define("_CHOOSE_USER_TO_REDIRECT", "Vous devez rediriger au moins une des bannettes vers un utilisateur.");
 if (!defined("_FORMAT_ERROR_ON_USER_FIELD"))
     define("_FORMAT_ERROR_ON_USER_FIELD", "Un champ n'est pas dans le bon format : Nom, Prénom (Identifiant)");
 if (!defined("_BASKETS_OWNER_MISSING"))
-    define("_BASKETS_OWNER_MISSING", "Le propriétaire des corbeilles n'est pas défini.");
+    define("_BASKETS_OWNER_MISSING", "Le propriétaire des bannettes n'est pas défini.");
 if (!defined("_FORM_ERROR"))
     define("_FORM_ERROR", "Erreur dans la transmission du formulaire...");
 if (!defined("_USER_ABS"))
@@ -374,17 +374,17 @@ if (!defined("_FILTER_BY_ENTITY"))
 if (!defined("_FILTER_BY"))
     define("_FILTER_BY", "Filtrer par");
 if (!defined("_OTHER_BASKETS"))
-    define("_OTHER_BASKETS", "Autres corbeilles");
+    define("_OTHER_BASKETS", "Autres bannettess");
 if (!defined("_SPREAD_SEARCH_TO_BASKETS"))
-    define("_SPREAD_SEARCH_TO_BASKETS", "Etendre la recherche aux corbeilles");
+    define("_SPREAD_SEARCH_TO_BASKETS", "Etendre la recherche aux bannettes");
 if (!defined("_BASKET_WELCOME_TXT1"))
-    define("_BASKET_WELCOME_TXT1", "Durant votre navigation dans les corbeilles,");
+    define("_BASKET_WELCOME_TXT1", "Durant votre navigation dans les bannettes,");
 if (!defined("_BASKET_WELCOME_TXT2"))
-    define("_BASKET_WELCOME_TXT2", "cliquez, à tout moment, dans la liste ci-dessus <br/>pour changer de corbeille");
+    define("_BASKET_WELCOME_TXT2", "cliquez, à tout moment, dans la liste ci-dessus <br/>pour changer de bannette");
 if (!defined("_VIEWED"))
     define("_VIEWED", "Vu?");
 if (!defined("_SEE_BASKETS_RELATED"))
-    define("_SEE_BASKETS_RELATED", "Voir les corbeilles associées");
+    define("_SEE_BASKETS_RELATED", "Voir les bannettes associées");
 if (!defined("_GO_MANAGE_BASKET"))
     define("_GO_MANAGE_BASKET", "Modifier");
 
@@ -411,18 +411,18 @@ if (!defined("_END_OF_THE_WF"))
     define("_END_OF_THE_WF", "Fin du workflow");
 
 if (!defined("_BASKET_VISIBLE_ONLY_ON_SEARCH"))
-    define("_BASKET_VISIBLE_ONLY_ON_SEARCH", "Corbeille de recherche uniquement");
+    define("_BASKET_VISIBLE_ONLY_ON_SEARCH", "Bannette de recherche uniquement");
 
 if (!defined("_MANAGE_SECONDARY_USER_BASKETS"))
-    define("_MANAGE_SECONDARY_USER_BASKETS", "Gérer l'accès aux corbeilles des groupes secondaires.");
+    define("_MANAGE_SECONDARY_USER_BASKETS", "Gérer l'accès aux bannettes des groupes secondaires.");
 if (!defined("_MANAGE_SECONDARY_USER_BASKETS_TEXT"))
-    define("_MANAGE_SECONDARY_USER_BASKETS_TEXT", "Permet de gérer l'accès à des corbeilles des groupes secondaires de l'utilisateur.");
+    define("_MANAGE_SECONDARY_USER_BASKETS_TEXT", "Permet de gérer l'accès à des bannettes des groupes secondaires de l'utilisateur.");
 if (!defined("_MANAGE_SECONDARY_USER_BASKETS_HELP"))
-    define("_MANAGE_SECONDARY_USER_BASKETS_HELP", "L'utilisateur doit avoir au moins un groupe secondaire ayant des corbeilles pour accéder à cette fonctionnalité.");
+    define("_MANAGE_SECONDARY_USER_BASKETS_HELP", "L'utilisateur doit avoir au moins un groupe secondaire ayant des bannettes pour accéder à cette fonctionnalité.");
 if (!defined("_MANAGE_SECONDARY_USER_BASKETS_HELP_COMPL"))
-    define("_MANAGE_SECONDARY_USER_BASKETS_HELP_COMPL", "(Ajouter un groupe secondaire ayant des corbeilles puis enregistrer l'utilisateur avant de revenir sur cet écran).");
+    define("_MANAGE_SECONDARY_USER_BASKETS_HELP_COMPL", "(Ajouter un groupe secondaire ayant des bannettes puis enregistrer l'utilisateur avant de revenir sur cet écran).");
 if (!defined("_MANAGE_BASKET_ORDER"))
-    define("_MANAGE_BASKET_ORDER", "Gérer l'ordre des corbeilles");
+    define("_MANAGE_BASKET_ORDER", "Gérer l'ordre des bannettes");
 if (!defined("_MOVE_UP_TOP"))
     define("_MOVE_UP_TOP", "Remonter tout en haut de la liste");
 if (!defined("_MOVE_UP_ONE_LEVEL"))
@@ -433,4 +433,4 @@ if (!defined("_MOVE_DOWN_BOTTOM"))
     define("_MOVE_DOWN_BOTTOM", "Descendre tout en bas de la liste");
 
 if (!defined("_BASKET_ORDER_EDITED"))
-    define("_BASKET_ORDER_EDITED", "Ordre des corbeilles modifié");
+    define("_BASKET_ORDER_EDITED", "Ordre des bannettes modifié");

@@ -117,7 +117,7 @@ if (!defined("_THIS_CASE_IS_CLOSED"))
 if (!defined("_CASE_CREATED"))
     define("_CASE_CREATED","Affaire crée");
 if (!defined("_JOIN_RES_CASE_IN_PROCESS"))
-    define("_JOIN_RES_CASE_IN_PROCESS","Attacher des courriers aux affaires (corbeille de traitement)");
+    define("_JOIN_RES_CASE_IN_PROCESS","Attacher des courriers aux affaires (bannette de traitement)");
 if (!defined("_CLOSE_CASE"))
     define("_CLOSE_CASE","Clôturer des affaires");
 if (!defined("_LINK_TO_CASE"))

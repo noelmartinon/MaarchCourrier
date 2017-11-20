@@ -325,7 +325,7 @@ if (!defined("_SEARCH_FOLDER_TREE"))
 if (!defined("_NB_DOCS_IN_FOLDER"))                 
     define("_NB_DOCS_IN_FOLDER", "Nombre de documents");
 if (!defined("_IS_FOLDER_BASKET"))                  
-    define("_IS_FOLDER_BASKET", "Corbeille de dossier");
+    define("_IS_FOLDER_BASKET", "Bannette de dossier");
 if (!defined("_IS_FOLDER_STATUS"))                  
     define("_IS_FOLDER_STATUS", "Statut de dossier");
 if (!defined("_IS_FOLDER_ACTION"))                  

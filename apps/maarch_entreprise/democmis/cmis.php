@@ -42,7 +42,7 @@
           <p></p>
         </form-->
         <p>
-          </p><h4>Voir la liste des corbeilles</h4>
+          </p><h4>Voir la liste des bannettes</h4>
           <div id="liencmis"> 
             <a href="<?php echo $_SESSION['config']['coreurl'];?>ws_server.php?cmis/letterbox_coll/basket" target="_blank">
               <?php echo $_SESSION['config']['coreurl'];?>ws_server.php?cmis/letterbox_coll/basket
@@ -51,7 +51,7 @@
           <!--curl -X GET -ubblier:maarch "<?php echo $_SESSION['config']['coreurl'];?>ws_server.php?REST/basket"-->
         <p></p>
         <p>
-          </p><h4>Liste des documents d'une corbeille</h4>
+          </p><h4>Liste des documents d'une bannette</h4>
           <div id="liencmis">
             <a href="<?php echo $_SESSION['config']['coreurl'];?>ws_server.php?cmis/letterbox_coll/basket/InitBasket" target="_blank">
               <?php echo $_SESSION['config']['coreurl'];?>ws_server.php?cmis/letterbox_coll/basket/InitBasket

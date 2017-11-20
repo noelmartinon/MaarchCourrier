@@ -239,7 +239,7 @@ if (!defined("_WELCOME_TITLE")) define("_WELCOME_TITLE", "Accueil");
 if (!defined("_HELP")) define("_HELP", "Aide");
 if (!defined("_SEARCH_ADV_SHORT")) define("_SEARCH_ADV_SHORT", "Recherche Avancée");
 if (!defined("_SEARCH_SCOPE")) define("_SEARCH_SCOPE", "Portée de la recherche");
-if (!defined("_SEARCH_SCOPE_HELP")) define("_SEARCH_SCOPE_HELP", "Etend la recherche aux corbeilles; autorise les actions si une corbeille particulière est sélectionnée");
+if (!defined("_SEARCH_SCOPE_HELP")) define("_SEARCH_SCOPE_HELP", "Etend la recherche aux bannettes; autorise les actions si une bannette particulière est sélectionnée");
 if (!defined("_RESULTS")) define("_RESULTS", "Résultat(s)");
 if (!defined("_USERS_LIST_SHORT")) define("_USERS_LIST_SHORT", "Liste utilisateurs");
 if (!defined("_MODELS_LIST_SHORT")) define("_MODELS_LIST_SHORT", "Liste modèles");
@@ -1272,7 +1272,7 @@ if (!defined("_CLOSE_MAIL")) define("_CLOSE_MAIL", "Clôturer un courrier");
 /************** Réouverture courrier **************/
 if (!defined("_MAIL_SENTENCE2")) define("_MAIL_SENTENCE2", "En saisissant le n° chrono ou le n°GED du document, vous modifierez le statut du courrier.");
 if (!defined("_MAIL_SENTENCE3")) define("_MAIL_SENTENCE3", "Cette fonction a pour but de changer le statut d' un courrier.");
-if (!defined("_MAIL_SENTENCE4")) define("_MAIL_SENTENCE4", "Le courrier sera disponible dans la corbeille des utilisateurs auquel il était affecté suivant le statut que vous aurez défini.");
+if (!defined("_MAIL_SENTENCE4")) define("_MAIL_SENTENCE4", "Le courrier sera disponible dans la bannette des utilisateurs auquel il était affecté suivant le statut que vous aurez défini.");
 if (!defined("_MAIL_SENTENCE5")) define("_MAIL_SENTENCE5", "d'accueil suite à la réouverture du courrier.");
 if (!defined("_ENTER_DOC_ID")) define("_ENTER_DOC_ID", " ou le n° GED du document ");
 if (!defined("_ENTER_REF_ID")) define("_ENTER_REF_ID", "Saisissez le n° chrono");

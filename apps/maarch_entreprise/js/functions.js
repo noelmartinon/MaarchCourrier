@@ -1028,11 +1028,11 @@ function test_form()
     }
     else if(error_num == 3)
     {
-        alert("Le propriétaire des corbeilles n'est pas défini.");
+        alert("Le propriétaire des bannettes n'est pas défini.");
     }
     else if(error_num == 4)
     {
-        alert("Vous devez rediriger au moins une des corbeilles vers un utilisateur.");
+        alert("Vous devez rediriger au moins une des bannettes vers un utilisateur.");
     }
     else
     {
