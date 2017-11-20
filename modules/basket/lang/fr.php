@@ -374,7 +374,7 @@ if (!defined("_FILTER_BY_ENTITY"))
 if (!defined("_FILTER_BY"))
     define("_FILTER_BY", "Filtrer par");
 if (!defined("_OTHER_BASKETS"))
-    define("_OTHER_BASKETS", "Autres bannettess");
+    define("_OTHER_BASKETS", "Autres bannettes");
 if (!defined("_SPREAD_SEARCH_TO_BASKETS"))
     define("_SPREAD_SEARCH_TO_BASKETS", "Etendre la recherche aux bannettes");
 if (!defined("_BASKET_WELCOME_TXT1"))
