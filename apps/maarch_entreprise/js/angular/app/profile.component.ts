@@ -219,7 +219,7 @@ export class ProfileComponent implements OnInit {
     }
 
     addBasketRedirection() {
-        if (this.basketsToRedirect[0] && $j("#absenceUser")[0].value) {
+        if (typeof this.basketsToRedirect[0] != 'undefined' && $j("#absenceUser")[0].value) {
             var redirectModel :any[] = [];
                 console.log(this.basketsToRedirect);
             this.basketsToRedirect.forEach((value: any) => {

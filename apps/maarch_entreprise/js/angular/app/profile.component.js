@@ -191,7 +191,7 @@ var ProfileComponent = (function () {
     };
     ProfileComponent.prototype.addBasketRedirection = function () {
         var _this = this;
-        if (this.basketsToRedirect[0] && $j("#absenceUser")[0].value) {
+        if (typeof this.basketsToRedirect[0] != 'undefined' && $j("#absenceUser")[0].value) {
             var redirectModel = [];
             console.log(this.basketsToRedirect);
             this.basketsToRedirect.forEach(function (value) {
