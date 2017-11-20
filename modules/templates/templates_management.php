@@ -310,7 +310,7 @@ if ($mode == 'list') {
                             </a>
                         </span>
                         <?php if ($mode == 'up') {?>
-                        <a href="#" onclick="$j('#templateEditTr').hide();$j('#addTemplateFile').click();$('template_style_icon').setStyle({color: '#009DC5'})" style="margin-left:15px">
+                        <a href="#" onclick="$j('#addTemplateFile').click();$('template_style_icon').setStyle({color: '#009DC5'})" style="margin-left:15px">
                             <i id="template_style_icon" class="fa fa-paperclip fa-2x"></i> Importer un fichier
                         </a>
                         <input class="button" name="addTemplate" id="addTemplate" onclick="$j('#addTemplateFile').click();" style="display:none;margin-left:15px" value="+" type="button"/>

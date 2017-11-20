@@ -127,6 +127,7 @@ function addTemplateBase(file)
                 $j('#template_style').hide();
                 $j('#addTemplate').val(file.files[0].name);
                 $j('#addTemplate').show();
+                $j('#templateEditTr').hide();
             } else {
                 alert(response.error_txt);
             }
