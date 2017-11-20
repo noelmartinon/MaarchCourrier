@@ -991,3 +991,8 @@ img.panelSelectedThumbnail,img:hover.panelSelectedThumbnail{
 .chosen-container-single .chosen-default {
     color: black !important;
 }
+
+#visa_content select{
+    font-size: 11px;
+}
+
