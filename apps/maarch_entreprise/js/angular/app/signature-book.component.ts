@@ -398,6 +398,13 @@ export class SignatureBookComponent implements OnInit {
                         if (this.signatureBook.resList.length > 0) {
                             this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = allSigned;
                         }
+
+                        if(this.headerTab==3){
+                            this.changeSignatureBookLeftContent(0);
+                            setTimeout(() => {
+                                this.changeSignatureBookLeftContent(3);
+                            }, 0);
+                        }
                     } else {
                         alert(data.error);
                     }
@@ -433,6 +440,13 @@ export class SignatureBookComponent implements OnInit {
                     this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = resId;
                     if (this.signatureBook.resList.length > 0) {
                         this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
+                    }
+
+                    if(this.headerTab==3){
+                        this.changeSignatureBookLeftContent(0);
+                        setTimeout(() => {
+                            this.changeSignatureBookLeftContent(3);
+                        }, 0);
                     }
                 } else {
                     alert(data.error);

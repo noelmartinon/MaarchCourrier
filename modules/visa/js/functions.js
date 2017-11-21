@@ -19,7 +19,7 @@ function addVisaUser(users) {
         if ($j("#isAllAttachementSigned").val() == 'false') {
             signRequest = '<br/><sub><select id="signRequest_'+next_visa+'"><option value="false">VISEUR</option><option value="true" '+selected+'>SIGNATAIRE</option></select></sub>';
         } else {
-            signRequest = '<br/><sub><select id="signRequest_'+next_visa+'" disabled="disabled"><option value="false">VISEUR</option><option value="true" '+selected+'>SIGNATAIRE</option></select></sub>';
+            signRequest = '<br/><sub><select id="signRequest_'+next_visa+'" disabled="disabled"><option value="false" '+selected+'>VISEUR</option><option value="true">SIGNATAIRE</option></select></sub>';
         }
 
         $j("#visa_content").append('<div class="droptarget" id="visa_' + next_visa + '" draggable="true">'
@@ -65,7 +65,7 @@ function addVisaUser(users) {
         if ($j("#isAllAttachementSigned").val() == 'false') {
             signRequest = '<br/><sub><select id="signRequest_'+next_visa+'"><option value="false">VISEUR</option><option value="true" '+selected+'>SIGNATAIRE</option></select></sub>';
         } else {
-            signRequest = '<br/><sub><select id="signRequest_'+next_visa+'" disabled="disabled"><option value="false">VISEUR</option><option value="true" '+selected+'>SIGNATAIRE</option></select></sub>';            
+            signRequest = '<br/><sub><select id="signRequest_'+next_visa+'" disabled="disabled"><option value="false" '+selected+'>VISEUR</option><option value="true">SIGNATAIRE</option></select></sub>';            
         }
         $j("#visa_content").append('<div class="droptarget" id="visa_' + next_visa + '" draggable="true">'
             +'<span class="visaUserStatus">'
