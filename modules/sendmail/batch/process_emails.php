@@ -256,8 +256,16 @@ while ($state <> 'END') {
             		$queryMlb = "SELECT alt_identifier FROM mlb_coll_ext WHERE res_id = ? ";
 					$stmt = Bt_doQuery($GLOBALS['db'], $queryMlb, array($email->res_id));
 					$mlbRecordSet = $stmt->fetchObject();
+
+					if(strlen($email->email_object) >= 100) {
+						$objectToSend = mb_substr($email->email_object, 0, 100);
+						$objectToSend = substr($objectToSend, 0, strrpos($objectToSend, ' ')).'...';
+					} else {
+						$objectToSend = $email->email_object;
+					}					
+
             		$bodyMailError = "Message automatique : <br><br>
-            						 Votre envoi de courriel dont l'objet est \"". $email->email_object . "\" avec le numéro chrono \"" . $mlbRecordSet->alt_identifier . "\" n'a pas été envoyé. Veuillez réessayer ou contacter votre administreur.";
+            						 Votre envoi de courriel dont l'objet est \"". $objectToSend . "\" avec le numéro chrono \"" . $mlbRecordSet->alt_identifier . "\" n'a pas été envoyé. Veuillez réessayer ou contacter votre administreur.";
             		Bt_doQuery($GLOBALS['db'], $query, array($emailFrom, $userInfo['mail'], $GLOBALS['subjectmail'], $bodyMailError, $GLOBALS['charset']));
                 }
 
