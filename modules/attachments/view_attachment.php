@@ -126,7 +126,7 @@ if (! empty($_SESSION['error'])) {
         } else {
             $line = $stmt->fetchObject();
 
-            if(!empty($_GET['editingMode']) && strpos($line->format, 'xl') === false && strpos($line->format, 'ppt') === false){
+            if((!empty($_GET['editingMode']) || !empty($_GET['viewpdf'])) && strpos($line->format, 'xl') === false && strpos($line->format, 'ppt') === false){
                 $stmtPdf = $db->query(
                     "SELECT docserver_id, path, filename, format, title
                      FROM res_view_attachments

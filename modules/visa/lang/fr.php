@@ -164,7 +164,7 @@ if (!defined("_NO_SIGNATORY"))
     define("_NO_SIGNATORY", "Aucun signataire");
 
 if (!defined("_SIGNATORY"))
-    define("_SIGNATORY", "Signataire");
+    define("_SIGNATORY", "SIGNATAIRE");
 
 if (!defined("_SIGNED_TO"))
     define("_SIGNED_TO", "Signé le");

@@ -2068,9 +2068,9 @@ $content .= '<div id="menuOnglet">
                     $content .= ' style="display:none" ';
                 }
 
-                    $content .= 'onclick="activeOngletAttachement()"> Pièce jointe </li>';
+                    $content .= 'onclick="activeOngletAttachement()"><span> Pièce jointe </span></li>';
                     if($_GET['cat'] != 'outgoing' && $data_attachment->attachment_type != 'outgoing_mail'){
-                        $content .='<li id="liMainDocument" onclick="activeOngletMainDocument()"> Document principal </li>';
+                        $content .='<li id="liMainDocument" onclick="activeOngletMainDocument()"><span> Document principal </span></li>';
                     }
                 $content .='</ul>
             </div>';

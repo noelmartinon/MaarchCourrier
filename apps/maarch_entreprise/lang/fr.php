@@ -826,7 +826,7 @@ if (!defined("_NO_ANSWER")) define("_NO_ANSWER","Pas de réponse");
 if (!defined("_ANSWER")) define("_ANSWER","Réponse");
 if (!defined("_DETAILS")) define("_DETAILS", "Fiche détaillée");
 if (!defined("_VISIBLEBY")) define("_VISIBLEBY", "Visible par");
-if (!defined("_DOWNLOAD")) define("_DOWNLOAD", "Télécharger le courrier");
+if (!defined("_DOWNLOAD")) define("_DOWNLOAD", "Télécharger");
 if (!defined("_SEARCH_RESULTS")) define("_SEARCH_RESULTS", "Résultat de la recherche");
 
 if (!defined("_THE_SEARCH")) define("_THE_SEARCH", "La recherche");

@@ -19,7 +19,7 @@
     font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
 }
 
-#ongletAttachement a
+#ongletAttachement span
 {
     display : block;
     color : #666;

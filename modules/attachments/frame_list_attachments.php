@@ -381,7 +381,8 @@ if (isset($_REQUEST['load'])) {
         $paramsTab['templates'] = $template_list;
     }
     $paramsTab['bool_showTemplateDefaultList'] = true;                                  //Default list (no template)
-    $paramsTab['viewDocumentLink'] = $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=view_attachment&res_id_master='.$_SESSION['doc_id'];
+    $paramsTab['downloadDocumentLink'] = $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=view_attachment&res_id_master='.$_SESSION['doc_id'];
+    $paramsTab['visualizeDocumentLink'] = $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=view_attachment&res_id_master='.$_SESSION['doc_id'].'&viewpdf=true';
 
 	$content = $list->showList($attachArr, $paramsTab, $listKey);
 	$status = 0;
