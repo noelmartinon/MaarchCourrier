@@ -574,6 +574,12 @@ abstract class admin_basket_Abstract extends Database
                     // Empties the basket administration session var and redirect to baskets list
                     $this->clearbasketinfos();
                     $_SESSION['info'] = _BASKET_ADDED;
+
+                    // Refresh personnal basket info
+                    require_once 'modules/basket/class/class_modules_tools.php';
+                    $basketModule = new basket();
+                    $basketModule->load_module_var_session($_SESSION['user']);
+
                     header("location: ".$_SESSION['config']['businessappurl']."index.php?page=basket&module=basket&order=".$order."&order_field=".$order_field."&start=".$start."&what=".$what);
                     exit();
                 }
@@ -623,6 +629,12 @@ abstract class admin_basket_Abstract extends Database
                 // Empties the basket administration session var and redirect to baskets list
                 $this->clearbasketinfos();
                 $_SESSION['info'] = _BASKET_UPDATED;
+
+                // Refresh personnal basket info
+                require_once 'modules/basket/class/class_modules_tools.php';
+                $basketModule = new basket();
+                $basketModule->load_module_var_session($_SESSION['user']);
+
                 header("location: ".$_SESSION['config']['businessappurl']."index.php?page=basket&module=basket&order=".$order."&order_field=".$order_field."&start=".$start."&what=".$what);
                 exit();
             }

@@ -69,15 +69,15 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                     );
                 }
             }
-            //$core_tools->show_array($collWithUserBaskets);
+
             ?>
             <div class="block">
                 <h2><?php echo _MY_BASKETS;?> : </h2>
             
             <?php
             $redirectedBaskets = \Baskets\Models\BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
-            $coloredBaskets = \Baskets\Models\BasketsModel::getColoredBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
-            $countColl = count($collWithUserBaskets);
+            $coloredBaskets    = \Baskets\Models\BasketsModel::getColoredBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+            $countColl         = count($collWithUserBaskets);
             $currentGroup = '';
             for ($cpt=0;$cpt<$countColl;$cpt++) {
                 echo '<h4><i class="fa fa-inbox fa-2x"></i>&nbsp;'
@@ -124,6 +124,14 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                     $redirectedTo = $redirectBasketValue['user'];
                                 }
                             }
+
+                            $color = $_SESSION['user']['baskets'][$i]['color'];
+                            foreach ($coloredBaskets as $coloredBasket) {
+                                if ($coloredBasket['basket_id'] == $_SESSION['user']['baskets'][$i]['id'] && $coloredBasket['group_id'] == $_SESSION['user']['baskets'][$i]['group_id']) {
+                                    $color = $coloredBasket['color'];
+                                }
+                            }
+                            
                             if (empty($redirectedTo)) {
 
                                 if ($_SESSION['user']['baskets'][$i]['abs_basket'] == true && !$abs_basket) {
@@ -132,12 +140,6 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                     $abs_basket = true;
                                 }
                                 
-                                $color = $_SESSION['user']['baskets'][$i]['color'];
-                                foreach ($coloredBaskets as $coloredBasket) {
-                                    if ($coloredBasket['basket_id'] == $_SESSION['user']['baskets'][$i]['id'] && $coloredBasket['group_id'] == $_SESSION['user']['baskets'][$i]['group_id']) {
-                                        $color = $coloredBasket['color'];
-                                    }
-                                }
                                 if ($core_tools->is_module_loaded('folder') && $_SESSION['user']['baskets'][$i]['is_folder_basket'] == 'Y') {
                                     echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'" href="'
                                         . $_SESSION['config']['businessappurl']
@@ -165,9 +167,8 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                 echo '<li style="padding-top: 5px;padding-bottom: 5px;"><a title="'.$_SESSION['user']['baskets'][$i]['desc'].'"><b><span id="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '" name="nb_' . $_SESSION['user']['baskets'][$i]['id']
                                     . '"><i class="fa-li fa fa-spinner fa-spin" style="margin-left: -10px;position: inherit;margin-right: -7px;"></i>'
-                                    . '</span></b> <i class="fa-li fa fa-share" style="padding-top: 5px;padding-bottom: 5px;color: #c62b62"></i>'
-                                    . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . ' (redirigé vers ' . $redirectedTo . ')'
-                                    . ' </a></li>';
+                                    . '</span></b> <i class="fa-li fa fa-share" style="padding-top: 5px;padding-bottom: 5px;color: #c62b62"></i><span style="color: ' .$color . '">' . functions::xssafe($_SESSION['user']['baskets'][$i]['name']) . ' (redirigé vers ' . $redirectedTo . ')'
+                                    . ' </span></a></li>';
                             }
                         }
                     }
