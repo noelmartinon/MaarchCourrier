@@ -293,6 +293,15 @@ var ProfileComponent = (function () {
             });
         }
     };
+    ProfileComponent.prototype.askRedirectBasket = function () {
+        var r = confirm('Voulez-vous rediriger vos corbeilles avant de vous mettre en absence ?');
+        if (r) {
+            $j('#redirectBasketCard').click();
+        }
+        else {
+            this.activateAbsence();
+        }
+    };
     ProfileComponent.prototype.updatePassword = function () {
         var _this = this;
         this.http.put(this.coreUrl + 'rest/currentUser/password', this.passwordModel)

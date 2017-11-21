@@ -323,6 +323,16 @@ export class ProfileComponent implements OnInit {
         }
     }
 
+    askRedirectBasket() {
+        let r = confirm('Voulez-vous rediriger vos corbeilles avant de vous mettre en absence ?');
+
+        if (r) {
+            $j('#redirectBasketCard').click();
+        } else {
+            this.activateAbsence();
+        }
+    }
+
     updatePassword() {
         this.http.put(this.coreUrl + 'rest/currentUser/password', this.passwordModel)
             .map(res => res.json())
