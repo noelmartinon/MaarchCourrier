@@ -1738,7 +1738,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status,  $co
                     $arrayPDOext = array_merge($arrayPDOext, array($contact_id));
                 }
                     $db->query("DELETE FROM contacts_res where res_id = ?", array($res_id));
-                    $query_ext .= ", is_multicontacts = ''";
+                    $query_ext .= ", is_multicontacts = null";
                     
             }elseif($contact_type == 'external'){
                 if($cat_id == 'incoming' || $cat_id == 'ged_doc')
@@ -1756,7 +1756,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status,  $co
                 $arrayPDOext = array_merge($arrayPDOext, array($addressId));
 
                 $db->query("DELETE FROM contacts_res where res_id = ?", array($res_id));
-                $query_ext .= ", is_multicontacts = ''";
+                $query_ext .= ", is_multicontacts = null";
             }
         }
     }
