@@ -238,10 +238,16 @@ while ($state <> 'END') {
                 $query = "INSERT INTO notif_email_stack (sender, recipient, subject, html_body, charset, module) VALUES (?, ?, ?, ?, ?, 'notifications')";  
 
                 $html = "Message automatique : <br><br>
-                		L'email avec l'identifiant ".$email->email_id." dans la table 'sendmail' n'a pas été envoyé. <br>
+                		Le courriel avec l'identifiant ".$email->email_id." dans la table 'sendmail' n'a pas été envoyé. <br>
                 		Pour plus d'informations, regardez les logs dans le fichier ".$GLOBALS['maarchDirectory']."/modules/sendmail/batch/".$logFile."<br><br>
                 		Répertoire d'installation de l'application : ".$GLOBALS['maarchDirectory']."<br>
                 		Fichier de configuration de sendmail : " . $GLOBALS['configFile'];
+
+        		$queryMlb = "SELECT alt_identifier FROM mlb_coll_ext WHERE res_id = ? ";
+				$stmt = Bt_doQuery($GLOBALS['db'], $queryMlb, array($email->res_id));
+				$mlbRecordSet = $stmt->fetchObject();
+
+				$html .= '<br><br>Le courriel a été envoyé depuis le courrier dont le numéro chrono est : ' . $mlbRecordSet->alt_identifier;
 
                 $adminMails = explode(',', $GLOBALS['adminmail']);
                 if(!empty($adminMails)){
@@ -253,10 +259,6 @@ while ($state <> 'END') {
                 }
 
             	if(!empty($userInfo['mail'])){
-            		$queryMlb = "SELECT alt_identifier FROM mlb_coll_ext WHERE res_id = ? ";
-					$stmt = Bt_doQuery($GLOBALS['db'], $queryMlb, array($email->res_id));
-					$mlbRecordSet = $stmt->fetchObject();
-
 					if(strlen($email->email_object) >= 100) {
 						$objectToSend = mb_substr($email->email_object, 0, 100);
 						$objectToSend = substr($objectToSend, 0, strrpos($objectToSend, ' ')).'...';
