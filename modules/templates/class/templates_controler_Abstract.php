@@ -188,17 +188,10 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             );
         } else {            
             if ($template->template_type == 'OFFICE') {
-                /*if ($mode == 'add' && !$_SESSION['m_admin']['templates']['applet']) {
-                    $return = array(
-                        'status' => 'ko', 
-                        'value' => $template, 
-                        'error' => _EDIT_YOUR_TEMPLATE,
-                    );
-                    return $return;
-                }*/
-                if (($mode == 'up' || $mode == 'add') 
-                  /*  && $_SESSION['m_admin']['templates']['applet'] */
-                ) {
+                if (($mode == 'up' && $_SESSION['m_admin']['templates']['applet']) 
+                    || ($mode == 'up' && !empty($_SESSION['m_admin']['templates']['current_style'])) 
+                    || $mode == 'add') 
+                {
                     $storeInfos = array();
                     $storeInfos = $this->storeTemplateFile();
                     if (!$storeInfos) {
@@ -208,7 +201,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                             'error' => $_SESSION['error'],
                         );
                     } else {
-                        //print_r($storeInfos);exit;
                         $template->template_path = $storeInfos['destination_dir'];
                         $template->template_file_name = $storeInfos['file_destination_name'];
                         $template->template_style = $storeInfos['template_style'];
