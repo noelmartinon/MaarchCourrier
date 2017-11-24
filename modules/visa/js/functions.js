@@ -5,14 +5,13 @@ function addVisaUser(users) {
         if(nb_visa == 0){
             $j("#emptyVisa").hide();      
         }
-
-        if ($j("select[id^=signRequest_] option:selected[value=true]").length <= 2) {
+        if ($j("select[id^=signRequest_] option:selected[value=true]").length >= 1 && $j("select[id^=signRequest_] option:last:selected[value=true]").length == 0) {
+            selected = '';
+        } else {
             if (!$j('#signRequest_'+nb_visa).is(':disabled')) {
                 $j('#signRequest_'+nb_visa).val("false");
             }
-            selected = ' selected="selected" ';
-        } else {   
-            selected = '';
+            selected = ' selected="selected" ';        
         }
         
 
