@@ -224,16 +224,21 @@ abstract class lists_Abstract extends Database
 
             case 'entity_subentities':
                 
-                  if (isset($_SESSION['filters']['entity']['VALUE']) && $_SESSION['filters']['entity_subentities']['checked'] == true && $_SESSION['filters']['entity']['VALUE'] != ''){
+                if (isset($_SESSION['filters']['entity']['VALUE']) && $_SESSION['filters']['entity_subentities']['checked'] == true && $_SESSION['filters']['entity']['VALUE'] != ''){
                     $checked = 'checked="checked"';
-                  }else{
-                        $checked =  '';
-                  }
-                    
-                $filters .='<input type="checkbox" '.$checked.' style="margin-left:0px" title="inclure les sous-entités" onclick="loadList(\''.$this->link
-                            .'&filter=entity_subentities&value=\' + document.filters.entity_id.value, \''
-                            .$this->divListId.'\', '.$this->modeReturn.');" />&nbsp;';
-
+                }else{
+                    $checked =  '';
+                }
+                if($_SESSION['filters']['entity_subentities']['checked']){
+                    $filters .='<input type="checkbox" '.$checked.' style="margin-left:0px" title="inclure les sous-entités" onclick="loadList(\''.$this->link
+                    .'&filter=entity&value=\' + document.filters.entity_id.value, \''
+                    .$this->divListId.'\', '.$this->modeReturn.');" />&nbsp;';
+                } else {
+                    $filters .='<input type="checkbox" '.$checked.' style="margin-left:0px" title="inclure les sous-entités" onclick="loadList(\''.$this->link
+                    .'&filter=entity_subentities&value=\' + document.filters.entity_id.value, \''
+                    .$this->divListId.'\', '.$this->modeReturn.');" />&nbsp;';
+                }
+                
             break;
             
             case 'typist':
@@ -738,9 +743,16 @@ abstract class lists_Abstract extends Database
                     
                     } else if ($_REQUEST['filter'] == 'entity_subentities') {
 
-                        //$_SESSION['filters']['entity']['VALUE'] = '';
-                        $_SESSION['filters']['entity']['CLAUSE'] = '';
-                        $_SESSION['filters']['entity_subentities']['checked'] = true;
+                        //$_SESSION['filters']['entity']['VALUE'] = '';                        
+                        if($_SESSION['filters']['entity_subentities']['checked'] == true){
+                            
+                            $_SESSION['filters']['entity_subentities']['checked'] = false;
+                            $_SESSION['filters']['entity_subentities']['VALUE'] = '';
+                            $_SESSION['filters']['entity_subentities']['CLAUSE'] = '';
+                        } else {
+                            $_SESSION['filters']['entity']['CLAUSE'] = '';
+                            $_SESSION['filters']['entity_subentities']['checked'] = true;                            
+                        }
 
                         require_once "modules" . DIRECTORY_SEPARATOR . "entities" . DIRECTORY_SEPARATOR
                             . "class" . DIRECTORY_SEPARATOR . "class_manage_entities.php";
