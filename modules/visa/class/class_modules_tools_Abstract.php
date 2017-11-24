@@ -514,8 +514,8 @@ abstract class visa_Abstract extends Database
 				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO;
 
 			} else if ($sAllAttachmentSigned == 'yes') {
-				$str = '<input type="hidden" id="isAllAttachementSigned" value="true"/>';
-				$isAllAttachementSigned = " disabled='disabled'";
+				$str = '<input type="hidden" id="isAllAttachementSigned" value="allsigned"/>';
+				$isAllAttachementSigned = "";
 				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO2;				
 			}else{
 				$str = '<input type="hidden" id="isAllAttachementSigned" value="false"/>';
@@ -569,7 +569,7 @@ abstract class visa_Abstract extends Database
                 $str .= '</script>';
                 $str .= '<br/><br/>';
             }
-            if (!empty($isAllAttachementSigned)) {
+            if (!empty($isAllAttachementSignedInfo)) {
 				$str .= '<b style="color:red;">'.$isAllAttachementSignedInfo.'</b>';
 			}
             $str .= '<div id="visa_content">';
@@ -1209,7 +1209,7 @@ abstract class visa_Abstract extends Database
 		$db = new Database();
 		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
 		$res2 = $stmt2->fetchObject();
-		$stmt3 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
+		$stmt3 = $db->query("SELECT count(res_id) as nb from res_view_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
 		$res3 = $stmt3->fetchObject();
 		if ($res3->nb == 0) {
 			return 'noAttachment';

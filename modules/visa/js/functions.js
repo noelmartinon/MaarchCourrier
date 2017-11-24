@@ -5,7 +5,8 @@ function addVisaUser(users) {
         if(nb_visa == 0){
             $j("#emptyVisa").hide();      
         }
-        if ($j("select[id^=signRequest_] option:selected[value=true]").length >= 1 && $j("select[id^=signRequest_] option:last:selected[value=true]").length == 0) {
+        if ($j("select[id^=signRequest_] option:selected[value=true]").length >= 2 || 
+            ($j("select[id^=signRequest_] option:selected[value=true]").length == 1 && $j("select[id^=signRequest_] option:last:selected[value=true]").length == 0)) {
             selected = '';
         } else {
             if (!$j('#signRequest_'+nb_visa).is(':disabled')) {
@@ -17,6 +18,8 @@ function addVisaUser(users) {
 
         if ($j("#isAllAttachementSigned").val() == 'false') {
             signRequest = '<br/><sub><select id="signRequest_'+next_visa+'"><option value="false">VISEUR</option><option value="true" '+selected+'>SIGNATAIRE</option></select></sub>';
+        } else if($j("#isAllAttachementSigned").val() == 'allsigned'){
+            signRequest = '<br/><sub><select id="signRequest_'+next_visa+'"><option value="false" '+selected+'>VISEUR</option><option value="true">SIGNATAIRE</option></select></sub>';
         } else {
             signRequest = '<br/><sub><select id="signRequest_'+next_visa+'" disabled="disabled"><option value="false" '+selected+'>VISEUR</option><option value="true">SIGNATAIRE</option></select></sub>';
         }
@@ -63,6 +66,8 @@ function addVisaUser(users) {
 
         if ($j("#isAllAttachementSigned").val() == 'false') {
             signRequest = '<br/><sub><select id="signRequest_'+next_visa+'"><option value="false">VISEUR</option><option value="true" '+selected+'>SIGNATAIRE</option></select></sub>';
+        } else if($j("#isAllAttachementSigned").val() == 'allsigned'){
+            signRequest = '<br/><sub><select id="signRequest_'+next_visa+'"><option value="false" '+selected+'>VISEUR</option><option value="true">SIGNATAIRE</option></select></sub>';
         } else {
             signRequest = '<br/><sub><select id="signRequest_'+next_visa+'" disabled="disabled"><option value="false" '+selected+'>VISEUR</option><option value="true">SIGNATAIRE</option></select></sub>';            
         }
@@ -107,6 +112,8 @@ function resetPosVisa () {
     i = 1;
     $j(".droptarget").each(function() {
         this.id = 'visa_' + i;
+        $j("#" + this.id).find("select[id^=signRequest_]")[0].id='signRequest_'+i;
+        $j("#" + this.id).find("[id^=signedUser_]")[0].id='signedUser_'+i;
         $j("#" + this.id).find(".visaUserPos").text(i);
         i++;
     });
