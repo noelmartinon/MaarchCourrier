@@ -209,13 +209,17 @@ var ProfileComponent = (function () {
                 $j('#selectBasketAbsenceUser option').prop('selected', false);
                 $j("#absenceUser")[0].value = "";
                 _this.basketsToRedirect = [];
-                _this.user.redirectedBaskets = data.redirectedBaskets;
-                _this.user.baskets.forEach(function (value, index) {
-                    _this.user.baskets[index]['disabled'] = false;
-                    _this.user.redirectedBaskets.forEach(function (value2) {
-                        if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
-                            _this.user.baskets[index]['disabled'] = true;
-                        }
+                _this.http.get(_this.coreUrl + 'rest/user/profile')
+                    .map(function (res) { return res.json(); })
+                    .subscribe(function (data) {
+                    _this.user = data;
+                    _this.user.baskets.forEach(function (value, index) {
+                        _this.user.baskets[index]['disabled'] = false;
+                        _this.user.redirectedBaskets.forEach(function (value2) {
+                            if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                                _this.user.baskets[index]['disabled'] = true;
+                            }
+                        });
                     });
                 });
             }, function (err) {

@@ -132,6 +132,17 @@ class UserController
                 return $response->withStatus(400)->withJson(['errors' => _UNDEFINED_USER]);
             }
             $data[$key]['newUser'] = $newUser;
+
+            if($value['basketOwner'] != $_SESSION['user']['UserId']){
+                BasketsModel::updateBasketsRedirection([
+                    'userId'      => $_SESSION['user']['UserId'],
+                    'basketOwner' => $value['basketOwner'],
+                    'basketId'    => $value['basketId'],
+                    'userAbs'     => $value['basketOwner'],
+                    'newUser'     => $newUser
+                ]);
+                unset($data[$key]);
+            }
         }
 
         if (!empty($data)) {

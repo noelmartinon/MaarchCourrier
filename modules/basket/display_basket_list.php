@@ -52,6 +52,10 @@ $db = new Database();
 <br />
 <?php
 if ($core_tools->test_service('display_basket_list','basket', false)) {
+
+        // Refresh personnal basket info
+        $bask->load_module_var_session($_SESSION['user']);
+
         if (
             isset($_SESSION['user']['baskets'])
             && count($_SESSION['user']['baskets']) > 0

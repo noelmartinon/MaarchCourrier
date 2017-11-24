@@ -238,15 +238,20 @@ export class ProfileComponent implements OnInit {
                     $j('#selectBasketAbsenceUser option').prop('selected', false);
                     $j("#absenceUser")[0].value = "";
                     this.basketsToRedirect = [];
-                    this.user.redirectedBaskets =  data.redirectedBaskets;
-                    this.user.baskets.forEach((value: any, index: number) => {
-                        this.user.baskets[index]['disabled'] = false;
-                        this.user.redirectedBaskets.forEach((value2: any) => {
-                            if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
-                                this.user.baskets[index]['disabled'] = true;
-                            }
+                    this.http.get(this.coreUrl + 'rest/user/profile')
+                        .map(res => res.json())
+                        .subscribe((data) => {
+                            this.user = data;
+
+                            this.user.baskets.forEach((value: any, index: number) => {
+                                this.user.baskets[index]['disabled'] = false;
+                                this.user.redirectedBaskets.forEach((value2: any) => {
+                                    if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                                        this.user.baskets[index]['disabled'] = true;
+                                    }
+                                });
+                            });
                         });
-                    });
                 }, (err) => {
                     this.resultInfo = JSON.parse(err._body).errors;
                     $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');

@@ -275,6 +275,23 @@ class BasketsModelAbstract extends \Apps_Table_Service
         return true;
     }
 
+    public static function updateBasketsRedirection(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['userId', 'basketOwner', 'basketId', 'userAbs', 'newUser']);
+        static::checkString($aArgs, ['userId']);
+
+        $isUpdated = parent::update([
+            'table'     => 'user_abs',
+            'set'       => [
+                'new_user' => $aArgs['newUser']
+            ],
+            'where'     => ['basket_id = ?', 'basket_owner = ?', 'user_abs = ?', 'new_user = ?'],
+            'data'      => [$aArgs['basketId'], $aArgs['basketOwner'], $aArgs['userAbs'], $aArgs['userId']]
+        ]);
+
+        return true;
+    }
+
     public static function deleteBasketRedirection(array $aArgs)
     {
         static::checkRequired($aArgs, ['userId', 'basketId']);
