@@ -200,13 +200,23 @@ class BasketsModelAbstract extends \Apps_Table_Service
 
         $groups = UserModel::getGroupsById(['userId' => $aArgs['userId']]);
         foreach ($groups as $group) {
-            $baskets = DatabaseModel::select([
-                'select'    => ['baskets.basket_id', 'baskets.basket_name', 'baskets.color'],
-                'table'     => ['groupbasket, baskets'],
-                'where'     => ['groupbasket.basket_id = baskets.basket_id', 'groupbasket.group_id = ?', 'baskets.is_visible = ?', 'baskets.basket_id != ?'],
-                'data'      => [$group['group_id'], 'Y', 'IndexingBasket'],
-                'order_by'  => ['baskets.basket_order', 'baskets.basket_name']
-            ]);
+            if($group['primary_group'] == 'Y'){
+                $baskets = DatabaseModel::select([
+                    'select'    => ['baskets.basket_id', 'baskets.basket_name', 'baskets.color'],
+                    'table'     => ['groupbasket, baskets'],
+                    'where'     => ['groupbasket.basket_id = baskets.basket_id', 'groupbasket.group_id = ?', 'baskets.is_visible = ?', 'baskets.basket_id != ?'],
+                    'data'      => [$group['group_id'], 'Y', 'IndexingBasket'],
+                    'order_by'  => ['baskets.basket_order', 'baskets.basket_name']
+                ]);
+            } else {
+                $baskets = DatabaseModel::select([
+                    'select'    => ['baskets.basket_id', 'baskets.basket_name', 'baskets.color'],
+                    'table'     => ['user_baskets_secondary, baskets'],
+                    'where'     => ['user_baskets_secondary.basket_id = baskets.basket_id', 'user_baskets_secondary.group_id = ?', 'baskets.is_visible = ?', 'baskets.basket_id != ?', 'user_baskets_secondary.user_id = ?'],
+                    'data'      => [$group['group_id'], 'Y', 'IndexingBasket', $aArgs['userId']],
+                    'order_by'  => ['baskets.basket_order', 'baskets.basket_name']
+                ]);
+            }
             $coloredBaskets = DatabaseModel::select([
                 'select'    => ['basket_id', 'color'],
                 'table'     => ['users_baskets'],

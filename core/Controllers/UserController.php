@@ -35,14 +35,14 @@ class UserController
         }
 
         $user = UserModel::getById(['userId' => $_SESSION['user']['UserId'], 'select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'thumbprint']]);
-        $user['signatures'] = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
-        $user['emailSignatures'] = UserModel::getEmailSignaturesById(['userId' => $_SESSION['user']['UserId']]);
-        $user['groups'] = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
-        $user['entities'] = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
-        $user['lang'] = LangModel::getProfileLang();
-        $user['baskets'] = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId'], 'rejectedBaskets' => ['IndexingBasket']]);
+        $user['signatures']        = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
+        $user['emailSignatures']   = UserModel::getEmailSignaturesById(['userId' => $_SESSION['user']['UserId']]);
+        $user['groups']            = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
+        $user['entities']          = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
+        $user['lang']              = LangModel::getProfileLang();
+        $user['baskets']           = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId'], 'rejectedBaskets' => ['IndexingBasket']]);
         $user['redirectedBaskets'] = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
-        $user['regroupedBaskets'] = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['regroupedBaskets']  = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['canModifyPassword'] = true;
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
