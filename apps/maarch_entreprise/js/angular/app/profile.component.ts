@@ -48,6 +48,7 @@ export class ProfileComponent implements OnInit {
     selectedSignatureLabel      : string    = "";
     resultInfo                  : string    = "";
     loading                     : boolean   = false;
+    displayAbsenceButton        : boolean   = false;
 
 
     constructor(public http: Http, private zone: NgZone) {
@@ -332,6 +333,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm('Voulez-vous rediriger vos corbeilles avant de vous mettre en absence ?');
 
         if (r) {
+            this.displayAbsenceButton=true;
             $j('#redirectBasketCard').click();
         } else {
             this.activateAbsence();

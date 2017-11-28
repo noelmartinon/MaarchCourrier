@@ -21,7 +21,7 @@
                     <li style="cursor: pointer">
                         <a data-toggle="modal" data-target="#manageSign"><i class="fa fa-vcard-o"></i> {{user.lang.manageSignatures}} </a>
                     </li>
-                    <li style="cursor: pointer">
+                    <li style="cursor: pointer" (click)="displayAbsenceButton=false">
                         <a data-toggle="modal" data-target="#manageAbs" id="redirectBasketCard"><i class="fa fa-share"></i> Rediriger mes bannettes </a>
                     </li>
                     <li style="cursor: pointer">
@@ -202,6 +202,7 @@
                         </form>
                     </div>
                     <div style="padding: 15px;text-align: center">
+                        En validant, les redirections sont automatiquement enregistrées<br><br>
                         <button type="button" (click)="addBasketRedirection()" class="btn btn-success">Valider</button>
                     </div>
                 </nav>
@@ -214,11 +215,12 @@
                         </span>
                     </li>
                 </ul>
-
-                <hr>
-                <div style="padding-bottom: 10px;text-align: center">
-                    <button type="button" (click)="activateAbsence()" class="btn btn-warning"><i class="fa fa-user-times"></i> Activer mon absence</button>
-                </div>
+                <span *ngIf="displayAbsenceButton">
+                    <hr>
+                    <div style="padding-bottom: 10px;text-align: center">
+                        <button type="button" (click)="activateAbsence()" class="btn btn-warning"><i class="fa fa-user-times"></i> Activer mon absence</button>
+                    </div>
+                </span>
 
             </div>
         </div>

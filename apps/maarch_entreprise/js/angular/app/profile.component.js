@@ -44,6 +44,7 @@ var ProfileComponent = (function () {
         this.selectedSignatureLabel = "";
         this.resultInfo = "";
         this.loading = false;
+        this.displayAbsenceButton = false;
         window['angularProfileComponent'] = {
             componentAfterUpload: function (base64Content) { return _this.processAfterUpload(base64Content); },
         };
@@ -300,6 +301,7 @@ var ProfileComponent = (function () {
     ProfileComponent.prototype.askRedirectBasket = function () {
         var r = confirm('Voulez-vous rediriger vos corbeilles avant de vous mettre en absence ?');
         if (r) {
+            this.displayAbsenceButton = true;
             $j('#redirectBasketCard').click();
         }
         else {

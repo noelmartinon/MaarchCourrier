@@ -108,7 +108,6 @@ function delVisaUser(target) {
 
 }
 function resetPosVisa () {
-    //$j(".visaUserSign").css("visibility","hidden");
     i = 1;
     $j(".droptarget").each(function() {
         this.id = 'visa_' + i;
@@ -117,9 +116,31 @@ function resetPosVisa () {
         $j("#" + this.id).find(".visaUserPos").text(i);
         i++;
     });
-    i--;
 
-    //$j("#visa_" + i).find(".visaUserSign").css("visibility","visible");
+    i = 1;
+    var hasSignatory = false;
+    $j(".droptarget").each(function() {
+        if ($j("#signRequest_"+(i)+" option:selected[value=true]").length) {
+            userRequestSign=true;
+        } else {
+            userRequestSign=false;
+        }
+        if ($j("#signedUser_"+(i)).css('visibility') == 'visible') {
+            userSignatory=true;
+        } else {
+            userSignatory=false;
+        }
+
+        if(userRequestSign || userSignatory){
+            hasSignatory = true;
+        }
+        if ($j("#signRequest_"+(i+1)).length == 0 && !hasSignatory) {
+            $j('#signRequest_'+(i)).val("true");
+        }
+        i++;
+
+    });
+    i--;
 
 }
 function updateVisaWorkflow(resId) {
