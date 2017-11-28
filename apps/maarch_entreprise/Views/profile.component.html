@@ -209,7 +209,7 @@
                     <li class="list-group-item" *ngFor="let basket of user.redirectedBaskets">
                         <i class="fa fa-tasks" title="{{basket.basket_id}}"></i> {{basket.basket_name}}
                         <span class="pull-right">
-                            <span class="label label-primary">{{basket.userToDisplay}}</span>
+                            <span class="label label-primary" title="{{basket.userIdRedirection}}">{{basket.userToDisplay}}</span>
                             <a (click)="delBasketRedirection(basket)" style="cursor: pointer" title="Supprimer la redirection"><i class="fa fa-trash fa-lg" style="color:red;"></i></a>
                         </span>
                     </li>

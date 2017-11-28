@@ -324,8 +324,9 @@ class BasketsModelAbstract extends \Apps_Table_Service
 
         foreach ($aBaskets as $key => $value) {
             $user = UserModel::getById(['userId' => $value['new_user'], 'select' => ['firstname', 'lastname']]);
-            $aBaskets[$key]['userToDisplay'] = "{$user['firstname']} {$user['lastname']} ({$value['new_user']})" ;
-            $aBaskets[$key]['user'] = "{$user['firstname']} {$user['lastname']}" ;
+            $aBaskets[$key]['userToDisplay']     = "{$user['firstname']} {$user['lastname']}";
+            $aBaskets[$key]['userIdRedirection'] = $value['new_user'];
+            $aBaskets[$key]['user']              = "{$user['firstname']} {$user['lastname']}" ;
         }
 
         return $aBaskets;
