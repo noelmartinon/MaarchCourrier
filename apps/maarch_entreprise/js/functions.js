@@ -935,7 +935,7 @@ function createModal(txt, id_mod, height, width, mode_frm, iframe_container_id){
     {
         width = '400px';
     }
-	if(iframe_container_id == undefined || iframe_container_id=='')
+    if(iframe_container_id == undefined || iframe_container_id=='')
     {
         iframe_container_id = '';
     }
@@ -985,15 +985,15 @@ function createModal(txt, id_mod, height, width, mode_frm, iframe_container_id){
     }
 
     if (iframe_container_id != ''){
-		var iframe_container = document.getElementById(iframe_container_id);
-		Element.insert(iframe_container.contentWindow.document.body,layer);
-		Element.insert(iframe_container.contentWindow.document.body,fenetre);
-	}
-	else {
-		
-		Element.insert(document.body,layer);
-		Element.insert(document.body,fenetre);
-	}
+        var iframe_container = document.getElementById(iframe_container_id);
+        Element.insert(iframe_container.contentWindow.document.body,layer);
+        Element.insert(iframe_container.contentWindow.document.body,fenetre);
+    }
+    else {
+        
+        Element.insert(document.body,layer);
+        Element.insert(document.body,fenetre);
+    }
 
     if( mode_frm == 'fullscreen')
     {
@@ -1240,7 +1240,7 @@ function valid_action_form(current_form_id, path_manage_script, id_action, value
             onSuccess: function(answer){
                 eval('response='+answer.responseText);
                 if(response.status == 0 ) { //form values checked
-						        var hist = '';
+                                var hist = '';
                     if(chosen_action_id == 'end_action') {
                         hist = 'Y';
                     }else{
@@ -1249,7 +1249,6 @@ function valid_action_form(current_form_id, path_manage_script, id_action, value
 
                     if(response.manage_form_now == false) {
                         pile_actions.action_push("action_send_form_confirm_result( '"+path_manage_script+"', '"+mode+"', '"+id_action+"', '"+values+"','"+table+"', '"+module+"','"+coll_id+"',  '"+frm_values+"',  '"+hist+"');");
-
                         if(chosen_action_id == 'end_action') {
                             end_actions();
                         } else {
@@ -1504,7 +1503,7 @@ function action_send_first_request( path_manage_script, mode_req,  id_action, re
                         actions_status.action_push(response.action_status);
                     }
                     window.top.createModal(response.form_content,'modal_'+id_action, response.height, response.width, response.mode_frm);
-                }	else if(response.status == 4) {// Confirm asked to the user (for visa)
+                }   else if(response.status == 4) {// Confirm asked to the user (for visa)
                     var modal_txt='<div class=h2_title>'+response.error+'</div>';
                     modal_txt += '<p class="buttons">';
                     modal_txt += '<input type="button" name="submit" id="submit" value="'+response.validate+'" class="button" onclick="destroyModal(\'modal_'+id_action+'\')"/>';
@@ -1559,7 +1558,7 @@ function action_send_form_confirm_result(path_manage_script, mode_req, id_action
                               coll_id : id_coll,
                               module : modulename,
                               form_values : values_new_form,
-			      			  hist : hist
+                              hist : hist
                               },
                 onCreate: function(answer) {
                     //show loading image in toolbar
@@ -1569,7 +1568,7 @@ function action_send_form_confirm_result(path_manage_script, mode_req, id_action
                     eval('response='+answer.responseText);
                     if(response.status == 0 ) //Form or confirm processed ok
                     {
-                        res_ids = response.result_id;
+         /*               res_ids = response.result_id;
                         if(res_id_values == 'none' && res_ids != '')
                         {
                             res_id_values = res_ids;
@@ -1582,7 +1581,28 @@ function action_send_form_confirm_result(path_manage_script, mode_req, id_action
                         }
                         var page_result = response.page_result;
                         page_result_final = response.page_result;
-                        close_action(id_action, page_result, path_manage_script, mode_req, res_id_values, table_name, id_coll);
+            close_action(id_action, page_result, path_manage_script, mode_req, res_id_values, table_name, id_coll);*/
+                            var modal = $('modal_'+id_action);
+    if(modal) {
+        destroyModal('modal_'+id_action);
+    }
+            if(pile_actions.values.length > 0) {
+                            end_actions();
+                        } else {
+                            res_ids = response.result_id;
+                            if(res_id_values == 'none' && res_ids != '')
+                            {
+                                res_id_values = res_ids;
+                            }
+                            var table_name = tablename;
+                            if(response.table && response.table != '')
+                            {
+                                table_name = response.table;
+                            }
+                            var page_result = response.page_result;
+                            page_result_final = response.page_result;
+                            close_action(id_action, page_result, path_manage_script, mode_req, res_id_values, table_name, id_coll);                            
+                        }
                     }
                     else //  Form Params errors
                     {
@@ -1615,8 +1635,7 @@ function action_change_status(path_manage_script, mode_req, res_id_values, table
                 new_status : status
             },
             success: function(answer) {
-
-                setTimeout(function(){
+                //setTimeout(function(){
                     if(answer.status == 0 ) {
                         actions_status.values = [];
                         // Status changed
@@ -1655,7 +1674,7 @@ function action_change_status(path_manage_script, mode_req, res_id_values, table
                     }
                     
                     do_nothing = false;
-                }, 500);
+                //}, 500);
             }
         });
     }
@@ -2551,9 +2570,9 @@ function previsualiseAdminRead(e, json){
     if (divWidth > 0) {
         leftPosition = mouseX - (divWidth + 40);
     }
-	if(leftPosition < 0){
-		leftPosition = - leftPosition;
-	}
+    if(leftPosition < 0){
+        leftPosition = - leftPosition;
+    }
     var divHeight = $('return_previsualise').getHeight();
     if (divHeight > 0) {
         topPosition = mouseY - (divHeight - 2);
@@ -2658,11 +2677,11 @@ var globalEval =  function(script){
 
 //
 function evalMyScripts(targetId) {
-	var myScripts = document.getElementById(targetId).getElementsByTagName('script');
-	for (var i=0; i<myScripts.length; i++) {
+    var myScripts = document.getElementById(targetId).getElementsByTagName('script');
+    for (var i=0; i<myScripts.length; i++) {
         // alert(myScripts[i].innerHTML);
-		globalEval(myScripts[i].innerHTML);
-	}
+        globalEval(myScripts[i].innerHTML);
+    }
 }
 
 /*
