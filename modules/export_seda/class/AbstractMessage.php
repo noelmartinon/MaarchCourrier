@@ -87,7 +87,11 @@ class AbstractMessage{
             $dest = __DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageId . DIRECTORY_SEPARATOR . $binaryDataObject->Attachment->filename;
 
             file_put_contents($dest, base64_decode($binaryDataObject->Attachment->value));
+
+            unset($binaryDataObject->Attachment->value);
         }
+
+        $this->db->updateDataMessage($messageObject->MessageIdentifier->value, json_encode($messageObject));
     }
 
     public function addTitleToMessage($reference, $title = ' ')

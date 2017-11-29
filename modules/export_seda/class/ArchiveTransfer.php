@@ -28,12 +28,37 @@ class ArchiveTransfer
     private $db;
     private $abstractMessage;
     private $externalLink;
+    private $xml;
 
     public function __construct()
     {
         $this->db = new RequestSeda();
         $this->abstractMessage = new AbstractMessage();
         $_SESSION['error'] = "";
+
+        $getXml = false;
+        $path = '';
+        if (file_exists(
+            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        ))
+        {
+            $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+                . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+            $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
+                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        }
+
+        if ($getXml) {
+            $this->xml = simplexml_load_file($path);
+        }
     }
 
     public function receive($listResId)
@@ -310,11 +335,7 @@ class ArchiveTransfer
             $entity = $this->db->getEntity($entity['ENTITY_ID']);
 
             if ($entity) {
-                $messageObject->TransferringAgency->Identifier->value = $entity->business_id;
-                $messageObject->ArchivalAgency->Identifier->value = $entity->archival_agency;
-                $messageObject->ArchivalAgreement->value = $entity->archival_agreement;
-
-                if (!$entity->business_id) {
+                if (!(string) $this->xml->CONFIG->senderOrgRegNumber) {
                     $_SESSION['error'] .= _TRANSFERRING_AGENCY_SIREN_REQUIRED;
                 }
 
@@ -325,6 +346,14 @@ class ArchiveTransfer
                 if (!$entity->archival_agreement) {
                     $_SESSION['error'] .= _ARCHIVAL_AGREEMENT_REQUIRED;
                 }
+
+                if (!empty($_SESSION['error'])) {
+                    return;
+                }
+
+                $messageObject->TransferringAgency->Identifier->value = (string) $this->xml->CONFIG->senderOrgRegNumber;
+                $messageObject->ArchivalAgency->Identifier->value = $entity->archival_agency;
+                $messageObject->ArchivalAgreement->value = $entity->archival_agreement;
             } else {
                 $_SESSION['error'] .= _NO_ENTITIES;
             }
