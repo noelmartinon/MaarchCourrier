@@ -760,7 +760,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                     } else if ($key == 'priority') {
                                         echo 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
                                     } else if ($key == 'nature_id') {
-										echo 'disabled';
+										echo 'disabled style="background-color : #e6e6d1;"';
 									}
 									?>
                                     >
