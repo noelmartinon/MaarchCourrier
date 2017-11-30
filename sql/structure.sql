@@ -245,6 +245,7 @@ WITH (OIDS=FALSE);
 
 CREATE TABLE users
 (
+  id serial NOT NULL,
   user_id character varying(128) NOT NULL,
   "password" character varying(255) DEFAULT NULL::character varying,
   firstname character varying(255) DEFAULT NULL::character varying,
