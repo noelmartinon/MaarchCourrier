@@ -126,9 +126,13 @@ class CoreConfigModel
         return $loggingMethod;
     }
 
-    public static function getOzwilloConfiguration()
+    public static function getOzwilloConfiguration(array $aArgs = [])
     {
-        $customId = CoreConfigModel::getCustomId();
+        if (empty($aArgs['customId'])) {
+            $customId = CoreConfigModel::getCustomId();
+        } else {
+            $customId = $aArgs['customId'];
+        }
 
         if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/ozwilloConfig.xml")) {
             $path = "custom/{$customId}/apps/maarch_entreprise/xml/ozwilloConfig.xml";
@@ -140,9 +144,11 @@ class CoreConfigModel
         if (file_exists($path)) {
             $loadedXml = simplexml_load_file($path);
             if ($loadedXml) {
-                $ozwilloConfig['uri']           = (string)$loadedXml->URI;
-                $ozwilloConfig['clientId']      = (string)$loadedXml->CLIENT_ID;
-                $ozwilloConfig['clientSecret']  = (string)$loadedXml->CLIENT_SECRET;
+                $ozwilloConfig['instanceUri']           = (string)$loadedXml->INSTANCE_URI;
+                $ozwilloConfig['instantiationSecret']   = (string)$loadedXml->INSTANTIATION_SECRET;
+                $ozwilloConfig['uri']                   = (string)$loadedXml->URI;
+                $ozwilloConfig['clientId']              = (string)$loadedXml->CLIENT_ID;
+                $ozwilloConfig['clientSecret']          = (string)$loadedXml->CLIENT_SECRET;
             }
         }
 
