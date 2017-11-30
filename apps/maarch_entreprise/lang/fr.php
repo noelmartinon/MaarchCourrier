@@ -815,6 +815,7 @@ if (!defined("_ADD_COPIES")) define("_ADD_COPIES","Ajouter des personnes en copi
 if (!defined("_TO_SIGN")) define("_TO_SIGN","Pour signature");
 if (!defined("_VISA_USER"))    define("_VISA_USER", "Pour visa");
 if (!defined("_VISA_USER_SEARCH"))    define("_VISA_USER_SEARCH", "VISEUR");
+if (!defined("_VISA_USER_SEARCH_MIN"))    define("_VISA_USER_SEARCH_MIN", "Nom du viseur");
 //Circuits d'avis
 if (!defined("_TO_VIEW")) define("_TO_VIEW","Pour avis");
 if (!defined("_TO_SHARED_VIEW")) define("_TO_SHARED_VIEW","Pour avis partagé");

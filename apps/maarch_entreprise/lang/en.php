@@ -801,6 +801,7 @@ if (!defined("_ADD_COPIES")) define("_ADD_COPIES","Add persons on copy");
 if (!defined("_TO_SIGN")) define("_TO_SIGN","For signature");
 if (!defined("_VISA_USER"))    define("_VISA_USER", "For visa");
 if (!defined("_VISA_USER_SEARCH"))    define("_VISA_USER_SEARCH", "Visa user");
+if (!defined("_VISA_USER_SEARCH_MIN"))    define("_VISA_USER_SEARCH_MIN", "Visa user name");
 
 //Circuits d'avis
 if (!defined("_TO_VIEW")) define("_TO_VIEW","For recommendation");
