@@ -156,9 +156,9 @@ abstract class ScheduleNotifications_Abstract
             fwrite($file_open, 'php \'basket_event_stack.php\' -c '.$ConfigNotif.' -n '.$notification_id);
         }
         else if ($notification_id == 'RELANCE1' || $notification_id == 'RELANCE2' || $notification_id == 'RET1' || $notification_id == 'RET2'){
-            fwrite($file_open, 'php \'process_event_stack.php\' -c '.$ConfigNotif.' -n '.$notification_id);
-            fwrite($file_open, "\n");
             fwrite($file_open, 'php \'stack_letterbox_alerts.php\' -c '.$ConfigNotif);
+            fwrite($file_open, "\n");
+            fwrite($file_open, 'php \'process_event_stack.php\' -c '.$ConfigNotif.' -n '.$notification_id);
         } else {
             fwrite($file_open, 'php \'process_event_stack.php\' -c '.$ConfigNotif.' -n '.$notification_id);
         }

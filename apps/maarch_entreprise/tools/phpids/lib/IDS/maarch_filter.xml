@@ -240,7 +240,7 @@
         </tags>
         <impact>5</impact>
     </filter>	 -->
-    <filter>
+<!--     <filter>
         <id>23</id>
         <rule><![CDATA[(?:\.\s*\w+\W*=)|(?:\W\s*(?:location)\s*\W[^({[;]+[({[;])|(?:\(\w+\?[:\w]+\))]]></rule>
         <description>Detects JavaScript location/document property access and window access obfuscation</description>
@@ -249,7 +249,7 @@
             <tag>csrf</tag>
         </tags>
         <impact>5</impact>
-    </filter>    
+    </filter>   -->  
     <filter>
         <id>24</id>
         <rule><![CDATA[(?:[".]script\s*\()|(?:\$\$?\s*\(\s*[\w"])|(?:\/[\w\s]+\/\.)|(?:=\s*\/\w+\/\s*\.)|(?:(?:this|window|top|parent|frames|self|content)\[\s*[(,"]*\s*[\w\$])|(?:,\s*new\s+\w+\s*[,;)])]]></rule>
