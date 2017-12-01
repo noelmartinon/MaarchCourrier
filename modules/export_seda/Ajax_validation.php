@@ -24,6 +24,7 @@ $error = $content = $res = '';
 
 if ($_REQUEST['reference']) {
     $resIds = explode(',',$_REQUEST['reference']);
+    arsort($resIds);
     if ($_REQUEST['type'] == 'acknowledgement') {
         require_once __DIR__.'/CheckAcknowledgement.php';
 
