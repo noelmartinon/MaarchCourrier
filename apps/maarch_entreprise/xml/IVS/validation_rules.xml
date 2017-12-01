@@ -759,6 +759,7 @@
 
     <validationRule name="url_path" extends="standardForm" mode="error">  
       <!-- <parameter name="url" type="url" /> -->
+      <parameter name="watermark_outgoing" type="string" />
       <parameter name="url" type="string" />
       <parameter name="baskets" type="identifier" />
       <parameter name="origin" type="identifier" />
