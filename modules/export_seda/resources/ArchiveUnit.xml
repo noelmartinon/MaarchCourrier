@@ -9,7 +9,7 @@
         <?merge .Management.StorageRule.bool() ?>
         <StorageRule>
             <?merge .Management.StorageRule.Rule.bool() ?><Rule><?merge .Management.StorageRule.Rule.value ?></Rule>
-            <?merge .Management.StorageRule.StartDate.bool() ?><StartDate><?merge .Management.StorageRule.StartDate.value ?></StartDate>
+            <?merge .Management.StorageRule.StartDate.bool() ?><StartDate><?merge .Management.StorageRule.StartDate ?></StartDate>
             <PreventInheritance><?merge .Management.StorageRule.PreventInheritance ?></PreventInheritance>
             <RefNonRuleId><?merge .Management.StorageRule.RefNonRuleId ?></RefNonRuleId>
             <FinalAction><?merge .Management.StorageRule.FinalAction ?></FinalAction>
@@ -17,7 +17,7 @@
         <?merge .Management.AppraisalRule.bool() ?>
         <AppraisalRule>
             <?merge .Management.AppraisalRule.Rule.bool() ?><Rule><?merge .Management.AppraisalRule.Rule.value ?></Rule>
-            <?merge .Management.AppraisalRule.StartDate.bool() ?><StartDate><?merge .Management.AppraisalRule.StartDate.value ?></StartDate>
+            <?merge .Management.AppraisalRule.StartDate.bool() ?><StartDate><?merge .Management.AppraisalRule.StartDate ?></StartDate>
             <PreventInheritance><?merge .Management.AppraisalRule.PreventInheritance ?></PreventInheritance>
             <RefNonRuleId><?merge .Management.AppraisalRule.RefNonRuleId ?></RefNonRuleId>
             <FinalAction><?merge .Management.AppraisalRule.FinalAction ?></FinalAction>
@@ -25,28 +25,28 @@
         <?merge .Management.AccessRule.bool() ?>
         <AccessRule>
             <?merge .Management.AccessRule.Rule.bool() ?><Rule><?merge .Management.AccessRule.Rule.value ?></Rule>
-            <?merge .Management.AccessRule.StartDate.bool() ?><StartDate><?merge .Management.AccessRule.StartDate.value ?></StartDate>
+            <?merge .Management.AccessRule.StartDate.bool() ?><StartDate><?merge .Management.AccessRule.StartDate ?></StartDate>
             <PreventInheritance><?merge .Management.AccessRule.PreventInheritance ?></PreventInheritance>
             <RefNonRuleId><?merge .Management.AccessRule.RefNonRuleId ?></RefNonRuleId>
         </AccessRule>
         <?merge .Management.DisseminationRule.bool() ?>
         <DisseminationRule>
             <?merge .Management.DisseminationRule.Rule.bool() ?><Rule><?merge .Management.DisseminationRule.Rule.value ?></Rule>
-            <?merge .Management.DisseminationRule.StartDate.bool() ?><StartDate><?merge .Management.DisseminationRule.StartDate.value ?></StartDate>
+            <?merge .Management.DisseminationRule.StartDate.bool() ?><StartDate><?merge .Management.DisseminationRule.StartDate ?></StartDate>
             <PreventInheritance><?merge .Management.DisseminationRule.PreventInheritance ?></PreventInheritance>
             <RefNonRuleId><?merge .Management.DisseminationRule.RefNonRuleId ?></RefNonRuleId>
         </DisseminationRule>
         <?merge .Management.ReuseRule.bool() ?>
         <ReuseRule>
             <?merge .Management.ReuseRule.Rule.bool() ?><Rule><?merge .Management.ReuseRule.Rule.value ?></Rule>
-            <?merge .Management.ReuseRule.StartDate.bool() ?><StartDate><?merge .Management.ReuseRule.StartDate.value ?></StartDate>
+            <?merge .Management.ReuseRule.StartDate.bool() ?><StartDate><?merge .Management.ReuseRule.StartDate ?></StartDate>
             <PreventInheritance><?merge .Management.ReuseRule.PreventInheritance ?></PreventInheritance>
             <RefNonRuleId><?merge .Management.ReuseRule.RefNonRuleId ?></RefNonRuleId>
         </ReuseRule>
         <?merge .Management.ClassificationRule.bool() ?>
         <ClassificationRule>
             <?merge .Management.ClassificationRule.Rule.bool() ?><Rule><?merge .Management.ClassificationRule.Rule.value ?></Rule>
-            <?merge .Management.ClassificationRule.StartDate.bool() ?><StartDate><?merge .Management.ClassificationRule.StartDate.value ?></StartDate>
+            <?merge .Management.ClassificationRule.StartDate.bool() ?><StartDate><?merge .Management.ClassificationRule.StartDate ?></StartDate>
             <PreventInheritance><?merge .Management.ClassificationRule.PreventInheritance ?></PreventInheritance>
             <RefNonRuleId><?merge .Management.ClassificationRule.RefNonRuleId ?></RefNonRuleId>
             <ClassificationLevel><?merge .Management.ClassificationRule.ClassificationLevel ?></ClassificationLevel>
