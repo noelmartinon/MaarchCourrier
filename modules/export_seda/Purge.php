@@ -66,7 +66,10 @@ Class Purge{
 
         $this->db->deleteUnitIdentifier($resId);
         $this->purgeResource($resId);
-        $this->purgeContact($letter->contact_id);
+
+        if ($letter->contact_id) {
+            $this->purgeContact($letter->contact_id);
+        }
 
         $unitIdentifiers = $this->db->getUnitIdentifierByMessageId($message->message_id);
         if (!$unitIdentifiers) {
