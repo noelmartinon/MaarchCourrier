@@ -229,7 +229,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     $frm_str .='<i onmouseover="this.style.cursor=\'pointer\';" '
         .'onclick="new Ajax.Request(\'' . $_SESSION['config']['businessappurl'] 
         . 'index.php?display=true&dir=actions&page=docLocker\',{ method:\'post\', parameters: {\'AJAX_CALL\': true, \'unlock\': true, \'res_id\': ' 
-        . $res_id . '}, onSuccess: function(answer){window.location.href=window.location.href;} });var tmp_bask=$(\'baskets\');';
+        . $res_id . '}, onSuccess: function(answer){window.location.href=window.location.href.replace(\'&directLinkToAction\', \'\');} });var tmp_bask=$(\'baskets\');';
     $frm_str .= 'if (tmp_bask){tmp_bask.style.visibility=\'visible\';}var tmp_ent =$(\'entity\');';
     $frm_str .= 'if (tmp_ent){tmp_ent.style.visibility=\'visible\';} var tmp_cat =$(\'category\');';
     $frm_str .= 'if (tmp_cat){tmp_cat.style.visibility=\'visible\';}destroyModal(\'modal_'

@@ -360,6 +360,10 @@ if (isset($_POST['add']) && $_POST['add']) {
                         $_SESSION['collection_id_choice'], $fileInfos
                     );
 
+                    if($attachment_types == 'outgoing_mail' && strpos($fileInfos['format'], 'xl') === false && strpos($fileInfos['format'], 'ppt') === false){
+                        $_SESSION['upfile']['outgoingMail'] = true;
+                    }
+
                     if (isset($storeResult['error']) && $storeResult['error'] <> '') {
                         $_SESSION['error'] = $storeResult['error'];
                     } else {
