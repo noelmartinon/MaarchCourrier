@@ -10,18 +10,60 @@ if ($_SESSION['config']['app_id']) {
 class AbstractMessage{
 
     private $db;
+    private $xml;
+    private $directoryMessage;
     public function __construct()
     {
         $this->db = new RequestSeda();
+
+        $getXml = false;
+        $path = '';
+        if (file_exists(
+            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        )) {
+            $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
+                . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        } elseif (file_exists(
+            $_SESSION['config']['corepath'] . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        )) {
+            $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
+                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
+            $getXml = true;
+        }
+
+        if ($getXml) {
+            $this->xml = simplexml_load_file($path);
+
+            $this->directoryMessage = (string) $this->xml->CONFIG->directoryMessage;
+        }
     }
 
     public function generatePackage($reference, $name)
     {
         $message = $this->db->getMessageByReference($reference);
+        $messageObject = json_decode($message->data);
 
-        $this->saveXml(json_decode($message->data), $name, ".xml");
+        if (!is_dir($this->directoryMessage)) {
+            umask(0);
+            mkdir($this->directoryMessage, 0777, true);
+        }
 
-        $this->sendAttachment(json_decode($message->data));
+        if (!is_dir($this->directoryMessage . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value)) {
+            umask(0);
+            mkdir($this->directoryMessage . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value, 0777, true);
+        }
+
+        $this->sendAttachment($messageObject);
+
+        $this->saveXml($messageObject, $name, ".xml");
     }
 
     public function saveXml($messageObject, $name, $extension)
@@ -44,18 +86,18 @@ class AbstractMessage{
         $DOMTemplateProcessor->removeEmptyNodes();
 
         try {
-            if (!is_dir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message')) {
+            if (!is_dir($this->directoryMessage)) {
                 umask(0);
-                mkdir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message', 0777, true);
+                mkdir($this->directoryMessage, 0777, true);
             }
 
-            if (!is_dir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value)) {
+            if (!is_dir($this->directoryMessage . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value)) {
                 umask(0);
-                mkdir(__DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value, 0777, true);
+                mkdir($this->directoryMessage . DIRECTORY_SEPARATOR . $messageObject->MessageIdentifier->value, 0777, true);
             }
 
-            if (!file_exists(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$messageObject->MessageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->MessageIdentifier->value . $extension)) {
-                $DOMTemplate->save(__DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$messageObject->MessageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->MessageIdentifier->value . $extension);
+            if (!file_exists($this->directoryMessage . DIRECTORY_SEPARATOR.$messageObject->MessageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->MessageIdentifier->value . $extension)) {
+                $DOMTemplate->save($this->directoryMessage . DIRECTORY_SEPARATOR.$messageObject->MessageIdentifier->value.DIRECTORY_SEPARATOR. $messageObject->MessageIdentifier->value . $extension);
             }
 
         } catch (Exception $e) {
@@ -66,7 +108,7 @@ class AbstractMessage{
     public function addAttachment($reference, $resIdMaster, $fileName, $extension, $title, $type) {
         $db = new RequestSeda();
         $object = new stdClass();
-        $dir =  __DIR__.DIRECTORY_SEPARATOR.'..'. DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$reference.DIRECTORY_SEPARATOR;
+        $dir =  $this->directoryMessage . DIRECTORY_SEPARATOR . $reference . DIRECTORY_SEPARATOR;
 
         $object->tmpDir = $dir;
         $object->size = filesize($dir);
@@ -84,11 +126,13 @@ class AbstractMessage{
         $messageId = $messageObject->MessageIdentifier->value;
 
         foreach ($messageObject->DataObjectPackage->BinaryDataObject as $binaryDataObject) {
-            $dest = __DIR__ . DIRECTORY_SEPARATOR . '..'. DIRECTORY_SEPARATOR.'message' . DIRECTORY_SEPARATOR . $messageId . DIRECTORY_SEPARATOR . $binaryDataObject->Attachment->filename;
+            $dest = $this->directoryMessage . DIRECTORY_SEPARATOR . $messageId . DIRECTORY_SEPARATOR . $binaryDataObject->Attachment->filename;
 
-            file_put_contents($dest, base64_decode($binaryDataObject->Attachment->value));
+            if (!file_exists($dest)) {
+                copy($binaryDataObject->Uri, $dest);
 
-            unset($binaryDataObject->Attachment->value);
+                unset($binaryDataObject->Uri);
+            }
         }
 
         $this->db->updateDataMessage($messageObject->MessageIdentifier->value, json_encode($messageObject));
