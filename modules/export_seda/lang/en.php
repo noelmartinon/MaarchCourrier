@@ -78,6 +78,9 @@ if (!defined("_RECEIVED_MESSAGE"))
 if (!defined("_ERROR_MESSAGE"))
     define("_RECEIVED_MESSAGE", "Message non-reçu");
 
+if (!defined("_DIRECTORY_MESSAGE_REQUIRED"))
+    define("_DIRECTORY_MESSAGE_REQUIRED", "Directory message not configured");
+
 if (!defined("_ACKNOWLEDGEMENT_REFERENCE"))
     define("_ACKNOWLEDGEMENT_REFERENCE", "Acknowledgement reference");
 
@@ -140,3 +143,6 @@ if (!defined("_ERROR_ORIGINATOR_EMPTY"))
 
 if (!defined("_ERROR_FILE_NOT_EXIST"))
     define("_ERROR_FILE_NOT_EXIST", "All the documents must be present in the storage areas");
+
+if (!defined("_ERROR_REPLY_NOT_EXIST"))
+    define("_ERROR_REPLY_NOT_EXIST", "La réponse au transfert doit être présente pour effectuer une action. Numéro du courrier : ");

@@ -43,14 +43,17 @@ class ArchiveTransfer
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
             . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
             . DIRECTORY_SEPARATOR . 'config.xml'
-        ))
-        {
+        )) {
             $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                 . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
                 . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
-        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+        } elseif (file_exists(
+            $_SESSION['config']['corepath'] . 'modules'
+            . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml'
+            . DIRECTORY_SEPARATOR . 'config.xml'
+        )) {
             $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
                 . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
@@ -318,6 +321,14 @@ class ArchiveTransfer
 
     private function initMessage($messageObject)
     {
+
+        $this->directoryMessage = (string) $this->xml->CONFIG->directoryMessage;
+
+        if (!$this->directoryMessage || !is_dir($this->directoryMessage)) {
+            $_SESSION['error'] .= _DIRECTORY_MESSAGE_REQUIRED;
+            return;
+        }
+
         $date = new DateTime;
         $messageObject->Date = $date->format(DateTime::ATOM);
         $messageObject->MessageIdentifier = new stdClass();
@@ -390,11 +401,10 @@ class ArchiveTransfer
                 $archiveUnit->Content = $this->getContent($type, $object);
             }
 
-            if ($object->type_id && $object->type_id != 0) {
-                $archiveUnit->Management = $this->getManagement($object);
-            }
+            $archiveUnit->Management = $this->getManagement($object);
         } else {
             $archiveUnit->Content = $this->getContent($type);
+            $archiveUnit->Management = $this->getManagement();
         }
 
 
@@ -617,21 +627,30 @@ class ArchiveTransfer
         return $content;
     }
 
-    private function getManagement($letterbox)
+    private function getManagement($letterbox = null)
     {
         $management = new stdClass();
 
-        $docTypes = $this->db->getDocTypes($letterbox->type_id);
+        if ($letterbox && $letterbox->type_id != 0) {
+            $docTypes = $this->db->getDocTypes($letterbox->type_id);
 
-        $management->AppraisalRule = new stdClass();
-        $management->AppraisalRule->Rule = new stdClass();
-        $management->AppraisalRule->Rule->value = $docTypes->retention_rule;
-        if ($docTypes->retention_final_disposition == "conservation") {
-            $management->AppraisalRule->FinalAction = "Keep";
-        } else {
-            $management->AppraisalRule->FinalAction = "Destroy";
+            $management->AppraisalRule = new stdClass();
+            $management->AppraisalRule->Rule = new stdClass();
+            $management->AppraisalRule->Rule->value = $docTypes->retention_rule;
+            $management->AppraisalRule->StartDate = date("Y-m-d");
+            if ($docTypes->retention_final_disposition == "conservation") {
+                $management->AppraisalRule->FinalAction = "Keep";
+            } else {
+                $management->AppraisalRule->FinalAction = "Destroy";
+            }
         }
 
+        if ((string) $this->xml->CONFIG->accessRuleCode) {
+            $management->AccessRule = new stdClass();
+            $management->AccessRule->Rule = new stdClass();
+            $management->AccessRule->Rule->value = (string)$this->xml->CONFIG->accessRuleCode;
+            $management->AccessRule->StartDate = date("Y-m-d");
+        }
 
         return $management;
     }
@@ -640,21 +659,27 @@ class ArchiveTransfer
     {
         $binaryDataObject = new stdClass();
 
-        $data = file_get_contents($filePath);
+        $pathInfo = pathinfo($filePath);
+
+        if ($id && $id != $pathInfo['filename']) {
+            $filename = $pathInfo['filename'] . '_' . $id . '.' . $pathInfo['extension'];
+        } else {
+            $filename = $pathInfo['filename'] . '_' . rand() . '.' . $pathInfo['extension'];
+        }
 
         $binaryDataObject->id = $id;
+        $binaryDataObject->Uri = $filePath;
         $binaryDataObject->MessageDigest = new stdClass();
-        $binaryDataObject->MessageDigest->value = hash('sha256', $data);
+        $binaryDataObject->MessageDigest->value = hash_file('sha256', $filePath);
         $binaryDataObject->MessageDigest->algorithm = "sha256";
         $binaryDataObject->Size = filesize($filePath);
 
 
         $binaryDataObject->Attachment = new stdClass();
-        $binaryDataObject->Attachment->value = base64_encode($data);
-        $binaryDataObject->Attachment->filename = basename($filePath);
+        $binaryDataObject->Attachment->filename = $filename;
 
         $binaryDataObject->FileInfo = new stdClass();
-        $binaryDataObject->FileInfo->Filename = basename($filePath);
+        $binaryDataObject->FileInfo->Filename = $filename;
 
         $binaryDataObject->FormatIdentification = new stdClass();
         $binaryDataObject->FormatIdentification->MimeType = mime_content_type($filePath);

@@ -92,6 +92,9 @@ if (!defined("_RECEIVED_MESSAGE"))
 if (!defined("_ERROR_MESSAGE"))
     define("_ERROR_MESSAGE", "Bordereau non-reçu");
 
+if (!defined("_DIRECTORY_MESSAGE_REQUIRED"))
+    define("_DIRECTORY_MESSAGE_REQUIRED", "Répertoire des messages non configuré");
+
 if (!defined("_TRANSFERRING_AGENCY_SIREN_REQUIRED"))
     define("_TRANSFERRING_AGENCY_SIREN_REQUIRED", "Numéro SIREN service versant obligatoire");
 
@@ -151,3 +154,6 @@ if (!defined("_ERROR_ORIGINATOR_EMPTY"))
 
 if (!defined("_ERROR_FILE_NOT_EXIST"))
     define("_ERROR_FILE_NOT_EXIST", "Tous les documents doivent être présent dans les zones de stockage");
+
+if (!defined("_ERROR_REPLY_NOT_EXIST"))
+    define("_ERROR_REPLY_NOT_EXIST", "La réponse au transfert doit être présente pour effectuer une action. Numéro du courrier : ");

@@ -9,7 +9,9 @@
         <token></token>
         <urlSAEService>http://srv-maarchrm-ap</urlSAEService>
         <urlSAE>http://maarchrm/transfer/sent</urlSAE>
+        <directoryMessage></directoryMessage>
         <senderOrgRegNumber></senderOrgRegNumber>
+        <accessRuleCode></accessRuleCode>
         <deleteData>true</deleteData>
     </CONFIG>
     <TABLENAME/>
