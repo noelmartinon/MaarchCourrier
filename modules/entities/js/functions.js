@@ -329,3 +329,65 @@ function loadToolbarEntities(where)
         }
     });
 }
+
+function moveToDest(user_id,role_id,origin) {
+    var pos = $j('#'+user_id+'_'+role_id)[0].rowIndex;
+
+    $j('tr[id$=_dest]').after($j('#'+user_id+'_'+role_id)[0]);
+
+    console.log($j('#diffListUser_'+role_id+' tr:eq('+pos+')'));
+    if ($j('#diffListUser_'+role_id+' tr:eq('+pos+')').length) {
+        $j('#diffListUser_'+role_id+' tr:eq('+pos+')')[0].before($j('tr[id$=_dest]')[0]);
+    }else{
+        $j('#diffListUser_'+role_id)[0].append($j('tr[id$=_dest]')[0]);
+    }
+    
+    var destUserId = $j('tr[id$=_dest]')[0].id.replace("_dest","");
+
+    $j('#'+destUserId+'_dest .movedest').append('<i class="fa fa-arrow-up" style="cursor:pointer;" title="" onclick="moveToDest(\''+destUserId+'\',\''+role_id+'\');"></i>');
+    
+    $j('tr[id$=_dest]')[0].id = destUserId+'_'+role_id;
+
+
+    $j('#'+user_id+'_'+role_id).removeClass('col');
+    $j('#'+user_id+'_'+role_id+' .movedest i').remove();
+
+    $j('#'+user_id+'_'+role_id).prop('onclick',null).off('click');
+
+    $j('#'+user_id+'_'+role_id)[0].id = user_id+'_dest';
+
+    i=0;
+    $j("#diffListUser_"+role_id+' tr').each(function() {
+        $j('#'+this.id).removeClass('col');
+
+        if (i%2) {
+            $j('#'+this.id).addClass('col');
+        }
+        i++
+    });
+
+    $j.ajax({
+        url : 'index.php?display=true&module=entities&page=reloadListDiff',
+        type : 'POST',
+        dataType : 'JSON',
+        data: {
+            rank: pos,
+            origin: origin,
+            role_id: role_id
+            
+        },
+        success : function(response){
+            if (response.status == 0) {
+                
+                var userList = response.result;
+
+            } else {
+                alert('ERROR!');
+            }
+        },
+        error : function(error){
+            console.log('ERROR!');
+        }
+
+     });
+}
