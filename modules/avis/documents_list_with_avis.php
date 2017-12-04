@@ -561,20 +561,27 @@ if (isset($_REQUEST['origin']) && $_REQUEST['origin'] == 'searching') {
     array_push($paramsTab['tools'], $save); 
 }
 $export = array(
-        "script"        =>  "window.open('".$_SESSION['config']['businessappurl']."index.php?display=true&page=export', '_blank');",
-        "icon"          =>  'cloud-download',
-        "tooltip"       =>  _EXPORT_LIST,
-        "disabledRules" =>  count($tab)." == 0"
-        );
+    "script"        =>  "window.open('".$_SESSION['config']['businessappurl']."index.php?display=true&page=export', '_blank');",
+    "icon"          =>  'file-excel-o',
+    "tooltip"       =>  _EXPORT_LIST,
+    "disabledRules" =>  count($tab)." == 0"
+    );
 array_push($paramsTab['tools'], $export);
+$export2 = array(
+"script"        =>  "print_current_result_list('".$_SESSION['config']['businessappurl']."');",
+"icon"          =>  'print',
+"tooltip"       =>  _PRINT_LIST,
+"disabledRules" =>  count($tab)." == 0"
+);
+array_push($paramsTab['tools'],$export2);  
 if ($core_tools->test_service('print_doc_details_from_list', 'apps', false)) {
-    $print = array(
-                "script"        =>  "window.open('".$_SESSION['config']['businessappurl']."index.php?display=true&page=print', '_blank');",
-                "icon"          =>  'print',
-                "tooltip"       =>  _PRINT_LIST,
-                "disabledRules" =>  count($tab)." == 0"
-             );
-    array_push($paramsTab['tools'], $print);   
+$print = array(
+            "script"        =>  "window.open('".$_SESSION['config']['businessappurl']."index.php?display=true&page=print', '_blank');",
+            "icon"          =>  'link',
+            "tooltip"       =>  _PRINT_DOC_FROM_LIST,
+            "disabledRules" =>  count($tab)." == 0"
+        );
+array_push($paramsTab['tools'], $print);   
 }
 
 //Afficher la liste

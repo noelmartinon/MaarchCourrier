@@ -1180,6 +1180,7 @@ if (!defined("_VIEW_DOC_FULL")) define("_VIEW_DOC_FULL", "Voir le document");
 if (!defined("_DETAILS_DOC_FULL")) define("_DETAILS_DOC_FULL", "Voir la fiche du document");
 if (!defined("_IDENTIFIER")) define("_IDENTIFIER", "Référence");
 if (!defined("_CHRONO_NUMBER")) define("_CHRONO_NUMBER", "Numéro chrono");
+if (!defined("_CHRONO_NUMBER_SHORT")) define("_CHRONO_NUMBER_SHORT", "N° chrno");
 if (!defined("_ATTACHMENT_TYPE")) define("_ATTACHMENT_TYPE", "Type de pièce jointe");
 if (!defined("_NO_CHRONO_NUMBER_DEFINED")) define("_NO_CHRONO_NUMBER_DEFINED", "Le numéro chrono n'est pas défini");
 if (!defined("_FOR_CONTACT_C")) define("_FOR_CONTACT_C", "Pour : ");
@@ -1543,7 +1544,7 @@ if (!defined("_CHECK_ALL"))    define("_CHECK_ALL", "Tout cocher");
 if (!defined("_UNCHECK_ALL"))    define("_UNCHECK_ALL", "/ décocher");
 
 //EXPORT
-if (!defined("_EXPORT_LIST"))    define("_EXPORT_LIST", "Exporter");
+if (!defined("_EXPORT_LIST"))    define("_EXPORT_LIST", "Exporter (format csv)");
 
 /******************** Action put in copy ************/
 if (!defined("_ADD_LINKS"))    define("_ADD_LINKS", "Ajouter des liaisons");
@@ -1706,6 +1707,7 @@ if (!defined("_CHOOSE_CURRENT_STATUS")) define("_CHOOSE_CURRENT_STATUS", "Conser
 if (!defined("_PRINT_DETAILS_SERVICE")) define("_PRINT_DETAILS_SERVICE", "Imprimer la fiche de liaison depuis la fiche détail");
 if (!defined("_PRINT_DETAILS")) define("_PRINT_DETAILS", "Imprimer fiche de liaison");
 if (!defined("_PRINT_DOC_DETAILS_FROM_LIST")) define("_PRINT_DOC_DETAILS_FROM_LIST", "Imprimer les fiches de liaison depuis les listes de résultats");
+if (!defined("_PRINT_DOC_FROM_LIST")) define("_PRINT_DOC_FROM_LIST", "Imprimer les fiches de liaison des documents");
 if (!defined("_PRINT_LIST")) define("_PRINT_LIST", "Imprimer la liste");
 if (!defined("_PRINT_CATEGORY")) define("_PRINT_CATEGORY", "Catégorie");
 if (!defined("_PRINT_DOC_DATE")) define("_PRINT_DOC_DATE", "Date du document");

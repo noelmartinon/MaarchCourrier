@@ -463,6 +463,7 @@ abstract class basket_Abstract extends Database
             $_SESSION['current_basket']['label'] = $_SESSION['user']['baskets'][$ind]['name'];
             $_SESSION['current_basket']['clause'] = $_SESSION['user']['baskets'][$ind]['clause'];
             $_SESSION['current_basket']['actions'] = $_SESSION['user']['baskets'][$ind]['actions'];
+            $_SESSION['current_basket']['basket_res_order'] = $_SESSION['user']['baskets'][$ind]['basket_res_order'];
             // $_SESSION['current_basket']['redirect_services'] = $_SESSION['user']['baskets'][$ind]['redirect_services'];
            // $_SESSION['current_basket']['redirect_users'] = $_SESSION['user']['baskets'][$ind]['redirect_users'];
             $_SESSION['current_basket']['basket_owner'] = $_SESSION['user']['baskets'][$ind]['basket_owner'];
@@ -800,7 +801,7 @@ abstract class basket_Abstract extends Database
         $secCtrl = new SecurityControler();
         $stmt = $db->query(
             "select basket_id, coll_id, basket_name, basket_desc, "
-            . "basket_clause, is_visible, is_generic, is_folder_basket, color from "
+            . "basket_clause, is_visible, is_generic, is_folder_basket, color, basket_res_order from "
             . BASKET_TABLE . " where basket_id = ? and enabled = 'Y'",array($basketId));
         $res = $stmt->fetchObject();
         $tab['id'] = $res->basket_id;
@@ -817,6 +818,7 @@ abstract class basket_Abstract extends Database
         $tab['desc'] = $this->show_string($res->basket_desc);
         $tab['name'] = $this->show_string($res->basket_name);
         $tab['color'] = $this->show_string($res->color);
+        $tab['basket_res_order'] = $this->show_string($res->basket_res_order);
         $tab['clause'] = $res->basket_clause;
         $tab['is_visible'] = $res->is_visible;
         $tab['is_folder_basket'] = $res->is_folder_basket;

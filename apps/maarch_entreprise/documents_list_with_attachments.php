@@ -117,8 +117,12 @@ $where = implode(' and ', $where_tab);
 //Order
 
 $order = $order_field = '';
-$order = $list->getOrder();
-$order_field = $list->getOrderField();
+$arr_order = explode(',',$_SESSION['current_basket']['basket_res_order']);
+if (count($arr_order) == 1 ) {
+    $order = $list->getOrder();
+    $order_field = $list->getOrderField();
+}
+
 if (!empty($order_field) && !empty($order)) {
     if ($_REQUEST['order_field'] == 'alt_identifier') {
         $orderstr = "order by order_alphanum(alt_identifier)"." ".$order;
@@ -134,10 +138,19 @@ if (!empty($order_field) && !empty($order)) {
     }
     $_SESSION['last_order_basket'] = $orderstr;
 } else {
-    $list->setOrder();
-    $list->setOrderField('res_id');
-    $orderstr = "order by res_id desc";
-    $_SESSION['last_order_basket'] = $orderstr;
+    if(!empty($_SESSION['current_basket']['basket_res_order'])) {
+        if (count($arr_order) == 1 ) {
+            $list->setOrder();
+            $list->setOrderField($arr_order[0]);
+        }
+        $orderstr = 'order by '.$_SESSION['current_basket']['basket_res_order'];
+        $_SESSION['last_order_basket'] = $orderstr;
+    } else {
+        $list->setOrder();
+        $list->setOrderField('res_id');
+        $orderstr = "order by res_id desc";
+        $_SESSION['last_order_basket'] = $orderstr;
+    }
 }
 
 //Request
@@ -228,6 +241,7 @@ for ($i=0;$i<$tabI;$i++) {
                 $tab[$i][$j]['hasNotes'] = $stmt->fetchObject();
                 $tab[$i][$j]['res_multi_contacts'] = $_SESSION['mlb_search_current_res_id'];
             }
+            
             if ($tab[$i][$j][$value]=="address_id") {
                 $addressId = $tab[$i][$j]["value"];
                 $tab[$i][$j]["show"] = false;
@@ -493,7 +507,7 @@ for ($i=0;$i<$tabI;$i++) {
 //Cle de la liste
 $listKey = 'res_id';
 
-//Initialiser le tableau de param�tres
+//Initialiser le tableau de parametres
 $paramsTab                                 = array();
 $paramsTab['pageTitle']                    =  _RESULTS." : ".count($tab).' '._FOUND_DOCS;   //Titre de la page
 $paramsTab['listCss']                      = 'listing largerList spec';                     //css
@@ -556,16 +570,23 @@ if (isset($_REQUEST['origin']) && $_REQUEST['origin'] == 'searching') {
 }
 $export = array(
         "script"        =>  "window.open('".$_SESSION['config']['businessappurl']."index.php?display=true&page=export', '_blank');",
-        "icon"          =>  'cloud-download',
+        "icon"          =>  'file-excel-o',
         "tooltip"       =>  _EXPORT_LIST,
         "disabledRules" =>  count($tab)." == 0"
         );
 array_push($paramsTab['tools'], $export);
+$export2 = array(
+    "script"        =>  "print_current_result_list('".$_SESSION['config']['businessappurl']."');",
+    "icon"          =>  'print',
+    "tooltip"       =>  _PRINT_LIST,
+    "disabledRules" =>  count($tab)." == 0"
+    );
+array_push($paramsTab['tools'],$export2);  
 if ($core_tools->test_service('print_doc_details_from_list', 'apps', false)) {
     $print = array(
                 "script"        =>  "window.open('".$_SESSION['config']['businessappurl']."index.php?display=true&page=print', '_blank');",
-                "icon"          =>  'print',
-                "tooltip"       =>  _PRINT_LIST,
+                "icon"          =>  'link',
+                "tooltip"       =>  _PRINT_DOC_FROM_LIST,
                 "disabledRules" =>  count($tab)." == 0"
             );
     array_push($paramsTab['tools'], $print);   

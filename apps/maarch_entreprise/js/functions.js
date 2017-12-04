@@ -3752,3 +3752,20 @@ function setAttachmentInSignatureBook(id, isVersion) {
         }
     });
 }
+
+function print_current_result_list(path){
+    alert("Cela imprimera la liste actuellement affichée");
+    var mywindow = window.open('', 'my div', 'height=400,width=600');
+    mywindow.document.write('<html><head><title>MAARCH</title>');
+    mywindow.document.write('<link rel="stylesheet" href="'+path+'/css/font-awesome/css/font-awesome.min.css" type="text/css" media="all"/>');
+    mywindow.document.write('<link rel="stylesheet" href="'+path+'/css/font-awesome/css/font-maarch.css" type="text/css" media="all"/>');
+    mywindow.document.write('<link rel="stylesheet" href="'+path+'/merged_css.php" type="text/css" media="all"/>');
+    mywindow.document.write('</head><body >');
+    mywindow.document.write('<style>.check,#checkUncheck{display:none;}</style>');
+    mywindow.document.write($j('<div/>').append($j('#extended_list').clone()).html());
+    mywindow.document.write('</body></html>');
+    mywindow.document.close();
+    mywindow.focus();
+    setTimeout(function(){mywindow.print();},500);
+    window.onfocus = function () { setTimeout(function () { mywindow.close(); }, 500); }
+}

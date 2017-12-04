@@ -1165,6 +1165,7 @@ if (!defined("_VIEW_DOC_FULL")) define("_VIEW_DOC_FULL", "see the document");
 if (!defined("_DETAILS_DOC_FULL")) define("_DETAILS_DOC_FULL", "See the document card");
 if (!defined("_IDENTIFIER")) define("_IDENTIFIER", "Reference");
 if (!defined("_CHRONO_NUMBER")) define("_CHRONO_NUMBER", "Chrono number");
+if (!defined("_CHRONO_NUMBER_SHORT")) define("_CHRONO_NUMBER_SHORT", "Chrno Num");
 if (!defined("_ATTACHMENT_TYPE")) define("_ATTACHMENT_TYPE", "Attachment type");
 if (!defined("_NO_CHRONO_NUMBER_DEFINED")) define("_NO_CHRONO_NUMBER_DEFINED", "The chrono number is not defined");
 if (!defined("_FOR_CONTACT_C")) define("_FOR_CONTACT_C", "For: ");
@@ -1525,7 +1526,7 @@ if (!defined("_CHECK_ALL"))    define("_CHECK_ALL", "Tick all");
 if (!defined("_UNCHECK_ALL"))    define("_UNCHECK_ALL", "/ untick");
 
 //EXPORT
-if (!defined("_EXPORT_LIST"))    define("_EXPORT_LIST", "Export");
+if (!defined("_EXPORT_LIST"))    define("_EXPORT_LIST", "Export (csv format)");
 
 /******************** Action put in copy ************/
 if (!defined("_ADD_LINKS"))    define("_ADD_LINKS", "Add connection");
@@ -1686,6 +1687,7 @@ if (!defined("_CHOOSE_CURRENT_STATUS")) define("_CHOOSE_CURRENT_STATUS", "Keep t
 if (!defined("_PRINT_DETAILS_SERVICE")) define("_PRINT_DETAILS_SERVICE", "Print the liaison sheet from the detail sheet");
 if (!defined("_PRINT_DETAILS")) define("_PRINT_DETAILS", "Print liaison sheet");
 if (!defined("_PRINT_DOC_DETAILS_FROM_LIST")) define("_PRINT_DOC_DETAILS_FROM_LIST", "Print the liaison sheets from the results lists");
+if (!defined("_PRINT_DOC_FROM_LIST")) define("_PRINT_DOC_FROM_LIST", "Print the liaison sheets");
 if (!defined("_PRINT_LIST")) define("_PRINT_LIST", "Print the list");
 if (!defined("_PRINT_CATEGORY")) define("_PRINT_CATEGORY", "Category");
 if (!defined("_PRINT_DOC_DATE")) define("_PRINT_DOC_DATE", "Document date");
