@@ -77,8 +77,8 @@ Mods
                 </th>-->
                 <th width="120px;">
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" >
-                                    <tr>
-                <th style="text-align:center">##checkUncheckAll##<br/>##defineLang|_NUM_GED##<br/>##sortColumn|res_id##</th>
+                <tr>
+                <th style="text-align:center">##checkUncheckAll##<br/>##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==res_id|<i>#defineLang|_NUM_GED#</i>|## ##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==chrono_number|<i>#defineLang|_CHRONO_NUMBER_SHORT#</i>|## / ##defineLang|_STATUS##<br/>##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==res_id|#sortColumn|res_id#|## ##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==chrono_number|#sortColumn|alt_identifier#|## / ##sortColumn|status##</th>
                 </tr>
                 </table>
                 </th>
@@ -91,7 +91,7 @@ Mods
                                         <th style="font-size:9px;" width ="140px" >##defineLang|_CREATION_DATE##<br/>##sortColumn|creation_date##</th>
                                         <th style="font-size:9px;" width ="185px" >##defineLang|_PROCESS_LIMIT_DATE##<br/>##sortColumn|process_limit_date##</th>
                                         <th style="font-size:9px;" width ="170px" >##defineLang|_ENTITY##<br/>##sortColumn|entity_label##</th>
-                                        <th style="font-size:9px;" width ="282px" >##defineLang|_TYPE## / ##defineLang|_CHRONO_NUMBER##<br/>##sortColumn|type_label## / ##sortColumn|alt_identifier##</th>
+                                        <th style="font-size:9px;" width ="282px" >##defineLang|_TYPE##<br/>##sortColumn|type_label##</th>
                                         <th style="font-size:9px;" width ="50px" >##defineLang|_DEST_USER##<br/>##sortColumn|dest_user##</th>
                                      
                                     </tr>                         
@@ -107,16 +107,13 @@ Mods
                 <tr  class="##cssLine|col|white##"  title="##showDefaultAction##">
 
                     <td width="10%" ##clickOnLine##>
-                        <!--<div align="center"><img src="##load_img|contact_maarch.gif##" alt="##loadValue|status##" title="##loadValue|status##"> </div>-->
                         <div align="center" style ="color:#009DC5;">##loadValue|status####func_isConfidential##</div>
                     </td>
                     <td width="90%" align="center" style="padding : 0px; vertical-align:top" ##clickOnLine##>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" >
                                 <tr>
                                     <td style="font-size:14px;font-weight:bold;word-wrap: break-word;max-width: 1000px;">##loadValue|subject##</td>
-                                    <td width="17.5%" style="font-size:14px;font-weight:bold;color:#5C7C89;font-style: italic;">
-                                        ##loadValue|alt_identifier##
-                                    </td>
+                 
                                     <td width="17.5%">
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                             <tr>
@@ -135,8 +132,7 @@ Mods
                     </td>
                 </tr>
                 <tr class="##cssLineReload##" title="##showDefaultAction##">
-                        <!-- <td style="text-align:center" style="font-size:13px;" ##clickOnLine##>##ifStatement|'#loadValue|locker_user_id#' != null|<img src="#loadImage|cadenas_rouge.png#">|##  ##radioButton## ##checkBox##<b>##loadValue|res_id##</b></td> -->
-                        <td style="text-align:center" style="font-size:13px;" >##func_cadenas|'#loadValue|locker_user_id#'|'#loadValue|locker_time#'##  ##radioButton## ##checkBox##<b>##loadValue|res_id##</b></td>
+                        <td title="n°##loadValue|res_id##" style="text-align:center" style="font-size:13px;" >##func_cadenas|'#loadValue|locker_user_id#'|'#loadValue|locker_time#'##  ##radioButton## ##checkBox##<b>##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==res_id|#loadValue|res_id#|## ##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==chrono_number|#loadValue|alt_identifier#|##</b></td>
                         <td style="text-align:center" >
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" >
                                     <tr>

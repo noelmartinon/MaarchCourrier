@@ -77,8 +77,8 @@ Mods
                 </th>-->
                 <th width="120px;">
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" >
-                                    <tr>
-                <th style="text-align:center">##checkUncheckAll##<br/>##defineLang|_NUM_GED##<br/>##sortColumn|res_id##</th>
+                <tr>
+                    <th style="text-align:center">##checkUncheckAll##<br/>##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==res_id|<i>#defineLang|_NUM_GED#</i>|## ##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==chrono_number|<i>#defineLang|_CHRONO_NUMBER_SHORT#</i>|## / ##defineLang|_STATUS##<br/>##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==res_id|#sortColumn|res_id#|## ##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==chrono_number|#sortColumn|alt_identifier#|## / ##sortColumn|status##</th>
                 </tr>
                 </table>
                 </th>
@@ -135,8 +135,7 @@ Mods
                     </td>
                 </tr>
                 <tr class="##cssLineReload##" title="##showDefaultAction##">
-                        <!-- <td style="text-align:center" style="font-size:13px;" ##clickOnLine##>##ifStatement|'#loadValue|locker_user_id#' != null|<img src="#loadImage|cadenas_rouge.png#">|##  ##radioButton## ##checkBox##<b>##loadValue|res_id##</b></td> -->
-                        <td style="text-align:center" style="font-size:13px;" >##func_cadenas|'#loadValue|locker_user_id#'|'#loadValue|locker_time#'##  ##radioButton## ##checkBox##<b>##loadValue|res_id##</b></td>
+                        <td title="n°##loadValue|res_id##" style="text-align:center" style="font-size:13px;" >##func_cadenas|'#loadValue|locker_user_id#'|'#loadValue|locker_time#'##  ##radioButton## ##checkBox##<b>##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==res_id|#loadValue|res_id#|## ##ifStatement|'#defineLang|_ID_TO_DISPLAY#'==chrono_number|#loadValue|alt_identifier#|##</b></td>
                         <td style="text-align:center" >
                             <table width="100%" border="0" cellspacing="0" cellpadding="0" >
                                     <tr>
@@ -164,8 +163,7 @@ Mods
                 </tr>
 			   <tr id="noteList_##loadValue|res_id##" name="noteList_##loadValue|res_id##" style="display: none; border-bottom: solid 1px black; background-color: white;" width="100%">
 					<td colspan="6" style="background-color: #f2f2f2;">
-						<div id="divNoteList_##loadValue|res_id##" align="center" style="color: grey;margin:10px;padding:10px;
-  border: 1px dashed #009DC5;">
+						<div id="divNoteList_##loadValue|res_id##" align="center" style="color: grey;margin:10px;padding:10px;border: 1px dashed #009DC5;">
 							<i class="fa fa-spinner fa-2x"></i><br />
 							##define_lang|_LOADING_INFORMATIONS##
 						</div>
@@ -181,8 +179,7 @@ Mods
 				</tr>	
                 <tr id="repList_##loadValue|res_id##" name="repList_##loadValue|res_id##" style="display: none; border-bottom: solid 1px black; background-color: #FFF;" width="100%">
                     <td colspan="2" style="background-color: #f2f2f2;">
-                        <div id="divRepList_##loadValue|res_id##" align="center" style="color: grey;margin:10px;padding:10px;
-  border: 1px dashed #009DC5;">
+                        <div id="divRepList_##loadValue|res_id##" align="center" style="color: grey;margin:10px;padding:10px;border: 1px dashed #009DC5;">
                             <i class="fa fa-spinner fa-2x"></i><br />
                             ##defineLang|_LOADING_INFORMATIONS##
                         </div>
@@ -190,8 +187,7 @@ Mods
                 </tr>
                 <tr id="diffList_##loadValue|res_id##" name="diffList_##loadValue|res_id##" style="display: none; border-bottom: solid 1px black;" width="100%">
                     <td colspan="2" style="background-color: #f2f2f2;">
-                        <div id="divDiffList_##loadValue|res_id##" align="center" style="color: grey;margin:10px;padding:10px;
-  border: 1px dashed #009DC5;">
+                        <div id="divDiffList_##loadValue|res_id##" align="center" style="color: grey;margin:10px;padding:10px;">
                             <i class="fa fa-spinner fa-2x"></i><br />
                             ##defineLang|_LOADING_INFORMATIONS##
                         </div>
