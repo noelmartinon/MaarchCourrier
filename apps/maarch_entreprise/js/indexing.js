@@ -1669,3 +1669,211 @@ function loadInfoContact(){
     
     return pathScript;
 }
+
+function loadIndexingModel() {
+    if ($j('#complementary_fields').css('display') == 'none') {
+        new Effect.toggle('complementary_fields', 'blind', {delay:0.2});
+        whatIsTheDivStatus('complementary_fields', 'divStatus_complementary_fields');
+    }
+    if ($j('#indexing_models_select').val() != 'none') {
+        $j('#action2_indexingmodels').css('visibility','visible');
+        $j('#action1_indexingmodels').removeClass('fa-plus');
+        $j('#action1_indexingmodels').addClass('fa-edit');
+
+        $j.ajax({
+            url : 'index.php?display=true&page=ajaxIndexingModel',
+            type : 'POST',
+            dataType : 'JSON',
+            data: {
+                mode : 'get',
+                id: $j('#indexing_models_select').val(),
+            },
+            success : function(response){
+                if (response.status == 0) {
+                    var content = JSON.parse(response.result_txt);
+
+                    $j.each(content, function( index, value ) {
+                        console.log( index + ": " + value );
+
+                        if ($j('#'+index).length) {
+                            $j('#'+index).val(value);
+                            $j('#category_id').change();
+                            
+                            if ($j('#'+index).is('select') && index != 'thesaurus') {
+                                $j('#'+index).change();
+                                Event.fire($(index), "chosen:updated");
+                            } else if (index == 'thesaurus') {
+                                $j.each(value, function( ind, thes ) {
+                                    add_thes(thes.id,thes.label);
+                                });
+                            }
+                        }
+                        
+                    });  
+
+                }
+            },
+            error : function(error){
+                alert('ERROR!');
+            }
+        
+        });
+    } else {
+        $j('#action2_indexingmodels').css('visibility','hidden');
+        $j('#action1_indexingmodels').removeClass('fa-edit');
+        $j('#action1_indexingmodels').addClass('fa-plus');
+        $j('#category_id').val('');
+        $j('#category_id').change();
+        Event.fire($('category_id'), "chosen:updated");
+        $j('#type_id').val('');
+        $j('#priority').val('');
+        $j('#priority').change();
+        Event.fire($('priority'), "chosen:updated");
+        $j('#nature_id').val('');
+        $j('#nature_id').change();
+        Event.fire($('nature_id'), "chosen:updated");
+        $j('#subject').val('');
+        $j('#destination').val('');
+        $j('#destination').change();
+        Event.fire($('destination'), "chosen:updated");
+        $j('#folder').val('');
+        $j('#folder').change();
+        Event.fire($('folder'), "chosen:updated");
+        $j('#thesaurus').val('');
+        Event.fire($('thesaurus'), "chosen:updated");
+
+    }
+}
+
+function saveIndexingModel() {
+
+    if ($j('#indexing_models_select').val() == 'none') {
+        var label_fields =[]
+        if ($j('[for=category_id]').length) {
+            label_fields.push($j('[for=category_id]').filter(function() { return $j(this).css("display") != "none" }).text());   
+        }
+        if ($j('[for=type_id]').length) {
+            label_fields.push($j('[for=type_id]').filter(function() { return $j(this).css("display") != "none" }).text());
+            
+        }
+        if ($j('[for=priority]').length) {
+            label_fields.push($j('[for=priority]').filter(function() { return $j(this).css("display") != "none" }).text());
+            
+        }
+        if ($j('[for=nature_id]').length) {
+            label_fields.push($j('[for=nature_id]').filter(function() { return $j(this).css("display") != "none" }).text());
+            
+        }
+        if ($j('[for=subject]').length) {
+            label_fields.push($j('[for=subject]').filter(function() { return $j(this).css("display") != "none" }).text());
+            
+        }
+        if ($j('[for=destination]').length) {
+            label_fields.push($j('[for=destination]').filter(function() { return $j(this).css("display") != "none" }).text());
+            
+        }
+        if ($j('[for=folder]').length) {
+            label_fields.push($j('[for=folder]').filter(function() { return $j(this).css("display") != "none" }).text());
+            
+        }
+        if ($j('[for=thesaurus]').length) {
+            label_fields.push($j('[for=thesaurus]').filter(function() { return $j(this).css("display") != "none" }).text());            
+        }
+        
+        var label = prompt("Nom du modèle:\nChamps concernés : "+label_fields.join(', '), "");
+        mode = 'add';
+    } else {
+        mode = 'up';
+    }
+    
+
+    if (label || $j('#indexing_models_select').val() != 'none') {
+        var obj = {};
+        if ($j('#category_id').val() != '') {
+            obj['category_id'] = $j('#category_id').val();
+        }
+        if ($j('#type_id').val() != '') {
+            obj['type_id'] = $j('#type_id').val();
+        }
+        if ($j('#priority').val() != '') {
+            obj['priority'] = $j('#priority').val();
+        }
+        if ($j('#nature_id').val() != '') {
+            obj['nature_id'] = $j('#nature_id').val();
+        }
+        if ($j('#subject').val() != '') {
+            obj['subject'] = $j('#subject').val();
+        }
+        if ($j('#destination').val() != '') {
+            obj['destination'] = $j('#destination').val();
+        }
+        if ($j('#folder').val() != '') {
+            obj['folder'] = $j('#folder').val();
+        }
+        if ($j('#thesaurus').length) {
+            obj['thesaurus'] = [];
+            $j.each($j('#thesaurus').val(),function()
+            {
+                $tmp = {
+                    "id" : this[0],
+                    "label" : $j('#thesaurus option[value='+this[0]+']').text()
+                }
+                obj['thesaurus'].push($tmp);
+            });
+        }
+        $j.ajax({
+            url : 'index.php?display=true&page=ajaxIndexingModel',
+            type : 'POST',
+            dataType : 'JSON',
+            data: {
+                id : $j('#indexing_models_select').val(),
+                mode : mode,
+                label: label,
+                content: JSON.stringify(obj)
+            },
+            success : function(response){
+                if (response.status == 0) {
+                    //alert(response.result_txt);
+                    if (mode == 'add') {
+                        var res_content = JSON.parse(response.result);
+                        $j('#indexing_models_select').append('<option value="'+res_content.id+'">'+res_content.label+'</option>');
+                        $j('#indexing_models_select').val(res_content.id);
+                        Event.fire($("indexing_models_select"), "chosen:updated");
+                    }
+                }
+            },
+            error : function(error){
+                alert('ERROR!');
+            }
+     
+        });
+    }
+
+}
+
+function delIndexingModel() {
+
+    if (confirm("Supprimer le modèle ?")) {
+        $j.ajax({
+            url : 'index.php?display=true&page=ajaxIndexingModel',
+            type : 'POST',
+            dataType : 'JSON',
+            data: {
+                mode : 'del',
+                id: $j('#indexing_models_select').val(),
+            },
+            success : function(response){
+                if (response.status == 0) {
+                    //alert(response.result_txt);
+                    $j('#indexing_models_select option:selected').remove();
+                    $j('#indexing_models_select option:selected').change();
+                    Event.fire($("indexing_models_select"), "chosen:updated");
+                }
+            },
+            error : function(error){
+                alert('ERROR!');
+            }
+        
+        });    
+    }
+}

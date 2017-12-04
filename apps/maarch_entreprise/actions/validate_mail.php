@@ -1,35 +1,14 @@
 <?php
-/*
-*   Copyright 2008-2013 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 /**
-* @brief   Action : Document validation
-*
-* Open a modal box to displays the validation form, make the form checks
-* and loads the result in database. Used by the core (manage_action.php page).
-*
-* @file
-* @author Claire Figueras <dev@maarch.org>
-* @date $date$
-* @version $Revision$
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
+
+* @brief   validate_mail
+* @author  dev <dev@maarch.org>
 * @ingroup apps
 */
+
 /**
 * $confirm  bool false
 */
@@ -343,7 +322,25 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
 
     $frm_str .= '<div  style="display:block">';
 
+    //INDEXING MODELS
+    $query="SELECT * FROM indexingmodels order by label ASC";
+    $stmt = $db->query($query, array());
     
+
+    $frm_str .= '<div style="display:table;width:100%;">';
+    $frm_str .= '<div style="display:table-cell;vertical-align:middle;">';
+    $frm_str .= '<select id="indexing_models_select" data-placeholder="Utiliser un modèle d\'enregistrement..." onchange="loadIndexingModel();"><option value="none"></option>';
+    while ($resIndexingModels = $stmt->fetchObject()) {
+        $frm_str .= '<option value="'.$resIndexingModels->id.'">'.$resIndexingModels->label.'</option>';
+    }
+    $frm_str .= '</select>';
+    $frm_str .= '</div>';
+    $frm_str .= '<div style="display:table-cell;text-align:right;vertical-align:middle;width: 12%;">';
+    $frm_str .= '<a style="cursor:pointer;"><i id="action1_indexingmodels" class="fa fa-plus fa-2x" onclick="saveIndexingModel();"></i></a> <a style="cursor:pointer;"><i class="fa fa-trash fa-2x" onclick="delIndexingModel();"></i></a>';
+    $frm_str .= '</div>';
+    $frm_str .= '</div>';
+    $frm_str .= '<script>new Chosen($(\'indexing_models_select\'),{width: "100%", disable_search_threshold: 10, search_contains: true,allow_single_deselect: true});</script>';
+
     $frm_str .= '<hr width="90%" align="center"/>';
     
     $frm_str .= '<h4 onclick="new Effect.toggle(\'general_infos_div\', \'blind\', {delay:0.2});'
@@ -387,7 +384,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     
     /*** Doctype ***/
     $frm_str .= '<tr id="type_id_tr" style="display:'.$display_value.';">';
-    $frm_str .='<td class="indexing_label"><span class="form_title" id="doctype_res" style="display:none;">'._DOCTYPE.'</span><span class="form_title" id="doctype_mail" style="display:inline;" >'._DOCTYPE_MAIL.'</span></td>';
+    $frm_str .='<td class="indexing_label"><label for="type_id" class="form_title" id="doctype_res" style="display:none;">'._DOCTYPE.'</label><label for="type_id" class="form_title" id="doctype_mail" style="display:inline;" >'._DOCTYPE_MAIL.'</label></td>';
     $frm_str .='<td>&nbsp;</td>';
     $frm_str .='<td class="indexing_field"><select name="type_id" id="type_id" onchange="clear_error(\'frm_error_'.$id_action.'\');changePriorityForSve(this.options[this.selectedIndex].value,\''
         . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
@@ -765,7 +762,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         $countAllEntities = count($allEntitiesTree);
 
         $frm_str .= '<tr id="department_tr" style="display:'.$display_value.';">';
-        $frm_str .='<td class="indexing_label"><label for="department" class="form_title" id="label_dep_dest" style="display:inline;" >'._DEPARTMENT_DEST.'</label><label for="department" class="form_title" id="label_dep_exp" style="display:none;" >'._DEPARTMENT_EXP.'</label><label for="department" ' . 'class="form_title" id="label_dep_owner" style="display:none;" >'. _DEPARTMENT_OWNER . '</label></td>';
+        $frm_str .='<td class="indexing_label"><label for="destination" class="form_title" id="label_dep_dest" style="display:inline;" >'._DEPARTMENT_DEST.'</label><label for="destination" class="form_title" id="label_dep_exp" style="display:none;" >'._DEPARTMENT_EXP.'</label><label for="destination" ' . 'class="form_title" id="label_dep_owner" style="display:none;" >'. _DEPARTMENT_OWNER . '</label></td>';
         $frm_str .='<td>&nbsp;</td>';
         $frm_str .='<td class="indexing_field"><select name="destination" id="destination" onchange="clear_error(\'frm_error_'.$id_action.'\');'.$func_load_listdiff_by_entity.'">';
         $frm_str .='<option value="">'._CHOOSE_DEPARTMENT.'</option>';
@@ -988,7 +985,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
 
 
         $frm_str .= '<tr id="thesaurus_tr" style="display:' . $display_value . ';">';
-            $frm_str .= '<td colspan="3" style="width:100%;">' . _THESAURUS . '</td>';
+            $frm_str .= '<td colspan="3" style="width:100%;"><label for="thesaurus" class="form_title" >' . _THESAURUS . '</label></td>';
         $frm_str .= '</tr>';
 
         $frm_str .= '<tr id="thesaurus_tr" style="display:' . $display_value . ';">';

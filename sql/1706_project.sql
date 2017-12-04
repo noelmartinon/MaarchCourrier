@@ -253,4 +253,16 @@ DO $$ BEGIN
   END IF;
 END$$;
 
+DROP TABLE IF EXISTS indexingmodels;
+CREATE TABLE indexingmodels
+(
+  id serial NOT NULL,
+  label character varying(255) NOT NULL,
+  fields_content text NOT NULL,
+  CONSTRAINT indexingmodels_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+
 UPDATE parameters SET param_value_int = '1711', param_value_string = '17.11.0' WHERE id = 'database_version';
