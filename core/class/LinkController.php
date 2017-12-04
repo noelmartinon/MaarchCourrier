@@ -62,6 +62,12 @@ class LinkController
                         $return .= '<td colspan="2" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
                             $return .=  '<b>'.$infos['subject'].'</b>';
                         $return .= '</td>';
+                        $return .= '<td colspan="2" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
+                        $return .= '</td>';
+                        $return .= '<td colspan="3" style="font-size:12px;" align="right" title="'._TYPIST.'" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
+                        $return .= '<i class="fa fa-user fa-2x" style="font-size:10px;"></i> ';
+                        $return .= $infos['typist'];
+                        $return .= '</td>';
                     $return .= '</tr>';
                     $return .= '<tr>';
                         $return .= '<td style="width:14%;text-align:center;" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
@@ -80,7 +86,7 @@ class LinkController
                                 $return .= $date[2].' '.$date[1].' '.$date[0];
                         $return .= '</td>';
                         $return .= '<td style="font-size:12px;width:14%" title="'._DEST_USER.'" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
-                                $return .= '<i class="fa fa-user fa-2x" style="font-size:10px;"></i> ';
+                                $return .= '<i class="fa fa-share-alt fa-2x" style="font-size:10px;"></i> ';
                                 $return .= $infos['dest_user'];
                         $return .= '</td>';
                         $return .= '<td style="font-size:12px;width:24%" title="'._DESTINATION.'" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
@@ -98,7 +104,7 @@ class LinkController
                             $users_visa_list = $visa->getUsersCurrentVis($infos['res_id']);
                             if(!empty($users_visa_list)){
                                 $users_visa_list = implode(', ', $users_visa_list);
-                                $return .= '<i class="fa fa-certificate fa-2x" style="font-size:10px;"></i> ';
+                                $return .= '<i class="fa fa-list-ol fa-2x" style="font-size:10px;"></i> ';
                                 $return .= $users_visa_list;
                             }
                             $return .= '</td>';
