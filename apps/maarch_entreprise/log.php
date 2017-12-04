@@ -57,8 +57,9 @@ if(isset($_SESSION['web_cas_url'])){
 
     $_REQUEST['pass'] = 'maarch';
 
-} else if (isset($_REQUEST['login'])) {
-    $login = $func->wash($_REQUEST['login'], 'no', _THE_ID, 'yes');
+} else if (!empty($_SESSION['sso']['userId'])) {
+    $login = $_SESSION['sso']['userId'];
+    $_REQUEST['pass'] = 'maarch';
 } else {
     $login = '';
 }

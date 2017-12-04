@@ -59,7 +59,7 @@ if (file_exists($_SESSION['config']['corepath'] . 'custom' .
     . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 
     'mapping_sso.xml')
 ){
-    $xmlPath = $_SESSION['config']['corepath'] . DIRECTORY_SEPARATOR . 'apps'
+    $xmlPath = $_SESSION['config']['corepath'] .  'apps'
     . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
     . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'mapping_sso.xml';
 } else {
@@ -401,9 +401,9 @@ if(!empty($control['error']) && $control['error'] <> 1) {
                     "ADMIN",
                     false);
     } else {
+        $_SESSION['sso']['userId'] = $loginArray['UserId'];
         header("location: " . $_SESSION['config']['businessappurl'] 
-            . "log.php?login=" . $loginArray['UserId'] 
-            . "&pass=" . $loginArray['password']);
+            . "log.php");
         //Traces fonctionnelles
         $trace->add("users",
                     $loginArray['UserId'],
@@ -503,8 +503,9 @@ function getHeaders()
 {
     foreach ($_SERVER as $h => $v ) 
     {
-      if( ereg( 'HTTP_(.+)', $h, $hp ) )
-      $headers[$hp[1]] = $v ;
+        if( strpos($h, 'HTTP_') === 0)
+        $headers[substr($h, 5)] = $v ;
+        // $headers[$h] = $v;
     }
     return $headers;
 }
