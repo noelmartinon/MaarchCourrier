@@ -972,8 +972,14 @@ function launch_autocompleter2_contacts_v2(path_script, id_text, id_div, cat_id,
             afterUpdateElement: function (text, li){
                 var all_li = li.id;
                 var res = all_li.split(",");
-                parent.$(contact_id).value = res[0];
-                parent.$(address_id).value = res[1];
+                if (parent.$(contact_id) == null) {
+                    top.$(contact_id).value = res[0];
+                    top.$(address_id).value = res[1];
+                } else {
+                    parent.$(contact_id).value = res[0];
+                    parent.$(address_id).value = res[1];
+                }
+                
                 
             }
         });
@@ -1455,7 +1461,7 @@ function set_new_contact_address(path_manage_script, id_div, close,transmission)
         new Effect.toggle(parent.document.getElementById(id_div), 'blind', {delay:0.2});  
     }
     
-    if(transmission != '' & transmission != '0'){
+    if(transmission != '' & transmission != '0' && transmission != undefined){
         new Ajax.Request(path_manage_script,
     {
         method:'post',

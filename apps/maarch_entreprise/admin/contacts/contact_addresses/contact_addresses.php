@@ -1,40 +1,22 @@
 <?php
-/*
-*    Copyright 2014 Maarch
-*
-*  This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*    along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 /**
-*
-*
-* @file
-* @author <dev@maarch.org>
-* @date $date$
-* @version $Revision$
-* @ingroup admin
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
+
+* @brief   contact_addresses
+* @author  dev <dev@maarch.org>
+* @ingroup apps
 */
 
 // GESTION DES ADDRESSES
 echo '<h2><i class="fa fa-home fa-2x"></i> &nbsp;'; 
-    if ($mode <> 'view') { 
-        echo _MANAGE_CONTACT_ADDRESSES_IMG;
-    } else {
-        echo _CONTACT_ADDRESSES_ASSOCIATED;
-    } 
+
+if ($mode <> 'view') { 
+    echo _MANAGE_CONTACT_ADDRESSES_IMG;
+} else {
+    echo _CONTACT_ADDRESSES_ASSOCIATED;
+} 
 echo '</h2>';
 
 require_once "core" . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR
@@ -127,8 +109,8 @@ for ($i = 0; $i < count($tab); $i ++) {
                 $tab[$i][$j]["show"]        = true;
                 $tab[$i][$j]["order"]       = 'departement';
             }
-            if($tab[$i][$j][$value]=="lastname")
-            {
+            if ($tab[$i][$j][$value]=="lastname") {
+
                 $tab[$i][$j]['value']       =$request->show_string($tab[$i][$j]['value']);
                 $tab[$i][$j]["lastname"]    =$tab[$i][$j]['value'];
                 $tab[$i][$j]["label"]       =_LASTNAME;
@@ -143,8 +125,8 @@ for ($i = 0; $i < count($tab); $i ++) {
                 }
                 $tab[$i][$j]["order"] = "lastname";
             }
-            if($tab[$i][$j][$value]=="firstname")
-            {
+            if ($tab[$i][$j][$value]=="firstname") {
+
                 $tab[$i][$j]["firstname"]   = $request->show_string($tab[$i][$j]['value']);
                 $tab[$i][$j]["label"]       =_FIRSTNAME;
                 $tab[$i][$j]["size"]        ="15";
@@ -158,8 +140,8 @@ for ($i = 0; $i < count($tab); $i ++) {
                 }
                 $tab[$i][$j]["order"]= "firstname";
             }
-            if($tab[$i][$j][$value]=="function")
-            {
+            if ($tab[$i][$j][$value]=="function") {
+
                 $tab[$i][$j]['value']       =$request->show_string($tab[$i][$j]['value']);
                 $tab[$i][$j]["function"]    =$tab[$i][$j]['value'];
                 $tab[$i][$j]["label"]       =_FUNCTION;
@@ -174,22 +156,22 @@ for ($i = 0; $i < count($tab); $i ++) {
                 }
                 $tab[$i][$j]["order"]= "function";
             }
-            if($tab[$i][$j][$value]=="is_private")
-            {
+            if ($tab[$i][$j][$value]=="is_private") {
+
                 $is_private = $tab[$i][$j]['value'];
                 $tab[$i][$j]["show"]=false;
             }
-            if($tab[$i][$j][$value]=="address_num")
-            {
+            if ($tab[$i][$j][$value]=="address_num") {
+
                 $address_num = $tab[$i][$j]['value'];
                 $tab[$i][$j]["show"]=false;
             }
-            if($tab[$i][$j][$value]=="address_street")
-            {
+            if ($tab[$i][$j][$value]=="address_street") {
+                
                 if ($is_private == "Y") {
                     $tab[$i][$j]['value'] = "Confidentielle";
                 } else {
-                    $tab[$i][$j]['value'] = $address_num . " " . $request->show_string($tab[$i][$j]['value']);                    
+                    $tab[$i][$j]['value'] = $address_num . " " . $request->show_string($tab[$i][$j]['value']);
                 }
 
                 $tab[$i][$j]["address_street"] = $tab[$i][$j]['value'];
@@ -205,8 +187,7 @@ for ($i = 0; $i < count($tab); $i ++) {
                 }
                 $tab[$i][$j]["order"]= "address_street";
             }
-            if($tab[$i][$j][$value]=="address_postal_code")
-            {
+            if ($tab[$i][$j][$value]=="address_postal_code") {
                 if ($is_private == "Y") {
                     $tab[$i][$j]['value'] = "Confidentiel";
                 } else {
@@ -218,15 +199,16 @@ for ($i = 0; $i < count($tab); $i ++) {
                 $tab[$i][$j]["label_align"]         ="left";
                 $tab[$i][$j]["align"]               ="left";
                 $tab[$i][$j]["valign"]              ="bottom";
-               if ($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == "Y") {
+
+                if ($_SESSION['m_admin']['contact']['IS_CORPORATE_PERSON'] == "Y") {
                     $tab[$i][$j]["show"]=false;
                 } else {
                     $tab[$i][$j]["show"]=true;
                 }
                 $tab[$i][$j]["order"]= "address_postal_code";
             }
-            if($tab[$i][$j][$value]=="address_town")
-            {
+            if ($tab[$i][$j][$value]=="address_town") {
+
                 if ($is_private == "Y") {
                     $tab[$i][$j]['value'] = "Confidentielle";
                 }
@@ -239,8 +221,7 @@ for ($i = 0; $i < count($tab); $i ++) {
                 $tab[$i][$j]["show"]         =true;
                 $tab[$i][$j]["order"]        = "address_town";
             }
-            if($tab[$i][$j][$value]=="phone")
-            {
+            if ($tab[$i][$j][$value]=="phone") {
                 if ($is_private == "Y") {
                     $tab[$i][$j]['value'] = "Confidentiel";
                 } else {
@@ -255,8 +236,7 @@ for ($i = 0; $i < count($tab); $i ++) {
                 $tab[$i][$j]["show"]        =true;
                 $tab[$i][$j]["order"]       = "phone";
             }
-            if($tab[$i][$j][$value]=="email")
-            {
+            if ($tab[$i][$j][$value]=="email") {
                 if ($is_private == "Y") {
                     $tab[$i][$j]['value'] = "Confidentiel";
                 }
@@ -274,97 +254,98 @@ for ($i = 0; $i < count($tab); $i ++) {
 }
 
 //List parameters
-    $paramsTab = array();
-    $paramsTab['bool_modeReturn'] = false;                                              //Desactivation du mode return (vs echo)
-    $paramsTab['pageTitle'] =  '';           											//Titre de la page
-    $paramsTab['listCss'] =  'listing largerList spec';
-    if ($mode == "view") {
-        $paramsTab['urlParameters'] = '&dir=indexing_searching&letters&display=true'; 
-    } else {
-        $paramsTab['urlParameters'] = '&dir=my_contacts&letters&display=true';                                   //parametre d'url supplementaire        
-    }
+$paramsTab = array();
+$paramsTab['bool_modeReturn'] = false;                                              //Desactivation du mode return (vs echo)
+$paramsTab['pageTitle'] =  '';                                                      //Titre de la page
+$paramsTab['listCss'] =  'listing largerList spec';
+if ($mode == "view") {
+    $paramsTab['urlParameters'] = '&dir=indexing_searching&letters&display=true'; 
+} else {
+    $paramsTab['urlParameters'] = '&dir=my_contacts&letters&display=true&seeAllAddresses';          //parametre d'url supplementaire        
+}
 
-    $paramsTab['bool_sortColumn']      = true;                                          //Affichage Tri
-    $paramsTab['bool_showSearchTools'] = true;                                          //Afficle le filtre alphabetique et le champ de recherche
-    $paramsTab['bool_showSearchBox']   = false;
+$paramsTab['bool_sortColumn']      = true;                                          //Affichage Tri
+$paramsTab['bool_showSearchTools'] = false;                                         //Affiche le filtre alphabetique
+$paramsTab['bool_showSearchBox']   = false;                                         //Affiche le champ de recherche
 
-    $paramsTab['searchBoxAutoCompletionUrl'] = $_SESSION['config']['businessappurl']
-        ."index.php?display=true&page=contact_addresses_list_by_name&idContact=".$_SESSION['contact']['current_contact_id'];   //Script pour l'autocompletion
-    $paramsTab['searchBoxAutoCompletionMinChars'] = 2;                                  //Nombre minimum de caractere pour activer l'autocompletion (1 par defaut)
-    if($mode <> 'view'){
-        $paramsTab['bool_showAddButton'] = true;                                            //Affichage du bouton Nouveau
-    }
-    $paramsTab['addButtonLabel'] = _NEW_CONTACT_ADDRESS;                                //Libellé du bouton Nouveau
-    if ($from_iframe) {
-	    $paramsTab['addButtonScript'] = "window.location='".$_SESSION['config']['businessappurl']
-	        ."index.php?display=false&dir=my_contacts&page=create_address_iframe&iframe=fromContactIframe'";
-    } else {
-        if($mode <> 'view'){
+$paramsTab['searchBoxAutoCompletionUrl'] = $_SESSION['config']['businessappurl']
+    ."index.php?display=true&page=contact_addresses_list_by_name&idContact=".$_SESSION['contact']['current_contact_id'];   //Script pour l'autocompletion
+$paramsTab['searchBoxAutoCompletionMinChars'] = 2;                                  //Nombre minimum de caractere pour activer l'autocompletion (1 par defaut)
+if ($mode <> 'view' && $_SESSION['user']['services']['my_contacts']) {
+    $paramsTab['bool_showAddButton'] = true;                                            //Affichage du bouton Nouveau
+}
+$paramsTab['addButtonLabel'] = _NEW_CONTACT_ADDRESS;                                //Libellé du bouton Nouveau
+if ($from_iframe) {
+    $paramsTab['addButtonScript'] = "window.location='".$_SESSION['config']['businessappurl']
+        ."index.php?display=false&dir=my_contacts&page=create_address_iframe&iframe=fromContactIframe'";
+} else {
+    if ($mode <> 'view') {
         $paramsTab['addButtonScript'] = "window.top.location='".$_SESSION['config']['businessappurl']
             ."index.php?page=contact_addresses_add&mycontact=Y'";                       //Action sur le bouton nouveau (2)            
-        }
     }
+}
 
-    //Action icons array
-    $paramsTab['actionIcons'] = array();
-        //get start
-        $start = $list2->getStart();
-    if ($mode <> 'view') {   
-       if ($from_iframe) {
-	        $update = array(
-	                "script"        => "window.location='".$_SESSION['config']['businessappurl']
-	                                        ."index.php?display=false&dir=my_contacts&page=update_address_iframe&id=@@id@@&fromContactIframe'",
-	                "class"         =>  "change",
-	                "label"         =>  _MODIFY,
-	                "tooltip"       =>  _MODIFY
-	                );
-        } else {
-	        $update = array(
-	                "script"        => "window.top.location='".$_SESSION['config']['businessappurl']
-	                                        ."index.php?page=contact_addresses_up&mycontact=Y&id=@@id@@&what=".$what."&start=".$start."'",
-	                "class"         =>  "change",
-	                "label"         =>  _MODIFY,
-	                "tooltip"       =>  _MODIFY
-	                );
-        }
-
-        array_push($paramsTab['actionIcons'], $update); 
-
-		if ($from_iframe) {
-            if ($_SESSION['AttachmentContact'] == "1") {
-                $infoContactDiv = "info_contact_div_attach";
-            } else {
-                $infoContactDiv = "show_tab";
-            }
-	        $use = array(
-	                "script"        => "set_new_contact_address('".$_SESSION['config']['businessappurl'] . "index.php?display=false&dir=my_contacts&page=get_last_contact_address&contactid=".$_SESSION['contact']['current_contact_id']."&addressid=@@id@@', '".$infoContactDiv."', 'true');simpleAjax('".$_SESSION['config']['businessappurl']."index.php?display=true&page=unsetAttachmentContact');",
-	                "class"         =>  "use",
-	                "label"         =>  _USE,
-                    "tooltip"       =>  _USE
-	                );
-	        array_push($paramsTab['actionIcons'], $use);
-		} else {
-	        $delete = array(
-	                "href"          => $_SESSION['config']['businessappurl']
-	                                    ."index.php?page=contact_addresses_del&mycontact=Y&what=".$what."&start=".$start,
-	                "class"         =>  "delete",
-	                "label"         =>  _DELETE,
-	                "tooltip"       =>  _DELETE,
-	                "alertText"     =>  _REALLY_DELETE.": @@lastname@@ @@firstname@@ ?"
-	                );
-	        array_push($paramsTab['actionIcons'], $delete);
-		}
+//Action icons array
+$paramsTab['actionIcons'] = array();
+//get start
+$start = $list2->getStart();
+if ($mode <> 'view') {
+    if ($from_iframe) {
+        $update = array(
+            "script"        => "window.location='".$_SESSION['config']['businessappurl']
+                                    ."index.php?display=false&dir=my_contacts&page=update_address_iframe&id=@@id@@&fromContactIframe'",
+            "class"         =>  "change",
+            "label"         =>  _MODIFY,
+            "tooltip"       =>  _MODIFY
+        );
     } else {
-        $view = array(
-                "script"        => "window.top.location='".$_SESSION['config']['businessappurl']
-                                        ."index.php?dir=indexing_searching&page=contact_address_view&addressid=@@id@@&what=".$what."&start=".$start."'",
-                "class"         =>  "view",
-                "label"         =>  _VIEW,
-                "tooltip"       =>  _VIEW
-                );
-        array_push($paramsTab['actionIcons'], $view);
+        $update = array(
+            "script"        => "window.top.location='".$_SESSION['config']['businessappurl']
+                                    ."index.php?page=contact_addresses_up&mycontact=Y&id=@@id@@&what=".$what."&start=".$start."'",
+            "class"         =>  "change",
+            "label"         =>  _MODIFY,
+            "tooltip"       =>  _MODIFY
+        );
     }
+
+    array_push($paramsTab['actionIcons'], $update); 
+
+    if ($from_iframe) {
+        if ($_SESSION['AttachmentContact'] == "1") {
+            $infoContactDiv = "info_contact_div_attach";
+        } else {
+            $infoContactDiv = "show_tab";
+        }
+        $use = array(
+            "script"        => "set_new_contact_address('".$_SESSION['config']['businessappurl'] . "index.php?display=false&dir=my_contacts&page=get_last_contact_address&contactid=".$_SESSION['contact']['current_contact_id']."&addressid=@@id@@', '".$infoContactDiv."', 'true');simpleAjax('".$_SESSION['config']['businessappurl']."index.php?display=true&page=unsetAttachmentContact');",
+            "class"         =>  "use",
+            "label"         =>  _USE,
+            "tooltip"       =>  _USE
+        );
+        array_push($paramsTab['actionIcons'], $use);
+    } else {
+        $delete = array(
+            "href"          => $_SESSION['config']['businessappurl']
+                                ."index.php?page=contact_addresses_del&mycontact=Y&what=".$what."&start=".$start,
+            "class"         =>  "delete",
+            "label"         =>  _DELETE,
+            "tooltip"       =>  _DELETE,
+            "alertText"     =>  _REALLY_DELETE.": @@lastname@@ @@firstname@@ ?"
+        );
+        array_push($paramsTab['actionIcons'], $delete);
+    }
+} else {
+    $view = array(
+        "script"        => "window.top.location='".$_SESSION['config']['businessappurl']
+                                ."index.php?dir=indexing_searching&page=contact_address_view&addressid=@@id@@&what=".$what."&start=".$start."'",
+        "class"         =>  "view",
+        "label"         =>  _VIEW,
+        "tooltip"       =>  _VIEW
+    );
+    array_push($paramsTab['actionIcons'], $view);
+}
+
 //Afficher la liste
-    echo '<br/>';
-    $list2->showList($tab, $paramsTab, 'id');
+echo '<br/>';
+$list2->showList($tab, $paramsTab, 'id');
     

@@ -1905,9 +1905,9 @@ $content .= '<span style="position:relative;"><input type="text" name="contact_a
 $content .= $data_contact;
 $content .= '"/><div id="show_contacts_attach" class="autocomplete autocompleteIndex" style="width: 100%;left: 0px;"></div><div class="autocomplete autocompleteIndex" id="searching_autocomplete" style="display: none;text-align:left;padding:5px;width: 100%;left: 0px;"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> chargement ...</div></span>';
 $content .='<a href="#" id="contact_card_attach" title="'._CONTACT_CARD.'" onclick="document.getElementById(\'info_contact_iframe_attach\').src=\'' . $_SESSION['config']['businessappurl']
-    . 'index.php?display=false&dir=my_contacts&page=info_contact_iframe&seeAllAddresses&contactid=\'+document.getElementById(\'contactidAttach\').value+\'&addressid=\'+document.getElementById(\'addressidAttach\').value+\'\';new Effect.toggle(\'info_contact_div_attach\', '
+    . 'index.php?display=false&dir=my_contacts&page=info_contact_iframe&fromAttachmentContact=Y&seeAllAddresses&contactid=\'+document.getElementById(\'contactidAttach\').value+\'&addressid=\'+document.getElementById(\'addressidAttach\').value+\'\';new Effect.toggle(\'info_contact_div_attach\', '
     . '\'blind\', {delay:0.2});return false;"'
-    . ' style="visibility:hidden;"> <i class="fa fa-book fa-lg"></i></a>';
+    . ' style=""> <i class="fa fa-book fa-lg"></i></a>';
 $content .= '</div>';
 $content .= '<input type="hidden" id="contactidAttach" name="contactidAttach" value="';
 if (isset($_REQUEST['id']) && !empty($data_attachment->dest_contact_id)) {

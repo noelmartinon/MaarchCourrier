@@ -791,28 +791,27 @@ var BrowserDetect = {
 BrowserDetect.init();
 
 function resize_frame_contact(mode) {
-    var width = $(parent.document.documentElement).getWidth();
-    if( width < 1200) {
-        $('inner_content').style.width = width - 600 + "px";
-    } else {
-        if ($('inner_content')) {
-            $('inner_content').style.width = "700px";            
-        } else if ($('inner_content_contact')) {
-            //$('inner_content_contact').style.width = "700px"; 
+    if (parent.$('iframe_tab') && mode == 'contact'){
+        if($j('#divList').length) {
+            var contentHeight = Math.round($j('#divList').height())+2;
+            parent.$('iframe_tab').style.height=contentHeight+"px";
+        } else if($j('#inner_content_contact').length) {
+            var contentHeight = Math.round($j('#inner_content_contact').height())+180;
+            parent.$('iframe_tab').style.height=contentHeight+"px";
+        } else {
+            var contentHeight = Math.round($j('#inner_content').height())+20;
+            parent.$('iframe_tab').style.height=contentHeight+"px";
         }
-    }
-    if (mode == 'contact') {
-        if ($('frmcontact_table')) {
-            $('frmcontact_table').style.width = "90%"; 
-        }
-        if (parent.$('contact_iframe'))
-            parent.$('contact_iframe').style.height="550px"
+        
+    } else if (parent.$('contact_iframe_attach') && mode == 'contact') {
+        var contentHeight = 370;
+        parent.$('contact_iframe_attach').style.height=contentHeight+"px";   
+    } else if (parent.$('info_contact_iframe_attach') && mode != 'contact') {
+        var contentHeight = Math.round($j('#inner_content_contact').height())+100;
+        parent.$('info_contact_iframe_attach').style.height=contentHeight+"px";   
     } else {
-        $('info_contact_div').style.width = "65%";
-        $('frmaddress_table1').style.width = "65%";
-        $('frmaddress_table2').style.width = "65%";
-        if (parent.$('contact_iframe'))
-            parent.$('contact_iframe').style.height="850px"
+        var contentHeight = Math.round($j('#inner_content_contact').height())+100;
+        parent.$('iframe_tab').style.height=contentHeight+"px";   
     }
 }
 
@@ -935,7 +934,7 @@ function createModal(txt, id_mod, height, width, mode_frm, iframe_container_id){
     {
         width = '400px';
     }
-    if(iframe_container_id == undefined || iframe_container_id=='')
+	if(iframe_container_id == undefined || iframe_container_id=='')
     {
         iframe_container_id = '';
     }
