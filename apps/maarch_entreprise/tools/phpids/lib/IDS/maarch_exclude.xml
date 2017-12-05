@@ -55,4 +55,8 @@
         <target></target>
         <page>get_tree_children_contact</page>
     </exclude>
+    <exclude>
+        <target>basket</target>
+        <page>manage_group_basket</page>
+    </exclude>
 </excludes>
