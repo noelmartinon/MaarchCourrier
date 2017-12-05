@@ -59,4 +59,8 @@
         <target>templates</target>
         <page>addTemplateBase</page>
     </exclude>
+    <exclude>
+        <target>basket</target>
+        <page>manage_group_basket</page>
+    </exclude>
 </excludes>
