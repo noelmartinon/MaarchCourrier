@@ -5,13 +5,6 @@ if ($viewResourceArr['status'] <> 'ko') {
     if (strtolower($viewResourceArr['mime_type']) == 'application/maarch') {
         ?>
         <head><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></head>
-        <!--<body id="validation_page" 
-        onload="javascript:moveTo(0,0);">
-            <div id="template_content" style="width:100%;">-->
-            <?php echo $content;?>
-            <!--</div>
-        </body>
-        </html>-->
         <?php
     } else {
         if(strtolower($viewResourceArr['ext']) == 'txt'){
@@ -35,7 +28,9 @@ if ($viewResourceArr['status'] <> 'ko') {
     $core_tools->load_html();
     $core_tools->load_header('', true, false);
     echo '<body>';
-    echo '<br/><div class="indexing_error">' . $viewResourceArr['error'] . '</div>';
+    echo '<div style="border: dashed;font-weight: bold;opacity: 0.5;font-size: 30px;height: 96%;text-align: center">';
+    echo '<div style="padding-top: 25%;">'.str_replace('||',' ',$viewResourceArr['error']).'<br><sub></sub></div>';
+    echo '</div>';
     echo '</body></html>';
     exit();
 }

@@ -1,31 +1,12 @@
 <?php
-
-/*
-*   Copyright 2008-2015 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 /**
-* File : view_attachement.php
-*
-* View a document
-*
-* @license GPL
-* @author  Claire Figueras  <dev@maarch.org>
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
+
+* @brief   view_attachment
+* @author  dev <dev@maarch.org>
+* @ingroup attachments
 */
 
 require_once "core/class/class_security.php";
@@ -186,6 +167,15 @@ if (! empty($_SESSION['error'])) {
             } else {
                 require_once 'core/docservers_tools.php';
                 $arrayIsAllowed = array();
+                if(!file_exists($file)) {
+                    ?>
+                    <div style="border: dashed;font-weight: bold;opacity: 0.5;font-size: 30px;height: 96%;text-align: center">
+                        <div style="padding-top: 25%;"><?php echo _FILE_NOT_EXISTS_ON_THE_SERVER;?><br><sub><?php echo '('.$file.')';?></sub></div>
+                    </div>
+                    
+                    <?php
+                    exit();
+                }
                 $arrayIsAllowed = Ds_isFileTypeAllowed($file);
                 if ($arrayIsAllowed['status']) {
                     if ($_SESSION['history']['attachview'] == "true") {
