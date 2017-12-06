@@ -488,14 +488,12 @@ abstract class visa_Abstract extends Database
 	}
 
 	public function setStatusVisa($res_id, $coll_id){
-		$curr_visa_wf = $this->getWorkflow($res_id, $coll_id, 'VISA_CIRCUIT');
 
 		$db = new Database();
-		$stmt = $db->query("SELECT sequence, item_mode from listinstance WHERE res_id= ? and coll_id = ? and difflist_type = ? and process_date ISNULL ORDER BY listinstance_id ASC LIMIT 1", array($res_id, $coll_id, 'VISA_CIRCUIT'));
+		$stmt = $db->query("SELECT requested_signature from listinstance WHERE res_id= ? and coll_id = ? and difflist_type = ? and process_date ISNULL ORDER BY listinstance_id ASC LIMIT 1", array($res_id, $coll_id, 'VISA_CIRCUIT'));
 		$resListDiffVisa = $stmt->fetchObject();
 
-		// If there is only one step in the visa workflow, we set status to ESIG
-		if ((count($curr_visa_wf['visa']) == 0 && count($curr_visa_wf['sign']) == 1) || $resListDiffVisa->item_mode == "sign"){
+		if ($resListDiffVisa->requested_signature){
 	        $mailStatus = 'ESIG';
 	    } else {
 	        $mailStatus = 'EVIS';
