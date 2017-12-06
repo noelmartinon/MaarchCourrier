@@ -532,12 +532,17 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     */
     public function getAllTemplatesForProcess($entityId) 
     {
+        include_once 'core/class/docservers_controler.php';
+
         $db = new Database();
         $stmt = $db->query(
             'select * from ' . _TEMPLATES_TABLE_NAME . ' t, ' . _TEMPLATES_ASSOCIATION_TABLE_NAME . ' ta '
             . 'where t.template_id = ta.template_id and ta.what = ? and ta.value_field = ? ORDER BY t.template_label',
             ['destination', $entityId]
         );
+        $docservers_controler = new docservers_controler();
+        $docserverTemplate = $docservers_controler->get('TEMPLATES');
+        var_dump($docserverTemplate);
         $templates = [];
         while ($res = $stmt->fetchObject()) {
             array_push(
@@ -547,6 +552,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     'TYPE' => $res->template_type,
                     'TARGET' => $res->template_target,
                     'ATTACHMENT_TYPE' => $res->template_attachment_type,
+                    'FILE' => $docserverTemplate->path_template.str_replace('#','/',$res->template_path).$res->template_file_name
                 )
             );
         }

@@ -18,10 +18,19 @@ if (isset($_SESSION['destination_entity']) && !empty($_SESSION['destination_enti
 $frmStr ="";
 $frmStr .= '<option value="">S&eacute;lectionnez le mod&egrave;le</option>';  
 for ($i=0;$i<count($templates);$i++) {
+	var_dump($templates[$i]);
+	if (!file_exists($templates[$i]['FILE'])) {
+		$disabled = 'disabled="disabled"';
+
+		$title = "title=\""._FILE." ".$templates[$i]['FILE']." "._NOT_AVAILABLE."\"";
+	} else {
+		$disabled = '';
+		$title = "";
+	}
     if ($templates[$i]['TYPE'] == 'OFFICE' 
     	&& ($templates[$i]['TARGET'] == 'attachments' || $templates[$i]['TARGET'] == '') 
     	&& ($templates[$i]['ATTACHMENT_TYPE'] == $_REQUEST['attachment_type'] || $templates[$i]['ATTACHMENT_TYPE'] == 'all')) {
-	       	$frmStr .= '<option value="'. functions::xssafe($templates[$i]['ID']).'">';
+	       	$frmStr .= '<option '.$title.' '. $disabled .' value="'. functions::xssafe($templates[$i]['ID']).'">';
 	        $frmStr .= functions::xssafe($templates[$i]['LABEL']);
 	        	$frmStr .= '</option>';
     }
