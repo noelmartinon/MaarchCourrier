@@ -211,11 +211,40 @@ abstract class indexing_searching_app_Abstract extends Database
         {
             $cat_id = 'empty';
         }
+        $checkEmptyMultiContact = false;
         // Simple cases
         foreach(array_keys($post) as $key)
         {
+            //save_contact
+            if (isset($_SESSION['adresses']) && !empty($_SESSION['adresses']['contactid'])) {
+                $db->query("DELETE FROM contacts_res WHERE res_id = ? and mode = ?", array($id_to_update,'multi'));
+                foreach ($_SESSION['adresses']['contactid'] as $contact_it => $value) {
+                    $db->query("INSERT INTO contacts_res(res_id,contact_id,address_id,mode,coll_id) VALUES(?,?,?,?,?)", array($id_to_update,$_SESSION['adresses']['contactid'][$contact_it],$_SESSION['adresses']['addressid'][$contact_it],'multi','letterbox_coll'));
+                }
+            } else {
+                if($key == 'contactid' && !empty($post[$key])) {
+                    $catContact = explode('_',$post['contact_type']);
+                    if (is_numeric($post[$key])) {
+                        array_push($data_ext, array('column' => $catContact[0].'_contact_id', 'value' => $post[$key], 'type' => "string"));
+                        array_push($data_ext, array('column' => $catContact[0].'_user_id', 'value' => null, 'type' => "string"));
+                    } else {
+                        array_push($data_ext, array('column' => $catContact[0].'_user_id', 'value' => $post[$key], 'type' => "string"));
+                        array_push($data_ext, array('column' => $catContact[0].'_contact_id', 'value' => null, 'type' => "string"));
+                    }
+                }
+                if($key == 'addressid') {
+                    if (empty(trim($post[$key]))) {
+                        $post[$key] = null;
+                    }
+                    array_push($data_ext, array('column' => 'address_id', 'value' => $post[$key], 'type' => "string"));
+                }
+            }
             if ($_ENV['categories'][$cat_id][$key]['modify'] == true)
             {
+                if ((empty($_SESSION['adresses']['contactid']) || !isset($_SESSION['adresses']['contactid'])) && $checkEmptyMultiContact == false && !in_array($post['contact_type'],['dest_contact_id', 'exp_contact_id','dest_user_id', 'exp_user_id'])) {
+                    $_SESSION['error'] .= $_ENV['categories'][$cat_id]['other_cases']['contact']['label'].' '._IS_EMPTY;
+                    $checkEmptyMultiContact = true;
+                }
                 if ($_ENV['categories'][$cat_id][$key]['mandatory'] == true  && $post[$key] == '' )
                 {
                     $_SESSION['error'] .= $_ENV['categories'][$cat_id][$key]['label'].' '._IS_EMPTY;
@@ -255,7 +284,7 @@ abstract class indexing_searching_app_Abstract extends Database
                 {
                     $_SESSION['error'] .= $_ENV['categories'][$cat_id][$key]['label']." "._WRONG_FORMAT;
                 }
-                if ($_ENV['categories'][$cat_id][$key]['type_field'] == 'string' && $_ENV['categories'][$cat_id][$key]['table'] <> 'none' && !empty($post[$key]))
+                if ($_ENV['categories'][$cat_id][$key]['type_field'] == 'string' && $_ENV['categories'][$cat_id][$key]['table'] <> 'none')
                 {
                     if ($_ENV['categories'][$cat_id][$key]['table'] == 'res')
                     {
@@ -456,23 +485,7 @@ abstract class indexing_searching_app_Abstract extends Database
             );
             
             $_SESSION['info'] = _INDEX_UPDATED;
-        } else {
-            $_SESSION['info'] = $_SESSION['error'];
-            $_SESSION['error'] = "";            
         }
-        //$_SESSION['error_page'] = $_SESSION['error'];
-        //$error = $_SESSION['error'];
-        // $_SESSION['error']= '';
-/*        ?>
-        <script type="text/javascript">
-            //window.opener.reload();
-            var error_div = $('main_error');
-            if (error_div)
-            {
-                error_div.innerHTML = '<?php functions::xecho($error);?>';
-            }
-        </script>
-        <?php*/
     }
 
 

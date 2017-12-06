@@ -1,35 +1,12 @@
 <?php
-
-
-/*
-*   Copyright 2008-2015 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 /**
-* File : details.php
-*
-* Detailed informations on an indexed document
-*
-* @package  indexing_searching
-* @version 1.3
-* @since 10/2005
-* @license GPL
-* @author  Claire Figueras  <dev@maarch.org>
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
+
+* @brief   details
+* @author  dev <dev@maarch.org>
+* @ingroup indexing_searching
 */
 
 //DECLARATIONS
@@ -71,12 +48,12 @@ $_SESSION['basket_used'] = $_SESSION['current_basket']['id'];
 if (!isset($_REQUEST['coll_id'])) {
     $_REQUEST['coll_id'] = '';
 }
-$_SESSION['doc_convert'] = array();
 $_SESSION['stockCheckbox'] = '';
 $_SESSION['save_list']['fromDetail'] = "true";
 $s_id = '';
 $_SESSION['req'] ='details';
 $_SESSION['indexing'] = array();
+
 $coll_id = '';
 $table = '';
 if (!isset($_REQUEST['coll_id']) || empty($_REQUEST['coll_id'])) {
@@ -127,12 +104,6 @@ if ($core->test_service('add_new_version', 'apps', false)) {
     $addNewVersion = true;
 }
 
-//test service view_emails_notifs
-// $viewEmailsNotifs = false;
-// if ($core->test_service('view_emails_notifs', 'notifications', false)) {
-    // $viewEmailsNotifs = true;
-// }
-
 /****************Management of the location bar  ************/
 $init = false;
 if (isset($_REQUEST['reinit']) && $_REQUEST['reinit'] == 'true') {
@@ -168,18 +139,17 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $s_id = addslashes($func->wash($_GET['id'], 'num', _THE_DOC));
 }
 
+
+//CHECK IF DATAS IN MLB_COLL_EXT
 $stmt = $db->query("SELECT res_id FROM mlb_coll_ext WHERE res_id = ?", array($s_id));
 if ($stmt->rowCount() <= 0) {
     $_SESSION['error'] = _QUALIFY_FIRST;
-    ?>
-        <script type="text/javascript">window.top.location.href='<?php
-            echo $_SESSION['config']['businessappurl'];?>index.php';</script>
-    <?php
+    echo "<script language=\"javascript\" type=\"text/javascript\">window.top.location.href='index.php';</script>";
     exit();
 }
+
 $_SESSION['doc_id'] = $s_id;
 $right = $security->test_right_doc($coll_id, $s_id);
-//$_SESSION['error'] = 'coll '.$coll_id.', res_id : '.$s_id;
 
 $stmt = $db->query("SELECT typist, creation_date, filename FROM ".$table." WHERE res_id = ?", array($s_id));
 $info_mail = $stmt->fetchObject();
@@ -188,22 +158,20 @@ $date1 = new DateTime($info_mail->creation_date);
 $date2 = new DateTime();
 $date2->sub(new DateInterval('PT1M'));
 
+//WARNING IF NO RIGHT BUT OWNER OF CURRENT DOC
 if (!$right && $_SESSION['user']['UserId'] == $info_mail->typist && $date1 > $date2) {
     $right = true;
     $_SESSION['info'] = _MAIL_WILL_DISAPPEAR;
 }
 
+//REDIRECT IF NO RIGHT
 if (!$right) {
     $_SESSION['error'] = _NO_RIGHT_TXT;
-    ?>
-    <script type="text/javascript">
-    window.top.location.href = '<?php
-        echo $_SESSION['config']['businessappurl'];
-        ?>index.php';
-    </script>
-    <?php
+    echo "<script language=\"javascript\" type=\"text/javascript\">window.top.location.href='index.php';</script>";
     exit();
 }
+
+//RECORD ACCESS TO THE DOC
 if (isset($s_id) && !empty($s_id) && $_SESSION['history']['resview'] == 'true') {
     $hist->add(
         $table,
@@ -225,7 +193,7 @@ $delete_doc = check_right(
     DELETE_RECORD
 );
 
-//update index with the doctype
+//UPDATE DATAS (IF FIELDS CAN BE MODIFIED) OF DOC
 if (isset($_POST['submit_index_doc'])) {
     $is->update_mail($_POST, 'POST', $s_id, $coll_id);
 
@@ -247,75 +215,28 @@ if (isset($_POST['submit_index_doc'])) {
         }else{
 	       $thesaurusList = '';
         }
-	$thesaurus->updateResThesaurusList($thesaurusList,$s_id);
+	    $thesaurus->updateResThesaurusList($thesaurusList,$s_id);
     }
 }
 
-//delete the doctype
+//DELETE DOC (status to DEL)
 if (isset($_POST['delete_doc'])) {
     $is ->delete_doc($s_id, $coll_id);
-    ?>
-        <script type="text/javascript">window.top.location.href='<?php
-            echo $_SESSION['config']['businessappurl']
-                . 'index.php?page=search_adv&dir=indexing_searching';
-            ?>';</script>
-    <?php
+    echo "<script language=\"javascript\" type=\"text/javascript\">window.top.location.href='index.php?page=search_adv&dir=indexing_searching';</script>";
     exit();
 }
+
+//CHANGE STATUS DOC TO VAL
 if (isset($_POST['put_doc_on_validation'])) {
-    $is ->update_doc_status($s_id, $coll_id, 'VAL');
-    ?>
-        <script language="javascript" type="text/javascript">window.top.location.href='<?php
-            echo $_SESSION['config']['businessappurl']
-            . 'index.php?page=search_adv&dir=indexing_searching';
-            ?>';</script>
-    <?php
+    $is->update_doc_status($s_id, $coll_id, 'VAL');
+    echo "<script language=\"javascript\" type=\"text/javascript\">window.top.location.href='index.php?page=search_adv&dir=indexing_searching';</script>";
     exit();
 }
+$_SESSION['adresses']['to'] = array();
+$_SESSION['adresses']['addressid'] = array();
+$_SESSION['adresses']['contactid'] = array();
 
-//Load multicontacts
-$query = "SELECT c.contact_firstname, c.contact_lastname, c.firstname, c.lastname, c.society 
-        FROM view_contacts c, contacts_res cres 
-        WHERE cres.coll_id = 'letterbox_coll' AND cres.res_id = ? AND cast (c.contact_id as varchar) = cres.contact_id AND c.ca_id = cres.address_id 
-        GROUP BY c.firstname, c.lastname, c.society, c.contact_firstname, c.contact_lastname";
-
-$stmt = $db->query($query, array($_REQUEST['id']));
-$nbContacts = 0;
-$frameContacts = "";
-$frameContacts = "{";
-while ($res = $stmt->fetchObject()) {
-    $nbContacts = $nbContacts + 1;
-    $contact_firstname = str_replace("'", "\'", $res->contact_firstname);
-    $contact_firstname = str_replace('"', " ", $contact_firstname);
-    $contact_lastname = str_replace("'", "\'", $res->contact_lastname);
-    $contact_lastname = str_replace('"', " ", $contact_lastname);
-    $firstname = str_replace("'", "\'", $res->firstname);
-    $firstname = str_replace('"', " ", $firstname);
-    $lastname = str_replace("'", "\'", $res->lastname);
-    $lastname = str_replace('"', " ", $lastname);
-    $society = str_replace("'", "\'", $res->society);
-    $society = str_replace('"', " ", $society);
-    $frameContacts .= "'contact " . $nbContacts . "' : '" . $contact_firstname . " " . $contact_lastname . " " . $firstname . " " . $lastname . " " . $society . " (contact)', ";
-}
-$query = "SELECT u.firstname, u.lastname, u.user_id ";
-$query .= "FROM users u, contacts_res cres  ";
-$query .= "WHERE cres.coll_id = 'letterbox_coll' AND cres.res_id = ? AND cast (u.user_id as varchar) = cres.contact_id ";
-$query .= "GROUP BY u.firstname, u.lastname, u.user_id";
-
-$stmt = $db->query($query, array($_REQUEST['id']));
-
-while($res = $stmt->fetchObject()){
-    $nbContacts = $nbContacts + 1;
-    $firstname = str_replace("'","\'", $res->firstname);
-    $firstname = str_replace('"'," ", $firstname);
-    $lastname = str_replace("'","\'", $res->lastname);
-    $lastname = str_replace('"'," ", $lastname);
-    $frameContacts .= "'contact ".$nbContacts."' : '" . $firstname . " " . $lastname . " (utilisateur)', ";
-}
-$frameContacts = substr($frameContacts, 0, -2);
-$frameContacts .= "}";
-
-if (empty($_SESSION['error']) || $_SESSION['indexation']) {
+//if (empty($_SESSION['error']) || $_SESSION['indexation']) {
     $comp_fields = '';
     $stmt = $db->query("SELECT type_id FROM ".$table." WHERE res_id = ?", array($s_id));
     if ($stmt->rowCount() > 0) {
@@ -345,87 +266,51 @@ if (empty($_SESSION['error']) || $_SESSION['indexation']) {
     );
     $res = $stmt->fetchObject();
 
-}
+//}
 ?>
 <div id="details_div">
-<h1 class="titdetail">
-    <i class="fa fa-info-circle fa-2x"></i>&nbsp;
-    <?php
+<?php
+echo '<h1 class="titdetail"><i class="fa fa-info-circle fa-2x"></i> ';
     if(_ID_TO_DISPLAY == 'res_id'){
-        echo '<i style="font-style:normal;">'._DETAILS . " : " . _DOC . ' ' . strtolower(_NUM).$s_id.'</i>';
+        $idToDisplay = $s_id;
+        $titleToDisplay = $res->alt_identifier;
     }else{
-        echo '<i style="font-style:normal;" title="'. _LETTER_NUM . $s_id . '">'._DETAILS . " : " . _DOC . ' ' . $res->alt_identifier.'</i>';
+        $idToDisplay = $res->alt_identifier;
+        $titleToDisplay = strtolower(_NUM).$s_id;
     }
-    ?>
-     <span>(<?php
-        echo  $security->retrieve_coll_label_from_coll_id($coll_id);
-        ?>)</span>
-</h1>
+    echo "<i style='font-style:normal;' title='{$titleToDisplay}'>"._DETAILS." : "._DOC." {$idToDisplay}</i> <span>({$security->retrieve_coll_label_from_coll_id($coll_id)})</span>";
+echo '</h1>';
+?>
 <div id="inner_content" class="clearfix">
 <?php 
-if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
+/*if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
 {
-    ?>
-    <div class="error">
-    <br />
-    <br />
-    <br />
-    <?php echo $_SESSION['error'];  $_SESSION['error'] = "";?>
-    <br />
-    <br />
-    <br />
-    </div>
-    <?php
-} else {
+    echo '<div class="error" id="main_error_popup" onclick="this.hide();" style="display: table-cell;">'.$_SESSION['error'].'</div>';
+    $_SESSION['error'] = "";
+    
+} else {*/
     if ($stmt->rowCount() == 0) {
-        ?>
-        <div align="center">
-            <br />
-            <br />
-            <?php echo _NO_DOCUMENT_CORRESPOND_TO_IDENTIFIER;?>.
-            <br />
-            <br />
-            <br />
-        </div>
-        <?php
-        } else {
-            ?>
-            <div id="info_detail" class="info" onclick="this.hide();">
-                <?php echo $_SESSION['info'] ;?>
-                <br />
-                <br />
-            </div>
-            <?php
-            if(isset($_SESSION['info']) && $_SESSION['info'] <> '') {
-                ?>
+        $_SESSION['error'] = _NO_DOCUMENT_CORRESPOND_TO_IDENTIFIER;
+        echo "<script language=\"javascript\" type=\"text/javascript\">window.top.location.href='index.php';</script>";
+        exit();
 
-                <script>
-                    var info_detail = $('info_detail');
-                    if (info_detail != null) {
-                        info_detail.style.display = 'table-cell';
-                        Element.hide.delay(10, 'info_detail');
-                    }
-                </script>
-                <?php
+        } else {
+
+            //POPUP INFO AND ERROR
+            echo '<div class="info" id="info_detail" onclick="this.hide();" style="display: none;">'.$_SESSION['info'].'</div>';
+            echo '<div class="error" id="error_detail" onclick="this.hide();" style="display: none;">'.$_SESSION['error'].'</div>';
+            
+            if (isset($_SESSION['info']) && $_SESSION['info'] <> '') {
+
+                echo '<script language=\'javascript\' type=\'text/javascript\'>$j("#info_detail").show().delay(5000).fadeOut();</script>';
                 $_SESSION['info'] = "";
             }
-    
-            $param_data = array(
-                'img_category_id' => true,
-                'img_priority' => true,
-                'img_type_id' => true,
-                'img_doc_date' => true,
-                'img_admission_date' => true,
-                'img_nature_id' => true,
-                'img_reference_number' => true,
-                'img_subject' => true,
-                'img_process_limit_date' => true,
-                'img_author' => true,
-                'img_destination' => true,
-                'img_folder' => true,
-                'img_contact' => true,
-                'img_confidentiality' => true,
-                );
+            if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation']))) {
+
+                echo '<script language=\'javascript\' type=\'text/javascript\'>$j("#error_detail").show().delay(5000).fadeOut();</script>';                
+                $_SESSION['error'] = "";
+            }
+
 
             $typist = $res->typist;
             $format = $res->format;
@@ -489,8 +374,6 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     $indexes[$key]['show_value'] = functions::format_date_db($res->{$tmp}, true);
                 }
             }
-            //$db->show_array($indexes);
-            $process_data = $is->get_process_data($coll_id, $s_id);
             $status = $res->status;
             if (!empty($status))
             {
@@ -526,11 +409,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                 }
             }
             $data = get_general_data($coll_id, $s_id, $mode_data, $param_data );
-            //$data = array_merge($data, $indexes);
-            $detailsExport = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" >';
-            $detailsExport .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">';
-            $detailsExport .= "<head><title>Maarch Details</title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><meta content='fr' http-equiv='Content-Language'/><meta http-equiv='cache-control' content='no-cache'/><meta http-equiv='pragma' content='no-cache'><meta http-equiv='Expires' content='0'></head>";
-            $detailsExport .= "<body onload='javascript:window.print();' style='font-size:8pt'>";
+
             ?>
             <div class="block">
                 <b>
@@ -538,7 +417,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     <?php
                     if (! isset($_POST['up_res_id']) || ! $_POST['up_res_id']) {
                         if ($_SESSION['indexation'] == false) {			
-	 		    echo '<a href="#" onclick="document.getElementById(\'ariane\').childNodes[document.getElementById(\'ariane\').childNodes.length-2].click();"><i class="fa fa-arrow-circle-left fa-2x" title="' .  _BACK . '"></i></a>';
+	 		                echo '<a href="#" onclick="document.getElementById(\'ariane\').childNodes[document.getElementById(\'ariane\').childNodes.length-2].click();"><i class="fa fa-arrow-circle-left fa-2x" title="' .  _BACK . '"></i></a>';
                         }
                     }
 		    
@@ -557,12 +436,11 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
             <dl id="tabricator1">
             <?php 
                 if($nbAttach == 0 && strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){
-                                $style = 'visibility:hidden;"';
-                            }else{
-                                $style = 'display:none;"';
-                            }
+                    $style = 'visibility:hidden;"';
+                }else{
+                    $style = 'display:none;"';
+                }
                 ?>
-                <?php $detailsExport .= "<h1><center>"._DETAILS_PRINT." : ".$s_id."</center></h1><hr>";?>
                 <dt class="fa fa-info-circle" style="font-size:2em;padding-left: 15px;<?php if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){echo 'padding-right: 0px;';}else{echo 'padding-right: 15px;';}?>" title="<?php echo _PROPERTIES;?>"> <sup><span style="font-size: 10px;<?php echo $style; ?>" class="nbResZero">0</span></sup></dt>
                 <dd>
                     
@@ -594,11 +472,9 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     </div>
                     <h2>
                         <span class="date">
-                            <?php $detailsExport .= "<h2>"._FILE_DATA."</h2>";?>
                             <b><?php echo _FILE_DATA;?></b>
                         </span>
                     </h2>
-                    <?php $detailsExport .= "<table cellpadding='2' cellspacing='0' border='1' class='block forms details' width='100%'>";?>
                     <table cellpadding="2" cellspacing="2" border="0" class="block forms details" width="100%">
                         <?php
                         $i=0;
@@ -610,9 +486,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                             if($key != 'is_multicontacts' || ($key == 'is_multicontacts' && $data[$key]['show_value'] == 'Y')){
                                 if ($i%2 != 1 || $i==0) // pair
                                 {
-                                    $detailsExport .= "<tr class='col'>"; ?>
-                                    <tr class="col">
-                                <?php
+                                    echo '<tr class="col">';
                                 }
                                 $folder_id = "";
                                 if ($key == "folder" && $data[$key]['show_value'] <> "")
@@ -623,298 +497,337 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                         $folder_id = str_replace("(", "", $folder_id);
                                         $folder_id = str_replace(")", "", $folder_id);
                                 }
-                                //$detailsExport .= "<th align='left' width='50px'>";
-                                ?>
-                                <th align="left" class="picto" >
-                                <?php
-                                if (isset($data[$key]['addon'])) {
-                                    if(in_array($key, ['dest_user_id', 'exp_user_id', 'dest_contact_id', 'exp_contact_id'])){ 
-                                        echo $data[$key]['addon_detail'];
-                                    } else {
-                                        echo $data[$key]['addon'];
-                                    }
-                                } elseif (isset($data[$key]['img'])) {
-                                    //$detailsExport .= "<img alt='".$data[$key]['label']."' title='".$data[$key]['label']."' src='".$data[$key]['img']."'  />";
-                                    if ($folder_id <> "") {
-                                        echo "<a href='" . $_SESSION['config']['businessappurl'] . "index.php?page=show_folder&module=folder&id=" . $folder_id . "'>";
-                                        ?>
-                                        <i class="fa fa-<?php functions::xecho($data[$key]['img']); ?> fa-2x" title="<?php functions::xecho($data[$key]['label']); ?>"></i>
-                                        </a>
-                                        <?php
-                                    } else if ($key == 'is_multicontacts') {
-                                        ?>
+                                //GET DATA ICON
+                                echo '<th align="center" class="picto" >';
 
-                                        <i class="fa fa-<?php functions::xecho($data[$key]['img']); ?> fa-2x" title="<?php functions::xecho($data[$key]['label']); ?>"
-                                           onclick = "previsualiseAdminRead(event, <?php functions::xecho($frameContacts); ?>);" style="cursor: pointer;"></i>
-                                        </a>
-                                    <?php
-                                    } else {
-                                    ?>
-                                        <i class="fa fa-<?php functions::xecho($data[$key]['img']); ?> fa-2x" title="<?php functions::xecho($data[$key]['label']); ?>"></i>
-                                        <?php
-                                    }
-                                }
-                                ?>
-                                </th>
-                            <?php			
-                            $detailsExport .= "<td align='left' width='200px'>"; ?>
-                            <td align="left" width="200px">
-                            <?php									
-                                $detailsExport .= $data[$key]['label'];
-                                echo $data[$key]['label'];
-                            ?>						
-                            </td>
-                            <?php			
-                            $detailsExport .=  "</td>";
-                            $detailsExport .=  "<td>";			
-                            ?>
-                            <td>			
-                                <?php
-                                $detailsExport .=  $data[$key]['show_value'];
-                            if (!isset($data[$key]['readonly']) || $data[$key]['readonly'] == true)
-                            {			
-                                if($key == 'is_multicontacts') {
-                                    if($data[$key]['show_value'] == 'Y'){
-                                    ?>
-                                        <input type="hidden" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($data[$key]['show_value']);?>" readonly="readonly" class="readonly" size="40"  title="<?php functions::xecho($data[$key]['show_value']);?>" alt="<?php functions::xecho($data[$key]['show_value']);?>" />
+                                $iconLabel = $data[$key]['label'];
+                                $iconLinkAttr = '';
 
-                                        <div onClick="$('return_previsualise').style.display='none';" id="return_previsualise" style="cursor: pointer; display: none; border-radius: 10px; box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.4); padding: 10px; width: auto; height: auto; position: absolute; top: 0; left: 0; z-index: 999; background-color: rgba(255, 255, 255, 0.9); border: 3px solid #459ed1;">';
-                                            <input type="hidden" id="identifierDetailFrame" value="" />
-                                        </div>
-
-                                        <input type="text" value="<?php functions::xecho($nbContacts . ' ' ._CONTACTS);?>" readonly="readonly" class="readonly" size="40"  title="<?php echo _SHOW_MULTI_CONTACT;?>" alt="<?php functions::xecho($data[$key]['show_value']);?>" 
-                                                                            onclick = "previsualiseAdminRead(event, <?php functions::xecho($frameContacts);?>);" style="cursor: pointer;"/>
-                                    <?php
-                                    }
-
-                                }elseif ($data[$key]['display'] == 'textinput')
-                                {
-                                    if($key == 'type_id'){
-                                        ?>
-                                        <input type="text" name="<?php echo $key;?>"  value="<?php echo $data[$key]['show_value'];?>" readonly="readonly" class="readonly" size="40"  title="<?php  echo $data[$key]['show_value']; ?>" alt="<?php  echo $data[$key]['show_value']; ?>" />
-                                        <input type="hidden" name="<?php echo $key;?>" id="<?php echo $data[$key]['value'];?>" value="<?php echo $data[$key]['value'];?>" readonly="readonly" class="readonly" size="40"  title="<?php  echo $data[$key]['show_value']; ?>" alt="<?php  echo $data[$key]['show_value']; ?>" />
-                                        <?php
-                                    }else{
-                                    ?>
-                                        <input type="text" name="<?php echo $key;?>" id="<?php echo $key;?>" value="<?php echo $data[$key]['show_value'];?>" readonly="readonly" class="readonly" size="40"  title="<?php  echo $data[$key]['show_value']; ?>" alt="<?php  echo $data[$key]['show_value']; ?>" />
-                                    <?php
-                                    }
-                                }
-                                elseif ($data[$key]['display'] == 'textarea')
-								
-                                {
-                                    echo '<textarea name="'.$key.'" id="'.$key.'" rows="3" readonly="readonly" class="readonly" style="width: 200px; max-width: 200px;">'
-                                        .$data[$key]['show_value']
-                                        .'</textarea>';								
-                                } else if ($data[$key]['field_type'] == 'radio') {
-                                    for($k=0; $k<count($data[$key]['radio']);$k++) {
-                                        ?><input name ="<?php functions::xecho($key);?>" <?php if ($data[$key]['value'] ==$data[$key]['radio'][$k]['ID']){ echo 'checked';}?> type="radio" id="<?php functions::xecho($key) .'_' . $data[$key]['radio'][$k]['ID'];?>" value="<?php functions::xecho($data[$key]['radio'][$k]['ID']);?>" disabled ><?php functions::xecho($data[$key]['radio'][$k]['LABEL']);
-                                    }
-                                }
-                                else				
-                                {
-                                    ?>
-                                    <input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($data[$key]['show_value']);?>" readonly="readonly" class="readonly" size="40" title="<?php functions::xecho($data[$key]['show_value']);?>" alt="<?php functions::xecho($data[$key]['show_value']);?>" />
-                                    <?php
-                                    if (isset($data[$key]['addon']))				
-                                    {
-                                        $frm_str .= $data[$key]['addon'];
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if ($data[$key]['field_type'] == 'textfield')
-                                {
-                                    ?>
-									
-									
-                                    <input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php echo $data[$key]['show_value'];?>" size="40"  title="<?php echo $data[$key]['show_value'];?>" alt="<?php echo $data[$key]['show_value'];?>" />
-                                    <?php
-                                }
-                                elseif ($data[$key]['display'] == 'textarea') 
-                                {
-                                    echo '<textarea name="'.$key.'" id="'.$key.'" rows="3" style="width: 200px; max-width: 200px;">'
-                                        .$data[$key]['show_value']
-                                    .'</textarea>';
-                                }
-                                else if ($data[$key]['field_type'] == 'date')
-                                {
-								
-								
-                                    ?>
-                                    <input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($data[$key]['show_value']);?>" size="40"  title="<?php functions::xecho($data[$key]['show_value']);?>" alt="<?php functions::xecho($data[$key]['show_value']);?>" onclick="showCalender(this);" />
+                                if ($key == 'is_multicontacts') {
+                                    echo '<a style="cursor:pointer;" onclick=\'$j("#input_multi_contact_add").toggle();\'><i class="fa fa-book fa-2x"></i><sup style="position: relative;top: -10px;"><i class="fa fa-users"></i></sup></a>';
                                     
-									
-									
-									
-									
-									<?php
+                                } else if (isset($data[$key]['img'])) {
+                                    $iconCode = $data[$key]['img'];
+
+                                    $iconShow = "<i class='fa fa-{$iconCode} fa-2x' title='{$iconLabel}'></i>";
+
+                                    if ($folder_id <> "") {
+                                        $iconShow = "<a href='index.php?page=show_folder&module=folder&id={$folder_id}'>".$iconShow."</a>";
+
+                                    } else if (in_array($key, ['dest_contact_id', 'exp_contact_id'])) {
+                                        $inputValue = $data[$key]['value'];
+                                        $inputAddressValue = $data[$key]['address_value'];
+
+                                        $iconShow = "<a href=\"#\" onclick=\"window.open('index.php?display=true&dir=my_contacts&page=info_contact_iframe&mode=view&popup&contactid={$inputValue}&addressid={$inputAddressValue}', 'contact_info', 'height=800, width=1000,scrollbars=yes,resizable=yes');\">".$iconShow."</a>";
+                                    } else if (in_array($key, ['dest_user_id', 'exp_user_id'])) {
+                                        $inputValue = $data[$key]['value'];
+                                        $inputAddressValue = $data[$key]['address_value'];
+
+                                        $iconShow = "<a style='cursor:pointer;' onclick=\"window.open('index.php?display=true&page=user_info&id={$inputValue}', 'contact_info', 'height=400, width=600,scrollbars=yes,resizable=yes');\">".$iconShow."</a>";
+                                    }
+
+                                    echo $iconShow;
+                                    
+                                } else {
+                                    echo "<i class='fa fa-question-circle-o fa-2x' title='{$iconLabel}'></i>";
+                                }
+                                echo '</th>';
+                                // END DATA ICON
+
+                                //GET DATA LABEL
+                                echo '<td align="left" width="200px">';         
+                                    echo $data[$key]['label'];
+                                echo '</td>';
+                                //END DATA LABEL
+                                
+                                //GET DATA INPUT
+                                echo '<td>';
+                                if (!isset($data[$key]['readonly']) || $data[$key]['readonly'] == true) {
+                                    $disabledAttr = 'disabled="disabled"';
+                                    $disabledClass = 'readonly';
+                                }else{
+                                    $disabledAttr = '';
+                                    $disabledClass = ''; 
+                                }
+                                if ($data[$key]['field_type'] == 'textfield') {
+                                    $inputValue = $data[$key]['show_value'];
+
+                                    if (in_array($key, ['exp_contact_id','dest_contact_id','exp_user_id','dest_user_id'])) {
+
+                   
+                                        echo "<input type='text' name='contact' id='contact' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' class='{$disabledClass}' {$disabledAttr}/>";
+                                                                    
+                                        $inputValue = $data[$key]['value'];
+                                        $inputAddressValue = $data[$key]['address_value'];
+                                        echo "<input type='hidden' name='contactid' id='contactid' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' />";
+                                        echo "<input type='hidden' name='addressid' id='addressid' value='{$inputAddressValue}' title='{$inputAddressValue}' alt='{$inputAddressValue}' size='40' />";
+                                        echo "<input type='hidden' name='contact_type' id='contact_type' value='{$key}' title='{$key}' alt='{$key}' size='40' />";
+                                        
+                                        //initialize autocomplete
+                                        echo '<div id="show_contacts" class="autocomplete autocompleteIndex" style="width:200px;"></div><div class="autocomplete autocompleteIndex" id="searching_autocomplete" style="display: none;text-align:left;padding:5px;width:200px;"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> chargement ...</div></span>';
+                                        echo '<script>launch_autocompleter_contacts_v2(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\', \'\', \'\', \'\', \'contactid\', \'addressid\');</script>';
+                                    } else if ($key == 'is_multicontacts') {
+                                        $_SESSION['adresses']['to'] = array();
+                                        $_SESSION['adresses']['addressid'] = array();
+                                        $_SESSION['adresses']['contactid'] = array();
+
+                                        $path_to_script = $_SESSION['config']['businessappurl']
+                                        ."index.php?display=true&dir=indexing_searching&page=add_multi_contacts&coll_id=".$collId;
+
+                                        if (empty($disabledAttr)) {
+                                            echo "<div id='input_multi_contact_add' style='display:none;'>";
+                                            echo "<input type='text' name='{$key}' id='{$key}' value='' title='' alt='' size='40' style='width:140px;'/>";
+                                            echo '<div id="multiContactList" class="autocomplete" style="width:200px;"></div><div class="autocomplete autocompleteIndex" id="searching_autocomplete_multi" style="display: none;text-align:left;padding:5px;width:200px;"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> chargement ...</div></span>';
+                                            echo '<script type="text/javascript">addMultiContacts(\'is_multicontacts\', \'multiContactList\', \''
+                                                    .$_SESSION['config']['businessappurl']
+                                                    .'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\', \'Input\', \'2\', \'contactid\', \'addressid\');</script>';
+                                            echo ' <input type="button" name="add" value="&nbsp;'._ADD
+                                                .'&nbsp;" id="valid_multi_contact" class="button" onclick="updateMultiContacts(\''.$path_to_script
+                                                .'&mode=adress\', \'add\', document.getElementById(\'is_multicontacts\').value, '
+                                                .'\'to\', false, document.getElementById(\'addressid\').value, document.getElementById(\'contactid\').value);display_contact_card(\'hidden\', \'multi_contact_card\');" />';
+                                            echo '</div>';
+                                        }
+                                        
+                                        
+                                        echo '<div name="to" id="to" class="multicontactInput">';
+
+                                        $nbContacts = count($data[$key]['multi']['contact_id']);
+                                        if ($nbContacts > 0) {
+                                            for ($icontacts = 0; $icontacts < $nbContacts; $icontacts++) {
+                                                $_SESSION['adresses']['to'][] = $data[$key]['multi']['arr_values'][$icontacts];
+                                                $_SESSION['adresses']['addressid'][] = $data[$key]['multi']['address_id'][$icontacts];
+                                                $_SESSION['adresses']['contactid'][] = $data[$key]['multi']['contact_id'][$icontacts];
+
+                                                echo '<div class="multicontact_element" style="display:table;width:200px;" id="'.$icontacts.'_'.$data[$key]['multi']['contact_id'][$icontacts].'"><div style="display:table-cell;width:100%;vertical-align:middle;">'.$data[$key]['multi']['arr_values'][$icontacts].'</div>';
+                                                    
+                                                if (empty($disabledAttr)) {
+                                                    echo '&nbsp;<div class="email_delete_button" style="display:table-cell;vertical-align:middle" id="'.$icontacts.'"'
+                                                        . 'onclick="updateMultiContacts(\''.$path_to_script
+                                                        .'&mode=adress\', \'del\', \''.$data[$key]['multi']['arr_values'][$icontacts].'\', \'to\', this.id, \''.$data[$key]['multi']['address_id'][$icontacts].'\', \''.$data[$key]['multi']['contact_id'][$icontacts].'\');" alt="'._DELETE.'" title="'
+                                                        ._DELETE.'">x</div>';
+                                                    echo '</div>';
+                                                }else{
+                                                    echo '&nbsp;<div class="email_delete_button" style="display:none;vertical-align:middle" id="'.$icontacts.'"'
+                                                    . 'onclick="" alt="'._DELETE.'" title="'
+                                                    ._DELETE.'">x</div>';
+                                                    echo '</div>';
+                                                }
+                                            }
+                                        }
+                                        echo '</div>';
+                                        echo "<input type='hidden' name='contactid' id='contactid' value='' title='' alt='' size='40' />";
+                                        echo "<input type='hidden' name='addressid' id='addressid' value='' title='' alt='' size='40' />";
+                                    } else {
+                                        echo "<input type='text' name='{$key}' id='{$key}' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' class='{$disabledClass}' {$disabledAttr}/>";                                        
+                                    }
+                                
+                                } elseif ($data[$key]['display'] == 'textarea') {
+
+                                    $inputValue = $data[$key]['show_value'];
+
+                                    echo "<textarea name='{$key}' id='{$key}' rows='3' style='width: 200px; max-width: 200px;' class='{$disabledClass}' {$disabledAttr}>{$inputValue}</textarea>";
+            
+                                } else if ($data[$key]['field_type'] == 'date') {
+
+                                    $inputValue = $data[$key]['show_value'];
+
+                                    echo "<input type='text' name='{$key}' id='{$key}' value='{$inputValue}' size='40' title='{$inputValue}' alt='{$inputValue}' class='{$disabledClass}' {$disabledAttr} onclick='showCalender(this);' />";
+								
                                 }
                                 else if ($data[$key]['field_type'] == 'select')
                                 {
-                                    ?>
-                                    <select id="<?php functions::xecho($key);?>" name="<?php functions::xecho($key);?>"
-                                    <?php if ($key == 'type_id'){
-                                        echo 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\');"';
+                                    $inputUrl = $_SESSION['config']['businessappurl'];
+                                    if ($key == 'type_id') {
+                                        
+                                        $inputAttr = 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\');"';
                                     } else if ($key == 'priority') {
-                                        echo 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
-                                    } else if ($key == 'nature_id') {
-										echo 'disabled';
-									}
-									?>
-                                    >
-                                    <?php
-                                        if ($key == 'type_id')
-                                        {
-                                            if ($_SESSION['features']['show_types_tree'] == 'true')
-                                            {
 
-                                                for($k=0; $k<count($data[$key]['select']);$k++)
-                                                {
-                                                ?><option value="" class="doctype_level1"><?php functions::xecho($data[$key]['select'][$k]['label']);?></option><?php
-                                                    for($j=0; $j<count($data[$key]['select'][$k]['level2']);$j++)
-                                                    {
-                                                        ?><option value="" class="doctype_level2">&nbsp;&nbsp;<?php functions::xecho($data[$key]['select'][$k]['level2'][$j]['label']);?></option><?php
-                                                        for($l=0; $l<count($data[$key]['select'][$k]['level2'][$j]['types']);$l++)
-                                                        {
-                                                            ?><option
-                                                            <?php if ($data[$key]['value'] ==$data[$key]['select'][$k]['level2'][$j]['types'][$l]['id']){ echo 'selected="selected"';}?>
-                                                             value="<?php functions::xecho($data[$key]['select'][$k]['level2'][$j]['types'][$l]['id']);?>" >&nbsp;&nbsp;&nbsp;&nbsp;<?php functions::xecho($data[$key]['select'][$k]['level2'][$j]['types'][$l]['label']);?></option><?php
+                                        $inputAttr = 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
+                                    }
+                                    
+                                    echo "<select id='{$key}' name='{$key}' class='{$disabledClass}' {$disabledAttr} {$inputAttr} >";
+                                    
+                                        if ($key == 'type_id') {
+
+                                            if ($_SESSION['features']['show_types_tree'] == 'true') {
+
+
+                                                for ($k=0; $k<count($data[$key]['select']);$k++) {
+
+                                                    $inputValue = $data[$key]['select'][$k]['label'];
+                                                    echo "<optgroup class='doctype_level1' label='{$inputValue}'>";
+
+                                                    for ($j=0; $j<count($data[$key]['select'][$k]['level2']);$j++) {
+                                                        
+                                                        $inputValue = $data[$key]['select'][$k]['level2'][$j]['label'];
+                                                        echo "<optgroup class='doctype_level2' label='&nbsp;&nbsp;&nbsp;&nbsp;{$inputValue}'>";
+
+                                                        for ($l=0; $l<count($data[$key]['select'][$k]['level2'][$j]['types']);$l++) {
+
+                                                            $inputValue = $data[$key]['select'][$k]['level2'][$j]['types'][$l]['label'];
+                                                            $inputId = $data[$key]['select'][$k]['level2'][$j]['types'][$l]['id'];
+
+                                                            if ($data[$key]['value'] == $data[$key]['select'][$k]['level2'][$j]['types'][$l]['id']) {
+                                                                $inputAttr = 'selected="selected"';
+                                                            } else {
+                                                                $inputAttr = '';
+                                                            }
+                                                            echo "<option value='{$inputId}' {$inputAttr}>&nbsp;&nbsp;&nbsp;&nbsp;{$inputValue}</option>";
                                                         }
+                                                        echo "</optgroup>";
                                                     }
+                                                    echo "</optgroup>";
                                                 }
                                             }
                                             else
                                             {
-                                                for($k=0; $k<count($data[$key]['select']);$k++)
-                                                {
-                                                    ?><option <?php if ($data[$key]['value'] ==$data[$key]['select'][$k]['ID']){ echo 'selected="selected"';}?> value="<?php functions::xecho($data[$key]['select'][$k]['ID']);?>" ><?php functions::xecho($data[$key]['select'][$k]['LABEL']);?></option><?php
+                                                for ($k=0; $k<count($data[$key]['select']);$k++) {
+
+                                                    $inputValue = $data[$key]['select'][$k]['LABEL'];
+                                                    $inputId = $data[$key]['select'][$k]['ID'];
+
+                                                    if ($data[$key]['value'] == $data[$key]['select'][$k]['ID']) {
+                                                        $inputAttr = 'selected="selected"';
+                                                    } else {
+                                                        $inputAttr = '';
+                                                    }
+                                                    echo "<option value='{$inputId}' {$inputAttr}>{$inputValue}</option>";                                                
                                                 }
                                             }
-                                        }
-                                        else
-                                        {
-                                            for($k=0; $k<count($data[$key]['select']);$k++)
-                                            {
-                                                ?><option value="<?php functions::xecho($data[$key]['select'][$k]['ID']);?>" <?php if ($data[$key]['value'] == $data[$key]['select'][$k]['ID']){echo 'selected="selected"';}?>><?php functions::xecho($data[$key]['select'][$k]['LABEL']);?></option><?php
+
+                                        } else {
+
+                                            for ($k=0; $k<count($data[$key]['select']);$k++) {
+
+                                                $inputValue = $data[$key]['select'][$k]['LABEL'];
+                                                $inputId = $data[$key]['select'][$k]['ID'];
+
+                                                if ($data[$key]['value'] == $data[$key]['select'][$k]['ID']) {
+                                                    $inputAttr = 'selected="selected"';
+                                                } else {
+                                                    $inputAttr = '';
+                                                }
+                                                echo "<option value='{$inputId}' {$inputAttr}>{$inputValue}</option>"; 
                                             }
                                         }
-                                    ?>
-                                    </select>
-                                    <?php
+                                    echo '</select>';
+
                                 } else if ($data[$key]['field_type'] == 'radio') {
-                                    for($k=0; $k<count($data[$key]['radio']);$k++) {
-                                        ?><input name ="<?php functions::xecho($key);?>" <?php if ($data[$key]['value'] ==$data[$key]['radio'][$k]['ID']){ echo 'checked';}?> type="radio" id="<?php functions::xecho($key) .'_' . $data[$key]['radio'][$k]['ID'];?>" value="<?php functions::xecho($data[$key]['radio'][$k]['ID']);?>" ><?php functions::xecho($data[$key]['radio'][$k]['LABEL']);
+                                    for ($k=0; $k<count($data[$key]['radio']);$k++) {
+
+                                        $inputValue = $data[$key]['radio'][$k]['LABEL'];
+                                        $inputId = $data[$key]['radio'][$k]['ID'];
+
+                                        if ($data[$key]['value'] == $data[$key]['radio'][$k]['ID']) {
+                                            $inputAttr = 'checked';
+                                        } else {
+                                            $inputAttr = '';
+                                        }
+                                        echo "<input type='radio' name='{$key}' id='{$key}_{$inputId}' value='{$inputId}' class='{$disabledClass}' {$disabledAttr} {$inputAttr}/>{$inputValue}";
                                     }
                                 } 
                                 else if ($data[$key]['field_type'] == 'autocomplete')
                                 {
                                     if ($key == 'folder' && $core->is_module_loaded('folder') && ($core->test_service('associate_folder', 'folder',false) == 1))
                                     {
-                                    ?>  
-                                        <input type="text" name="folder" id="folder" onblur="" value="<?php echo $data['folder']['show_value']; ?>" />
-                                        <div id="show_folder" class="autocomplete"></div>
-                                        <script type="text/javascript">initList('folder', 'show_folder','<?php echo $_SESSION['config']['businessappurl'];
-                                        ?>index.php?display=true&module=folder&page=autocomplete_folders&mode=folder',  'Input', '2');</script>
-                                        <?php
-                                    } else { ?>
-                                         <input class="readonly" type="text" name="folder" id="folder" onblur="" value="<?php echo $data['folder']['show_value']; ?>" readonly="readonly"/>
-                                    <?php }
+                                        $inputValue = $data['folder']['show_value'];
+                                        echo "<input type='text' name='folder' id='folder' onblur='' value='{$inputValue}' class='{$disabledClass}' {$disabledAttr}/>";
+                                        echo '<div id="show_folder" class="autocomplete"></div>';
+                                        echo '<script type="text/javascript">initList(\'folder\', \'show_folder\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=folder&page=autocomplete_folders&mode=folder\',  \'Input\', \'2\');</script>';
+                                    } else { 
+                                        $inputValue = $data['folder']['show_value'];
+                                        echo "<input type='text' name='folder' id='folder' class='readonly' onblur='' value='{$inputValue}' readonly='readonly'/>";      
+                                    }
+                                } else if ($data[$key]['display'] == 'textinput') {
+                                    
+                                    $inputValue = $data[$key]['show_value'];
+
+                                    echo "<input type='text' name='{$key}' id='{$key}' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' class='{$disabledClass}' {$disabledAttr}/>";
+
+                                    if ($key == 'type_id') {
+
+                                        $inputValue = $data[$key]['value'];
+                                        echo "<input type='hidden' name='{$key}' id='{$key}' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' readonly='readonly' class='readonly'/>";
+                                    }
                                 }
-                            }
-                                $detailsExport .=  "</td>";
-                                ?>
-                            </td>
-                            <?php
+
+                                echo '</td>';
+                                //END DATA INPUT
+
                             if ($i%2 == 1 && $i!=0) // impair
                             {
-                                $detailsExport .=  "</td>";
-                                ?>
-                                </tr>
-                                <?php
+                                echo '</tr>';
                             }
                             else
                             {
                                 if ($i+1 == count($data))
                                 {
-                                    $detailsExport .= "<td  colspan='2'>&nbsp;</td></tr>";
                                     echo '<td  colspan="2">&nbsp;</td></tr>';
                                 }
                             }
                             $i++;
                             }
                         }
-                        $detailsExport .=  "<tr class='col'>";
-                        $detailsExport .=  "<td align='left' width='200px'>";
-                        $detailsExport .=  _STATUS;
-                        $detailsExport .=  "</td>";
-                        $detailsExport .=  "<td>";
-                        $detailsExport .=  $res_status['LABEL'];
-                        $detailsExport .=  "</td>";
-                        $detailsExport .=  "<td align='left' width='200px'>";
-                        $detailsExport .=  _CHRONO_NUMBER;
-                        $detailsExport .=  "</td>";
-                        $detailsExport .=  "<td>";
-                        $detailsExport .=  $chrono_number;
-                        $detailsExport .=  "</td>";
-                        $detailsExport .=  "</tr>";
+                        //OTHER DATAS STATUS, CHRONO NUMBER
+                        echo '<tr class="col">';
 
-                        ?>
-                        <tr class="col">
-                            <th align="left" class="picto">
-                                <!--img alt="<?php echo _STATUS.' : '.$res_status['LABEL'];?>" src="<?php functions::xecho($res_status['IMG_SRC']);?>" title="<?php functions::xecho($res_status['LABEL']);?>" alt="<?php functions::xecho($res_status['LABEL']);?>"/-->
-                                <?php 
-                                $img_class = substr($res_status['IMG_SRC'], 0, 2);
-                                ?>
-                                <i class = "<?php echo $img_class; ?> <?php functions::xecho($res_status['IMG_SRC']);?> <?php echo $img_class; ?>-2x" alt = "<?php functions::xecho($res_status['LABEL']);?>" title = "<?php functions::xecho($res_status['LABEL']);?>"></i>
-                            </th>
-                            <td align="left" width="200px">
-                                <?php echo _STATUS;?>
-                            </td>
-                            <td>
-                                <input type="text" class="readonly" readonly="readonly" value="<?php functions::xecho($res_status['LABEL']);?>" size="40"  />
-                            </td>
-                        <!--</tr>
-                        <tr class="col">-->
-                            <th align="left" class="picto">
-                                <i class="fa fa-compass fa-2x" title="<?php echo _CHRONO_NUMBER;?>" ></i>
-                            </th>
-                            <td align="left" width="200px">
-                                <?php echo _CHRONO_NUMBER;?>
-                            </td>
-                            <td>
-                                <input type="text" class="readonly" readonly="readonly" value="<?php functions::xecho($chrono_number);?>" size="40" title="<?php functions::xecho($chrono_number);?>" alt="<?php functions::xecho($chrono_number);?>" />
-                            </td>
-                        </tr>
-                        <tr class="col">
-                            <th align="left" class="picto">
-                                <i class="fa fa-sitemap fa-2x" title="<?php echo _INITIATOR;?>" ></i>
-                            </th>
-                            <td align="left" width="200px">
-                                <?php echo _INITIATOR;?>
-                            </td>
-                            <td>
-                                <textarea rows="2" style="width: 200px; max-width: 200px;" class="readonly" readonly="readonly"><?php functions::xecho($entities);?></textarea>
-                            </td>
-                            <!-- typist -->
-                            <th align="left" class="picto">
-                                <i class="fa fa-user fa-2x"></i>
-                            </th>
-                            <td align="left" width="200px">
-                                <?php echo _TYPIST;?>
-                            </td>
-                            <td>
-                                <input type="text" class="readonly" readonly="readonly" value="<?php functions::xecho($typistLabel); 
-                                ?>" size="40" title="<?php functions::xecho($typistLabel);?>" alt="<?php functions::xecho($typistLabel);?>" />
-                            </td>
-                        </tr>
+                            //STATUS
+                            echo '<th align="left" class="picto">';
+                                $statusId = $res_status['ID'];
+                                $statusLabel = $res_status['LABEL'];
+                                $iconClass = substr($res_status['IMG_SRC'], 0, 2);
+                                $iconCode = $res_status['IMG_SRC'];
 
-                    </table>
-                    <?php
-                    $detailsExport .=  "</table>";
+                                echo "<i class='{$iconClass} {$iconCode} {$iconClass}-2x' alt='{$statusLabel}' title='$statusLabel'></i>";
+                            echo '</th>';
+                            echo '<td align="left" width="200px">';
+                                echo  _STATUS;
+                            echo '</td>';
+                            echo '<td>';
+                                echo "<input type='text' class='readonly' readonly='readonly' value='{$statusLabel}' title='{$statusId}' size='40'";
+                            echo '</td>';
+
+                            //CHRONO NUMBER
+                            echo '<th align="left" class="picto">';
+                                echo '<i class="fa fa-compass fa-2x" title="'._CHRONO_NUMBER.'" ></i>';
+                            echo '</th>';
+                            echo '<td align="left" width="200px">';
+                                echo _CHRONO_NUMBER;
+                            echo '</td>';
+                            echo '<td>';
+                                echo "<input type='text' class='readonly' readonly='readonly' value='{$chrono_number}' title='{$chrono_number}' alt='{$chrono_number}' size='40'";
+                            echo '</td>';
+                        echo '</tr>';
+
+                        //OTHER DATAS INITIATOR, TYPIST
+                        echo '<tr class="col">';
+
+                            //INITIATOR
+                            echo '<th align="left" class="picto">';
+                                echo '<i class="fa fa-sitemap fa-2x" title="'._INITIATOR.'"></i>';
+                            echo '</th>';
+                            echo '<td align="left" width="200px">';
+                                echo  _INITIATOR;
+                            echo '</td>';
+                            echo '<td>';
+                                echo "<textarea rows='2' style='width: 200px; max-width: 200px;' class='readonly' readonly='readonly'>{$entities}</textarea>";
+                            echo '</td>';
+
+                            //TYPIST
+                            echo '<th align="left" class="picto">';
+                                echo '<i class="fa fa-user fa-2x" title="'._TYPIST.'"></i>';
+                            echo '</th>';
+                            echo '<td align="left" width="200px">';
+                                echo  _TYPIST;
+                            echo '</td>';
+                            echo '<td>';
+                                echo "<input type='text' class='readonly' readonly='readonly' value='{$typistLabel}' title='{$typistLabel}' alt='{$typistLabel}' size='40'";
+                            echo '</td>';
+                        echo '</tr>';
+                    echo '</table>';
+                    //END GENERAL DATAS
                     ?>
-
+                    
                     <div id="opt_indexes">
                     <?php if (count($indexes) > 0 || ($core->is_module_loaded('tags') && ($core->test_service('tag_view', 'tags', false) == 1)) || ($core->is_module_loaded('thesaurus') && ($core->test_service('thesaurus_view', 'thesaurus', false) == 1)))
                     {
@@ -934,40 +847,25 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
 
                                 if ($i%2 != 1 || $i==0) // pair
                                 {
-                                    $detailsExport .= "<tr class='col'>";
-                                    ?>
-                                    <tr class="col">
-                                    <?php
+                                    echo '<tr class="col">';
                                 }
-                                $detailsExport .= "<th align='left' width='50px'>";
                                 ?>
                                 <th align="left" class="picto" >
                                     <?php
                                     if (isset($indexes[$key]['img']))
                                     {
-                                        //$detailsExport .= "<img alt='".$indexes[$key]['label']."' title='".$indexes[$key]['label']."' src='".$indexes[$key]['img']."'  />";
                                         ?>
                                         <i class="fa fa-<?php functions::xecho($indexes[$key]['img']);?> fa-2x" title="<?php functions::xecho($indexes[$key]['label']);?>" ></i>
                                         <?php
                                     }
-                                    $detailsExport .= "</th>";
                                     ?>
                                 </th>
-                                <?php
-                                $detailsExport .= "<td align='left' width='200px'>";
-                                ?>
                                 <td align="left" width="200px">
                                     <?php
-                                    $detailsExport .= $indexes[$key]['label'];
                                     functions::xecho($indexes[$key]['label']);?> :
                                 </td>
-                                <?php
-                                $detailsExport .=  "</td>";
-                                $detailsExport .=  "<td>";
-                                ?>
                                 <td>
                                     <?php
-                                    $detailsExport .=  $indexes[$key]['show_value'];
                                     if ($indexes[$key]['type_field'] == 'input')
                                     {
                                         ?>
@@ -989,23 +887,16 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                             }?>
                                         </select><?php
                                     }
-
-                                    $detailsExport .=  "</td>";
-                                    ?>
-                                </td>
-                                <?php
+                                echo '</td>';
+    
                                 if ($i%2 == 1 && $i!=0) // impair
                                 {
-                                    $detailsExport .=  "</td>";
-                                    ?>
-                                    </tr>
-                                    <?php
+                                    echo '</tr>';
                                 }
                                 else
                                 {
                                     if ($i+1 == count($indexes))
                                     {
-                                        $detailsExport .= "<td  colspan='2'>&nbsp;</td></tr>";
                                         echo '<td  colspan="2">&nbsp;</td></tr>';
                                     }
                                 }
@@ -1129,34 +1020,6 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     echo $technicalInfo_frame;
                 }
                 
-                //$core->execute_app_services($_SESSION['app_services'], 'details.php');
-                $detailsExport .= "<h2>"._NOTES."</h2>";
-                $detailsExport .= "<table cellpadding='4' cellspacing='0' border='1' width='100%'>";
-                $detailsExport .= "<tr height='130px'>";
-                $detailsExport .= "<td width='15%'>";
-                $detailsExport .= "<h3>"._NOTES_1."</h3>";
-                $detailsExport .= "</td>";
-                $detailsExport .= "<td width='85%'>";
-                $detailsExport .= "&nbsp;";
-                $detailsExport .= "</td>";
-                $detailsExport .= "</tr>";
-                $detailsExport .= "<tr height='130px'>";
-                $detailsExport .= "<td width='15%'>";
-                $detailsExport .= "<h3>"._NOTES_2."</h3>";
-                $detailsExport .= "</td>";
-                $detailsExport .= "<td width='85%'>";
-                $detailsExport .= "&nbsp;";
-                $detailsExport .= "</td>";
-                $detailsExport .= "</tr>";
-                $detailsExport .= "<tr height='130px'>";
-                $detailsExport .= "<td width='15%'>";
-                $detailsExport .= "<h3>"._NOTES_3."</h3>";
-                $detailsExport .= "</td>";
-                $detailsExport .= "<td width='85%'>";
-                $detailsExport .= "&nbsp;";
-                $detailsExport .= "</td>";
-                $detailsExport .= "</tr>";
-                $detailsExport .= "</table>";
                 if ($core->is_module_loaded('entities'))
                 {
                     require_once('modules/entities/class/class_manage_listdiff.php');
@@ -1169,7 +1032,6 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                             
                     $diffList_frame = '';
                     $category = $data['category_id']['value'];
-                    $detailsExport .= "<h2>"._DIFF_LIST."</h2>";
                    
                     $onlyCC = '';
                     if($core->test_service('add_copy_in_indexing_validation', 'entities', false) && $_SESSION['user']['UserId'] != 'superadmin'){
@@ -1284,8 +1146,6 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                     $attachments_frame .= '<dd id="other_attachments">';
                     $attachments_frame .= '<iframe src="" name="attachments_iframe" width="100%" align="left" scrolling="yes" frameborder="0" id="attachments_iframe" style="height:100%;"></iframe>';
                     $responses_frame .= '</dd>';
-                    $detailsExport .= "<h3>"._ATTACHED_DOC." : </h3>";
-                    $detailsExport .= "<br><br><br>";
                     
                     //LOAD TOOLBAR BADGE
                     $toolbarBagde_script = $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=attachments&page=load_toolbar_attachments&resId='.$s_id.'&collId='.$coll_id;
@@ -1478,7 +1338,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                 ?>
             </dl>
     <?php
-}
+//}
 ?> 
 </div>
 </div>
@@ -1498,8 +1358,5 @@ if($_SESSION['indexation'] == true && $category == 'outgoing'){
     }
     
 }
-$detailsExport .= "</body></html>";
-$_SESSION['doc_convert'] = array();
-$_SESSION['doc_convert']['details_result'] = $detailsExport;
 
 $_SESSION['info'] = '';

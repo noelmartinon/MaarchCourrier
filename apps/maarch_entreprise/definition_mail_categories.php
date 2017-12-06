@@ -122,7 +122,7 @@ $_ENV['categories']['incoming']['nature_id'] = array (
     'label' => _NATURE,
     'table' => 'coll_ext',
     'img' => 'envelope',
-    'modify' => true,
+    'modify' => false, //DO NOT MODIFY !
     'form_show' => 'select'
 );
 $_ENV['categories']['incoming']['reference_number'] = array (
@@ -183,9 +183,10 @@ $_ENV['categories']['incoming']['other_cases']['contact'] = array (
     'label' => _SHIPPER,
     'table' => 'coll_ext',
     'special' => 'exp_user_id,exp_contact_id',
-    'modify' => false
+    'modify' => true,
+    'img' => 'book',
+    'form_show' => 'textfield'
 );
-
 $_ENV['categories']['incoming']['confidentiality'] = array (
     'type_form' => 'radio',
     'type_field' => 'string',
@@ -252,7 +253,9 @@ $_ENV['categories']['ged_doc']['other_cases']['contact'] = array (
     'label' => _AUTHOR_DOC,
     'table' => 'coll_ext',
     'special' => 'exp_user_id,exp_contact_id',
-    'modify' => false
+    'modify' => true,
+    'img' => 'book',
+    'form_show' => 'textfield'
 );
 
 $_ENV['categories']['ged_doc']['confidentiality'] = array (
@@ -310,7 +313,7 @@ $_ENV['categories']['outgoing']['nature_id'] = array (
     'label' => _NATURE,
     'table' => 'coll_ext',
     'img' => 'envelope',
-    'modify' => true,
+    'modify' => false, //DO NOT MODIFY !
     'form_show' => 'select'
 );
 $_ENV['categories']['outgoing']['reference_number'] = array (
@@ -333,16 +336,6 @@ $_ENV['categories']['outgoing']['subject'] = array (
     'modify' => true,
     'form_show' => 'textarea'
 );
-/*$_ENV['categories']['outgoing']['other_cases']['chrono_number'] = array (
-    'type_form' => 'integer',
-    'type_field' => 'integer',
-    'mandatory' => true,
-    'label' => _CHRONO_NUMBER,
-    'table' => 'none',
-    'img' => 'compass',
-    'modify' => false,
-    'form_show' => 'textfield'
-);*/
 $_ENV['categories']['outgoing']['process_limit_date_use'] = array (
     'type_form' => 'radio',
     'mandatory' => true,
@@ -360,7 +353,7 @@ $_ENV['categories']['outgoing']['other_cases']['process_limit_date'] = array (
     'label' => _PROCESS_LIMIT_DATE,
     'table' => 'coll_ext',
     'img' => 'bell',
-    'modify' => false,
+    'modify' => true,
     'form_show' => 'date'
 );
 $_ENV['categories']['outgoing']['type_contact'] = array (
@@ -383,7 +376,9 @@ $_ENV['categories']['outgoing']['other_cases']['contact'] = array (
     'table' => 'coll_ext',
     'special' => 'dest_user_id,dest_contact_id,is_multicontacts',
     'img' => 'book',
-    'modify' => false
+    'modify' => true,
+    'img' => 'book',
+    'form_show' => 'textfield'
 );
 $_ENV['categories']['outgoing']['confidentiality'] = array (
     'type_form' => 'radio',
@@ -440,7 +435,7 @@ $_ENV['categories']['internal']['nature_id'] = array (
     'label' => _NATURE,
     'table' => 'coll_ext',
     'img' => 'envelope',
-    'modify' => true,
+    'modify' => false, //DO NOT MODIFY !
     'form_show' => 'select'
 );
 $_ENV['categories']['internal']['reference_number'] = array (
@@ -500,77 +495,9 @@ $_ENV['categories']['internal']['other_cases']['contact'] = array (
     'label' => _SHIPPER,
     'table' => 'coll_ext',
     'special' => 'exp_user_id,exp_contact_id',
-    'modify' => false
-);
-
-///////////////////////////// GED DOC ////////////////////////////////////////////////
-$_ENV['categories']['ged_doc'] = array ();
-$_ENV['categories']['ged_doc']['img_cat'] = '<i class="fa fa-arrow-right fa-2x"></i>';
-$_ENV['categories']['ged_doc']['other_cases'] = array ();
-$_ENV['categories']['ged_doc']['type_id'] = array (
-    'type_form' => 'integer',
-    'type_field' => 'integer',
-    'mandatory' => true,
-    'label' => _DOCTYPE,
-    'table' => 'res',
-    'img' => 'file',
     'modify' => true,
-    'form_show' => 'select'
-);
-$_ENV['categories']['ged_doc']['doc_date'] = array (
-    'type_form' => 'date',
-    'type_field' => 'date',
-    'mandatory' => true,
-    'label' => _DOC_DATE,
-    'table' => 'res',
-    'img' => 'calendar-o',
-    'modify' => true,
-    'form_show' => 'date'
-);
-
-$_ENV['categories']['ged_doc']['subject'] = array (
-    'type_form' => 'string',
-    'type_field' => 'string',
-    'mandatory' => true,
-    'label' => _SUBJECT,
-    'table' => 'res',
-    'img' => 'info',
-    'modify' => true,
-    'form_show' => 'textarea'
-);
-$_ENV['categories']['ged_doc']['type_contact'] = array (
-    'type_form' => 'radio',
-    'mandatory' => true,
-    'label' => _AUTHOR_TYPE,
-    'table' => 'none',
-    'values' => array (
-        'internal',
-        'external'
-    ),
-    'modify' => false
-);
-$_ENV['categories']['ged_doc']['other_cases']['author'] = array (
-    'type_form' => 'string',
-    'type_field' => 'string',
-    'mandatory' => true,
-    'label' => _AUTHOR,
-    'table' => 'coll_ext',
-    'special' => 'exp_user_id,exp_contact_id,author',
-    'modify' => false
-);
-
-$_ENV['categories']['ged_doc']['confidentiality'] = array (
-    'type_form' => 'radio',
-    'type_field' => 'string',
-    'mandatory' => false,
-    'label' => _CONFIDENTIALITY,
-    'table' => 'res',
-    'values' => array (
-        'Y',
-        'N'
-    ),
-    'img' => 'exclamation-triangle',
-    'modify' => true,
+    'img' => 'book',
+    'form_show' => 'textfield'
 );
 
 /////////////////////////////FOLDER DOCUMENT////////////////////////////////////////////////
@@ -791,7 +718,7 @@ if ($core->is_module_loaded('folder')) {
         'modify' => true,
         'form_show' => 'autocomplete'
     );
-    //Folder (internal)
+    //Folder (ged_doc)
     $_ENV['categories']['ged_doc']['other_cases']['folder'] = array (
         'type_form' => 'string',
         'type_field' => 'string',
@@ -852,22 +779,14 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
 
     // First we load the category_id
     if ($mode == 'full' || 'form') {
-        if ($params['img_category_id'] == true) {
-            $data['category_id'] = array (
-                'value' => $res->category_id,
-                'show_value' => $_SESSION['coll_categories']['letterbox_coll'][$res->category_id],
-                'label' => _CATEGORY,
-                'display' => 'textinput',
-                'img' => 'arrows'
-            );
-        } else {
-            $data['category_id'] = array (
-                'value' => $res->category_id,
-                'show_value' => $_SESSION['coll_categories']['letterbox_coll'][$res->category_id],
-                'label' => _CATEGORY,
-                'display' => 'textinput'
-            );
-        }
+        $data['category_id'] = array (
+            'value' => $res->category_id,
+            'show_value' => $_SESSION['coll_categories']['letterbox_coll'][$res->category_id],
+            'label' => _CATEGORY,
+            'display' => 'textinput',
+            'img' => 'arrows'
+        );
+        
     } else {
         $data['category_id'] = $res->category_id;
     }
@@ -880,22 +799,14 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
         if ($field <> 'process_limit_date_use' && $field <> 'other_cases' && $field <> 'type_contact' && $field <> 'img_cat') {
             $fields .= $field . ',';
             if (($mode == 'full' || $mode == 'form') && (!isset ($params['show_' . $field]) || $params['show_' . $field] == true)) {
-                if ($params['img_' . $field] == true) {
-                    $data[$field] = array (
-                        'value' => '',
-                        'show_value' => '',
-                        'label' => $_ENV['categories'][$cat_id][$field]['label'],
-                        'display' => 'textinput',
-                        'img' => $_ENV['categories'][$cat_id][$field]['img']
-                    );
-                } else {
-                    $data[$field] = array (
-                        'value' => '',
-                        'show_value' => '',
-                        'label' => $_ENV['categories'][$cat_id][$field]['label'],
-                        'display' => 'textinput'
-                    );
-                }
+               
+                $data[$field] = array (
+                    'value' => '',
+                    'show_value' => '',
+                    'label' => $_ENV['categories'][$cat_id][$field]['label'],
+                    'display' => 'textinput',
+                    'img' => $_ENV['categories'][$cat_id][$field]['img']
+                );
                 array_push($arr, $field);
                 if ($field == 'subject' || $field == 'destination') {
                     $data[$field]['display'] = 'textarea';
@@ -980,30 +891,21 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
     if (isset ($_ENV['categories'][$cat_id]['other_cases']['process_limit_date']) && count($_ENV['categories'][$cat_id]['other_cases']['process_limit_date']) > 0 && (!isset ($params['show_process_limit_date']) || $params['show_process_limit_date'] == true)) {
         $fields .= 'process_limit_date,';
         if ($mode == 'full' || 'form') {
-            if ($params['img_process_limit_date'] == true) {
-                $data['process_limit_date'] = array (
-                    'value' => '',
-                    'show_value' => '',
-                    'label' => $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['label'],
-                    'display' => 'textinput',
-                    'img' => $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['img'],
-                    'modify' => true,
-                    'form_show' => 'date',
-                    'field_type' => 'date'
-                );
-            } else {
-                $data['process_limit_date'] = array (
-                    'value' => '',
-                    'show_value' => '',
-                    'label' => $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['label'],
-                    'display' => 'textinput'
-                );
-            }
-            $data['process_limit_date']['readonly'] = false;
-            if (isset($_ENV['categories'][$cat_id]['process_limit_date']['modify'])
-                && $mode == 'form' && $_ENV['categories'][$cat_id]['process_limit_date']['modify']
+            $data['process_limit_date'] = array (
+                'value' => '',
+                'show_value' => '',
+                'label' => $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['label'],
+                'display' => 'textinput',
+                'img' => $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['img'],
+                'modify' => $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['modify'],
+                'form_show' => 'date',
+                'field_type' => 'date'
+            );
+
+            if (isset($_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['modify'])
+                && $mode == 'form' && $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['modify']
             ) {
-                $data['process_limit_date']['field_type'] = $_ENV['categories'][$cat_id]['process_limit_date']['form_show'];
+                $data['process_limit_date']['field_type'] = $_ENV['categories'][$cat_id]['other_cases']['process_limit_date']['form_show'];
                 $data['process_limit_date']['readonly'] = false;
             }
         } else {
@@ -1029,13 +931,12 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
                     'show_value' => '',
                     'label' => $_ENV['categories'][$cat_id]['other_cases']['contact']['label'],
                     'display' => 'textarea',
-					'img' => $_ENV['categories'][$cat_id]['other_cases']['contact']['img'],
+                    'img' => $_ENV['categories'][$cat_id]['other_cases']['contact']['img'],
+                    'field_type' => $_ENV['categories'][$cat_id]['other_cases']['contact']['form_show']
                 );
-                $data[$arr_tmp[$i]]['readonly'] = true;
-                if (isset($_ENV['categories'][$cat_id][$arr_tmp[$i]]['modify'])
-                    && $mode == 'form' && $_ENV['categories'][$cat_id][$arr_tmp[$i]]['modify']
+                if (isset($_ENV['categories'][$cat_id]['other_cases']['contact']['modify'])
+                    && $mode == 'form' && $_ENV['categories'][$cat_id]['other_cases']['contact']['modify']
                 ) {
-                    $data[$arr_tmp[$i]]['field_type'] = $_ENV['categories'][$cat_id][$arr_tmp[$i]]['form_show'];
                     $data[$arr_tmp[$i]]['readonly'] = false;
                 }
             }
@@ -1054,22 +955,14 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
 
         array_push($arr, 'folder');
         if ($mode == 'full' || $mode == 'form') {
-            if ($params['img_folder'] == true) {
-                $data['folder'] = array(
-                    'value' => '',
-                    'show_value' => '',
-                    'label' => $_ENV['categories'][$cat_id]['other_cases']['folder']['label'],
-                    'display' => 'textinput',
-                    'img' => $_ENV['categories'][$cat_id]['other_cases']['folder']['img']
-                );
-            } else {
-                $data['folder'] = array(
-                    'value' => '',
-                    'show_value' => '',
-                    'label' => $_ENV['categories'][$cat_id]['other_cases']['folder']['label'],
-                    'display' => 'textinput'
-                );
-            }
+            $data['folder'] = array(
+                'value' => '',
+                'show_value' => '',
+                'label' => $_ENV['categories'][$cat_id]['other_cases']['folder']['label'],
+                'display' => 'textinput',
+                'img' => $_ENV['categories'][$cat_id]['other_cases']['folder']['img']
+            );
+
             $data['folder']['readonly'] = true;
             if ($mode == 'form' && $_ENV['categories'][$cat_id]['other_cases']['folder']['modify']) {
                 $data['folder']['field_type'] = $_ENV['categories'][$cat_id]['other_cases']['folder']['form_show'];
@@ -1146,7 +1039,6 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
                     $postAddon = ' ><i class="fa fa-book fa-2x" title="' . _CONTACT_CARD . '"></i></a>';
 
                     $data[$arr[$i]]['addon'] = $preAddon.'loadTab(\''.$res_id.'\',\''.$coll_id.'\',\''._CONTACT_CARD.'\',\''.$pathScriptTab.'\',\'contactInfo\');return false;"'.$postAddon;
-                    $data[$arr[$i]]['addon_detail'] = $preAddon.'window.open(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&page=user_info&id=' . $line->{$arr[$i]} . '\', \'contact_info\', \'height=400, width=600,scrollbars=yes,resizable=yes\');"'.$postAddon;
                 } else {
                     unset ($data[$arr[$i]]);
                 }
@@ -1156,6 +1048,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
                     $stmt2 = $db->query("SELECT address_id FROM mlb_coll_ext WHERE res_id = ?", array($res_id));
                     $resAddress = $stmt2->fetchObject();
                     $addressId = $resAddress->address_id;
+                    $data[$arr[$i]]['address_value'] = $addressId;
                     $stmt2 = $db->query('SELECT is_corporate_person, is_private, contact_lastname, contact_firstname, society, society_short, contact_purpose_id, address_num, address_street, address_postal_code, address_town, lastname, firstname FROM view_contacts WHERE contact_id = ? and ca_id = ?', array($line->{$arr[$i]}, $addressId));
                     $res = $stmt2->fetchObject();
                     if ($res->is_corporate_person == 'Y') {
@@ -1188,9 +1081,47 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
                     $postAddon = ' ><i class="fa fa-book fa-2x" title="' . _CONTACT_CARD . '"></i></a>';
 
                     $data[$arr[$i]]['addon'] = $preAddon.'loadTab(\''.$res_id.'\',\''.$coll_id.'\',\''._CONTACT_CARD.'\',\''.$pathScriptTab.'\',\'contactInfo\');return false;"'.$postAddon;
-                    $data[$arr[$i]]['addon_detail'] = $preAddon.'window.open(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=my_contacts&page=info_contact_iframe&mode=view&popup&contactid=' . $line->{$arr[$i]} . '&addressid='.$addressId.'\', \'contact_info\', \'height=800, width=1000,scrollbars=yes,resizable=yes\');"'.$postAddon;
                 } else {
                     unset ($data[$arr[$i]]);
+                }
+            } else if ($arr[$i] == 'is_multicontacts') {
+                $stmt2 = $db->query('SELECT contact_id, address_id, mode FROM contacts_res WHERE res_id = ?', array($res_id));
+                
+                $data[$arr[$i]]['multi']['contact_id']=[];
+                $data[$arr[$i]]['multi']['address_id']=[];
+
+                while ($contact_res = $stmt2->fetchObject()) {
+                    $display_contact = '';
+                    $data[$arr[$i]][$contact_res->mode]['contact_id'][] = $contact_res->contact_id;
+                    $data[$arr[$i]][$contact_res->mode]['address_id'][] = $contact_res->address_id;
+                    
+                    $stmt3 = $db->query('SELECT is_corporate_person, is_private, contact_lastname, contact_firstname, society, society_short, contact_purpose_id, address_num, address_street, address_postal_code, address_town, lastname, firstname FROM view_contacts WHERE contact_id = ? and ca_id = ?', array($contact_res->contact_id, $contact_res->address_id));
+                    $res = $stmt3->fetchObject();
+                    if ($res->is_corporate_person == 'Y') {
+                        $display_contact = $res->society . ' ' ;
+                        if (!empty ($res->society_short)) {
+                            $display_contact .= '('.$res->society_short.') ';
+                        }
+                    } else {
+                        $display_contact = $res->contact_lastname . ' ' . $res->contact_firstname . ' ';
+                        if (!empty ($res->society)) {
+                            $display_contact .= '(' .$res->society . ') ';
+                        }                        
+                    }
+                    if ($res->is_private == 'Y') {
+                        $display_contact .= '('._CONFIDENTIAL_ADDRESS.')';
+                    } else {
+                        require_once("apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_contacts_v2.php");
+                        $contact = new contacts_v2();
+                        $display_contact .= '- ' . $contact->get_label_contact($res->contact_purpose_id, $_SESSION['tablename']['contact_purposes']).' : ';
+                        if (!empty($res->lastname) || !empty($res->firstname)) {
+                            $display_contact .= $res->lastname . ' ' . $res->firstname . ' ';
+                        }
+                        if (!empty($res->address_num) || !empty($res->address_street) || !empty($res->address_town) || !empty($res->address_postal_code)) {
+                            $display_contact .= ', '.$res->address_num .' ' . $res->address_street .' ' . $res->address_postal_code .' ' . strtoupper($res->address_town);
+                        }         
+                    }
+                    $data[$arr[$i]][$contact_res->mode]['arr_values'][] = $display_contact;
                 }
             }
             // Folder
@@ -1302,7 +1233,6 @@ function get_general_data($coll_id, $res_id, $mode, $params = array ()) {
         }
         
     }
-                        
     return $data;
 }
 
