@@ -56,6 +56,11 @@ class ContactController
             $data['isPrivate'] = 'Y';
         }
 
+        $contact = \ContactsModel::getByEmail(['email' => $data['email'], 'select' => ['contacts_v2.contact_id', 'contact_addresses.id']]);
+        if (!empty($contact['id'])) {
+            return $response->withJson(['contactId' => $contact['contact_id'], 'addressId' => $contact['id']]);
+        }
+
         $contactId = \ContactsModel::create($data);
 
         $data['contactId'] = $contactId;
