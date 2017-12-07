@@ -146,6 +146,7 @@ class CoreConfigModel
             if ($loadedXml) {
                 $ozwilloConfig['instanceUri']           = (string)$loadedXml->INSTANCE_URI;
                 $ozwilloConfig['instantiationSecret']   = (string)$loadedXml->INSTANTIATION_SECRET;
+                $ozwilloConfig['destructionSecret']     = (string)$loadedXml->DESTRUCTION_SECRET;
                 $ozwilloConfig['uri']                   = (string)$loadedXml->URI;
                 $ozwilloConfig['clientId']              = (string)$loadedXml->CLIENT_ID;
                 $ozwilloConfig['clientSecret']          = (string)$loadedXml->CLIENT_SECRET;
