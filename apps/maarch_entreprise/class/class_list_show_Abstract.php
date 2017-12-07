@@ -1393,7 +1393,7 @@ class list_show_Abstract extends functions
                                         while($res = $stmt->fetchObject()){
                                             $item_mode = null;
                                             $item_mode = $res->item_mode;
-                                            $entity_label[] = $res->entity_label;
+                                            $entity_label[] = addslashes($res->entity_label);
                                         }
                                         if($item_mode == 'dest'){
                                            ?>
