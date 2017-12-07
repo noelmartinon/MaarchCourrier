@@ -266,3 +266,5 @@ WITH (
 );
 
 UPDATE parameters SET param_value_int = '1711', param_value_string = '17.11.0' WHERE id = 'database_version';
+
+ALTER TABLE notif_event_stack ALTER COLUMN record_id TYPE character varying(128);
