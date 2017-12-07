@@ -624,16 +624,16 @@ class StoreController
                 $aArgs['data'][$key]['value'] = ChronoModel::getChrono(['id' => $categoryId, 'entityId' => $document['destination'], 'typeId' => $document['type_id']]);
             } elseif ($value['column'] == 'exp_contact_id' && !empty($value['value']) && !is_numeric($value['value'])) {
                 $mail = explode('<', str_replace('>', '', $value['value']));
-                $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_id']]);
-                if (!empty($contact[0]['contact_id'])) {
+                $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contacts_v2.contact_id']]);
+                if (!empty($contact['contact_id'])) {
                     $aArgs['data'][$key]['value'] = $contact[0]['contact_id'];
                 } else {
                     $aArgs['data'][$key]['value'] = 0;
                 }
             } elseif ($value['column'] == 'address_id' && !empty($value['value']) && !is_numeric($value['value'])) {
                 $mail = explode('<', str_replace('>', '', $value['value']));
-                $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['ca_id']]);
-                if (!empty($contact[0]['ca_id'])) {
+                $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_addresses.id']]);
+                if (!empty($contact['id'])) {
                     $aArgs['data'][$key]['value'] = $contact[0]['ca_id'];
                 } else {
                     $aArgs['data'][$key]['value'] = 0;

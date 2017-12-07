@@ -292,7 +292,7 @@ class ResController
         return $response->withJson($datas);
     }
 
-    public function updateStatus(RequestInterface $request, ResponseInterface $response, $aArgs)
+    public function updateStatus(RequestInterface $request, ResponseInterface $response)
     {
         $data = $request->getParams();
 
@@ -306,22 +306,23 @@ class ResController
             $data['historyMessage'] = _UPDATE_STATUS;
         }
 
-        $check = Validator::stringType()->notEmpty()->validate($data['status']);
+        $check = Validator::intVal()->notEmpty()->validate($data['resId']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['status']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['historyMessage']);
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $document = ResModel::getById(['resId' => $aArgs['resId']]);
+        $document = ResModel::getById(['resId' => $data['resId']]);
         if (empty($document)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document not found']);
         }
 
-        ResModel::updateStatus(['resId' => $aArgs['resId'], 'status' => $data['status']]);
+        ResModel::updateStatus(['resId' => $data['resId'], 'status' => $data['status']]);
 
         HistoryController::add([
             'tableName' => 'res_letterbox',
-            'recordId'  => $aArgs['resId'],
+            'recordId'  => $data['resId'],
             'eventType' => 'UP',
             'info'      => $data['historyMessage'],
             'moduleId'  => 'apps',

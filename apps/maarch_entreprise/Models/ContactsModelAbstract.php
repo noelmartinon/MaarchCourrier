@@ -151,20 +151,25 @@ class ContactsModelAbstract extends Apps_Table_Service
         return $labelledContact;
     }
 
-    public static function getByEmail(array $aArgs = [])
+    public static function getByEmail(array $aArgs)
     {
-        static::checkRequired($aArgs, ['email']);
-        static::checkString($aArgs, ['email']);
+        \Core\Models\ValidatorModel::notEmpty($aArgs, ['email']);
+        \Core\Models\ValidatorModel::stringType($aArgs, ['email']);
+        \Core\Models\ValidatorModel::arrayType($aArgs, ['select']);
 
-        $aReturn = static::select([
+        $aContacts = \Core\Models\DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['view_contacts'],
-            'where'     => ['email = ? and enabled = ?'],
+            'table'     => ['contact_addresses, contacts_v2'],
+            'where'     => ['email = ? and enabled = ?', 'contact_addresses.contact_id = contacts_v2.contact_id'],
             'data'      => [$aArgs['email'], 'Y'],
-            'order_by'     => ['creation_date'],
+            'order_by'  => ['creation_date'],
         ]);
 
-        return $aReturn;
+        if (empty($aContacts[0])) {
+            return [];
+        }
+
+        return $aContacts[0];
     }
 
     public static function purgeContact($aArgs)
