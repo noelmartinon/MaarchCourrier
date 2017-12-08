@@ -22,6 +22,7 @@ class CurlModel
         ValidatorModel::notEmpty($aArgs, ['curlCallId']);
         ValidatorModel::stringType($aArgs, ['curlCallId']);
         ValidatorModel::arrayType($aArgs, ['bodyData']);
+        ValidatorModel::boolType($aArgs, ['noAuth']);
 
         $curlConfig = CurlModel::getConfigByCallId(['curlCallId' => $aArgs['curlCallId']]);
         if (empty($curlConfig)) {
@@ -36,6 +37,9 @@ class CurlModel
             ],
             CURLOPT_RETURNTRANSFER => true,
         ];
+        if (empty($aArgs['noAuth'])) {
+            $opts[CURLOPT_HTTPHEADER][] = 'Authorization: Basic ' . base64_encode($curlConfig['user']. ':' .$curlConfig['password']);
+        }
 
         if ($curlConfig['method'] == 'POST' || $curlConfig['method'] == 'PUT') {
             if (!empty($curlConfig['data'])) {
@@ -76,6 +80,9 @@ class CurlModel
         $curlConfig = [];
         if (file_exists($path)) {
             $loadedXml = simplexml_load_file($path);
+
+            $curlConfig['user']     = (string)$loadedXml->user;
+            $curlConfig['password'] = (string)$loadedXml->password;
             foreach ($loadedXml->call as $call) {
                 if ((string)$call->id == $aArgs['curlCallId']) {
                     $curlConfig['url']      = (string)$call->url;
