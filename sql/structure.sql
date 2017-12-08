@@ -447,6 +447,7 @@ CREATE TABLE res_attachments
   tnl_path character varying(255) DEFAULT NULL::character varying,
   tnl_filename character varying(255) DEFAULT NULL::character varying,
   in_signature_book boolean DEFAULT FALSE,
+  signatory_user_serial_id int,
   CONSTRAINT res_attachments_pkey PRIMARY KEY (res_id)
 )
 WITH (OIDS=FALSE);
@@ -648,6 +649,7 @@ CREATE TABLE entities
   ldap_id character varying(255),
   archival_agency character varying(255),
   archival_agreement character varying(255),
+  entity_full_name text,
   CONSTRAINT entities_pkey PRIMARY KEY (entity_id)
 )
 WITH (OIDS=FALSE);
@@ -674,6 +676,8 @@ CREATE TABLE listinstance
   added_by_entity character varying(50) NOT NULL,
   visible character varying(1) NOT NULL DEFAULT 'Y'::bpchar,
   viewed bigint,
+  signatory boolean default false,
+  requested_signature boolean default false,
   difflist_type character varying(50),
   process_date timestamp without time zone,
   process_comment character varying(255),
@@ -2441,6 +2445,18 @@ CREATE TABLE user_baskets_secondary
   CONSTRAINT user_baskets_secondary_pkey PRIMARY KEY (system_id)
 );
 
+DROP TABLE IF EXISTS users_baskets;
+CREATE TABLE users_baskets
+(
+  id serial NOT NULL,
+  user_serial_id integer NOT NULL,
+  basket_id character varying(32) NOT NULL,
+  group_id character varying(32) NOT NULL,
+  color character varying(16),
+  CONSTRAINT users_baskets_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE);
+
 DROP SEQUENCE IF EXISTS listinstance_history_id_seq;
 CREATE SEQUENCE listinstance_history_id_seq
 INCREMENT 1
@@ -2979,6 +2995,7 @@ CREATE TABLE res_version_attachments
   res_id_master bigint,
   attachment_id_master bigint,
   in_signature_book boolean DEFAULT FALSE,
+  signatory_user_serial_id int,
   CONSTRAINT res_version_attachments_pkey PRIMARY KEY (res_id)
 )
 WITH (
@@ -2994,7 +3011,7 @@ CREATE VIEW res_view_attachments AS
     filename, offset_doc, logical_adr, fingerprint, filesize, is_paper, page_count,
     scan_date, scan_user, scan_location, scan_wkstation, scan_batch, burn_batch, scan_postmark,
     envelop_id, status, destination, approver, validation_date, effective_date, work_batch, origin, is_ingoing, priority, initiator, dest_user,
-    coll_id, dest_contact_id, dest_address_id, updated_by, is_multicontacts, is_multi_docservers, res_id_master, attachment_type, attachment_id_master, in_signature_book
+    coll_id, dest_contact_id, dest_address_id, updated_by, is_multicontacts, is_multi_docservers, res_id_master, attachment_type, attachment_id_master, in_signature_book, signatory_user_serial_id
   FROM res_version_attachments
   UNION ALL
   SELECT res_id, '0' as res_id_version, title, subject, description, publisher, contributor, type_id, format, typist,
@@ -3003,7 +3020,7 @@ CREATE VIEW res_view_attachments AS
     filename, offset_doc, logical_adr, fingerprint, filesize, is_paper, page_count,
     scan_date, scan_user, scan_location, scan_wkstation, scan_batch, burn_batch, scan_postmark,
     envelop_id, status, destination, approver, validation_date, effective_date, work_batch, origin, is_ingoing, priority, initiator, dest_user,
-    coll_id, dest_contact_id, dest_address_id, updated_by, is_multicontacts, is_multi_docservers, res_id_master, attachment_type, '0', in_signature_book
+    coll_id, dest_contact_id, dest_address_id, updated_by, is_multicontacts, is_multi_docservers, res_id_master, attachment_type, '0', in_signature_book, signatory_user_serial_id
   FROM res_attachments;
 
 -- thesaurus
