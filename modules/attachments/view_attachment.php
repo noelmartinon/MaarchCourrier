@@ -187,6 +187,10 @@ if (! empty($_SESSION['error'])) {
                     }
                     //WATERMARK
                     if (strtoupper($format) == 'PDF') {
+                        if($_REQUEST['watermark_outgoing'] == 'true'){
+                            $_SESSION['modules_loaded']['attachments']['watermark']['enabled'] = 'true';
+                        }
+                        
                         if ($_SESSION['modules_loaded']['attachments']['watermark']['enabled'] == 'true') {
                             $table = 'res_attachments';
                             $watermarkForAttachments = true;
