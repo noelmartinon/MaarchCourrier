@@ -444,14 +444,15 @@ function validate_notif_submit() {
     } else {
         if ($mode == 'add') {
             $_SESSION['info'] = _NOTIF_ADDED;
-
-            if (PHP_OS == "Linux") {
-                $ScheduleNotifications = new ScheduleNotifications();
-                $ScheduleNotifications->createScriptNotification($control['value'], $notifObj->notification_id);
-            }
         } else {
             $_SESSION['info'] = _NOTIF_MODIFIED;
         }
+
+        if (PHP_OS == "Linux") {
+            $ScheduleNotifications = new ScheduleNotifications();
+            $ScheduleNotifications->createScriptNotification($control['value'], $notifObj->notification_id);
+        }
+        
         unset($_SESSION['m_admin']);
         header(
             'location: ' . $_SESSION['config']['businessappurl']
