@@ -70,13 +70,25 @@ if (empty($_SESSION['user'])) {
 
 //login management
 if (empty($_SESSION['user'])) {
-    require_once('apps/maarch_entreprise/class/class_login.php');
-    $loginObj = new login();
-    $loginMethods = $loginObj->build_login_method();
-    require_once('core/services/Session.php');
-    $oSessionService = new \Core_Session_Service();
+    if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
+        $_SESSION['error'] = '';
+        $security = new security();
+        $pass = $security->getPasswordHash($_SERVER['PHP_AUTH_PW']);
+        $res  = $security->login($_SERVER['PHP_AUTH_USER'], $pass);
 
-    $loginObj->execute_login_script($loginMethods, true);
+        $_SESSION['user'] = $res['user'];
+        if (!empty($res['error'])) {
+            $_SESSION['error'] = $res['error'];
+        }
+    } else {
+        require_once('apps/maarch_entreprise/class/class_login.php');
+        $loginObj = new login();
+        $loginMethods = $loginObj->build_login_method();
+        require_once('core/services/Session.php');
+        $oSessionService = new \Core_Session_Service();
+
+        $loginObj->execute_login_script($loginMethods, true);
+    }
 }
 
 if ($_SESSION['error']) {

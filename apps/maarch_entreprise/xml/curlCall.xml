@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>
+    <user>super</user>
+    <password>maaarch</password>
     <call>
         <id>sendFile</id>
-        <url></url>
+        <url>http://127.0.0.1/maarch_trunk/rest/user/profile</url>
         <method>POST</method>
     </call>
     <call>
