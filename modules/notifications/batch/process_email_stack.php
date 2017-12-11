@@ -120,6 +120,6 @@ Bt_logInDataBase(
 );
 Bt_updateWorkBatch();
 
-//unlink($GLOBALS['lckFile']);
+unlink($GLOBALS['lckFile']);
 exit($GLOBALS['exitCode']);
 ?>
