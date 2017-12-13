@@ -16,7 +16,7 @@
 * along with htmlMimeMail; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 * 
-* © Copyright 2004 Richard Heyes
+* ï¿½ Copyright 2004 Richard Heyes
 */
 
 require_once(dirname(__FILE__) . '/mimePart.php');
@@ -710,16 +710,16 @@ class htmlMimeMail
             case 'mail':
                 $subject = '';
                 if (!empty($this->headers['Subject'])) {
-                    $subject = $this->_encodeHeader($this->headers['Subject'], $this->build_params['head_charset']);
+                    $subject = $this->headers['Subject'];                    
                     unset($this->headers['Subject']);
                 }
 
                 // Get flat representation of headers
                 foreach ($this->headers as $name => $value) {
-                    $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
+                    $headers[] = $headers[] = $name . ': ' . $value;                    
                 }
 
-                $to = $this->_encodeHeader(implode(', ', $recipients), $this->build_params['head_charset']);
+                $to = implode(', ', $recipients);                
 
                 if (!empty($this->return_path)) {
                     $result = mail($to, $subject, $this->output, implode(CRLF, $headers), '-f' . $this->return_path);
@@ -739,11 +739,11 @@ class htmlMimeMail
             case 'sendmail':
 	                // Get flat representation of headers
 	                foreach ($this->headers as $name => $value) {
-	                    $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
+	                    $headers[] = $name . ': ' . $value;
 	                }
 	 
 	                // Encode To:
-	                $headers[] = 'To: ' . $this->_encodeHeader(implode(', ', $recipients), $this->build_params['head_charset']);
+	                $headers[] = 'To: ' . implode(', ', $recipients);
 	 
 	                // Get return path arg for sendmail command if necessary
 	                $returnPath = '';
@@ -794,16 +794,16 @@ class htmlMimeMail
                     if ($name == 'Bcc') {
                         continue;
                     }
-                    //ajout d'une condition pour subject, car _encodeHeader ne prend pas les caractères spéciaux avec php7 en revanche fonctionne très bien avec php5.6
+                    //ajout d'une condition pour subject, car _encodeHeader ne prend pas les caractï¿½res spï¿½ciaux avec php7 en revanche fonctionne trï¿½s bien avec php5.6
                     if ($name == 'Subject'){
                         $headers[] = $name . ': ' . $value;
                     }else{
-                        $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
+                        $headers[] = $name . ': ' . $value;
                     }
                     
                 }
                 // Add To header based on $recipients argument
-                $headers[] = 'To: ' . $this->_encodeHeader(implode(', ', $recipients), $this->build_params['head_charset']);
+                $headers[] = 'To: ' . implode(', ', $recipients);
                 
                 // Add headers to send_params
                 $send_params['headers']    = $headers;
