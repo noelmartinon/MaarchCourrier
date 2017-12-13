@@ -50,7 +50,9 @@ if (!$Class_Install->createPath($path)) {
     exit;
 }
 
-if (!$Class_Install->copy_dir($_SESSION['config']['corepath'], $path . DIRECTORY_SEPARATOR)) {
+$cmd = "cp -R ".$_SESSION['config']['corepath']." ".$path . DIRECTORY_SEPARATOR;
+
+if (!exec($cmd)) {
     $return['status'] = 0;
     $return['text'] = _CAN_NOT_COPY_TO . ':' . $path;
 
