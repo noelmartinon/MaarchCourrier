@@ -307,7 +307,7 @@ $list->admin_list($tab, $nb, '&nbsp;', 'id','history','history','id', true, '', 
             </td>
             <td style="width:33%;">
                 <div> <label><?php echo _USER;?> :</label>
-                    <input type="text" name="user" id="user" value="<?php if (isset($history_user)){ functions::xecho($history_user);}?>"  /><div id="show_user" class="autocomplete"></div>
+                <input type="text" name="user" id="user" value="<?php if (isset($history_user)){ functions::xecho($history_user);}?>"  /><div id="show_user" class="autocomplete" style="position: relative; left:227px; top: 1px; width: 199.667px;"></div>
                 </div>
             </td>
         </tr>
