@@ -175,3 +175,15 @@ $app->post('/contacts', \Core\Controllers\ContactController::class . ':create');
 $app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateController::class . ':duplicate');
 
 $app->run();
+
+if ($_SESSION['user']['UserId'] == 'restUser') {
+    $name = $_SESSION['sessionName'];
+
+    setcookie ($name, "", 1);
+    setcookie ($name, false);
+    unset($_COOKIE[$name]);
+
+    session_unset();
+    session_destroy();
+    unset($_SESSION['sessionName']);
+}
