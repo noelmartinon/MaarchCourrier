@@ -62,7 +62,7 @@
                 $nb_attachment = $stmt->rowCount();
         }
 
-        if ($category_id == "incoming" || ($category_id == "outgoing" && $nb_attachment > 0)) {
+        if ($category_id == "incoming" || ($category_id == "outgoing" && $nb_attachment > 0) || $category_id == "internal") {
             if (isset($_SESSION['save_chrono_number']) && $_SESSION['save_chrono_number'] <> "") {
                 echo "{status: 1, chronoNB: '".$_SESSION['save_chrono_number']."'}";
             } else {
