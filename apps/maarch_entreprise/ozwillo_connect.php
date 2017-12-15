@@ -13,17 +13,27 @@ if (!empty($_SESSION['ozwillo']['code']) && !empty($_SESSION['ozwillo']['state']
 $oidc = new OpenIDConnectClient($ozwilloConfig['uri'], $ozwilloConfig['clientId'], $ozwilloConfig['clientSecret']);
 $oidc->addScope('openid');
 $oidc->addScope('email');
+$oidc->addScope('profile');
 $oidc->authenticate();
 
-$userId = $oidc->requestUserInfo('email');
-$user = \Core\Models\UserModel::getById(['userId' => $userId]);
-
-if (empty($user)) {
-    echo '<br>' . _USER_NOT_EXIST;
+$idToken = $oidc->getIdTokenPayload();
+if (empty($idToken->app_user) && empty($idToken->app_admin)) {
+    echo '<br>Utilisateur non autorisé';
     exit;
 }
 
-$_SESSION['ozwillo']['userId'] = $userId;
+$profile = $oidc->requestUserInfo();
+$user = \Core\Models\UserModel::getById(['userId' => $idToken->sub]);
+
+if (empty($user)) {
+    $firstname = empty($profile->given_name) ? 'utilisateur' : $profile->given_name;
+    $lastname = empty($profile->family_name) ? 'utilisateur' : $profile->family_name;
+    \Core\Models\UserModel::create(['user' => ['userId' => $idToken->sub, 'firstname' => $firstname, 'lastname' => $lastname]]);
+    $user = \Core\Models\UserModel::getById(['userId' => $idToken->sub]);
+    \Core\Models\UserModel::addGroup(['id' => $user['id'], 'groupId' => 'AGENT']);
+}
+
+$_SESSION['ozwillo']['userId'] = $idToken->sub;
 $_SESSION['ozwillo']['accessToken'] = $oidc->getAccessToken();
 unset($_REQUEST['code']);
 unset($_REQUEST['state']);
