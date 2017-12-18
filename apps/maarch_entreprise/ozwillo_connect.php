@@ -28,9 +28,9 @@ $user = \Core\Models\UserModel::getById(['userId' => $idToken->sub]);
 if (empty($user)) {
     $firstname = empty($profile->given_name) ? 'utilisateur' : $profile->given_name;
     $lastname = empty($profile->family_name) ? 'utilisateur' : $profile->family_name;
-    \Core\Models\UserModel::create(['user' => ['userId' => $idToken->sub, 'firstname' => $firstname, 'lastname' => $lastname]]);
-    $user = \Core\Models\UserModel::getById(['userId' => $idToken->sub]);
-    \Core\Models\UserModel::addGroup(['id' => $user['id'], 'groupId' => 'AGENT']);
+    \Core\Models\UserModel::create(['user' => ['userId' => $idToken->sub, 'firstname' => $firstname, 'lastname' => $lastname, 'changePassword' => 'N']]);
+    \Core\Models\UserModel::addGroup(['userId' => $idToken->sub, 'groupId' => 'AGENT']);
+    \Core\Models\UserModel::addEntity(['userId' => $idToken->sub, 'entityId' => 'VILLE', 'primaryEntity' => 'Y']);
 }
 
 $_SESSION['ozwillo']['userId'] = $idToken->sub;
@@ -38,20 +38,6 @@ $_SESSION['ozwillo']['accessToken'] = $oidc->getAccessToken();
 unset($_REQUEST['code']);
 unset($_REQUEST['state']);
 
+header("location: log.php");
 $trace = new history();
-if ($restMode) {
-    $_SESSION['error'] = '';
-    $security = new security();
-    $pass = $security->getPasswordHash('maarch');
-    $res  = $security->login($userId, $pass);
-
-    $_SESSION['user'] = $res['user'];
-    if (!empty($res['error'])) {
-        $_SESSION['error'] = $res['error'];
-    }
-
-    $trace->add('users', $userId, 'LOGIN', 'userlogin', 'Ozwillo Connection', $_SESSION['config']['databasetype'], 'ADMIN', false);
-} else {
-    header("location: log.php");
-    $trace->add('users', $userId, 'LOGIN', 'userlogin', 'Ozwillo Connection', $_SESSION['config']['databasetype'], 'ADMIN', false);
-}
+$trace->add('users', $idToken->sub, 'LOGIN', 'userlogin', 'Ozwillo Connection', $_SESSION['config']['databasetype'], 'ADMIN', false);

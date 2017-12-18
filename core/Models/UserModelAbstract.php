@@ -64,7 +64,7 @@ class UserModelAbstract extends \Apps_Table_Service
                 'thumbprint'        => $aArgs['user']['thumbprint'],
                 'enabled'           => 'Y',
                 'status'            => 'OK',
-                'change_password'   => $aArgs['user']['changePassword'],
+                'change_password'   => empty($aArgs['user']['changePassword']) ? 'Y' : $aArgs['user']['changePassword'],
                 'loginmode'         => 'standard',
                 'password'          => SecurityModel::getPasswordHash('maarch')
             ]
@@ -170,18 +170,34 @@ class UserModelAbstract extends \Apps_Table_Service
 
     public static function addGroup(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['id', 'groupId']);
-        ValidatorModel::intVal($aArgs, ['id']);
+        ValidatorModel::notEmpty($aArgs, ['userId', 'groupId']);
         ValidatorModel::stringType($aArgs, ['groupId', 'role']);
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         DatabaseModel::insert([
             'table'         => 'usergroup_content',
             'columnsValues' => [
-                'user_id'       => $user['user_id'],
+                'user_id'       => $aArgs['userId'],
                 'group_id'      => $aArgs['groupId'],
                 'role'          => $aArgs['role'],
                 'primary_group' => 'Y'
+            ]
+        ]);
+
+        return true;
+    }
+
+    public static function addEntity(array $aArgs = [])
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId', 'entityId', 'primaryEntity']);
+        ValidatorModel::stringType($aArgs, ['entityId', 'role', 'primaryEntity']);
+
+        DatabaseModel::insert([
+            'table'         => 'users_entities',
+            'columnsValues' => [
+                'user_id'           => $aArgs['userId'],
+                'entity_id'         => $aArgs['entityId'],
+                'user_role'         => $aArgs['role'],
+                'primary_entity'    => $aArgs['primaryEntity']
             ]
         ]);
 
