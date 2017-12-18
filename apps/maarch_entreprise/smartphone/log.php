@@ -125,10 +125,9 @@ if (count($_SESSION['config']) <= 0) {
             
             $login = end(explode('\\', $login));
 
-            $query = 'select * from ' . USERS_TABLE
-                       . " where user_id like ? ";
-
-            $stmt = $db->query($query,array($this->$login));
+            $query = "SELECT * FROM users WHERE user_id ILIKE ?";
+            $stmt = $db->query($query,array($login));
+            
             if ($stmt->fetchObject()) {
                 $_SESSION['error'] = '';
                 $pass = $sec->getPasswordHash($password);
