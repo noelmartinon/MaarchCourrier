@@ -69,7 +69,8 @@ var SignatureBookComponent = (function () {
         window['angularSignatureBookComponent'] = {
             componentAfterAttach: function (value) { return _this.processAfterAttach(value); },
             componentAfterAction: function () { return _this.processAfterAction(); },
-            componentAfterNotes: function () { return _this.processAfterNotes(); }
+            componentAfterNotes: function () { return _this.processAfterNotes(); },
+            componentAfterLinks: function () { return _this.processAfterLinks(); }
         };
     }
     SignatureBookComponent.prototype.prepareSignatureBook = function () {
@@ -150,6 +151,10 @@ var SignatureBookComponent = (function () {
     SignatureBookComponent.prototype.processAfterNotes = function () {
         var _this = this;
         this.zone.run(function () { return _this.refreshNotes(); });
+    };
+    SignatureBookComponent.prototype.processAfterLinks = function () {
+        var _this = this;
+        this.zone.run(function () { return _this.refreshLinks(); });
     };
     SignatureBookComponent.prototype.processAfterAction = function () {
         var _this = this;
@@ -351,6 +356,14 @@ var SignatureBookComponent = (function () {
             .map(function (res) { return res.json(); })
             .subscribe(function (data) {
             _this.signatureBook.nbNotes = data;
+        });
+    };
+    SignatureBookComponent.prototype.refreshLinks = function () {
+        var _this = this;
+        this.http.get(this.coreUrl + 'rest/links/resId/' + this.resId)
+            .map(function (res) { return res.json(); })
+            .subscribe(function (data) {
+            _this.signatureBook.nbLinks = data.length;
         });
     };
     SignatureBookComponent.prototype.signFile = function (attachment, signature) {

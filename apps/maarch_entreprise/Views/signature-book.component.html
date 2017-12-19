@@ -19,7 +19,9 @@
                 <i class="fa fa-history fa-2x"></i>
             </div>
             <div title="{{signatureBook.lang.links}}" class="item" [ngClass]="{'activeTabSignatureBook': headerTab == 5}" (click)="changeSignatureBookLeftContent(5)">
-                <i class="fa fa-link fa-2x"></i>
+                <i class="fa fa-link fa-2x">
+                    <sup *ngIf="signatureBook.nbLinks > 0" class="nbRes" style="font-size: 12px;font-weight: bold;">{{signatureBook.nbLinks}}</sup>
+                </i>
             </div>
         </div>
         <div id="labelSignatureBook" title="{{signatureBook.currentAction.actionLabel}}" ><div>{{signatureBook.currentAction.actionLabel}}</div></div>

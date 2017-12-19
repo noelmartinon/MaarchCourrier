@@ -2432,6 +2432,10 @@ function addLinks(path_manage_script, child, parent, action, tableHist) {
 
                 eval("response = "+answer.responseText);
                 if(response.status == 0 || response.status == 1) {
+                    if (typeof window.parent['angularSignatureBookComponent'] != "undefined") {
+                        window.parent.angularSignatureBookComponent.componentAfterLinks();
+                    }
+
                     if(response.status == 0) {
                         $(divName).innerHTML = response.links;
                         

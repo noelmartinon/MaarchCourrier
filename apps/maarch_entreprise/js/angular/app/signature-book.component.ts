@@ -71,7 +71,8 @@ export class SignatureBookComponent implements OnInit {
         window['angularSignatureBookComponent'] = {
             componentAfterAttach: (value: string) => this.processAfterAttach(value),
             componentAfterAction: () => this.processAfterAction(),
-            componentAfterNotes: () => this.processAfterNotes()
+            componentAfterNotes: () => this.processAfterNotes(),
+            componentAfterLinks: () => this.processAfterLinks()
         };
     }
 
@@ -161,6 +162,10 @@ export class SignatureBookComponent implements OnInit {
 
     processAfterNotes() {
         this.zone.run(() => this.refreshNotes());
+    }
+
+    processAfterLinks() {
+        this.zone.run(() => this.refreshLinks());
     }
 
     processAfterAction() {
@@ -359,6 +364,14 @@ export class SignatureBookComponent implements OnInit {
             .map(res => res.json())
             .subscribe((data) => {
                 this.signatureBook.nbNotes = data;
+            });
+    }
+
+    refreshLinks() {
+        this.http.get(this.coreUrl + 'rest/links/resId/' + this.resId)
+            .map(res => res.json())
+            .subscribe((data) => {
+                this.signatureBook.nbLinks = data.length;
             });
     }
 

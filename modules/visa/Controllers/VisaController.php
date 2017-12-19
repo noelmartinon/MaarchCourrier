@@ -14,6 +14,7 @@
 namespace Visa\Controllers;
 
 use Attachments\Models\AttachmentsModel;
+use Core\Models\LinkModel;
 use Core\Models\ListinstanceModel;
 use Core\Models\ServiceModel;
 use Core\Models\UserModel;
@@ -77,6 +78,7 @@ class VisaController
         $datas['currentAction'] = $currentAction;
         $datas['resList']       = [];
         $datas['nbNotes']       = \NotesModel::countForCurrentUserByResId(['resId' => $resId]);
+        $datas['nbLinks']       = count(LinkModel::getByResId(['resId' => $resId]));
         $datas['signatures']    = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
         $datas['consigne']      = UserModel::getCurrentConsigneById(['resId' => $resId]);
         $datas['hasWorkflow']   = \VisaModel::hasVisaWorkflowByResId(['resId' => $resId]);

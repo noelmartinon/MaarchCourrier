@@ -174,6 +174,9 @@ $app->post('/contacts', \Core\Controllers\ContactController::class . ':create');
 //Templates
 $app->post('/templates/{id}/duplicate', \Templates\Controllers\TemplateController::class . ':duplicate');
 
+//Links
+$app->get('/links/resId/{resId}', \Core\Controllers\LinkController::class . ':getByResId');
+
 $app->run();
 
 if ($_SESSION['user']['UserId'] == 'restUser') {
