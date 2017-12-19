@@ -46,6 +46,33 @@ class UserModelAbstract extends \Apps_Table_Service
         return $aReturn[0];
     }
 
+    public static function create(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['user']);
+        ValidatorModel::notEmpty($aArgs['user'], ['userId', 'firstname', 'lastname']);
+        ValidatorModel::stringType($aArgs['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'thumbprint', 'phone', 'changePassword']);
+
+        DatabaseModel::insert([
+            'table'         => 'users',
+            'columnsValues' => [
+                'user_id'           => $aArgs['user']['userId'],
+                'firstname'         => $aArgs['user']['firstname'],
+                'lastname'          => $aArgs['user']['lastname'],
+                'mail'              => $aArgs['user']['mail'],
+                'phone'             => $aArgs['user']['phone'],
+                'initials'          => $aArgs['user']['initials'],
+                'thumbprint'        => $aArgs['user']['thumbprint'],
+                'enabled'           => 'Y',
+                'status'            => 'OK',
+                'change_password'   => empty($aArgs['user']['changePassword']) ? 'Y' : $aArgs['user']['changePassword'],
+                'loginmode'         => 'standard',
+                'password'          => SecurityModel::getPasswordHash('maarch')
+            ]
+        ]);
+
+        return true;
+    }
+
     public static function getPrimaryGroupById(array $aArgs = [])
     {
         static::checkRequired($aArgs, ['userId']);
@@ -139,6 +166,42 @@ class UserModelAbstract extends \Apps_Table_Service
         } else {
             return false;
         }
+    }
+
+    public static function addGroup(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId', 'groupId']);
+        ValidatorModel::stringType($aArgs, ['groupId', 'role']);
+
+        DatabaseModel::insert([
+            'table'         => 'usergroup_content',
+            'columnsValues' => [
+                'user_id'       => $aArgs['userId'],
+                'group_id'      => $aArgs['groupId'],
+                'role'          => $aArgs['role'],
+                'primary_group' => 'Y'
+            ]
+        ]);
+
+        return true;
+    }
+
+    public static function addEntity(array $aArgs = [])
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId', 'entityId', 'primaryEntity']);
+        ValidatorModel::stringType($aArgs, ['entityId', 'role', 'primaryEntity']);
+
+        DatabaseModel::insert([
+            'table'         => 'users_entities',
+            'columnsValues' => [
+                'user_id'           => $aArgs['userId'],
+                'entity_id'         => $aArgs['entityId'],
+                'user_role'         => $aArgs['role'],
+                'primary_entity'    => $aArgs['primaryEntity']
+            ]
+        ]);
+
+        return true;
     }
 
     public static function createSignature(array $aArgs = [])

@@ -626,7 +626,7 @@ class StoreController
                 $mail = explode('<', str_replace('>', '', $value['value']));
                 $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contacts_v2.contact_id']]);
                 if (!empty($contact['contact_id'])) {
-                    $aArgs['data'][$key]['value'] = $contact[0]['contact_id'];
+                    $aArgs['data'][$key]['value'] = $contact['contact_id'];
                 } else {
                     $aArgs['data'][$key]['value'] = 0;
                 }
@@ -634,7 +634,7 @@ class StoreController
                 $mail = explode('<', str_replace('>', '', $value['value']));
                 $contact = \ContactsModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_addresses.id']]);
                 if (!empty($contact['id'])) {
-                    $aArgs['data'][$key]['value'] = $contact[0]['ca_id'];
+                    $aArgs['data'][$key]['value'] = $contact['id'];
                 } else {
                     $aArgs['data'][$key]['value'] = 0;
                 }
