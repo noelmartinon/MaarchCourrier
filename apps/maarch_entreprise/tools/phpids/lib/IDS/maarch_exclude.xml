@@ -52,6 +52,10 @@
         <page>get_tree_childs</page>
     </exclude>
     <exclude>
+        <target>entities</target>
+        <page>load_toolbarEntities</page>
+    </exclude>
+    <exclude>
         <target></target>
         <page>get_tree_children_contact</page>
     </exclude>
