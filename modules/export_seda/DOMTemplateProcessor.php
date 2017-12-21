@@ -70,9 +70,6 @@ class DOMTemplateProcessor
     {
         parent::__construct($document);
 
-
-        $this->xinclude();
-        $this->xinclude();
         $this->xinclude();
         $this->xinclude();
         $this->xinclude();

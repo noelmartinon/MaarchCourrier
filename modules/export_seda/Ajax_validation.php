@@ -32,10 +32,9 @@ if ($_REQUEST['reference']) {
         foreach ($resIds as $id) {
             $res = $checkAcknowledgement->checkAttachment($id);
 
-            if ($res == false) {
+            if ($res === false) {
                 $status = 1;
                 $error = $_SESSION['error'];
-                break;
             }
         }
         $content = $res;
@@ -46,10 +45,9 @@ if ($_REQUEST['reference']) {
         foreach ($resIds as $id) {
             $res = $checkReply->checkAttachment($id);
 
-            if ($res == false) {
+            if ($res === false) {
                 $status = 1;
                 $error = $_SESSION['error'];
-                break;
             }
         }
         $content = $res;
@@ -60,10 +58,9 @@ if ($_REQUEST['reference']) {
         foreach ($resIds as $id) {
             $res = $purge->purge($id);
 
-            if ($res == false) {
+            if ($res === false) {
                 $status = 1;
                 $error = $_SESSION['error'];
-                break;
             }
         }
         $content = $res;
@@ -74,10 +71,9 @@ if ($_REQUEST['reference']) {
         foreach ($resIds as $id) {
             $res = $reset->reset($id);
 
-            if ($res == false) {
+            if ($res === false) {
                 $status = 1;
                 $error = $_SESSION['error'];
-                break;
             }
         }
         $content = $res;

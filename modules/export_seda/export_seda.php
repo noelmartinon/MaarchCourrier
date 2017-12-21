@@ -33,9 +33,9 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $archiveTransfer = new ArchiveTransfer();
     $db = new RequestSeda();
     foreach ($values as $value) {
-        $letter = $db->getLetter($value);
+        $status = $db->getStatusLetter($value);
 
-        if ($letter->status == 'SEND_SEDA') {
+        if ($status == 'SEND_SEDA') {
             $_SESSION['error'] = _ERROR_MESSAGE_ALREADY_SENT . " " . $value;
         }
     }

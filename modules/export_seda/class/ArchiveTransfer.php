@@ -29,6 +29,7 @@ class ArchiveTransfer
     private $abstractMessage;
     private $externalLink;
     private $xml;
+    protected $entities;
 
     public function __construct()
     {
@@ -62,6 +63,8 @@ class ArchiveTransfer
         if ($getXml) {
             $this->xml = simplexml_load_file($path);
         }
+
+        $this->entities = [];
     }
 
     public function receive($listResId)
@@ -343,7 +346,12 @@ class ArchiveTransfer
         $messageObject->ArchivalAgreement = new stdClass();
 
         foreach ($_SESSION['user']['entities'] as $entity) {
-            $entity = $this->db->getEntity($entity['ENTITY_ID']);
+            $res = array_key_exists($entity['ENTITY_ID'], $this->entities);
+            if ($res === false) {
+                $this->entities[$entity['ENTITY_ID']] = $entity = $this->db->getEntity($entity['ENTITY_ID']);
+            } else {
+                $entity = $this->entities[$entity['ENTITY_ID']];
+            }
 
             if ($entity) {
                 if (!(string) $this->xml->CONFIG->senderOrgRegNumber) {
@@ -441,38 +449,40 @@ class ArchiveTransfer
             }
         }
 
-        if ($type != 'Note' && $type != 'Email') {
-            $notes = $this->db->getNotes($object->res_id);
-            if ($notes) {
-                $i = 1;
-                foreach ($notes as $note) {
-                    $note->title = 'Note n° ' . $note->id;
-                    $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
-                        "Note",
-                        $note,
-                        null,
-                        $archiveUnitId . '_note_' . $i,
-                        $note->id
-                    );
-                    $i++;
+        if ($object->res_id) {
+            if ($type != 'Note' && $type != 'Email') {
+                $notes = $this->db->getNotes($object->res_id);
+                if ($notes) {
+                    $i = 1;
+                    foreach ($notes as $note) {
+                        $note->title = 'Note n° ' . $note->id;
+                        $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
+                            "Note",
+                            $note,
+                            null,
+                            $archiveUnitId . '_note_' . $i,
+                            $note->id
+                        );
+                        $i++;
+                    }
                 }
             }
-        }
 
-        if ($type != 'Email' && $type != 'Note') {
-            $emails = $this->db->getMails($object->res_id);
-            if ($emails) {
-                $i = 1;
-                foreach ($emails as $email) {
-                    $email->title = 'Email n° ' . $email->email_id;
-                    $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
-                        "Email",
-                        $email,
-                        null,
-                        $archiveUnitId . '_email_' . $i,
-                        $email->email_id
-                    );
-                    $i++;
+            if ($type != 'Email' && $type != 'Note') {
+                $emails = $this->db->getMails($object->res_id);
+                if ($emails) {
+                    $i = 1;
+                    foreach ($emails as $email) {
+                        $email->title = 'Email n° ' . $email->email_id;
+                        $archiveUnit->ArchiveUnit[] = $this->getArchiveUnit(
+                            "Email",
+                            $email,
+                            null,
+                            $archiveUnitId . '_email_' . $i,
+                            $email->email_id
+                        );
+                        $i++;
+                    }
                 }
             }
         }
@@ -509,23 +519,27 @@ class ArchiveTransfer
                 $content->Addressee = [];
                 $content->Keyword = [];
 
-                $keyword = $addressee = "";
+                $keyword = $addressee = $entity = "";
+
+                if ($object->destination) {
+                    $res = array_key_exists($object->destination, $this->entities);
+                    if ($res === false) {
+                        $this->entities[$object->destination] = $entity = $this->db->getEntity($object->destination);
+                    } else {
+                        $entity = $this->entities[$object->destination];
+                    }
+                }
+
                 if ($object->exp_contact_id) {
                     $contact = $this->db->getContact($object->exp_contact_id);
-                    $entity = $this->db->getEntity($object->destination);
-
                     $keyword = $this->getKeyword($contact);
                     $addressee = $this->getAddresse($entity, "entity");
                 } elseif ($object->dest_contact_id) {
                     $contact = $this->db->getContact($object->dest_contact_id);
-                    $entity = $this->db->getEntity($object->destination);
-
                     $addressee = $this->getAddresse($contact);
                     $keyword = $this->getKeyword($entity, "entity");
                 } elseif ($object->exp_user_id) {
                     $user = $this->db->getUserInformation($object->exp_user_id);
-                    $entity = $this->db->getEntity($object->destination);
-
                     $keyword = $this->getKeyword($user);
                     $addressee = $this->getAddresse($entity, "entity");
                 }
@@ -587,9 +601,15 @@ class ArchiveTransfer
                     $reference->ArchiveUnitRefId = 'letterbox_' . $key;
                     $content->RelatedObjectReference->References[] = $reference;
                 } else {
-                    $letterbox = $this->db->getLetter($key);
-                    if (isset($letterbox->destination)) {
-                        $entity = $this->db->getEntity($letterbox->destination);
+                    $destination = $this->db->getDestinationLetter($key);
+                    if (isset($destination)) {
+                        $res = array_key_exists($destination, $this->entities);
+                        if ($res === false) {
+                            $this->entities[$destination] = $entity = $this->db->getEntity($destination);
+                        } else {
+                            $entity = $this->entities[$destination];
+                        }
+
                         $reference->RepositoryArchiveUnitPID = 'originator:' . $entity->business_id . ':' . $key;
                         $content->RelatedObjectReference->References[] = $reference;
                     }
@@ -601,7 +621,14 @@ class ArchiveTransfer
         if (isset($object->destination)) {
             $content->OriginatingAgency = new stdClass();
             $content->OriginatingAgency->Identifier = new stdClass();
-            $content->OriginatingAgency->Identifier->value = $this->db->getEntity($object->destination)->business_id;
+
+            $res = array_key_exists($object->destination, $this->entities);
+            if ($res === false) {
+                $this->entities[$object->destination] = $entity = $this->db->getEntity($object->destination);
+            } else {
+                $entity = $this->entities[$object->destination];
+            }
+            $content->OriginatingAgency->Identifier->value = $entity->business_id;
 
             if (empty($content->OriginatingAgency->Identifier->value)) {
                 unset($content->OriginatingAgency);
@@ -744,7 +771,12 @@ class ArchiveTransfer
 
     private function getEntity($entityId, $param)
     {
-        $entity = $this->db->getEntity($entityId);
+        $res = array_key_exists($entityId, $this->entities);
+        if ($res === false) {
+            $this->entities[$entityId] = $entity = $this->db->getEntity($entityId);
+        } else {
+            $entity = $this->entities[$entityId];
+        }
 
         if (!$entity) {
             return false;
@@ -794,7 +826,12 @@ class ArchiveTransfer
 
     private function getEntityParent($parentId, $param)
     {
-        $entity = $this->db->getEntity($parentId);
+        $res = array_key_exists($parentId, $this->entities);
+        if ($res === false) {
+            $this->entities[$parentId] = $entity = $this->db->getEntity($parentId);
+        } else {
+            $entity = $this->entities[$parentId];
+        }
 
         if (!$entity) {
             return false;

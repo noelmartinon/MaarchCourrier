@@ -11,8 +11,8 @@ class CheckAcknowledgement
     }
 
     public function checkAttachment($resId) {
-        $letter = $this->db->getLetter($resId);
-        if ($letter->status != "SEND_SEDA") {
+        $status = $this->db->getStatusLetter($resId);
+        if ($status != "SEND_SEDA") {
             $_SESSION['error'] = _ERROR_STATUS_SEDA . $resId;
             return false;
         }
