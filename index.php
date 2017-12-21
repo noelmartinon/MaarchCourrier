@@ -52,7 +52,7 @@ if (isset($_GET['origin']) && $_GET['origin'] == 'scan') {
     header('location: apps/'.$_SESSION['businessapps'][0]['appid'].'/reopen.php');
 } else {
     $_SESSION['config']['app_id'] = $_SESSION['businessapps'][0]['appid'];
-    header('location: apps/'.$_SESSION['config']['app_id']
+    header('location: '.$_SESSION['config']['coreurl'].'apps/'.$_SESSION['config']['app_id']
         . '/index.php?display=true&page=login');
 }
 
