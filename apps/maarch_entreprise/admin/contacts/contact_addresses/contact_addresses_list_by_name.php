@@ -52,25 +52,24 @@ if(isset($_GET['id']) &&  $_GET['id'] <> ''){
 
 $query .= " order by lastname";
 $stmt = $db->query($query, $arrayPDO);
-
 $listArray = array();
 while($line = $stmt->fetchObject())
 {
-	$listArray[$line->id] = $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
+	$listArray[$line->id]['label'] = $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
 	
 	if ($line->tag <> "" || $line->firstname) {
-		$listArray[$line->id] .= " :";
+		$listArray[$line->id]['label'] .= " :";
 		if ($line->tag <> "") {
-			$listArray[$line->id] .= " " . $line->tag;
+			$listArray[$line->id]['label'] .= " " . $line->tag;
 		}
 		if ($line->firstname <> "") {
-			$listArray[$line->id] .= " " . $line->firstname;
+			$listArray[$line->id]['label'] .= " " . $line->firstname;
 		}
 	}
 
 }
 
-$query = "SELECT ca.id, c.lastname as tag, c.firstname, ca.contact_purpose_id, cp.label 
+$query = "SELECT ca.id, c.lastname as tag, c.firstname, ca.address_street, ca.address_complement, ca.contact_purpose_id, cp.label 
 			FROM ".$_SESSION['tablename']['contact_addresses']." ca
 			LEFT JOIN contact_purposes cp on ca.contact_purpose_id = cp.id LEFT JOIN contacts_v2 c on c.contact_id = ca.contact_id 
 			WHERE (lower(c.lastname) like lower(?)
@@ -84,15 +83,17 @@ $stmt = $db->query($query, $arrayPDO);
 
 while($line = $stmt->fetchObject())
 {
-	$listArray[$line->id] = $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
-	
+	$listArray[$line->id]['label'] = $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
+	$adr = $line->address_street." ".$line->address_complement;
+	$listArray[$line->id]['address'] = $adr;
+
 	if ($line->tag <> "" || $line->firstname) {
-		$listArray[$line->id] .= " :";
+		$listArray[$line->id]['label'] .= " :";
 		if ($line->tag <> "") {
-			$listArray[$line->id] .= " " . $line->tag;
+			$listArray[$line->id]['label'] .= " " . $line->tag;
 		}
 		if ($line->firstname <> "") {
-			$listArray[$line->id] .= " " . $line->firstname;
+			$listArray[$line->id]['label'] .= " " . $line->firstname;
 		}
 	}
 
@@ -106,7 +107,8 @@ foreach($listArray as $key => $what)
 	{
 		$flagAuthView = true;
 	}
-    echo "<li id=".functions::xssafe($key).">".functions::xssafe($what)."</li>\n";
+	echo "<li id=".functions::xssafe($key).">".$what['address']."\n";
+	echo "<div style='font-size:11px;font-style:italic;'>".$what['label']."</div></li>";
 	if($flagAuthView)
 	{
 		echo "<li id=".functions::xssafe($key).">...</li>\n";
