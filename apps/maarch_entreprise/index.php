@@ -171,7 +171,11 @@ if (
 }
 
 //Ozwillo
-if (!empty($_REQUEST['code']) && !empty($_REQUEST['state'])) {
+if (!empty($_REQUEST['code']) || !empty($_REQUEST['state'])) {
+    if (!empty($_REQUEST['error'])) {
+        echo $_REQUEST['error'] . ' ' . $_REQUEST['error_description'];
+        exit;
+    }
     $_SESSION['ozwillo']['code'] = $_REQUEST['code'];
     $_SESSION['ozwillo']['state'] = $_REQUEST['state'];
 }
