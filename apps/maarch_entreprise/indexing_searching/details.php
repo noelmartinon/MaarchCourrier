@@ -772,10 +772,10 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
 
                                                 for($k=0; $k<count($data[$key]['select']);$k++)
                                                 {
-                                                ?><option value="" class="doctype_level1"><?php functions::xecho($data[$key]['select'][$k]['label']);?></option><?php
+                                                ?><option value="" class="doctype_level1" disabled><?php functions::xecho($data[$key]['select'][$k]['label']);?></option><?php
                                                     for($j=0; $j<count($data[$key]['select'][$k]['level2']);$j++)
                                                     {
-                                                        ?><option value="" class="doctype_level2">&nbsp;&nbsp;<?php functions::xecho($data[$key]['select'][$k]['level2'][$j]['label']);?></option><?php
+                                                        ?><option value="" class="doctype_level2" disabled>&nbsp;&nbsp;<?php functions::xecho($data[$key]['select'][$k]['level2'][$j]['label']);?></option><?php
                                                         for($l=0; $l<count($data[$key]['select'][$k]['level2'][$j]['types']);$l++)
                                                         {
                                                             ?><option
