@@ -542,7 +542,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         );
         $docservers_controler = new docservers_controler();
         $docserverTemplate = $docservers_controler->get('TEMPLATES');
-        var_dump($docserverTemplate);
         $templates = [];
         while ($res = $stmt->fetchObject()) {
             array_push(
