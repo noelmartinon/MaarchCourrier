@@ -1977,6 +1977,3 @@ if (!defined('_DOC_CREATED'))
     define('_DOC_CREATED', 'Document created');
 if (!defined("_SAVE_POSITION"))
     define("_SAVE_POSITION", "Save");
-
-if (!defined("_NO_ADDRESS_GIVEN"))
-    define("_NO_ADDRESS_GIVEN", "No address");
