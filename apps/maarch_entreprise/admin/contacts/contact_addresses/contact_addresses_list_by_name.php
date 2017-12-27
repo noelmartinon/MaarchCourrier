@@ -31,7 +31,8 @@ require_once("apps".DIRECTORY_SEPARATOR."maarch_entreprise".DIRECTORY_SEPARATOR.
 $contact = new contacts_v2();
 $db = new Database();
 
-$query = "SELECT ca.id, ca.lastname as tag, ca.firstname, ca.contact_purpose_id, cp.label 
+$query = "SELECT ca.id, ca.lastname as tag, ca.firstname, ca.contact_purpose_id, cp.label, ca.address_num, ca.address_street, ca.address_complement
+
 			FROM ".$_SESSION['tablename']['contact_addresses']." ca
 			LEFT JOIN contact_purposes cp on ca.contact_purpose_id = cp.id	
 			WHERE (lower(lastname) like lower(?)
@@ -55,7 +56,9 @@ $stmt = $db->query($query, $arrayPDO);
 $listArray = array();
 while($line = $stmt->fetchObject())
 {
-	$listArray[$line->id]['label'] = $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
+	$listArray[$line->id] ['label']= $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
+	$adr = $line->address_num." ".$line->address_street." ".$line->address_complement;
+	$listArray[$line->id]['address'] = $adr;
 	
 	if ($line->tag <> "" || $line->firstname) {
 		$listArray[$line->id]['label'] .= " :";
@@ -69,7 +72,7 @@ while($line = $stmt->fetchObject())
 
 }
 
-$query = "SELECT ca.id, c.lastname as tag, c.firstname, ca.address_street, ca.address_complement, ca.contact_purpose_id, cp.label 
+$query = "SELECT ca.id, c.lastname as tag, c.firstname, ca.address_num, ca.address_street, ca.address_complement, ca.contact_purpose_id, cp.label 
 			FROM ".$_SESSION['tablename']['contact_addresses']." ca
 			LEFT JOIN contact_purposes cp on ca.contact_purpose_id = cp.id LEFT JOIN contacts_v2 c on c.contact_id = ca.contact_id 
 			WHERE (lower(c.lastname) like lower(?)
@@ -80,11 +83,10 @@ $query = "SELECT ca.id, c.lastname as tag, c.firstname, ca.address_street, ca.ad
 
 $query .= " order by c.lastname";
 $stmt = $db->query($query, $arrayPDO);
-
 while($line = $stmt->fetchObject())
 {
 	$listArray[$line->id]['label'] = $contact->get_label_contact($line->contact_purpose_id, $_SESSION['tablename']['contact_purposes']);
-	$adr = $line->address_street." ".$line->address_complement;
+	$adr = $line->address_num." ".$line->address_street." ".$line->address_complement;
 	$listArray[$line->id]['address'] = $adr;
 
 	if ($line->tag <> "" || $line->firstname) {
