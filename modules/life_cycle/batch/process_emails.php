@@ -21,6 +21,7 @@ while ($state <> 'END') {
 		$totalEmailsToProcess = 1;
 		$currentEmail = 0;
 		$GLOBALS['emails'] = array();
+		$emailRecordset = new stdClass();
 		$emailRecordset->to_list=$GLOBALS['MailToNotify'];
 		$emailRecordset->email_object='statistiques du '.date('d/m/Y');
 		$emailRecordset->email_body='Ci-joint.';

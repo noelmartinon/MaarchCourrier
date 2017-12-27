@@ -10,7 +10,7 @@
 		<loaded>true</loaded>
 		<watermark>
 			<enabled>false</enabled> <!-- If true, a watermark is applied on the document /!\ WARNING /!\ BUG WITH SIGNATUREBOOK IF TRUE -->
-			<text>Copie conforme de [title] [alt_identifier] au statut [status] le [date_now] [hour_now]</text> <!-- text with fusion fields [column_name] or [date_now], ex : [alt_identifier] with status [status] the [date_now] [hour_now]-->
+			<text>Copie conforme de [alt_identifier] au statut [status] le [date_now] [hour_now]</text> <!-- text with fusion fields [column_name] or [date_now], ex : [alt_identifier] with status [status] the [date_now] [hour_now]-->
 			<position>30,35,0,0.5</position> <!-- Setup position with X, Y, angle, opacity ; ex : 50,450,30,0.5 -->
 			<font>helvetica,10</font> <!-- Setup the font name and her size, ex: helvetica,10 -->
 			<text_color>20,192,30</text_color> <!-- Setup the color of the text, ex: 192,192,192 -->
