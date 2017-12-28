@@ -29,8 +29,8 @@ if (isset($_REQUEST['mode']) && !empty($_REQUEST['mode'])) {
 try{
     include_once "core/class/usergroups_controler.php";
     include_once "core/class/users_controler.php";
+    include_once "core/class/class_request.php";
     if ($mode == 'list') {
-        include_once "core/class/class_request.php";
         include_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_list_show.php";
     }
     if (in_array($mode, ['del', 'up', 'add']) && $entities_loaded) {
@@ -140,6 +140,17 @@ function location_bar_management($mode)
     $ct=new core_tools();
     $ct->manage_location_bar($page_path, $page_label, $page_id, $init, $level);
 }
+//Recursive function to find an item in multidimensional array
+
+function in_array_r($needle, $haystack, $strict = false) {
+    foreach ($haystack as $item) {
+        if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 /**
  * Initialize session parameters for update display
@@ -147,13 +158,40 @@ function location_bar_management($mode)
  */
 function display_up($user_id)
 {
+    
     $uc = new users_controler();
     $ugc = new usergroups_controler();
     $db = new Database();
-
+    $request = new request();
     $state=true;
-    $user = $uc->get($user_id);
 
+    if($_SESSION["user"]["UserId"] != "superadmin"){
+        if ($entities_loaded == true ) {       
+            $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype']);
+        } else {
+            include_once 'modules'.DIRECTORY_SEPARATOR.'entities'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.'class_manage_entities.php';
+            $select[USERS_TABLE] = array();
+
+            array_push($select[USERS_TABLE], 'user_id');
+
+            $arrayPDO = array();
+            
+            $ent = new entity();
+            
+            $my_tab_entities_id = $ent->get_all_entities_id_user($_SESSION['user']['entities']);
+            
+            $where = " ((status = 'OK' or status = 'ABS') and users.user_id != 'superadmin') and ((users_entities.entity_id is NULL) or users_entities.entity_id in (".join(',', $my_tab_entities_id)."))";
+            $orderstr = "order by user_id asc";
+
+            $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], 'default', 'users_entities', 'users', 'users_entities', 'user_id', true, false, true);
+            if(!in_array_r($user_id,$tab)){
+                return false;
+            }
+        }
+    }
+    
+    
+    $user = $uc->get($user_id);
     if (empty($user)) {
         $state = false;
     } else {
@@ -215,7 +253,6 @@ function display_list()
     $list = new list_show();
     $func = new functions();
     init_session();
-
     $select[USERS_TABLE] = array();
     array_push($select[USERS_TABLE], 'user_id', 'lastname', 'firstname', 'enabled', 'status', 'mail');
     $where = " ((status = 'OK' or status = 'ABS') and user_id != 'superadmin')";
@@ -240,7 +277,7 @@ function display_list()
     $orderstr = $list->define_order($order, $field);
     $request = new request();
 
-    if ($entities_loaded == true ) {
+    if ($entities_loaded == true ) {        
         $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype']);
     } else {
         include_once 'modules'.DIRECTORY_SEPARATOR.'entities'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.'class_manage_entities.php';
@@ -270,10 +307,9 @@ function display_list()
         if (isset($_REQUEST['order_field']) && !empty($_REQUEST['order_field'])) {
             $field = trim($_REQUEST['order_field']);
         }
-
         $orderstr = $list->define_order($order, $field);
+        
         $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], 'default', 'users_entities', 'users','users_entities', 'user_id', true, false, true);
-
     }
     for ($i=0;$i<count($tab);$i++) {
         foreach ($tab[$i] as &$item) {
