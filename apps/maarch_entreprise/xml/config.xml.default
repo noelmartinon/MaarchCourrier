@@ -21,7 +21,7 @@
         <ldap>false</ldap> <!-- if true, ldap authentification, see ldap xml config file -->
         <userdefaultpassword>maarch</userdefaultpassword> <!-- default user's password -->
         <usePDO>false</usePDO>
-        <usePHPIDS>false</usePHPIDS>
+        <usePHPIDS>true</usePHPIDS>
     </CONFIG>
     <CRYPT>
         <encrypt>false</encrypt>
