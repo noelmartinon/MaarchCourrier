@@ -149,14 +149,14 @@ abstract class lists_Abstract extends Database
     protected $collId;  
     
     function __construct(){
-        $this->order = $_REQUEST['order'];
-        $this->orderField = $_REQUEST['order_field'];
-        $this->start = $_REQUEST['start'];
-        $this->whatSearch = $_REQUEST['what'];
+        $this->order      = !empty($_REQUEST['order']) ? $_REQUEST['order'] : null;
+        $this->orderField = !empty($_REQUEST['order_field']) ? $_REQUEST['order_field'] : null;
+        $this->start      = !empty($_REQUEST['start']) ? $_REQUEST['start'] : null;
+        $this->whatSearch = !empty($_REQUEST['what']) ? $_REQUEST['what'] : null;
         $this->_manageFilters();
         if (isset($_REQUEST['template'])) $this->template = $_REQUEST['template'];
         if (isset($_REQUEST['coll_id'])) $this->collId = $_REQUEST['coll_id'];
-        if(!isset($_SESSION['previous_basket']['id'])){
+        if(!isset($_SESSION['previous_basket']['id'] && !empty($_SESSION['current_basket']['id']))){
             $_SESSION['previous_basket']['id'] = $_SESSION['current_basket']['id'];
         }
     }
@@ -707,7 +707,7 @@ abstract class lists_Abstract extends Database
     protected function _manageFilters() {
     
         //Reset all filters
-        if ($_REQUEST['filter'] == 'reset'){
+        if (!empty($_REQUEST['filter']) && $_REQUEST['filter'] == 'reset'){
         
            $this->_resetFilter2();
            
@@ -3438,6 +3438,9 @@ abstract class lists_Abstract extends Database
             $showColumn = array();
             $sortColumn = array();
             for ($j=0;$j<count($resultArray[0]);$j++) {
+                if(empty($resultArray[0][$j]["label"])){
+                    $resultArray[0][$j]["label"] = null;
+                }
                 array_push($listColumn,$resultArray[0][$j]["label"]);
                 array_push($showColumn,$resultArray[0][$j]["show"]);
                 array_push($sortColumn,$resultArray[0][$j]["order"]);

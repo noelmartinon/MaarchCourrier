@@ -42,7 +42,7 @@ include_once '../../core/class/class_db_pdo.php';
 include_once '../../core/init.php';
 include_once 'apps/maarch_entreprise/define.php';
 
-if ($_SESSION['config']['usePHPIDS'] == 'true') {
+if (!empty($_SESSION['config']['usePHPIDS']) && $_SESSION['config']['usePHPIDS'] == 'true') {
     include 'apps/maarch_entreprise/phpids_control.php';
 }
 

@@ -576,7 +576,7 @@ abstract class indexing_searching_app_Abstract extends Database
             $json_tab .= "'".$key."' : {";
             //echo 'key '.$key."<br/>val ";
             //$this->show_array($value);
-            if($value['param']['autocompletion']){
+            if(!empty($value['param']['autocompletion'])){
                 $idListByName = $key.'ListByName';
                 $autocompleteId = 'ac_'.$key;
                 $options_criteria_list .= '<option id="option_'.$key.'" value="'.$value['label'].'" data-load={"id":"'.$key.'","idList":"'.$idListByName.'","autocompleteId":"'.$autocompleteId.'","config":"'.$_SESSION['config']['businessappurl'].'"} > '.$value['label'].'</option>';
@@ -602,7 +602,10 @@ abstract class indexing_searching_app_Abstract extends Database
         //$hidden = '<input type="hidden" name="meta[]" value="" />';
         if ($field_type == 'input_text')
         {
-            if($param['autocompletion']){
+            if(empty($param['other'])){
+                $param['other'] = null;
+            }
+            if(!empty($param['autocompletion'])){
                 $idListByName = $id.'ListByName';
                 $autocompleteId = 'ac_'.$id;
                 $str = $init.'<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text"/>';

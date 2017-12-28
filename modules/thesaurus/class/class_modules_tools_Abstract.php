@@ -58,7 +58,7 @@ abstract class thesaurus_Abstract
         $stmt = $db->query(
             'SELECT * FROM thesaurus'
             . ' ORDER BY thesaurus_name ASC '
-            ,$where_what);
+            , []);
 
         while($thesaurus=$stmt->fetchObject()){
             $array_thesaurus[]=$thesaurus;

@@ -142,7 +142,7 @@ abstract class tag_controler_Abstract extends ObjectControler
             while($tag=$stmt->fetchObject()){
                 $tougue['tag_id']    = $tag->tag_id;
                 $tougue['tag_label'] = $tag->tag_label;
-                $tougue['coll_id']   = $tag->coll_id;
+                $tougue['coll_id']   = isset($tag->coll_id) ? $tag->coll_id : null;
                 array_push($return, $tougue);
             }
             return $return;

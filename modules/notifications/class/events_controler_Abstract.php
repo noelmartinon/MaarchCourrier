@@ -1,23 +1,11 @@
 <?php
 
-/*
-*   Copyright 2008-2016 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework. If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * Copyright Maarch since 2008 under licence GPLv3.
+ * See LICENCE.txt file at the root folder for more details.
+ * This file is part of Maarch software.
+ *
+ */
 
 /**
 * @brief Contains the docservers_controler Object
@@ -45,7 +33,7 @@ try {
  */
 abstract class events_controler_Abstract extends ObjectControler
 {
-    public function getEventsByNotificationSid($notification_sid) 
+    public function getEventsByNotificationSid($notification_sid)
     {
         $query = "SELECT * FROM " . _NOTIF_EVENT_STACK_TABLE_NAME
             . " WHERE exec_date is NULL "
@@ -60,34 +48,39 @@ abstract class events_controler_Abstract extends ObjectControler
     }
     
   
-    function wildcard_match($pattern, $str)
+    public function wildcard_match($pattern, $str)
     {
         $pattern = '/^' . str_replace(array('%', '\*', '\?', '\[', '\]'), array('.*', '.*', '.', '[', ']+'), preg_quote($pattern)) . '$/is';
         $result = preg_match($pattern, $str);
         return $result;
     }
     
-    public function fill_event_stack($event_id, $table_name, $record_id, $user, $info) {
-        if ($record_id == '') return;
-        
-        $query = "SELECT * "
-            ."FROM " . _NOTIFICATIONS_TABLE_NAME 
-            ." WHERE is_enabled = 'Y'";
-        $dbConn = new Database();
-        $stmt = $dbConn->query($query);
-        if($stmt->rowCount() === 0) {
+    public function fill_event_stack($event_id, $table_name, $record_id, $user, $info)
+    {
+        if ($record_id == '') {
             return;
         }
         
-        while($notification = $stmt->fetchObject()) {
-            $event_ids = explode(',' , $notification->event_id);
-            if($event_id == $notification->event_id
+        $query = "SELECT * "
+            ."FROM " . _NOTIFICATIONS_TABLE_NAME
+            ." WHERE is_enabled = 'Y'";
+        $dbConn = new Database();
+        $stmt = $dbConn->query($query);
+        if ($stmt->rowCount() === 0) {
+            return;
+        }
+        
+        while ($notification = $stmt->fetchObject()) {
+            $event_ids = explode(',', $notification->event_id);
+            if ($event_id == $notification->event_id
                 || $this->wildcard_match($notification->event_id, $event_id)
                 || in_array($event_id, $event_ids)) {
                 $notifications[] = $notification;
             }
         }
-        if (count($notifications) == 0) return;
+        if (empty($notifications)) {
+            return;
+        }
         foreach ($notifications as $notification) {
             $dbConn->query(
                 "INSERT INTO "
@@ -115,13 +108,12 @@ abstract class events_controler_Abstract extends ObjectControler
         }
     }
     
-    public function commitEvent($eventId, $result) {
+    public function commitEvent($eventId, $result)
+    {
         $dbConn = new Database();
-        $query = "UPDATE " . _NOTIF_EVENT_STACK_TABLE_NAME 
-            . " SET exec_date = CURRENT_TIMESTAMP, exec_result = ?" 
+        $query = "UPDATE " . _NOTIF_EVENT_STACK_TABLE_NAME
+            . " SET exec_date = CURRENT_TIMESTAMP, exec_result = ?"
             . " WHERE event_stack_sid = ?";
         $dbConn->query($query, array($result, $eventId));
     }
-    
-    
 }

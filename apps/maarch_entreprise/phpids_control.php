@@ -1,15 +1,23 @@
 <?php
 
+/**
+ * Copyright Maarch since 2008 under licence GPLv3.
+ * See LICENCE.txt file at the root folder for more details.
+ * This file is part of Maarch software.
+ *
+ */
+
+
 $processIDS = true;
 for ($cptIDS=0;$cptIDS<count($_SESSION['PHPIDS_EXCLUDES']);$cptIDS++) {
     if (
             (
-                $_REQUEST['module'] == $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['TARGET'] ||
-                $_REQUEST['admin']  == $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['TARGET'] || 
+                (isset($_REQUEST['module']) && $_REQUEST['module'] == $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['TARGET']) ||
+                (isset($_REQUEST['admin']) && $_REQUEST['admin']  == $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['TARGET']) ||
                 $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['TARGET'] == ""
             )
-        &&  
-            $_REQUEST['page'] == $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['PAGE']
+        &&
+            isset($_REQUEST['page']) && $_REQUEST['page'] == $_SESSION['PHPIDS_EXCLUDES'][$cptIDS]['PAGE']
     ) {
         $processIDS = false;
         break;
@@ -26,7 +34,6 @@ if ($processIDS) {
     require_once 'IDS/Init.php';
 
     try {
-
         $request = array(
             'REQUEST' => $_REQUEST,
             'GET' => $_GET,
@@ -35,11 +42,11 @@ if ($processIDS) {
         );
 
         $init = IDS_Init::init(
-            dirname(__FILE__) 
+            dirname(__FILE__)
             . '/tools/phpids/lib/IDS/Config/Config.ini.php'
         );
         
-        $init->config['General']['base_path'] = dirname(__FILE__) 
+        $init->config['General']['base_path'] = dirname(__FILE__)
             . '/tools/phpids/lib/IDS/';
         $init->config['General']['use_base_path'] = true;
         $init->config['Caching']['caching'] = 'none';
@@ -56,29 +63,28 @@ if ($processIDS) {
             $hist->add(
                 $_SESSION['tablename']['users'],
                 $_SESSION['user']['UserId'],
-                'PHPIDS','phpidscontrol',
-                ' PHPIDS CONTROL, USER : ' . $_SESSION['user']['UserId'] . ' IP : ' . $ip  
-                    . ' MESSAGE : ' 
+                'PHPIDS', 'phpidscontrol',
+                ' PHPIDS CONTROL, USER : ' . $_SESSION['user']['UserId'] . ' IP : ' . $ip
+                    . ' MESSAGE : '
                     . (string) $result,
                 $_SESSION['config']['databasetype'],
-                'admin'
-                 ,
+                'admin',
                 false,
                 _OK,
-                _LEVEL_ERROR
+                'ERROR'
             );
             if ($_SESSION['config']['debug'] == 'true') {
                 echo $result;
                 $_SESSION['securityMessage'] = (string) $result;
-                $varRedirect = '<script language="javascript">window.location.href=\'' 
-                    . $_SESSION['config']['businessappurl'] 
+                $varRedirect = '<script language="javascript">window.location.href=\''
+                    . $_SESSION['config']['businessappurl']
                     . "index.php?page=security_message';</script>";
                 echo $varRedirect;
                 exit;
             } elseif ($result->getImpact() >= 30) {
                 $_SESSION['securityMessage'] = (string) $result;
-                $varRedirect = '<script language="javascript">window.location.href=\'' 
-                    . $_SESSION['config']['businessappurl'] 
+                $varRedirect = '<script language="javascript">window.location.href=\''
+                    . $_SESSION['config']['businessappurl']
                     . "index.php?page=security_message';</script>";
                 echo $varRedirect;
                 exit;

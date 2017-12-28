@@ -1594,7 +1594,7 @@ class core_tools extends functions
         // Cleans the page variables and looks if she exists or not before including her
         if(isset($_GET['page']) && !empty($_GET['page'])) {
             // CVA 31 oct 2014 Security Local File Inclusion
-             if($_GET['module']=='tags'){
+             if(isset($_GET['module']) && $_GET['module']=='tags'){
                  $this->f_page = str_replace(
                      array('../', '..%2F'), 
                      array ('', ''), 

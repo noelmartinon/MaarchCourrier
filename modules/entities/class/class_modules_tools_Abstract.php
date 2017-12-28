@@ -161,13 +161,12 @@ abstract class entities_Abstract extends functions
                 $arrSecondary = array();
                 for ($cptB=0;$cptB<count($_SESSION['user']['baskets']);$cptB++) {
                     $arrTmp = array();
-                    if ($_SESSION['user']['baskets'][$cptB]['is_secondary']) {
+                    if (!empty($_SESSION['user']['baskets'][$cptB]['is_secondary'])) {
                         $arrTmp = $this->load_redirect_groupbasket_secondary_session(
                             $_SESSION['user']['baskets'][$cptB]['id'],
                             $_SESSION['user']['baskets'][$cptB]['group_id'],
                             $userData['UserId']
                         );
-                        //$this->show_array($arr3);
                     }
                     if (!empty($arrTmp[$_SESSION['user']['baskets'][$cptB]['id']])) {
                         $arrSecondary = array_merge($arrSecondary, $arrTmp);

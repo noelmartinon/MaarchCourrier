@@ -28,6 +28,8 @@
 * @ingroup visa
 */
 
+$core_path = $_SESSION['config']['corepath'];
+$core_path = str_replace("\\", "/", $core_path);
 define('FPDF_FONTPATH',$core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/font/');
 require($core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdf.php');
 require($core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdi.php');

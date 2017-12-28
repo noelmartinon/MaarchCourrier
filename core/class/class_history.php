@@ -84,7 +84,7 @@ class history
     * @param $id_module = 'admin'
     * @param $isTech = false
     * @param $result = _OK
-    * @param $level = _LEVEL_DEBUG
+    * @param $level = 'DEBUG'
     * @param $user = ''
     */
     public function add(
@@ -97,7 +97,7 @@ class history
         $id_module = 'admin',
         $isTech = false,
         $result = _OK,
-        $level = _LEVEL_DEBUG,
+        $level = 'DEBUG',
         $user = ''
     )
     {
@@ -360,31 +360,31 @@ class history
 
         switch ($level) {
 
-            case _LEVEL_DEBUG:
+            case 'DEBUG':
                 $logger->debug(
                     $logLine
                 );
                 break;
 
-             case _LEVEL_INFO:
+             case 'INFO':
                 $logger->info(
                     $logLine
                 );
                 break;
 
-            case _LEVEL_WARN:
+            case 'WARN':
                 $logger->warn(
                     $logLine
                 );
                 break;
 
-            case _LEVEL_ERROR:
+            case 'ERROR':
                 $logger->error(
                     $logLine
                 );
                 break;
 
-            case _LEVEL_FATAL:
+            case 'FATAL':
                 $logger->fatal(
                     $logLine
                 );

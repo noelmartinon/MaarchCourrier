@@ -93,9 +93,8 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                         && $_SESSION['user']['baskets'][$i]['id_page'] <> 'redirect_to_action'
                         && $_SESSION['user']['baskets'][$i]['coll_id'] == $collWithUserBaskets[$cpt]['coll_id'] 
                     ) {
-                        if (
-                            $_SESSION['user']['baskets'][$i]['group_desc'] <> $currentGroup
-                            && $_SESSION['user']['baskets'][$i]['group_desc'] <> ''
+                        if (!empty($_SESSION['user']['baskets'][$i]['group_desc']) 
+                            && $_SESSION['user']['baskets'][$i]['group_desc'] <> $currentGroup
                         ) {
                             $currentGroup = $_SESSION['user']['baskets'][$i]['group_desc'];
                             echo '<li style="padding-top: 5px;padding-bottom: 5px;"><i class="fa-li fa fa-users" style="padding-top: 5px;padding-bottom: 5px;"></i>'
@@ -128,8 +127,10 @@ if ($core_tools->test_service('display_basket_list','basket', false)) {
                                     $redirectedTo = $redirectBasketValue['user'];
                                 }
                             }
-
-                            $color = $_SESSION['user']['baskets'][$i]['color'];
+                            $color = null;
+                            if(isset($_SESSION['user']['baskets'][$i]['color'])){
+                                $color = $_SESSION['user']['baskets'][$i]['color'];
+                            }
                             foreach ($coloredBaskets as $coloredBasket) {
                                 if ($coloredBasket['basket_id'] == $_SESSION['user']['baskets'][$i]['id'] && $coloredBasket['group_id'] == $_SESSION['user']['baskets'][$i]['group_id']) {
                                     $color = $coloredBasket['color'];

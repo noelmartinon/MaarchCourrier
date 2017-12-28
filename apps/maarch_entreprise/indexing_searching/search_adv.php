@@ -499,7 +499,7 @@ function del_query_confirm()
 }
 -->
 </script>
-<?php if($_GET['mode']!='popup'){ ?>
+<?php if(empty($_GET['mode']) || $_GET['mode']!='popup'){ ?>
 <h1>
     <i class="fa fa-search fa-2x"></i> <?php echo _ADV_SEARCH_MLB;?>
 </h1>
@@ -582,7 +582,7 @@ if(isset($_REQUEST['nodetails']))
                                     <option id="true" value="true"><?php echo _ALL_BASKETS;?></option>
                                     <option id="false" value="false"><?php echo _NO;?></option>
                                     <?php 
-                                    if($_REQUEST['mode'] != 'popup') {
+                                    if(empty($_REQUEST['mode']) || $_REQUEST['mode'] != 'popup') {
                                         for($i=0; $i< count($_SESSION['user']['baskets']);$i++) {
                                             if (
                                                 $_SESSION['user']['baskets'][$i]['coll_id'] == $coll_id 

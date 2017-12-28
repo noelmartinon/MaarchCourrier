@@ -52,7 +52,7 @@ function changeStyle(style_id, path_to_script)
             eval("response = "+answer.responseText)
         },
         onFailure: function() {
-            $('modal').innerHTML = '<div class="error"><?php echo _SERVER_ERROR;?></div>'+form_txt;
+            $('modal').innerHTML = '<div class="error">Server error</div>'+form_txt;
             form.query_name.value = this.name;
         }
     });
