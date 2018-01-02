@@ -1,42 +1,36 @@
 <?php
+/**
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 
-/*
-*
-*    Copyright 2008,2015 Maarch
-*
-*  This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*    along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*
-*   @author <dev@maarch.org>
+* @brief   save_attachment_from_cm
+* @author  dev <dev@maarch.org>
+* @ingroup content_management
 */
 
 // FOR ADD, UP TEMPLATES and temporary backup
+if (empty($_REQUEST['uniqueId']) || $_REQUEST['uniqueId'] == null) {
+    $i = 0;
+} else {
+    $i = $_REQUEST['uniqueId'];
+}
 
-/*$_SESSION['m_admin']['templates']['current_style'] 
-        = $_SESSION['config']['tmppath'] . $tmpFileName; */
+if (!isset($_SESSION['upfile'])) {
+    $_SESSION['upfile'] = [];
+}
 
-$_SESSION['upfile']['tmp_name']             = $_SESSION['config']['tmppath'] . $tmpFileName;
-$_SESSION['upfile']['size']                 = filesize($_SESSION['config']['tmppath'] . $tmpFileName);
-$_SESSION['upfile']['error']                = "";
-$_SESSION['upfile']['fileNameOnTmp']        = $tmpFileName;
-$_SESSION['upfile']['format']               = $fileExtension;
-$_SESSION['upfile']['upAttachment']         = true;
-$_SESSION['m_admin']['templates']['applet'] = true;
+$_SESSION['upfile'][$i]['tmp_name']             = $_SESSION['config']['tmppath'] . $tmpFileName;
+$_SESSION['upfile'][$i]['size']                 = filesize($_SESSION['config']['tmppath'] . $tmpFileName);
+$_SESSION['upfile'][$i]['error']                = "";
+$_SESSION['upfile'][$i]['fileNameOnTmp']        = $tmpFileName;
+$_SESSION['upfile'][$i]['format']               = $fileExtension;
+$_SESSION['upfile'][$i]['upAttachment']         = true;
 
-if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == true){
-	$_SESSION['upfile']['fileNamePdfOnTmp'] = $tmpFilePdfName;
+$_SESSION['m_admin']['templates']['applet']     = true;
+
+if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == true) {
+	$_SESSION['upfile'][$i]['fileNamePdfOnTmp'] = $tmpFilePdfName;
 }
 
 // Temporary backup
@@ -56,18 +50,17 @@ $ac 				= new attachments_controler();
 
 require_once 'core/docservers_tools.php';
 
+//CHECK AUTHORIZED EXTENSION
 $arrayIsAllowed = array();
 $arrayIsAllowed = Ds_isFileTypeAllowed(
-    $_SESSION['config']['tmppath'] . $_SESSION['upfile']['fileNameOnTmp']
+    $_SESSION['config']['tmppath'] . $_SESSION['upfile'][$i]['fileNameOnTmp']
 );
 
 if ($arrayIsAllowed['status'] == false) {
 	$_SESSION['error']  = _WRONG_FILE_TYPE . ' ' . $arrayIsAllowed['mime_type'];
 	$_SESSION['upfile'] = array();
 } else {
-    if (! isset($_SESSION['collection_id_choice'])
-        || empty($_SESSION['collection_id_choice'])
-    ) {
+    if (! isset($_SESSION['collection_id_choice']) || empty($_SESSION['collection_id_choice'])) {
         $_SESSION['collection_id_choice'] = $_SESSION['user']['collections'][0];
     }
 
@@ -80,7 +73,7 @@ if ($arrayIsAllowed['status'] == false) {
 
         // some checking on docserver size limit
         $newSize = $docserverControler->checkSize(
-            $docserver, $_SESSION['upfile']['size']
+            $docserver, $_SESSION['upfile'][$i]['size']
         );
         if ($newSize == 0) {
             $_SESSION['error'] = _DOCSERVER_ERROR . ' : ' . _NOT_ENOUGH_DISK_SPACE . ". " . _MORE_INFOS . ".";
@@ -96,11 +89,12 @@ if ($arrayIsAllowed['status'] == false) {
         } else {
             $fileInfos = array(
                 "tmpDir"      => $_SESSION['config']['tmppath'],
-                "size"        => $_SESSION['upfile']['size'],
-                "format"      => $_SESSION['upfile']['format'],
-                "tmpFileName" => $_SESSION['upfile']['fileNameOnTmp'],
+                "size"        => $_SESSION['upfile'][$i]['size'],
+                "format"      => $_SESSION['upfile'][$i]['format'],
+                "tmpFileName" => $_SESSION['upfile'][$i]['fileNameOnTmp'],
             );
 
+            //SAVE FILE ON DOCSERVER ATTACHMENT
             $storeResult = array();
             $storeResult = $docserverControler->storeResourceOnDocserver(
                 $_SESSION['collection_id_choice'], $fileInfos
@@ -108,13 +102,17 @@ if ($arrayIsAllowed['status'] == false) {
 
             if (isset($storeResult['error']) && $storeResult['error'] <> '') {
                 $_SESSION['error'] = $storeResult['error'];
-            } else if(isset($_SESSION['attachmentInfo']['inProgressResId'])){
 
-				$ac->removeTemporaryAttachmentOnDocserver($_SESSION['attachmentInfo']['inProgressResId'], $_SESSION['doc_id'], $_SESSION['user']['UserId']);
+            //MODE SECOND BACKUP AND MORE
+            } else if(isset($_SESSION['attachmentInfo'][$i]['inProgressResId'])){
+
+                //DELETE OLD BACKUP
+				$ac->removeTemporaryAttachmentOnDocserver($_SESSION['attachmentInfo'][$i]['inProgressResId'], $_SESSION['doc_id'], $_SESSION['user']['UserId']);
 
 		        require_once 'core/class/docserver_types_controler.php';
 				$docserverTypeControler = new docserver_types_controler();
 
+                //RETRIEVE FILE PATH
 				$filetmp = $storeResult['path_template'];
 				$filetmp .= str_replace('#',DIRECTORY_SEPARATOR, $storeResult['destination_dir']);
 				$filetmp .= $storeResult['file_destination_name'];
@@ -127,10 +125,14 @@ if ($arrayIsAllowed['status'] == false) {
 		        	$tableName = 'res_attachments';
 	        	} else if ($_SESSION['targetAttachment'] == 'edit') {
 		        	$tableName = 'res_version_attachments';
-	        	}
+                }
+                
+                //UPDATE NEW FILE PATH
 	        	$db->query('UPDATE '.$tableName.' SET fingerprint = ?, filesize = ?, path = ?, filename = ? WHERE res_id = ?', 
-	        		array($fingerprint, filesize($filetmp), $storeResult['destination_dir'], $storeResult['file_destination_name'], $_SESSION['attachmentInfo']['inProgressResId']));
-	        } else {
+	        		array($fingerprint, filesize($filetmp), $storeResult['destination_dir'], $storeResult['file_destination_name'], $_SESSION['attachmentInfo'][$i]['inProgressResId']));
+            
+            //MODE FIRST BACKUP
+            } else {
                 $_SESSION['data'] = array();
 
                 array_push($_SESSION['data'], array( 'column' => "typist", 			'value' => $_SESSION['user']['UserId'], 			'type' => "string" ) );
@@ -139,42 +141,49 @@ if ($arrayIsAllowed['status'] == false) {
                 array_push($_SESSION['data'], array( 'column' => "status", 			'value' => 'TMP', 									'type' => "string" ) );
                 array_push($_SESSION['data'], array( 'column' => "offset_doc", 		'value' => ' ', 									'type' => "string" ) );
                 array_push($_SESSION['data'], array( 'column' => "logical_adr", 	'value' => ' ', 									'type' => "string" ) );
-                array_push($_SESSION['data'], array( 'column' => "title", 			'value' => $_SESSION['attachmentInfo']['title'], 	'type' => "string" ) );
+                array_push($_SESSION['data'], array( 'column' => "title", 			'value' => $_SESSION['attachmentInfo'][$i]['title'], 	'type' => "string" ) );
                 array_push($_SESSION['data'], array( 'column' => "coll_id", 		'value' => $_SESSION['collection_id_choice'], 		'type' => "string" ) );
                 array_push($_SESSION['data'], array( 'column' => "res_id_master", 	'value' => $_SESSION['doc_id'], 					'type' => "integer") );
-                array_push($_SESSION['data'], array( 'column' => "type_id", 		'value' => 0, 										'type' => "integer" ) );
+                
+                if ($objectType == 'outgoingMail') {
+                    $_SESSION['upfile'][$i]['outgoingMail'] = true;
+                    array_push($_SESSION['data'], array( 'column' => "type_id", 		'value' => 1, 										'type' => "integer" ) );
+                } else {
+                    array_push($_SESSION['data'], array( 'column' => "type_id", 		'value' => 0, 										'type' => "integer" ) );
+                }
+                
 
                 if ($_SESSION['origin'] == "scan") {
                     array_push($_SESSION['data'], array( 'column' => "scan_user", 	'value' => $_SESSION['user']['UserId'], 			'type' => "string" ) );
                     array_push($_SESSION['data'], array( 'column' => "scan_date", 	'value' => $req->current_datetime(), 				'type' => "function" ) );
                 }
-                if (isset($_SESSION['attachmentInfo']['back_date']) && $_SESSION['attachmentInfo']['back_date'] <> '') {
-                    array_push($_SESSION['data'], array( 'column' => "validation_date", 'value' => $func->format_date_db($_SESSION['attachmentInfo']['back_date']), 'type' => "date", ) );
+                if (isset($_SESSION['attachmentInfo'][$i]['back_date']) && $_SESSION['attachmentInfo'][$i]['back_date'] <> '') {
+                    array_push($_SESSION['data'], array( 'column' => "validation_date", 'value' => $func->format_date_db($_SESSION['attachmentInfo'][$i]['back_date']), 'type' => "date", ) );
                 }
 
-                if (isset($_SESSION['attachmentInfo']['contactId']) && $_SESSION['attachmentInfo']['contactId'] != '' && is_numeric($_SESSION['attachmentInfo']['contactId'])) {
-                    array_push($_SESSION['data'], array( 'column' => 'dest_contact_id', 'value' => $_SESSION['attachmentInfo']['contactId'], 'type' => 'integer' ) );
-                } else if (isset($_SESSION['attachmentInfo']['contactId']) && $_SESSION['attachmentInfo']['contactId'] != '' && !is_numeric($_SESSION['attachmentInfo']['contactId'])) {
+                if (isset($_SESSION['attachmentInfo'][$i]['contactId']) && $_SESSION['attachmentInfo'][$i]['contactId'] != '' && is_numeric($_SESSION['attachmentInfo'][$i]['contactId'])) {
+                    array_push($_SESSION['data'], array( 'column' => 'dest_contact_id', 'value' => $_SESSION['attachmentInfo'][$i]['contactId'], 'type' => 'integer' ) );
+                } else if (isset($_SESSION['attachmentInfo'][$i]['contactId']) && $_SESSION['attachmentInfo'][$i]['contactId'] != '' && !is_numeric($_SESSION['attachmentInfo'][$i]['contactId'])) {
                     $_SESSION['data'][] = [
                             'column' => 'dest_user',
-                            'value' => $_SESSION['attachmentInfo']['contactId'],
+                            'value' => $_SESSION['attachmentInfo'][$i]['contactId'],
                             'type' => 'string',
                         ];
                 }
 
-                if (isset($_SESSION['attachmentInfo']['addressId']) && $_SESSION['attachmentInfo']['addressId'] <> '') {
-                    array_push($_SESSION['data'], array( 'column' => "dest_address_id", 'value' => $_SESSION['attachmentInfo']['addressId'], 'type' => "integer" ) );
+                if (isset($_SESSION['attachmentInfo'][$i]['addressId']) && $_SESSION['attachmentInfo'][$i]['addressId'] <> '') {
+                    array_push($_SESSION['data'], array( 'column' => "dest_address_id", 'value' => $_SESSION['attachmentInfo'][$i]['addressId'], 'type' => "integer" ) );
                 }
 
                 if ($_SESSION['targetAttachment'] == 'add'){
 					$relation       = 1;
-                    if(!empty($_SESSION['attachmentInfo']['chrono'])){
-                        $identifier     = $_SESSION['attachmentInfo']['chrono'];
+                    if(!empty($_SESSION['attachmentInfo'][$i]['chrono'])){
+                        $identifier     = $_SESSION['attachmentInfo'][$i]['chrono'];
                     }else{
                         $identifier     = null;    
                     }
 					
-					$attachmentType = $_SESSION['attachmentInfo']['type'];
+					$attachmentType = $_SESSION['attachmentInfo'][$i]['type'];
 					$TableName      = RES_ATTACHMENTS_TABLE;
 
                 } else if ($_SESSION['targetAttachment'] == 'edit') {
@@ -224,7 +233,7 @@ if ($arrayIsAllowed['status'] == false) {
 					$_SESSION['config']['databasetype']
 				);
 
-				$_SESSION['attachmentInfo']['inProgressResId'] = $id;
+				$_SESSION['attachmentInfo'][$i]['inProgressResId'] = $id;
 	        }
         }
     }

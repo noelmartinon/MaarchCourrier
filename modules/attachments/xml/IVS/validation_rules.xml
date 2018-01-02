@@ -10,7 +10,7 @@
 		<parameter name="relation" type="identifier" />
 		<parameter name="add" type="string" />
 		<parameter name="attachment_types" type="identifier" />
-		<parameter name="back_date" type="datefr" />
+		<parameter name="back_date" type="arrayOfStrings" />
 		<parameter name="cancel" type="string" />
 		<parameter name="chrono" type="string" />
 		<parameter name="contact_attach" type="string" />
@@ -28,6 +28,7 @@
 
 	<validationRule name="get_chrono_attachment" extends="standardForm" mode="error">
 		<parameter name="module" type="identifier" />
+		<parameter name="index" type="integer" />
 	</validationRule>
 
 	<validationRule name="frame_list_attachments" extends="standardForm" mode="error">

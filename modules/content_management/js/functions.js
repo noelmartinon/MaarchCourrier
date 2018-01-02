@@ -1,7 +1,7 @@
 var editing;
-function editingDoc(user){
+function editingDoc(elem,user){
 
-    editing = setInterval(function() {checkEditingDoc('user')}, 500);
+    editing = setInterval(function() {checkEditingDoc(elem,'user')}, 500);
 
 }
 //load applet in a modal
@@ -192,10 +192,17 @@ function showDiv(divName, spanNb, divCreate, path_manage_script)
     });
 }
 
-function checkEditingDoc(userId) {
-    if($j('#add').length){
+function checkEditingDoc(elem, userId) {
+
+    if ($j('#'+elem.id).parent().parent().find('[name=attachNum\\[\\]]').length) {
+        var attachNum = $j('#'+elem.id).parent().parent().find('[name=attachNum\\[\\]]').val();
+    } else {
+        var attachNum = '0';
+    }
+    
+    if ($j('#add').length) {
         var target = $j('#add');
-    }else{
+    } else {
         var target = $j('#edit');
     }
     //LOCK VALIDATE BUTTON
@@ -203,14 +210,15 @@ function checkEditingDoc(userId) {
     target.css({"opacity":"0.5"});
     target.val('Edition en cours ...');
 
-    //LOCK EDIT BUTTON TRANSMISSION
-    $j(".transmissionEdit").css({"opacity":"0.5"});
-    $j(".transmissionEdit").prop('disabled', true);
+    //LOCK EDIT BUTTON (IF MULTI ATTACHMENT)
+    $j("[name=templateOffice_edit\\[\\]]").css({"opacity":"0.5"});
+    $j("[name=templateOffice_edit\\[\\]]").prop('disabled', true);
 
     $j.ajax({
        url : 'index.php?display=true&page=checkEditingDoc&module=content_management',
        type : 'POST',
        dataType : 'JSON',
+       data: {attachNum : attachNum},
        success : function(response){
             if (response.status == 0) {
                 console.log('no lck found!');
@@ -220,22 +228,28 @@ function checkEditingDoc(userId) {
                 target.css({"opacity":"1"});
                 target.val('Valider');
 
-                //UNLOCK EDIT BUTTON TRANSMISSION
-                $j(".transmissionEdit, #edit").css({"opacity":"1"});
-                $j(".transmissionEdit, #edit").prop('disabled', false);
+                //UNLOCK EDIT BUTTON (IF MULTI ATTACHMENT)
+                $j("[name=templateOffice_edit\\[\\]], #edit").css({"opacity":"1"});
+                $j("[name=templateOffice_edit\\[\\]], #edit").prop('disabled', false);
 
                 //END OF CHECKING APPLET
                 console.log('clearInterval');
-
-                if($j('#liAttachement', window.top.document).length && response.pdf_version != '') {
-                	window.top.document.getElementById('liAttachement').click();
-                }
-                
-                if($j('#viewframevalid_attachment').length && response.pdf_version != '') {
-                    document.getElementById('viewframevalid_attachment').src='index.php?display=true&dir=indexing_searching&page=file_iframe&#navpanes=0'+response.pdf_version;                    
-                }
-                //console.log(response.pdf_version);
                 clearInterval(editing);
+
+                //CONSTRUCT TAB (IF PDF)
+                $j("#MainDocument",window.parent.document).after($j("#MainDocument",window.parent.document).clone());
+                $j("#iframeMainDocument",window.parent.document).after($j("#iframeMainDocument",window.parent.document).clone());
+                if ($j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).length) {
+                    $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).remove();
+                    $j("div #iframePjDocument_"+attachNum,window.parent.document).remove();
+                }
+                $j("div #iframeMainDocument",window.parent.document).eq(1).attr("id","iframePjDocument_"+attachNum);
+                $j("div #iframePjDocument_"+attachNum,window.parent.document).attr("src","index.php?display=true&dir=indexing_searching&page=file_iframe&num="+attachNum+"&#navpanes=0"+response.pdf_version);              
+
+                $j("#ongletAttachement #MainDocument",window.parent.document).eq(1).attr("id","PjDocument_"+attachNum);
+                $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).html("<span>PJ n°"+(parseInt(attachNum)+1)+"</span>");
+                $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).click();
+                
             } else {
                 console.log('lck found! Editing in progress !');
 
@@ -244,9 +258,9 @@ function checkEditingDoc(userId) {
                 target.css({"opacity":"0.5"});
                 target.val('Edition en cours ...');
 
-                //LOCK EDIT BUTTON TRANSMISSION
-                $j(".transmissionEdit, #edit").css({"opacity":"0.5"});
-                $j(".transmissionEdit, #edit").prop('disabled', true);
+                //LOCK EDIT BUTTON (IF MULTI ATTACHMENT)
+                $j("[name=templateOffice_edit\\[\\]]").css({"opacity":"0.5"});
+                $j("[name=templateOffice_edit\\[\\]]").prop('disabled', true);
 
             }
        },
@@ -259,8 +273,48 @@ function checkEditingDoc(userId) {
 
 }
 
-function showAppletLauncher(path, width, height) {
+function showAppletLauncher(target, resId, objectTable, objectType, mode) {
 
+    if (mode == 'template') {
+        var path = 'index.php?display=true&module=content_management&page=applet_modal_launcher&uniqueId=0&objectType=' + objectType + '&objectId=' + resId + '&objectTable=' + objectTable;
+    
+    } else {
+        //Num of Attachment
+        var attachNum = $j('#'+target.id).parent().parent().find('[name=attachNum\\[\\]]').val();
+        //Only add mode
+        if (objectType == 'attachmentVersion') {
+            var templateOffice = $j('#'+target.id).parent().parent().find('[name=templateOffice\\[\\]]').val();
+        } else {
+            var templateOffice = $j('#'+target.id).parent().parent().find('#res_id').val();
+        }
+        var attachment_types = $j('#'+target.id).parent().parent().find('[name=attachment_types\\[\\]]').val();
+
+        if (attachment_types == 'transmission') {
+            var contactidAttach = $j('#formAttachment [name=contactidAttach\\[\\]]').first().val();
+            var addressidAttach = $j('#formAttachment [name=addressidAttach\\[\\]]').first().val();
+        } else {
+            var contactidAttach = $j('#'+target.id).parent().parent().find('[name=contactidAttach\\[\\]]').val();
+            var addressidAttach = $j('#'+target.id).parent().parent().find('[name=addressidAttach\\[\\]]').val();
+        }
+        
+        var chrono = $j('#'+target.id).parent().parent().find('[name=chrono\\[\\]]').val();
+        var title = cleanTitle($j('#'+target.id).parent().parent().find('[name=title\\[\\]]').val());
+        var back_date = $j('#'+target.id).parent().parent().find('[name=back_date\\[\\]]').val();
+        var backDateStatus = $j('#'+target.id).parent().parent().find('[name=backDateStatus\\[\\]]').val();
+        var path = 'index.php?display=true&module=content_management&page=applet_modal_launcher&uniqueId='+attachNum+'&objectType='+objectType+'&objectId='+templateOffice+'&attachType='+attachment_types+'&objectTable=' + objectTable + '&contactId='+contactidAttach+'&addressId='+addressidAttach+'&chronoAttachment='+chrono+'&titleAttachment='+title+'&backDateStatus='+backDateStatus+'&back_date='+back_date+'&resMaster=' + resId
+    }
+    
+
+    /*console.log('attach number : '+attachNum);
+    console.log('template_id : '+templateOffice);
+    console.log('attachment type : '+attachment_types);
+    console.log('contact_id : '+contactidAttach);
+    console.log('address_id : '+addressidAttach);
+    console.log('chrono : '+chrono);
+    console.log('title : '+title);
+    console.log('back date : '+back_date);
+    console.log('path : '+path);*/
+    
     new Ajax.Request(path,
     {
         method:'post',

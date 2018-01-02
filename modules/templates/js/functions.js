@@ -26,7 +26,6 @@ function show_special_form(elem_to_view, elem_to_hide1)
 
 function show_special_form_3_elements(elem_to_view, elem_to_hide1, elem_to_hide2)
 {
-    console.log(elem_to_view);
     var elem_0 = window.document.getElementById(elem_to_view);
     var elem_1 = window.document.getElementById(elem_to_hide1);
     var elem_2 = window.document.getElementById(elem_to_hide2);
@@ -69,7 +68,6 @@ function setradiobutton(target)
     }else if(target=="sendmail") {
         $j("#office,#span_office").hide();
         $j("#html").click();
-        console.log("office caché !");
     } else if(target=="notifications") {
         $j("#txt,#span_txt,#office,#span_office").hide();
         $j("#html").click();
@@ -89,14 +87,41 @@ function setradiobutton(target)
 
 function select_template(path_to_script, attachment_type)
 {
+    
+    if ($j('#'+attachment_type.id).val() != '') {
+        $j('#formAttachment .transmissionDiv #newAttachButton').prop("disabled",false);
+        $j('#formAttachment .transmissionDiv #newAttachButton').removeClass("readonly");
+        
+    } else {
+        $j('#formAttachment .transmissionDiv #newAttachButton').prop("disabled",true);
+        $j('#formAttachment .transmissionDiv #newAttachButton').addClass("readonly");
+    }
+    if ($j('#'+attachment_type.id+' option:selected').attr("width_delay") != '' && $j('#'+attachment_type.id+' option:selected').attr("width_delay") != undefined) {
+        var delay = $j('#'+attachment_type.id+' option:selected').attr("width_delay");
+        var delay_date = defineBackDate(delay);
+        $j('#'+attachment_type.id).parent().parent().find('[name=back_date\\[\\]]').val(delay_date);
+
+    } else {
+        $j('#'+attachment_type.id).parent().parent().find('[name=back_date\\[\\]]').val("");
+    }
+
+    if ($j('#'+attachment_type.id+' option:selected').val() == "transmission") {
+        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]] option').remove();
+        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]]').append('<option value="EXP_RTURN">Attente retour</option>');
+        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]]').append('<option value="NO_RTURN">Pas de retour</option>');
+    } else {
+        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]] option').remove();
+        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]]').append('<option value="A_TRA">A traiter</option>');
+    }
+
     new Ajax.Request(path_to_script,
     {
         method:'post',
-        parameters: {attachment_type: attachment_type},
+        parameters: {attachment_type: $j('#'+attachment_type.id).val()},
         onSuccess: function(answer){
-            $('templateOffice').innerHTML = answer.responseText;
-            if (typeof ($('templateOffice').onchange) == 'function')
-                $('templateOffice').onchange();
+            $j('#'+attachment_type.id).parent().parent().find('[name=templateOffice\\[\\]]').html(answer.responseText);
+            $j('#'+attachment_type.id).parent().parent().find('[name=templateOffice\\[\\]]').change();    
+            $j('#'+attachment_type.id).parent().parent().find('[name=contact_attach\\[\\]]').change();
         }
     });
 }

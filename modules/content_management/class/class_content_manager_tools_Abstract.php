@@ -355,6 +355,7 @@ abstract class content_management_tools_Abstract
         $convertPdf = "false",
         $onlyConvert = "false"
     ) {
+        
         $docXML = new DomDocument('1.0', "UTF-8");
 
         //create unique id for APPLET
@@ -514,7 +515,7 @@ abstract class content_management_tools_Abstract
         }
         $param4_balise=$docXML->createElement("argument", htmlentities($objectId));
 
-        if (empty($uniqueId)) {
+        if ($uniqueId < 0) {
             $uniqueId = 'empty';
         }
         $param5_balise=$docXML->createElement("argument", htmlentities($uniqueId));

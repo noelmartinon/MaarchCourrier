@@ -79,6 +79,8 @@ if (!defined("_CHOOSE_MODEL"))
     define( "_CHOOSE_MODEL", "Sélectionnez le modèle");
 if (!defined("_BACK_DATE"))
     define( "_BACK_DATE", "Date de retour");
+if (!defined("_EFFECTIVE_DATE"))
+    define( "_EFFECTIVE_DATE", "Date de retour effective");
 if (!defined("_ATTACHMENT_TYPES"))
     define( "_ATTACHMENT_TYPES", "Type d'attachement");
 if (!defined("_RESPONSE_PROJECT"))
@@ -149,3 +151,6 @@ if (!defined("_NO_PREVIEW_AVAILABLE"))
 
 if (!defined("_FILE_HAS_NO_PDF"))
     define( "_FILE_HAS_NO_PDF", "La version PDF du fichier n'existe pas.");
+
+if (!defined("_MODEL_NOT_EDITED"))
+    define( "_MODEL_NOT_EDITED", "Modèle non édité");

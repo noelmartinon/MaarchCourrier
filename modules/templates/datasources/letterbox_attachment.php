@@ -225,10 +225,10 @@ if (!empty($res_id)) {
 
     // Transmissions
     $datasources['transmissions'] = [];
-    if (isset($_SESSION['transmissionContacts'])) {
+    if (isset($_SESSION['transmissionContacts']) && count($_SESSION['transmissionContacts']) > 0) {
 
-        if (isset($_SESSION['upfileTransmissionNumber']) && $_SESSION['transmissionContacts'][$_SESSION['upfileTransmissionNumber']]) {
-            $curNb = $_SESSION['upfileTransmissionNumber'];
+        if (isset($_SESSION['attachmentInfo']['attachNum']) && $_SESSION['transmissionContacts'][$_SESSION['attachmentInfo']['attachNum']]) {
+            $curNb = $_SESSION['attachmentInfo']['attachNum'];
             foreach ($_SESSION['transmissionContacts'][$curNb] as $key => $value) {
                 if ($key == 'title')
                     $datasources['transmissions'][0]['currentContact_' . $key] = $contacts->get_civility_contact($value);
@@ -237,13 +237,16 @@ if (!empty($res_id)) {
             }
         }
 
-        for ($nb = 1; $_SESSION['transmissionContacts'][$nb]; $nb++) {
-            foreach ($_SESSION['transmissionContacts'][$nb] as $key => $value) {
-                if ($key == 'title')
+        $nb = 0;
+        foreach ($_SESSION['transmissionContacts'] as $it => $transmission) {
+            foreach ($transmission as $key => $value) {
+                if ($key == 'title') {
                     $datasources['transmissions'][0][$key . $nb] = $contacts->get_civility_contact($value);
-                else
+                } else {
                     $datasources['transmissions'][0][$key . $nb] = $value;
+                }    
             }
+            $nb++;
         }
     }
 }

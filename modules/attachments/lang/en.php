@@ -79,6 +79,8 @@ if (!defined("_CHOOSE_MODEL"))
     define( "_CHOOSE_MODEL", "Select the model");
 if (!defined("_BACK_DATE"))
     define( "_BACK_DATE", "Return date");
+if (!defined("_EFFECTIVE_DATE"))
+    define( "_EFFECTIVE_DATE", "Effective date");
 if (!defined("_ATTACHMENT_TYPES"))
     define( "_ATTACHMENT_TYPES", "Attachment type");
 if (!defined("_RESPONSE_PROJECT"))
@@ -149,3 +151,6 @@ if (!defined("_NO_PREVIEW_AVAILABLE"))
 
 if (!defined("_FILE_HAS_NO_PDF"))
     define( "_FILE_HAS_NO_PDF", "PDF version does not exist for this file.");
+
+if (!defined("_MODEL_NOT_EDITED"))
+    define( "_MODEL_NOT_EDITED", "Model not edited");

@@ -156,7 +156,7 @@ if (!empty($_REQUEST['action'])
             && $objectType <> 'newAttachment'
             && $objectType != 'transmission'
         ) {
-            //case of res -> master or version
+            //case of res -> master or version (DEPRECATED DO NOT USE!)
             include 'modules/content_management/retrieve_res_from_cm.php';
         } elseif ($objectType == 'attachment' || $objectType == 'attachmentUpVersion') {
             //case of res -> update attachment
@@ -316,24 +316,25 @@ if (!empty($_REQUEST['action'])
                 );
                 createXML('ERROR', $result);
             } else {
-                //depending on the type of object, the action is not the same
+                //depending on the type of object, the action is not the same (???)
                 if ($objectType == 'resource') {
                     include 'modules/content_management/save_new_version_from_cm.php';
                 }
+                //EDIT ATTACHMENT (???)
                 if ($objectType == 'resourceEdit') {
                     include 'modules/content_management/save_editRes_from_cm.php';
-                } elseif ($objectType == 'attachmentFromTemplate' || $objectType == 'newAttachment') {
+                //ADD NEW ATTACHMENT (???)  
+                } elseif ($objectType == 'attachmentFromTemplate') {
                     include 'modules/content_management/save_attach_res_from_cm.php';
+                //(???)
                 } elseif ($objectType == 'attachment') {
                     include 'modules/content_management/save_attach_from_cm.php';
+                //ADD - EDIT NEW TEMPLATE
                 } elseif ($objectType == 'templateStyle' || $objectType == 'template') {
                     include 'modules/content_management/save_template_from_cm.php';
-                } elseif ($objectType == 'attachmentVersion' || $objectType == 'attachmentUpVersion') {
+                //ADD - EDIT NEW ATTACHMENT (FOR TEMPORARY SAVE)
+                } elseif ($objectType == 'attachmentVersion' || $objectType == 'attachmentUpVersion' || $objectType == 'outgoingMail' || $objectType == 'newAttachment') {
                     include 'modules/content_management/save_attachment_from_cm.php';
-                } elseif ($objectType == 'outgoingMail') {
-                    include 'modules/content_management/save_outmail_from_cm.php';
-                } elseif ($objectType == 'transmission') {
-                    include 'modules/content_management/save_transmission_from_cm.php';
                 }
 
                 if ($_REQUEST['step']== 'end') {

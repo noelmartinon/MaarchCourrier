@@ -1064,6 +1064,7 @@ function destroyModal(id_mod){
     document.getElementsByTagName('body')[0].removeChild($j("#" + id_mod)[0]);
     document.getElementsByTagName('body')[0].removeChild($j("#" + id_layer)[0]);
     $j("input[type='button']").prop("disabled", false).css("opacity", "1");
+    $j('body',window.top.window.document).css("overflow","auto");
 
     // FIX IE 11
     if($j('#leftPanelShowDocumentIframe')){

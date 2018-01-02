@@ -36,148 +36,236 @@ require_once 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
     . 'class_indexing_searching_app.php';
 $is = new indexing_searching_app();
 
-$extension = explode(".",$_SESSION['upfile']['name']);
-$count_level = count($extension)-1;
-$the_ext = $extension[$count_level];
-$_SESSION['upfile']['format'] = $the_ext;
+//REFACTORING
+if (isset($_GET['num'])) {
+    $num = $_GET['num'];
+    if (!empty($_SESSION['upfile'][$num]['fileNamePdfOnTmp'])) {
+        $mimeType = $is->get_mime_type('pdf');
+        header("Pragma: public");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: public");
+        header("Content-Description: File Transfer");
+        header("Content-Type: ".$mimeType);
+        header("Content-Disposition: inline; filename=" . basename('maarch') . ".pdf");
+        header("Content-Transfer-Encoding: binary");
+        if (file_exists($_SESSION['config']['tmppath'] . $_SESSION['upfile'][$num]['fileNamePdfOnTmp'])) {
+            $loc = $_SESSION['config']['tmppath'] . $_SESSION['upfile'][$num]['fileNamePdfOnTmp'];
+            readfile($loc);
+        }
+        exit();
+    } elseif (isset($_SESSION['upfile'][$num]['mime'])
+        && ! empty($_SESSION['upfile'][$num]['mime'])
+        && isset($_SESSION['upfile'][$num]['format'])
+        && ! empty($_SESSION['upfile'][$num]['format'])
+        && $_SESSION['upfile'][$num]['error'] <> 1
+    ) {
+		$extension = explode(".",$_SESSION['upfile'][$num]['name']);
+		$count_level = count($extension)-1;
+		$the_ext = $extension[$count_level];
+		$_SESSION['upfile'][$num]['format'] = $the_ext;
+		
+		$extList = $is->filetypes_showed_indexation();
+		
+		if (isset($_SESSION['upfile'][$num]['format'])) {
+			$showFile = $is->show_index_frame($_SESSION['upfile'][$num]['format']);
+			$ext = strtolower($_SESSION['upfile'][$num]['format']);
+		} else {
+			$showFile = false;
+			$ext = '';
+		}
 
-$extList = $is->filetypes_showed_indexation();
-
-if (isset($_SESSION['upfile']['format'])) {
-    $showFile = $is->show_index_frame($_SESSION['upfile']['format']);
-    $ext = strtolower($_SESSION['upfile']['format']);
+        if ($showFile) {
+            $mimeType = $is->get_mime_type($_SESSION['upfile'][$num]['format']);
+			//print_r($_SESSION['upfile']);exit;
+			header("Pragma: public");
+            header("Expires: 0");
+            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-Type: ".$mimeType);
+            header(
+            "Content-Disposition: inline; filename=" . basename('maarch') . "."
+            . $ext . ";"
+        );
+            header("Content-Transfer-Encoding: binary");
+            $ext = strtolower($_SESSION['upfile'][$num]['format']);
+            if (file_exists($_SESSION['upfile'][$num]['local_path'])) {
+                $loc = $_SESSION['upfile'][$num]['local_path'];
+                readfile($loc);
+            }
+            exit();
+        } else {
+            $core->load_html();
+            $core->load_header();
+        //time = $core->get_session_time_expire();
+        ?>
+		<body background="<?php
+        echo $_SESSION['config']['businessappurl']; ?>static.php?filename=bg_home_home.gif" style="background-repeat:no-repeat;background-position:center">
+		<?php
+           $ext = strtolower($_SESSION['upfile'][$num]['format']);
+            if (file_exists($_SESSION['upfile'][$num]['local_path'])) {
+                echo "<br/><br/><div class=\"error\">"
+                . _FILE_LOADED_BUT_NOT_VISIBLE . _ONLY_FILETYPES_AUTHORISED
+                . " <br/><ul>";
+                for ($i = 0; $i < count($extList); $i ++) {
+                    echo "<li>" . $extList[$i] . "</li>";
+                }
+                echo "</ul></div>";
+            } else {
+                echo "<br/><br/><div class=\"error\">"
+                . _PROBLEM_LOADING_FILE_TMP_DIR . ".</div>";
+            } ?>
+		&nbsp;
+		</body>
+		</html>
+		<?php
+        }
+    }
 } else {
-    $showFile = false;
-    $ext = '';
-}
-
-if ($_SESSION['origin'] == "scan") {
-	if (file_exists(
-	    $_SESSION['config']['tmppath'] . 'tmp_file_'
-	    . $_SESSION['upfile']['md5'] . '.' . $ext
-	)
-	) {
-		header("Pragma: public");
-		header("Expires: 0");
-		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Cache-Control: public");
-		header("Content-Description: File Transfer");
-		header("Content-Type: ".$_SESSION['upfile']['mime']);
-		header(
-			"Content-Disposition: inline; filename=" . basename('maarch') . "."
-		    . $ext . ";"
-		);
-		header("Content-Transfer-Encoding: binary");
-		$loc = $_SESSION['config']['tmppath'] . 'tmp_file_'
-		     . $_SESSION['upfile']['md5'] . '.' . $ext;
-		readfile($loc);
+	$extension = explode(".",$_SESSION['upfile']['name']);
+	$count_level = count($extension)-1;
+	$the_ext = $extension[$count_level];
+	$_SESSION['upfile']['format'] = $the_ext;
+	
+	$extList = $is->filetypes_showed_indexation();
+	
+	if (isset($_SESSION['upfile']['format'])) {
+		$showFile = $is->show_index_frame($_SESSION['upfile']['format']);
+		$ext = strtolower($_SESSION['upfile']['format']);
 	} else {
-		echo "<br/>PROBLEM DURING FILE SEND";
+		$showFile = false;
+		$ext = '';
 	}
-	exit();
-}else if (!empty($_SESSION['upfile']['fileNamePdfOnTmp'])) {
-	$mimeType = $is->get_mime_type('pdf');
-	header("Pragma: public");
-	header("Expires: 0");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	header("Cache-Control: public");
-	header("Content-Description: File Transfer");
-	header("Content-Type: ".$mimeType);
-	header("Content-Disposition: inline; filename=" . basename('maarch') . ".pdf");
-	header("Content-Transfer-Encoding: binary");
-	if (file_exists($_SESSION['config']['tmppath'] . $_SESSION['upfile']['fileNamePdfOnTmp'])) {
-		$loc = $_SESSION['config']['tmppath'] . $_SESSION['upfile']['fileNamePdfOnTmp'];
-		readfile($loc);
-	}
-	exit();
-
-} else if (isset($_SESSION['upfile']['mime'])
-    && ! empty($_SESSION['upfile']['mime'])
-    && isset($_SESSION['upfile']['format'])
-    && ! empty($_SESSION['upfile']['format'])
-    && $_SESSION['upfile']['error'] <> 1
-) {
-	if ($showFile) {
-		$mimeType = $is->get_mime_type($_SESSION['upfile']['format']);
-		//print_r($_SESSION['upfile']);exit;
+	
+	if ($_SESSION['origin'] == "scan") {
+		if (file_exists(
+			$_SESSION['config']['tmppath'] . 'tmp_file_'
+			. $_SESSION['upfile']['md5'] . '.' . $ext
+		)
+		) {
+			header("Pragma: public");
+			header("Expires: 0");
+			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			header("Cache-Control: public");
+			header("Content-Description: File Transfer");
+			header("Content-Type: ".$_SESSION['upfile']['mime']);
+			header(
+				"Content-Disposition: inline; filename=" . basename('maarch') . "."
+				. $ext . ";"
+			);
+			header("Content-Transfer-Encoding: binary");
+			$loc = $_SESSION['config']['tmppath'] . 'tmp_file_'
+				 . $_SESSION['upfile']['md5'] . '.' . $ext;
+			readfile($loc);
+		} else {
+			echo "<br/>PROBLEM DURING FILE SEND";
+		}
+		exit();
+	}else if (!empty($_SESSION['upfile']['fileNamePdfOnTmp'])) {
+		$mimeType = $is->get_mime_type('pdf');
 		header("Pragma: public");
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
 		header("Cache-Control: public");
 		header("Content-Description: File Transfer");
 		header("Content-Type: ".$mimeType);
-		header(
-			"Content-Disposition: inline; filename=" . basename('maarch') . "."
-		    . $ext . ";"
-		);
+		header("Content-Disposition: inline; filename=" . basename('maarch') . ".pdf");
 		header("Content-Transfer-Encoding: binary");
-		$ext = strtolower($_SESSION['upfile']['format']);
-		if (file_exists($_SESSION['upfile']['local_path'])) {
-			$loc = $_SESSION['upfile']['local_path'];
+		if (file_exists($_SESSION['config']['tmppath'] . $_SESSION['upfile']['fileNamePdfOnTmp'])) {
+			$loc = $_SESSION['config']['tmppath'] . $_SESSION['upfile']['fileNamePdfOnTmp'];
 			readfile($loc);
 		}
 		exit();
+	
+	} else if (isset($_SESSION['upfile']['mime'])
+		&& ! empty($_SESSION['upfile']['mime'])
+		&& isset($_SESSION['upfile']['format'])
+		&& ! empty($_SESSION['upfile']['format'])
+		&& $_SESSION['upfile']['error'] <> 1
+	) {
+		if ($showFile) {
+			$mimeType = $is->get_mime_type($_SESSION['upfile']['format']);
+			//print_r($_SESSION['upfile']);exit;
+			header("Pragma: public");
+			header("Expires: 0");
+			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			header("Cache-Control: public");
+			header("Content-Description: File Transfer");
+			header("Content-Type: ".$mimeType);
+			header(
+				"Content-Disposition: inline; filename=" . basename('maarch') . "."
+				. $ext . ";"
+			);
+			header("Content-Transfer-Encoding: binary");
+			$ext = strtolower($_SESSION['upfile']['format']);
+			if (file_exists($_SESSION['upfile']['local_path'])) {
+				$loc = $_SESSION['upfile']['local_path'];
+				readfile($loc);
+			}
+			exit();
+		} else {
+			$core->load_html();
+			$core->load_header();
+			//time = $core->get_session_time_expire();
+			?>
+			<body background="<?php
+			echo $_SESSION['config']['businessappurl'];
+			?>static.php?filename=bg_home_home.gif" style="background-repeat:no-repeat;background-position:center">
+			<?php
+			   $ext = strtolower($_SESSION['upfile']['format']);
+			if (file_exists($_SESSION['upfile']['local_path'])) {
+				echo "<br/><br/><div class=\"error\">"
+					. _FILE_LOADED_BUT_NOT_VISIBLE . _ONLY_FILETYPES_AUTHORISED
+					. " <br/><ul>";
+				for ($i = 0; $i < count($extList); $i ++) {
+					echo "<li>" . $extList[$i] . "</li>";
+				}
+				echo "</ul></div>";
+			} else {
+				echo "<br/><br/><div class=\"error\">"
+					. _PROBLEM_LOADING_FILE_TMP_DIR . ".</div>";
+			}
+			?>
+			&nbsp;
+			</body>
+			</html>
+			<?php
+		}
 	} else {
-        $core->load_html();
-        $core->load_header();
-        //time = $core->get_session_time_expire();
+		 $core->load_html();
+		 $core->load_header();
 		?>
 		<body background="<?php
 		echo $_SESSION['config']['businessappurl'];
 		?>static.php?filename=bg_home_home.gif" style="background-repeat:no-repeat;background-position:center">
 		<?php
-   		$ext = strtolower($_SESSION['upfile']['format']);
-        if (file_exists($_SESSION['upfile']['local_path'])) {
-			echo "<br/><br/><div class=\"error\">"
-			    . _FILE_LOADED_BUT_NOT_VISIBLE . _ONLY_FILETYPES_AUTHORISED
-			    . " <br/><ul>";
-		    for ($i = 0; $i < count($extList); $i ++) {
-			    echo "<li>" . $extList[$i] . "</li>";
-		    }
-			echo "</ul></div>";
+		if (isset($_SESSION['upfile']['error'])
+			&& $_SESSION['upfile']['error'] == 1
+		) {
+			$filesize = $func->return_bytes(ini_get("upload_max_filesize"));
+			echo "<br/><br/><div class=\"error\">" . _MAX_SIZE_UPLOAD_REACHED
+				. " (" . round($filesize / 1024, 2) . "Ko Max)</div>";
 		} else {
-			echo "<br/><br/><div class=\"error\">"
-			    . _PROBLEM_LOADING_FILE_TMP_DIR . ".</div>";
-		}
-	    ?>
-        &nbsp;
-        </body>
-        </html>
-        <?php
-	}
-} else {
-     $core->load_html();
-     $core->load_header();
-	?>
-    <body background="<?php
-    echo $_SESSION['config']['businessappurl'];
-    ?>static.php?filename=bg_home_home.gif" style="background-repeat:no-repeat;background-position:center">
-	<?php
-	if (isset($_SESSION['upfile']['error'])
-	    && $_SESSION['upfile']['error'] == 1
-	) {
-	    $filesize = $func->return_bytes(ini_get("upload_max_filesize"));
-		echo "<br/><br/><div class=\"error\">" . _MAX_SIZE_UPLOAD_REACHED
-		    . " (" . round($filesize / 1024, 2) . "Ko Max)</div>";
-	} else {
-	    echo "<br/><br/><div class=\"advertissement\">" . $_SESSION['error']
-	        . " " . _ONLY_FILETYPES_AUTHORISED . " :<br/><ul>";
-		$displayedExtList = '';
-		$extension_array = array();
-		for ($i = 0; $i < count($extList); $i ++) {
-			if (!array_search($extList[$i], $extension_array)) {
-				$extension_array[] = $extList[$i];
-				$displayedExtList .= $extList[$i].", ";
+			echo "<br/><br/><div class=\"advertissement\">" . $_SESSION['error']
+				. " " . _ONLY_FILETYPES_AUTHORISED . " :<br/><ul>";
+			$displayedExtList = '';
+			$extension_array = array();
+			for ($i = 0; $i < count($extList); $i ++) {
+				if (!array_search($extList[$i], $extension_array)) {
+					$extension_array[] = $extList[$i];
+					$displayedExtList .= $extList[$i].", ";
+				}
 			}
+	
+			echo "<li>" . substr($displayedExtList, 0 , - 2) . "</li>";
+			echo "</ul></div>";
 		}
-
-		echo "<li>" . substr($displayedExtList, 0 , - 2) . "</li>";
-		echo "</ul></div>";
+		$_SESSION['error'] = '';
+		?>
+		&nbsp;
+		</body>
+		</html>
+		<?php
 	}
-	$_SESSION['error'] = '';
-	?>
-    &nbsp;
-    </body>
-    </html>
-    <?php
 }

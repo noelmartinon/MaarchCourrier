@@ -293,15 +293,7 @@ if ($mode == 'list') {
                             <label><?php echo _EDIT_TEMPLATE;?> :</label>
                   
                                 <?php
-                                $strAction .= 'showAppletLauncher(\''
-                                    . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
-                                    . '&module=content_management&page=applet_modal_launcher&objectType='
-                                    . $objectType
-                                    . '&objectId='
-                                    . $objectId
-                                    . '&objectTable='
-                                    . $objectTable
-                                    . '\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';';
+                                $strAction .= 'showAppletLauncher(this,\''.$objectId.'\',\''.$objectTable.'\',\''.$objectType.'\',\'template\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';';
                                 ?>
                                 <a href="#" onClick="<?php functions::xecho($strAction);?>">
                                 

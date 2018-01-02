@@ -1,7 +1,6 @@
 // Date + 60 jours, utile pour les transmissions
-function defineBackDate() {
+function defineBackDate(delay) {
 	var date1 = new Date();
-	var delay = $j('#withDelay')[0].value;
 	date1.setDate(date1.getDate() + Number(delay));
 	var str_date = date1.toLocaleDateString();
     var t = str_date.split('/');
@@ -59,207 +58,56 @@ function setRturnForEffectiveDate() {
   $('effectiveDateStatus').selectedIndex = 1;
 }
 
-function saveContactToSession(size, prePath) {
+function saveContactToSession(target) {
 
   setTimeout(function() {
-    var contactId = $("transmissionContactidAttach" + size).value;
-    var addressId = $("transmissionAddressidAttach" + size).value;
+    var transmissionContactidAttach = [];
+    var transmissionAddressidAttach = [];
+    
+    $j('#formAttachment #addAttach1').each(function (index) {
+        if ($j('#formAttachment #addAttach1').find('[name=attachment_types\\[\\]]').eq(index).val() == 'transmission') {
+            var item1 = {
+                "index": index,
+                "val": $j('#formAttachment #addAttach1').find('[name=contactidAttach\\[\\]]').eq(index).val(),
+            };
+            transmissionContactidAttach.push(item1);
+            var item2 = {
+                "index": index,
+                "val": $j('#formAttachment #addAttach1').find('[name=addressidAttach\\[\\]]').eq(index).val(),
+            };
+            transmissionAddressidAttach.push(item2);
+        }        
+    });
 
-    if (contactId) {
-      new Ajax.Request(prePath + "index.php?display=true&module=attachments&page=saveTransmissionContact",
-        {
-          method:'post',
-          parameters: {
-            size      : size,
-            contactId : contactId,
-            addressId : addressId
-          }
-        });
-    }
+    $j.ajax({
+        type: "POST",
+        data: {
+            transmissionContactidAttach : transmissionContactidAttach,
+            transmissionAddressidAttach : transmissionAddressidAttach
+        },
+        url: "index.php?display=true&module=attachments&page=saveTransmissionContact",
+        success: function(msg){
+            
+        }
+    });
 
   }, 500);
 }
 
-function displayTransmissionContactCard(mode, id, size)
-{
-  var contactCard = $(id);
-
-  var contactId = $("transmissionContact_attach" + size).value;
-
-  if(contactCard && (mode == 'hidden' || mode == 'visible') && contactId != '') {
-    contactCard.style.visibility = mode;
-  } else if (contactId == '') {
-    contactCard.style.visibility = "hidden";
-  }
-}
-
-function disableTransmissionButton(currentValue) {
-  var size = $('transmission').childElementCount;
-
-  for (var i = 1; i <= size; i++) {
-    $('transmission').lastElementChild.remove();
-  }
-
-  var addButton = $('newTransmissionButton0');
-
-  addButton.style.display = "";
-  if (currentValue == "" || $("chrono_display").style.display == "none") {
-    addButton.style.opacity = 0.5;
-  } else {
-    addButton.style.opacity = 1;
-  }
-}
-
-function showOrButtonForAttachment() {
-  if ($("edit").style.display != "none" && $("newTransmissionButton0").style.display != "none") {
-    $("divOr0").style.display = "";
-  } else {
-    $("divOr0").style.display = "none";
-  }
-}
-
-function showTransmissionEditButton(currentValue, editParagraph, size) {
-  if (currentValue == "") {
-    $(editParagraph).style.display = "none";
-    $("divOr" + size).style.display = "none";
-  } else {
-    $(editParagraph).style.display = "";
-    if ($("newTransmissionButton" + size).style.display != "none")
-      $("divOr" + size).style.display = "";
-  }
-}
 
 function hideEditAndAddButton(editParagraph) {
   $(editParagraph).style.display = "none";
 }
 
-function delLastTransmission() {
 
-  var size = $('transmission').childElementCount;
-
-  if ($('delTransmissionButton' + size).style.opacity == 1) {
-    if (size >= 1) {
-      $('transmission').lastElementChild.remove();
-
-      $('newTransmissionButton' + (size - 1)).style.display = "";
-      if (size > 1) {
-        $('delTransmissionButton' + (size - 1)).style.display = "";
-        if ($("paraEdit" + (size - 1)).style.display != "none")
-          $("divOr" + (size - 1)).style.display = "";
-      } else if (size == 1) {
-        if ($("edit").style.display != "none")
-          $("divOr0").style.display = "";
-      }
-    }
-  }
-}
-
-function hideInput(currentValue, editDate) {
-	if (currentValue == "NO_RTURN") {
-		editDate.value = null
+function hideInput(target) {
+	if ($j('#'+target.id).val() == "NO_RTURN") {
+        $j('#'+target.id).parent().parent().find('[name=back_date\\[\\]]').val("");
 	} else {
-		editDate.value = defineBackDate();
+        var delay = $j('#'+target.id).parent().parent().find('[name=attachment_types\\[\\]] option:selected').attr("width_delay");
+        var delay_date = defineBackDate(delay);
+        $j('#'+target.id).parent().parent().find('[name=back_date\\[\\]]').val(delay_date);
 	}
-}
-
-function addNewTransmission(prePath, docId, canCreateContact, langString, user) {
-  var size = $j('#transmission')[0].childElementCount;
-  
-  var extra_js = '$("add").value="Edition en cours ...";editingDoc("'+user+'");$("add").disabled="disabled";$("add").style.opacity="0.5";';
-
-  if ($('newTransmissionButton' + size).style.opacity == 1) {
-
-    var div = document.createElement('div');
-    $('transmission').appendChild(div);
-    size = $('transmission').childElementCount;
-
-    $('newTransmissionButton' + (size - 1)).style.display = "none";
-    $("divOr" + (size - 1)).style.display = "none";
-    if (size > 1) {
-      $('delTransmissionButton' + (size - 1)).style.display = "none";
-    }
-
-    div.className = "transmissionDiv";
-    var content   = "<hr style='width:85%; height: 4px; margin-left:0px; margin-bottom:10px; margin-top: 10px'>" +
-                    "<p>" +
-                      "<label>" + "Type d'attachement" + "</label>" +
-                      "<select name='transmissionType" + size + "' id='transmissionType" + size + "' />" +
-                        "<option value='transmission'>Transmission</option>" +
-                      "</select>" +
-                      "&nbsp;<span class='red_asterisk'><i class='fa fa-star'></i></span>" +
-                    "</p>" +
-                    "<p>" +
-                      "<label>" + "Numéro chrono" + "</label>" +
-                      "<input type='text' name='DisTransmissionChrono" + size + "' id='DisTransmissionChrono" + size + "' disabled class='readonly' />" +
-                      "<input type='hidden' name='transmissionChrono" + size + "' id='transmissionChrono" + size + "' />" +
-                    "</p>" +
-                    "<p>" +
-                      "<label>" + "Fichier" + "</label>" +
-                      "<select name='transmissionTemplate" + size + "' id='transmissionTemplate" + size + "' style='display:inline-block;' onchange='showTransmissionEditButton(this.options[this.selectedIndex].value, paraEdit" + size + ", " + size + ")'>" +
-                      "</select>" +
-                      "&nbsp;<span class='red_asterisk'><i class='fa fa-star'></i></span>" +
-                    "</p>" +
-                    "<p>" +
-                      "<label>" + "Objet" + "</label>" +
-                      "<input type='text' name='transmissionTitle" + size + "' id='transmissionTitle" + size + "' maxlength='250' value='' />" +
-                      "&nbsp;<span class='red_asterisk'><i class='fa fa-star'></i></span>" +
-                    "</p>" +
-                    "<p>" +
-                      "<label>" + "Date de retour attendue" + "</label>" +
-                      "<input type='hidden' name='withDelay" + size + "' id='withDelay" + size + "' value='' style='width: 75px' />" +
-                      "<input type='text' name='transmissionBackDate" + size + "' id='transmissionBackDate" + size + "' onClick='showCalender(this);' onchange='checkBackDate(this)' onfocus='checkBackDate(this)' value='' style='width: 75px' />" +
-                      "<select name='transmissionExpectedDate" + size + "' id='transmissionExpectedDate" + size + "' style='margin-left: 20px;width: 105px' onchange = 'hideInput(this.options[this.selectedIndex].value,transmissionBackDate" + size +")'/>" +
-                        "<option value='EXP_RTURN'>Attente retour</option>" +
-                        "<option value='NO_RTURN'>Pas de retour</option>" +
-                      "</select>" +
-                    "</p>";
-
-                    if (canCreateContact) {
-    content +=        "<label>" + "Destinataire" +
-                        " <a href='#' title='" + "Ajouter un contact ou une adresse" + "' " +
-                          "onclick='document.getElementById(\"contact_iframe_attach\").src=\"index.php?display=false&dir=my_contacts&page=create_contact_iframe&fromAttachmentContact=Y&transmissionInput="+size+"\";new Effect.toggle(\"create_contact_div_attach\", \"blind\", {delay:0.2});return false;' style='display:inline;' >" +
-                          "<i class='fa fa-pencil fa-lg' title='" + "Ajouter un contact ou une adresse" + "'>" +
-                          "</i>" +
-                        "</a>" +
-                      "</label>";
-                    } else {
-    content +=        "<label>Destinataire</label>";
-                    }
-
-    content +=        "<span style='position:relative'><input type='text' name='transmissionContact_attach" + size + "' id='transmissionContact_attach" + size + "' value='' " +
-                        "onblur='displayTransmissionContactCard(\"visible\", \"transmissionContactCard" + size + "\", " + size + ");' " +
-                        "onkeyup='erase_contact_external_id(\"transmissionContact_attach" + size + "\", \"transmissionContactidAttach" + size + "\");erase_contact_external_id(\"transmissionContact_attach" + size + "\", \"transmissionAddressidAttach" + size + "\");' />" +
-                      "<a href='#' id='transmissionContactCard" + size + "' title='Fiche contact' onclick='document.getElementById(\"info_contact_iframe_attach\").src=\"" + prePath + "index.php?display=false&dir=my_contacts&page=info_contact_iframe&seeAllAddresses&contactid=\"+document.getElementById(\"transmissionContactidAttach"+size+"\").value+\"&addressid=\"+document.getElementById(\"transmissionAddressidAttach"+size+"\").value+\"\";new Effect.toggle(\"info_contact_div_attach\", \"blind\", {delay:0.2});return false;' style='visibility:hidden;'> " +
-                        "<i class='fa fa-book fa-lg'></i>" +
-                      "</a>" +
-                    "<div id='transmission_show_contacts_attach" + size + "' class='autocomplete autocompleteIndex' style='display: none;width:100%;left:0px;'></div></span>" +
-
-                    "<input type='hidden' id='transmissionContactidAttach" + size + "' name='transmissionContactidAttach" + size + "' value='' onchange='saveContactToSession(\"" + size + "\", \"" + prePath + "\")' />" +
-                    "<input type='hidden' id='transmissionAddressidAttach" + size + "' name='transmissionAddressidAttach" + size + "' value='' />" +
-                    "<p><div style='float: left;display: none;margin-bottom: 5px' id='paraEdit" + size + "'>" +
-                      "<input type='button' style='margin-top: 0' value='" + "Editer" + "' name='transmissionEdit" + size + "' id='transmissionEdit" + size + "' class='button transmissionEdit' " +
-                        "onclick='showAppletLauncher(\"" + prePath + "index.php?display=true&module=content_management&page=applet_modal_launcher&transmissionNumber=" + size + "&objectType=transmission&objectId=\"+$(\"transmissionTemplate" + size + "\").value+\"&attachType=transmission&objectTable=res_letterbox&contactId=\"+$(\"contactidAttach\").value+\"&addressId=\"+$(\"addressidAttach\").value+\"&chronoAttachment=\"+$(\"transmissionChrono" + size + "\").value+\"&titleAttachment=\"+$(\"transmissionTitle" + size + "\").value+\"&back_date=\"+$(\"transmissionBackDate" + size + "\").value+\"&resMaster=" + docId + "\", \"100px\", \"500px\");" +
-                        "hideEditAndAddButton(paraEdit" + size + ");"+ extra_js +"' />" +
-                      "<span style='display: none' id='divOr" + size + "'>" +
-                        "&nbsp;ou&nbsp;" +
-                      "</span>" +
-                    "</div>" +
-                    "<div style='float: left'>" +
-                      "<i id='newTransmissionButton" + size + "' title='Nouvelle transmission' style='opacity: 1;cursor: pointer;' class='fa fa-plus-circle fa-2x' " +
-                        "onclick='addNewTransmission(\"" + prePath + "\", " + docId + ", " + canCreateContact + ")'></i>" +
-                      "&nbsp;" +
-                      "<i id='delTransmissionButton" + size + "' title='Supprimer la dernière transmission' style='opacity: 1;cursor: pointer;' class='fa fa-minus-circle fa-2x' " +
-                        "onclick='delLastTransmission()'></i>" +
-                    "</div></p>";
-
-    div.innerHTML = content;
-    $('transmissionChrono' + size).value = $('chrono').value + "." + String.fromCharCode(64 + size);
-    $('DisTransmissionChrono' + size).value = $('chrono').value + "." + String.fromCharCode(64 + size);
-    $('transmissionTitle' + size).value = $('title').value;
-    $('transmissionBackDate' + size).value = defineBackDate();
-    getTemplatesForSelect((prePath + "index.php?display=true&module=templates&page=select_templates"), "transmission", "transmissionTemplate" + size);
-    launch_autocompleter_contacts_v2(prePath + "index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", "transmissionContact_attach" + size, "transmission_show_contacts_attach" + size, "", "transmissionContactidAttach" + size, "transmissionAddressidAttach" + size)
-  }
 }
 
 function getTemplatesForSelect(path_to_script, attachment_type, selectToChange)
@@ -302,15 +150,6 @@ function showAttachmentsForm(path, width, height) {
     });
 }
 
-function get_num_rep(res_id){
-	var trig_elements = document.getElementsByClassName('trig');
-	for (i=0; i<trig_elements.length; i++){
-		var id = trig_elements[i].id;
-		var splitted_id = id.split("_");
-		if (splitted_id.length == 3 && splitted_id[0] == 'ans' && splitted_id[2] == res_id) return splitted_id[1];
-	}
-	return 0;
-}
 function ValidAttachmentsForm(path, form_id, fromAngular) {
 
     new Ajax.Request(path,
@@ -321,7 +160,9 @@ function ValidAttachmentsForm(path, form_id, fromAngular) {
         encoding: 'UTF-8',
         onSuccess: function (answer) {
             eval("response = " + answer.responseText);
+
             if (response.status == 0) {
+
                 destroyModal('form_attachments');
 
                 if (typeof fromAngular != "undefined") {
@@ -348,30 +189,13 @@ function ValidAttachmentsForm(path, form_id, fromAngular) {
                         }
                     }
 
-                    if ($('cur_idAffich'))
-                        var num_rep = $('cur_idAffich').value;
-                    if ($('cur_resId'))
-                        var res_id_master = $('cur_resId').value;
-                    if (response.cur_id)
-                        var rep_id = response.cur_id;
-                    if (num_rep == 0)
-                        num_rep = get_num_rep(rep_id);
-
-                    if ($('viewframevalidRep' + num_rep + '_' + rep_id)) {
-                        if (response.majFrameId > 0) {
-                            $('viewframevalidRep' + num_rep + '_' + rep_id).src = "index.php?display=true&module=visa&page=view_pdf_attachement&res_id_master=" + res_id_master + "&id=" + response.majFrameId;
-                            if ($('cur_rep'))
-                                $('cur_rep').value = response.majFrameId;
-                            $('viewframevalidRep' + num_rep + '_' + rep_id).id = 'viewframevalidRep' + num_rep + '_' + response.majFrameId;
-                        }
-                        else
-                            $('viewframevalidRep' + num_rep + '_' + rep_id).src = $('viewframevalidRep' + num_rep + '_' + rep_id).src;
-                    }
+                    $j("#main_info").html(response.content).show().delay(5000).fadeOut();
 
                     eval(response.exec_js);
                 }
             } else {
-                alert(response.error);
+                $j("#main_error").css("opacity","1");
+                $j("#main_error").html(response.error).show().delay(5000).fadeOut();
             }
         }
     });
@@ -463,8 +287,9 @@ function createModalinAttachmentList(txt, id_mod, height, width, mode_frm){
     var tmp_height = height;
     
     var layer_height = document.body.clientHeight;
-    
     var layer_width = window.top.window.document.getElementsByTagName('html')[0].offsetWidth - 5;
+
+    
     var layer = new Element('div', {'id':id_layer, 'class' : 'lb1-layer', 'style' : "display:block;filter:alpha(opacity=70);opacity:.70;z-index:"+get_z_indexes()['layer']+';width :'+ (layer_width)+"px;height:"+layer_height+'px;'});
 
     if( mode_frm == 'fullscreen') {
@@ -483,23 +308,24 @@ function createModalinAttachmentList(txt, id_mod, height, width, mode_frm){
                 fenetre.style.width = (window.top.window.document.getElementsByTagName('html')[0].offsetWidth - 55)+"px";
             }
         } else {
-            fenetre.style.width = (window.top.window.document.getElementsByTagName('html')[0].offsetWidth - 30)+"px";
+            //fenetre.style.width = (window.top.window.document.getElementsByTagName('html')[0].offsetWidth - 30)+"px";
+            fenetre.style.width = "98%";
         }
-        fenetre.style.height = (window.top.window.document.getElementsByTagName('body')[0].offsetHeight - 20)+"px";
+        //fenetre.style.height = (window.top.window.document.getElementsByTagName('body')[0].offsetHeight - 20)+"px";
+        fenetre.style.height = "95%";
     }
 
     Element.update(fenetre,txt);
+    
+    
     Event.observe(layer, 'mousewheel', function(event){Event.stop(event);}.bindAsEventListener(), true);
     Event.observe(layer, 'DOMMouseScroll', function(event){Event.stop(event);}.bindAsEventListener(), false);
+    
+    $j('html',window.top.window.document).scrollTop(0);
+    $j('body',window.top.window.document).scrollTop(0);
+    
+    $j('body',window.top.window.document).css("overflow","hidden");
     window.top.window.$(id_mod).focus();
-}
-
-function setButtonStyle(radioButton, fileFormat, statusValidateButton) {
-    if (radioButton == "yes" && fileFormat != "pdf" && statusValidateButton == "1") {
-        $('edit').style.visibility="hidden";
-    } else if (radioButton == "no" && fileFormat != "pdf") {
-        $('edit').style.visibility="visible";
-    }
 }
 
 function cleanTitle(str) {
@@ -533,4 +359,219 @@ function activeOngletMainDocument() {
     $j('#liMainDocument').css('background-color', 'white');
     $j('#liMainDocument').css('height', '23px');
   }
+}
+
+function activePjTab(target) {
+
+    $j('[id^=PjDocument_],#MainDocument').css('background-color', 'rgb(197, 197, 197)');
+    $j('[id^=PjDocument_],#MainDocument').css('height', '21px');
+    $j('[id^=iframePjDocument_],#iframeMainDocument').hide();
+
+    $j('#'+target.id).css('background-color', 'white');
+    $j('#'+target.id).css('height', '23px');
+    $j('#iframe'+target.id).show();
+}
+
+function addNewAttach() {
+
+    //STEP 1 : add content
+    $j("#formAttachment #addAttach1").last().after($j("#formAttachment #addAttach1").first().clone().find("#choose_file").remove().end().clone());
+    
+    //STEP 2 : remove templateOfficeTool
+    $j("#formAttachment .transmissionDiv #templateOfficeTool").hide();
+
+    //STEP 3 : change ids
+    $j("[name=attachment_types\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=chrono_display\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=chrono\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=attachNum\\[\\]]").each(function( index ) {
+        this.value = index;
+        this.id = this.id.replace(/\d+/,'')+index;    
+    });
+    $j("[name=back_date\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=backDateStatus\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=contact_card_attach]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+        $j('#'+this.id).attr("onclick","showContactInfo(this,$j('[name=contactidAttach\\\\[\\\\]]')["+index+"],$j('[name=addressidAttach\\\\[\\\\]]')["+index+"]);");
+    });
+    $j("[name=contactidAttach\\[\\]]").each(function( index ) {
+        if ($j("#selectContactIdRes option:eq("+index+")").length) {
+            var contact = $j("#selectContactIdRes option:eq("+index+")").val();
+            contactId = contact.split('#');
+            this.value = contactId[0];
+        }
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=addressidAttach\\[\\]]").each(function( index ) {
+        if($j("#selectContactIdRes option:eq("+index+")").length) {
+            var contact = $j("#selectContactIdRes option:eq("+index+")").val();
+            contactId = contact.split('#');
+            this.value = contactId[1];
+        }
+        this.id = this.id.replace(/\d+/,'')+index;
+    });
+    $j("[name=contact_attach\\[\\]]").each(function( index ) {
+        if ($j("#selectContactIdRes option:eq("+index+")").length) {
+            $j("#"+this.id).val($j("#selectContactIdRes option:eq("+index+")").html());
+        }
+        $j("#"+this.id).attr("onchange","saveContactToSession(this);");
+        $j("#"+this.id).change();
+        this.id = this.id+index;
+        
+    });
+    $j("[name=templateOffice\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+        $j("#"+this.id).attr("onchange","showEditButton(this);");
+    });
+
+    $j("[name=templateOffice_edit\\[\\]]").each(function( index ) {
+        var id_split = this.id.replace(/\d+/,'').split('_');
+        this.id = id_split[0]+index+'_'+id_split[1];
+    });
+
+    //STEP 4 : reset new element
+    $j("#formAttachment .transmissionDiv [name=attachment_types\\[\\]]").last().val('');
+    $j("#formAttachment .transmissionDiv [name=attachment_types\\[\\]]").last().change();
+    $j("#formAttachment .transmissionDiv [name=templateOffice\\[\\]]").last().val('');
+    $j("#formAttachment .transmissionDiv [name=templateOffice\\[\\]]").last().css('display','inline-block');
+    $j("#formAttachment .transmissionDiv [name=templateOffice\\[\\]]").last().prop('disabled',false);
+    $j("#formAttachment .transmissionDiv [name=templateOffice\\[\\]]").last().change();
+    $j("#formAttachment .transmissionDiv [name=chrono_display\\[\\]]").last().val('');
+    $j("#formAttachment .transmissionDiv [name=chrono\\[\\]]").last().val('');
+    $j("#formAttachment .transmissionDiv [name=back_date\\[\\]]").last().val('');
+    $j("#formAttachment .transmissionDiv #newAttachButton").css("visibility","hidden");
+    $j("#formAttachment .transmissionDiv #newAttachButton").prop("disabled",true);
+    $j("#formAttachment .transmissionDiv #newAttachButton").last().css("visibility","visible");
+    $j("#formAttachment .transmissionDiv #newAttachButton").last().addClass("readonly");
+
+    $j("#formAttachment .transmissionDiv #templateOfficeTool #attachment_type_icon").first().attr("onclick","$j('#'+this.id).css('color','#009DC5');$j('#'+this.id).parent().parent().parent().parent().find('#attachment_type_icon2').first().css('color','#666');$j('#'+this.id).parent().parent().parent().parent().find('#templateOffice0').css('display','none');$j('#'+this.id).parent().parent().parent().parent().find('#templateOffice0').prop('disabled',true);$j('#'+this.id).parent().parent().parent().parent().find('#templateOffice0').css('display','none');$j('#'+this.id).parent().parent().parent().parent().find('#choose_file').css('display','inline-block');$j('#'+this.id).parent().parent().parent().parent().find('#choose_file').contents().find('#file').click()");
+    $j("#formAttachment .transmissionDiv #templateOfficeTool #attachment_type_icon2").first().attr("onclick","$j('#'+this.id).css('color','#009DC5');$j('#'+this.id).parent().parent().parent().parent().find('#attachment_type_icon').first().css('color','#666');$j('#'+this.id).parent().parent().parent().parent().find('#templateOffice0').css('display','inline-block');$j('#'+this.id).parent().parent().parent().parent().find('#templateOffice0').prop('disabled',false);$j('#'+this.id).parent().parent().parent().parent().find('#choose_file').css('display','none');");
+
+
+    $j("#formAttachment .transmissionDiv #templateOfficeTool").first().show();
+
+    launch_autocompleter2_contacts_v2("index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", $j("#formAttachment .transmissionDiv [name=contact_attach\\[\\]]").last().attr("id"), "show_contacts_attach", "", $j("#formAttachment .transmissionDiv [name=contactidAttach\\[\\]]").last().attr("id"), $j("#formAttachment .transmissionDiv [name=addressidAttach\\[\\]]").last().attr("id"));
+    launch_autocompleter2_contacts_v2("index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", $j("#formAttachment .transmissionDiv [name=contact_attach\\[\\]]").first().attr("id"), "show_contacts_attach", "", $j("#formAttachment .transmissionDiv [name=contactidAttach\\[\\]]").first().attr("id"), $j("#formAttachment .transmissionDiv [name=addressidAttach\\[\\]]").first().attr("id"));
+    
+    
+
+
+}
+
+function showEditButton(target) {
+
+    var modele_id = $j('#'+target.id).val();
+
+    if (modele_id != '') {
+
+        $j('#'+target.id+'_edit').css("display","inline");
+        $j('#'+target.id).css("width","166px");
+        
+        if ($('not_enabled')) {
+            $('not_enabled').setStyle({display: 'inline'});
+        }
+
+        $j('#'+target.id).parent().parent().find('#choose_file').css("display","none");
+
+        if ($('file_loaded')) {
+            $('file_loaded').setStyle({display: 'none'});
+        }
+    } else {
+        $j('#'+target.id+'_edit').css("display","none");
+        $j('#'+target.id).css("width","206px");
+
+        if ($('not_enabled')) {
+            $('not_enabled').setStyle({display: 'none'});
+        }
+        if ($('file_loaded')) {
+            $('file_loaded').setStyle({display: 'none'});
+        }
+    }
+}
+
+function affiche_chrono(target){
+    var type_id = document.getElementById(target.id).options[document.getElementById(target.id).selectedIndex];
+    var chrono_display = $j(target).parent().parent().find("[name=chrono_display\\[\\]]");
+    var chrono_label = $j(target).parent().parent().find("[name=chrono_label\\[\\]]");
+    var get_chrono_display = $j(target).parent().parent().find("[name=get_chrono_display\\[\\]]");
+    var chrono = $j(target).parent().parent().find("[name=chrono\\[\\]]");
+
+    //FOR MULTI ATTACHMENT
+    var index = '0';
+    var regexIndex = chrono.attr("id").match(/\d+/);
+    if (regexIndex != null) {
+        index = regexIndex[0];
+    }
+
+    //GENERATE CHRONO
+    if (type_id.value == 'transmission' && index != '0') {
+        get_chrono_display.css("display","none"); 
+        chrono_label.css("display","inline"); 
+        chrono_display.css("display","inline"); 
+        var num = $j('[value=transmission]:selected').length;
+        var chr = String.fromCharCode(64 + num);
+        chrono_display.val($j("#chrono0").val()+'.'+chr);
+        chrono.val($j("#chrono0").val()+'.'+chr);
+
+    } else if (type_id.getAttribute('with_chrono') == 'true') {
+        get_chrono_display.css("display","none"); 
+        chrono_label.css("display","inline"); 
+        chrono_display.css("display","inline"); 
+        
+        new Ajax.Request('index.php?display=true&module=attachments&page=get_chrono_attachment',
+        {
+            method:'post',
+            parameters:
+            {
+                index : index,
+                type_id : type_id
+            },
+                onSuccess: function(answer){
+                eval("response = "+answer.responseText);
+                chrono_display.val(response.chronoNB);
+                chrono.val(response.chronoNB);
+            }
+        });
+    } else if (type_id.getAttribute('get_chrono') != '' && type_id.getAttribute('get_chrono') != null) {
+        chrono_display.css("display","none");
+        chrono_display.val('');
+        chrono_label.css("display","inline");
+        get_chrono_display.css("display","inline");
+        chrono.val('');
+        new Ajax.Request('index.php?display=true&module=attachments&page=get_other_chrono_attachment',
+        {
+            method:'post',
+            parameters:
+            {
+                type_id : type_id.value
+            },
+                onSuccess: function(answer){
+                eval("response = "+answer.responseText);
+                get_chrono_display.html(response.chronoList);
+            }
+        });
+    } else {
+        chrono_label.css("display","none");
+        get_chrono_display.css("display","none");
+        chrono_display.css("display","none");
+        chrono_display.val('');
+        chrono.val('');
+    }
+}
+
+
+function showContactInfo(target,contactTarget,addressTarget) {
+    $j('#info_contact_div_attach').slideToggle("slow",function(){
+        $j('#'+target.name+'_iframe').attr('src','index.php?display=false&dir=my_contacts&page=info_contact_iframe&fromAttachmentContact=Y&seeAllAddresses&contactid='+contactTarget.value+'&addressid='+addressTarget.value);
+    });
 }
