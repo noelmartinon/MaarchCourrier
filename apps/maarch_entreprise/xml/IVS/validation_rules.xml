@@ -511,6 +511,7 @@
       <parameter name="original" type="boolean" />
       <parameter name="aVersion" type="boolean" />
       <parameter name="dir" type="identifier" />
+      <parameter name="watermark_outgoing" type="string" />
     </validationRule>
 
     <validationRule name="multi_contacts" extends="standardForm" mode="error">  
@@ -759,7 +760,6 @@
 
     <validationRule name="url_path" extends="standardForm" mode="error">  
       <!-- <parameter name="url" type="url" /> -->
-      <parameter name="watermark_outgoing" type="string" />
       <parameter name="url" type="string" />
       <parameter name="baskets" type="identifier" />
       <parameter name="origin" type="identifier" />

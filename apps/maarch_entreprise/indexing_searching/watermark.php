@@ -58,10 +58,17 @@ if ($watermarkTab['text'] == '') {
     	} elseif ($matches[1][$z] == 'hour_now') {
     		$currentText = date('H:m:i');
         } elseif($matches[1][$z] == 'alt_identifier'){
+
+            if($_REQUEST['watermark_outgoing'] == "true"){
+                $res_id = $_REQUEST['res_id_master'];
+            } else {
+                $res_id = $s_id;
+            }
+
             $dbView = new Database();
 		    $query = " select " . $matches[1][$z] 
 		        . " as thecolumn from mlb_coll_ext where res_id = ?";
-		    $stmt = $dbView->query($query, array($_REQUEST['res_id_master']));
+		    $stmt = $dbView->query($query, array($res_id));
             $returnQuery = $stmt->fetchObject();
             $currentText = $returnQuery->thecolumn;
         } else {
