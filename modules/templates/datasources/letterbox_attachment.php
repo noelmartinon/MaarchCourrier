@@ -174,6 +174,7 @@ if (!empty($res_id)) {
     $countVisa = 1;
     $i = 1;
     while ($avis = $stmt->fetchObject()) {
+        
         $stmt2 = $dbDatasource->query("SELECT * FROM users WHERE user_id = ? ", [$avis->item_id]);
         $avisContact = $stmt2->fetchObject();
         $stmt3 = $dbDatasource->query("SELECT en.entity_id, en.entity_label FROM entities en, users_entities ue WHERE ue.user_id = ? AND primary_entity = ? AND ue.entity_id = en.entity_id", [$avis->item_id, 'Y']);
