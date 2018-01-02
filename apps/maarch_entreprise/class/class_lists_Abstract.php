@@ -156,7 +156,7 @@ abstract class lists_Abstract extends Database
         $this->_manageFilters();
         if (isset($_REQUEST['template'])) $this->template = $_REQUEST['template'];
         if (isset($_REQUEST['coll_id'])) $this->collId = $_REQUEST['coll_id'];
-        if(!isset($_SESSION['previous_basket']['id'] && !empty($_SESSION['current_basket']['id']))){
+        if(!isset($_SESSION['previous_basket']['id']) && !empty($_SESSION['current_basket']['id'])){
             $_SESSION['previous_basket']['id'] = $_SESSION['current_basket']['id'];
         }
     }
