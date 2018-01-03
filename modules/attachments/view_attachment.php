@@ -136,6 +136,13 @@ if (! empty($_SESSION['error'])) {
             $file      = $docserver . $path . $filename;
             $file      = str_replace("#", DIRECTORY_SEPARATOR, $file);
 
+            if (!copy($file, $_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR  . $filename)) {
+                echo 'error';
+                exit();
+            } else {
+                $file = $_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR  . $filename;
+            }
+
             if (strtoupper($format) == "MAARCH") {
                 if (file_exists($file)) {
                     $myfile = fopen($file, "r");
