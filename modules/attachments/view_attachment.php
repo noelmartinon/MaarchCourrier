@@ -128,9 +128,9 @@ if (! empty($_SESSION['error'])) {
             $docserver = $line->docserver_id;
             $path = $line->path;
             $filename = $line->filename;
-	    $nameShow = $function->normalize($line->title);
-	    $nameShow = preg_replace('/([^.a-z0-9]+)/i', '_', $nameShow);
-	    $nameShow .= '_'. date("j_m_Y__G_i");
+    	    $nameShow = $function->normalize($line->title);
+    	    $nameShow = preg_replace('/([^.a-z0-9]+)/i', '_', $nameShow);
+    	    $nameShow .= '_'. date("j_m_Y__G_i");
             $format = $line->format;
             $stmt = $db->query(
                 "select path_template from " . _DOCSERVERS_TABLE_NAME
@@ -141,6 +141,14 @@ if (! empty($_SESSION['error'])) {
             $docserver = $lineDoc->path_template;
             $file = $docserver . $path . $filename;
             $file = str_replace("#", DIRECTORY_SEPARATOR, $file);
+            
+            if (!copy($file, $_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR  . $filename)) {
+                echo 'error';
+                exit();
+            } else {
+                $file = $_SESSION['config']['tmppath'] . DIRECTORY_SEPARATOR  . $filename;
+            }
+            
             if (strtoupper($format) == "MAARCH") {
                 if (file_exists($file)) {
                     $myfile = fopen($file, "r");
