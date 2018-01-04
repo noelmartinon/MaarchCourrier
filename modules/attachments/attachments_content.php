@@ -1953,9 +1953,7 @@ if(!isset($_REQUEST['id'])) {
     $content .= '<p><div style="float: left;margin-bottom: 5px">';
     $content .= '<input type="button" value="';
     $content .= _EDIT_MODEL;
-    /*$content .= '" name="edit" id="edit" style="display:none;margin-top: 0" class="button" '
-        . 'onclick="window.open(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=applet_popup_launcher&objectType=attachmentVersion&objectId=\'+$(\'templateOffice\').value+\'&attachType=\'+$(\'attachment_types\').value+\'&objectTable=' . $objectTable . '&contactId=\'+$(\'contactidAttach\').value+\'&addressId=\'+$(\'addressidAttach\').value+\'&chronoAttachment=\'+$(\'chrono\').value+\'&titleAttachment=\'+cleanTitle($(\'title\').value)+\'&back_date=\'+$(\'back_date\').value+\'&resMaster=' . $_SESSION['doc_id']
-        . '\', \'\', \'height=200, width=250,scrollbars=no,resizable=no,directories=no,toolbar=no\');$(\'add\').value=\'Edition en cours ...\';setInterval(function() {checkEditingDoc(\''.$_SESSION['user']['UserId'].'\')}, 500);$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';this.hide();"/>';*/
+
     $content .= '" name="edit" id="edit" style="display:none;margin-top: 0" class="button" '
         . 'onclick="showAppletLauncher(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=applet_modal_launcher&objectType=attachmentVersion&objectId=\'+$(\'templateOffice\').value+\'&attachType=\'+$(\'attachment_types\').value+\'&objectTable=' . $objectTable . '&contactId=\'+$(\'contactidAttach\').value+\'&addressId=\'+$(\'addressidAttach\').value+\'&chronoAttachment=\'+$(\'chrono\').value+\'&titleAttachment=\'+cleanTitle($(\'title\').value)+\'&back_date=\'+$(\'back_date\').value+\'&resMaster=' . $_SESSION['doc_id']
         . '\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';this.hide();"/>';
@@ -1987,17 +1985,11 @@ $content .= '</div>';
             if (isset($_REQUEST['id']) && !in_array($attachmentFormat, ["pdf", "jpg", "jpeg", "png"])) {
                 $content .= '<input type="button" value="';
                 $content .= _EDIT_MODEL;
-                /*$content .= '" name="editModel" id="editModel" class="button" onclick="$(\'hiddenValidateStatus\').value=\'2\';$(\'edit\').style.visibility=\'visible\';window.open(\''
-                    . $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=applet_popup_launcher&objectType=attachmentUpVersion&objectId='.$_REQUEST['id'].'&contactId=\'+$(\'contactidAttach\').value+\'&addressId=\'+$(\'addressidAttach\').value+\'&titleAttachment=\'+cleanTitle($(\'title\').value)+\'&back_date=\'+$(\'back_date\').value+\'&objectTable=res_view_attachments&resMaster='.$_SESSION['doc_id']
-                    .'\', \'\', \'height=200, width=250,scrollbars=no,resizable=no,directories=no,toolbar=no\');$(\'edit\').value=\'Edition en cours ...\';setInterval(function() {checkEditingDoc(\''.$_SESSION['user']['UserId'].'\')}, 500);$(\'edit\').disabled=\'disabled\';$(\'edit\').style.opacity=\'0.5\';this.hide();"/>';*/
+
                 $content .= '" name="editModel" id="editModel" class="button" onclick="$(\'hiddenValidateStatus\').value=\'2\';$(\'edit\').style.visibility=\'visible\';showAppletLauncher(\''
                     . $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=applet_modal_launcher&objectType=attachmentUpVersion&objectId='.$_REQUEST['id'].'&contactId=\'+$(\'contactidAttach\').value+\'&addressId=\'+$(\'addressidAttach\').value+\'&titleAttachment=\'+cleanTitle($(\'title\').value)+\'&back_date=\'+$(\'back_date\').value+\'&objectTable=res_view_attachments&resMaster='.$_SESSION['doc_id']
                     .'\', \'\', \'height=200, width=250,scrollbars=no,resizable=no,directories=no,toolbar=no\');$(\'edit\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'edit\').disabled=\'disabled\';$(\'edit\').style.opacity=\'0.5\';this.hide();"/>';
-            } /*else {
-                                    $content .= '" name="edit" id="edit" style="display:none" class="button" '
-                                                .'onclick="window.open(\''. $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=applet_popup_launcher&objectType=attachmentVersion&objectId=\'+$(\'templateOffice\').value+\'&objectTable='. $objectTable .'&contactId=\'+$(\'contactidAttach\').value+\'&chronoAttachment=\'+$(\'chrono\').value+\'&resMaster='.$_SESSION['doc_id']
-                                                .'\', \'\', \'height=200, width=250,scrollbars=no,resizable=no,directories=no,toolbar=no\');"/>';
-                                }*/
+            }
 
             $content .= '&nbsp;';
             $content .= '&nbsp;';
@@ -2094,10 +2086,12 @@ $content .= '<iframe src="index.php?display=true&editingMode=true&dir=indexing_s
 $content .= '</div>';
 
 if(empty($_REQUEST['id'])){
-    $js = 'setTimeout(function(){window.parent.document.getElementById(\'liMainDocument\').click()}, 1000)';
+    $js = 'setTimeout(function(){window.parent.document.getElementById(\'liMainDocument\').click()}, 1000);';
 } else {
-    $js = 'setTimeout(function(){window.top.document.getElementById(\'liAttachement\').click()}, 1000)';
+    $js = 'setTimeout(function(){window.top.document.getElementById(\'liAttachement\').click()}, 1000);';
 }
+
+$js .= "setInterval(function(){window.top.clearTimeout(window.top.chronoExpiration);window.top.chronoExpiration=window.top.setTimeout('redirect_to_url(\'index.php?display=true&page=logout&logout=true\')', ".$_SESSION['config']['cookietime']."*60*1000); }, 10000);";
 
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
