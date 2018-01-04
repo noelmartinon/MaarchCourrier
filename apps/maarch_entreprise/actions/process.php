@@ -728,10 +728,15 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     $frm_str .='</div>';
     
     //RESOURCE FRAME
+    if($data['category_id']['value'] == "outgoing"){
+        $watermark_outgoing = "true";
+    } else {
+        $watermark_outgoing = "false";
+    }
+    
     $frm_str .= '<iframe src="' . $_SESSION['config']['businessappurl']
         . 'index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='
-        . $res_id . '&watermark_outgoing=true" name="viewframe" id="viewframe" scrolling="auto" frameborder="0" width="100%" style="width:100% !important;"></iframe>';
-
+        . $res_id . '&watermark_outgoing='.$watermark_outgoing.'" name="viewframe" id="viewframe" scrolling="auto" frameborder="0" width="100%" style="width:100% !important;"></iframe>';
     $frm_str .= '</div>';
 
     //EXTRA SCRIPT

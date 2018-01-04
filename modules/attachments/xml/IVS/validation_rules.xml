@@ -81,6 +81,7 @@
 		<parameter name="res_id_master" type="integer" />
 		<parameter name="id" type="identifier" />
 		<parameter name="editingMode" type="string" />
+		<parameter name="watermark_outgoing" type="string" />
 	</validationRule>
 
 </validationRules>
