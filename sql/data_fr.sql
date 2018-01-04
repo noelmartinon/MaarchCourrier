@@ -849,7 +849,7 @@ INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id
 DELETE FROM baskets WHERE basket_id = 'MyBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'MyBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'MyBasket';
-INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, is_folder_basket, enabled, basket_order) VALUES ('MyBasket', 'Courriers à traiter', 'Bannette de traitement', 'status in (''NEW'', ''COU'', ''SVX'') and dest_user = @user', 'letterbox_coll', 'Y', 'N', 'Y',100);
+INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, is_folder_basket, enabled, basket_order, flag_notif) VALUES ('MyBasket', 'Courriers à traiter', 'Bannette de traitement', 'status in (''NEW'', ''COU'', ''SVX'') and dest_user = @user', 'letterbox_coll', 'Y', 'N', 'Y',100, 'Y');
 DELETE FROM baskets WHERE basket_id = 'LateMailBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'LateMailBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'LateMailBasket';
