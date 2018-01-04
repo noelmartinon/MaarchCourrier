@@ -1393,6 +1393,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     }
     $content .= "<input type='hidden' name='dataCreationDate' id='dataCreationDate' value='{$dataForDate}' />";
 
+
     //CONTACT
     $content .= '<div style="margin-bottom:10px;">';
     $content .= '<label>'. _DEST_USER_PJ;
@@ -1441,6 +1442,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         $content .= '</p>';
     } 
 $content .= '</div>';
+
 
 $content .= '<div id="transmission"></div>';
     $content .= '<p class="buttons">';
@@ -1529,10 +1531,11 @@ $content .= '<iframe src="index.php?display=true&editingMode=true&dir=indexing_s
 $content .= '</div>';
 
 if ($mode == 'add') {
-    $js .= 'setTimeout(function(){window.parent.document.getElementById(\'MainDocument\').click()}, 1000)';
+    $js .= 'setTimeout(function(){window.parent.document.getElementById(\'MainDocument\').click()}, 1000);';
 } else {
-    $js .= 'setTimeout(function(){window.top.document.getElementById(\'PjDocument_0\').click()}, 1000)';
+    $js .= 'setTimeout(function(){window.top.document.getElementById(\'PjDocument_0\').click()}, 1000);';
 }
 
+$js .= "setInterval(function(){window.top.clearTimeout(window.top.chronoExpiration);window.top.chronoExpiration=window.top.setTimeout('redirect_to_url(\'index.php?display=true&page=logout&logout=true\')', ".$_SESSION['config']['cookietime']."*60*1000); }, 10000);";
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
