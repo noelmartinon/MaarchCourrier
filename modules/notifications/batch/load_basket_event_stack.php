@@ -272,10 +272,10 @@ $coreTools = new core_tools();
 $coreTools->load_lang($lang, $maarchDirectory, $maarchApps);
 $func = new functions();
 
-$notifications_controler = new notifications_controler();
+$notifications_controler  = new notifications_controler();
 $diffusion_type_controler = new diffusion_type_controler();
-$events_controler = new events_controler();
-$templates_controler = new templates_controler();
+$events_controler         = new events_controler();
+$templates_controler      = new templates_controler();
 
 $db = new Database();
 
