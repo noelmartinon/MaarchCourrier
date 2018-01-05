@@ -104,38 +104,42 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
 
         include 'modules/visa/retrieve_attachment_from_cm.php';
 
-        $infoSignFile = pathinfo($pathToWantedSignature);
-        if ($infoSignFile['extension']=='png') {
-            $im2 = @imagecreatefrompng($pathToWantedSignature);
-        } else if ($infoSignFile['extension']=='jpeg' || $infoSignFile['extension']=='jpg') {
-            $im2 = @imagecreatefromjpeg($pathToWantedSignature);
-        } else if ($infoSignFile['extension']=='gif') {
-            $im2 = @imagecreatefromgif($pathToWantedSignature);
+        //ADD CURRENT DATE IN SIGN IMG FILE
+        $tmpPathToWantedSignature = $pathToWantedSignature;
+        if ($core->test_service('use_date_in_signBlock', 'visa', false) == 1) {
+            $infoSignFile = pathinfo($pathToWantedSignature);
+            if ($infoSignFile['extension']=='png') {
+                $im2 = @imagecreatefrompng($pathToWantedSignature);
+            } else if ($infoSignFile['extension']=='jpeg' || $infoSignFile['extension']=='jpg') {
+                $im2 = @imagecreatefromjpeg($pathToWantedSignature);
+            } else if ($infoSignFile['extension']=='gif') {
+                $im2 = @imagecreatefromgif($pathToWantedSignature);
+            }
+            
+            $im = imagecreatetruecolor(imagesx($im2), imagesy($im2)+30);
+            $white = imagecolorallocate($im, 255, 255, 255);
+            $grey = imagecolorallocate($im, 128, 128, 128);
+            $black = imagecolorallocate($im, 0, 0, 0);
+            imagefilledrectangle($im, 0, 0, imagesx($im2), 30, $white);
+
+            $stmt = $db->query(
+                "select city from entities"
+                . " where (parent_entity_id IS NULL or parent_entity_id = '') and (city IS NOT NULL or city <> '')", array()
+            );
+            $res = $stmt->fetchObject();
+            if (!empty($res->city)) {
+                $text = $res->city.', le '.date('d / m / Y');
+            } else {
+                $text = 'Le '.date('d/m/Y'); 
+            }
+
+            $font = 'modules/visa/LiberationSans-Regular.ttf';
+            imagettftext($im, 10, 0, 10, 20, $black, $font, $text);
+            imagecopy($im, $im2, 0, 30, 0, 0, imagesx($im2), imagesy($im2));
+
+            $tmpPathToWantedSignature = $_SESSION['config']['tmppath'].'tmp_file_' . $_SESSION['user']['UserId'] . '_' . rand() . '.png';
+            imagepng($im, $tmpPathToWantedSignature);
         }
-        
-        $im = imagecreatetruecolor(imagesx($im2), imagesy($im2)+30);
-        $white = imagecolorallocate($im, 255, 255, 255);
-        $grey = imagecolorallocate($im, 128, 128, 128);
-        $black = imagecolorallocate($im, 0, 0, 0);
-        imagefilledrectangle($im, 0, 0, imagesx($im2), 30, $white);
-
-        $stmt = $db->query(
-            "select city from entities"
-            . " where (parent_entity_id IS NULL or parent_entity_id = '') and (city IS NOT NULL or city <> '')", array()
-        );
-        $res = $stmt->fetchObject();
-        if (!empty($res->city)) {
-            $text = $res->city.', le '.date('d / m / Y');
-        } else {
-            $text = 'Le '.date('d/m/Y'); 
-        }
-
-        $font = 'modules/visa/LiberationSans-Regular.ttf';
-        imagettftext($im, 10, 0, 10, 20, $black, $font, $text);
-        imagecopy($im, $im2, 0, 30, 0, 0, imagesx($im2), imagesy($im2));
-
-        $tmpPathToWantedSignature = $_SESSION['config']['tmppath'].'tmp_file_' . $_SESSION['user']['UserId'] . '_' . rand() . '.png';
-        imagepng($im, $tmpPathToWantedSignature);
 
         
         if (!file_exists($fileOnDs)) {

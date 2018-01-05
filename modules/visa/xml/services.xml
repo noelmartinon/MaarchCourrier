@@ -39,6 +39,7 @@
 	   <system_service>false</system_service>
 	   <enabled>true</enabled>
 	</SERVICE>
+
 	<SERVICE>
 	   <id>modify_visa_in_signatureBook</id> <!-- if servicetype = menu, this id must be equal to the id of the menu item -->
 	   <name>_MODIFY_VISA_IN_SIGNATUREBOOK</name>
@@ -53,6 +54,16 @@
 	   <id>print_folder_doc</id> <!-- if servicetype = menu, this id must be equal to the id of the menu item -->
 	   <name>_PRINT_FOLDER_DOC</name>
 	   <comment>_PRINT_FOLDER_DOC</comment>
+	   <servicepage></servicepage>
+	   <servicetype>use</servicetype>
+	   <system_service>false</system_service>
+	   <enabled>true</enabled>
+	</SERVICE>
+
+	<SERVICE>
+	   <id>use_date_in_signBlock</id> <!-- if servicetype = menu, this id must be equal to the id of the menu item -->
+	   <name>_USE_DATE_IN_SIGNBLOCK</name>
+	   <comment>_USE_DATE_IN_SIGNBLOCK_DESC</comment>
 	   <servicepage></servicepage>
 	   <servicetype>use</servicetype>
 	   <system_service>false</system_service>

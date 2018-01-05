@@ -189,3 +189,9 @@ if (!defined('_NO_USER_SIGNED_DOC'))
 
 if (!defined('_IS_ALL_ATTACHMENT_SIGNED_INFO2'))
     define('_IS_ALL_ATTACHMENT_SIGNED_INFO2', "You can't request a signed document to users, all attachments in signature book are signed.");
+
+if (!defined('_USE_DATE_IN_SIGNBLOCK'))
+    define('_USE_DATE_IN_SIGNBLOCK', "Add current date in sign block");
+
+if (!defined('_USE_DATE_IN_SIGNBLOCK_DESC'))
+    define('_USE_DATE_IN_SIGNBLOCK_DESC', "The current date is added in top of sign block (with the town if it wrote in parent entity of application).");
