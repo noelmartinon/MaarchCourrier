@@ -1040,13 +1040,13 @@ echo '</h1>';
                     $pathScriptTab = $_SESSION['config']['businessappurl']
                         . 'index.php?display=true&page=show_diffList_tab&module=entities&resId='.$s_id.'&collId='.$coll_id.'&fromDetail=true&category='.$category.'&roles='.urlencode($roles_str).$onlyCC;    
                     
-                    $diffList_frame .= '<dt class="fa fa-share-alt" style="font-size:2em;padding-left: 15px;';
+                    $diffList_frame .= '<dt style="font-size:2em;padding-left: 15px;';
                     if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){
-                        $diffList_frame .=  'padding-right: 0px;';
+                        $diffList_frame .=  'padding-right: 0px;height: 29px;';
                     }else{
-                        $diffList_frame .=  'padding-right: 15px;';
+                        $diffList_frame .=  'padding-right: 15px;height: 30px;';
                     }
-                    $diffList_frame .= '" title="'._DIFF_LIST.'" onclick="loadSpecificTab(\'diffList_iframe\',\''.$pathScriptTab.'\');return false;"> <sup><span style="font-size: 10px;';
+                    $diffList_frame .= '" title="'._DIFF_LIST.'" onclick="loadSpecificTab(\'diffList_iframe\',\''.$pathScriptTab.'\');return false;"><i class="fa fa-share-alt" onclick="this.closest(\'dt\').click()"></i> <sup><span style="font-size: 10px;';
 
                         if(strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')){
                             $style = 'visibility:hidden;"';
