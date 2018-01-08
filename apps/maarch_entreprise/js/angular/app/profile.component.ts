@@ -330,7 +330,7 @@ export class ProfileComponent implements OnInit {
     }
 
     askRedirectBasket() {
-        let r = confirm('Voulez-vous rediriger vos corbeilles avant de vous mettre en absence ?');
+        let r = confirm('Voulez-vous rediriger vos bannettes avant de vous mettre en absence ?');
 
         if (r) {
             this.displayAbsenceButton=true;

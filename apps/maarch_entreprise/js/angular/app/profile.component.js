@@ -299,7 +299,7 @@ var ProfileComponent = (function () {
         }
     };
     ProfileComponent.prototype.askRedirectBasket = function () {
-        var r = confirm('Voulez-vous rediriger vos corbeilles avant de vous mettre en absence ?');
+        var r = confirm('Voulez-vous rediriger vos bannettes avant de vous mettre en absence ?');
         if (r) {
             this.displayAbsenceButton = true;
             $j('#redirectBasketCard').click();
