@@ -1,30 +1,11 @@
 <?php
-/*
-*
-*    Copyright 2008,2009 Maarch
-*
-*  This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*    along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*
 /**
-* @brief  Reports administration : laffect reports to groups
-*
-* @file
-* @author Claire Yves Christian KPAKPO <dev@maarch.org>
-* @date $date$
-* @version $Revision$
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
+
+* @brief   reports
+* @author  dev <dev@maarch.org>
 * @ingroup reports
 */
 
@@ -51,46 +32,47 @@ $pageLabel = _REPORTS;
 $pageId = "reports";
 $rep->manage_location_bar($pagePath, $pageLabel, $pageId, $init, $level);
 /***********************************************************/
+
+// RETRIEVE NB OF DOCUMENTS
 $stmt = $db->query(
-			"select count(*) as total from " . $_SESSION['collections'][0]['view']
-			. " inner join mlb_coll_ext on " . $_SESSION['collections'][0]['view']
-			. ".res_id = mlb_coll_ext.res_id where " . $_SESSION['collections'][0]['view']
-			. ".status not in ('DEL','BAD')"
+	"select count(1) as total from " . $_SESSION['collections'][0]['view']
+	. " inner join mlb_coll_ext on " . $_SESSION['collections'][0]['view']
+	. ".res_id = mlb_coll_ext.res_id where " . $_SESSION['collections'][0]['view']
+	. ".status not in ('DEL','BAD')"
 );
 
-//$db->show();
-
+// RETRIEVE NB OF FOLDERS
 $countPiece = $stmt->fetchObject();
 if ($rep->is_module_loaded('folder')) {
     $stmt2 = $db->query(
-				"SELECT count(*) as total from " 
+				"SELECT count(1) as total from " 
 				. $_SESSION['tablename']['fold_folders'] . " where status not in ('DEL','FOLDDEL')"
 		);
     $countFolder = $stmt2->fetchObject();
 }
-//$db->show();
-?>
-<h1><i class="fa fa-area-chart fa-2x"></i> <?php 
-echo _REPORTS;
-?></h1>
-<div id="inner_content" class="clearfix">
-<div class="block">
-<h2>
-    <i class="fa fa-file fa-2x"></i> <?php 
-echo _NB_TOTAL_DOC;
-?> : <b><?php functions::xecho($countPiece->total);?></b>
-    <?php 
+
+// HEADER
+echo '<h1><i class="fa fa-area-chart fa-2x"></i>'._REPORTS.'</h1>';
+echo '<div id="inner_content" class="clearfix">';
+echo '<div class="block">';
+
+//SUB HEADER
+echo '<h2><i class="fa fa-file fa-2x"></i> '._NB_TOTAL_DOC.' <b>'.$countPiece->total.'</b>';
 if ($rep->is_module_loaded('folder')) {
-	?>
-    &nbsp;&nbsp; <i class="fa fa-folder fa-2x"></i> <?php 
-    echo _NB_TOTAL_FOLDER;
-    ?> : <b><?php functions::xecho($countFolder->total);?></b><?php
+	echo '&nbsp;&nbsp; <i class="fa fa-folder fa-2x"></i> '._NB_TOTAL_FOLDER.' <b>'.$countFolder->total.'</b>';
 }
-?>
-    </h2>
-<?php 
-include 'modules' . DIRECTORY_SEPARATOR . 'reports' . DIRECTORY_SEPARATOR
-	. 'user_reports.php';
-?>
-</div>
-</div>
+
+//SHOW GENERATED STAT FILES (LIFE_CYCLE MODULE)
+if ($rep->is_module_loaded('life_cycle')) {
+	echo '<span style="float:right;font-size:10px;cursor:pointer;" title="Afficher la liste des fichiers statistiques disponible"><span class="fa-stack fa-lg" onclick="showStatFiles();">
+	<i class="fa fa-file-o fa-stack-2x"></i>
+	<i class="fa fa-area-chart fa-stack-1x"></i>
+	</span></span>';
+}
+echo '</h2>';
+
+//STATS CONTENT
+include 'modules' . DIRECTORY_SEPARATOR . 'reports' . DIRECTORY_SEPARATOR . 'user_reports.php';
+
+echo '</div>';
+echo '</div>';

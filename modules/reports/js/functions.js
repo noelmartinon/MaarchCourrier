@@ -48,3 +48,23 @@ function record_data(url)
 		}
 	});
 }
+
+
+function showStatFiles()
+{
+	$j.ajax(
+	{
+		url : 'index.php?display=true&module=reports&page=getStatFiles',
+		type : 'POST',
+		success: function(answer){
+			eval("response = "+answer);
+			if (response.status == 1) {
+				var modal_content = convertToTextVisibleNewLine(response.content);
+				createModalinAttachmentList(modal_content, 'showStatFilesList', '480', '800', '');
+				//eval(response.exec_js);
+			} else {
+				alert(response.error);
+			}
+		}
+	});
+}

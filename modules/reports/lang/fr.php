@@ -82,4 +82,5 @@ if (!defined("_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_DESC"))
     define("_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_DESC", "Permet d'afficher le délai (en jour) de la création jusqu'à la clôture d'un courrier.");
 if (!defined("_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_BY_TYPE"))
     define("_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_BY_TYPE", "Délai moyen de traitement par type de courrier");
-?>
+if (!defined("_FILESTAT_DESC"))
+    define("_FILESTAT_DESC", "Ces fichiers sont générés via <b>tâche(s) plannifiée(s)</b> présentes dans le module <b>life_cycle</b>.<br/>Seul les <b>10 derniers fichiers</b> sont affichés.");

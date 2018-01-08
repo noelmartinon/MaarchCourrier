@@ -8,7 +8,7 @@
         <LogLevel>INFO</LogLevel> <!-- DEBUG, INFO, NOTICE, WARNING, ERROR-->
         <DisplayedLogLevel>INFO</DisplayedLogLevel> <!-- DEBUG, INFO, NOTICE, WARNING, ERROR-->
         <StackSizeLimit>10000</StackSizeLimit> <!-- on doc -->
-        <ExportFolder>/var/www/MaarchCourrier/modules/life_cycle/batch/</ExportFolder>
+        <ExportFolder>/var/www/MaarchCourrier/modules/life_cycle/batch/files/</ExportFolder>
 		<FromDate>18 months</FromDate> <!-- ex : 18 months, 20 days, ... -->
         <MailToNotify>yourmail@test.com</MailToNotify><!-- If multiple, separate by ','-->
     </CONFIG>
