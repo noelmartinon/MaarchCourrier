@@ -157,3 +157,12 @@ if (!defined("_ERROR_FILE_NOT_EXIST"))
 
 if (!defined("_ERROR_REPLY_NOT_EXIST"))
     define("_ERROR_REPLY_NOT_EXIST", "La réponse au transfert doit être présente pour effectuer une action. Numéro du courrier : ");
+
+if (!defined("_ERROR_EXTENSION_CERTIFICATE"))
+    define("_ERROR_EXTENSION_CERTIFICATE", "Le certificat n'est pas dans le bon format (.crt ou .pem)");
+
+if (!defined("_ERROR_UNKNOW_CERTIFICATE"))
+    define("_ERROR_UNKNOW_CERTIFICATE", "Erreur avec le certificat SSL ou TLS.");
+
+if (!defined("_UNKNOWN_TARGET"))
+    define("_UNKNOWN_TARGET", "Cible inconnue");

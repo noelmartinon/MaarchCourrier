@@ -13,6 +13,7 @@
         <senderOrgRegNumber></senderOrgRegNumber>
         <accessRuleCode></accessRuleCode>
         <deleteData>true</deleteData>
+        <certificateSSL></certificateSSL>
     </CONFIG>
     <TABLENAME/>
     <HISTORY>

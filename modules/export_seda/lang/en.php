@@ -145,4 +145,13 @@ if (!defined("_ERROR_FILE_NOT_EXIST"))
     define("_ERROR_FILE_NOT_EXIST", "All the documents must be present in the storage areas");
 
 if (!defined("_ERROR_REPLY_NOT_EXIST"))
-    define("_ERROR_REPLY_NOT_EXIST", "La réponse au transfert doit être présente pour effectuer une action. Numéro du courrier : ");
+    define("_ERROR_REPLY_NOT_EXIST", "Reply not exist. Letter number : ");
+
+if (!defined("_ERROR_EXTENSION_CERTIFICATE"))
+    define("_ERROR_EXTENSION_CERTIFICATE", "Wrong certificate format (.crt or .pem)");
+
+if (!defined("_ERROR_UNKNOW_CERTIFICATE"))
+    define("_ERROR_UNKNOW_CERTIFICATE", "Unknow certificate");
+
+if (!defined("_UNKNOWN_TARGET"))
+    define("_UNKNOWN_TARGET", "Unknown target");
