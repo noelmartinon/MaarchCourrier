@@ -44,7 +44,7 @@ class AdapterMaarchRM{
         $res[2] = "LAABS-AUTH=".$token;
 
         $data = new stdClass();
-        $messageDirectory = __DIR__.DIRECTORY_SEPARATOR.'message'.DIRECTORY_SEPARATOR.$reference;
+        $messageDirectory = (string) $this->xml->CONFIG->directoryMessage.DIRECTORY_SEPARATOR.$reference;
         $messageFile = $reference.".xml";
 
         $files = scandir($messageDirectory);
