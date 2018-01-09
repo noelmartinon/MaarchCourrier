@@ -547,8 +547,8 @@ abstract class visa_Abstract extends Database
 						}
                     }
                     $str .= '</optgroup>';
-		}				
-		$str .= '</select>';
+				}				
+				$str .= '</select>';
                 $str .= '<script>';
                 $str .= 'new Chosen($(\'visaUserList\'),{width: "250px", disable_search_threshold: 10});';
                 $str .= '</script>';
@@ -570,7 +570,7 @@ abstract class visa_Abstract extends Database
                 $str .= '<br/><br/>';
             }
             if (!empty($isAllAttachementSignedInfo)) {
-				$str .= '<b style="color:red;">'.$isAllAttachementSignedInfo.'</b>';
+				$str .= '<b style="color:red;" id="cannotaddsignatory">'.$isAllAttachementSignedInfo.'</b>';
 			}
             $str .= '<div id="visa_content">';
             //VISA USER IN DOCUMENT

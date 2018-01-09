@@ -641,6 +641,15 @@ echo '</h1>';
                                         
                                         $inputAttr = 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\');"';
                                     } else if ($key == 'priority') {
+                                        echo 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
+                                    }
+									?>
+                                    >
+                                    <?php
+                                        if ($key == 'type_id')
+                                        {
+                                            if ($_SESSION['features']['show_types_tree'] == 'true')
+                                            {
 
                                         $inputAttr = 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
                                     }

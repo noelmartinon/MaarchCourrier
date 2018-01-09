@@ -1536,6 +1536,7 @@ if ($mode == 'add') {
     $js .= 'setTimeout(function(){window.top.document.getElementById(\'PjDocument_0\').click()}, 1000);';
 }
 
-$js .= "setInterval(function(){window.top.clearTimeout(window.top.chronoExpiration);window.top.chronoExpiration=window.top.setTimeout('redirect_to_url(\'index.php?display=true&page=logout&logout=true\')', ".$_SESSION['config']['cookietime']."*60*1000); }, 10000);";
+$js .= "setInterval(function(){window.top.clearTimeout(window.top.chronoExpiration);window.top.chronoExpiration=window.top.setTimeout('redirect_to_url(\'index.php?display=true&page=logout&logout=true\')', ".$_SESSION['config']['cookietime']."*60*1000); }, 60000);";
+
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
