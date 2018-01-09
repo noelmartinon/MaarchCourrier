@@ -122,7 +122,7 @@ $_ENV['categories']['incoming']['nature_id'] = array (
     'label' => _NATURE,
     'table' => 'coll_ext',
     'img' => 'envelope',
-    'modify' => true,
+    'modify' => false,
     'form_show' => 'select'
 );
 $_ENV['categories']['incoming']['reference_number'] = array (
@@ -310,7 +310,7 @@ $_ENV['categories']['outgoing']['nature_id'] = array (
     'label' => _NATURE,
     'table' => 'coll_ext',
     'img' => 'envelope',
-    'modify' => true,
+    'modify' => false,
     'form_show' => 'select'
 );
 $_ENV['categories']['outgoing']['reference_number'] = array (
@@ -440,7 +440,7 @@ $_ENV['categories']['internal']['nature_id'] = array (
     'label' => _NATURE,
     'table' => 'coll_ext',
     'img' => 'envelope',
-    'modify' => true,
+    'modify' => false,
     'form_show' => 'select'
 );
 $_ENV['categories']['internal']['reference_number'] = array (
