@@ -69,7 +69,7 @@ while ($state <> 'END') {
                 if(empty($aRecipients)){
                     $aRecipients = "0=1";
                 }
-                $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and usergroup_content.user_id=users.user_id and users.user_id in (?)", array($line2->group_id, $aRecipients));
+                $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK') and usergroup_content.user_id=users.user_id and users.user_id in (?)", array($line2->group_id, $aRecipients));
                 $baskets_notif = array();
                 $rowCount3 = $stmt3->rowCount();
                 $logger->write("GROUP: " . $line2->group_id . " ... " . $rowCount3 . " user(s) to notify", 'INFO');
