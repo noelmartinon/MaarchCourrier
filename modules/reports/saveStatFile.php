@@ -12,7 +12,7 @@ if (isset($_GET['filename'])) {
 
 	//COPY FILE IN TMP PATH
 	if (!empty($_SESSION['custom_override_id'])) {
-		if (!@copy("custom/{$_SESSION['custom_override_id']}modules/life_cycle/batch/files/{$_GET['filename']}.csv",$_SESSION['config']['tmppath']."{$_GET['filename']}.csv")) {
+		if (!@copy("custom/{$_SESSION['custom_override_id']}/modules/life_cycle/batch/files/{$_GET['filename']}.csv",$_SESSION['config']['tmppath']."{$_GET['filename']}.csv")) {
 			exit('We cannot retrieve this file ! (permission problem)');
 		}
 	} else {
