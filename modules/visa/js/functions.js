@@ -117,9 +117,7 @@ function resetPosVisa () {
         i++;
     });
 
-        if($j("#cannotaddsignatory")){
-
-        } else {
+        if($j("#cannotaddsignatory").length == 0){
             i = 1;
             var hasSignatory = false;
             $j(".droptarget").each(function() {
@@ -175,7 +173,7 @@ function updateVisaWorkflow(resId) {
             if(userRequestSign || userSignatory){
                 hasSignatory = true;
             }
-            if ($j("#signRequest_"+(i+2)).length == 0 && !hasSignatory && !$j("#cannotaddsignatory")) {
+            if ($j("#signRequest_"+(i+2)).length == 0 && !hasSignatory && $j("#cannotaddsignatory").length == 0) {
                 userRequestSign=true;
                 $j('#signRequest_'+(i+1)).val("true");
             }
