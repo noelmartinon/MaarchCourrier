@@ -2164,7 +2164,7 @@ class Install extends functions
         $db->query($query, array($sec->getPasswordHash($newPass)));
     }
 
-    function copy_dir($dir2copy, $dir_paste, $excludeExt=false)
+    function copy_dir($dir2copy, $dir_paste, $excludeExt=false, $excludeSymlink = false)
     {
         // On vérifie si $dir2copy est un dossier
         if (is_dir($dir2copy))
@@ -2182,19 +2182,38 @@ class Install extends functions
                         mkdir ($dir_paste, 0777);
                     }
                     // S'il s'agit d'un dossier, on relance la fonction recursive
-                    if (is_dir($dir2copy.$file) && $file != '..' && $file != '.') {
-                        $this->copy_dir($dir2copy.$file.'/' , $dir_paste.$file.'/', $excludeExt);  
-                    } elseif ($file != '..' && $file != '.') {
-                        if (count($excludeExt>0) && is_array($excludeExt)) {
-                            $copyIt = true;
-                            foreach ($excludeExt as $key => $value) {
-                                if (strtolower($value) == strtolower(pathinfo($dir2copy . $file, PATHINFO_EXTENSION))) {
-                                    $copyIt = false;
-                                } 
+                    // La variable excludeSymlink permet de prendre en compte ou pas les liens symboliques 
+                    if($excludeSymlink){
+                        if (is_dir($dir2copy.$file) && $file != '..' && $file != '.' && !is_link($dir2copy.$file)) {
+                            $this->copy_dir($dir2copy.$file.'/' , $dir_paste.$file.'/', $excludeExt, $excludeSymlink);  
+                        } elseif ($file != '..' && $file != '.' && !is_link($dir2copy.$file)) {
+                            if (count($excludeExt>0) && is_array($excludeExt)) {
+                                $copyIt = true;
+                                foreach ($excludeExt as $key => $value) {
+                                    if (strtolower($value) == strtolower(pathinfo($dir2copy . $file, PATHINFO_EXTENSION))) {
+                                        $copyIt = false;
+                                    } 
+                                }
+                            }
+                            if ($copyIt) {
+                                copy($dir2copy.$file, $dir_paste.$file);
                             }
                         }
-                        if ($copyIt) {
-                            copy($dir2copy.$file, $dir_paste.$file);
+                    } else {
+                        if (is_dir($dir2copy.$file) && $file != '..' && $file != '.') {
+                            $this->copy_dir($dir2copy.$file.'/' , $dir_paste.$file.'/', $excludeExt, $excludeSymlink);  
+                        } elseif ($file != '..' && $file != '.') {
+                            if (count($excludeExt>0) && is_array($excludeExt)) {
+                                $copyIt = true;
+                                foreach ($excludeExt as $key => $value) {
+                                    if (strtolower($value) == strtolower(pathinfo($dir2copy . $file, PATHINFO_EXTENSION))) {
+                                        $copyIt = false;
+                                    } 
+                                }
+                            }
+                            if ($copyIt) {
+                                copy($dir2copy.$file, $dir_paste.$file);
+                            }
                         }
                     }
                 }
