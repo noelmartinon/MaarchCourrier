@@ -64,7 +64,7 @@ if ($rep->is_module_loaded('folder')) {
 
 //SHOW GENERATED STAT FILES (LIFE_CYCLE MODULE)
 if ($rep->is_module_loaded('life_cycle')) {
-	echo '<span style="float:right;font-size:10px;cursor:pointer;" title="Afficher la liste des fichiers statistiques disponible"><span class="fa-stack fa-lg" onclick="showStatFiles();">
+	echo '<span style="float:right;font-size:10px;cursor:pointer;" title="'._FILESTAT_LIST_DESC.'"><span class="fa-stack fa-lg" onclick="showStatFiles();">
 	<i class="fa fa-file-o fa-stack-2x"></i>
 	<i class="fa fa-area-chart fa-stack-1x"></i>
 	</span></span>';
