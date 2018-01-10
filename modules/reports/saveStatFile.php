@@ -26,7 +26,7 @@ if (isset($_GET['filename'])) {
 	header('Expires: 0');
 	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 	header('Content-Type: application/vnd.ms-excel; charset=utf-8');
-	header('Content-Disposition: inline; filename=test.csv;');
+	header('Content-Disposition: inline; filename="'.$_GET['filename'].'.csv"');
 	ob_clean();
 	flush();
 	readfile($_SESSION['config']['tmppath']."{$_GET['filename']}.csv");
