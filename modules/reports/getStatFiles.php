@@ -13,7 +13,7 @@ $content = '';
 
 //GET STAT FILES
 if (!empty($_SESSION['custom_override_id'])) {
-	$dir =  'custom/' . $_SESSION['custom_override_id'] . 'modules/life_cycle/batch/files/*.csv';
+	$dir =  'custom/' . $_SESSION['custom_override_id'] . '/modules/life_cycle/batch/files/*.csv';
 } else {
 	$dir = 'modules/life_cycle/batch/files/*.csv';
 }
