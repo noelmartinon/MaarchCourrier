@@ -68,14 +68,14 @@ if ($watermarkTab['text'] == '') {
             $dbView = new Database();
 		    $query = " select " . $matches[1][$z] 
 		        . " as thecolumn from mlb_coll_ext where res_id = ?";
-		    $stmt = $dbView->query($query, array($_REQUEST['res_id_master']));
+		    $stmt = $dbView->query($query, array($res_id));
             $returnQuery = $stmt->fetchObject();
             $currentText = $returnQuery->thecolumn;
         } else {
 		    $dbView = new Database();
 		    $query = " select " . $matches[1][$z] 
 		        . " as thecolumn from " . $table . " where res_id = ?";
-		    $stmt = $dbView->query($query, array($res_id));
+		    $stmt = $dbView->query($query, array($s_id));
 		    $returnQuery = $stmt->fetchObject();
 		    $currentText = $returnQuery->thecolumn;
     	}
