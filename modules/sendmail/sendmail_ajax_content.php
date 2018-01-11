@@ -194,13 +194,14 @@ switch ($mode) {
             $error = $request->wash_html(_INCORRECT_SENDER,'NONE');
             $status = 1;
         } else {
-            if (isset($_SESSION['adresses']['to']) && count($_SESSION['adresses']['to']) > 0 ) {
-                if (!empty($_REQUEST['object'])) {
-                    // print_r($_REQUEST);exit;
+            if ((isset($_SESSION['adresses']['to']) && count($_SESSION['adresses']['to']) > 0) || $_REQUEST['for'] == 'save') {
+                if (!empty($_REQUEST['object']) || $_REQUEST['for'] == 'save') {
                     
                     //Check adress for to
-                    $to =  join(',', $_SESSION['adresses']['to']);
-                    $error = $sendmail_tools->CheckEmailAdress($to);
+                    if(!empty($_SESSION['adresses']['to'])){
+                        $to =  join(',', $_SESSION['adresses']['to']);
+                        $error = $sendmail_tools->CheckEmailAdress($to);
+                    }
                     
                     if (empty($error)) {
                         
@@ -330,13 +331,14 @@ switch ($mode) {
                 $error = $request->wash_html(_INCORRECT_SENDER,'NONE');
                 $status = 1;
             } else {
-                if (isset($_SESSION['adresses']['to']) && count($_SESSION['adresses']['to']) > 0 ) {
-                    if (!empty($_REQUEST['object'])) {
-                        // print_r($_REQUEST);exit;
+                if ((isset($_SESSION['adresses']['to']) && count($_SESSION['adresses']['to']) > 0) || $_REQUEST['for'] == 'save') {
+                    if (!empty($_REQUEST['object']) || $_REQUEST['for'] == 'save') {
                         
                         //Check adress for to
-                        $to =  join(',', $_SESSION['adresses']['to']);
-                        $error = $sendmail_tools->CheckEmailAdress($to);
+                        if(!empty($_SESSION['adresses']['to'])){
+                            $to =  join(',', $_SESSION['adresses']['to']);
+                            $error = $sendmail_tools->CheckEmailAdress($to);
+                        }
                         
                         if (empty($error)) {
                             
