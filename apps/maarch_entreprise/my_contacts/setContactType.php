@@ -47,7 +47,7 @@ while($res = $stmt->fetchObject()){
     if(isset($_SESSION['m_admin']['contact']['CONTACT_TYPE']) && $res->id == $_SESSION['m_admin']['contact']['CONTACT_TYPE'] )
     {
         $frmStr .= 'selected="selected"';
-    } else if ($_POST['contact_target'] == "no_corporate" && $iCount == 0) {
+    } else if ($iCount == 0) {
         $frmStr .= 'selected="selected"';
     }
 
