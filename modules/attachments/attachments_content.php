@@ -4,43 +4,45 @@
 * See LICENCE.txt file at the root folder for more details.
 * This file is part of Maarch software.
 
+*
 * @brief   attachments_content
+*
 * @author  dev <dev@maarch.org>
 * @ingroup attachments
 */
-
-require_once "core/class/class_security.php";
-require_once "core/class/class_request.php";
-require_once "core/class/class_resource.php";
-require_once "apps" . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-    . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR
-    . "class_indexing_searching_app.php";
-require_once "core/class/docservers_controler.php";
+require_once 'core/class/class_security.php';
+require_once 'core/class/class_request.php';
+require_once 'core/class/class_resource.php';
+require_once 'apps'.DIRECTORY_SEPARATOR.$_SESSION['config']['app_id']
+    .DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR
+    .'class_indexing_searching_app.php';
+require_once 'core/class/docservers_controler.php';
 require_once 'modules/attachments/attachments_tables.php';
-require_once "core/class/class_history.php";
+require_once 'core/class/class_history.php';
 require_once 'modules/attachments/class/attachments_controler.php';
 require_once 'modules/attachments/Models/AttachmentsModel.php';
 
-
-$core               = new core_tools();
+$core = new core_tools();
 $core->load_lang();
-$sec                = new security();
-$func               = new functions();
-$db                 = new Database();
-$req                = new request();
+$sec = new security();
+$func = new functions();
+$db = new Database();
+$req = new request();
 $docserverControler = new docservers_controler();
-$ac                 = new attachments_controler();
+$ac = new attachments_controler();
 
-$_SESSION['error'] = "";
+$_SESSION['error'] = '';
 
 $status = 0;
-$error  = $content = $js = $parameters = '';
+$error = $content = $js = $parameters = '';
 $_SESSION['cm_applet'][$_SESSION['user']['UserId']] = '';
 
-function _parse($text) {
+function _parse($text)
+{
     $text = str_replace("\r\n", "\n", $text);
     $text = str_replace("\r", "\n", $text);
-    $text = str_replace("\n", "\\n ", $text);
+    $text = str_replace("\n", '\\n ', $text);
+
     return $text;
 }
 
@@ -50,13 +52,12 @@ if (!empty($_REQUEST['docId'])) {
 
 //BEGIN SAVE ATTACHMENT VALIDATE BUTTTON
 if (isset($_POST['add']) && $_POST['add']) {
-
     //CHECK FORM ERRORS
-    if((count($_SESSION['upfile'])-1) <> count($_REQUEST['attachNum'])) {
+    if ((count($_SESSION['upfile']) - 1) != count($_REQUEST['attachNum'])) {
         $error = _MODEL_NOT_EDITED;
         $status = 1;
     } else {
-        for ($numAttach = 0;$numAttach < count($_SESSION['upfile'])-1;$numAttach++) {   
+        for ($numAttach = 0; $numAttach < count($_SESSION['upfile']) - 1; ++$numAttach) {
             //EMPTY ATTACHMENTS FILE ?
             if (empty($_SESSION['upfile'][$numAttach]['tmp_name'])) {
                 $error = _FILE_MISSING;
@@ -65,75 +66,72 @@ if (isset($_POST['add']) && $_POST['add']) {
             }
             //MAX SIZE FILE ?
             if ($_SESSION['upfile'][$numAttach]['error'] == 1) {
-                $filesize = $func->return_bytes(ini_get("upload_max_filesize"));
-                $error = _ERROR_FILE_UPLOAD_MAX . "(" . round($filesize / 1024, 2) . "Ko Max)";
+                $filesize = $func->return_bytes(ini_get('upload_max_filesize'));
+                $error = _ERROR_FILE_UPLOAD_MAX.'('.round($filesize / 1024, 2).'Ko Max)';
             }
-    
+
             //EMPTY ATTACHMENT TYPE ?
             $attachment_types = '';
             if (!isset($_REQUEST['attachment_types'][$numAttach]) || empty($_REQUEST['attachment_types'][$numAttach])) {
-                $error = _ATTACHMENT_TYPES . ' ' . _MANDATORY;
+                $error = _ATTACHMENT_TYPES.' '._MANDATORY;
             } else {
                 $attachment_types = $func->protect_string_db($_REQUEST['attachment_types'][$numAttach]);
             }
-    
+
             //EMPTY TITLE ?
             $title = '';
-            if (! isset($_REQUEST['title'][$numAttach]) || empty($_REQUEST['title'][$numAttach])) {
-                $error = _OBJECT . ' ' . _MANDATORY;
+            if (!isset($_REQUEST['title'][$numAttach]) || empty($_REQUEST['title'][$numAttach])) {
+                $error = _OBJECT.' '._MANDATORY;
             } else {
                 $title = $_REQUEST['title'][$numAttach];
-                $title = str_replace("&#039;", "'", $title);
+                $title = str_replace('&#039;', "'", $title);
             }
-    
+
             //PROCESS ATTACHMENT
             if (empty($error)) {
-                
-                $back_date       = $_REQUEST['back_date'][$numAttach];
+                $back_date = $_REQUEST['back_date'][$numAttach];
                 $contactidAttach = $_REQUEST['contactidAttach'][$numAttach];
                 $addressidAttach = $_REQUEST['addressidAttach'][$numAttach];
-                $chrono          = $_REQUEST['chrono'][$numAttach];
+                $chrono = $_REQUEST['chrono'][$numAttach];
                 if (isset($_REQUEST['attachStatus'][$numAttach])) {
-                    $attachStatus  = $_REQUEST['effectiveDateStatus'][$numAttach];
+                    $attachStatus = $_REQUEST['effectiveDateStatus'][$numAttach];
                 } else {
-                    $attachStatus  = 'A_TRA';
+                    $attachStatus = 'A_TRA';
                 }
 
                 require_once 'core/docservers_tools.php';
                 $arrayIsAllowed = array();
                 $arrayIsAllowed = Ds_isFileTypeAllowed(
-                    $_SESSION['config']['tmppath'] . $_SESSION['upfile'][$numAttach]['fileNameOnTmp']
+                    $_SESSION['config']['tmppath'].$_SESSION['upfile'][$numAttach]['fileNameOnTmp']
                 );
                 if ($arrayIsAllowed['status'] == false) {
-                    $error = _WRONG_FILE_TYPE . ' ' . $arrayIsAllowed['mime_type'];
+                    $error = _WRONG_FILE_TYPE.' '.$arrayIsAllowed['mime_type'];
                     $_SESSION['upfile'] = array();
                 } else {
-                    if (! isset($_SESSION['collection_id_choice'])
+                    if (!isset($_SESSION['collection_id_choice'])
                         || empty($_SESSION['collection_id_choice'])
                     ) {
                         $_SESSION['collection_id_choice'] = $_SESSION['user']['collections'][0];
                     }
-        
+
                     //CHECK DOCSERVER FOR ATTACHMENT
                     $docserver = $docserverControler->getDocserverToInsert(
                         $_SESSION['collection_id_choice']
                     );
                     if (empty($docserver)) {
-                        $error = _DOCSERVER_ERROR . ' : ' . _NO_AVAILABLE_DOCSERVER . ". " . _MORE_INFOS;
-                        $location = "";
+                        $error = _DOCSERVER_ERROR.' : '._NO_AVAILABLE_DOCSERVER.'. '._MORE_INFOS;
+                        $location = '';
                     } else {
                         //CHECK DOCSERVER SPACE
                         $newSize = $docserverControler->checkSize(
                             $docserver, $_SESSION['upfile'][$numAttach]['size']
                         );
                         if ($newSize == 0) {
-                            $error = _DOCSERVER_ERROR . ' : ' . _NOT_ENOUGH_DISK_SPACE . ". " . _MORE_INFOS;
-                            ?>
+                            $error = _DOCSERVER_ERROR.' : '._NOT_ENOUGH_DISK_SPACE.'. '._MORE_INFOS; ?>
                             <script type="text/javascript">
                                 var eleframe1 =  window.parent.top.document.getElementById('list_attach');
                                 eleframe1.location.href = '<?php
-                            echo $_SESSION['config']['businessappurl'];
-                            ?>index.php?display=true&module=attachments&page=frame_list_attachments&attach_type_exclude=converted_pdf,print_folder&mode=normal&load';
+                            echo $_SESSION['config']['businessappurl']; ?>index.php?display=true&module=attachments&page=frame_list_attachments&attach_type_exclude=converted_pdf,print_folder&mode=normal&load';
                             </script>
                             <?php
                             exit();
@@ -141,23 +139,23 @@ if (isset($_POST['add']) && $_POST['add']) {
                             //GET FILE INFOS
                             $path_parts = pathinfo($_SESSION['upfile'][$numAttach]['fileNameOnTmp']);
                             $fileInfos = array(
-                                "tmpDir"      => $_SESSION['config']['tmppath'],
-                                "size"        => $_SESSION['upfile'][$numAttach]['size'],
-                                "format"      => $path_parts['extension'],
-                                "tmpFileName" => $_SESSION['upfile'][$numAttach]['fileNameOnTmp'],
+                                'tmpDir' => $_SESSION['config']['tmppath'],
+                                'size' => $_SESSION['upfile'][$numAttach]['size'],
+                                'format' => $path_parts['extension'],
+                                'tmpFileName' => $_SESSION['upfile'][$numAttach]['fileNameOnTmp'],
                             );
-        
+
                             //SAVE FILE ON DOCSERVER
                             $storeResult = array();
                             $storeResult = $docserverControler->storeResourceOnDocserver(
                                 $_SESSION['collection_id_choice'], $fileInfos
                             );
-        
-                            if($attachment_types == 'outgoing_mail' && strpos($fileInfos['format'], 'xl') === false && strpos($fileInfos['format'], 'ppt') === false){
+
+                            if ($attachment_types == 'outgoing_mail' && strpos($fileInfos['format'], 'xl') === false && strpos($fileInfos['format'], 'ppt') === false) {
                                 $_SESSION['upfile'][$numAttach]['outgoingMail'] = true;
                             }
-        
-                            if (isset($storeResult['error']) && $storeResult['error'] <> '') {
+
+                            if (isset($storeResult['error']) && $storeResult['error'] != '') {
                                 $error = $storeResult['error'];
                             } else {
                                 $resAttach = new resource();
@@ -165,65 +163,65 @@ if (isset($_POST['add']) && $_POST['add']) {
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "typist",
+                                        'column' => 'typist',
                                         'value' => $_SESSION['user']['UserId'],
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "format",
+                                        'column' => 'format',
                                         'value' => $fileInfos['format'],
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "docserver_id",
+                                        'column' => 'docserver_id',
                                         'value' => $storeResult['docserver_id'],
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "status",
+                                        'column' => 'status',
                                         'value' => $attachStatus,
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "offset_doc",
+                                        'column' => 'offset_doc',
                                         'value' => ' ',
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "logical_adr",
+                                        'column' => 'logical_adr',
                                         'value' => ' ',
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "title",
+                                        'column' => 'title',
                                         'value' => $title,
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "attachment_type",
+                                        'column' => 'attachment_type',
                                         'value' => $attachment_types,
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 //GET SIGN PROPERTY FOR CURRENT ATTACHMENT TYPE
@@ -233,119 +231,119 @@ if (isset($_POST['add']) && $_POST['add']) {
                                         array_push(
                                             $_SESSION['data'],
                                             array(
-                                                'column' => "in_signature_book",
+                                                'column' => 'in_signature_book',
                                                 'value' => 1,
-                                                'type' => "bool",
+                                                'type' => 'bool',
                                             )
                                         );
                                     }
                                 }
-        
+
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "coll_id",
+                                        'column' => 'coll_id',
                                         'value' => $_SESSION['collection_id_choice'],
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                 );
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "res_id_master",
+                                        'column' => 'res_id_master',
                                         'value' => $_SESSION['doc_id'],
-                                        'type' => "integer",
+                                        'type' => 'integer',
                                     )
                                 );
-                                if ($_SESSION['origin'] == "scan") {
+                                if ($_SESSION['origin'] == 'scan') {
                                     array_push(
                                         $_SESSION['data'],
                                         array(
-                                            'column' => "scan_user",
+                                            'column' => 'scan_user',
                                             'value' => $_SESSION['user']['UserId'],
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data'],
                                         array(
-                                            'column' => "scan_date",
+                                            'column' => 'scan_date',
                                             'value' => $req->current_datetime(),
-                                            'type' => "function",
+                                            'type' => 'function',
                                         )
                                     );
                                 }
-                                if (isset($back_date) && $back_date <> '') {
+                                if (isset($back_date) && $back_date != '') {
                                     array_push(
                                         $_SESSION['data'],
                                         array(
-                                            'column' => "validation_date",
+                                            'column' => 'validation_date',
                                             'value' => $func->format_date_db($back_date),
-                                            'type' => "date",
+                                            'type' => 'date',
                                         )
                                     );
                                 }
-        
-                                if (isset($contactidAttach) && $contactidAttach <> '' && is_numeric($contactidAttach)) {
+
+                                if (isset($contactidAttach) && $contactidAttach != '' && is_numeric($contactidAttach)) {
                                     array_push(
                                         $_SESSION['data'],
                                         array(
-                                            'column' => "dest_contact_id",
+                                            'column' => 'dest_contact_id',
                                             'value' => $contactidAttach,
-                                            'type' => "integer",
+                                            'type' => 'integer',
                                         )
                                     );
-                                } else if (isset($contactidAttach) && $contactidAttach != '' && !is_numeric($contactidAttach)) {
+                                } elseif (isset($contactidAttach) && $contactidAttach != '' && !is_numeric($contactidAttach)) {
                                     $_SESSION['data'][] = [
                                         'column' => 'dest_user',
                                         'value' => $contactidAttach,
                                         'type' => 'string',
                                     ];
                                 }
-        
-                                if (isset($addressidAttach) && $addressidAttach <> '' && is_numeric($addressidAttach)) {
+
+                                if (isset($addressidAttach) && $addressidAttach != '' && is_numeric($addressidAttach)) {
                                     array_push(
                                         $_SESSION['data'],
                                         array(
-                                            'column' => "dest_address_id",
+                                            'column' => 'dest_address_id',
                                             'value' => $addressidAttach,
-                                            'type' => "integer",
+                                            'type' => 'integer',
                                         )
                                     );
                                 }
-                                if(!empty($chrono)){
+                                if (!empty($chrono)) {
                                     array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "identifier",
+                                        'column' => 'identifier',
                                         'value' => $chrono,
-                                        'type' => "string",
+                                        'type' => 'string',
                                     )
                                     );
                                 }
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "type_id",
+                                        'column' => 'type_id',
                                         'value' => 0,
-                                        'type' => "int",
+                                        'type' => 'int',
                                     )
                                 );
-        
+
                                 array_push(
                                     $_SESSION['data'],
                                     array(
-                                        'column' => "relation",
+                                        'column' => 'relation',
                                         'value' => 1,
-                                        'type' => "int",
+                                        'type' => 'int',
                                     )
                                 );
-    
+
                                 //SAVE META DATAS IN DB
                                 $id = $resAttach->load_into_db(
                                     RES_ATTACHMENTS_TABLE,
                                     $storeResult['destination_dir'],
-                                    $storeResult['file_destination_name'] ,
+                                    $storeResult['file_destination_name'],
                                     $storeResult['path_template'],
                                     $storeResult['docserver_id'],
                                     $_SESSION['data'],
@@ -358,173 +356,171 @@ if (isset($_POST['add']) && $_POST['add']) {
                                     $stmt = $db->query($query);
                                     $templateOffice = $stmt->fetchObject()->template_id;
                                 }
-                                if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == true && $_SESSION['upfile'][$numAttach]['fileNamePdfOnTmp'] != '' && isset($templateOffice)){
+                                if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == true && $_SESSION['upfile'][$numAttach]['fileNamePdfOnTmp'] != '' && isset($templateOffice)) {
                                     $_SESSION['new_id'] = $id;
-                                    $file    = $_SESSION['config']['tmppath'].$_SESSION['upfile'][$numAttach]['fileNamePdfOnTmp'];
-                                    $newfile = $storeResult['path_template'].str_replace('#',"/",$storeResult['destination_dir']).substr ($storeResult['file_destination_name'], 0, strrpos  ($storeResult['file_destination_name'], "." )).".pdf";
-                                    
+                                    $file = $_SESSION['config']['tmppath'].$_SESSION['upfile'][$numAttach]['fileNamePdfOnTmp'];
+                                    $newfile = $storeResult['path_template'].str_replace('#', '/', $storeResult['destination_dir']).substr($storeResult['file_destination_name'], 0, strrpos($storeResult['file_destination_name'], '.')).'.pdf';
+
                                     copy($file, $newfile);
-                                    
+
                                     //CREATE METAS DATA FOR CONVERTED PDF
                                     $_SESSION['data_pdf'] = array();
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "typist",
+                                            'column' => 'typist',
                                             'value' => $_SESSION['user']['UserId'],
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "format",
+                                            'column' => 'format',
                                             'value' => 'pdf',
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "docserver_id",
+                                            'column' => 'docserver_id',
                                             'value' => $storeResult['docserver_id'],
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "status",
+                                            'column' => 'status',
                                             'value' => 'TRA',
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "offset_doc",
+                                            'column' => 'offset_doc',
                                             'value' => ' ',
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "logical_adr",
+                                            'column' => 'logical_adr',
                                             'value' => ' ',
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "title",
+                                            'column' => 'title',
                                             'value' => $title,
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "attachment_type",
+                                            'column' => 'attachment_type',
                                             'value' => 'converted_pdf',
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "coll_id",
+                                            'column' => 'coll_id',
                                             'value' => $_SESSION['collection_id_choice'],
-                                            'type' => "string",
+                                            'type' => 'string',
                                         )
                                     );
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "res_id_master",
+                                            'column' => 'res_id_master',
                                             'value' => $_SESSION['doc_id'],
-                                            'type' => "integer",
+                                            'type' => 'integer',
                                         )
                                     );
-                                
-                                    if (isset($_SESSION['upfile'][$numAttach]['outgoingMail']) && $_SESSION['upfile'][$numAttach]['outgoingMail']){
+
+                                    if (isset($_SESSION['upfile'][$numAttach]['outgoingMail']) && $_SESSION['upfile'][$numAttach]['outgoingMail']) {
                                         array_push(
                                             $_SESSION['data_pdf'],
                                             array(
-                                                'column' => "type_id",
+                                                'column' => 'type_id',
                                                 'value' => 1,
-                                                'type' => "int",
+                                                'type' => 'int',
                                             )
                                         );
-                                    
                                     } else {
                                         array_push(
                                             $_SESSION['data_pdf'],
                                             array(
-                                                'column' => "type_id",
+                                                'column' => 'type_id',
                                                 'value' => 0,
-                                                'type' => "int",
+                                                'type' => 'int',
                                             )
                                         );
-        
                                     }
-        
+
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "relation",
+                                            'column' => 'relation',
                                             'value' => 1,
-                                            'type' => "int",
+                                            'type' => 'int',
                                         )
                                     );
-        
+
                                     array_push(
                                         $_SESSION['data_pdf'],
                                         array(
-                                            'column' => "in_signature_book",
+                                            'column' => 'in_signature_book',
                                             'value' => 1,
-                                            'type' => "bool",
+                                            'type' => 'bool',
                                         )
                                     );
-                                    
+
                                     $id_up = $resAttach->load_into_db(
                                         RES_ATTACHMENTS_TABLE,
                                         $storeResult['destination_dir'],
-                                        substr ($storeResult['file_destination_name'], 0, strrpos  ($storeResult['file_destination_name'], "." )).".pdf" ,
+                                        substr($storeResult['file_destination_name'], 0, strrpos($storeResult['file_destination_name'], '.')).'.pdf',
                                         $storeResult['path_template'],
                                         $storeResult['docserver_id'], $_SESSION['data_pdf'],
                                         $_SESSION['config']['databasetype']
                                     );
-                                    
+
                                     unset($_SESSION['upfile'][$attachNum]['fileNamePdfOnTmp']);
                                 }
-                                
+
                                 if ($id == false) {
                                     $error = $resAttach->get_error();
                                 } else {
                                     // Delete temporary backup
-                                    $db->query("DELETE FROM res_attachments WHERE res_id = ? and status = 'TMP' and typist = ?", 
+                                    $db->query("DELETE FROM res_attachments WHERE res_id = ? and status = 'TMP' and typist = ?",
                                                     array($_SESSION['attachmentInfo'][$attachNum]['inProgressResId'], $_SESSION['user']['UserId']));
-        
-                                    if ($_SESSION['history']['attachadd'] == "true") {
+
+                                    if ($_SESSION['history']['attachadd'] == 'true') {
                                         $hist = new history();
                                         $view = $sec->retrieve_view_from_coll_id(
                                             $_SESSION['collection_id_choice']
                                         );
                                         $hist->add(
-                                            $view, $_SESSION['doc_id'], "ADD", 'attachadd',
-                                            ucfirst(_DOC_NUM) . $id . ' '
-                                            . _NEW_ATTACH_ADDED . ' ' . _TO_MASTER_DOCUMENT
-                                            . $_SESSION['doc_id'],
+                                            $view, $_SESSION['doc_id'], 'ADD', 'attachadd',
+                                            ucfirst(_DOC_NUM).$id.' '
+                                            ._NEW_ATTACH_ADDED.' '._TO_MASTER_DOCUMENT
+                                            .$_SESSION['doc_id'],
                                             $_SESSION['config']['databasetype'],
                                             'apps'
                                         );
                                         $content = _NEW_ATTACH_ADDED;
                                         $hist->add(
-                                            RES_ATTACHMENTS_TABLE, $id, "ADD",'attachadd',
-                                            $content . " (" . $title
-                                            . ") ",
+                                            RES_ATTACHMENTS_TABLE, $id, 'ADD', 'attachadd',
+                                            $content.' ('.$title
+                                            .') ',
                                             $_SESSION['config']['databasetype'],
                                             'attachments'
                                         );
@@ -534,27 +530,24 @@ if (isset($_POST['add']) && $_POST['add']) {
                         }
                     }
                     //IF SUCCESS EXTRA JS FOR UPDATE TABS
-                    if ( empty($error) || $content == _NEW_ATTACH_ADDED ) {
+                    if (empty($error) || $content == _NEW_ATTACH_ADDED) {
                         $new_nb_attach = 0;
-                        $stmt = $db->query("select res_id from "
-                            . $_SESSION['tablename']['attach_res_attachments']
-                            . " where status <> 'DEL' and attachment_type <> 'converted_pdf' and attachment_type <> 'print_folder' and res_id_master = ?", array($_SESSION['doc_id']));
+                        $stmt = $db->query('select res_id from '
+                            .$_SESSION['tablename']['attach_res_attachments']
+                            ." where status <> 'DEL' and attachment_type <> 'converted_pdf' and attachment_type <> 'print_folder' and res_id_master = ?", array($_SESSION['doc_id']));
                         if ($stmt->rowCount() > 0) {
                             $new_nb_attach = $stmt->rowCount();
                         }
                         if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'create') {
                             //Redirection vers bannette MyBasket s'il s'agit d'un courrier spontané et que l'utilisateur connecté est le destinataire du courrier
-                            if (isset($_SESSION['upfile'][$attachNum]['outgoingMail']) && $_SESSION['upfile'][$attachNum]['outgoingMail'] && $_SESSION['user']['UserId'] == $_SESSION['details']['diff_list']['dest']['users'][0]['user_id']){
-                                    $js .= "window.parent.top.location.href = 'index.php?page=view_baskets&module=basket&baskets=MyBasket&resid=".$_SESSION['doc_id']."&directLinkToAction';";
-                            }
-                            else {
-                                if($attachment_types == 'response_project' || $attachment_types == 'outgoing_mail' || $attachment_types == 'signed_response' || $attachment_types == 'aihp'){
+                            if (isset($_SESSION['upfile'][$attachNum]['outgoingMail']) && $_SESSION['upfile'][$attachNum]['outgoingMail'] && $_SESSION['user']['UserId'] == $_SESSION['details']['diff_list']['dest']['users'][0]['user_id']) {
+                                $js .= "window.parent.top.location.href = 'index.php?page=view_baskets&module=basket&baskets=MyBasket&resid=".$_SESSION['doc_id']."&directLinkToAction';";
+                            } else {
+                                if ($attachment_types == 'response_project' || $attachment_types == 'outgoing_mail' || $attachment_types == 'signed_response' || $attachment_types == 'aihp') {
                                     $js .= 'loadSpecificTab(\'responses_iframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&view_only=true&load&fromDetail=response&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp\');';
-                                }else{
+                                } else {
                                     $js .= 'loadSpecificTab(\'attachments_iframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&page=show_attachments_details_tab&module=attachments&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll&fromDetail=attachments&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp\');';
-        
                                 }
-                                
                             }
                         } else {
                             $js .= 'var eleframe1 =  window.parent.top.document.getElementById(\'list_attach\');';
@@ -569,11 +562,12 @@ if (isset($_POST['add']) && $_POST['add']) {
             }
         }
     }
-    
 
-    if (!isset($_SESSION['new_id'])) $_SESSION['new_id'] = 0;
+    if (!isset($_SESSION['new_id'])) {
+        $_SESSION['new_id'] = 0;
+    }
 
-    echo "{\"status\" : \"" . $status . "\", \"content\" : \"" . addslashes(_parse($content)) . "\", \"error\" : \"" . addslashes($error) . "\", \"majFrameId\" : \"".functions::xssafe($_SESSION['new_id'])."\", \"exec_js\" : \"".addslashes($js)."\", \"type\" : \"".$attachment_types."\"}";
+    echo '{"status" : "'.$status.'", "content" : "'.addslashes(_parse($content)).'", "error" : "'.addslashes($error).'", "majFrameId" : "'.functions::xssafe($_SESSION['new_id']).'", "exec_js" : "'.addslashes($js).'", "type" : "'.$attachment_types.'"}';
     //RAZ SESSIONS FILE
     if (empty($error)) {
         unset($_SESSION['new_id']);
@@ -584,55 +578,53 @@ if (isset($_POST['add']) && $_POST['add']) {
     }
     exit();
 
-//BEGIN EDIT ATTACHMENT VALIDATE BUTTTON
-} else if (isset($_POST['edit']) && $_POST['edit']) {
+    //BEGIN EDIT ATTACHMENT VALIDATE BUTTTON
+} elseif (isset($_POST['edit']) && $_POST['edit']) {
     $resAttach = new resource();
     $status = 0;
     $error = '';
-    
+
     //EMPTY TITLE ?
     $title = '';
-    if (! isset($_REQUEST['title'][0]) || empty($_REQUEST['title'][0])) {
-        $error .= _OBJECT . ' ' . _MANDATORY . ". ";
-
+    if (!isset($_REQUEST['title'][0]) || empty($_REQUEST['title'][0])) {
+        $error .= _OBJECT.' '._MANDATORY.'. ';
     } else {
-
         $title = $_REQUEST['title'][0];
-        $title = str_replace("&#039;", "'", $title);
+        $title = str_replace('&#039;', "'", $title);
     }
 
     //CURRENT ATTACHMENT IS A VERSION OF OLD ATTACHMENT ?
-    if ((int)$_REQUEST['relation'] > 1) {
+    if ((int) $_REQUEST['relation'] > 1) {
         $column_res = 'res_id_version';
     } else {
         $column_res = 'res_id';
     }
 
     //IS NEW VERSION ?
-    if ($_REQUEST['new_version'] == "yes") {
+    if ($_REQUEST['new_version'] == 'yes') {
         $is_new_version = true;
 
         //RETRIEVE PREVIOUS ATTACHMENT
-        $stmt = $db->query("SELECT res_id, res_id_version, attachment_type, identifier, relation, attachment_id_master 
+        $stmt = $db->query('SELECT res_id, res_id_version, attachment_type, identifier, relation, attachment_id_master 
                             FROM res_view_attachments
-                            WHERE ".$column_res." = ? and res_id_master = ?
-                            ORDER BY relation desc", array($_REQUEST['res_id'],$_SESSION['doc_id']));
+                            WHERE '.$column_res.' = ? and res_id_master = ?
+                            ORDER BY relation desc', array($_REQUEST['res_id'], $_SESSION['doc_id']));
         $previous_attachment = $stmt->fetchObject();
 
         $path_parts = pathinfo($_SESSION['upfile'][0]['fileNameOnTmp']);
         $fileInfos = array(
-            "tmpDir"      => $_SESSION['config']['tmppath'],
-            "size"        => $_SESSION['upfile'][0]['size'],
-            "format"      => $path_parts['extension'],
-            "tmpFileName" => $_SESSION['upfile'][0]['fileNameOnTmp'],
+            'tmpDir' => $_SESSION['config']['tmppath'],
+            'size' => $_SESSION['upfile'][0]['size'],
+            'format' => $path_parts['extension'],
+            'tmpFileName' => $_SESSION['upfile'][0]['fileNameOnTmp'],
         );
         $storeResult = array();
-            
+
         $storeResult = $docserverControler->storeResourceOnDocserver(
             $_SESSION['collection_id_choice'], $fileInfos
         );
 
-        if (isset($storeResult['error']) && $storeResult['error'] <> '') {
+        if (isset($storeResult['error']) && $storeResult['error'] != '') {
             $error = $storeResult['error'];
         }
         //SET META DATAS OF NEW ATTACHMENT
@@ -641,73 +633,73 @@ if (isset($_POST['add']) && $_POST['add']) {
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "typist",
+                    'column' => 'typist',
                     'value' => $_SESSION['user']['UserId'],
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "format",
+                    'column' => 'format',
                     'value' => $fileInfos['format'],
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "docserver_id",
+                    'column' => 'docserver_id',
                     'value' => $storeResult['docserver_id'],
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             if (!empty($_REQUEST['effectiveDateStatus'][0])) {
                 $_SESSION['data'][] = [
                     'column' => 'status',
-                    'value'  => $_REQUEST['effectiveDateStatus'][0],
-                    'type'   => 'string'
+                    'value' => $_REQUEST['effectiveDateStatus'][0],
+                    'type' => 'string',
                 ];
             } else {
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "status",
+                        'column' => 'status',
                         'value' => 'A_TRA',
-                        'type' => "string",
+                        'type' => 'string',
                     )
                 );
             }
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "offset_doc",
+                    'column' => 'offset_doc',
                     'value' => ' ',
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "logical_adr",
+                    'column' => 'logical_adr',
                     'value' => ' ',
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "title",
+                    'column' => 'title',
                     'value' => $title,
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "attachment_type",
+                    'column' => 'attachment_type',
                     'value' => $previous_attachment->attachment_type,
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             $attachmentTypesList = \Attachments\Models\AttachmentsModel::getAttachmentsTypesByXML();
@@ -716,9 +708,9 @@ if (isset($_POST['add']) && $_POST['add']) {
                     array_push(
                         $_SESSION['data'],
                         array(
-                            'column' => "in_signature_book",
+                            'column' => 'in_signature_book',
                             'value' => 1,
-                            'type' => "bool",
+                            'type' => 'bool',
                         )
                     );
                 }
@@ -726,64 +718,64 @@ if (isset($_POST['add']) && $_POST['add']) {
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "coll_id",
+                    'column' => 'coll_id',
                     'value' => $_SESSION['collection_id_choice'],
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "res_id_master",
+                    'column' => 'res_id_master',
                     'value' => $_SESSION['doc_id'],
-                    'type' => "integer",
+                    'type' => 'integer',
                 )
             );
-            if ((int)$previous_attachment->attachment_id_master == 0) {
+            if ((int) $previous_attachment->attachment_id_master == 0) {
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "attachment_id_master",
+                        'column' => 'attachment_id_master',
                         'value' => $_REQUEST['res_id'],
-                        'type' => "integer",
+                        'type' => 'integer',
                     )
                 );
             } else {
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "attachment_id_master",
-                        'value' => (int)$previous_attachment->attachment_id_master,
-                        'type' => "integer",
+                        'column' => 'attachment_id_master',
+                        'value' => (int) $previous_attachment->attachment_id_master,
+                        'type' => 'integer',
                     )
-                );                    
+                );
             }
 
-            if ($_SESSION['origin'] == "scan") {
+            if ($_SESSION['origin'] == 'scan') {
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "scan_user",
+                        'column' => 'scan_user',
                         'value' => $_SESSION['user']['UserId'],
-                        'type' => "string",
+                        'type' => 'string',
                     )
                 );
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "scan_date",
+                        'column' => 'scan_date',
                         'value' => $req->current_datetime(),
-                        'type' => "function",
+                        'type' => 'function',
                     )
                 );
             }
-            if (isset($_REQUEST['back_date'][0]) && $_REQUEST['back_date'][0] <> '') {
+            if (isset($_REQUEST['back_date'][0]) && $_REQUEST['back_date'][0] != '') {
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "validation_date",
+                        'column' => 'validation_date',
                         'value' => $func->format_date_db($_REQUEST['back_date'][0]),
-                        'type' => "date",
+                        'type' => 'date',
                     )
                 );
             }
@@ -791,61 +783,61 @@ if (isset($_POST['add']) && $_POST['add']) {
             if (!empty($_REQUEST['effectiveDate'][0])) {
                 $_SESSION['data'][] = [
                     'column' => 'effective_date',
-                    'value'  => $func->format_date_db($_REQUEST['effectiveDate'][0]),
-                    'type'   => 'date'
+                    'value' => $func->format_date_db($_REQUEST['effectiveDate'][0]),
+                    'type' => 'date',
                 ];
             }
 
             if (isset($_REQUEST['contactidAttach'][0]) && $_REQUEST['contactidAttach'][0] != '' && is_numeric($_REQUEST['contactidAttach'][0])) {
-                    $_SESSION['data'][] = [
+                $_SESSION['data'][] = [
                         'column' => 'dest_contact_id',
                         'value' => $_REQUEST['contactidAttach'][0],
-                        'type' => 'integer'
+                        'type' => 'integer',
                     ];
-            } else if (isset($_REQUEST['contactidAttach'][0]) && $_REQUEST['contactidAttach'][0] != '' && !is_numeric($_REQUEST['contactidAttach'][0])) {
-                    $_SESSION['data'][] = [
+            } elseif (isset($_REQUEST['contactidAttach'][0]) && $_REQUEST['contactidAttach'][0] != '' && !is_numeric($_REQUEST['contactidAttach'][0])) {
+                $_SESSION['data'][] = [
                         'column' => 'dest_user',
                         'value' => $_REQUEST['contactidAttach'][0],
-                        'type' => 'string'
+                        'type' => 'string',
                     ];
             }
 
-            if (isset($_REQUEST['addressidAttach'][0]) && $_REQUEST['addressidAttach'][0] <> '') {
+            if (isset($_REQUEST['addressidAttach'][0]) && $_REQUEST['addressidAttach'][0] != '') {
                 array_push(
                     $_SESSION['data'],
                     array(
-                        'column' => "dest_address_id",
+                        'column' => 'dest_address_id',
                         'value' => $_REQUEST['addressidAttach'][0],
-                        'type' => "integer",
+                        'type' => 'integer',
                     )
                 );
             }
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "identifier",
+                    'column' => 'identifier',
                     'value' => $previous_attachment->identifier,
-                    'type' => "string",
+                    'type' => 'string',
                 )
             );
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "type_id",
+                    'column' => 'type_id',
                     'value' => 0,
-                    'type' => "int",
+                    'type' => 'int',
                 )
             );
 
-            $relation = (int)$previous_attachment->relation;
-            $relation++;
+            $relation = (int) $previous_attachment->relation;
+            ++$relation;
 
             array_push(
                 $_SESSION['data'],
                 array(
-                    'column' => "relation",
+                    'column' => 'relation',
                     'value' => $relation,
-                    'type' => "int",
+                    'type' => 'int',
                 )
             );
 
@@ -853,45 +845,43 @@ if (isset($_POST['add']) && $_POST['add']) {
             $id = $resAttach->load_into_db(
                 'res_version_attachments',
                 $storeResult['destination_dir'],
-                $storeResult['file_destination_name'] ,
+                $storeResult['file_destination_name'],
                 $storeResult['path_template'],
                 $storeResult['docserver_id'], $_SESSION['data'],
                 $_SESSION['config']['databasetype']
             );
 
             //DEPRECATED OLD ATTACHMENT FILE
-            if ((int)$_REQUEST['relation'] == 1) {
-                $stmt = $db->query("UPDATE res_attachments SET status = 'OBS' WHERE res_id = ?", array($previous_attachment->res_id) );
-
+            if ((int) $_REQUEST['relation'] == 1) {
+                $stmt = $db->query("UPDATE res_attachments SET status = 'OBS' WHERE res_id = ?", array($previous_attachment->res_id));
             } else {
                 $stmt = $db->query("UPDATE res_version_attachments SET status = 'OBS' WHERE res_id = ?", array($previous_attachment->res_id_version));
             }
         }
-
     } else {
         $is_new_version = false;
-        $set_update = "";
+        $set_update = '';
         $arrayPDO = array();
 
         //CREATE SQL UPDATE
-        $set_update = " title = :title";
-        $arrayPDO = array_merge($arrayPDO, array(":title" => $title));
-        if (isset($_REQUEST['back_date'][0]) && $_REQUEST['back_date'][0] <> "") {
+        $set_update = ' title = :title';
+        $arrayPDO = array_merge($arrayPDO, array(':title' => $title));
+        if (isset($_REQUEST['back_date'][0]) && $_REQUEST['back_date'][0] != '') {
             $set_update .= ", validation_date = '".$req->format_date_db($_REQUEST['back_date'][0])."'";
         } else {
-            $set_update .= ", validation_date = null";
+            $set_update .= ', validation_date = null';
         }
         if (!empty($_REQUEST['effectiveDate'][0])) {
             $set_update .= ", effective_date = '".$req->format_date_db($_REQUEST['effectiveDate'][0])."'";
         }
         if (isset($_REQUEST['contactidAttach'][0]) && $_REQUEST['contactidAttach'][0] != '' && is_numeric($_REQUEST['contactidAttach'][0])) {
-            $set_update .= ", dest_user = null, dest_contact_id = ".$_REQUEST['contactidAttach'][0].", dest_address_id = ".$_REQUEST['addressidAttach'][0];
-        } else if (isset($_REQUEST['contactidAttach'][0]) && $_REQUEST['contactidAttach'][0] != '' && !is_numeric($_REQUEST['contactidAttach'][0])) {
+            $set_update .= ', dest_user = null, dest_contact_id = '.$_REQUEST['contactidAttach'][0].', dest_address_id = '.$_REQUEST['addressidAttach'][0];
+        } elseif (isset($_REQUEST['contactidAttach'][0]) && $_REQUEST['contactidAttach'][0] != '' && !is_numeric($_REQUEST['contactidAttach'][0])) {
             $set_update .= ", dest_user = '".$_REQUEST['contactidAttach'][0]."', dest_contact_id = null, dest_address_id = null";
         } else {
-            $set_update .= ", dest_user = null, dest_contact_id = null, dest_address_id = null";
+            $set_update .= ', dest_user = null, dest_contact_id = null, dest_address_id = null';
         }
-        if ((int)$_REQUEST['relation'] > 1) {
+        if ((int) $_REQUEST['relation'] > 1) {
             $column_res = 'res_id_version';
         } else {
             $column_res = 'res_id';
@@ -908,32 +898,31 @@ if (isset($_POST['add']) && $_POST['add']) {
             $docserverTypeObject = $docserverTypeControler->get($docserver->docserver_type_id);
 
             //HASH OLD AND NEW ATTACHMENT FILE
-            $stmt = $db->query("SELECT fingerprint FROM res_view_attachments WHERE ".$column_res." = ? and res_id_master = ? and status <> 'OBS'"
-                                , array($_REQUEST['res_id'], $_SESSION['doc_id']));
-            $res = $stmt->fetchObject(); 
+            $stmt = $db->query('SELECT fingerprint FROM res_view_attachments WHERE '.$column_res." = ? and res_id_master = ? and status <> 'OBS'", array($_REQUEST['res_id'], $_SESSION['doc_id']));
+            $res = $stmt->fetchObject();
             $NewHash = Ds_doFingerprint($_SESSION['upfile'][0]['tmp_name'], $docserverTypeObject->fingerprint_mode);
             $OriginalHash = $res->fingerprint;
 
             //SAVE NEW ATTACHMENT FILE (IF <> HASH)
-            if ($OriginalHash <> $NewHash) {
+            if ($OriginalHash != $NewHash) {
                 //$_SESSION['upfile'][0]['upAttachment'] = false;
                 $path_parts = pathinfo($_SESSION['upfile'][0]['fileNameOnTmp']);
                 $fileInfos = array(
-                    "tmpDir"      => $_SESSION['config']['tmppath'],
-                    "size"        => $_SESSION['upfile'][0]['size'],
-                    "format"      => $path_parts['extension'],
-                    "tmpFileName" => $_SESSION['upfile'][0]['fileNameOnTmp'],
+                    'tmpDir' => $_SESSION['config']['tmppath'],
+                    'size' => $_SESSION['upfile'][0]['size'],
+                    'format' => $path_parts['extension'],
+                    'tmpFileName' => $_SESSION['upfile'][0]['fileNameOnTmp'],
                 );
                 $storeResult = array();
                 $storeResult = $docserverControler->storeResourceOnDocserver(
                     $_SESSION['collection_id_choice'], $fileInfos
                 );
-                if (isset($storeResult['error']) && $storeResult['error'] <> '') {
+                if (isset($storeResult['error']) && $storeResult['error'] != '') {
                     $error = $storeResult['error'];
-                }else {
+                } else {
                     $filetmp = $storeResult['path_template'];
                     $tmp = $storeResult['destination_dir'];
-                    $tmp = str_replace('#',DIRECTORY_SEPARATOR,$tmp);
+                    $tmp = str_replace('#', DIRECTORY_SEPARATOR, $tmp);
                     $filetmp .= $tmp;
                     $filetmp .= $storeResult['file_destination_name'];
                     $docserverTypeControler = new docserver_types_controler();
@@ -943,127 +932,126 @@ if (isset($_POST['add']) && $_POST['add']) {
                     $filesize = filesize($filetmp);
 
                     //CREATE SQL UPDATE (FOR METAS DATA FILE)
-                    $set_update .= ", fingerprint = :fingerprint";
-                    $set_update .= ", filesize = :filesize";
-                    $set_update .= ", path = :path";
-                    $set_update .= ", filename = :filename";
-                    $arrayPDO = array_merge($arrayPDO, 
-                        array(  ":fingerprint" => $fingerprint, 
-                                ":filesize" => $filesize, 
-                                ":path" => $storeResult['destination_dir'],
-                                ":filename" => $storeResult['file_destination_name'])
+                    $set_update .= ', fingerprint = :fingerprint';
+                    $set_update .= ', filesize = :filesize';
+                    $set_update .= ', path = :path';
+                    $set_update .= ', filename = :filename';
+                    $arrayPDO = array_merge($arrayPDO,
+                        array(':fingerprint' => $fingerprint,
+                                ':filesize' => $filesize,
+                                ':path' => $storeResult['destination_dir'],
+                                ':filename' => $storeResult['file_destination_name'], )
                         );
                 }
             }
         }
 
-        $set_update .= ", doc_date = ".$req->current_datetime().", updated_by = :updated_by";
-        $arrayPDO = array_merge($arrayPDO, array(":updated_by" => $_SESSION['user']['UserId']));
+        $set_update .= ', doc_date = '.$req->current_datetime().', updated_by = :updated_by';
+        $arrayPDO = array_merge($arrayPDO, array(':updated_by' => $_SESSION['user']['UserId']));
         if (!empty($_REQUEST['effectiveDateStatus'])) {
-            $set_update .= ", status = :effectiveStatus";
-            $arrayPDO = array_merge($arrayPDO, array(":effectiveStatus" => $_REQUEST['effectiveDateStatus'][0]));
+            $set_update .= ', status = :effectiveStatus';
+            $arrayPDO = array_merge($arrayPDO, array(':effectiveStatus' => $_REQUEST['effectiveDateStatus'][0]));
         } else {
             $set_update .= ", status = 'A_TRA'";
         }
-        $arrayPDO = array_merge($arrayPDO, array(":res_id" => $_REQUEST['res_id']));
+        $arrayPDO = array_merge($arrayPDO, array(':res_id' => $_REQUEST['res_id']));
 
         //UPDATE QUERY
-        if ((int)$_REQUEST['relation'] == 1) {
-            $stmt = $db->query("UPDATE res_attachments SET " . $set_update . " WHERE res_id = :res_id", $arrayPDO);
+        if ((int) $_REQUEST['relation'] == 1) {
+            $stmt = $db->query('UPDATE res_attachments SET '.$set_update.' WHERE res_id = :res_id', $arrayPDO);
         } else {
-            $stmt = $db->query("UPDATE res_version_attachments SET " . $set_update . " WHERE res_id = :res_id", $arrayPDO);
+            $stmt = $db->query('UPDATE res_version_attachments SET '.$set_update.' WHERE res_id = :res_id', $arrayPDO);
         }
     }
     //copie de la version PDF de la pièce si mode de conversion sur le client
     if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == true && $_SESSION['upfile'][0]['fileNamePdfOnTmp'] != '' && empty($error) && $_SESSION['upfile'][0]['upAttachment'] != false) {
-
         $_SESSION['new_id'] = $id;
         $file = $_SESSION['config']['tmppath'].$_SESSION['upfile'][0]['fileNamePdfOnTmp'];
-        $newfile = $storeResult['path_template'].str_replace('#',"/",$storeResult['destination_dir']).substr ($storeResult['file_destination_name'], 0, strrpos  ($storeResult['file_destination_name'], "." )).".pdf";
-        
+        $newfile = $storeResult['path_template'].str_replace('#', '/', $storeResult['destination_dir']).substr($storeResult['file_destination_name'], 0, strrpos($storeResult['file_destination_name'], '.')).'.pdf';
+
         copy($file, $newfile);
 
         //SET META DATAS OF CONVERTED PDF
-        $_SESSION['data_pdf'] = array();   
+        $_SESSION['data_pdf'] = array();
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "typist",
+                'column' => 'typist',
                 'value' => $_SESSION['user']['UserId'],
-                'type' => "string",
+                'type' => 'string',
             )
         );
-        
+
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "format",
+                'column' => 'format',
                 'value' => 'pdf',
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "docserver_id",
+                'column' => 'docserver_id',
                 'value' => $storeResult['docserver_id'],
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "status",
+                'column' => 'status',
                 'value' => 'TRA',
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "offset_doc",
+                'column' => 'offset_doc',
                 'value' => ' ',
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "logical_adr",
+                'column' => 'logical_adr',
                 'value' => ' ',
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "title",
+                'column' => 'title',
                 'value' => $title,
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "attachment_type",
+                'column' => 'attachment_type',
                 'value' => 'converted_pdf',
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "coll_id",
+                'column' => 'coll_id',
                 'value' => $_SESSION['collection_id_choice'],
-                'type' => "string",
+                'type' => 'string',
             )
         );
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "res_id_master",
+                'column' => 'res_id_master',
                 'value' => $_SESSION['doc_id'],
-                'type' => "integer",
+                'type' => 'integer',
             )
         );
 
@@ -1074,9 +1062,9 @@ if (isset($_POST['add']) && $_POST['add']) {
         }
 
         //DEPRECATED OLD CONVERTED PDF
-        if ((int)$_REQUEST['relation'] == 1) {
+        if ((int) $_REQUEST['relation'] == 1) {
             if (isset($old_pdf_id) && $old_pdf_id != 0 && (!empty($_SESSION['upfile'][0]['fileNamePdfOnTmp']))) {
-                $stmt = $db->query("UPDATE res_attachments SET status = 'DEL' WHERE res_id = ?", array($old_pdf_id) );
+                $stmt = $db->query("UPDATE res_attachments SET status = 'DEL' WHERE res_id = ?", array($old_pdf_id));
             }
         } else {
             if (isset($pdf_id) && $pdf_id != 0 && (!empty($_SESSION['upfile'][0]['fileNamePdfOnTmp']))) {
@@ -1084,7 +1072,7 @@ if (isset($_POST['add']) && $_POST['add']) {
             }
         }
 
-        if ((isset($_SESSION['upfile'][0]['outgoingMail']) && $_SESSION['upfile'][0]['outgoingMail']) || ($infos_old_pdf['type_id']==1)) {
+        if ((isset($_SESSION['upfile'][0]['outgoingMail']) && $_SESSION['upfile'][0]['outgoingMail']) || ($infos_old_pdf['type_id'] == 1)) {
             $type_id = 1;
         } else {
             $type_id = 0;
@@ -1093,27 +1081,27 @@ if (isset($_POST['add']) && $_POST['add']) {
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "type_id",
+                'column' => 'type_id',
                 'value' => $type_id,
-                'type' => "int",
+                'type' => 'int',
             )
         );
 
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "relation",
+                'column' => 'relation',
                 'value' => 1,
-                'type' => "int",
+                'type' => 'int',
             )
         );
 
         array_push(
             $_SESSION['data_pdf'],
             array(
-                'column' => "in_signature_book",
+                'column' => 'in_signature_book',
                 'value' => 1,
-                'type' => "bool",
+                'type' => 'bool',
             )
         );
 
@@ -1121,7 +1109,7 @@ if (isset($_POST['add']) && $_POST['add']) {
         $id_up = $resAttach->load_into_db(
             RES_ATTACHMENTS_TABLE,
             $storeResult['destination_dir'],
-            substr ($storeResult['file_destination_name'], 0, strrpos  ($storeResult['file_destination_name'], "." )).".pdf" ,
+            substr($storeResult['file_destination_name'], 0, strrpos($storeResult['file_destination_name'], '.')).'.pdf',
             $storeResult['path_template'],
             $storeResult['docserver_id'], $_SESSION['data_pdf'],
             $_SESSION['config']['databasetype']
@@ -1132,30 +1120,29 @@ if (isset($_POST['add']) && $_POST['add']) {
         //DELETE TEMPORARY BACKUP
         $stmt = $db->query("SELECT attachment_id_master 
                             FROM res_version_attachments
-                            WHERE res_id = ? and status = 'TMP' and res_id_master = ?" 
-                            , array($_SESSION['attachmentInfo']['inProgressResId'], $_SESSION['doc_id']));
+                            WHERE res_id = ? and status = 'TMP' and res_id_master = ?", array($_SESSION['attachmentInfo']['inProgressResId'], $_SESSION['doc_id']));
         $previous_attachment = $stmt->fetchObject();
 
         $db->query("DELETE FROM res_version_attachments WHERE attachment_id_master = ? and status = 'TMP'", array($previous_attachment->attachment_id_master));
 
         //ADD ACTION IN HISTORY
-        if ($_SESSION['history']['attachup'] == "true") {
+        if ($_SESSION['history']['attachup'] == 'true') {
             $hist = new history();
             $view = $sec->retrieve_view_from_coll_id(
                 $_SESSION['collection_id_choice']
             );
             $hist->add(
-                $view, $_SESSION['doc_id'], "UP", 'attachup',
-                ucfirst(_DOC_NUM) . $id . ' '
-                . _ATTACH_UPDATED,
+                $view, $_SESSION['doc_id'], 'UP', 'attachup',
+                ucfirst(_DOC_NUM).$id.' '
+                ._ATTACH_UPDATED,
                 $_SESSION['config']['databasetype'],
                 'apps'
             );
             $content = _ATTACH_UPDATED;
             $hist->add(
-                RES_ATTACHMENTS_TABLE, $id, "UP",'attachup',
-                $_SESSION['info'] . " (" . $title
-                . ") ",
+                RES_ATTACHMENTS_TABLE, $id, 'UP', 'attachup',
+                $_SESSION['info'].' ('.$title
+                .') ',
                 $_SESSION['config']['databasetype'],
                 'attachments'
             );
@@ -1166,7 +1153,7 @@ if (isset($_POST['add']) && $_POST['add']) {
             $js .= 'eleframe1 =  parent.document.getElementsByName(\'attachments_iframe\');';
             $js .= 'eleframe1[0].src = \''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=show_attachments_details_tab&load';
             $js .= '&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp&fromDetail=attachments&collId=letterbox_coll&resId='.$_SESSION['doc_id'];
-        } else if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'response'){
+        } elseif (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'response') {
             $js .= 'eleframe1 =  parent.document.getElementsByName(\'responses_iframe\');';
             $js .= 'eleframe1[0].src = \''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=show_attachments_details_tab&load';
             $js .= '&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp&fromDetail=response&collId=letterbox_coll&resId='.$_SESSION['doc_id'];
@@ -1174,10 +1161,12 @@ if (isset($_POST['add']) && $_POST['add']) {
             $js .= 'var eleframe1 =  parent.document.getElementsByName(\'list_attach\');';
             $js .= 'eleframe1[0].src = \''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&attach_type_exclude=converted_pdf,print_folder&load';
         }
-        $js .='\';';
+        $js .= '\';';
 
         //RAZ SESSIONS
-        if (!isset($_SESSION['new_id'])) $_SESSION['new_id'] = 0;
+        if (!isset($_SESSION['new_id'])) {
+            $_SESSION['new_id'] = 0;
+        }
         unset($_SESSION['upfile'][0]['fileNamePdfOnTmp']);
         unset($_SESSION['new_id']);
         unset($_SESSION['attachmentInfo']);
@@ -1185,11 +1174,10 @@ if (isset($_POST['add']) && $_POST['add']) {
         unset($_SESSION['targetAttachment']);
     }
 
-    echo "{\"status\" : \"" . $status . "\", \"content\" : \"" . addslashes(_parse($content)) . "\", \"title\" : \"" . addslashes($title) . "\", \"isVersion\" : \"" . $isVersion . "\", \"error\" : \"" . addslashes($error) . "\", \"majFrameId\" : \"".$_SESSION['new_id']."\", \"exec_js\" : \"".addslashes($js)."\", \"cur_id\" : \"".$_REQUEST['res_id']."\"}";
+    echo '{"status" : "'.$status.'", "content" : "'.addslashes(_parse($content)).'", "title" : "'.addslashes($title).'", "isVersion" : "'.$isVersion.'", "error" : "'.addslashes($error).'", "majFrameId" : "'.$_SESSION['new_id'].'", "exec_js" : "'.addslashes($js).'", "cur_id" : "'.$_REQUEST['res_id'].'"}';
 
-    exit(); 
+    exit();
 }
-
 
 //INITIALIZE EDIT MODE
 if (isset($_REQUEST['id'])) {
@@ -1200,7 +1188,7 @@ if (isset($_REQUEST['id'])) {
     unset($_SESSION['upfile']);
 
     //GET DATAS attachment
-    $infoAttach = (object)$ac->getAttachmentInfos($resId);
+    $infoAttach = (object) $ac->getAttachmentInfos($resId);
 
     //var_dump($infoAttach);
 
@@ -1211,14 +1199,13 @@ if (isset($_REQUEST['id'])) {
     $_SESSION['upfile'][0]['fileNamePdfOnTmp'] = $infoAttach->pathfile_pdf;
 
     $viewResourceArr = $docserverControler->viewResource(
-        $resId, 
-        $infoAttach->target_table_origin, 
-        'adr_x', 
+        $resId,
+        $infoAttach->target_table_origin,
+        'adr_x',
         false
     );
-    
-    $_SESSION['upfile'][0]['fileNameOnTmp'] = str_replace($viewResourceArr->tmp_path.DIRECTORY_SEPARATOR, '', $viewResourceArr->file_path);
 
+    $_SESSION['upfile'][0]['fileNameOnTmp'] = str_replace($viewResourceArr->tmp_path.DIRECTORY_SEPARATOR, '', $viewResourceArr->file_path);
 } else {
     //INITIALIZE ADD MODE
     $mode = 'add';
@@ -1229,29 +1216,24 @@ if (isset($_REQUEST['id'])) {
     unset($_SESSION['transmissionContacts']);
 
     //GET DATAS attachment
-    $infoAttach = (object)$ac->initAttachmentInfos($_SESSION['doc_id']);
-    
+    $infoAttach = (object) $ac->initAttachmentInfos($_SESSION['doc_id']);
+
     //On recherche le type de document attaché à ce courrier
-    $stmt = $db->query("SELECT type_id, creation_date FROM res_letterbox WHERE res_id = ?",array($_SESSION['doc_id']));
+    $stmt = $db->query('SELECT type_id, creation_date FROM res_letterbox WHERE res_id = ?', array($_SESSION['doc_id']));
     $type_id = $stmt->fetchObject();
     $type_id = $type_id->type_id;
     $dataForDate = $type_id->creation_date;
     //On recherche le sve_type
-    $stmt = $db->query("SELECT * FROM mlb_doctype_ext WHERE type_id = ?",array($type_id));
+    $stmt = $db->query('SELECT * FROM mlb_doctype_ext WHERE type_id = ?', array($type_id));
     $sve = $stmt->fetchObject();
     $sve_type = $sve->process_mode;
     //On met tous les attachments ayant le type_sve attaché au courrier dans un tableau
     $attachments_types_for_process = array();
-    foreach($_SESSION['attachment_types_with_process'] as $key => $value){
-
-        if($sve_type == $value or $value == ''){
-
+    foreach ($_SESSION['attachment_types_with_process'] as $key => $value) {
+        if ($sve_type == $value or $value == '') {
             $attachments_types_for_process[$key] = $_SESSION['attachment_types'][$key];
-
         }
-
     }
-
 }
 
 //BEGIN FORM ATTACHMENT
@@ -1260,7 +1242,7 @@ unset($_SESSION['cm_applet'][$_SESSION['user']['UserId']]);
 $objectTable = $sec->retrieve_table_from_coll($_SESSION['collection_id_choice']);
 
 //BEDING HEADER
-$content .= '<h2>&nbsp;' . $title;
+$content .= '<h2>&nbsp;'.$title;
 
 //multicontact
 if (!empty($infoAttach->multi_contact)) {
@@ -1289,26 +1271,25 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     }
     $content .= '<input type="hidden" name="fromDetail" id="fromDetail" value="'.$_REQUEST['fromDetail'].'"/>';
 
-        
     //ATTACHMENT TYPE
     $content .= '<p>';
-    $content .= '<label>' . _ATTACHMENT_TYPES . '</label>';
+    $content .= '<label>'._ATTACHMENT_TYPES.'</label>';
     if ($mode == 'add') {
-        $content .= '<select name="attachment_types[]" id="attachment_types" onchange="affiche_chrono(this);select_template(\'' . $_SESSION['config']['businessappurl']
-        . 'index.php?display=true&module=templates&page='
-        . 'select_templates\', this);"/>';
-        $content .= '<option value="">' . _CHOOSE_ATTACHMENT_TYPE . '</option>';
-        foreach(array_keys($attachments_types_for_process) as $attachmentType) {
-            if(empty($_SESSION['attachment_types_get_chrono'][$attachmentType][0])){
+        $content .= '<select name="attachment_types[]" id="attachment_types" onchange="affiche_chrono(this);select_template(\''.$_SESSION['config']['businessappurl']
+        .'index.php?display=true&module=templates&page='
+        .'select_templates\', this);"/>';
+        $content .= '<option value="">'._CHOOSE_ATTACHMENT_TYPE.'</option>';
+        foreach (array_keys($attachments_types_for_process) as $attachmentType) {
+            if (empty($_SESSION['attachment_types_get_chrono'][$attachmentType][0])) {
                 $_SESSION['attachment_types_get_chrono'][$attachmentType] = '';
             }
-            if(empty($_SESSION['attachment_types_with_delay'][$attachmentType][0])){
+            if (empty($_SESSION['attachment_types_with_delay'][$attachmentType][0])) {
                 $_SESSION['attachment_types_with_delay'][$attachmentType] = '';
             }
-            if($_SESSION['attachment_types_show'][$attachmentType] == "true"){
-                $content .= '<option value="' . $attachmentType . '" width_delay="'.$_SESSION['attachment_types_with_delay'][$attachmentType].'" with_chrono = "'. $_SESSION['attachment_types_with_chrono'][$attachmentType].'" get_chrono = "'. $_SESSION['attachment_types_get_chrono'][$attachmentType].'"';
+            if ($_SESSION['attachment_types_show'][$attachmentType] == 'true') {
+                $content .= '<option value="'.$attachmentType.'" width_delay="'.$_SESSION['attachment_types_with_delay'][$attachmentType].'" with_chrono = "'.$_SESSION['attachment_types_with_chrono'][$attachmentType].'" get_chrono = "'.$_SESSION['attachment_types_get_chrono'][$attachmentType].'"';
 
-                if(isset($_GET['cat']) && $_GET['cat'] == 'outgoing' && $attachmentType == 'outgoing_mail'){
+                if (isset($_GET['cat']) && $_GET['cat'] == 'outgoing' && $attachmentType == 'outgoing_mail') {
                     $content .= ' selected = "selected"';
                     $content .= '<script>$("attachment_types").onchange();</script>';
                 }
@@ -1319,43 +1300,42 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         }
         $content .= '</select>&nbsp;<span class="red_asterisk" id="attachment_types_mandatory"><i class="fa fa-star"></i></span>';
     } else {
-        $content .= '<input type="text" name="attachment_types_show[]" id="attachment_types_show" value="' . $_SESSION['attachment_types'][$infoAttach->attachment_type] . '" disabled class="readonly"/>';        
-        $content .= '<input type="hidden" name="attachment_types[]" id="attachment_types" value="' . $infoAttach->attachment_type . '" readonly class="readonly"/>';        
+        $content .= '<input type="text" name="attachment_types_show[]" id="attachment_types_show" value="'.$_SESSION['attachment_types'][$infoAttach->attachment_type].'" disabled class="readonly"/>';
+        $content .= '<input type="hidden" name="attachment_types[]" id="attachment_types" value="'.$infoAttach->attachment_type.'" readonly class="readonly"/>';
     }
     $content .= '</p>';
 
     //PJ CHRONO
     $content .= '<p>';
-    $content .= '<label id="chrono_label" name="chrono_label[]" style="display:none">'. _CHRONO_NUMBER.'</label>';
-    $content .= '<input type="text" name="chrono_display[]" id="chrono_display" value="' . $infoAttach->identifier . '"  style="display:none" disabled class="readonly"/>';
-    if($mode == 'add') {   
+    $content .= '<label id="chrono_label" name="chrono_label[]" style="display:none">'._CHRONO_NUMBER.'</label>';
+    $content .= '<input type="text" name="chrono_display[]" id="chrono_display" value="'.$infoAttach->identifier.'"  style="display:none" disabled class="readonly"/>';
+    if ($mode == 'add') {
         $content .= '<select name="get_chrono_display[]" id="get_chrono_display" style="display:none" onchange="$(\'chrono\').value=this.options[this.selectedIndex].value"/>';
     } else {
-        $js .= '$j("#chrono_label,#chrono_display", window.top.document).show();';        
+        $js .= '$j("#chrono_label,#chrono_display", window.top.document).show();';
     }
-    $content .= '<input type="hidden" name="chrono[]" id="chrono" value="' . $infoAttach->identifier . '"/>';
+    $content .= '<input type="hidden" name="chrono[]" id="chrono" value="'.$infoAttach->identifier.'"/>';
     $content .= '</p>';
-
 
     $content .= '<p style="text-align:left;margin-left:74.5%;"></p>';
     //FILE
     if ($mode == 'add') {
         $content .= '<p>';
-        $content .= '<label id="file_label">'. _FILE.' <span id="templateOfficeTool"><i class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" style="cursor:pointer;" id="attachment_type_icon" onclick="$(\'attachment_type_icon\').setStyle({color: \'#009DC5\'});$(\'attachment_type_icon2\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'none\'});$(\'templateOffice\').disabled=true;$(\'templateOffice_edit\').setStyle({display: \'none\'});$(\'choose_file\').setStyle({display: \'inline-block\'});document.getElementById(\'choose_file\').contentDocument.getElementById(\'file\').click();"></i> <i class="fa fa-file-text-o fa-lg" title="'._GENERATED_FILE.'" style="cursor:pointer;color:#009DC5;" id="attachment_type_icon2" onclick="$(\'attachment_type_icon2\').setStyle({color: \'#009DC5\'});$(\'attachment_type_icon\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'inline-block\'});$(\'templateOffice\').disabled=false;$(\'choose_file\').setStyle({display: \'none\'});"></i></span></label>';
+        $content .= '<label id="file_label">'._FILE.' <span id="templateOfficeTool"><i class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" style="cursor:pointer;" id="attachment_type_icon" onclick="$(\'attachment_type_icon\').setStyle({color: \'#009DC5\'});$(\'attachment_type_icon2\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'none\'});$(\'templateOffice\').disabled=true;$(\'templateOffice_edit\').setStyle({display: \'none\'});$(\'choose_file\').setStyle({display: \'inline-block\'});document.getElementById(\'choose_file\').contentDocument.getElementById(\'file\').click();"></i> <i class="fa fa-file-text-o fa-lg" title="'._GENERATED_FILE.'" style="cursor:pointer;color:#009DC5;" id="attachment_type_icon2" onclick="$(\'attachment_type_icon2\').setStyle({color: \'#009DC5\'});$(\'attachment_type_icon\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'inline-block\'});$(\'templateOffice\').disabled=false;$(\'choose_file\').setStyle({display: \'none\'});"></i></span></label>';
         $content .= '<select name="templateOffice[]" id="templateOffice" style="display:inline-block;" onchange="showEditButton(this);">';
-        $content .= '<option value="">'. _CHOOSE_MODEL.'</option>';
+        $content .= '<option value="">'._CHOOSE_MODEL.'</option>';
 
         $content .= '</select>';
         if ($mode == 'add') {
             $content .= ' <input type="button" value="';
             $content .= _EDIT_MODEL;
             $content .= '" name="templateOffice_edit[]" id="templateOffice_edit" style="display:none;margin-top: 0" class="button" '
-                . 'onclick="showAppletLauncher(this, \'' . $_SESSION['doc_id'] .'\',\'' . $objectTable .'\',\'attachmentVersion\',\'attachment\');$(\'add\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';this.hide();$j(\'#\'+this.id).parent().find(\'[name=templateOffice\\\\[\\\\]]\').css(\'width\',\'206px\');"/>';
+                .'onclick="showAppletLauncher(this, \''.$_SESSION['doc_id'].'\',\''.$objectTable.'\',\'attachmentVersion\',\'attachment\');$(\'add\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';this.hide();$j(\'#\'+this.id).parent().find(\'[name=templateOffice\\\\[\\\\]]\').css(\'width\',\'206px\');"/>';
         }
-        $content .= '<iframe style="display:none; width:210px" name="choose_file" id="choose_file" frameborder="0" scrolling="no" height="25" src="' . $_SESSION['config']['businessappurl']
-            . 'index.php?display=true&module=attachments&page=choose_attachment"></iframe>';
+        $content .= '<iframe style="display:none; width:210px" name="choose_file" id="choose_file" frameborder="0" scrolling="no" height="25" src="'.$_SESSION['config']['businessappurl']
+            .'index.php?display=true&module=attachments&page=choose_attachment"></iframe>';
 
-        $content .='&nbsp;<span class="red_asterisk" id="templateOffice_mandatory"><i class="fa fa-star"></i></span>';
+        $content .= '&nbsp;<span class="red_asterisk" id="templateOffice_mandatory"><i class="fa fa-star"></i></span>';
         $content .= '</p>';
     }
 
@@ -1365,49 +1345,48 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
 
     //PJ SUBJECT
     $content .= '<p>';
-    $content .= '<label>'. _OBJECT .'</label>';
+    $content .= '<label>'._OBJECT.'</label>';
     $content .= "<input type='text' name='title[]' id='title' maxlength='250' value='{$infoAttach->title}'/> ";
     $content .= '&nbsp;<span class="red_asterisk" id="templateOffice_mandatory"><i class="fa fa-star"></i></span>';
     $content .= '</p>';
 
     //BACK DATE
     $content .= '<p>';
-    $content .= '<label>'. _BACK_DATE.'</label>';
+    $content .= '<label>'._BACK_DATE.'</label>';
     $content .= "<input type='text' name='back_date[]' id='back_date' onClick='showCalender(this);' onfocus='checkBackDate(this);' onchange='checkBackDate(this);' value='{$req->format_date_db($infoAttach->validation_date)}' />";
     $content .= '</p>';
 
     //EFFECTIVE BACK DATE (for transmission)
-    if($mode == 'edit' && $infoAttach->attachment_type == 'transmission') {
+    if ($mode == 'edit' && $infoAttach->attachment_type == 'transmission') {
         $content .= '<p>';
-        $content .= '<label>'. _EFFECTIVE_DATE.'</label>';
+        $content .= '<label>'._EFFECTIVE_DATE.'</label>';
         $content .= "<input type='text' name='effectiveDate[]' id='effectiveDate' onblur='setRturnForEffectiveDate();' onClick='showCalender(this);' onfocus='checkBackDate(this);' onchange='checkBackDate(this);' style='width: 75px' value='{$req->format_date_db($infoAttach->effective_date)}' />";
         $content .= '<select name="effectiveDateStatus[]" id="effectiveDateStatus" style="margin-left: 20px;width: 105px" />';
         $content .= '<option value="EXP_RTURN">Attente retour</option>';
-        if ($infoAttach->status == "RTURN") {
+        if ($infoAttach->status == 'RTURN') {
             $content .= '<option selected="selected" value="RTURN">Retourné</option>';
-        }else {
+        } else {
             $content .= '<option value="RTURN">Retourné</option>';
-        } 
+        }
         $content .= '</select>';
         $content .= '</p>';
     }
     $content .= "<input type='hidden' name='dataCreationDate' id='dataCreationDate' value='{$dataForDate}' />";
 
-
     //CONTACT
     $content .= '<div style="margin-bottom:10px;">';
-    $content .= '<label>'. _DEST_USER_PJ;
+    $content .= '<label>'._DEST_USER_PJ;
     if ($core->test_admin('my_contacts', 'apps', false)) {
-        $content .= ' <a href="#" id="create_multi_contact" title="' . _CREATE_CONTACT
-                . '" onclick="new Effect.toggle(\'create_contact_div_attach\', '
-                . '\'blind\', {delay:0.2});return false;" '
-                . 'style="display:inline;" ><i class="fa fa-pencil fa-lg" title="' . _CREATE_CONTACT . '"></i></a>';
+        $content .= ' <a href="#" id="create_multi_contact" title="'._CREATE_CONTACT
+                .'" onclick="new Effect.toggle(\'create_contact_div_attach\', '
+                .'\'blind\', {delay:0.2});return false;" '
+                .'style="display:inline;" ><i class="fa fa-pencil fa-lg" title="'._CREATE_CONTACT.'"></i></a>';
     }
     $content .= '</label>';
     $content .= '<span style="position:relative;"><input type="text" name="contact_attach[]" onblur="display_contact_card(\'visible\', \'contact_card_attach\');" onkeyup="erase_contact_external_id(\'contact_attach\', \'contactidAttach\');erase_contact_external_id(\'contact_attach\', \'addressidAttach\');" id="contact_attach" onchange="saveContactToSession(this);" value="';
     $content .= $infoAttach->contact_show;
     $content .= '"/><div id="show_contacts_attach" class="autocomplete autocompleteIndex" style="width: 100%;left: 0px;"></div><div class="autocomplete autocompleteIndex" id="searching_autocomplete" style="display: none;text-align:left;padding:5px;width: 100%;left: 0px;"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> chargement ...</div></span>';
-    $content .='<a href="#" id="contact_card_attach" name="contact_card_attach" title="'._CONTACT_CARD.'" onclick="showContactInfo(this,document.getElementById(\'contactidAttach\'),document.getElementById(\'addressidAttach\'));" style=""> <i class="fa fa-book fa-lg"></i></a>';
+    $content .= '<a href="#" id="contact_card_attach" name="contact_card_attach" title="'._CONTACT_CARD.'" onclick="showContactInfo(this,document.getElementById(\'contactidAttach\'),document.getElementById(\'addressidAttach\'));" style=""> <i class="fa fa-book fa-lg"></i></a>';
     $content .= '</div>';
     $content .= "<input type='hidden' id='contactidAttach' name='contactidAttach[]' value='{$infoAttach->contact_id}' />";
     $content .= "<input type='hidden' id='addressidAttach' name='addressidAttach[]' value='{$infoAttach->address_id}' />";
@@ -1416,41 +1395,43 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     if (!$canCreateContact) {
         $canCreateContact = 0;
     }
-        
+
     if ($mode == 'add' && $_GET['cat'] != 'outgoing') {
         $content .= '<p>';
-        
-        //ADD ATTACH OTHER ATTACHEMENT
+
         $content .= '<div style="float: left">';
 
-            $content .= '<input type="button" class="button readonly" id="newAttachButton" value="+ Nouvel attachement" title="Nouvel attachement" onclick="addNewAttach();" disabled="disabled"></i>';
-        
+        //ADD ATTACH OTHER ATTACHEMENT
+        $content .= '<input type="button" class="button readonly" id="newAttachButton" value="+ Nouvel attachement" title="Nouvel attachement" onclick="addNewAttach();" disabled="disabled"></input>';
+        $content .= '&nbsp;';
+        //DEL ATTACH (HIDDEN DEFAULT)
+        $content .= '<input type="button" class="button readonly" style="background:#d14836;color:white;display:none;" name="delAttachButton[]" id="delAttachButton" value="- Supprimer" title="Supprimer attachement" disabled="disabled"></input>';
+
         $content .= '</div>';
-  
+
         $content .= '</p>';
     }
 
     $content .= "<input type='hidden' id='attachNum' name='attachNum[]' value='0' />";
 
     //NEW VERSION IN EDIT MODE
-    if ($mode == 'edit' && ($infoAttach->status <> 'TMP' || ($infoAttach->status == 'TMP' && $infoAttach->relation > 1))) {
+    if ($mode == 'edit' && ($infoAttach->status != 'TMP' || ($infoAttach->status == 'TMP' && $infoAttach->relation > 1))) {
         $content .= '<p>';
-        $content .= '<label>'. _CREATE_NEW_ATTACHMENT_VERSION.'</label>';
+        $content .= '<label>'._CREATE_NEW_ATTACHMENT_VERSION.'</label>';
         $content .= '<input type="radio" name="new_version" id="new_version_yes" value="yes" onclick="$j(\'#edit\').css(\'visibility\',\'hidden\');$j(\'#editModel\').css(\'display\',\'inline-block\');"/>'._YES;
         $content .= '&nbsp;&nbsp;';
         $content .= '<input type="radio" name="new_version" id="new_version_no" checked value="no" onclick="$j(\'#edit\').css(\'visibility\',\'visible\');"/>'._NO;
         $content .= '</p>';
-    } 
+    }
 $content .= '</div>';
-
 
 $content .= '<div id="transmission"></div>';
     $content .= '<p class="buttons">';
         //EDIT MODEL BUTTON
-        if ($mode == 'edit' && !in_array($infoAttach->format, ["pdf", "jpg", "jpeg", "png"])) {
+        if ($mode == 'edit' && !in_array($infoAttach->format, ['pdf', 'jpg', 'jpeg', 'png'])) {
             $content .= '<input type="button" value="';
             $content .= _EDIT_MODEL;
-            $content .= '" name="editModel" id="editModel" class="button" onclick="$(\'edit\').style.visibility=\'visible\';showAppletLauncher(this, \'' . $_SESSION['doc_id'] .'\',\'' . $objectTable .'\',\'attachmentUpVersion\',\'attachment\');$(\'edit\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'edit\').disabled=\'disabled\';$(\'edit\').style.opacity=\'0.5\';this.hide();"/>';
+            $content .= '" name="editModel" id="editModel" class="button" onclick="$(\'edit\').style.visibility=\'visible\';showAppletLauncher(this, \''.$_SESSION['doc_id'].'\',\''.$objectTable.'\',\'attachmentUpVersion\',\'attachment\');$(\'edit\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'edit\').disabled=\'disabled\';$(\'edit\').style.opacity=\'0.5\';this.hide();"/>';
         }
 
         $content .= '&nbsp;';
@@ -1458,11 +1439,11 @@ $content .= '<div id="transmission"></div>';
 
         //VALIDATE BUTTON
         $content .= '<input type="button" value="';
-        $content .=  _VALIDATE;
+        $content .= _VALIDATE;
         if (isset($_REQUEST['id'])) {
-            $content .= '" name="edit" id="edit" class="button" onclick="ValidAttachmentsForm(\'' . $_SESSION['config']['businessappurl'] ;
+            $content .= '" name="edit" id="edit" class="button" onclick="ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
         } else {
-            $content .= '" name="add" id="add" class="button" onclick="simpleAjax(\'' . $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');ValidAttachmentsForm(\'' . $_SESSION['config']['businessappurl'] ;
+            $content .= '" name="add" id="add" class="button" onclick="simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
         }
         $content .= 'index.php?display=true&module=attachments&page=attachments_content\', \'formAttachment\'';
 
@@ -1471,7 +1452,7 @@ $content .= '<div id="transmission"></div>';
             $content .= ", '{$mode}'";
         }
 
-        $content .= ');simpleAjax(\'' . $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\')"/>';
+        $content .= ');simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\')"/>';
 
         $content .= '&nbsp;';
         $content .= '&nbsp;';
@@ -1479,33 +1460,32 @@ $content .= '<div id="transmission"></div>';
 
         //CANCEL BUTTON
         $content .= '<input type="button" value="';
-        $content .=  _CANCEL;
-        $content .= '" name="cancel" class="button"  onclick="simpleAjax(\'' . $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');';
-        $content .= 'simpleAjax(\'' . $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\');destroyModal(\'form_attachments\');"/>';
+        $content .= _CANCEL;
+        $content .= '" name="cancel" class="button"  onclick="simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');';
+        $content .= 'simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\');destroyModal(\'form_attachments\');"/>';
 
     $content .= '</p>';
 $content .= '</form>';
 
 //EXTRA JS
-$content .= '<script>launch_autocompleter2_contacts_v2("'. $_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", "contact_attach", "show_contacts_attach", "", "contactidAttach", "addressidAttach")</script>';
+$content .= '<script>launch_autocompleter2_contacts_v2("'.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", "contact_attach", "show_contacts_attach", "", "contactidAttach", "addressidAttach")</script>';
 $content .= '<script>display_contact_card(\'visible\', \'contact_card_attach\');</script>';
 
 //IFRAME CREATE CONTACT
 if ($core->test_admin('my_contacts', 'apps', false)) {
     $content .= '<div id="create_contact_div_attach" style="display:none;float:right;width:65%;background-color:#deedf3">';
-        $content .= '<iframe width="100%" height="550" src="' . $_SESSION['config']['businessappurl']
-                . 'index.php?display=false&dir=my_contacts&page=create_contact_iframe&fromAttachmentContact=Y&transmissionInput=0" name="contact_iframe_attach" id="contact_iframe_attach"'
-                . ' scrolling="auto" frameborder="0" style="display:block;">'
-                . '</iframe>';
+    $content .= '<iframe width="100%" height="550" src="'.$_SESSION['config']['businessappurl']
+                .'index.php?display=false&dir=my_contacts&page=create_contact_iframe&fromAttachmentContact=Y&transmissionInput=0" name="contact_iframe_attach" id="contact_iframe_attach"'
+                .' scrolling="auto" frameborder="0" style="display:block;">'
+                .'</iframe>';
     $content .= '</div>';
 }
 //IFRAME INFO CONTACT
 $content .= '<div id="info_contact_div_attach" style="display:none;float:right;width:65%;background-color:#deedf3">';
     $content .= '<iframe width="100%" height="800" name="contact_card_attach_iframe" id="contact_card_attach_iframe"'
-            . ' scrolling="auto" frameborder="0" style="display:block;">'
-            . '</iframe>';
+            .' scrolling="auto" frameborder="0" style="display:block;">'
+            .'</iframe>';
 $content .= '</div>';
-
 
 $content .= '<div style="float: right; width: 65%">';
 
@@ -1515,19 +1495,19 @@ $content .= '<div id="menuOnglet">';
         if ($mode == 'edit') {
             $content .= '<li id="PjDocument_0" onclick="activePjTab(this)"><span> Pièce jointe </span></li>';
         }
-        $content .='<li id="MainDocument" onclick="activePjTab(this)"><span> Document principal </span></li>';
-    $content .='</ul>';
-$content .='</div>';
+        $content .= '<li id="MainDocument" onclick="activePjTab(this)"><span> Document principal </span></li>';
+    $content .= '</ul>';
+$content .= '</div>';
 
 // ATTACHMENT IFRAME
 if ($mode == 'edit') {
     $srcAttachment = 'index.php?display=true&module=attachments&page=view_attachment&editingMode=true&res_id_master='.functions::xssafe($_SESSION['doc_id']).'&id='.functions::xssafe($_REQUEST['id']);
-    $content .= '<iframe src="'.$srcAttachment.'" name="iframePjDocument_0" id="iframePjDocument_0" scrolling="auto" frameborder="0" style="width:100% !important;height:85vh;display:none" onmouseover="this.focus()"></iframe>';  
+    $content .= '<iframe src="'.$srcAttachment.'" name="iframePjDocument_0" id="iframePjDocument_0" scrolling="auto" frameborder="0" style="width:100% !important;height:85vh;display:none" onmouseover="this.focus()"></iframe>';
 }
 
 // MAIN DOCUMENT IFRAME
-$content .= '<iframe src="index.php?display=true&editingMode=true&dir=indexing_searching&page=view_resource_controler&id='. functions::xssafe($_SESSION['doc_id']).'#view=FitH" name="iframeMainDocument" id="iframeMainDocument" scrolling="auto" frameborder="0" style="width:100% !important;height:85vh;display:none" onmouseover="this.focus()"></iframe>';
-    
+$content .= '<iframe src="index.php?display=true&editingMode=true&dir=indexing_searching&page=view_resource_controler&id='.functions::xssafe($_SESSION['doc_id']).'#view=FitH" name="iframeMainDocument" id="iframeMainDocument" scrolling="auto" frameborder="0" style="width:100% !important;height:85vh;display:none" onmouseover="this.focus()"></iframe>';
+
 $content .= '</div>';
 
 if ($mode == 'add') {
@@ -1536,7 +1516,7 @@ if ($mode == 'add') {
     $js .= 'setTimeout(function(){window.top.document.getElementById(\'PjDocument_0\').click()}, 1000);';
 }
 
-$js .= "setInterval(function(){window.top.clearTimeout(window.top.chronoExpiration);window.top.chronoExpiration=window.top.setTimeout('redirect_to_url(\'index.php?display=true&page=logout&logout=true\')', ".$_SESSION['config']['cookietime']."*60*1000); }, 60000);";
+$js .= "setInterval(function(){window.top.clearTimeout(window.top.chronoExpiration);window.top.chronoExpiration=window.top.setTimeout('redirect_to_url(\'index.php?display=true&page=logout&logout=true\')', ".$_SESSION['config']['cookietime'].'*60*1000); }, 60000);';
 
-echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
-exit ();
+echo '{status : '.$status.", content : '".addslashes(_parse($content))."', error : '".addslashes($error)."', exec_js : '".addslashes($js)."'}";
+exit();

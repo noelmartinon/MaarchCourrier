@@ -439,6 +439,19 @@ function addNewAttach() {
         this.id = id_split[0]+index+'_'+id_split[1];
     });
 
+    $j("[name=delAttachButton\\[\\]]").each(function( index ) {
+        this.id = this.id.replace(/\d+/,'')+index;
+        $j("#"+this.id).attr("onclick","delAttach("+index+");");
+
+        if ($j("[name=delAttachButton\\[\\]]").length == 1 || index == 0) {
+            $j("#"+this.id).css("display","none");
+            $j("#"+this.id).prop("disabled",true);
+        } else {
+            $j("#"+this.id).css("display","inline-block");
+            $j("#"+this.id).prop("disabled",false);
+        }
+    });
+
     //STEP 4 : reset new element
     $j("#formAttachment .transmissionDiv [name=attachment_types\\[\\]]").last().val('');
     $j("#formAttachment .transmissionDiv [name=attachment_types\\[\\]]").last().change();
@@ -462,10 +475,112 @@ function addNewAttach() {
 
     launch_autocompleter2_contacts_v2("index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", $j("#formAttachment .transmissionDiv [name=contact_attach\\[\\]]").last().attr("id"), "show_contacts_attach", "", $j("#formAttachment .transmissionDiv [name=contactidAttach\\[\\]]").last().attr("id"), $j("#formAttachment .transmissionDiv [name=addressidAttach\\[\\]]").last().attr("id"));
     launch_autocompleter2_contacts_v2("index.php?display=true&dir=indexing_searching&page=autocomplete_contacts", $j("#formAttachment .transmissionDiv [name=contact_attach\\[\\]]").first().attr("id"), "show_contacts_attach", "", $j("#formAttachment .transmissionDiv [name=contactidAttach\\[\\]]").first().attr("id"), $j("#formAttachment .transmissionDiv [name=addressidAttach\\[\\]]").first().attr("id"));
-    
-    
+}
 
+function delAttach(index) {
 
+    //DELETE DATA IN SESSION
+    $j.ajax({
+        url: 'index.php?display=true&module=attachments&page=ajaxDelAttachment',
+        type: 'POST',
+        dataType: 'JSON',
+        data: {
+            index: index,
+        },
+        success: function (response) {
+            if (response.status == 0) {
+                //alert('ok');
+                $j("#MainDocument").click();
+                $j("#delAttachButton"+index).parent().parent().remove();
+                $j("#PjDocument_"+index).remove();
+                $j("#iframePjDocument_"+index).remove();
+
+                //reset ids
+                $j("[name=attachment_types\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=chrono_display\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=chrono\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=attachNum\\[\\]]").each(function( index ) {
+                    this.value = index;
+                    this.id = this.id.replace(/\d+/,'')+index;    
+                });
+                $j("[name=back_date\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=backDateStatus\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=contact_card_attach]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                    $j('#'+this.id).attr("onclick","showContactInfo(this,$j('[name=contactidAttach\\\\[\\\\]]')["+index+"],$j('[name=addressidAttach\\\\[\\\\]]')["+index+"]);");
+                });
+                $j("[name=contactidAttach\\[\\]]").each(function( index ) {
+                    if ($j("#selectContactIdRes option:eq("+index+")").length) {
+                        var contact = $j("#selectContactIdRes option:eq("+index+")").val();
+                        contactId = contact.split('#');
+                        this.value = contactId[0];
+                    }
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=addressidAttach\\[\\]]").each(function( index ) {
+                    if($j("#selectContactIdRes option:eq("+index+")").length) {
+                        var contact = $j("#selectContactIdRes option:eq("+index+")").val();
+                        contactId = contact.split('#');
+                        this.value = contactId[1];
+                    }
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
+                $j("[name=contact_attach\\[\\]]").each(function( index ) {
+                    if ($j("#selectContactIdRes option:eq("+index+")").length) {
+                        $j("#"+this.id).val($j("#selectContactIdRes option:eq("+index+")").html());
+                    }
+                    $j("#"+this.id).attr("onchange","saveContactToSession(this);");
+                    $j("#"+this.id).change();
+                    this.id = this.id+index;
+                    
+                });
+                $j("[name=templateOffice\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                    $j("#"+this.id).attr("onchange","showEditButton(this);");
+                });
+
+                $j("[name=templateOffice_edit\\[\\]]").each(function( index ) {
+                    var id_split = this.id.replace(/\d+/,'').split('_');
+                    this.id = id_split[0]+index+'_'+id_split[1];
+                });
+
+                $j("[name=delAttachButton\\[\\]]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                    $j("#"+this.id).attr("onclick","delAttach("+index+");");
+
+                    if ($j("[name=delAttachButton\\[\\]]").length == 1 || index == 0) {
+                        $j("#"+this.id).css("display","none");
+                        $j("#"+this.id).prop("disabled",true);
+                    } else {
+                        $j("#"+this.id).css("display","inline-block");
+                        $j("#"+this.id).prop("disabled",false);
+                    }
+                });
+
+                $j("#formAttachment .transmissionDiv #templateOfficeTool").first().show();
+                $j("#formAttachment .transmissionDiv #newAttachButton").last().prop("disabled",false);
+                $j("#formAttachment .transmissionDiv #newAttachButton").last().css("visibility","visible");
+                $j("#formAttachment .transmissionDiv #newAttachButton").last().removeClass("readonly");
+                
+            }
+        },
+        error: function (error) {
+            alert(error);
+        }
+
+    });
+
+    
 }
 
 function showEditButton(target) {
