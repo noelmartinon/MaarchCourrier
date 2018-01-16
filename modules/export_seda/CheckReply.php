@@ -136,6 +136,33 @@ Class CheckReply {
             curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
             curl_setopt($curl, CURLOPT_COOKIE, $this->token);
 
+            if (empty($this->xml->CONFIG->certificateSSL)) {
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            } else {
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+
+                $certificateSSL = $this->xml->CONFIG->certificateSSL;
+                if (is_file($certificateSSL)) {
+                    $ext = ['.crt','.pem'];
+
+                    $filenameExt = strrchr($certificateSSL, '.');
+                    if (in_array($filenameExt, $ext)) {
+                        curl_setopt($curl, CURLOPT_CAINFO, $certificateSSL);
+                    } else {
+                        $res['status'] = 1;
+                        $res['content'] = _ERROR_EXTENSION_CERTIFICATE;
+                        return $res;
+                    }
+                } elseif (is_dir($certificateSSL)) {
+                    curl_setopt($curl, CURLOPT_CAPATH, $certificateSSL);
+                } else {
+                    $res['status'] = 1;
+                    $res['content'] = _ERROR_UNKNOW_CERTIFICATE;
+                    return $res;
+                }
+            }
+
             $data = json_decode(curl_exec($curl));
 
             curl_close($curl);
