@@ -14,25 +14,25 @@ var forms_1 = require("@angular/forms");
 var app_component_1 = require("./app.component");
 var profile_component_1 = require("./profile.component");
 var signature_book_component_1 = require("./signature-book.component");
-var AppModule = (function () {
+var AppModule = /** @class */ (function () {
     function AppModule() {
     }
+    AppModule = __decorate([
+        core_1.NgModule({
+            imports: [
+                platform_browser_1.BrowserModule,
+                forms_1.FormsModule,
+                router_1.RouterModule.forRoot([
+                    { path: 'profile', component: profile_component_1.ProfileComponent },
+                    { path: ':basketId/signatureBook/:resId', component: signature_book_component_1.SignatureBookComponent },
+                    { path: '**', redirectTo: '', pathMatch: 'full' },
+                ], { useHash: true }),
+                http_1.HttpModule
+            ],
+            declarations: [app_component_1.AppComponent, profile_component_1.ProfileComponent, signature_book_component_1.SignatureBookComponent, signature_book_component_1.SafeUrlPipe],
+            bootstrap: [app_component_1.AppComponent]
+        })
+    ], AppModule);
     return AppModule;
 }());
-AppModule = __decorate([
-    core_1.NgModule({
-        imports: [
-            platform_browser_1.BrowserModule,
-            forms_1.FormsModule,
-            router_1.RouterModule.forRoot([
-                { path: 'profile', component: profile_component_1.ProfileComponent },
-                { path: ':basketId/signatureBook/:resId', component: signature_book_component_1.SignatureBookComponent },
-                { path: '**', redirectTo: '', pathMatch: 'full' },
-            ], { useHash: true }),
-            http_1.HttpModule
-        ],
-        declarations: [app_component_1.AppComponent, profile_component_1.ProfileComponent, signature_book_component_1.SignatureBookComponent, signature_book_component_1.SafeUrlPipe],
-        bootstrap: [app_component_1.AppComponent]
-    })
-], AppModule);
 exports.AppModule = AppModule;

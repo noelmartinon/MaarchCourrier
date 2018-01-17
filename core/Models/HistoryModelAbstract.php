@@ -146,22 +146,19 @@ class HistoryModelAbstract
         return $aReturn;
     }
 
-    public static function getHistoryByUserId(array $aArgs = [])
+    public static function getHistoryByUserId(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['userId']);
         ValidatorModel::stringType($aArgs, ['userId']);
 
-        $aReturn = DatabaseModel::select(
-            [
-                'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-                'table'     => ['history'],
-                'where'     => ['user_id = ?'],
-                'data'      => [$aArgs['userId']],
-                'order_by'  => ['event_date DESC']
-            ]
-        );
+        $aHistories = DatabaseModel::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['history'],
+            'where'     => ['user_id = ?', 'event_date > (CURRENT_TIMESTAMP - interval \'30 DAYS\')'],
+            'data'      => [$aArgs['userId']]
+        ]);
 
-        return $aReturn;
+        return $aHistories;
     }
 
     public static function getFilter(array $aArgs = [])

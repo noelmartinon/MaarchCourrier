@@ -17,6 +17,7 @@ namespace Core\Controllers;
 
 use Baskets\Models\BasketsModel;
 use Core\Models\CoreConfigModel;
+use Core\Models\HistoryModel;
 use Core\Models\LangModel;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -35,14 +36,15 @@ class UserController
         }
 
         $user = UserModel::getById(['userId' => $_SESSION['user']['UserId'], 'select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'thumbprint']]);
-        $user['signatures']        = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
-        $user['emailSignatures']   = UserModel::getEmailSignaturesById(['userId' => $_SESSION['user']['UserId']]);
-        $user['groups']            = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
-        $user['entities']          = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
-        $user['lang']              = LangModel::getProfileLang();
-        $user['baskets']           = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId'], 'rejectedBaskets' => ['IndexingBasket']]);
-        $user['redirectedBaskets'] = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
-        $user['regroupedBaskets']  = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['signatures']         = UserModel::getSignaturesById(['userId' => $_SESSION['user']['UserId']]);
+        $user['emailSignatures']    = UserModel::getEmailSignaturesById(['userId' => $_SESSION['user']['UserId']]);
+        $user['groups']             = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
+        $user['entities']           = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
+        $user['lang']               = LangModel::getProfileLang();
+        $user['baskets']            = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId'], 'rejectedBaskets' => ['IndexingBasket']]);
+        $user['redirectedBaskets']  = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['regroupedBaskets']   = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
+        $user['histories']          = HistoryModel::getHistoryByUserId(['userId' => $_SESSION['user']['UserId'], 'select' => ['event_date', 'info']]);
         $user['canModifyPassword'] = true;
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
