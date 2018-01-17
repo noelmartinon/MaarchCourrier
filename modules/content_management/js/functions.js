@@ -237,7 +237,8 @@ function checkEditingDoc(elem, userId) {
                 clearInterval(editing);
 
                 //CONSTRUCT TAB (IF PDF)
-                $j("#MainDocument",window.parent.document).after($j("#MainDocument",window.parent.document).clone());
+                $j("#ongletAttachement li",window.parent.document).eq(attachNum).after($j("#MainDocument",window.parent.document).clone())
+                //$j("#MainDocument",window.parent.document).after($j("#MainDocument",window.parent.document).clone());
                 $j("#iframeMainDocument",window.parent.document).after($j("#iframeMainDocument",window.parent.document).clone());
                 if ($j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).length) {
                     $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).remove();
@@ -249,6 +250,10 @@ function checkEditingDoc(elem, userId) {
                 $j("#ongletAttachement #MainDocument",window.parent.document).eq(1).attr("id","PjDocument_"+attachNum);
                 $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).html("<span>PJ n°"+(parseInt(attachNum)+1)+"</span>");
                 $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).click();
+                $j("#ongletAttachement [id^=PjDocument_]",window.parent.document).each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                    $j("#"+this.id,window.parent.document).attr("onclick","activePjTab(this);");
+                });
                 
             } else {
                 console.log('lck found! Editing in progress !');

@@ -496,6 +496,13 @@ function delAttach(index) {
                 $j("#iframePjDocument_"+index).remove();
 
                 //reset ids
+                $j("[id^=PjDocument_]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                    $j("#"+this.id).html("<span>PJ n°"+(parseInt(index)+1)+"</span>");
+                });
+                $j("[id^=iframePjDocument_]").each(function( index ) {
+                    this.id = this.id.replace(/\d+/,'')+index;
+                });
                 $j("[name=attachment_types\\[\\]]").each(function( index ) {
                     this.id = this.id.replace(/\d+/,'')+index;
                 });

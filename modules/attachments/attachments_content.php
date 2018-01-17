@@ -1402,10 +1402,10 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         $content .= '<div style="float: left">';
 
         //ADD ATTACH OTHER ATTACHEMENT
-        $content .= '<input type="button" class="button readonly" id="newAttachButton" value="+ Nouvel attachement" title="Nouvel attachement" onclick="addNewAttach();" disabled="disabled"></input>';
+        $content .= '<input type="button" class="button readonly" id="newAttachButton" value="'._NEW_ATTACH_ADDED.'" title="'._NEW_ATTACH_ADDED.'" onclick="addNewAttach();" disabled="disabled"></input>';
         $content .= '&nbsp;';
         //DEL ATTACH (HIDDEN DEFAULT)
-        $content .= '<input type="button" class="button readonly" style="background:#d14836;color:white;display:none;" name="delAttachButton[]" id="delAttachButton" value="- Supprimer" title="Supprimer attachement" disabled="disabled"></input>';
+        $content .= '<input type="button" class="button readonly" style="background:#d14836;color:white;display:none;" name="delAttachButton[]" id="delAttachButton" value="'._DELETE.'" title="'._DELETE.'" disabled="disabled"></input>';
 
         $content .= '</div>';
 
@@ -1492,10 +1492,10 @@ $content .= '<div style="float: right; width: 65%">';
 //TABS
 $content .= '<div id="menuOnglet">';
     $content .= '<ul id="ongletAttachement" style="cursor:pointer;width:auto;">';
-        if ($mode == 'edit') {
-            $content .= '<li id="PjDocument_0" onclick="activePjTab(this)"><span> Pièce jointe </span></li>';
-        }
         $content .= '<li id="MainDocument" onclick="activePjTab(this)"><span> Document principal </span></li>';
+        if ($mode == 'edit') {
+            $content .= '<li id="PjDocument_0" onclick="activePjTab(this)"><span> PJ n°1 </span></li>';
+        }
     $content .= '</ul>';
 $content .= '</div>';
 
