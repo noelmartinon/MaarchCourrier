@@ -1358,9 +1358,10 @@ function updateMultiContacts(path, action, contact, target, array_index, address
 			if(response.status == 0){
 				$(target).innerHTML = response.content;
 				if (action == 'add') {
-                    $('email').value = '';
-                    $('contactid').value = '';
-                    $('addressid').value = '';
+                    $j('#contactid').val('');
+                    $j('#is_multicontacts').val('');
+                    $j('#addressid').val('');
+                    $j('#email').val('');
                 }
 			} else {
 				alert(response.error);
