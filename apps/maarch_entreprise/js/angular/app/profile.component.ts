@@ -144,6 +144,21 @@ export class ProfileComponent implements OnInit {
                             }
                         }
                     });
+                    $j('#historyTable').DataTable({
+                        "order": [[ 0, "desc" ]],
+                        "language": {
+                            "sLengthMenu": "Voir _MENU_ lignes par page",
+                            "sInfo": "Page _PAGE_ sur _PAGES_",
+                            "SInfoEmpty": "Aucune données",
+                            "sSearch": "Rechercher&nbsp;:",
+                            "oPaginate": {
+                                "sFirst":      "Premier",
+                                "sPrevious":   "Précédent",
+                                "sNext":       "Suivant",
+                                "sLast":       "Dernier"
+                            }
+                        }
+                    });
                 }, 0);
 
                 this.loading = false;

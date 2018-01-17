@@ -14,21 +14,21 @@ var http_1 = require("@angular/http");
 var platform_browser_1 = require("@angular/platform-browser");
 var router_1 = require("@angular/router");
 require("rxjs/add/operator/map");
-var SafeUrlPipe = (function () {
+var SafeUrlPipe = /** @class */ (function () {
     function SafeUrlPipe(sanitizer) {
         this.sanitizer = sanitizer;
     }
     SafeUrlPipe.prototype.transform = function (url) {
         return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     };
+    SafeUrlPipe = __decorate([
+        core_1.Pipe({ name: 'safeUrl' }),
+        __metadata("design:paramtypes", [platform_browser_1.DomSanitizer])
+    ], SafeUrlPipe);
     return SafeUrlPipe;
 }());
-SafeUrlPipe = __decorate([
-    core_1.Pipe({ name: 'safeUrl' }),
-    __metadata("design:paramtypes", [platform_browser_1.DomSanitizer])
-], SafeUrlPipe);
 exports.SafeUrlPipe = SafeUrlPipe;
-var SignatureBookComponent = (function () {
+var SignatureBookComponent = /** @class */ (function () {
     function SignatureBookComponent(http, route, router, zone) {
         var _this = this;
         this.http = http;
@@ -526,12 +526,12 @@ var SignatureBookComponent = (function () {
             valid_action_form('empty', 'index.php?display=true&page=manage_action&module=core', this.signatureBook.currentAction.id, this.resId, 'res_letterbox', 'null', 'letterbox_coll', 'page', false, [$j("#signatureBookActions option:selected")[0].value]);
         }
     };
+    SignatureBookComponent = __decorate([
+        core_1.Component({
+            templateUrl: angularGlobals["signature-bookView"],
+        }),
+        __metadata("design:paramtypes", [http_1.Http, router_1.ActivatedRoute, router_1.Router, core_1.NgZone])
+    ], SignatureBookComponent);
     return SignatureBookComponent;
 }());
-SignatureBookComponent = __decorate([
-    core_1.Component({
-        templateUrl: angularGlobals["signature-bookView"],
-    }),
-    __metadata("design:paramtypes", [http_1.Http, router_1.ActivatedRoute, router_1.Router, core_1.NgZone])
-], SignatureBookComponent);
 exports.SignatureBookComponent = SignatureBookComponent;

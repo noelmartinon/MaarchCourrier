@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 require("rxjs/add/operator/map");
-var ProfileComponent = (function () {
+var ProfileComponent = /** @class */ (function () {
     function ProfileComponent(http, zone) {
         var _this = this;
         this.http = http;
@@ -124,6 +124,21 @@ var ProfileComponent = (function () {
                             type: "POST",
                             dataType: "json",
                             url: _this.coreUrl + "rest/users/autocompleter",
+                        }
+                    }
+                });
+                $j('#historyTable').DataTable({
+                    "order": [[0, "desc"]],
+                    "language": {
+                        "sLengthMenu": "Voir _MENU_ lignes par page",
+                        "sInfo": "Page _PAGE_ sur _PAGES_",
+                        "SInfoEmpty": "Aucune données",
+                        "sSearch": "Rechercher&nbsp;:",
+                        "oPaginate": {
+                            "sFirst": "Premier",
+                            "sPrevious": "Précédent",
+                            "sNext": "Suivant",
+                            "sLast": "Dernier"
                         }
                     }
                 });
@@ -530,13 +545,13 @@ var ProfileComponent = (function () {
         createModal(this.user.absence, 'modal_redirect', 'auto', '950px');
         autocomplete(this.user.countBasketsForAbsence, 'index.php?display=true&module=basket&page=autocomplete_users_list');
     };
+    ProfileComponent = __decorate([
+        core_1.Component({
+            templateUrl: angularGlobals.profileView,
+            styleUrls: ['../../node_modules/bootstrap/dist/css/bootstrap.min.css', 'css/profile.component.css']
+        }),
+        __metadata("design:paramtypes", [http_1.Http, core_1.NgZone])
+    ], ProfileComponent);
     return ProfileComponent;
 }());
-ProfileComponent = __decorate([
-    core_1.Component({
-        templateUrl: angularGlobals.profileView,
-        styleUrls: ['../../node_modules/bootstrap/dist/css/bootstrap.min.css', 'css/profile.component.css']
-    }),
-    __metadata("design:paramtypes", [http_1.Http, core_1.NgZone])
-], ProfileComponent);
 exports.ProfileComponent = ProfileComponent;
