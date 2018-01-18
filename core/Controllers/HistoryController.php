@@ -17,6 +17,7 @@ namespace Core\Controllers;
 
 use Core\Models\CoreConfigModel;
 use Core\Models\TextFormatModel;
+use Core\Models\UserModel;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Core\Models\HistoryModel;
@@ -179,6 +180,17 @@ class HistoryController
         );
 
         return $str;
+    }
+
+    public function getByUserId(RequestInterface $request, ResponseInterface $response, array $aArgs)
+    {
+        if ($aArgs['userId'] != $_SESSION['user']['UserId'] && !ServiceModel::hasService(['id' => 'view_history', 'userId' => $_SESSION['user']['UserId'], 'location' => 'apps', 'type' => 'admin'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $aHistories = HistoryModel::getHistoryByUserId(['userId' => $aArgs['userId'], 'select' => ['info', 'event_date']]);
+
+        return $response->withJson(['histories' => $aHistories]);
     }
 
     public function getForAdministration(RequestInterface $request, ResponseInterface $response, $aArgs)

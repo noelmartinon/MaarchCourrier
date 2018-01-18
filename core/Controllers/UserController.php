@@ -44,7 +44,6 @@ class UserController
         $user['baskets']            = BasketsModel::getBasketsByUserId(['userId' => $_SESSION['user']['UserId'], 'rejectedBaskets' => ['IndexingBasket']]);
         $user['redirectedBaskets']  = BasketsModel::getBasketsRedirectedByUserId(['userId' => $_SESSION['user']['UserId']]);
         $user['regroupedBaskets']   = BasketsModel::getRegroupedBasketsByUserId(['userId' => $_SESSION['user']['UserId']]);
-        $user['histories']          = HistoryModel::getHistoryByUserId(['userId' => $_SESSION['user']['UserId'], 'select' => ['event_date', 'info']]);
         $user['canModifyPassword'] = true;
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();

@@ -20,6 +20,7 @@ var ProfileComponent = /** @class */ (function () {
         this.user = {
             lang: {}
         };
+        this.histories = [];
         this.passwordModel = {
             currentPassword: "",
             newPassword: "",
@@ -124,21 +125,6 @@ var ProfileComponent = /** @class */ (function () {
                             type: "POST",
                             dataType: "json",
                             url: _this.coreUrl + "rest/users/autocompleter",
-                        }
-                    }
-                });
-                $j('#historyTable').DataTable({
-                    "order": [[0, "desc"]],
-                    "language": {
-                        "sLengthMenu": "Voir _MENU_ lignes par page",
-                        "sInfo": "Page _PAGE_ sur _PAGES_",
-                        "SInfoEmpty": "Aucune données",
-                        "sSearch": "Rechercher&nbsp;:",
-                        "oPaginate": {
-                            "sFirst": "Premier",
-                            "sPrevious": "Précédent",
-                            "sNext": "Suivant",
-                            "sLast": "Dernier"
                         }
                     }
                 });
@@ -514,6 +500,40 @@ var ProfileComponent = /** @class */ (function () {
                         $j("#resultInfo").slideUp(500);
                     });
                 }
+            });
+        }
+    };
+    ProfileComponent.prototype.getHistories = function () {
+        var _this = this;
+        if (this.histories.length == 0) {
+            this.http.get(this.coreUrl + 'rest/histories/users/' + this.user.user_id)
+                .map(function (res) { return res.json(); })
+                .subscribe(function (data) {
+                _this.histories = data.histories;
+                setTimeout(function () {
+                    $j('#historyTable').DataTable({
+                        "dom": '<"topleft"p><"top"f>rt<"bottom"i><"clear">',
+                        "order": [[0, "desc"]],
+                        "language": {
+                            "sLengthMenu": "",
+                            "sInfo": "Page _PAGE_ sur _PAGES_",
+                            "SInfoEmpty": "Aucune données",
+                            "sSearch": "Rechercher&nbsp;:",
+                            "oPaginate": {
+                                "sFirst": "Premier",
+                                "sPrevious": "Précédent",
+                                "sNext": "Suivant",
+                                "sLast": "Dernier"
+                            }
+                        }
+                    });
+                }, 0);
+            }, function (err) {
+                _this.resultInfo = JSON.parse(err._body).errors;
+                $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                    $j("#resultInfo").slideUp(500);
+                });
             });
         }
     };

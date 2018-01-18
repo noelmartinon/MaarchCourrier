@@ -23,6 +23,7 @@ export class ProfileComponent implements OnInit {
     user                        : any       = {
         lang                    : {}
     };
+    histories                   : any[]     = [];
     passwordModel               : any       = {
         currentPassword         : "",
         newPassword             : "",
@@ -141,21 +142,6 @@ export class ProfileComponent implements OnInit {
                                 type: "POST",
                                 dataType: "json",
                                 url: this.coreUrl + "rest/users/autocompleter",
-                            }
-                        }
-                    });
-                    $j('#historyTable').DataTable({
-                        "order": [[ 0, "desc" ]],
-                        "language": {
-                            "sLengthMenu": "Voir _MENU_ lignes par page",
-                            "sInfo": "Page _PAGE_ sur _PAGES_",
-                            "SInfoEmpty": "Aucune données",
-                            "sSearch": "Rechercher&nbsp;:",
-                            "oPaginate": {
-                                "sFirst":      "Premier",
-                                "sPrevious":   "Précédent",
-                                "sNext":       "Suivant",
-                                "sLast":       "Dernier"
                             }
                         }
                     });
@@ -544,6 +530,41 @@ export class ProfileComponent implements OnInit {
                             $j("#resultInfo").slideUp(500);
                         });  
                     }
+                });
+        }
+    }
+
+    getHistories() {
+        if (this.histories.length == 0) {
+            this.http.get(this.coreUrl + 'rest/histories/users/' + this.user.user_id)
+                .map(res => res.json())
+                .subscribe((data : any) => {
+                    this.histories = data.histories;
+
+                    setTimeout(() => {
+                        $j('#historyTable').DataTable({
+                            "dom": '<"topleft"p><"top"f>rt<"bottom"i><"clear">',
+                            "order": [[ 0, "desc" ]],
+                            "language": {
+                                "sLengthMenu": "",
+                                "sInfo": "Page _PAGE_ sur _PAGES_",
+                                "SInfoEmpty": "Aucune données",
+                                "sSearch": "Rechercher&nbsp;:",
+                                "oPaginate": {
+                                    "sFirst":      "Premier",
+                                    "sPrevious":   "Précédent",
+                                    "sNext":       "Suivant",
+                                    "sLast":       "Dernier"
+                                }
+                            }
+                        });
+                    }, 0);
+                }, (err) => {
+                    this.resultInfo = JSON.parse(err._body).errors;
+                    $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                    $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                        $j("#resultInfo").slideUp(500);
+                    });
                 });
         }
     }
