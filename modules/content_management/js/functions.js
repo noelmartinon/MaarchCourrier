@@ -237,7 +237,12 @@ function checkEditingDoc(elem, userId) {
                 clearInterval(editing);
 
                 //CONSTRUCT TAB (IF PDF)
-                $j("#ongletAttachement li",window.parent.document).eq(attachNum).after($j("#MainDocument",window.parent.document).clone())
+                if ($j("#ongletAttachement li",window.parent.document).eq(attachNum).length) {
+                    $j("#ongletAttachement li",window.parent.document).eq(attachNum).after($j("#MainDocument",window.parent.document).clone())
+                } else {
+                    $j("#MainDocument",window.parent.document).after($j("#MainDocument",window.parent.document).clone());
+                }
+                
                 //$j("#MainDocument",window.parent.document).after($j("#MainDocument",window.parent.document).clone());
                 $j("#iframeMainDocument",window.parent.document).after($j("#iframeMainDocument",window.parent.document).clone());
                 if ($j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).length) {
@@ -251,7 +256,6 @@ function checkEditingDoc(elem, userId) {
                 $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).html("<span>PJ n°"+(parseInt(attachNum)+1)+"</span>");
                 $j("#ongletAttachement #PjDocument_"+attachNum,window.parent.document).click();
                 $j("#ongletAttachement [id^=PjDocument_]",window.parent.document).each(function( index ) {
-                    this.id = this.id.replace(/\d+/,'')+index;
                     $j("#"+this.id,window.parent.document).attr("onclick","activePjTab(this);");
                 });
                 

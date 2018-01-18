@@ -1238,6 +1238,7 @@ if (isset($_REQUEST['id'])) {
 
 //BEGIN FORM ATTACHMENT
 //INITIALIZE
+unset($_SESSION['adresses']);
 unset($_SESSION['cm_applet'][$_SESSION['user']['UserId']]);
 $objectTable = $sec->retrieve_table_from_coll($_SESSION['collection_id_choice']);
 
