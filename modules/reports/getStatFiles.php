@@ -25,7 +25,7 @@ if (file_exists('custom'.DIRECTORY_SEPARATOR.$_SESSION['custom_override_id'].DIR
         $path = $xml->CONFIG->ExportFolder;
     } else {
         if (!empty($_SESSION['custom_override_id'])) {
-            $path = 'custom'.DIRECTORY_SEPARATOR.$_SESSION['custom_override_id'].'modules'.DIRECTORY_SEPARATOR.'life_cycle'.DIRECTORY_SEPARATOR.'batch'.DIRECTORY_SEPARATOR.'files/';
+            $path = 'custom'.DIRECTORY_SEPARATOR.$_SESSION['custom_override_id'].DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'life_cycle'.DIRECTORY_SEPARATOR.'batch'.DIRECTORY_SEPARATOR.'files/';
         } else {
             $path = 'modules'.DIRECTORY_SEPARATOR.'life_cycle'.DIRECTORY_SEPARATOR.'batch'.DIRECTORY_SEPARATOR.'files/';
         }
