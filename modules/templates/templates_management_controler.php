@@ -267,7 +267,7 @@ function display_up($templateId)
     $templatesControler = new templates_controler();
     $stylesArray = array();
     if (is_dir('custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles')) {
-       $dir = 'custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles';
+       $dir = 'custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles/';
     } else {
         $dir = 'modules/templates/templates/styles/';
     }
@@ -322,7 +322,7 @@ function display_add()
     $stylesArray = array();
     //echo 'custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles';exit;
     if (is_dir('custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles')) {
-       $dir = 'custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles';
+       $dir = 'custom/' . $_SESSION['custom_override_id'] . '/modules/templates/templates/styles/';
     } else {
         $dir = 'modules/templates/templates/styles/';
     }
