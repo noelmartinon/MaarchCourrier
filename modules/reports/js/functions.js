@@ -60,8 +60,8 @@ function showStatFiles()
 			eval("response = "+answer);
 			if (response.status == 1) {
 				var modal_content = convertToTextVisibleNewLine(response.content);
-				createModalinAttachmentList(modal_content, 'showStatFilesList', '480', '800', '');
-				//eval(response.exec_js);
+				$j('#div_generatedStatFiles').html(modal_content);
+				$j('#div_generatedStatFiles').slideToggle('slow');
 			} else {
 				alert(response.error);
 			}
