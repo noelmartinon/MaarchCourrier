@@ -3110,7 +3110,7 @@ if (!defined('_CHRONO_NUMBER')) {
     define('_CHRONO_NUMBER', 'Numéro chrono');
 }
 if (!defined('_CHRONO_NUMBER_SHORT')) {
-    define('_CHRONO_NUMBER_SHORT', 'N° chrno');
+    define('_CHRONO_NUMBER_SHORT', 'chrono');
 }
 if (!defined('_ATTACHMENT_TYPE')) {
     define('_ATTACHMENT_TYPE', 'Type de pièce jointe');

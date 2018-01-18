@@ -3068,7 +3068,7 @@ if (!defined('_CHRONO_NUMBER')) {
     define('_CHRONO_NUMBER', 'Chrono number');
 }
 if (!defined('_CHRONO_NUMBER_SHORT')) {
-    define('_CHRONO_NUMBER_SHORT', 'Chrno Num');
+    define('_CHRONO_NUMBER_SHORT', 'Chrono');
 }
 if (!defined('_ATTACHMENT_TYPE')) {
     define('_ATTACHMENT_TYPE', 'Attachment type');
