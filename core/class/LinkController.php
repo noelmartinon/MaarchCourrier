@@ -37,16 +37,16 @@ class LinkController
             $otherInfos = $stmt->fetchObject();
             $chronoNumber = $this->getAltIdentifier($key);
 
-            if (isset($infos['is_multicontacts'])) {
-                $contact = _MULTI_CONTACT;
-            } elseif (!empty($infos['exp_contact_id']['show_value'])) {
+            if (!empty($infos['exp_contact_id']['show_value'])) {
                 $contact = $infos['exp_contact_id']['show_value'];
             } elseif (!empty($infos['dest_contact_id']['show_value'])) {
                 $contact = $infos['dest_contact_id']['show_value'];
             } elseif (!empty($infos['exp_user_id']['show_value'])) {
                 $contact = $infos['exp_user_id']['show_value'];
-            } else {
+            } elseif (!empty($infos['dest_user_id']['show_value'])) {
                 $contact = $infos['dest_user_id']['show_value'];
+            } else {
+                $contact = _MULTI_CONTACT;
             }
 
             $infos['subject'] = preg_replace("/\r\n|\r|\n/", '<br/>', $infos['subject']);
