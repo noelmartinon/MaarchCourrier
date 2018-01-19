@@ -751,6 +751,7 @@
 
     <validationRule name="users_autocomplete_list" extends="standardForm" mode="error">  
       <parameter name="Input" type="string" />
+      <parameter name="getDisableUser" type="string" />
     </validationRule>
 
     <validationRule name="select_address" extends="standardForm" mode="error">  
