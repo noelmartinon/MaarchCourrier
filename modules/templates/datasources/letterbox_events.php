@@ -34,89 +34,88 @@
 $dbDatasource = new Database();
 $contacts = new contacts_v2();
 
-$datasources['recipient'][0] = (array)$recipient;
+$datasources['recipient'][0] = (array) $recipient;
 
 $datasources['res_letterbox'] = array();
 $datasources['contact'] = array();
 
-foreach($events as $event) {
+foreach ($events as $event) {
     $res = array();
     $arrayPDO = array();
-    
-    $select = "SELECT lb.*";
-    $from = " FROM ".$res_view." lb ";
-    $where = " WHERE ";
-    
-    switch($event->table_name) {
+
+    $select = 'SELECT lb.*';
+    $from = ' FROM '.$res_view.' lb ';
+    $where = ' WHERE ';
+
+    switch ($event->table_name) {
     case 'notes':
-        $from .= " JOIN notes ON notes.identifier = lb.res_id";
-        $where .= " notes.id = ? ";
-        $arrayPDO = array_merge($arrayPDO,array($event->record_id));
+        $from .= ' JOIN notes ON notes.identifier = lb.res_id';
+        $where .= ' notes.id = ? ';
+        $arrayPDO = array_merge($arrayPDO, array($event->record_id));
         break;
-    
+
     case 'listinstance':
-        $from .= " JOIN listinstance li ON lb.res_id = li.res_id";
-        $where .= " li.coll_id = ? AND listinstance_id = ? ";
+        $from .= ' JOIN listinstance li ON lb.res_id = li.res_id';
+        $where .= ' li.coll_id = ? AND listinstance_id = ? ';
         $arrayPDO = array_merge($arrayPDO, array($coll_id, $event->record_id));
         break;
-        
+
     case 'res_letterbox':
     case 'res_view_letterbox':
     default:
-        $where .= " lb.res_id = ? ";
+        $where .= ' lb.res_id = ? ';
         $arrayPDO = array_merge($arrayPDO, array($event->record_id));
     }
 
-    $query = $select . $from . $where;
-    
-    if($GLOBALS['logger']) {
-        $GLOBALS['logger']->write($query , 'DEBUG');
+    $query = $select.$from.$where;
+
+    if ($GLOBALS['logger']) {
+        $GLOBALS['logger']->write($query, 'DEBUG');
     }
-    
+
     // Main document resource from view
     $stmt = $dbDatasource->query($query, $arrayPDO);
     $res = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    // Lien vers la page d�tail
-    $urlToApp = str_replace('//', '/', $maarchUrl . '/apps/' . $maarchApps . '/index.php?');
-    $res['linktodoc'] = $urlToApp . 'display=true&page=view_resource_controler&dir=indexing_searching&id=' . $res['res_id'];
-    $res['linktodetail'] = $urlToApp . 'page=details&dir=indexing_searching&id=' . $res['res_id'];
-    $res['linktoprocess'] = $urlToApp . 'page=view_baskets&module=basket&baskets=MyBasket&directLinkToAction&resid=' . $res['res_id'];
 
-    $stmt2 = $dbDatasource->query("SELECT * FROM entities WHERE entity_id = ? ", array($res['initiator']));
+    // Lien vers la page d�tail
+    $urlToApp = str_replace('//', '/', $maarchUrl.'/apps/'.$maarchApps.'/index.php?');
+    $res['linktodoc'] = $urlToApp.'display=true&page=view_resource_controler&dir=indexing_searching&id='.$res['res_id'];
+    $res['linktodetail'] = $urlToApp.'page=details&dir=indexing_searching&id='.$res['res_id'];
+    $res['linktoprocess'] = $urlToApp.'page=view_baskets&module=basket&baskets=MyBasket&directLinkToAction&resid='.$res['res_id'];
+
+    $stmt2 = $dbDatasource->query('SELECT * FROM entities WHERE entity_id = ? ', array($res['initiator']));
     $initiator = $stmt2->fetch(PDO::FETCH_ASSOC);
-    foreach (array_keys($initiator) as $value){
-        $res['initiator_'.$value] = $initiator[$value];
+    if (is_array($initiator) && !empty($initiator)) {
+        foreach (array_keys($initiator) as $value) {
+            $res['initiator_'.$value] = $initiator[$value];
+        }
     }
-    
+
     // Insertion
     $datasources['res_letterbox'][] = $res;
-    
-	//multicontact
-	$stmt = $dbDatasource->query("SELECT * FROM contacts_res WHERE res_id = ? AND contact_id = ? ", array($res['res_id'], $res['contact_id']));
-	$datasources['res_letterbox_contact'][] = $stmt->fetch(PDO::FETCH_ASSOC);
-	if ($datasources['res_letterbox_contact'][0]['contact_id'] <> '') {
-	    // $datasources['contact'] = array();
-	    $stmt = $dbDatasource->query("SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ", array($datasources['res_letterbox_contact'][0]['contact_id'], $datasources['res_letterbox_contact'][0]['address_id']));
-	    $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
-		$myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
-	    $datasources['contact'][] = $myContact;
 
-	// single Contact
-	}else if (isset($res['contact_id']) && isset($res['address_id'])) {
-	    $stmt = $dbDatasource->query("SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ", array($res['contact_id'], $res['address_id']));
-	    $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
-	    $myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
-	    $datasources['contact'][] = $myContact;
-        
-	} else {
-        $stmt = $dbDatasource->query("SELECT * FROM view_contacts WHERE contact_id = 0");
+    //multicontact
+    $stmt = $dbDatasource->query('SELECT * FROM contacts_res WHERE res_id = ? AND contact_id = ? ', array($res['res_id'], $res['contact_id']));
+    $datasources['res_letterbox_contact'][] = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($datasources['res_letterbox_contact'][0]['contact_id'] != '') {
+        // $datasources['contact'] = array();
+        $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ', array($datasources['res_letterbox_contact'][0]['contact_id'], $datasources['res_letterbox_contact'][0]['address_id']));
+        $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
+        $myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
+        $datasources['contact'][] = $myContact;
+
+        // single Contact
+    } elseif (isset($res['contact_id']) && isset($res['address_id'])) {
+        $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ', array($res['contact_id'], $res['address_id']));
+        $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
+        $myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
+        $datasources['contact'][] = $myContact;
+    } else {
+        $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = 0');
         $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
         $datasources['contact'][] = $myContact;
     }
 }
 
-$datasources['images'][0]['imgdetail'] = $maarchUrl . '/apps/' . $maarchApps . '/img/object.gif';
-$datasources['images'][0]['imgdoc'] = $maarchUrl . '/apps/' . $maarchApps . '/img/picto_dld.gif';
-
-?>
+$datasources['images'][0]['imgdetail'] = $maarchUrl.'/apps/'.$maarchApps.'/img/object.gif';
+$datasources['images'][0]['imgdoc'] = $maarchUrl.'/apps/'.$maarchApps.'/img/picto_dld.gif';
