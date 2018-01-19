@@ -154,7 +154,7 @@ class HistoryModelAbstract
         $aHistories = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['history'],
-            'where'     => ['user_id = ?', 'event_date > (CURRENT_TIMESTAMP - interval \'30 DAYS\')'],
+            'where'     => ['user_id = ?', 'event_date > (CURRENT_TIMESTAMP - interval \'7 DAYS\')'],
             'data'      => [$aArgs['userId']]
         ]);
 
