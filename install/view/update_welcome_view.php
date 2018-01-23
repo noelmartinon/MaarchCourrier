@@ -38,11 +38,11 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
     <div class="contentBlock" id="welcome">
         <p>
             <div id="buttons">
-                <!--div style="float: left;" class="previousButton" id="previous">
+                <div style="float: left;" class="previousButton" id="previous">
                     <a href="#" onClick="goTo('index.php?step=update_language');">
                         <?php echo _PREVIOUS_INSTALL;?>
                     </a>
-                </div-->
+                </div>
                 <div style="float: right;" class="nextButton" id="next">
                     <a href="#" onClick="goTo('index.php?step=update_backup');">
                         <?php echo _NEXT_INSTALL;?>

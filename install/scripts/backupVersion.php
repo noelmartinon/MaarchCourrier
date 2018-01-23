@@ -52,13 +52,12 @@ if (!$Class_Install->createPath($path)) {
 
 if (!$Class_Install->copy_dir($_SESSION['config']['corepath'] , $path . DIRECTORY_SEPARATOR, false, true)) {
     $return['status'] = 0;
-    $return['text'] = _CAN_NOT_COPY_TO . ':' . $path;
+    $return['text'] = _CAN_NOT_COPY_TO . ' : ' . $path . '<br>' . _CHECK_RIGHT_SOURCE_FOLDER;
 
     $jsonReturn = json_encode($return);
 
     echo $jsonReturn;
     exit;
 }
-
 echo '{"status":1}';
 exit;

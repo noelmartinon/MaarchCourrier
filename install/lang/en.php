@@ -446,3 +446,15 @@ if (!defined('_INSTALL_ZIP_LIB_FIRST')) {
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE')) {
     define('_NO_AVAILABLE_TAG_TO_UPDATE', "No available tag to update");
 }
+
+if (!defined('_CAN_NOT_COPY_TO')) {
+    define('_CAN_NOT_COPY_TO', "Can not copy to");
+}
+
+if (!defined('_CHECK_RIGHT_SOURCE_FOLDER')) {
+    define('_CHECK_RIGHT_SOURCE_FOLDER', "One folder or file does not have enought rights.");
+}
+
+if (!defined('_MISSING_PREREQUISITE_UPDATE')) {
+    define('_MISSING_PREREQUISITE_UPDATE', "Prerequisite is missing to update :");
+}
