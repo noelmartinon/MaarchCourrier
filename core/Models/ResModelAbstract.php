@@ -200,4 +200,24 @@ class ResModelAbstract extends \Apps_Table_Service
 
         return ['lock' => $lock, 'lockBy' => $lockBy];
     }
+
+    public static function getDocsByClause(array $aArgs = [])
+    {
+        static::checkRequired($aArgs, ['clause']);
+
+        if (!empty($aArgs['table'])) {
+            $table = $aArgs['table'];
+        } else {
+            $table = 'res_view_letterbox';
+        }
+
+        $aReturn = static::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => [$table],
+            'where'     => [$aArgs['clause']],
+            'order_by'  => ['res_id']
+        ]);
+
+        return $aReturn;
+    }
 }

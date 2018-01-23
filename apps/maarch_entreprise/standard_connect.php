@@ -1,7 +1,18 @@
 <?php
+function getHeaders() 
+{
+
+    foreach ($_SERVER as $h => $v ) 
+    {      
+      if( preg_match( '/HTTP_(.+)/', $h, $hp ) )
+        $headers[$hp[1]] = $v ;
+    }
+    return $headers;
+}
 
 if ($restMode) {
     $userLogin = [];
+    $http_header = getHeaders();
     //HTTP AUTH
     if (
         (isset($_SERVER["PHP_AUTH_USER"])
@@ -13,6 +24,18 @@ if ($restMode) {
     ) {
         list($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"])
             = explode(":", base64_decode(substr($_SERVER["HTTP_AUTHORIZATION"], 6)));
+    } elseif (isset($http_header['LOGIN']) && isset($http_header['PASSWORD'])) {
+        $force_login = $http_header['LOGIN'];
+        $force_psw = $http_header['PASSWORD'];
+    } elseif(!isset($_SERVER["PHP_AUTH_USER"])) {
+        header("WWW-Authenticate: Basic realm=\"Maarch WebServer Engine\"");
+        if (preg_match("/Microsoft/", $_SERVER["SERVER_SOFTWARE"])) {
+            header("Status: 401 Unauthorized");
+            exit();
+        } else {
+            header("HTTP/1.0 401 Unauthorized");
+            exit();
+        }
     }
     if (
         (isset($_SERVER["PHP_AUTH_USER"])
@@ -22,6 +45,11 @@ if ($restMode) {
     ) {
         $_SESSION['user']['UserId'] = $_SERVER["PHP_AUTH_USER"];
         $password = $_SERVER["PHP_AUTH_PW"];
+    }
+
+    else if (isset($force_login) && isset($force_psw)){
+        $_SESSION['user']['UserId'] = $force_login;
+        $password = $force_psw;
     }
 
     $userLogin['user'] = $_SESSION['user']['UserId'];

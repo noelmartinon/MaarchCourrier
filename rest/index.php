@@ -149,4 +149,7 @@ $app->put('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::
 $app->delete('/currentUser/emailSignature/{id}', \Core\Controllers\UserController::class . ':deleteCurrentUserEmailSignature');
 //$app->put('/user/{id}', \Core\Controllers\UserController::class . ':update');
 
+//Documents list, ex:  qualiville
+$app->get('/res/listDocs/{clause}/{select}', \Core\Controllers\ResController::class . ':getListDocs');
+
 $app->run();
