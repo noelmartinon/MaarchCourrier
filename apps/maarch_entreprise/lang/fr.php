@@ -4913,16 +4913,16 @@ if (!defined('_ADMIN_UPDATE_CONTROL_DESC')) {
     define('_ADMIN_UPDATE_CONTROL_DESC', 'Vérification mise à jour');
 }
 if (!defined('_YOUR_VERSION')) {
-    define('_YOUR_VERSION', 'Votre version');
+    define('_YOUR_VERSION', 'Votre version actuelle');
 }
 if (!defined('_AVAILABLE_VERSION_TO_UPDATE')) {
     define('_AVAILABLE_VERSION_TO_UPDATE', 'Versions disponibles');
 }
 if (!defined('_CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT')) {
-    define('_CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT', 'Cliquez ici pour commencer la procédure de mise à jour');
+    define('_CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT', 'Commencer la procédure de mise à jour');
 }
 if (!defined('_NEW_MAJOR_VERSION_AVAILABLE')) {
-    define('_NEW_MAJOR_VERSION_AVAILABLE', 'Nouvelle version majeure disponible');
+    define('_NEW_MAJOR_VERSION_AVAILABLE', 'Nouvelle(s) version(s) majeure(s) disponible(s)');
 }
 if (!defined('_BRANCH_VERSION')) {
     define('_BRANCH_VERSION', 'Branche');
@@ -4970,7 +4970,7 @@ if (!defined('_LAST_RELEASE_DETAILS')) {
     define('_LAST_RELEASE_DETAILS', 'Détails des versions mineures disponibles');
 }
 if (!defined('_CHOOSE_VERSION_TO_UPDATE')) {
-    define('_CHOOSE_VERSION_TO_UPDATE', 'Choisissez la version');
+    define('_CHOOSE_VERSION_TO_UPDATE', 'Choisissez la nouvelle version');
 }
 if (!defined('_DOWNLOAD_VERSION')) {
     define('_DOWNLOAD_VERSION', 'Télécharger la version');
@@ -4994,7 +4994,7 @@ if (!defined('_UPDATE_DESC_END')) {
     define('_UPDATE_DESC_END', 'Mise à jour réussi');
 }
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE')) {
-    define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucun tag de disponible pour une mise à jour');
+    define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucune version disponible pour une mise à jour');
 }
 /*if (!defined('_DATE_CURRENT_USE'))
     define('_DATE_CURRENT_USE', 'Date limite d\'utilité courante');*/

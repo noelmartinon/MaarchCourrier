@@ -4852,7 +4852,7 @@ if (!defined('_AVAILABLE_VERSION_TO_UPDATE')) {
     define('_AVAILABLE_VERSION_TO_UPDATE', 'Available versions');
 }
 if (!defined('_CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT')) {
-    define('_CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT', 'Click here to begin the update process');
+    define('_CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT', 'To begin the update process');
 }
 if (!defined('_NEW_MAJOR_VERSION_AVAILABLE')) {
     define('_NEW_MAJOR_VERSION_AVAILABLE', 'New major version available');

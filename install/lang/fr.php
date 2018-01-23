@@ -167,7 +167,7 @@ if (!defined('_MUST_CHOOSE_PATH_ROOT')) {
     define('_MUST_CHOOSE_PATH_ROOT', "Vous devez choisir le dossier racine");
 }
 if (!defined('_PATH_UNAPPROACHABLE')) {
-    define('_PATH_UNAPPROACHABLE', "Le dossier racine n'est pas accessible");
+    define('_PATH_UNAPPROACHABLE', "Le dossier n'est pas accessible");
 }
 if (!defined('_THE_PATH_DOES_NOT_HAVE_THE_ADEQUATE_RIGHTS')) {
     define('_THE_PATH_DOES_NOT_HAVE_THE_ADEQUATE_RIGHTS', "Le dossier n'a pas les droits appropriés");
@@ -449,3 +449,16 @@ if (!defined('_INSTALL_ZIP_LIB_FIRST')) {
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE')) {
     define('_NO_AVAILABLE_TAG_TO_UPDATE', "Pas de tag disponible pour une mise à jour");
 }
+
+if (!defined('_CAN_NOT_COPY_TO')) {
+    define('_CAN_NOT_COPY_TO', "Impossible de copier le dossier vers");
+}
+
+if (!defined('_CHECK_RIGHT_SOURCE_FOLDER')) {
+    define('_CHECK_RIGHT_SOURCE_FOLDER', "Un dossier ou fichier n'a pas les droits suffisants.");
+}
+
+if (!defined('_MISSING_PREREQUISITE_UPDATE')) {
+    define('_MISSING_PREREQUISITE_UPDATE', "Il manque un pré-requis pour réaliser la mise à jour :");
+}
+
