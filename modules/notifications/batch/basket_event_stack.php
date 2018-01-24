@@ -218,7 +218,7 @@ while ($state <> 'END') {
             $attachments = array();
             if($tmpNotif['attach']) {   
                 $logger->write('Adding attachments', 'INFO');
-                foreach($tmpNotif['events'] as $event) {
+                foreach($tmpNotif['baskets']['MyBasket']['events'] as $event) {
                     // Check if event is related to document in collection
                     if($event->res_id != '') {
                         $query = "SELECT "
@@ -235,6 +235,7 @@ while ($state <> 'END') {
                         $attachments[] = $path;
                     }
                 }
+                
                 $logger->write(count($attachments) . ' attachment(s) added', 'INFO');
             }
             if(in_array($user_id, $exceptUsers[$basketId])){
