@@ -737,13 +737,13 @@ class htmlMimeMail
                 break;
 
             case 'sendmail':
-                    // Get flat representation of headers                    
+	                // Get flat representation of headers
 	                foreach ($this->headers as $name => $value) {
-                        $headers[] = $name . ': ' . $this->_encodeHeader($value,$this->build_params['head_charset']);                        
-                    }
+	                    $headers[] = $name . ': ' . $value;
+	                }
                     
 	                // Encode To:
-                    $headers[] = 'To: ' . $this->_encodeHeader(implode(', ', $recipients),$this->build_params['head_charset']);
+	                $headers[] = 'To: ' . implode(', ', $recipients);
 	 
 	                // Get return path arg for sendmail command if necessary
 	                $returnPath = '';
@@ -784,7 +784,7 @@ class htmlMimeMail
 
                 // Get flat representation of headers, parsing
                 // Cc and Bcc as we go
-                foreach ($this->headers as $name => $value) {                    
+                foreach ($this->headers as $name => $value) {
                     if ($name == 'Cc' OR $name == 'Bcc') {
                         $addresses = $RFC822Obj->parseAddressList($value, $this->smtp_params['helo'], null, false);
                         foreach ($addresses as $address) {
@@ -795,7 +795,7 @@ class htmlMimeMail
                         continue;
                     }
                     //ajout d'une condition pour subject, car _encodeHeader ne prend pas les caract�res sp�ciaux avec php7 en revanche fonctionne tr�s bien avec php5.6
-                    if ($name == 'Subject'){                        
+                    if ($name == 'Subject'){
                         $headers[] = $name . ': ' . $value;
                     }else{
                         $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
@@ -803,7 +803,8 @@ class htmlMimeMail
                     
                 }
                 // Add To header based on $recipients argument
-                $headers[] = 'To: ' . $this->_encodeHeader(implode(', ', $recipients),$this->build_params['head_charset']);
+                $headers[] = 'To: ' . implode(', ', $recipients);
+                
                 // Add headers to send_params
                 $send_params['headers']    = $headers;
                 $send_params['recipients'] = array_values(array_unique($smtp_recipients));
