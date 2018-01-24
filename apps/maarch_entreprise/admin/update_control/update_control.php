@@ -124,9 +124,6 @@ foreach ($tags as $key => $value) {
                     } ?>
                 </select>
                 <?php
-                if ($_SESSION['user']['UserId'] != 'superadmin') {
-                    echo _CONNECT_YOU_IN_SUPERADMIN;
-                }
             } else {
                 echo _NO_AVAILABLE_TAG_TO_UPDATE . '<br />';
             }
@@ -139,7 +136,11 @@ foreach ($tags as $key => $value) {
 <div align="center" style="margin-bottom:150px">
     <?php
         if ($isAnyAvailableTag && count($tags)>0) {
-            echo '<a style="margin-top:100px" href="'.$_SESSION['config']['coreurl'].'install/index.php?step=update_language"><input class="button" value="'._CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT.'" type="button"></a>';
+            if ($_SESSION['user']['UserId'] != 'superadmin') {
+                echo _CONNECT_YOU_IN_SUPERADMIN;
+            } else {
+                echo '<a style="margin-top:100px" href="'.$_SESSION['config']['coreurl'].'install/index.php?step=update_language"><input class="button" value="'._CLICK_HERE_TO_GO_TO_UPDATE_MANAGEMENT.'" type="button"></a>';
+            }
         }
 
         if ($isAnyAvailableVersion) {

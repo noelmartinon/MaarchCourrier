@@ -39,11 +39,11 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
     <div class="contentBlock" id="welcome">
         <p>
             <div id="buttons">
-                <div style="float: left;" class="previousButton" id="previous">
+<!--                 <div style="float: left;" class="previousButton" id="previous">
                     <a href="#" onClick="goTo('index.php?step=update_deploy');">
                         <?php echo _PREVIOUS_INSTALL;?>
                     </a>
-                </div>
+                </div> -->
                 <div style="float: right;" class="nextButton" id="start">
                     <a href="#" onClick="goTo('../index.php');">
                         <?php echo _START_MEP_1_3;?>
