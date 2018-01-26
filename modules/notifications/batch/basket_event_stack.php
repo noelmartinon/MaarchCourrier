@@ -46,7 +46,6 @@ while ($state <> 'END') {
         $db       = new Database();
         $secCtrl  = new SecurityControler();
         $entities = new entities();
-
         $stmt = $db->query("SELECT basket_id, except_notif, basket_clause FROM baskets WHERE flag_notif = 'Y'");
 
         while ($line = $stmt->fetchObject()) {
@@ -59,17 +58,21 @@ while ($state <> 'END') {
             $stmt2 = $db->query("SELECT group_id FROM groupbasket WHERE basket_id = ?", array($line->basket_id));
 
             $u=1;
-            while ($line2 = $stmt2->fetchObject()) {
-                $recipients = array();
-                $recipients = $diffusion_type_controler->getRecipients($notification, '');
-                $aRecipients = [];
-                foreach ($recipients as $itemRecipient) {
-                    array_push($aRecipients, $itemRecipient->user_id);
+            while ($line2 = $stmt2->fetchObject()) {                
+                if ($notification->diffusion_type == "groups"){
+                    $recipients = array();
+                    $recipients = $diffusion_type_controler->getRecipients($notification, '');
+                    $aRecipients = [];
+                    foreach ($recipients as $itemRecipient) {
+                        array_push($aRecipients, $itemRecipient->user_id);
+                    }
+                    if(empty($aRecipients)){
+                        $aRecipients = "0=1";
+                    }
+                    $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK') and usergroup_content.user_id=users.user_id and users.user_id in (?)", array($line2->group_id, $aRecipients));
+                } else {
+                    $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK') and usergroup_content.user_id=users.user_id",array($line2->group_id));
                 }
-                if(empty($aRecipients)){
-                    $aRecipients = "0=1";
-                }
-                $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK') and usergroup_content.user_id=users.user_id and users.user_id in (?)", array($line2->group_id, $aRecipients));
                 $baskets_notif = array();
                 $rowCount3 = $stmt3->rowCount();
                 $logger->write("GROUP: " . $line2->group_id . " ... " . $rowCount3 . " user(s) to notify", 'INFO');
@@ -84,7 +87,6 @@ while ($state <> 'END') {
                         $abs_user = $testStmt->fetchObject();
                         $user_id  = $abs_user->new_user;
                     }
-                        
                     $stmt4 = $db->query("SELECT res_id FROM res_view_letterbox ".$whereClause);
                     if(!empty($stmt4)){
                         $userNbDoc = $stmt4->rowCount();
@@ -136,7 +138,6 @@ while ($state <> 'END') {
     /**********************************************************************/
     case 'SCAN_EVENT':
         $i = 1;
-        
         foreach ($events as $event) {
             $logger->write("scanning EVENT : " .$i."/".$totalEventsToProcess." (BASKET => ".$basket_id[0].", DOCUMENT => ".$res_id.", RECIPIENT => ".$user_id.")", 'INFO');
             preg_match_all('#\[(\w+)]#', $event->event_info, $result);
@@ -168,8 +169,7 @@ while ($state <> 'END') {
             preg_match_all('#\[(\w+)]#', $event->event_info, $result);
             $basket_id = $result[1];
             $tmpNotifs[$user_id]['baskets'][$basket_id[0]]['events'][] = $event;
-
-        $i++;
+            $i++;
         }
         $totalNotificationsToProcess = count($tmpNotifs);
         $logger->write($totalNotificationsToProcess .' notifications to process', 'INFO');
@@ -203,6 +203,7 @@ while ($state <> 'END') {
                     'res_table'    => $coll_table,
                     'res_view'     => $coll_view
                 );
+
                 $html = $templates_controler->merge($notification->template_id, $params, 'content');
            
                 if (strlen($html) === 0) {
@@ -221,12 +222,12 @@ while ($state <> 'END') {
                 $html = str_replace('&amp;', '&', $html);
                 $html = str_replace('&', '#and#', $html);
                 
-                // Attachments
-                $attachments = array();
-                if ($tmpNotif['attach']) {
+                // Attachments                
+                $attachments = array();                
+                if ($tmpNotif['attach']) {                    
                     $logger->write('Adding attachments', 'INFO');
-                    foreach ($tmpNotif['events'] as $event) {
-                        // Check if event is related to document in collection
+                    foreach ($basket_list['events'] as $event) {
+                        // Check if event is related to document in collection                        
                         if ($event->res_id != '') {
                             $query = "SELECT "
                                 . "ds.path_template ,"
