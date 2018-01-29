@@ -1460,7 +1460,7 @@ $content .= '<div id="transmission"></div>';
         $content .= '<label>&nbsp;</label>';
 
         //CANCEL BUTTON
-        $content .= '<input type="button" value="';
+        $content .= '<input id="cancelpj" type="button" value="';
         $content .= _CANCEL;
         $content .= '" name="cancel" class="button"  onclick="simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');';
         $content .= 'simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\');destroyModal(\'form_attachments\');"/>';

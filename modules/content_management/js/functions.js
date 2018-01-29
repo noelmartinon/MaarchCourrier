@@ -232,6 +232,11 @@ function checkEditingDoc(elem, userId) {
                 $j("[name=templateOffice_edit\\[\\]], #edit").css({"opacity":"1"});
                 $j("[name=templateOffice_edit\\[\\]], #edit").prop('disabled', false);
 
+                if($j('#cancelpj').length){
+                    $j('#cancelpj').prop('disabled', false);
+                    $j('#cancelpj').css({'opacity':'1'});
+                }
+
                 //END OF CHECKING APPLET
                 console.log('clearInterval');
                 clearInterval(editing);
@@ -270,6 +275,11 @@ function checkEditingDoc(elem, userId) {
                 //LOCK EDIT BUTTON (IF MULTI ATTACHMENT)
                 $j("[name=templateOffice_edit\\[\\]]").css({"opacity":"0.5"});
                 $j("[name=templateOffice_edit\\[\\]]").prop('disabled', true);
+
+                if($j('#cancelpj').length){
+                    $j('#cancelpj').prop('disabled', true);
+                    $j('#cancelpj').css({'opacity':'0.5'});
+                }
 
             }
        },
