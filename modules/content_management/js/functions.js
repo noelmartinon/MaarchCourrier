@@ -220,6 +220,11 @@ function checkEditingDoc(userId) {
                 target.css({"opacity":"1"});
                 target.val('Valider');
 
+                if($j('#cancelpj').length){
+                    $j('#cancelpj').prop('disabled', false);
+                    $j('#cancelpj').css({'opacity':'1'});
+                }
+
                 //UNLOCK EDIT BUTTON TRANSMISSION
                 $j(".transmissionEdit, #edit").css({"opacity":"1"});
                 $j(".transmissionEdit, #edit").prop('disabled', false);
@@ -243,6 +248,11 @@ function checkEditingDoc(userId) {
                 target.prop('disabled', true);
                 target.css({"opacity":"0.5"});
                 target.val('Edition en cours ...');
+
+                if($j('#cancelpj').length){
+                    $j('#cancelpj').prop('disabled', true);
+                    $j('#cancelpj').css({'opacity':'0.5'});
+                }
 
                 //LOCK EDIT BUTTON TRANSMISSION
                 $j(".transmissionEdit, #edit").css({"opacity":"0.5"});

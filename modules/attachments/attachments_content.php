@@ -2018,7 +2018,7 @@ $content .= '</div>';
             $content .= '&nbsp;';
             $content .= '<label>&nbsp;</label>';
 
-            $content .= '<input type="button" value="';
+            $content .= '<input id="cancelpj" type="button" value="';
             $content .=  _CANCEL;
             $content .= '" name="cancel" class="button"  onclick="simpleAjax(\'' . $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');';
             if (isset($_REQUEST['id'])) {
