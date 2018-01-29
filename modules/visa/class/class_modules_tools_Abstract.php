@@ -509,9 +509,9 @@ abstract class visa_Abstract extends Database
 			$circuit = $this->getWorkflow($res_id, $coll_id, $typeList);
 			$sAllAttachmentSigned = $this->isAllAttachementSigned($res_id);
 			if ($sAllAttachmentSigned == 'noAttachment') {
-				$str = '<input type="hidden" id="isAllAttachementSigned" value="true"/>';
-				$isAllAttachementSigned = " disabled='disabled'";
-				$isAllAttachementSignedInfo = _IS_ALL_ATTACHMENT_SIGNED_INFO;
+				$str = '<input type="hidden" id="isAllAttachementSigned" value="false"/>';
+				$isAllAttachementSigned = "";
+				$isAllAttachementSignedInfo = "";
 
 			} else if ($sAllAttachmentSigned == 'yes') {
 				$str = '<input type="hidden" id="isAllAttachementSigned" value="allsigned"/>';
@@ -570,7 +570,7 @@ abstract class visa_Abstract extends Database
                 $str .= '<br/><br/>';
             }
             if (!empty($isAllAttachementSignedInfo)) {
-				$str .= '<b style="color:red;" id="cannotaddsignatory">'.$isAllAttachementSignedInfo.'</b>';
+				$str .= '<b style="color:red;">'.$isAllAttachementSignedInfo.'</b>';
 			}
             $str .= '<div id="visa_content">';
             //VISA USER IN DOCUMENT
