@@ -134,24 +134,26 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     $_SESSION['action_error'] = '';
     $result = '';
     $coll_id = $_SESSION['current_basket']['coll_id'];
-    $res_id = $arr_id[0];
     require_once("core/class/class_security.php");
     $sec = new security();
     $table = $sec->retrieve_table_from_coll($coll_id);
 
     # save note
-        if($formValues['note_content_to_users'] != ''){
-            //Add notes
+    if($formValues['note_content_to_users'] != ''){
+        //Add notes
+        $msgResult = "";
+        foreach($arr_id as $res_id){
             $nb_avis = $sequence +1;
             $userIdTypist = $_SESSION['user']['UserId'];
             $content_note = $formValues['note_content_to_users'];
             $content_note = str_replace(";", ".", $content_note);
             $content_note = str_replace("--", "-", $content_note);
             $content_note = $content_note;
+            $msgResult .= $res_id.'#';
             $note->addNote($res_id, $coll_id, $content_note);
-            
         }
-    return array('result' => $res_id.'#', 'history_msg' => '');
+    }
+    return array('result' => $msgResult, 'history_msg' => '');
 }
 
  /**
