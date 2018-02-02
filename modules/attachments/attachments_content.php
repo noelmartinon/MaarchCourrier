@@ -936,11 +936,13 @@ if (isset($_POST['add']) && $_POST['add']) {
                     $set_update .= ', filesize = :filesize';
                     $set_update .= ', path = :path';
                     $set_update .= ', filename = :filename';
+                    $set_update .= ', docserver_id = :docserver_id';
                     $arrayPDO = array_merge($arrayPDO,
                         array(':fingerprint' => $fingerprint,
                                 ':filesize' => $filesize,
                                 ':path' => $storeResult['destination_dir'],
-                                ':filename' => $storeResult['file_destination_name'], )
+                                ':filename' => $storeResult['file_destination_name'],
+                                ':docserver_id' => $storeResult['docserver_id'] )
                         );
                 }
             }
