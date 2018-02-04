@@ -129,8 +129,9 @@ require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
             $view = $sec->retrieve_view_from_coll_id($collId);
             $table = $sec->retrieve_table_from_coll($collId);
             //retrieve the process entity of document
+            $aResId = explode(", ", $values_str);
             $stmt = $db->query(
-                "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($values_str)
+                "SELECT destination FROM " . $table . " WHERE res_id in (?)", array($aResId)
             );
             $resultDest = $stmt->fetchObject();
             $destination = $resultDest->destination;
@@ -146,10 +147,8 @@ require_once "apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
                     . $_SESSION['config']['businessappurl'] . 'index.php?display=true'
                     . '&module=templates&page=templates_ajax_content_for_notes\');document.getElementById(\'notes\').focus();">';
         $frm_str .= '<option value="">' . _SELECT_NOTE_TEMPLATE . '</option>';
-        //var_dump($templates);
             for ($i=0;$i<count($templates);$i++) {
                 if ($templates[$i]['TYPE'] == 'TXT' && ($templates[$i]['TARGET'] == 'notes' || $templates[$i]['TARGET'] == '')) {
-                    // var_dump($templates[$i]['LABEL']);
                     $frm_str .= '<option value="';
                     $frm_str .= $templates[$i]['ID'];
                     $frm_str .= '">';
