@@ -909,6 +909,13 @@ class ResController
             }
         }
 
+        $securityClause = $_SESSION['user']['security']['letterbox_coll']['DOC']['where'];
+        if(empty($securityClause)){
+            $securityClause = '1=2';
+        }
+
+        $clause .= ' AND ' . $securityClause;
+
         $result = array();        
         $resList = ResModel::getDocsByClause(
             [
