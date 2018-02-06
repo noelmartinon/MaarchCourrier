@@ -19,8 +19,14 @@
 *   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-if (!empty($_REQUEST['cookies'])) {
-    $_SESSION['clientSideCookies'] = $_REQUEST['cookies'];
+if(!empty($_COOKIE)) {
+    $cookie = "";
+    $sep = "";
+    foreach($_COOKIE as $name => $val) {
+      $cookie = $cookie . $sep . $name . "=" . $val;
+      $sep = "; ";
+    }
+    $_SESSION['clientSideCookies'] = $cookie;
     echo '{"status" : 0}';
 } else {
     $_SESSION['clientSideCookies'] = false;

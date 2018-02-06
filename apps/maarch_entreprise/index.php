@@ -243,18 +243,7 @@ else{
     if (empty($_SESSION['clientSideCookies'])) {
         ?>
         <script type="text/javascript">
-            function getCookies() {
-                
-                //document.cookie = "maarch_cookie_1=thefirstcookie";
-                //document.cookie = "maarch_cookie_2=thesecondcookie";
-                return document.cookie;
-            }
 
-            var theCookies;
-            theCookies = getCookies();
-            
-            
-            if (theCookies != undefined) {
                 var path_manage_script = '<?php echo $_SESSION["config"]["businessappurl"];?>' + 'index.php?display=true&page=setProxyCookies';
 
                 $j.ajax(
@@ -263,14 +252,13 @@ else{
                     type:'POST',
                     dataType:'json',
                     data: {
-                        cookies : theCookies
+
                     },
                     success: function(answer)
                     {
 
                     }
                 });
-            }
         </script>
         <?php
     }
