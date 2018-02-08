@@ -46,7 +46,7 @@ $doc_date = '';
 if ($_SESSION['category_id'] == 'outgoing') {
 	$doc_date = ', doc_date : "' . date('d-m-Y') . '"';
 	$destination = ', destination : "'.$_SESSION['user']['primaryentity']['id']. '"';
-	$_SESSION['indexing']['diff_list']['dest']['user'] = '';
+	$_SESSION['indexing']['diff_list']['dest']['user'] = array();
 	$diffListOutgoing = array(
 							'user_id' => $_SESSION['user']['FirstName'],
 							'lastname' => $_SESSION['user']['LastName'],
