@@ -82,11 +82,15 @@ if(isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
 			$orderstr = "order by coll_id desc";
 		}
 		//Query
+		$securityClause = $_SESSION['user']['security']['letterbox_coll']['DOC']['where'];
+		
 		$stmt = $db->query(
-					"SELECT * FROM "
-                    . FILEPLAN_RES_POSITIONS_TABLE
-                    . " WHERE fileplan_id = ?"
-                    . " AND position_id = ?"
+					"SELECT fp.res_id, fp.coll_id, fp.fileplan_id, fp.position_id FROM "
+                    . FILEPLAN_RES_POSITIONS_TABLE ." fp, res_letterbox rl"
+					. " WHERE fp.res_id = rl.res_id"
+					. " AND fp.fileplan_id = ?"
+					. " AND fp.position_id = ?"
+					. " AND (".$securityClause.")"
                     . " ".$orderstr
 		,array($fileplan_id,$position_id));
 
@@ -287,8 +291,8 @@ if(isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
 				}
 				
 			//List
-				$listKey = 'list_id';                                                               //Clé de la liste
-				$paramsTab = array();                                                               //Initialiser le tableau de paramètres
+				$listKey = 'list_id';                                                               //Clï¿½ de la liste
+				$paramsTab = array();                                                               //Initialiser le tableau de paramï¿½tres
 				$paramsTab['bool_sortColumn'] = true;                                               //Affichage Tri
 				$paramsTab['pageTitle'] = '<h2 style="margin-left:0px;">'.$description.':</h2><br/> '
 					.count($tab).' '._FOUND_DOC.'<br/>';     										//Titre de la page
