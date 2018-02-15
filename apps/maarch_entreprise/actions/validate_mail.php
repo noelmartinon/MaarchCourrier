@@ -536,26 +536,26 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     $frm_str .= '<tr id="contact_choose_tr" style="display:'.$display_value.';">';
     $frm_str .='<td class="indexing_label"><label for="type_contact" class="form_title" ><span id="exp_contact_choose_label">'._SHIPPER_TYPE.'</span><span id="dest_contact_choose_label">'._DEST_TYPE.'</span></label></td>';
     $frm_str .='<td>&nbsp;</td>';
-    $frm_str .='<td class="indexing_field"><input type="radio" name="type_contact" id="type_contact_internal" value="internal"  class="check" onclick="clear_error(\'frm_error_'.$id_action.'\');change_contact_type(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\');update_contact_type_session(\''
+    $frm_str .='<td class="indexing_field"><input type="radio" name="type_contact" id="type_contact_internal" value="internal"  class="check" onclick="clear_error(\'frm_error_'.$id_action.'\');change_contact_type(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\', false);update_contact_type_session(\''
         .$_SESSION['config']['businessappurl']
         .'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts_prepare_multi\');reset_check_date_exp();"';
     if ($data['type_contact'] == 'internal') {
         $frm_str .= ' checked="checked" '; 
     }
     $frm_str .= ' /><label for="type_contact_internal">'._INTERNAL2.'</label></td></tr>';
-					
+
     $frm_str .= '<tr id="contact_choose_2_tr" style="display:'.$display_value.';">';
     $frm_str .='<td>&nbsp;</td>';
     $frm_str .='<td>&nbsp;</td>';
-    $frm_str .='<td class="indexing_field">';					
-    $frm_str .= '<input type="radio" name="type_contact" class="check" id="type_contact_external" value="external" onclick="clear_error(\'frm_error_'.$id_action.'\');change_contact_type(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\');update_contact_type_session(\''
+    $frm_str .='<td class="indexing_field">';
+    $frm_str .= '<input type="radio" name="type_contact" class="check" id="type_contact_external" value="external" onclick="clear_error(\'frm_error_'.$id_action.'\');change_contact_type(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\', false);update_contact_type_session(\''
         .$_SESSION['config']['businessappurl']
         .'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts_prepare_multi\');"';
     if ($data['type_contact'] == 'external') {
         $frm_str .= ' checked="checked" ';
     }
     $frm_str .= '/><label for="type_contact_external">'._EXTERNAL.'</label></td></tr>';
-					
+
     $frm_str .= '<tr id="contact_choose_3_tr" style="display:' . $displayValue
 								. ';">';
     $frm_str .= '<td>&nbsp;</td>';
