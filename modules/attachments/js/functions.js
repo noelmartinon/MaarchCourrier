@@ -217,13 +217,12 @@ function modifyAttachmentsForm(path, width, height) {
                     },  
         onSuccess: function(answer) {
             eval("response = "+answer.responseText);
-           
             if(response.status == 0){
                 var modal_content = convertToTextVisibleNewLine(response.content);
                 createModalinAttachmentList(modal_content, 'form_attachments', height, width, 'fullscreen'); 
                 eval(response.exec_js);
             } else {
-                window.top.$('main_error').innerHTML = response.error;
+                alert(response.error);
             }
         }
     });

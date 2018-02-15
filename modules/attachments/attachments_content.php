@@ -1191,23 +1191,28 @@ if (isset($_REQUEST['id'])) {
 
     //GET DATAS attachment
     $infoAttach = (object) $ac->getAttachmentInfos($resId);
+    if(!file_exists($infoAttach->pathfile)){
+        $status = 1;
+        $error = _FILE_NOT_EXISTS_ON_THE_SERVER;
 
-    //var_dump($infoAttach);
+        echo '{"status" : "'.$status.'", "content" : "'.addslashes(_parse($content)).'", "title" : "'.addslashes($title).'", "isVersion" : "'.$isVersion.'", "error" : "'.addslashes($error).'", "majFrameId" : "'.$_SESSION['new_id'].'", "exec_js" : "'.addslashes($js).'", "cur_id" : "'.$_REQUEST['res_id'].'"}';
+        exit;
+    } else {
+        //RETRIEVE ATTACHMENT FILE
+        $_SESSION['upfile'][0]['upAttachment'] = false;
+        $_SESSION['upfile'][0]['size'] = filesize($infoAttach->pathfile);
+        $_SESSION['upfile'][0]['format'] = $infoAttach->format;
+        $_SESSION['upfile'][0]['fileNamePdfOnTmp'] = $infoAttach->pathfile_pdf;
 
-    //RETRIEVE ATTACHMENT FILE
-    $_SESSION['upfile'][0]['upAttachment'] = false;
-    $_SESSION['upfile'][0]['size'] = filesize($infoAttach->pathfile);
-    $_SESSION['upfile'][0]['format'] = $infoAttach->format;
-    $_SESSION['upfile'][0]['fileNamePdfOnTmp'] = $infoAttach->pathfile_pdf;
+        $viewResourceArr = $docserverControler->viewResource(
+            $resId,
+            $infoAttach->target_table_origin,
+            'adr_x',
+            false
+        );
 
-    $viewResourceArr = $docserverControler->viewResource(
-        $resId,
-        $infoAttach->target_table_origin,
-        'adr_x',
-        false
-    );
-
-    $_SESSION['upfile'][0]['fileNameOnTmp'] = str_replace($viewResourceArr->tmp_path.DIRECTORY_SEPARATOR, '', $viewResourceArr->file_path);
+        $_SESSION['upfile'][0]['fileNameOnTmp'] = str_replace($viewResourceArr->tmp_path.DIRECTORY_SEPARATOR, '', $viewResourceArr->file_path);
+    }
 } else {
     //INITIALIZE ADD MODE
     $mode = 'add';
