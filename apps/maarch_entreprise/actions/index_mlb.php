@@ -546,7 +546,7 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
             . 'onclick="clear_error(\'frm_error_' . $actionId . '\');reset_check_date_exp();'
             . 'change_contact_type(\'' . $_SESSION['config']['businessappurl']
             . 'index.php?display=true&dir=indexing_searching&page='
-            . 'autocomplete_contacts\', true);update_contact_type_session(\''
+            . 'autocomplete_contacts\', false);update_contact_type_session(\''
         .$_SESSION['config']['businessappurl']
         .'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts_prepare_multi\');"  /><label for="type_contact_internal">' . _INTERNAL2 . '</label>'
 			.  '</td></tr>';
@@ -559,7 +559,7 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
             . 'onclick="clear_error(\'frm_error_' . $actionId . '\');'
             . 'change_contact_type(\'' . $_SESSION['config']['businessappurl']
             . 'index.php?display=true&dir=indexing_searching'
-            . '&autocomplete_contacts\', true);update_contact_type_session(\''
+            . '&autocomplete_contacts\', false);update_contact_type_session(\''
         .$_SESSION['config']['businessappurl']
         .'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts_prepare_multi\');"  class="check"/><label for="type_contact_external">' . _EXTERNAL	.'</label>'		
             . '</td>';
