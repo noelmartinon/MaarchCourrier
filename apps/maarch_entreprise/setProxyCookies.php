@@ -23,12 +23,21 @@ if(!empty($_COOKIE)) {
     $cookie = "";
     $sep = "";
     foreach($_COOKIE as $name => $val) {
-      $cookie = $cookie . $sep . $name . "=" . $val;
+      $cookie = $cookie . $sep . $name . "=" . str_replace(" ", "+", $val);
       $sep = "; ";
     }
     $_SESSION['clientSideCookies'] = $cookie;
     echo '{"status" : 0}';
-} else {
+}
+
+if (!empty($_REQUEST['cookies'])) {
+    if(!empty($_SESSION['clientSideCookies'])){
+        $_SESSION['clientSideCookies'] .= '; ';
+    }
+    $_SESSION['clientSideCookies'] .= $_REQUEST['cookies'];
+}
+
+if(empty($_SESSION['clientSideCookies'])){
     $_SESSION['clientSideCookies'] = false;
     echo '{"status" : 1}';
 }

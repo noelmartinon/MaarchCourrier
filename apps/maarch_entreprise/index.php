@@ -256,7 +256,7 @@ else{
                     type:'POST',
                     dataType:'json',
                     data: {
-
+                        cookies : document.cookie
                     },
                     success: function(answer)
                     {
