@@ -48,9 +48,15 @@ foreach ($args as $key => $value) {
     $args_bold[$key] = '<b>'. $value . '</b>';
 }
 echo "<ul id=\"autocomplete_contacts_ul\">";
-//STEP 1 : search with lastname (physical contact)
-    $query = "SELECT contact_type, society, lastname, firstname, contact_id, is_corporate_person, society_short FROM contacts_v2 WHERE is_corporate_person = 'N' AND enabled = 'Y' AND enabled = 'Y' AND (LOWER(translate(lastname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))) ORDER BY lastname,firstname ASC";
+//STEP 1 : search with lastname (physical contact) Modif : search with lastname and firstname
+    $query = "SELECT contact_type, society, lastname, firstname, contact_id, is_corporate_person, society_short FROM contacts_v2 WHERE is_corporate_person = 'N' AND enabled = 'Y' AND enabled = 'Y' ";
+    $query.= "AND (LOWER(translate(lastname || ' ' || firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))";
+    $query.= "LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')))";
+    $query.= "OR (LOWER(translate(firstname || ' ' || lastname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))";
+    $query.= "LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')))";
+    $query.= "ORDER BY lastname,firstname ASC";
     $arrayPDO = array('%'.$_REQUEST['what'].'%');
+    $arrayPDO[] = array('%'.$_REQUEST['what'].'%');
     $stmt = $db->query($query, $arrayPDO);
     $nb_step1 = $stmt->rowCount();
     

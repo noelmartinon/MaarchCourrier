@@ -52,9 +52,10 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     
     // Order of select elements (# is for parallel check)
     $columnTarget = array(
-        'firstname#lastname', 
+        'firstname#lastname',
+        'lastname#firstname',
         'contact_firstname#contact_lastname', 
-        'society', 
+        'society',
         'address_num#address_street#address_postal_code#address_town'
     );
 
@@ -74,7 +75,6 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     $nb_total = 0;
     // First, internal user
     $contactRequest = "lower(translate(firstname || ' ' || lastname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) LIKE lower(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))";
-    
     $query = "SELECT * FROM users WHERE ".$contactRequest . $request_user;
     $arrayPDO = array('%'.$_REQUEST['Input'].'%');
     $stmt = $db->query($query, $arrayPDO);
