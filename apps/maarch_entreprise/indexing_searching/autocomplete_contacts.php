@@ -55,7 +55,8 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
         'firstname#lastname',
         'lastname#firstname',
         'contact_firstname#contact_lastname', 
-        'society',
+        'society', 
+        'society_short',
         'address_num#address_street#address_postal_code#address_town'
     );
 
