@@ -558,6 +558,8 @@ export class ProfileComponent implements OnInit {
                                 }
                             }
                         });
+                        $j("#historyTable th:first-child").click();
+                        $j("#historyTable th:first-child").click();
                     }, 0);
                 }, (err) => {
                     this.resultInfo = JSON.parse(err._body).errors;

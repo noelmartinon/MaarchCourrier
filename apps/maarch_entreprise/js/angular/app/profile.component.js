@@ -527,6 +527,8 @@ var ProfileComponent = /** @class */ (function () {
                             }
                         }
                     });
+                    $j("#historyTable th:first-child").click();
+                    $j("#historyTable th:first-child").click();
                 }, 0);
             }, function (err) {
                 _this.resultInfo = JSON.parse(err._body).errors;
