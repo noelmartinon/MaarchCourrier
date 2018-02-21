@@ -277,7 +277,7 @@ abstract class entities_Abstract extends functions
                 }
                 $entities = preg_replace("|, $|", '', $entities);
 
-                if ($entities == '' && $userId == 'superadmin') {
+                if ($entities == '') {
                     $entities = $this->empty_list();
                 }
                 $where = preg_replace(
@@ -314,7 +314,7 @@ abstract class entities_Abstract extends functions
                     $entities .= $children[$j] .  ", ";
                 }
                 $entities = preg_replace("|, $|", '', $entities);
-                if ($entities == '' && $userId == 'superadmin') {
+                if ($entities == '') {
                     $entities = $this->empty_list();
                 }
                 $where = preg_replace(
@@ -352,7 +352,7 @@ abstract class entities_Abstract extends functions
                     $entities .= $children[$j] . ", ";
                 }
                 $entities = preg_replace("|, $|", '', $entities);
-                if ($entities == '' && $userId == 'superadmin') {
+                if ($entities == '') {
                     $entities = $this->empty_list();
                 }
 
