@@ -345,15 +345,17 @@
                 <h4 class="modal-title">Mon historique</h4>
             </div>
             <div class="modal-body" style="height: 70vh;overflow: auto">
-                <table id="historyTable" class="table table-hover table-condensed">
+                <table id="historyTable" class="table table-hover table-condensed" style="width:100%;">
                     <thead>
                     <tr>
+                        <th></th>
                         <th>Date</th>
                         <th>Description</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr *ngFor="let history of histories">
+                        <td style="vertical-align:middle;">{{history.event_date}}</td>
                         <td style="vertical-align:middle;">{{history.event_date | date : "dd/MM/y HH:mm"}}</td>
                         <td style="vertical-align:middle;">{{history.info}}</td>
                     </tr>

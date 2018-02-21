@@ -514,6 +514,11 @@ var ProfileComponent = /** @class */ (function () {
                     $j('#historyTable').DataTable({
                         "dom": '<"topleft"p><"top"f>rt<"bottom"i><"clear">',
                         "order": [[0, "desc"]],
+                        "columns": [
+                            { "orderable": false },
+                            { "orderable": false },
+                            { "orderable": false }
+                        ],
                         "language": {
                             "sLengthMenu": "",
                             "sInfo": "Page _PAGE_ sur _PAGES_",
@@ -525,10 +530,15 @@ var ProfileComponent = /** @class */ (function () {
                                 "sNext": "Suivant",
                                 "sLast": "Dernier"
                             }
-                        }
+                        },
+                        "columnDefs": [
+                            {
+                                "targets": [0],
+                                "visible": false,
+                                "searchable": false,
+                            }
+                        ]
                     });
-                    $j("#historyTable th:first-child").click();
-                    $j("#historyTable th:first-child").click();
                 }, 0);
             }, function (err) {
                 _this.resultInfo = JSON.parse(err._body).errors;

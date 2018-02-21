@@ -545,6 +545,11 @@ export class ProfileComponent implements OnInit {
                         $j('#historyTable').DataTable({
                             "dom": '<"topleft"p><"top"f>rt<"bottom"i><"clear">',
                             "order": [[ 0, "desc" ]],
+                            "columns": [
+                                { "orderable": false },
+                                { "orderable": false },
+                                { "orderable": false }
+                              ],
                             "language": {
                                 "sLengthMenu": "",
                                 "sInfo": "Page _PAGE_ sur _PAGES_",
@@ -556,10 +561,15 @@ export class ProfileComponent implements OnInit {
                                     "sNext":       "Suivant",
                                     "sLast":       "Dernier"
                                 }
-                            }
+                            },
+                            "columnDefs": [
+                                {
+                                    "targets": [ 0 ],
+                                    "visible": false,
+                                    "searchable": false,
+                                }
+                            ]
                         });
-                        $j("#historyTable th:first-child").click();
-                        $j("#historyTable th:first-child").click();
                     }, 0);
                 }, (err) => {
                     this.resultInfo = JSON.parse(err._body).errors;
