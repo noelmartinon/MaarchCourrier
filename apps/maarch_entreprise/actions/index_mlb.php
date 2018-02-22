@@ -1008,7 +1008,7 @@ function check_form($formId, $values)
 {
     
     if ($_SESSION['upfile']['format']=='maarch'){
-        $_SESSION['upfile']='';
+        $_SESSION['upfile']=[];
         $_SESSION['upfile']['error']='0';
         $_SESSION['upfile']['format']='maarch';
     } elseif (empty($_SESSION['upfile']['format'])) {

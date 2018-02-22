@@ -63,4 +63,12 @@
         <target>basket</target>
         <page>manage_group_basket</page>
     </exclude>
+    <exclude>
+        <target>templates</target>
+        <page>file_iframe</page>
+    </exclude>
+    <exclude>
+        <target></target>
+        <page>getIframeTemplateContent</page>
+    </exclude>
 </excludes>
