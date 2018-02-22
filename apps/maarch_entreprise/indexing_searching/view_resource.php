@@ -3,8 +3,10 @@
 /* View */
 if ($viewResourceArr['status'] <> 'ko') {
     if (strtolower($viewResourceArr['mime_type']) == 'application/maarch') {
+        
         ?>
         <head><meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></head>
+        <?php echo $content;?>
         <?php
     } else {
         if(strtolower($viewResourceArr['ext']) == 'txt'){
