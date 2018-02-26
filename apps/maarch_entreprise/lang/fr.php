@@ -4782,9 +4782,11 @@ if (!defined('_RETENTION_RULE')) {
 if (!defined('_DURATION_CURRENT_USE')) {
     define('_DURATION_CURRENT_USE', "Durée d'utilité courante");
 }
-
 if (!defined('_UNSELECT_ALL')) {
     define('_UNSELECT_ALL', 'Tout désélectionner');
+}
+if (!defined("_ARCHIVE_TRANSFER_COLL")){
+    define("_ARCHIVE_TRANSFER_COLL","Archivage");
 }
 
 /***** Profile *****/
