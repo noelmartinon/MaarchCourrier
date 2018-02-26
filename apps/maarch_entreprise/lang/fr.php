@@ -1840,7 +1840,7 @@ if (!defined("_RETENTION_RULE")) define("_RETENTION_RULE","Règle de conservatio
 if (!defined("_DURATION_CURRENT_USE")) define("_DURATION_CURRENT_USE","Durée d'utilité courante");
 
 if (!defined("_UNSELECT_ALL")) define("_UNSELECT_ALL","Tout désélectionner");
-
+if (!defined("_ARCHIVE_TRANSFER_COLL")) define("_ARCHIVE_TRANSFER_COLL","Archivage");
 /***** Profile *****/
 if (!defined('_MANAGE_SIGNATURES'))
     define('_MANAGE_SIGNATURES', 'Gérer mes signatures');
