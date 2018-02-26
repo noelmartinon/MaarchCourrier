@@ -93,11 +93,7 @@ if (isset($_POST['add']) && $_POST['add']) {
                 $contactidAttach = $_REQUEST['contactidAttach'][$numAttach];
                 $addressidAttach = $_REQUEST['addressidAttach'][$numAttach];
                 $chrono = $_REQUEST['chrono'][$numAttach];
-                if (isset($_REQUEST['attachStatus'][$numAttach])) {
-                    $attachStatus = $_REQUEST['effectiveDateStatus'][$numAttach];
-                } else {
-                    $attachStatus = 'A_TRA';
-                }
+                $attachStatus = $_REQUEST['effectiveDateStatus'][$numAttach];
 
                 require_once 'core/docservers_tools.php';
                 $arrayIsAllowed = array();
@@ -942,7 +938,7 @@ if (isset($_POST['add']) && $_POST['add']) {
                                 ':filesize' => $filesize,
                                 ':path' => $storeResult['destination_dir'],
                                 ':filename' => $storeResult['file_destination_name'],
-                                ':docserver_id' => $storeResult['docserver_id'] )
+                                ':docserver_id' => $storeResult['docserver_id'], )
                         );
                 }
             }
@@ -1191,7 +1187,7 @@ if (isset($_REQUEST['id'])) {
 
     //GET DATAS attachment
     $infoAttach = (object) $ac->getAttachmentInfos($resId);
-    if(!file_exists($infoAttach->pathfile)){
+    if (!file_exists($infoAttach->pathfile)) {
         $status = 1;
         $error = _FILE_NOT_EXISTS_ON_THE_SERVER;
 
@@ -1359,23 +1355,40 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     $content .= '</p>';
 
     //BACK DATE
-    $content .= '<p>';
-    $content .= '<label>'._BACK_DATE.'</label>';
-    $content .= "<input type='text' name='back_date[]' id='back_date' onClick='showCalender(this);' onfocus='checkBackDate(this);' onchange='checkBackDate(this);' value='{$req->format_date_db($infoAttach->validation_date)}' />";
-    $content .= '</p>';
+    if ($mode == 'add' || ($mode == 'edit' && (($infoAttach->attachment_type == 'transmission' && $infoAttach->status != 'NO_RTURN') || $infoAttach->attachment_type != 'transmission'))) {
+        $content .= '<p>';
+        $content .= '<label>'._BACK_DATE.'</label>';
+        $content .= "<input type='text' name='back_date[]' id='back_date' onClick='showCalender(this);' onfocus='checkBackDate(this);' onchange='checkBackDate(this);' value='{$req->format_date_db($infoAttach->validation_date)}'/>";
+        if ($mode == 'add') {
+            $content .= '<select name="effectiveDateStatus[]" id="effectiveDateStatus" style="display:none;margin-left: 20px;width: 105px" onchange="checkEffectiveDateStatus(this);"/>';
+            $content .= '<option value="A_TRA">A traiter</option>';
+            $content .= '</select>';
+        }
+        $content .= '</p>';
+    }
 
     //EFFECTIVE BACK DATE (for transmission)
     if ($mode == 'edit' && $infoAttach->attachment_type == 'transmission') {
         $content .= '<p>';
         $content .= '<label>'._EFFECTIVE_DATE.'</label>';
-        $content .= "<input type='text' name='effectiveDate[]' id='effectiveDate' onblur='setRturnForEffectiveDate();' onClick='showCalender(this);' onfocus='checkBackDate(this);' onchange='checkBackDate(this);' style='width: 75px' value='{$req->format_date_db($infoAttach->effective_date)}' />";
-        $content .= '<select name="effectiveDateStatus[]" id="effectiveDateStatus" style="margin-left: 20px;width: 105px" />';
-        $content .= '<option value="EXP_RTURN">Attente retour</option>';
-        if ($infoAttach->status == 'RTURN') {
-            $content .= '<option selected="selected" value="RTURN">Retourné</option>';
-        } else {
-            $content .= '<option value="RTURN">Retourné</option>';
+        $content .= "<input type='text' name='effectiveDate[]' id='effectiveDate' onblur='setRturnForEffectiveDate();' onClick='showCalender(this);' onfocus='checkBackDate(this);' onchange='checkBackDate(this);' style='width: 75px' value='{$req->format_date_db($infoAttach->effective_date)}'";
+        if ($infoAttach->status == 'NO_RTURN') {
+            $content .= ' disabled="disabled" class="readonly"';
         }
+        $content .= '/>';
+        $content .= '<select name="effectiveDateStatus[]" id="effectiveDateStatus" style="margin-left: 20px;width: 105px" />';
+
+        if ($infoAttach->status == 'EXP_RTURN' || $infoAttach->status == 'RTURN') {
+            $content .= '<option value="EXP_RTURN">Attente retour</option>';
+            if ($infoAttach->status == 'RTURN') {
+                $content .= '<option selected="selected" value="RTURN">Retourné</option>';
+            } else {
+                $content .= '<option value="RTURN">Retourné</option>';
+            }
+        } else {
+            $content .= '<option selected="selected" value="NO_RTURN">Pas de retour</option>';
+        }
+
         $content .= '</select>';
         $content .= '</p>';
     }

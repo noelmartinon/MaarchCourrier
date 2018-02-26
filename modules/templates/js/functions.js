@@ -106,12 +106,16 @@ function select_template(path_to_script, attachment_type)
     }
 
     if ($j('#'+attachment_type.id+' option:selected').val() == "transmission") {
-        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]] option').remove();
-        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]]').append('<option value="EXP_RTURN">Attente retour</option>');
-        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]]').append('<option value="NO_RTURN">Pas de retour</option>');
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]]').css('display','inline-block');
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]] option').remove();
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]]').append('<option value="EXP_RTURN">Attente retour</option>');
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]]').append('<option value="NO_RTURN">Pas de retour</option>');
+        $j('#'+attachment_type.id).parent().parent().find('[name=back_date\\[\\]]').css('width','75px');
     } else {
-        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]] option').remove();
-        $j('#'+attachment_type.id).parent().parent().find('[name=backDateStatus\\[\\]]').append('<option value="A_TRA">A traiter</option>');
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]]').css('display','none');
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]] option').remove();
+        $j('#'+attachment_type.id).parent().parent().find('[name=effectiveDateStatus\\[\\]]').append('<option value="A_TRA">A traiter</option>');
+        $j('#'+attachment_type.id).parent().parent().find('[name=back_date\\[\\]]').css('width','inherite');
     }
 
     new Ajax.Request(path_to_script,

@@ -396,8 +396,9 @@ function addNewAttach() {
     $j("[name=back_date\\[\\]]").each(function( index ) {
         this.id = this.id.replace(/\d+/,'')+index;
     });
-    $j("[name=backDateStatus\\[\\]]").each(function( index ) {
+    $j("[name=effectiveDateStatus\\[\\]]").each(function( index ) {
         this.id = this.id.replace(/\d+/,'')+index;
+        $j("#"+this.id).attr("onchange","checkEffectiveDateStatus(this);");
     });
     $j("[name=contact_card_attach]").each(function( index ) {
         this.id = this.id.replace(/\d+/,'')+index;
@@ -690,9 +691,20 @@ function affiche_chrono(target){
     }
 }
 
-
 function showContactInfo(target,contactTarget,addressTarget) {
     $j('#info_contact_div_attach').slideToggle("slow",function(){
         $j('#'+target.name+'_iframe').attr('src','index.php?display=false&dir=my_contacts&page=info_contact_iframe&fromAttachmentContact=Y&seeAllAddresses&contactid='+contactTarget.value+'&addressid='+addressTarget.value);
     });
+}
+
+function checkEffectiveDateStatus(effectiveDateStatus) {
+    console.log($j('#'+effectiveDateStatus.id).val());
+    if ($j('#'+effectiveDateStatus.id).val() == 'NO_RTURN') {
+        $j('#'+effectiveDateStatus.id).parent().find('[name=back_date\\[\\]]').val('');
+        $j('#'+effectiveDateStatus.id).parent().find('[name=back_date\\[\\]]').prop('disabled',true);
+        $j('#'+effectiveDateStatus.id).parent().find('[name=back_date\\[\\]]').addClass('readonly');
+    } else {
+        $j('#'+effectiveDateStatus.id).parent().find('[name=back_date\\[\\]]').prop('disabled',false);
+        $j('#'+effectiveDateStatus.id).parent().find('[name=back_date\\[\\]]').removeClass('readonly');
+    }    
 }
