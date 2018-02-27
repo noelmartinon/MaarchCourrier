@@ -1757,9 +1757,9 @@ class Install extends functions
             $res .= "\n";
             $res .= "cd ".realpath('.')."/modules/notifications/batch/";
             $res .= "\n";
-            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n NCT';
+            $res .= '#php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n NCT';
             $res .= "\n";
-            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n NCC';
+            $res .= '#php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n NCC';
             $res .= "\n";
             $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n ANC';
             $res .= "\n";
