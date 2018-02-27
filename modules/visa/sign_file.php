@@ -106,13 +106,24 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
         $tmpPathToWantedSignature = $pathToWantedSignature;
         if ($core->test_service('use_date_in_signBlock', 'visa', false) == 1) {
             $infoSignFile = pathinfo($pathToWantedSignature);
+
+            //GET SIGN FILE
             if ($infoSignFile['extension'] == 'png') {
-                $im2 = @imagecreatefrompng($pathToWantedSignature);
+                $source_image = @imagecreatefrompng($pathToWantedSignature);
             } elseif ($infoSignFile['extension'] == 'jpeg' || $infoSignFile['extension'] == 'jpg') {
-                $im2 = @imagecreatefromjpeg($pathToWantedSignature);
+                $source_image = @imagecreatefromjpeg($pathToWantedSignature);
             } elseif ($infoSignFile['extension'] == 'gif') {
-                $im2 = @imagecreatefromgif($pathToWantedSignature);
+                $source_image = @imagecreatefromgif($pathToWantedSignature);
             }
+
+            $source_imagex = imagesx($source_image);
+            $source_imagey = imagesy($source_image);
+
+            $dest_imagex = $_SESSION['modules_loaded']['visa']['width_blocsign'];
+            $dest_imagey = $_SESSION['modules_loaded']['visa']['height_blocsign'];
+            $im2 = imagecreatetruecolor($dest_imagex, $dest_imagey);
+
+            imagecopyresampled($im2, $source_image, 0, 0, 0, 0, $dest_imagex, $dest_imagey, $source_imagex, $source_imagey);
 
             $im = imagecreatetruecolor(imagesx($im2), imagesy($im2) + 30);
             $white = imagecolorallocate($im, 255, 255, 255);
@@ -132,7 +143,7 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
             }
 
             $font = 'modules/visa/LibraSerifModern-Regular.otf';
-            imagettftext($im, 10, 0, 10, 20, $black, $font, $text);
+            imagettftext($im, 8, 0, 10, 20, $black, $font, $text);
             imagecopy($im, $im2, 0, 30, 0, 0, imagesx($im2), imagesy($im2));
 
             $tmpPathToWantedSignature = $_SESSION['config']['tmppath'].'tmp_file_'.$_SESSION['user']['UserId'].'_'.rand().'.png';
