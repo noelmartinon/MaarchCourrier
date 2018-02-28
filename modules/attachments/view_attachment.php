@@ -92,9 +92,9 @@ if (! empty($_SESSION['error'])) {
         $_SESSION['collection_id_choice'], 
         $resIdMaster
     );
-    $table = $sec->retrieve_table_from_coll($collId);
+    $view = $sec->retrieve_view_from_coll_id($collId);
     $stmt = $db->query(
-        "SELECT res_id FROM " . $table . " WHERE res_id = ? ".$where2,array($resIdMaster));
+        "SELECT res_id FROM " . $view . " WHERE res_id = ? ".$where2,array($resIdMaster));
 
     if ($stmt->rowCount() == 0 and !$right) {
         $_SESSION['error'] = _NO_DOC_OR_NO_RIGHTS;
