@@ -86,6 +86,7 @@ if (isset($_REQUEST['load'])) {
     //Load list
     $target = $_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=document_history&id=' . $id . $parameters . $smallQuery;
     $listContent = $list->loadList($target);
+    $list->_resetFilter2();
     echo $listContent;
     
     ?>

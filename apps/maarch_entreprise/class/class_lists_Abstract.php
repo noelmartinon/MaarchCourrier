@@ -694,7 +694,7 @@ abstract class lists_Abstract extends Database
         
     }
 
-    protected function _resetFilter2() {
+    public function _resetFilter2() {
 
             foreach ($_SESSION['filters'] as $key => $val) {
                 $_SESSION['filters'][$key]['VALUE'] = '';

@@ -107,9 +107,7 @@ if (isset($_REQUEST['load'])) {
     //
     $where_tab[] = " identifier = ? ";
     $arrayPDO = array($identifier);
-    //From filters
-    $filterClause = $list->getFilters(); 
-    if (!empty($filterClause)) $where_tab[] = $filterClause;//Filter clause
+
     //Build where
     $where = implode(' and ', $where_tab);
     
