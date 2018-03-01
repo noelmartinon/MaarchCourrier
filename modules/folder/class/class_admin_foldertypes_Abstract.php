@@ -1009,7 +1009,6 @@ abstract class foldertype_Abstract
         // Checks the manadatory indexes
         $indexes = $this->get_indexes($foldertypeId);
         $mandatoryIndexes = $this->get_mandatory_indexes($foldertypeId);
-
         for ($i = 0; $i < count($mandatoryIndexes); $i ++) {
             if (empty($values[$mandatoryIndexes[$i]])) { // Pb 0
                 $_SESSION['error'] .= $indexes[$mandatoryIndexes[$i]]['label']
@@ -1127,9 +1126,7 @@ abstract class foldertype_Abstract
                 		'type' => "date"
                 	)
                 );
-            } else if ($indexes[$key]['type'] == 'string' 
-            	&& ! empty($values[$key])
-            ) {
+            } else if ($indexes[$key]['type'] == 'string') {
                 array_push(
                 	$data, 
                 	array(
@@ -1138,9 +1135,11 @@ abstract class foldertype_Abstract
                 		'type' => "string"
                 	)
                 );
-            } else if ($indexes[$key]['type'] == 'float' 
-            	&& ! empty($values[$key])
-            ) {
+            } else if ($indexes[$key]['type'] == 'float') {
+                if($values[$key] === ''){
+                    $values[$key] = NULL;
+                }
+
                 array_push(
                 	$data, 
                 	array(
@@ -1149,9 +1148,11 @@ abstract class foldertype_Abstract
                 		'type' => "float"
                 	)
                 );
-            } else if ($indexes[$key]['type'] == 'integer' 
-            	&& !empty($values[$key])
-            ) {
+            } else if ($indexes[$key]['type'] == 'integer') {
+                if($values[$key] === ''){
+                    $values[$key] = NULL;
+                }
+                
                 array_push(
                 	$data, 
                 	array(
