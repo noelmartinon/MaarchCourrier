@@ -1623,8 +1623,6 @@ function loadIndexingModel() {
                     var content = JSON.parse(response.result_txt);
 
                     $j.each(content, function( index, value ) {
-                        console.log( index + ": " + value );
-
                         if ($j('#'+index).length) {
                             $j('#'+index).val(value);
                             $j('#category_id').change();
@@ -1742,11 +1740,10 @@ function saveIndexingModel() {
         }
         if ($j('#thesaurus').length) {
             obj['thesaurus'] = [];
-            $j.each($j('#thesaurus').val(),function()
-            {
+                $j("#thesaurus > option").each(function() {
                 $tmp = {
-                    "id" : this[0],
-                    "label" : $j('#thesaurus option[value='+this[0]+']').text()
+                    "id" : this.value,
+                    "label" : this.text
                 }
                 obj['thesaurus'].push($tmp);
             });
