@@ -944,7 +944,7 @@ function get_form_txt($values, $pathManageAction,  $actionId, $table, $module, $
         $frmStr .= '<iframe src="' . $_SESSION['config']['businessappurl']
                 . 'index.php?display=true&dir=indexing_searching&page='
                 . 'file_iframe" name="file_iframe" id="file_iframe" '
-                . 'scrolling="auto" frameborder="0" style="display:block;" onmouseover="this.focus()">'
+                . 'scrolling="auto" frameborder="0" style="display:block;" >'
                 . '</iframe>';
     }
     $frmStr .= '</div>';
