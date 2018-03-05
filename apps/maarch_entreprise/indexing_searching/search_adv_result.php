@@ -174,7 +174,7 @@ if (count($_REQUEST['meta']) > 0) {
             } elseif ($tab_id_fields[$j] == 'chrono' && !empty($_REQUEST['chrono'])) {
                 $json_txt .= " 'chrono' : ['".addslashes(trim($_REQUEST['chrono']))."'],";
                 $chrono = $func->wash($_REQUEST['chrono'],"no",_CHRONO_NUMBER,"no");
-                $where_request .= " (lower(alt_identifier) like lower(:chrono) or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE coll_id = 'letterbox_coll' AND lower(identifier) like lower(:chrono) )))";
+                $where_request .= " (lower(alt_identifier) like lower(:chrono) or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE coll_id = 'letterbox_coll' AND lower(identifier) like lower(:chrono)  AND status NOT IN ('DEL','OBS','TMP'))))";
                 $arrayPDO = array_merge($arrayPDO, array(":chrono" => "%".$chrono."%"));
                 $where_request .=" and  ";
             } 
@@ -202,7 +202,7 @@ if (count($_REQUEST['meta']) > 0) {
             elseif ($tab_id_fields[$j] == 'attachment_types' && !empty($_REQUEST['attachment_types']))
             {
                 $json_txt .= " 'attachment_types' : ['".addslashes(trim($_REQUEST['attachment_types']))."'],";
-                $where_request .= " (res_id in (SELECT res_id_master FROM res_view_attachments WHERE attachment_type = :attachmentTypes) )";
+                $where_request .= " (res_id in (SELECT res_id_master FROM res_view_attachments WHERE attachment_type = :attachmentTypes AND status NOT IN ('DEL','OBS','TMP')) )";
                 $arrayPDO = array_merge($arrayPDO, array(":attachmentTypes" => $_REQUEST['attachment_types']));
                 $where_request .=" and  ";
             }
@@ -316,7 +316,7 @@ if (count($_REQUEST['meta']) > 0) {
                 $subject = $func->normalize($subject);
                 $json_txt .= " 'subject' : ['".addslashes(trim($subject))."'],";
                 $where_request .= " (lower(translate(subject,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')) like lower(:subject) "
-                    ."or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE coll_id = 'letterbox_coll' AND lower(translate(title,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))  like lower(:subject) ))) and ";
+                    ."or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE coll_id = 'letterbox_coll' AND lower(translate(title,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))  like lower(:subject) AND status NOT IN ('DEL','OBS','TMP') ))) and ";
                 $arrayPDO = array_merge($arrayPDO, array(":subject" => "%".$subject."%"));
             } elseif ($tab_id_fields[$j] == 'fulltext' && !empty($_REQUEST['fulltext'])
             ) {
@@ -518,7 +518,7 @@ if (count($_REQUEST['meta']) > 0) {
                 }
                 else
                 {
-                    $where_request .= " res_id in (SELECT res_id_master FROM res_view_attachments WHERE (".$req->extract_date("creation_date")." >= :creationDatePjFrom) ) and ";
+                    $where_request .= " res_id in (SELECT res_id_master FROM res_view_attachments WHERE (".$req->extract_date("creation_date")." >= :creationDatePjFrom) AND status NOT IN ('DEL','OBS','TMP') ) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":creationDatePjFrom" => $func->format_date_db($_REQUEST['creation_date_pj_from'])));
                     $json_txt .= " 'creation_date_pj_from' : ['".trim($_REQUEST['creation_date_pj_from'])."'],";
                 }
@@ -532,7 +532,7 @@ if (count($_REQUEST['meta']) > 0) {
                 }
                 else
                 {
-                    $where_request .= " res_id in (SELECT res_id_master FROM res_view_attachments WHERE (".$req->extract_date("creation_date")." <= :creationDatePjTo) )and ";
+                    $where_request .= " res_id in (SELECT res_id_master FROM res_view_attachments WHERE (".$req->extract_date("creation_date")." <= :creationDatePjTo) AND status NOT IN ('DEL','OBS','TMP') ) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":creationDatePjTo" => $func->format_date_db($_REQUEST['creation_date_pj_to'])));
                     $json_txt .= " 'creation_date_pj_to' : ['".trim($_REQUEST['creation_date_pj_to'])."'],";
                 }
@@ -770,7 +770,7 @@ if (count($_REQUEST['meta']) > 0) {
                 $json_txt .= " 'contactid_external' : ['".addslashes(trim($_REQUEST['contactid_external']))."'], 'contactid' : ['".addslashes(trim($_REQUEST['contactid']))."'],";
                     $contact_id = $_REQUEST['contactid_external'];
 					$where_request .= " (res_id in (select res_id from contacts_res where contact_id = :contactIdExternal and coll_id = '" . $coll_id . "') or ";
-                    $where_request .= " (exp_contact_id = '".$contact_id."' or dest_contact_id = '".$contact_id."') or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE dest_contact_id = ".$contact_id.") )) and ";
+                    $where_request .= " (exp_contact_id = '".$contact_id."' or dest_contact_id = '".$contact_id."') or (res_id in (SELECT res_id_master FROM res_view_attachments WHERE dest_contact_id = ".$contact_id." AND status NOT IN ('DEL','OBS','TMP')) )) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":contactIdExternal" => $contact_id));
             }
             //recherche sur les contacts externes en fonction de ce que la personne a saisi
@@ -779,7 +779,7 @@ if (count($_REQUEST['meta']) > 0) {
                 $json_txt .= " 'contactid_external' : ['".addslashes(trim($_REQUEST['contactid_external']))."'], 'contactid' : ['".addslashes(trim($_REQUEST['contactid']))."'],";
                     $contact_id = $_REQUEST['contactid'];
                     $where_request .= " (contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) ".
-                        " or res_id in (SELECT res_id_master FROM res_view_attachments WHERE dest_contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) ) ) and ";
+                        " or res_id in (SELECT res_id_master FROM res_view_attachments WHERE dest_contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) AND status NOT IN ('DEL','OBS','TMP') ) ) and ";
                     $arrayPDO = array_merge($arrayPDO, array(":contactId" => "%".$contact_id."%"));
             }
             elseif ($tab_id_fields[$j] == 'addresses_id' && !empty($_REQUEST['addresses_id']))
