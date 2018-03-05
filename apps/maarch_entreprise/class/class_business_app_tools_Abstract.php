@@ -462,8 +462,7 @@ abstract class business_app_tools_Abstract extends Database
         }
     }
 
-    // Méthode défini dans la classe simple pour cause de problèmes de surcharges custom
-    protected function _loadEntrepriseVar()
+    public static function _loadEntrepriseVar()
     {
         $core = new core_tools();
         if (file_exists(
@@ -475,42 +474,58 @@ abstract class business_app_tools_Abstract extends Database
         )
         ) {
             $path = $_SESSION['config']['corepath'] . 'custom'
-                  . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
-                  . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR
-                  . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR . 'xml'
-                  . DIRECTORY_SEPARATOR . 'entreprise.xml';
+                . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
+                . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR
+                . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR . 'xml'
+                . DIRECTORY_SEPARATOR . 'entreprise.xml';
         } else {
             $path = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                  . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
-                  . 'entreprise.xml';
+                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
+                . 'entreprise.xml';
         }
         $xmlfile = simplexml_load_file($path);
         $langPath = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                  . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR
-                  . $_SESSION['config']['lang'] . '.php';
-        
+            . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR
+            . $_SESSION['config']['lang'] . '.php';
+
         $_SESSION['mail_natures'] = array();
         $_SESSION['mail_natures_attribute'] = array();
+        $_SESSION['mail_natures_third'] = [];
         $mailNatures = $xmlfile->mail_natures;
-
         if (count($mailNatures) > 0) {
             foreach ($mailNatures->nature as $nature ) {
                 $label = (string) $nature->label;
-                $attribute = (string) $nature->attributes();
+                $attribute = (string) $nature['with_reference'];
+                $attributeThird = (string) $nature['with_third'];
                 if (!empty($label) && defined($label)
                     && constant($label) <> NULL
-                 ) {
+                ) {
                     $label = constant($label);
                 }
                 $_SESSION['mail_natures'][(string) $nature->id] = $label;
                 $_SESSION['mail_natures_attribute'][(string) $nature->id] = $attribute;
+                $_SESSION['mail_natures_third'][(string) $nature->id] = $attributeThird;
             }
             $_SESSION['default_mail_nature'] = (string) $mailNatures->default_nature;
         }
 
-        $_SESSION['attachment_types']             = array();
+        $_SESSION['processing_modes'] = array();
+        $processingModes = $xmlfile->process_modes; 
+        if(count($processingModes) > 0) {
+            foreach ($processingModes->process_mode as $process ) {
+                $label = (string) $process->label;
+                $_SESSION['processing_modes'][(string) $process->label] = $label;
+                $process_mode_priority = (string) $process->process_mode_priority;
+                $_SESSION['process_mode_priority'][(string) $process->label] = $process_mode_priority;
+            }
+
+        }
+
+        $_SESSION['attachment_types'] = array();
         $_SESSION['attachment_types_with_chrono'] = array();
-        $_SESSION['attachment_types_show']        = array();
+        $_SESSION['attachment_types_show'] = array();
+        $_SESSION['attachment_types_with_process'] = array();
+        $_SESSION['attachment_types_with_delay'] = array();
         $attachmentTypes = $xmlfile->attachment_types;
         if (count($attachmentTypes) > 0) {
             foreach ($attachmentTypes->type as $type ) {
@@ -519,23 +534,28 @@ abstract class business_app_tools_Abstract extends Database
                 $get_chrono = (string) $type['get_chrono'];
                 $attach_in_mail = (string) $type['attach_in_mail'];
                 $show_attachment_type = (string) $type['show'];
+                $delay = (string) $type['with_delay'];
+                $process = (string) $type->process_mode;
                 if (!empty($label) && defined($label)
                     && constant($label) <> NULL
-                 ) {
+                ) {
                     $label = constant($label);
                 }
+
                 $array_get_chrono = explode(',', $get_chrono);
-                $_SESSION['attachment_types'][(string) $type->id]                = $label;
-                $_SESSION['attachment_types_with_chrono'][(string) $type->id]    = $with_chrono;
-                $_SESSION['attachment_types_show'][(string) $type->id]           = $show_attachment_type;
-                $_SESSION['attachment_types_get_chrono'][(string) $type->id]     = $array_get_chrono;
+                $_SESSION['attachment_types'][(string) $type->id] = $label;
+                $_SESSION['attachment_types_with_chrono'][(string) $type->id] = $with_chrono;
+                $_SESSION['attachment_types_show'][(string) $type->id] = $show_attachment_type;
+                $_SESSION['attachment_types_get_chrono'][(string) $type->id] = $array_get_chrono;
                 $_SESSION['attachment_types_attach_in_mail'][(string) $type->id] = $attach_in_mail;
+                $_SESSION['attachment_types_with_process'][(string) $type->id] = $process;
+                $_SESSION['attachment_types_with_delay'][(string) $type->id] = $delay;
             }
         }
 
-        $_SESSION['mail_priorities']           = array();
+        $_SESSION['mail_priorities'] = array();
         $_SESSION['mail_priorities_attribute'] = array();
-        $_SESSION['mail_priorities_wdays']     = array();
+        $_SESSION['mail_priorities_wdays'] = array();
         $mailPriorities = $xmlfile->priorities;
         if (count($mailPriorities) > 0) {
             $i = 0;
@@ -543,6 +563,10 @@ abstract class business_app_tools_Abstract extends Database
                 $label = (string) $priority;
                 $attribute = (string) $priority['with_delay'];
                 $workingDays = (string) $priority['working_days'];
+                $color = (string) $priority['color'];
+                if($color == "" || $color == NULL){
+                    $color = '#009DC5';
+                }
                 if (!empty($label) && defined($label)
                     && constant($label) <> NULL
                 ) {
@@ -551,16 +575,12 @@ abstract class business_app_tools_Abstract extends Database
                 $_SESSION['mail_priorities'][$i] = $label;
                 $_SESSION['mail_priorities_attribute'][$i] = $attribute;
                 $_SESSION['mail_priorities_wdays'][$i] = ($workingDays != 'false' ? 'true' : 'false');
+                $_SESSION['mail_priorities_color'][$i] = $color;
                 $i++;
             }
             $_SESSION['default_mail_priority'] = (string) $mailPriorities->default_priority;
+            $_SESSION['default_sve_priority'] = (string) $mailPriorities->default_sve_priority;
         }
-
-        $_SESSION['type_calendar'] = array();
-        var_dump($xmlfile);
-        $type_calendar = $xmlfile->type_calendar;
-        $_SESSION['type_calendar'] = $type_calendar;
-
 
         $contact_check = $xmlfile->contact_check;
         if (count($contact_check) > 0) {
