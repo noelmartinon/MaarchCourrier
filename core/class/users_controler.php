@@ -401,7 +401,7 @@ class users_controler extends ObjectControler implements ObjectControlerIF
             $sec = new security();
             $user->password =  $sec->getPasswordHash($params['userdefaultpassword']);
 
-            if($_SESSION['config']['ldap'] == "true" || isset($_SESSION['web_cas_url'])){
+            if($_SESSION['config']['ldap'] == "true" || isset($_SESSION['web_cas_url']) || isset($_SESSION['web_sso_url'])){
                 $user->change_password = "N";
             }
 

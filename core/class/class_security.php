@@ -252,7 +252,7 @@ class security extends Database
                     );
                 }
 
-                if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url'])) {
+                if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url']) && !isset($_SESSION['web_sso_url'])) {
                     return array(
                         'user'  => $array,
                         'error' => $error,
@@ -484,7 +484,7 @@ class security extends Database
                     $hist->add($_SESSION['tablename']['users'],$_SESSION['user']['UserId'],"LOGIN","IP : ".$ip.", BROWSER : ".$navigateur , $_SESSION['config']['databasetype']);
                 }
 */
-                if($_SESSION['user']['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url'])) {
+                if($_SESSION['user']['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url']) && !isset($_SESSION['web_sso_url'])) {
                     header("location: ".$_SESSION['config']['businessappurl']."index.php?display=true&page=change_pass");
                     exit();
 
