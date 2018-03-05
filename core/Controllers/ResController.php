@@ -887,7 +887,8 @@ class ResController
         }
 
         $clause = implode(" AND ", $tab_where);
-        if (empty($clause)) $clause = ' 1=1 ';
+        if (empty($clause))
+            $clause = ' 1=2 ';
 
         $colSelect = $aArgs['select'];
         $select_elem = explode(",",$colSelect);
@@ -907,6 +908,12 @@ class ResController
                 elseif ($c_elem[0] == "entities")
                     $clause .= " AND res_letterbox.destination=entities.entity_id ";
             }
+        }
+
+        $db = new \Database();
+        $stmt = $db->query('select count(*) from res_view_letterbox ' . $clause, [], true);
+        if (!isset($stmt) || !$stmt) {
+            return $response->withStatus(500)->withJson(['errors' => 'Clause is not valid']);
         }
 
         $securityClause = $_SESSION['user']['security']['letterbox_coll']['DOC']['where'];
