@@ -408,8 +408,8 @@ if ($mode == 'add') {
 
                 //Get data
                 $id = $user_notes[$i]['id']; 
-                $noteShort = $request->cut_string($user_notes[$i]['label'], 50);
-                $note = $user_notes[$i]['label'];
+                $noteShort = functions::xssafe($request->cut_string($user_notes[$i]['label'], 50));
+                $note = functions::xssafe($user_notes[$i]['label']);
                 $userArray = $users_tools->get_user($user_notes[$i]['author']);
                 $date = $request->dateformat($user_notes[$i]['date']);
                 
@@ -779,8 +779,8 @@ if ($mode == 'add') {
 
                         //Get data
                         $id = $user_notes[$i]['id']; 
-                        $noteShort = $request->cut_string($user_notes[$i]['label'], 50);
-                        $note = $user_notes[$i]['label'];
+                        $noteShort = functions::xssafe($request->cut_string($user_notes[$i]['label'], 50));
+                        $note = functions::xssafe($user_notes[$i]['label']);
                         $userArray = $users_tools->get_user($user_notes[$i]['author']);
                         $date = $request->dateformat($user_notes[$i]['date']);
                         
@@ -1142,8 +1142,8 @@ if ($mode == 'add') {
 
                         //Get data
                         $id = $user_notes[$i]['id']; 
-                        $noteShort = $request->cut_string($user_notes[$i]['label'], 50);
-                        $note = $user_notes[$i]['label'];
+                        $noteShort = functions::xssafe($request->cut_string($user_notes[$i]['label'], 50));
+                        $note = functions::xssafe($user_notes[$i]['label']);
                         $userArray = $users_tools->get_user($user_notes[$i]['author']);
                         $date = $request->dateformat($user_notes[$i]['date']);
                         
