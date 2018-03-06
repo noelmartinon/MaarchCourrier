@@ -911,7 +911,7 @@ class ResController
         }
 
         $db = new \Database();
-        $stmt = $db->query('select count(*) from res_view_letterbox ' . $clause, [], true);
+        $stmt = $db->query('select count(*) from res_view_letterbox where ' . $clause, [], true);
         if (!isset($stmt) || !$stmt) {
             return $response->withStatus(500)->withJson(['errors' => 'Clause is not valid']);
         }
