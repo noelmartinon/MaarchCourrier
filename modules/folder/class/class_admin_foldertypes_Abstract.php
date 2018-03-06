@@ -1002,6 +1002,7 @@ abstract class foldertype_Abstract
     */
     public function check_indexes($foldertypeId, $values)
     {
+        $functions = new functions();
         if (empty($foldertypeId)) {
             return false;
         }
@@ -1032,19 +1033,19 @@ abstract class foldertype_Abstract
             } else if ($indexes[$key]['type'] == 'string'  
             	&& ! empty($values[$key])
             ) {
-                $fieldValue = functions::wash(
+                $fieldValue = $functions->wash(
                 	$values[$key], "no", $indexes[$key]['label']
                 );
             } else if ($indexes[$key]['type'] == 'float' 
             	&& ! empty($values[$key]) 
             ) {
-                $fieldValue = functions::wash(
+                $fieldValue = $functions->wash(
                 	$values[$key], "float", $indexes[$key]['label']
                 );
             } else if ($indexes[$key]['type'] == 'integer' 
             	&& ! empty($values[$key]) 
             ) {
-                $fieldValue = functions::wash(
+                $fieldValue = $functions->wash(
                 	$values[$key], "num", $indexes[$key]['label']
                 );
             }
