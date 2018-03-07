@@ -323,15 +323,17 @@ public class MaarchCM {
         return cookie;
     }
 
-    public void createPDF(String docxFile, String directory, boolean isUnix) {
+    public void createPDF(String docxFile, String directory, String os) {
         try {
             System.out.println("mode ! : "+editMode);
             boolean conversion = true;
             String cmd = "";
             if (docxFile.contains(".odt") || docxFile.contains(".ods") || docxFile.contains(".ODT") || docxFile.contains(".ODS")) {
                 logger.log("This is opendocument ! ", Level.INFO);
-                if (isUnix) {
+                if (os == "linux") {
                     cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp+idApplet+"_conv/ --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
+                } else if (os == "mac") {
+                    cmd = "cd /Applications/LibreOffice.app/Contents/MacOs && ./soffice --headless --convert-to pdf:writer_pdf_Export --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
                 } else {
                     String convertProgram;
                     convertProgram = fM.findPathProgramInRegistry("soffice.exe");
@@ -340,8 +342,10 @@ public class MaarchCM {
 
             } else if (docxFile.contains(".doc") || docxFile.contains(".docx") || docxFile.contains(".DOC") || docxFile.contains(".DOCX")) {
                 if (useExeConvert.equals("false")) {
-                    if (isUnix) {
+                    if (os == "linux") {
                         cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp+idApplet+"_conv\\ --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
+                    }  else if (os == "mac") {
+                        cmd = "cd /Applications/LibreOffice.app/Contents/MacOs && ./soffice --headless --convert-to pdf:writer_pdf_Export --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
                     } else if(editMode.equals("libreoffice")){
                         String convertProgram;
                         convertProgram = fM.findPathProgramInRegistry("soffice.exe");
@@ -366,7 +370,7 @@ public class MaarchCM {
                 FileManager fM = new FileManager();
 
                 Process proc_vbs;
-                if (isUnix) {
+                if (os == "linux" || os == "mac") {
                     //cmd = "cscript \""+vbsPath+"\" \""+docxFile+"\" /nologo \r\n";
                     final Writer outBat;
                     outBat = new OutputStreamWriter(new FileOutputStream(appPath_convert), "CP850");
@@ -639,7 +643,7 @@ public class MaarchCM {
             if ("true".equals(convertPdf)) {
                 if ((fileExtension.equalsIgnoreCase("docx") || fileExtension.equalsIgnoreCase("doc") || fileExtension.equalsIgnoreCase("docm") || fileExtension.equalsIgnoreCase("odt") || fileExtension.equalsIgnoreCase("ott"))) {
                     logger.log("----------CONVERSION PDF----------", Level.INFO);
-                    createPDF(userLocalDirTmp + fileToEdit, userLocalDirTmp, isUnix);
+                    createPDF(userLocalDirTmp + fileToEdit, userLocalDirTmp, os);
 
                     String pdfFile = userLocalDirTmp + "thefile_" + idApplet + ".pdf";
 
