@@ -1118,7 +1118,11 @@ abstract class foldertype_Abstract
         $indexes = $this->get_indexes($foldertypeId);
 
         foreach (array_keys($values) as $key) {
-            if ($indexes[$key]['type'] == 'date' && ! empty($values[$key])) {
+            if ($indexes[$key]['type'] == 'date') {
+                if($values[$key] === ''){
+                    $values[$key] = NULL;
+                }
+
                 array_push(
                 	$data, 
                 	array(
@@ -1127,9 +1131,11 @@ abstract class foldertype_Abstract
                 		'type' => "date"
                 	)
                 );
-            } else if ($indexes[$key]['type'] == 'string' 
-            	&& ! empty($values[$key])
-            ) {
+            } else if ($indexes[$key]['type'] == 'string') {
+                if($values[$key] === ''){
+                    $values[$key] = NULL;
+                }
+
                 array_push(
                 	$data, 
                 	array(
@@ -1138,9 +1144,11 @@ abstract class foldertype_Abstract
                 		'type' => "string"
                 	)
                 );
-            } else if ($indexes[$key]['type'] == 'float' 
-            	&& ! empty($values[$key])
-            ) {
+            } else if ($indexes[$key]['type'] == 'float') {
+                if($values[$key] === ''){
+                    $values[$key] = NULL;
+                }
+
                 array_push(
                 	$data, 
                 	array(
@@ -1149,9 +1157,11 @@ abstract class foldertype_Abstract
                 		'type' => "float"
                 	)
                 );
-            } else if ($indexes[$key]['type'] == 'integer' 
-            	&& !empty($values[$key])
-            ) {
+            } else if ($indexes[$key]['type'] == 'integer') {
+                if($values[$key] === ''){
+                    $values[$key] = NULL;
+                }
+
                 array_push(
                 	$data, 
                 	array(

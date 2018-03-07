@@ -222,10 +222,6 @@ if (isset($_POST['delete_folder'])) {
                                         {
                                             $value = $folderArray['index'][$key]['show_value'];
                                         }
-                                        elseif($folderArray['index'][$key]['default_value'])
-                                        {
-                                            $value = $folderArray['index'][$key]['default_value'];
-                                        }
                                         if($folderArray['index'][$key]['type_field'] == 'input')
                                         {
                                             if($folderArray['index'][$key]['type'] == 'date')
