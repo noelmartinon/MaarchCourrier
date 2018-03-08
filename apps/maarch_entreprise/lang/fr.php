@@ -4990,10 +4990,10 @@ if (!defined('_DEPLOY_VERSION')) {
     define('_DEPLOY_VERSION', 'Déployer la version');
 }
 if (!defined('_UPDATE_END')) {
-    define('_UPDATE_END', 'Mise à jour réussi');
+    define('_UPDATE_END', 'Mise à jour réussie');
 }
 if (!defined('_UPDATE_DESC_END')) {
-    define('_UPDATE_DESC_END', 'Mise à jour réussi');
+    define('_UPDATE_DESC_END', 'Mise à jour réussie');
 }
 if (!defined('_NO_AVAILABLE_TAG_TO_UPDATE')) {
     define('_NO_AVAILABLE_TAG_TO_UPDATE', 'Aucune version disponible pour une mise à jour');
