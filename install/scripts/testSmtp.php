@@ -27,7 +27,7 @@
         $MAILER->smtp_host = $host;
         $MAILER->smtp_user = $user;
         $MAILER->smtp_password = $pass;
-        $MAILER->mailfrom = $mailfrom;
+        //$MAILER->mailfrom = $mailfrom;
         $MAILER->domains = $smtpDomains;
         if($auth == 1){
         $MAILER->smtp_auth = "true";
