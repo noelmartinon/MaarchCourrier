@@ -999,7 +999,7 @@ abstract class folder_Abstract extends request
 	{
 		$folders = array();
 		$db = new Database();
-		$stmt = $db->query('SELECT folders_system_id, folder_name, parent_id, folder_level FROM folders WHERE foldertype_id not in (100) AND status NOT IN (\'DEL\') AND parent_id = \''.$parent_id.'\' order by folder_id asc', array());
+		$stmt = $db->query('SELECT folders_system_id, folder_name, parent_id, folder_level FROM folders WHERE foldertype_id not in (100) AND status NOT IN (\'DEL\') AND parent_id = \''.$parent_id.'\' AND (destination IS NULL OR destination = ?) order by folder_id asc', array($_SESSION['user']['primaryentity']['id']));
 		while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
 			$stmt3 = $db->query(
 				"SELECT count(folders_system_id) as total FROM folders WHERE foldertype_id not in (100) AND parent_id IN (".$row['folders_system_id'].")  AND status NOT IN ('DEL')"
