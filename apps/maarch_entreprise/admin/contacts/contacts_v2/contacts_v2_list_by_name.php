@@ -68,24 +68,35 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
     else $l = $nb_step1;
     
     $found = false;
-
     for ($i=0; $i<$l; $i++) {
 
         $res = $stmt->fetchObject();
-
+        $isSociety = false;
         if(!empty($res->society)){
-            $arr_contact_info = array($res->firstname,$res->lastname,'('.$res->society.')');
+            if($res->firstname === '' && $res->lastname === ''){
+                $arr_contact_info = array($res->firstname,$res->lastname,$res->society);
+                $isSociety = true;               
+            } else {
+                $arr_contact_info = array($res->firstname,$res->lastname,'('.$res->society.')');
+                $contact_info = implode(' ', $arr_contact_info);
+            }            
         }else{
             $arr_contact_info = array($res->firstname,$res->lastname);
+            $contact_info = implode(' ', $arr_contact_info);
         }
-        $contact_info = implode(' ', $arr_contact_info);
-
+        
         if ($i%2==1) $color = 'LightYellow';
         else $color = 'white';
 
-        echo "<li id='".$res->contact_id."' style='font-size:12px;background-color:$color;'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
+        if($isSociety){
+            echo "<li id='".$res->contact_id."' style='font-size:12px;background-color:$color;'><i class='fa fa-building fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='structure'></i> "
+                . '<span style="display:table-cell;vertical-align:middle;">'. str_replace($args, $args_bold, $res->society) .'</span>'
+            ."</li>";
+        } else {
+            echo "<li id='".$res->contact_id."' style='font-size:12px;background-color:$color;'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
                 . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
             ."</li>";
+        }        
     }
     /*
     //STEP 2 : search with society(physical contact)
