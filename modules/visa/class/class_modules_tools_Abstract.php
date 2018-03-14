@@ -1174,7 +1174,8 @@ abstract class visa_Abstract extends Database
                             $idNote = $user_notes[$i]['id']; 
                             //$noteShort = $request->cut_string($user_notes[$i]['label'], 50);
                             $noteShort = $request->cut_string(str_replace(array("'", "\r", "\n","\""),array("'", " ", " ", "&quot;"),
-                            $user_notes[$i]['label']), 50);
+							$user_notes[$i]['label']), 50);
+							$noteShort = functions::xssafe($noteShort);
 
                             $note = $user_notes[$i]['label'];
                             $userArray = $users_tools->get_user($user_notes[$i]['author']);
