@@ -119,16 +119,14 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
             $source_imagex = imagesx($source_image);
             $source_imagey = imagesy($source_image);
 
-            $dest_imagex = $_SESSION['modules_loaded']['visa']['width_blocsign'];
-            $dest_imagey = $_SESSION['modules_loaded']['visa']['height_blocsign'];
+            $dest_imagex = $_SESSION['modules_loaded']['visa']['width_blocsign'] + 100;
+            $dest_imagey = $_SESSION['modules_loaded']['visa']['height_blocsign'] + 100;
             $im2 = imagecreatetruecolor($dest_imagex, $dest_imagey);
 
             imagecopyresampled($im2, $source_image, 0, 0, 0, 0, $dest_imagex, $dest_imagey, $source_imagex, $source_imagey);
 
             $im = imagecreatetruecolor(imagesx($im2), imagesy($im2) + 30);
             $white = imagecolorallocate($im, 255, 255, 255);
-            $grey = imagecolorallocate($im, 128, 128, 128);
-            $black = imagecolorallocate($im, 0, 0, 0);
             imagefilledrectangle($im, 0, 0, imagesx($im2), 30, $white);
 
             $stmt = $db->query(
@@ -143,7 +141,9 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
             }
 
             $font = 'modules/visa/LibraSerifModern-Regular.otf';
-            imagettftext($im, 8, 0, 10, 20, $black, $font, $text);
+
+            imagettftext($im, 12, 0, 10, 20, $black, $font, $text);
+
             imagecopy($im, $im2, 0, 30, 0, 0, imagesx($im2), imagesy($im2));
 
             $tmpPathToWantedSignature = $_SESSION['config']['tmppath'].'tmp_file_'.$_SESSION['user']['UserId'].'_'.rand().'.png';
