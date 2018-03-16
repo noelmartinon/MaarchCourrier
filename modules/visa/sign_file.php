@@ -142,7 +142,7 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
 
             $font = 'modules/visa/LibraSerifModern-Regular.otf';
 
-            imagettftext($im, 12, 0, 10, 20, $black, $font, $text);
+            imagettftext($im, 14, 0, 10, 20, $black, $font, $text);
 
             imagecopy($im, $im2, 0, 30, 0, 0, imagesx($im2), imagesy($im2));
 
