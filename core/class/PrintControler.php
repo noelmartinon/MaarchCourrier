@@ -429,7 +429,7 @@ class PrintControler extends PrintFunctions
 				
 				$pdf->SetFont('Arial','',11);
 				
-				$pdf->MultiCell(182,5,utf8_decode($this->unprotect_string($this->array_print[$cpt]['subject'])),1, 'L', false);
+				$pdf->MultiCell(182,5, iconv('UTF-8', 'windows-1252', $this->unprotect_string($this->array_print[$cpt]['subject'])),1, 'L', false);
 				
 				/**********************************************************************/
 				
