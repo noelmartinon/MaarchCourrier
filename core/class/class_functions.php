@@ -304,7 +304,7 @@ class functions
                     }
 
                 case "mail":
-                    if (preg_match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,4}$/",$w_var))
+                    if (preg_match("/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,10}$/",$w_var))
                     {
                         return $w_var;
                     }
