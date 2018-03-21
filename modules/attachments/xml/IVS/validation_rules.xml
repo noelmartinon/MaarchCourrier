@@ -14,7 +14,7 @@
 		<parameter name="cancel" type="string" />
 		<parameter name="chrono" type="string" />
 		<parameter name="contact_attach" type="string" />
-		<parameter name="contactidAttach" type="login" />
+		<parameter name="contactidAttach" type="arrayOfStrings" />
 		<parameter name="editModel" type="string" />
 		<parameter name="edit" type="string" />
 		<parameter name="fromDetail" type="string" />
