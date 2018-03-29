@@ -239,7 +239,7 @@ for($i=0; $i<$totalEntities;$i++)
     {
 
         $stmt = $db->query("SELECT count(res_id) AS total FROM ".$view
-                    ." WHERE destination = ? and status not in ('DEL','BAD') and date(process_limit_date) <= date(now()) and closing_date is null".$where_date." ".$where_status." ".$where_priority . $where_clause,array($entities[$i]['ID']));
+                    ." WHERE destination = ? and status not in ('DEL','BAD','END') and date(process_limit_date) <= date(now()) and closing_date is null".$where_date." ".$where_status." ".$where_priority . $where_clause,array($entities[$i]['ID']));
 
         if( $stmt->rowCount() > 0)
         {
@@ -290,7 +290,7 @@ if($report_type == 'graph')
 
     $src1 = $_SESSION['config']['businessappurl']."index.php?display=true&module=reports&page=graphs&type=histo&largeur=$largeur&hauteur=600&marge_bas=300&title=".$title;
 
-    $_SESSION['GRAPH']['VALUES']='';
+    $_SESSION['GRAPH']['VALUES']=[];
     for($i=0;$i<count($vol);$i++)
     {
         $_SESSION['GRAPH']['VALUES'][$i]=$vol[$i];
