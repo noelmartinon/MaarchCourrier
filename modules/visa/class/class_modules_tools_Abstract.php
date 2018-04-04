@@ -1205,9 +1205,9 @@ abstract class visa_Abstract extends Database
 	public function isAllAttachementSigned($res_id){
 		
 		$db = new Database();
-		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments WHERE in_signature_book = true AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
+		$stmt2 = $db->query("SELECT count(1) as nb from res_view_attachments WHERE in_signature_book = true AND signatory_user_serial_id IS NULL AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
 		$res2 = $stmt2->fetchObject();
-		$stmt3 = $db->query("SELECT count(res_id) as nb from res_view_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
+		$stmt3 = $db->query("SELECT count(1) as nb from res_view_attachments WHERE in_signature_book = true AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder','signed_response') AND res_id_master = ?", array($res_id));
 		$res3 = $stmt3->fetchObject();
 		if ($res3->nb == 0) {
 			return 'noAttachment';
@@ -1222,7 +1222,7 @@ abstract class visa_Abstract extends Database
 		$db = new Database();
 		$stmt = $db->query("SELECT count(listinstance_id) as nb from listinstance l where l.res_id=? AND l.item_id=? AND l.difflist_type='VISA_CIRCUIT' AND l.requested_signature='true'", array($res_id,$user_id));
 		$res = $stmt->fetchObject();
-		$stmt2 = $db->query("SELECT count(res_id) as nb from res_attachments r where r.res_id_master=? AND r.signatory_user_serial_id = (select id from users where user_id = ?) AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder')", array($res_id,$user_id));
+		$stmt2 = $db->query("SELECT count(1) as nb from res_view_attachments r where r.res_id_master=? AND r.signatory_user_serial_id = (select id from users where user_id = ?) AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN ('converted_pdf','print_folder')", array($res_id,$user_id));
 		$res2 = $stmt2->fetchObject();
 		
 		if ($res->nb > 0 && $res2->nb == 0) {
