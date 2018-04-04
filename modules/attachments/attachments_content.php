@@ -1206,8 +1206,7 @@ if (isset($_REQUEST['id'])) {
             'adr_x',
             false
         );
-
-        $_SESSION['upfile'][0]['fileNameOnTmp'] = str_replace($viewResourceArr->tmp_path.DIRECTORY_SEPARATOR, '', $viewResourceArr->file_path);
+        $_SESSION['upfile'][0]['fileNameOnTmp'] = str_replace($viewResourceArr['tmp_path'].DIRECTORY_SEPARATOR, '', $viewResourceArr['file_path']);
     }
 } else {
     //INITIALIZE ADD MODE
@@ -1439,7 +1438,11 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     if ($mode == 'edit' && ($infoAttach->status != 'TMP' || ($infoAttach->status == 'TMP' && $infoAttach->relation > 1))) {
         $content .= '<p>';
         $content .= '<label>'._CREATE_NEW_ATTACHMENT_VERSION.'</label>';
-        $content .= '<input type="radio" name="new_version" id="new_version_yes" value="yes" onclick="$j(\'#edit\').css(\'visibility\',\'hidden\');$j(\'#editModel\').css(\'display\',\'inline-block\');"/>'._YES;
+        $content .= '<input type="radio" name="new_version" id="new_version_yes" value="yes" onclick="';
+        if (!in_array($infoAttach->format, ['pdf', 'jpg', 'jpeg', 'png'])) {
+            $content .= '$j(\'#edit\').css(\'visibility\',\'hidden\');';
+        }
+        $content .= '$j(\'#editModel\').css(\'display\',\'inline-block\');"/>'._YES;
         $content .= '&nbsp;&nbsp;';
         $content .= '<input type="radio" name="new_version" id="new_version_no" checked value="no" onclick="$j(\'#edit\').css(\'visibility\',\'visible\');"/>'._NO;
         $content .= '</p>';
