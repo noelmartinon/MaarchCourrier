@@ -69,11 +69,10 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
     
     $found = false;
     for ($i=0; $i<$l; $i++) {
-
         $res = $stmt->fetchObject();
         $isSociety = false;
         if(!empty($res->society)){
-            if($res->firstname === '' && $res->lastname === ''){
+            if($res->firstname == null && $res->lastname == null){
                 $arr_contact_info = array($res->firstname,$res->lastname,$res->society);
                 $isSociety = true;               
             } else {
@@ -96,7 +95,7 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
             echo "<li id='".$res->contact_id."' style='font-size:12px;background-color:$color;'><i class='fa fa-user fa-1x' style='padding:5px;display:table-cell;vertical-align:middle;' title='personne physique'></i> "
                 . '<span style="display:table-cell;vertical-align:middle;">' . str_replace($args, $args_bold, $contact_info) . '</span>'
             ."</li>";
-        }        
+        }
     }
     /*
     //STEP 2 : search with society(physical contact)
