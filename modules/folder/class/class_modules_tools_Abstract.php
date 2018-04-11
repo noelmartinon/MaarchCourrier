@@ -425,7 +425,7 @@ abstract class folder_Abstract extends request
 				if($iframe == true){
 					header(
 					"location: " . $_SESSION['config']['businessappurl']
-				    . "index.php?page=create_folder_form_iframe&module=folder&display=false"
+				    . "index.php?page=create_folder_form_iframe&module=folder&display=false&show_iframe=false"
 					);
 				}else{
 					unset($_SESSION['m_admin']);
