@@ -105,37 +105,42 @@ if (!empty($_REQUEST['fileplan_id'])) {
 				'nom_fileplan' => $row['position_label']
 				);
 		}
-		foreach ($categories AS $noeud)
-		{
-			$tmp = explode('@@', $_REQUEST['res_id']);
+		if(!empty($categories)){
+			foreach ($categories AS $noeud)
+			{
+				$tmp = explode('@@', $_REQUEST['res_id']);
 
-			if($multi_doc==false){
-				$stmt2 = $db->query(
-					"select fileplan_id, position_id from fp_res_fileplan_positions where"
-					." res_id = ? and position_id = ?"
-					,array($tmp[1],$noeud['fileplan_id']));
-				$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
+				if($multi_doc==false){
+					$stmt2 = $db->query(
+						"select fileplan_id, position_id from fp_res_fileplan_positions where"
+						." res_id = ? and position_id = ?"
+						,array($tmp[1],$noeud['fileplan_id']));
+					$row2 = $stmt2->fetch(PDO::FETCH_ASSOC);
 
-				if(!$row2){
-					$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
-						."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-						. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					if(!$row2){
+						$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
+							."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
+							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					}else{
+						$_SESSION['origin_positions'][]=$noeud['fileplan_id'];
+						$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' checked='checked' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
+							."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
+							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					}
+
 				}else{
-					$_SESSION['origin_positions'][]=$noeud['fileplan_id'];
-					$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' checked='checked' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
-						."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-						. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
+							."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
+							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
 				}
 
-			}else{
-				$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
-						."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-						. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+
+				$html .= "</li>\n";
 			}
-
-
-			$html .= "</li>\n";
+		} else {
+			$html .= _NO_RESULTS;
 		}
+		
 		$html .= "</ul>\n";
 		$html.="</form>";
 	}else{
