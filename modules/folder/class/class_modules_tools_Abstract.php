@@ -324,7 +324,7 @@ abstract class folder_Abstract extends request
 				}
 			exit();
 		} else if(preg_match('/\'|\"/',$_SESSION['m_admin']['folder']['folder_id'])) 
-{ 
+		{
 			$_SESSION['error'] = _CHAR_ERROR . "<br />";
 				if($iframe == true){
 					header(
@@ -425,7 +425,7 @@ abstract class folder_Abstract extends request
 				if($iframe == true){
 					header(
 					"location: " . $_SESSION['config']['businessappurl']
-				    . "index.php?page=create_folder_form_iframe&module=folder&display=false"
+				    . "index.php?page=create_folder_form_iframe&module=folder&display=false&show_iframe=false"
 					);
 				}else{
 					unset($_SESSION['m_admin']);

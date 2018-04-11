@@ -152,7 +152,7 @@ $init = false;
                 </p>
             </div>
             <p class="buttons" style="text-align:center;">
-                <input type="submit" name="validate" id="validate" value="<?php echo _VALIDATE; ?>" class="button"/>
+                <input type="submit" name="validate" id="validate" value="<?php echo _VALIDATE; ?>" class="button" />
                 <input type="button" name="cancel" id="cancel" value="<?php echo _CANCEL; ?>"
                        class="button" onclick="new Effect.BlindUp(parent.document.getElementById('show_tab'));return false;" />
             </p>
@@ -169,6 +169,16 @@ $init = false;
                 get_folder_index('<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=true' . '&module=folder&page=create_folder_get_folder_index'; ?>'
                     , ft_list.options[ft_list.options.selectedIndex].value, 'folder_indexes');
             }
+            
+            
         </script>
-    <?php } ?>
+    <?php }
+    if(!empty($_GET['show_iframe']) && $_GET['show_iframe']=='false'){
+    ?>
+        <script>
+            new Effect.BlindUp(parent.document.getElementById('show_tab'));
+        </script>
+    <?php
+    }
+    ?>
 </div>
