@@ -54,6 +54,7 @@
 	</validationRule>
 	<validationRule name="fileplan_list_autocompletion" extends="standardForm" mode="error"/>
 	<validationRule name="positions_tree_childs" extends="standardForm" mode="error">
+		<parameter name="origin" type="string" />
 		<parameter name="branch" type="string" />
 		<parameter name="branch_id" type="identifierAt" />
 		<parameter name="fileplan_id" type="integer" />
