@@ -90,18 +90,28 @@ if (!empty($res_id)) {
 
     if (isset($datasources['contact'][0]['title']) && $datasources['contact'][0]['title'] == '') {
         $datasources['contact'][0]['title'] = $datasources['contact'][0]['contact_title'];
+    } else {
+        $datasources['contact'][0]['contact_title'] = $datasources['contact'][0]['title'];
     }
     if (isset($datasources['contact'][0]['firstname']) && $datasources['contact'][0]['firstname'] == '') {
         $datasources['contact'][0]['firstname'] = $datasources['contact'][0]['contact_firstname'];
+    } else {
+        $datasources['contact'][0]['contact_firstname'] = $datasources['contact'][0]['firstname'];
     }
     if (isset($datasources['contact'][0]['lastname']) && $datasources['contact'][0]['lastname'] == '') {
         $datasources['contact'][0]['lastname'] = $datasources['contact'][0]['contact_lastname'];
+    } else {
+        $datasources['contact'][0]['contact_lastname'] = $datasources['contact'][0]['lastname'];
     }
     if (isset($datasources['contact'][0]['function']) && $datasources['contact'][0]['function'] == '') {
         $datasources['contact'][0]['function'] = $datasources['contact'][0]['contact_function'];
+    } else {
+        $datasources['contact'][0]['contact_function'] = $datasources['contact'][0]['function'];
     }
     if (isset($datasources['contact'][0]['other_data']) && $datasources['contact'][0]['other_data'] == '') {
         $datasources['contact'][0]['other_data'] = $datasources['contact'][0]['contact_other_data'];
+    } else {
+        $datasources['contact'][0]['contact_other_data'] = $datasources['contact'][0]['other_data'];
     }
 
     // Notes
@@ -201,22 +211,78 @@ if (!empty($res_id)) {
         if (isset($_SESSION['attachmentInfo']['attachNum']) && $_SESSION['transmissionContacts'][$_SESSION['attachmentInfo']['attachNum']]) {
             $curNb = $_SESSION['attachmentInfo']['attachNum'];
             foreach ($_SESSION['transmissionContacts'][$curNb] as $key => $value) {
-                if ($key == 'title') {
+                if ($key == 'title' || $key == 'contact_title') {
                     $datasources['transmissions'][0]['currentContact_'.$key] = $contacts->get_civility_contact($value);
                 } else {
                     $datasources['transmissions'][0]['currentContact_'.$key] = $value;
                 }
+            }
+
+            if (isset($datasources['transmissions'][0]['currentContact_title']) && $datasources['transmissions'][0]['currentContact_title'] == '') {
+                $datasources['transmissions'][0]['currentContact_title'] = $datasources['transmissions'][0]['currentContact_contact_title'];
+            } else {
+                $datasources['transmissions'][0]['currentContact_contact_title'] = $datasources['transmissions'][0]['currentContact_title'];
+            }
+            if (isset($datasources['transmissions'][0]['currentContact_firstname']) && $datasources['transmissions'][0]['currentContact_firstname'] == '') {
+                $datasources['transmissions'][0]['currentContact_firstname'] = $datasources['transmissions'][0]['currentContact_contact_firstname'];
+            } else {
+                $datasources['transmissions'][0]['currentContact_contact_firstname'] = $datasources['transmissions'][0]['currentContact_firstname'];
+            }
+            if (isset($datasources['transmissions'][0]['currentContact_lastname']) && $datasources['transmissions'][0]['currentContact_lastname'] == '') {
+                $datasources['transmissions'][0]['currentContact_lastname'] = $datasources['transmissions'][0]['currentContact_contact_lastname'];
+            } else {
+                $datasources['transmissions'][0]['currentContact_contact_lastname'] = $datasources['transmissions'][0]['currentContact_lastname'];
+            }
+            if (isset($datasources['transmissions'][0]['currentContact_function']) && $datasources['transmissions'][0]['currentContact_function'] == '') {
+                $datasources['transmissions'][0]['currentContact_function'] = $datasources['transmissions'][0]['currentContact_contact_function'];
+            } else {
+                $datasources['transmissions'][0]['currentContact_contact_function'] = $datasources['transmissions'][0]['currentContact_function'];
+            }
+            if (isset($datasources['transmissions'][0]['currentContact_other_data']) && $datasources['transmissions'][0]['currentContact_other_data'] == '') {
+                $datasources['transmissions'][0]['currentContact_other_data'] = $datasources['transmissions'][0]['currentContact_contact_other_data'];
+            } else {
+                $datasources['transmissions'][0]['currentContact_contact_other_data'] = $datasources['transmissions'][0]['currentContact_other_data'];
             }
         }
 
         $nb = 1;
         foreach ($_SESSION['transmissionContacts'] as $it => $transmission) {
             foreach ($transmission as $key => $value) {
-                if ($key == 'title') {
+                if ($key == 'title' || $key == 'contact_title') {
                     $datasources['transmissions'][0][$key.$nb] = $contacts->get_civility_contact($value);
                 } else {
                     $datasources['transmissions'][0][$key.$nb] = $value;
                 }
+            }
+            ++$nb;
+        }
+
+        $nb = 1;
+        foreach ($_SESSION['transmissionContacts'] as $it => $transmission) {
+            if (isset($datasources['transmissions'][0]['title'.$nb]) && $datasources['transmissions'][0]['title'.$nb] == '') {
+                $datasources['transmissions'][0]['title'.$nb] = $datasources['transmissions'][0]['contact_title'.$nb];
+            } else {
+                $datasources['transmissions'][0]['contact_title'.$nb] = $datasources['transmissions'][0]['title'.$nb];
+            }
+            if (isset($datasources['transmissions'][0]['firstname'.$nb]) && $datasources['transmissions'][0]['firstname'.$nb] == '') {
+                $datasources['transmissions'][0]['firstname'.$nb] = $datasources['transmissions'][0]['contact_firstname'.$nb];
+            } else {
+                $datasources['transmissions'][0]['contact_firstname'.$nb] = $datasources['transmissions'][0]['firstname'.$nb];
+            }
+            if (isset($datasources['transmissions'][0]['lastname'.$nb]) && $datasources['transmissions'][0]['lastname'.$nb] == '') {
+                $datasources['transmissions'][0]['lastname'.$nb] = $datasources['transmissions'][0]['contact_lastname'.$nb];
+            } else {
+                $datasources['transmissions'][0]['contact_lastname'.$nb] = $datasources['transmissions'][0]['lastname'.$nb];
+            }
+            if (isset($datasources['transmissions'][0]['function'.$nb]) && $datasources['transmissions'][0]['function'.$nb] == '') {
+                $datasources['transmissions'][0]['function'.$nb] = $datasources['transmissions'][0]['contact_function'.$nb];
+            } else {
+                $datasources['transmissions'][0]['contact_function'.$nb] = $datasources['transmissions'][0]['function'.$nb];
+            }
+            if (isset($datasources['transmissions'][0]['other_data'.$nb]) && $datasources['transmissions'][0]['other_data'.$nb] == '') {
+                $datasources['transmissions'][0]['other_data'.$nb] = $datasources['transmissions'][0]['contact_other_data'.$nb];
+            } else {
+                $datasources['transmissions'][0]['contact_other_data'.$nb] = $datasources['transmissions'][0]['other_data'.$nb];
             }
             ++$nb;
         }

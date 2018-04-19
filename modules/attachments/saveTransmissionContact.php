@@ -4,14 +4,15 @@
 * See LICENCE.txt file at the root folder for more details.
 * This file is part of Maarch software.
 
+*
 * @brief   saveTransmissionContact
+*
 * @author  dev <dev@maarch.org>
 * @ingroup attachment
 */
 unset($_SESSION['transmissionContacts']);
 
 if (isset($_POST['transmissionContactidAttach']) && !empty($_POST['transmissionContactidAttach'])) {
- 
     $db = new Database();
 
     foreach ($_POST['transmissionContactidAttach'] as $key => $contactId) {
@@ -29,10 +30,5 @@ if (isset($_POST['transmissionContactidAttach']) && !empty($_POST['transmissionC
         foreach ($contact as $column => $value) {
             $_SESSION['transmissionContacts'][$_POST['transmissionAddressidAttach'][$key]['index']][$column] = $value;
         }
-        if (is_numeric($_POST['transmissionContactidAttach'][$key])) {
-            $_SESSION['transmissionContacts'][$_POST['transmissionAddressidAttach'][$key]['index']]['firstname'] = $contact->contact_firstname == '' ? $contact->firstname : $contact->contact_firstname;
-            $_SESSION['transmissionContacts'][$_POST['transmissionAddressidAttach'][$key]['index']]['lastname']  = $contact->contact_lastname == '' ? $contact->lastname : $contact->contact_lastname;
-            $_SESSION['transmissionContacts'][$_POST['transmissionAddressidAttach'][$key]['index']]['title']     = $contact->contact_title == '' ? $contact->title : $contact->contact_title;
-        }
-    }      
+    }
 }
