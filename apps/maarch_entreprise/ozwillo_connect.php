@@ -29,8 +29,8 @@ if (empty($user)) {
     $firstname = empty($profile->given_name) ? 'utilisateur' : $profile->given_name;
     $lastname = empty($profile->family_name) ? 'utilisateur' : $profile->family_name;
     \Core\Models\UserModel::create(['user' => ['userId' => $idToken->sub, 'firstname' => $firstname, 'lastname' => $lastname, 'changePassword' => 'N']]);
-    \Core\Models\UserModel::addGroup(['userId' => $idToken->sub, 'groupId' => 'AGENT']);
-    \Core\Models\UserModel::addEntity(['userId' => $idToken->sub, 'entityId' => 'VILLE', 'primaryEntity' => 'Y']);
+    \Core\Models\UserModel::addGroup(['userId' => $idToken->sub, 'groupId' => $ozwilloConfig['groupId']]);
+    \Core\Models\UserModel::addEntity(['userId' => $idToken->sub, 'entityId' => $ozwilloConfig['entityId'], 'primaryEntity' => 'Y']);
 }
 
 $_SESSION['ozwillo']['userId'] = $idToken->sub;

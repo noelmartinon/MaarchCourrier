@@ -150,6 +150,8 @@ class CoreConfigModel
                 $ozwilloConfig['uri']                   = (string)$loadedXml->URI;
                 $ozwilloConfig['clientId']              = (string)$loadedXml->CLIENT_ID;
                 $ozwilloConfig['clientSecret']          = (string)$loadedXml->CLIENT_SECRET;
+                $ozwilloConfig['groupId']               = (string)$loadedXml->GROUP_ID;
+                $ozwilloConfig['entityId']              = (string)$loadedXml->ENTITY_ID;
             }
         }
 
