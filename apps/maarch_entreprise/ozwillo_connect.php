@@ -26,6 +26,12 @@ $profile = $oidc->requestUserInfo();
 $user = \Core\Models\UserModel::getById(['userId' => $idToken->sub]);
 
 if (empty($user)) {
+    if (empty($ozwilloConfig['groupId'])) {
+        $ozwilloConfig['groupId'] = 'AGENT';
+    }
+    if (empty($ozwilloConfig['entityId'])) {
+        $ozwilloConfig['entityId'] = 'VILLE';
+    }
     $firstname = empty($profile->given_name) ? 'utilisateur' : $profile->given_name;
     $lastname = empty($profile->family_name) ? 'utilisateur' : $profile->family_name;
     \Core\Models\UserModel::create(['user' => ['userId' => $idToken->sub, 'firstname' => $firstname, 'lastname' => $lastname, 'changePassword' => 'N']]);
