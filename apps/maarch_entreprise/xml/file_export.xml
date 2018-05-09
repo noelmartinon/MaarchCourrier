@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROOT>
+    <DESTINATION>
+        <path>/var/share/export/</path> <!-- path of the destination folder for the exported doc-->
+    </DESTINATION>
+    <NAME>
+        <ELEMENT>   <!-- 'column' for database data || 'text' for brut text || 'date' with year/month/day/full_date as value -->
+            <type>column</type>
+            <value>res_id</value>
+            <filter/>
+        </ELEMENT>
+        <ELEMENT>   <!-- 'column' for database data || 'text' for brut text || 'date' with year/month/day/full_date as filter -->
+            <type>column</type>
+            <value>date</value>
+            <filter>year</filter>   <!-- year, month, day or full_date-->
+        </ELEMENT>
+        <ELEMENT>   <!-- 'column' for database data || 'text' for brut text || 'date' with year/month/day/full_date as value -->
+            <type>text</type>
+            <value>F</value>
+            <filter/>               
+        </ELEMENT>
+    </NAME>
+    <EXTENSION>
+        <ELEMENT>
+            <type>column</type>
+            <value>format</value>
+            <filter/>
+        </ELEMENT>
+    </EXTENSION>
+    <SEPARATOR>             <!-- Separator, used to separate all the elements between them -->
+        <value/>
+    </SEPARATOR>
+    <STATUS>
+        <IN>DOC_TO_EXP</IN>  <!-- status before the use of the export action  | could be empty or multiple values with ',' -->
+        <OUT_ID>506</OUT_ID>    <!-- ID of the exported status in maarch. By default, don't touch it -->
+    </STATUS>
+    <ATTACHMENTS>
+        <TYPES>simple_attachment, outgoing_mail_signed</TYPES>     <!-- Specify the attachment type to export the file's attachment | separate with ','. If empty all the attachments will be export -->
+        <SUFFIX>_PJ</SUFFIX> <!-- Used to suffix the name of the exported document | Better used a '_' before the extension | this suffix will be suffix by the number of the attachment-->
+    </ATTACHMENTS>
+</ROOT>
+
+

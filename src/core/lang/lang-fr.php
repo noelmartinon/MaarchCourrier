@@ -355,3 +355,4 @@ define('_MAIL_TYPOLOGY_REPORT', 'Volume de courriers par typologie');
 define('_MAIL_TYPOLOGY_REPORT_DESC', 'Permet d\'afficher le nombre de courriers enregistrés par type de document.');
 define('_MAIL_VOL_BY_CAT_REPORT', 'Volume de courriers par catégorie');
 define('_MAIL_VOL_BY_CAT_REPORT_DESC', 'Permet d\'afficher le nombre de courriers enregistrés par catégorie (arrivé, départ, etc.).');
+define('_EXPORT_DOC', 'Export de document(s)');

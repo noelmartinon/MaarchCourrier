@@ -5244,3 +5244,19 @@ if (!defined('_IMG_ALREADY_UPLOADED')) {
 if (!defined('_FILE_FORMAT_NOT_ALLOWED')) {
     define('_FILE_FORMAT_NOT_ALLOWED', "Format d'image non autorisé");
 }
+
+/***** Document export *****/
+
+if (!defined("_EXPORT_DOC")) define("_EXPORT_DOC", "Export de document(s)");
+
+if (!defined("_TMP_FILE_ERROR")) define("_TMP_FILE_ERROR", "Le fichier temporaire n'existe pas");
+if (!defined("_ERROR_WHILE_RETRIEVING_FILE")) define ("_ERROR_WHILE_RETRIEVING_FILE", "Erreur lors de la récupération des informations du docserver");
+if (!defined("_ERROR_WHILE_RETRIEVING_ATTACHMENT_FILE")) define ("_ERROR_WHILE_RETRIEVING_ATTACHMENT_FILE", "Erreur lors de la récupération des informations de la pièce jointe sur le docserver");
+
+if (!defined("_COPY_ERROR")) define("_COPY_ERROR", "Erreur lors de la copie du fichier dans le repertoire de destination");
+if (!defined("_ATTACHMENT_COPY_ERROR")) define("_ATTACHMENT_COPY_ERROR", "Erreur lors de la copie de la pièce jointe dans le repertoire de destination");
+if (!defined("_STATUS_ERROR")) define("_STATUS_ERROR", "Le statut ne correspond pas à celui paramétré dans l'application");
+if (!defined("_PATH_ERROR")) define ("_PATH_ERROR", "Le dossier de destination n'est pas accessible");
+
+if (!defined("_N°")) define ("_N°", "n°");
+if(!defined ("_WITH_SUCCESS")) define("_WITH_SUCCESS", "effectué avec succès");

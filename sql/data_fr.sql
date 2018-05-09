@@ -911,6 +911,10 @@ DELETE FROM baskets WHERE basket_id = 'NumericBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'NumericBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'NumericBasket';
 INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, is_folder_basket, enabled, basket_order) VALUES ('NumericBasket', 'Plis numériques à qualifier', 'Plis numériques à qualifier', 'status = ''NUMQUAL''', 'letterbox_coll', 'Y', 'N', 'Y',220);
+DELETE FROM baskets WHERE basket_id = 'ExportBasket';
+DELETE FROM actions_groupbaskets WHERE basket_id = 'ExportBasket';
+DELETE FROM groupbasket_redirect WHERE basket_id = 'ExportBasket';
+INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, is_folder_basket, enabled, basket_order) VALUES ('ExportBasket', 'Documents à exporter', 'Banette des documents à exporter', 'status=''DOC_TO_EXP''', 'letterbox_coll', 'Y', 'N', 'Y',230);
 
 -- Create GROUPBASKET
 TRUNCATE TABLE groupbasket;
@@ -968,7 +972,8 @@ DELETE FROM groupbasket WHERE basket_id = 'ReconcilBasket';
 INSERT INTO groupbasket (group_id, basket_id, result_page) VALUES ('COURRIER', 'ReconcilBasket', 'list_with_attachments');
 DELETE FROM groupbasket WHERE basket_id = 'NumericBasket';
 INSERT INTO groupbasket (group_id, basket_id, result_page) VALUES ('COURRIER', 'NumericBasket', 'list_with_attachments');
-
+DELETE FROM groupbasket WHERE basket_id = 'ExportBasket';
+INSERT INTO groupbasket (group_id, basket_id, result_page) VALUES ('AGENT', 'ExportBasket', 'list_with_attachments');
 
 -- Create Security
 TRUNCATE TABLE security;
@@ -1124,6 +1129,8 @@ INSERT INTO status (id, label_status, is_system, is_folder_status, img_filename,
 INSERT INTO status (id, label_status, is_system, is_folder_status, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('NO_RETRN', 'Pas de retour', 'Y', 'N', '', 'apps', 'N', 'N');
 INSERT INTO status (id, label_status, is_system, is_folder_status, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('PJQUAL', 'PJ à réconcilier', 'Y', 'N', 'fm-letter-status-attr', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, is_folder_status, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('NUMQUAL', 'Plis à qualifier', 'Y', 'N', 'fm-letter-status-attr', 'apps', 'Y', 'Y');
+INSERT INTO status (id, label_status, is_system, is_folder_status, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('DOC_TO_EXP', 'Document à exporter', 'N', 'N', 'fm-letter-status-aenv', 'apps', 'Y', 'Y');
+INSERT INTO status (id, label_status, is_system, is_folder_status, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('EXP_DOC', 'Document exporté', 'N', 'N', 'fm-letter-status-validated', 'apps', 'Y', 'Y');
 ------------
 --STATUS IMAGES-
 ------------
@@ -1216,6 +1223,8 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, is_folder_
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, is_folder_action, enabled, action_page, history, origin, create_id, category_id) VALUES (503, '', 'Supprimer courrier', 'DEL', 'N', 'N', 'Y', 'purge_letter', 'Y', 'apps', 'N', NULL);
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, is_folder_action, enabled, action_page, history, origin, create_id, category_id) VALUES (504, '', 'Remise à zero du courrier', 'END', 'N', 'N', 'Y', 'reset_letter', 'Y', 'apps', 'N', NULL);
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, is_folder_action, enabled, action_page, history, origin, create_id, category_id) VALUES (505, 'indexing', 'Réconcilier une réponse à un courrier', 'DEL', 'N', 'N', 'Y', 'validate_mail', 'Y', 'apps', 'N', NULL);
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, is_folder_action, enabled, action_page, history, origin, create_id, category_id) VALUES (peinture ?
+, '', 'Exporter le(s) document(s)', 'EXP_DOC', 'N', 'N', 'Y', 'export_file', 'Y', 'apps', 'N', NULL);
 Select setval('actions_id_seq', (select max(id)+1 from actions), false);
 ------------
 -- BANNETTES SECONDAIRES
@@ -1259,6 +1268,8 @@ INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, 
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'AGENT', 'EenvBasket', 'Y', 'Y', 'Y');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (20, '', 'AGENT', 'EenvBasket', 'Y', 'N', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'AGENT', 'SuiviParafBasket', 'Y', 'Y', 'Y');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (506, '', 'AGENT', 'ExportBasket', 'Y', 'N', 'N');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'AGENT', 'ExportBasket', 'N', 'Y', 'Y');
 
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (19, '', 'RESPONSABLE', 'MyBasket', '', 'Y', 'Y');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (1, '', 'RESPONSABLE', 'MyBasket', 'N', 'Y', 'N');
