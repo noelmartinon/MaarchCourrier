@@ -24,6 +24,7 @@ return array(
     'Parameter\\' => array($baseDir . '/src/app/parameter'),
     'Notification\\' => array($baseDir . '/src/app/notification'),
     'Note\\' => array($baseDir . '/src/app/note'),
+    'Maarch\\' => array($baseDir . '/rest/Maarch'),
     'Link\\' => array($baseDir . '/src/app/link'),
     'Interop\\Container\\' => array($vendorDir . '/container-interop/container-interop/src/Interop/Container'),
     'Http\\Promise\\' => array($vendorDir . '/php-http/promise/src'),

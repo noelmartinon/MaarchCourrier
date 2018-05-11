@@ -54,6 +54,10 @@ class ComposerStaticInit3cf41326f2ce1ccc88c4676c4e39ea47
             'Notification\\' => 13,
             'Note\\' => 5,
         ),
+        'M' => 
+        array (
+            'Maarch\\' => 7,
+        ),
         'L' => 
         array (
             'Link\\' => 5,
@@ -181,6 +185,10 @@ class ComposerStaticInit3cf41326f2ce1ccc88c4676c4e39ea47
         'Note\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/app/note',
+        ),
+        'Maarch\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/rest/Maarch',
         ),
         'Link\\' => 
         array (

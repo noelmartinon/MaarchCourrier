@@ -26,7 +26,9 @@
 
             "Core\\"          : "core/",
             "Convert\\"       : "modules/convert/",
-            "Sendmail\\"      : "modules/sendmail/"
+            "Sendmail\\"      : "modules/sendmail/",
+          
+            "Maarch\\"        : "rest/Maarch/"
     	}
     },
     "require": {
