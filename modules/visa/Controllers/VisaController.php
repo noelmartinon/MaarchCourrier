@@ -99,6 +99,7 @@ class VisaController
         $datas['listinstance']  = ListInstanceModel::getCurrentStepByResId(['resId' => $resId]);
         $datas['canSign']       = ServiceModel::hasService(['id' => 'sign_document', 'userId' => $GLOBALS['userId'], 'location' => 'visa', 'type' => 'use']);
         $datas['lang']          = LangModel::getSignatureBookLang();
+        $datas['isCurrentWorkflowUser'] = $datas['listinstance']['item_id'] == $GLOBALS['userId'];
 
         return $response->withJson($datas);
     }

@@ -506,7 +506,7 @@ export class SignatureBookComponent implements OnInit {
 
     validForm() {
         if ($j("#signatureBookActions option:selected")[0].value != "") {
-            if (this.signatureBook['listinstance']['requested_signature'] == true) {
+            if (this.signatureBook['listinstance']['requested_signature'] == true && this.signatureBook['isCurrentWorkflowUser'] == true) {
                 this.http.get(this.coreUrl + 'rest/listinstance/' + this.signatureBook['listinstance']['listinstance_id'])
                     .subscribe((data: any) => {
                         var r = true;
