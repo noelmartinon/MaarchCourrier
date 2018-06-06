@@ -85,6 +85,7 @@ class VisaController
         $datas['listinstance']  = ListinstanceModel::getCurrentStepByResId(['resId' => $resId]);
         $datas['canSign']       = $coreTools->test_service('sign_document', 'visa', false);
         $datas['lang']          = LangModel::getSignatureBookLang();
+        $datas['isCurrentWorkflowUser'] = $datas['listinstance']['item_id'] == $_SESSION['user']['UserId'];
 
 
         return $response->withJson($datas);
