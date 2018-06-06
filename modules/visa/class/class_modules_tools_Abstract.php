@@ -1222,6 +1222,9 @@ abstract class visa_Abstract extends Database
 	}
 	public function currentUserSignRequired($res_id){
 		$user_id = $this->getCurrentUserStep($res_id);
+		if ($_SESSION['user']['UserId'] != $user_id) {
+		    return 'false';
+		}
 		$db = new Database();
 		$stmt = $db->query("SELECT count(listinstance_id) as nb from listinstance l where l.res_id=? AND l.item_id=? AND l.difflist_type='VISA_CIRCUIT' AND l.requested_signature='true'", array($res_id,$user_id));
 		$res = $stmt->fetchObject();
