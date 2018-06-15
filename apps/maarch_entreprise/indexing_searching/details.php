@@ -945,7 +945,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                     {
                                         //$detailsExport .= "<img alt='".$indexes[$key]['label']."' title='".$indexes[$key]['label']."' src='".$indexes[$key]['img']."'  />";
                                         ?>
-                                        <i class="fa fa-<?php functions::xecho($indexes[$key]['img']);?> fa-2x" title="<?php functions::xecho($indexes[$key]['label']);?>" ></i>
+                                        <i class="fa fa-<?php functions::xecho($indexes[$key]['img']);?> fa-2x" title="<?php echo $indexes[$key]['label'];?>" ></i>
                                         <?php
                                     }
                                     $detailsExport .= "</th>";
@@ -957,7 +957,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                 <td align="left" width="200px">
                                     <?php
                                     $detailsExport .= $indexes[$key]['label'];
-                                    functions::xecho($indexes[$key]['label']);?> :
+                                    echo $indexes[$key]['label'];?> :
                                 </td>
                                 <?php
                                 $detailsExport .=  "</td>";
@@ -969,7 +969,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                     if ($indexes[$key]['type_field'] == 'input')
                                     {
                                         ?>
-                                        <input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php functions::xecho($indexes[$key]['show_value']);?>" <?php if (!isset($indexes[$key]['readonly']) || $indexes[$key]['readonly'] == true){ echo 'readonly="readonly" class="readonly"';}else if ($indexes[$key]['type'] == 'date'){echo 'onclick="showCalender(this);"';}?> size="40"  title="<?php functions::xecho($indexes[$key]['show_value']);?>" alt="<?php functions::xecho($indexes[$key]['show_value']);?>"   />
+                                        <input type="text" name="<?php functions::xecho($key);?>" id="<?php functions::xecho($key);?>" value="<?php echo $indexes[$key]['show_value'];?>" <?php if (!isset($indexes[$key]['readonly']) || $indexes[$key]['readonly'] == true){ echo 'readonly="readonly" class="readonly"';}else if ($indexes[$key]['type'] == 'date'){echo 'onclick="showCalender(this);"';}?> size="40"  title="<?php echo $indexes[$key]['show_value'];?>" alt="<?php functions::xecho($indexes[$key]['show_value']);?>"   />
                                         <?php
                                     }
                                     else
@@ -982,7 +982,7 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                                 <option value="<?php functions::xecho($indexes[$key]['values'][$j]['id']);?>" <?php
                                                 if ($indexes[$key]['values'][$j]['id'] == $indexes[$key]['value']) {
                                                     echo 'selected="selected"';
-                                                }?>><?php functions::xecho($indexes[$key]['values'][$j]['label']);?></option><?php
+                                                }?>><?php echo $indexes[$key]['values'][$j]['label'];?></option><?php
                                             }?>
                                         </select><?php
                                     }
