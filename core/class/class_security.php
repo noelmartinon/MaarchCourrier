@@ -243,7 +243,8 @@ class security extends Database
                     );
                 }
 
-                if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url']) && !isset($_SESSION['web_sso_url'])) {
+                $loggingMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
+                if ($array['change_pass'] == 'Y' && !in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'ozwillo'])) {
                     return array(
                         'user' => $array,
                         'error' => $error,

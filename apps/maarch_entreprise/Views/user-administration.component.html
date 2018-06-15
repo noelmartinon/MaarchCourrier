@@ -34,7 +34,7 @@
                         {{lang.desactivateAbsence}}
                     </p>
                 </a>
-                <a mat-list-item *ngIf="!creationMode && !loading" (click)="resetPassword(user)">
+                <a mat-list-item *ngIf="!creationMode && !loading && user.canModifyPassword" (click)="resetPassword(user)">
                     <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
                     <p mat-line>
                         {{lang.reinitPassword}}
