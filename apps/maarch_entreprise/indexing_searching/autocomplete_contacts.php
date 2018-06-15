@@ -152,7 +152,7 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
             $address = '';
 
             if ((!empty($res->address_street) || !empty($res->lastname)) && $res->is_private != 'Y') {
-                if ($res->is_corporate == 'N') {
+                if ($res->is_corporate_person == 'N') {
                     $arr_address = array($res->address_num, $res->address_street, $res->address_postal_code, $res->address_town);
                 } else {
                     $arr_address = array($res->firstname, $res->lastname.',', $res->address_num, $res->address_street, $res->address_postal_code, $res->address_town);
