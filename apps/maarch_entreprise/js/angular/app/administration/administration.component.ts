@@ -36,6 +36,8 @@ export class AdministrationComponent implements OnInit {
 
     prepareAdministration() {
         $j('#inner_content').remove();
+        $j('#inner_content_contact').parent('div').remove();
+        $j('#inner_content_contact').remove();
         $j('#menunav').hide();
         $j('#divList').remove();
         $j('#magicContactsTable').remove();
