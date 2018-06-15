@@ -1261,7 +1261,7 @@ abstract class types_Abstract extends database
                     $data,
                     array(
                         'column' => $key,
-                        'value' => $this->protect_string_db($values[$key]),
+                        'value' => $values[$key],
                         'type' => "string",
                     )
                 );

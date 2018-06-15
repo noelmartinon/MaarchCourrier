@@ -199,7 +199,7 @@ if(count($indexes) > 0)
                         ) {
                             $opt_indexes .= 'selected="selected"';
                         }
-                        $opt_indexes .= ' >' . functions::xssafe($indexes[$key]['values'][$i]['label']) 
+                        $opt_indexes .= ' >' . $indexes[$key]['values'][$i]['label'] 
                             . '</option>';
                     }
                 $opt_indexes .= '</select>';

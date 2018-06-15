@@ -1047,13 +1047,13 @@ if ($stmt->rowCount() == 0) {
                         <?php
                         if (isset($indexes[$key]['img'])) {
                             ?>
-                            <i class="fa fa-<?php functions::xecho($indexes[$key]['img']); ?> fa-2x" title="<?php functions::xecho($indexes[$key]['label']); ?>" ></i>
+                            <i class="fa fa-<?php functions::xecho($indexes[$key]['img']); ?> fa-2x" title="<?php echo $indexes[$key]['label']; ?>" ></i>
                             <?php
                         } ?>
                         </th>
                         <td align="left" width="200px">
                             <?php
-                            functions::xecho($indexes[$key]['label']); ?> :
+                            echo $indexes[$key]['label']; ?> :
                         </td>
                         <td>
                         <?php
@@ -1068,7 +1068,7 @@ if ($stmt->rowCount() == 0) {
                                 echo 'readonly="readonly" class="readonly"';
                             } elseif ($indexes[$key]['type'] == 'date') {
                                 echo 'onclick="showCalender(this);"';
-                            } ?> style="width: 200px; "  title="<?php functions::xecho($indexes[$key]['show_value']); ?>" alt="<?php functions::xecho($indexes[$key]['show_value']); ?>" ><?php functions::xecho($indexes[$key]['show_value']); ?></textarea>
+                            } ?> style="width: 200px; "  title="<?php echo $indexes[$key]['show_value']; ?>" alt="<?php echo $indexes[$key]['show_value']; ?>" ><?php echo $indexes[$key]['show_value']; ?></textarea>
                         <?php
                         } else {
                             ?>
@@ -1080,7 +1080,7 @@ if ($stmt->rowCount() == 0) {
                                     <option value="<?php functions::xecho($indexes[$key]['values'][$j]['id']); ?>" <?php
                                     if ($indexes[$key]['values'][$j]['id'] == $indexes[$key]['value']) {
                                         echo 'selected="selected"';
-                                    } ?>><?php functions::xecho($indexes[$key]['values'][$j]['label']); ?></option><?php
+                                    } ?>><?php echo $indexes[$key]['values'][$j]['label']; ?></option><?php
                                 } ?>
                             </select><?php
                         }
