@@ -621,25 +621,19 @@ abstract class contacts_v2_Abstract extends Database
             <tr>
                 <td>&nbsp;</td>
                 <td class="indexing_field">
-                    <input type="radio" class="check" name="is_corporate" value="Y" <?php if ($_SESSION[ 'm_admin'][
-                        'contact'][ 'IS_CORPORATE_PERSON']=='Y') {
+                    <input type="radio" class="check" name="is_corporate" value="Y" <?php if ($_SESSION[ 'm_admin']['contact'][ 'IS_CORPORATE_PERSON']=='Y') {
                     ?> checked="checked"
                     <?php
 
-                } ?>onclick="javascript:show_admin_contacts( true, '
-                    <?php functions::xecho($display_value); ?>');setContactType('corporate', '
-                    <?php echo $can_add_contact; ?>')" id="corpo_yes">
+                } ?>onclick="javascript:show_admin_contacts( true, '<?php functions::xecho($display_value); ?>');setContactType('corporate', '<?php echo $can_add_contact; ?>')" id="corpo_yes">
                     <span onclick="$('corpo_yes').click();" onmouseover="this.style.cursor='pointer';">
                         <?php echo _IS_CORPORATE_PERSON; ?>
                     </span>
-                    <input type="radio" class="check" name="is_corporate" value="N" <?php if ($_SESSION[ 'm_admin'][
-                        'contact'][ 'IS_CORPORATE_PERSON']=='N') {
+                    <input type="radio" class="check" name="is_corporate" value="N" <?php if ($_SESSION[ 'm_admin']['contact'][ 'IS_CORPORATE_PERSON']=='N') {
                     ?> checked="checked"
                     <?php
 
-                } ?>onclick="javascript:show_admin_contacts( false, '
-                    <?php functions::xecho($display_value); ?>');setContactType('no_corporate', '
-                    <?php echo $can_add_contact; ?>')" id="corpo_no">
+                } ?>onclick="javascript:show_admin_contacts( false, '<?php functions::xecho($display_value); ?>');setContactType('no_corporate', '<?php echo $can_add_contact; ?>')" id="corpo_no">
                     <span onclick="$('corpo_no').click();" onmouseover="this.style.cursor='pointer';">
                         <?php echo _INDIVIDUAL; ?>
                     </span>
