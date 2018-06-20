@@ -1200,9 +1200,10 @@ if ($stmt->rowCount() == 0) {
 
 //OUTGOING CREATION MODE
 if ($_SESSION['indexation'] == true && $category == 'outgoing') {
+    $_SESSION['indexation'] = false;
     $is_outgoing_indexing_mode = false;
     $selectAttachments = 'SELECT attachment_type FROM res_view_attachments'
-        ." WHERE res_id_master = ? and coll_id = ? and status <> 'DEL' and attachment_type = 'outgoing_mail'";
+        ." WHERE res_id_master = ? and coll_id = ? and status <> 'DEL' and attachment_type in ('outgoing_mail', 'outgoing_mail_signed')";
     $stmt = $db->query($selectAttachments, array($_SESSION['doc_id'], $_SESSION['collection_id_choice']));
     if ($stmt->rowCount() == 0) {
         //launch outgoing_mail creation
