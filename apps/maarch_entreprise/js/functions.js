@@ -1569,20 +1569,27 @@ function action_send_form_confirm_result(path_manage_script, mode_req, id_action
                     eval('response='+answer.responseText);
                     if(response.status == 0 ) //Form or confirm processed ok
                     {
-                        res_ids = response.result_id;
-                        if(res_id_values == 'none' && res_ids != '')
-                        {
-                            res_id_values = res_ids;
+                        var modal = $('modal_'+id_action);
+                        if(modal) {
+                            destroyModal('modal_'+id_action);
                         }
-                        end_actions();
-                        var table_name = tablename;
-                        if(response.table && response.table != '')
-                        {
-                            table_name = response.table;
+                        if(pile_actions.values.length > 0) {
+                            end_actions();
+                        } else {
+                            res_ids = response.result_id;
+                            if(res_id_values == 'none' && res_ids != '')
+                            {
+                                res_id_values = res_ids;
+                            }
+                            var table_name = tablename;
+                            if(response.table && response.table != '')
+                            {
+                                table_name = response.table;
+                            }
+                            var page_result = response.page_result;
+                            page_result_final = response.page_result;
+                            close_action(id_action, page_result, path_manage_script, mode_req, res_id_values, table_name, id_coll);                            
                         }
-                        var page_result = response.page_result;
-                        page_result_final = response.page_result;
-                        close_action(id_action, page_result, path_manage_script, mode_req, res_id_values, table_name, id_coll);
                     }
                     else //  Form Params errors
                     {
@@ -1616,46 +1623,44 @@ function action_change_status(path_manage_script, mode_req, res_id_values, table
             },
             success: function(answer) {
 
-                setTimeout(function(){
-                    if(answer.status == 0 ) {
-                        actions_status.values = [];
-                        // Status changed
-                    } else {
-                        try{
-                            $('frm_error').innerHTML = answer.error_txt;
-                        }
-                        catch(e){}
+                if(answer.status == 0 ) {
+                    actions_status.values = [];
+                    // Status changed
+                } else {
+                    try{
+                        $('frm_error').innerHTML = answer.error_txt;
                     }
-                    if(page != '' && page != NaN && page && page != null ) {
-                        do_nothing = false;
-                        window.top.location.href=page;
-
-                    } else if(do_nothing == false) {
-
-                        var cur_url = window.top.location.href;
-                        if (cur_url.indexOf("&directLinkToAction") != -1) {
-                            if (typeof window['angularSignatureBookComponent'] != "undefined") {
-                                window.angularSignatureBookComponent.componentAfterAction();
-                            } else {
-                                window.top.location = cur_url.replace("&directLinkToAction", "");
-                            }
-                        } else {
-                            if (typeof window['angularSignatureBookComponent'] != "undefined") {
-                                window.angularSignatureBookComponent.componentAfterAction();
-                            } else {
-                                window.top.location.hash = "";
-                                window.top.location.reload();
-                            }
-                        }
-                    }
-                    
-                    // fix for Chrome and firefox
-                    if (page_result_final != '') {
-                        window.top.location.href=page_result_final;
-                    }
-                    
+                    catch(e){}
+                }
+                if(page != '' && page != NaN && page && page != null ) {
                     do_nothing = false;
-                }, 200);
+                    window.top.location.href=page;
+
+                } else if(do_nothing == false) {
+
+                    var cur_url = window.top.location.href;
+                    if (cur_url.indexOf("&directLinkToAction") != -1) {
+                        if (typeof window['angularSignatureBookComponent'] != "undefined") {
+                            window.angularSignatureBookComponent.componentAfterAction();
+                        } else {
+                            window.top.location = cur_url.replace("&directLinkToAction", "");
+                        }
+                    } else {
+                        if (typeof window['angularSignatureBookComponent'] != "undefined") {
+                            window.angularSignatureBookComponent.componentAfterAction();
+                        } else {
+                            window.top.location.hash = "";
+                            window.top.location.reload();
+                        }
+                    }
+                }
+                
+                // fix for Chrome and firefox
+                if (page_result_final != '') {
+                    window.top.location.href=page_result_final;
+                }
+                
+                do_nothing = false;
             }
         });
     }
