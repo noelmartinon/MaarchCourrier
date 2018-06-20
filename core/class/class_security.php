@@ -244,7 +244,7 @@ class security extends Database
                 }
 
                 $loggingMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
-                if ($array['change_pass'] == 'Y' && !in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'ozwillo'])) {
+                if ($array['change_pass'] == 'Y' && !in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'ozwillo']) && $_SESSION['config']['ldap'] == 'false') {
                     return array(
                         'user' => $array,
                         'error' => $error,
