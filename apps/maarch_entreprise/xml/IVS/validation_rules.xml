@@ -233,8 +233,8 @@
     <validationRule name="admin_action" extends="standardForm" mode="error">
       <parameter name="action_page" type="identifier" />
       <parameter name="action_submit" type="string" />
-      <parameter name="categories_chosen" type="category_list" />
-      <parameter name="categorieslist" type="category_list" />
+      <parameter name="categories_chosen" type="arrayOfStrings" />
+      <parameter name="categorieslist" type="arrayOfStrings" />
       <parameter name="history" type="YN" />
       <parameter name="is_folder_action" type="YN" />
       <parameter name="keyword" type="keyword_id" />

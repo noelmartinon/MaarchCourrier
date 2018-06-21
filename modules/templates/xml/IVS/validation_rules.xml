@@ -14,7 +14,7 @@
 		<parameter name="template_datasource" type="identifier" />
 		<parameter name="template_content" type="string" />
 		<parameter name="template_content_txt" type="string" />
-		<parameter name="template_style" type="document_id" />
+		<parameter name="template_style" type="string" />
 		<parameter name="entities_chosen" type="identifier" />
 		<parameter name="submit" type="identifier" />
 		<parameter name="Submit" type="string" />
@@ -41,7 +41,7 @@
 	</validationRule>
 
 	<validationRule name="admin_change_templates" extends="standardForm" mode="error">
-		<parameter name="template_style" type="document_id" />
+		<parameter name="template_style" type="string" />
 		<parameter name="module" type="identifier" />
 	</validationRule>
 	
