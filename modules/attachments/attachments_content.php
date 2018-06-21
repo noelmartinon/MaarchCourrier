@@ -34,7 +34,7 @@ $_SESSION['error'] = '';
 
 $status = 0;
 $error = $content = $js = $parameters = '';
-$_SESSION['cm_applet'][$_SESSION['user']['UserId']] = '';
+$_SESSION['cm_applet'][$_SESSION['user']['UserId']] = [];
 
 function _parse($text)
 {
