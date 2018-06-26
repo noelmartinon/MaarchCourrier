@@ -80,6 +80,31 @@
                                 style="cursor:pointer;"></mat-row>
                         </mat-table>
                     </mat-tab>
+                    <mat-tab label="{{lang.relatedBaskets}}" *ngIf="!creationMode">
+                        <div class="row" style="margin:0px;">
+                            <div class="col-md-6 col-xs-6">
+                                <mat-form-field>
+                                    <input matInput (keyup)="applyBasketsFilter($event.target.value)" placeholder="{{lang.filterBy}}">
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <mat-paginator #paginatorBaskets [length]="100" [pageSize]="10">
+                                </mat-paginator>
+                            </div>
+                        </div>
+                        <mat-table #table [dataSource]="basketsDataSource" matSort matSortActive="basket_name" matSortDirection="asc">
+                            <ng-container matColumnDef="basket_name">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.label}}</mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.basket_name}} </mat-cell>
+                            </ng-container>
+                            <ng-container matColumnDef="basket_desc">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.description}}</mat-header-cell>
+                                <mat-cell *matCellDef="let element"> {{element.basket_desc}} </mat-cell>
+                            </ng-container>
+                            <mat-header-row *matHeaderRowDef="basketsDisplayedColumns"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: basketsDisplayedColumns;" routerLink="/administration/baskets/{{row.basket_id}}" matTooltip="{{lang.view}}" style="cursor:pointer;"></mat-row>
+                        </mat-table>
+                    </mat-tab>
                     <mat-tab label="{{lang.privileges}}" *ngIf="!creationMode">
                         <mat-tab-group [(selectedIndex)]="selectedTabIndex_2" *ngIf="!creationMode">
                             <mat-tab label="{{lang.menus}}">

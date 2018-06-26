@@ -2,6 +2,8 @@
 
 namespace Group\controllers;
 
+use Basket\models\GroupBasketModel;
+use Gitlab\Model\Group;
 use Group\models\ServiceModel;
 use Group\models\GroupModel;
 use Respect\Validation\Validator;
@@ -134,9 +136,12 @@ class GroupController
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
         }
 
-        $group['users']     = GroupModel::getUsersByGroupId(['groupId' => $group['group_id'], 'select' => ['users.id', 'users.user_id', 'users.firstname', 'users.lastname']]);
-        $group['security']  = GroupModel::getSecurityByGroupId(['groupId' => $group['group_id']]);
-        $group['services']  = GroupModel::getAllServicesByGroupId(['groupId' => $group['group_id']]);
+        $group['security']          = GroupModel::getSecurityByGroupId(['groupId' => $group['group_id']]);
+        $group['services']          = GroupModel::getAllServicesByGroupId(['groupId' => $group['group_id']]);
+        $group['users']             = GroupModel::getUsersByGroupId(['groupId' => $group['group_id'], 'select' => ['users.id', 'users.user_id', 'users.firstname', 'users.lastname']]);
+        $group['baskets']           = GroupBasketModel::getBasketsByGroupId(['select' => ['baskets.basket_id', 'baskets.basket_name', 'baskets.basket_desc'], 'groupId' => $group['group_id']]);
+        $group['canAdminUsers']     = ServiceModel::hasService(['id' => 'admin_users', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin']);
+        $group['canAdminBaskets']   = ServiceModel::hasService(['id' => 'admin_baskets', 'userId' => $GLOBALS['userId'], 'location' => 'basket', 'type' => 'admin']);
 
         return $response->withJson(['group' => $group]);
     }

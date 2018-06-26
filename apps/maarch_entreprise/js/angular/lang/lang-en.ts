@@ -272,6 +272,7 @@ export const LANG_EN = {
     "redirects"                         : "Redirections",
     "reinitPassword"                    : "Reset password",
     "relatedUsers"                      : "Related users",
+    "relatedBaskets"                    : "Related basket(s)",
     "removeUserRedirect"                : "Remove user (diffusion list + diffusion model entity)",
     "renewPsw"                          : "Enter the password again",
     "reports"                           : "Reports",

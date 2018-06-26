@@ -30,14 +30,22 @@ export class GroupAdministrationComponent implements OnInit {
 
     displayedColumns    = ['firstname', 'lastname'];
     dataSource          : any;
+    basketsDisplayedColumns         = ['basket_name', 'basket_desc'];
+    basketsDataSource               : any;
 
 
+    @ViewChild('paginatorBaskets') paginatorBaskets: MatPaginator;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim();
         filterValue = filterValue.toLowerCase();
         this.dataSource.filter = filterValue;
+    }
+    applyBasketsFilter(filterValue: string) {
+        filterValue = filterValue.trim();
+        filterValue = filterValue.toLowerCase();
+        this.basketsDataSource.filter = filterValue;
     }
 
     constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,public http: HttpClient, private route: ActivatedRoute, private router: Router, private notify: NotificationService) {
@@ -69,6 +77,9 @@ export class GroupAdministrationComponent implements OnInit {
                             this.dataSource = new MatTableDataSource(this.group.users);
                             this.dataSource.paginator = this.paginator;
                             this.dataSource.sort = this.sort;
+                            this.basketsDataSource = new MatTableDataSource(this.group.baskets);
+                            this.basketsDataSource.paginator = this.paginatorBaskets;
+                            this.basketsDataSource.sort = this.sort;
                         }, 0);
 
                     }, () => {

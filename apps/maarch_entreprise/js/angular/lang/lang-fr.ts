@@ -342,6 +342,7 @@ export const LANG_FR = {
     "redirectWhenAbscence"              : "Rediriger la bannette à une personne",
     "reinitPassword"                    : "Réinitialiser le mot de passe",
     "relatedUsers"                      : "Utilisateur(s) associé(s)",
+    "relatedBaskets"                    : "Bannette(s) associée(s)",
     "removeUserRedirect"                : "Supprimer la personne (liste de diffusion + modèle de l'entité)",
     "renewPsw"                          : "Retaper le mot de passe",
     "reports"                           : "Statistiques",
