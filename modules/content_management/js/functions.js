@@ -319,6 +319,9 @@ function showAppletLauncher(target, resId, objectTable, objectType, mode) {
         var chrono = $j('#'+target.id).parent().parent().find('[name=chrono\\[\\]]').val();
         var title = cleanTitle($j('#'+target.id).parent().parent().find('[name=title\\[\\]]').val());
         var back_date = $j('#'+target.id).parent().parent().find('[name=back_date\\[\\]]').val();
+        if (typeof back_date === "undefined") {
+            back_date = '';
+        }
         var backDateStatus = $j('#'+target.id).parent().parent().find('[name=backDateStatus\\[\\]]').val();
         var path = 'index.php?display=true&module=content_management&page=applet_modal_launcher&uniqueId='+attachNum+'&objectType='+objectType+'&objectId='+templateOffice+'&attachType='+attachment_types+'&objectTable=' + objectTable + '&contactId='+contactidAttach+'&addressId='+addressidAttach+'&chronoAttachment='+chrono+'&titleAttachment='+title+'&backDateStatus='+backDateStatus+'&back_date='+back_date+'&resMaster=' + resId
     }
