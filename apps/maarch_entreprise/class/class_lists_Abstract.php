@@ -3617,9 +3617,9 @@ abstract class lists_Abstract extends Database
             if (
                 $this->params['bool_checkBox'] === true ||
                 $this->params['bool_radioButton'] === true ||
-                count($parameters['actions'] > 0) ||
-                count($parameters['buttons'] > 0) ||
-                !empty($parameters['defaultAction'])
+                count($parameters['actions']) > 0 ||
+                count($parameters['buttons']) > 0 ||
+                !empty($this->params['defaultAction'])
                 ) {
                 //Need a form!
                 $this->withForm = true;
