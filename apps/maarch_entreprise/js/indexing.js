@@ -386,6 +386,8 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
     if(cat_id == 'incoming')
     {
         var category = [
+        {id:'attachment_tr', type:'tr', state:'display'},
++       {id:'attach_show', type:'tr', state:'display'},
         {id:'doctype_mail', type:'label', state:'display'},
         {id:'doctype_res', type:'label', state:'hide'},
         {id:'priority_tr', type:'tr', state:'display'},
@@ -801,7 +803,7 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
             {id:'contact_mandatory', type:'label', state:'hide'},
             {id:'nature_id_mandatory', type:'label', state:'hide'},
             {id:'subject_mandatory', type:'label', state:'hide'},
-            //{id:'subject_tr', type:'label', state:'hide'},
+            {id:'subject_tr', type:'label', state:'hide'},
             {id:'destination_mandatory', type:'label', state:'hide'},
             {id:'process_limit_date_use_mandatory', type:'label', state:'hide'},
             {id:'process_limit_date_mandatory', type:'label', state:'hide'},
@@ -905,18 +907,6 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
                 }
             }
         });
-    }
-     // NCH01		
-    if(cat_id == 'attachment'){		
-        document.getElementById("attachment_tr").style.display='table-row';		
-        document.getElementById("attach_show").style.display='table-row';
-        document.getElementById("subject_tr").style.display = 'none';
-        document.getElementById("diff_list_tr").style.display = 'none';
-    }else{		
-        document.getElementById("attachment_tr").style.display='none';		
-        document.getElementById("attach_show").style.display='none';
-        document.getElementById("diff_list_tr").style.display = 'table-row';
-        document.getElementById("subject_tr").style.display = 'table-row';
     }
 }
 
