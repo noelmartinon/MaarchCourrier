@@ -386,8 +386,6 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
     if(cat_id == 'incoming')
     {
         var category = [
-        {id:'attachment_tr', type:'tr', state:'display'},
-+       {id:'attach_show', type:'tr', state:'display'},
         {id:'doctype_mail', type:'label', state:'display'},
         {id:'doctype_res', type:'label', state:'hide'},
         {id:'priority_tr', type:'tr', state:'display'},
@@ -656,7 +654,6 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
         {id:'category_img_human_resources', type:'label', state:'hide'},
         
         {id:'doctype_tr', type:'tr', state:'display'},
-        {id:'subject_tr', type:'tr', state:'display'},
 		{id:'box_id_tr', type:'tr', state:'display'},
 		{id:'type_id_tr', type:'tr', state:'display'},
 		{id:'appraisal_code_tr', type:'tr', state:'display'},
@@ -712,7 +709,6 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
         {id:'category_img_human_resources', type:'label', state:'display'},
         
         {id:'doctype_tr', type:'tr', state:'display'},
-        {id:'subject_tr', type:'tr', state:'display'},
 		{id:'box_id_tr', type:'tr', state:'hide'},
 		{id:'type_id_tr', type:'tr', state:'hide'},
 		{id:'appraisal_code_tr', type:'tr', state:'hide'},
@@ -803,7 +799,6 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
             {id:'contact_mandatory', type:'label', state:'hide'},
             {id:'nature_id_mandatory', type:'label', state:'hide'},
             {id:'subject_mandatory', type:'label', state:'hide'},
-            {id:'subject_tr', type:'label', state:'hide'},
             {id:'destination_mandatory', type:'label', state:'hide'},
             {id:'process_limit_date_use_mandatory', type:'label', state:'hide'},
             {id:'process_limit_date_mandatory', type:'label', state:'hide'},
@@ -817,6 +812,26 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
             {id:'show_multi_contact_tr', type:'tr', state:'hide'}
         ];
     }
+
+    if(cat_id == 'attachment'){ // only qualification page
+        document.getElementById("attachment_tr").style.display='table-row';
+        document.getElementById("attach_show").style.display='display';
+        $j('#attach_reconciliation').click();
+
+        document.getElementById("subject_tr").style.display = 'none';
+        document.getElementById("diff_list_tr").style.display = 'none';
+    }else{
+        if($j('#attach_reconciliation').length > 0){ // qualification page
+            document.getElementById("attachment_tr").style.display='none';
+        } else { // indexing page
+            document.getElementById("attachment_tr").style.display='table-row';
+        }
+        $j('#no_attach').click();
+        
+        document.getElementById("diff_list_tr").style.display = 'display';
+        document.getElementById("subject_tr").style.display = 'display';
+    }
+
     if(params_cat)
     {
         process_category(category, display_value_tr, params_cat);
