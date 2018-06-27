@@ -65,7 +65,7 @@ if ($core_tools->test_service('join_res_case_in_process', 'cases', false) == 1) 
     $frm_str .= '<td colspan="3"> <input type="button" class="button" name="search_case" '
             . 'id="search_case" value="';
     if ($case_properties['case_id'] <> '') {
-        $frm_str .= _MODIFY_CASE;
+        $frm_str .= _MODIFY_CASE;        
     } else {
         $frm_str .= _JOIN_CASE;
     }
@@ -73,7 +73,13 @@ if ($core_tools->test_service('join_res_case_in_process', 'cases', false) == 1) 
             . 'index.php?display=true&module=cases&page=search_adv_for_cases'
             . '&searched_item=res_id_in_process&searched_value=' . $_SESSION['doc_id']
             . '\',\'\', \'scrollbars=yes,menubar=no,toolbar=no,resizable=yes,'
-            . 'status=no,width=1020,height=710\');"/></td>';
+            . 'status=no,width=1020,height=710\');"/>';
+    if($case_properties['case_id']){
+        $frm_str .= ' <input type="button" class="button" name="btn_unlink_case" '
+                . 'id="btn_unlink_case" value="'._UNLINK_CASE.'"'
+                . 'onclick="if(confirm(\''.addslashes(_UNLINK_CASE).'?\')){unlink_case(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=cases&page=unlink_case\','.$case_properties['case_id'].','. $res_id .');}"/>';
+    }        
+    $frm_str .= '</td>';
 }
 $frm_str .= '</tr>';
 $frm_str .= '</table>';

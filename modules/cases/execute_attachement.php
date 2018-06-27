@@ -112,6 +112,23 @@ if (($core_tools->test_service('join_res_case', 'cases', false) == 1) || ($core_
                     case_id.value = '<?php functions::xecho($return_description['case_id'] ); ?>';
                     case_label.value = '<?php echo addslashes($return_description['case_label']); ?>';
                     case_description.value = '<?php echo addslashes($return_description['case_description']); ?>';
+                    lang_unlink_case = '<?php echo addslashes(_UNLINK_CASE);?>';
+                    url_script = '<?php echo $_SESSION['config']['businessappurl']?>'+'index.php?display=true&module=cases&page=unlink_case';
+                    case_id = '<?php echo $return_description['case_id']; ?>';
+                    res_id = '<?php echo $actual_res_id; ?>';
+                    strOnClick = 'if(confirm(\"'+lang_unlink_case+'?\")){unlink_case(\''+url_script+'\','+case_id+','+res_id+');}';
+
+                    var btn_unlink_case = $j(' <input/>').attr({
+                    type    : "button",
+                    id      : "btn_unlink_case",
+                    onclick : strOnClick,
+                    class   : 'button',
+                    value   : lang_unlink_case
+                    });
+
+                    btn_search_case = window.opener.$j('#search_case');
+                    btn_search_case.after(btn_unlink_case);
+                    btn_search_case.after('<span> </span>');
                     
                 }
                 //self.close();
