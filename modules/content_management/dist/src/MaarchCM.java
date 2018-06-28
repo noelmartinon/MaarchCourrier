@@ -9,16 +9,31 @@
 package com.maarch;
 
 //import java.applet.Applet;
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.FileVisitResult;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,9 +60,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import netscape.javascript.JSObject;
 
-import javax.swing.JOptionPane;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
@@ -69,6 +82,7 @@ public class MaarchCM {
     protected String uniqueId;
     protected String convertPdf;
     protected String onlyConvert;
+    protected String md5File;
 
     protected String domain;
     protected String userLocalDirTmp;
@@ -100,25 +114,71 @@ public class MaarchCM {
     public String fileToEdit;
     public String editMode;    
     public String programName;
+    
+    SystemTray tray = SystemTray.getSystemTray();
+    //If the icon is a file
+    Image image = Toolkit.getDefaultToolkit().createImage(this.getClass().getResource("logo_only.png"));
+    //Alternative (if the icon is on the classpath):
+
+    ActionListener exitListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Exiting...");
+            System.exit(0);
+        }
+    };
+    TrayIcon trayIcon = new TrayIcon(image, "Tray Demo");
 
 
     
     public List<String> fileToDelete = new ArrayList<String>();
     
     
-    public static void main(String[] args) throws JSException {
+    public static void main(String[] args) throws JSException, AWTException, InterruptedException, IOException {
             MaarchCM MaarchCM = new MaarchCM();
             MaarchCM.start(args);
     }
-
+    
+   
     /**
      * Launch of the JNLP
      */
-    public void start(String[] args) throws JSException {
+    public void start(String[] args) throws JSException, AWTException, InterruptedException, IOException {
         
-        System.out.println("----------BEGIN----------");
-        System.out.println("----------ARGUMENTS----------");
+        logger = new MyLogger(userLocalDirTmp + File.separator);
+        FileManager.deleteLogsOnDirWithTime(userLocalDirTmp);
+        PopupMenu popup = new PopupMenu();
+        MenuItem defaultItem = new MenuItem("Fermer l'applet");
+        defaultItem.addActionListener(exitListener);
+        popup.add(defaultItem);
+        //Let the system resize the image if needed
+        trayIcon.setImageAutoSize(true);
+        //Set tooltip text for the tray icon
+        trayIcon.setToolTip("Maarch content editor");
+        tray.add(trayIcon);
         
+        trayIcon.setPopupMenu(popup);
+                
+        initDatas(args);
+        
+        initHttpRequest();
+        
+        getClientEnv();
+        
+        try {
+            //editObject();
+            if (onlyConvert.equals("true")) {
+               launchOnlyConvert(); 
+            } else {
+                editObject_v2();
+            }
+            logger.close();
+            System.exit(0);
+        } catch (Exception ex) {
+            Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void initDatas(String[] args) {
         int index;
 
         for (index = 0; index < args.length; ++index)
@@ -136,20 +196,63 @@ public class MaarchCM {
         userMaarch = args[8];
         convertPdf = args[9];
         onlyConvert = args[10];
+        md5File = args[11];
+
+        logger.log("----------CONTROL PARAMETERS----------", Level.INFO);
+        logger.log("URL : " + url, Level.INFO);
+        logger.log("OBJECT TYPE : " + objectType, Level.INFO);
+        logger.log("ID APPLET : " + idApplet, Level.INFO);
+        logger.log("OBJECT TABLE : " + objectTable, Level.INFO);
+        logger.log("OBJECT ID : " + objectId, Level.INFO);
+        logger.log("UNIQUE ID : " + uniqueId, Level.INFO);
+        logger.log("COOKIE : " + cookie, Level.INFO);
+        logger.log("CLIENTSIDECOOKIES : " + clientSideCookies, Level.INFO);
+        logger.log("USERMAARCH : " + userMaarch, Level.INFO);
+        logger.log("CONVERTPDF : " + convertPdf, Level.INFO);
+        logger.log("ONLYCONVERT : " + onlyConvert, Level.INFO);
+        logger.log("MD5FILE : " + md5File, Level.INFO);
+        logger.log("--------------------------------------", Level.INFO);
         
-        System.out.println("URL : " + url);
-        System.out.println("OBJECT TYPE : " + objectType);
-        System.out.println("ID APPLET : " + idApplet);
-        System.out.println("OBJECT TABLE : " + objectTable);
-        System.out.println("OBJECT ID : " + objectId);
-        System.out.println("UNIQUE ID : " + uniqueId);
-        System.out.println("COOKIE : " + cookie);
-        System.out.println("CLIENTSIDECOOKIES : " + clientSideCookies);
-        System.out.println("USERMAARCH : " + userMaarch);
-        System.out.println("CONVERTPDF : " + convertPdf);
-        System.out.println("ONLYCONVERT : " + onlyConvert);
-        System.out.println("----------CONTROL PARAMETERS----------");
+        System.out.println("");
+    }
+    public void getClientEnv() throws InterruptedException, IOException {
+        logger.log("----------CONTROL CLIENT SIDE----------", Level.INFO);
+        os = System.getProperty("os.name").toLowerCase();
+        boolean isUnix = os.contains("nix") || os.contains("nux");
+        boolean isWindows = os.contains("win");
+        boolean isMac = os.contains("mac");
+        if (isWindows) {
+            logger.log("OS : Windows", Level.INFO);
+            os = "win";
+        } else if (isMac) {
+            logger.log("OS : Mac", Level.INFO);
+            os = "mac";
+        } else if (isUnix) {
+            logger.log("OS : Linux", Level.INFO);
+            os = "linux";
+        } else {
+            logger.log("OS : Undefined", Level.INFO);
+        }
+        fM = new FileManager();
+        String userLocalDir = System.getProperty("user.home");
+        userLocalDirTmp = userLocalDir + File.separator + "maarchTmp";
         
+        logger.log("TMP FOLDER : "+userLocalDirTmp, Level.INFO);
+        logger.log("APP PATH: " + appPath, Level.INFO);
+        System.out.println("----------BEGIN LOCAL DIR TMP IF NOT EXISTS----------");
+
+        String info = fM.createUserLocalDirTmp(userLocalDirTmp, os);
+
+        if (info == "ERROR") {
+            messageStatus = "ERROR";
+            messageResult.clear();
+            messageResult.put("ERROR", "Permissions insuffisante sur votre répertoire temporaire maarch");
+            processReturn(messageResult);
+        }
+        logger.log("---------------------------------------", Level.INFO);
+    }
+    
+    public void initHttpRequest() {
         if (
                 isURLInvalid() ||
                 isObjectTypeInvalid() ||
@@ -219,18 +322,8 @@ public class MaarchCM {
         if (httpClient == null) {
             System.out.println("NO HTTP CLIENT WAS INSTANTIATED, THE APPLICATION WILL FAIL!");
         }
-
-        try {
-            editObject();
-            //TODO exit of JNLP
-            //MaarchCM.destroy();
-            //MaarchCM.stop();
-            System.exit(0);
-        } catch (Exception ex) {
-            Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
-
+    
     /**
      * Controls the url parameter
      * @return boolean
@@ -276,21 +369,14 @@ public class MaarchCM {
     private boolean isObjectTableInvalid() {
         Set<String> whiteList = new HashSet<>();
         whiteList.add("res_letterbox");
-        whiteList.add("res_business");
-        whiteList.add("res_x");
         whiteList.add("res_attachments");
         whiteList.add("mlb_coll_ext");
-        whiteList.add("business_coll_ext");
         whiteList.add("res_version_letterbox");
-        whiteList.add("res_version_business");
-        whiteList.add("res_version_x");
         whiteList.add("res_view_attachments");
-        whiteList.add("res_view");
         whiteList.add("res_view_letterbox");
-        whiteList.add("res_view_business");
         whiteList.add("templates");
         if (whiteList.contains(objectTable)) return false; //success
-        System.out.println("objectTable not in the authorized list " + objectTable);
+        logger.log("OBJECTTABLE NOT IN THE AUTHORIZED LIST ! "+ objectTable, Level.WARNING);
         return true; //default is failure
     }
 
@@ -300,7 +386,7 @@ public class MaarchCM {
      */
     private boolean isObjectIdInvalid() {
         if (objectId != null && objectId.length() > 0) return false; //success
-        System.out.println("objectId is null or empty " + objectId);
+        logger.log("OBJECTID IS NULL OR EMPTY ! "+ objectId, Level.WARNING);
         return true; //default is failure
     }
 
@@ -310,7 +396,7 @@ public class MaarchCM {
      */
     private boolean isCookieInvalid() {
         if (cookie != null && cookie.length() > 0) return false; //success
-        System.out.println("cookie is null or empty " + cookie);
+        logger.log("COOKIE IS NULL OR EMPTY !", Level.WARNING);
         return true; //default is failure
     }
 
@@ -333,86 +419,79 @@ public class MaarchCM {
         logger.log("createPDF ", Level.INFO);
         try {
             System.out.println("mode ! : " + editMode);
-            //patch onlyConvert
-            if (onlyConvert.equals("true")) {
-                if ("linux".equals(os) || "mac".equals(os)) {
-                    editMode = "libreoffice";
-                } else {
-                    programName = fM.findGoodProgramWithExt(fileExtension);
-                    String pathProgram;
-                    pathProgram = fM.findPathProgramInRegistry(programName);
-                    System.out.println("check prog name : "+programName);
-                    System.out.println("check path : "+pathProgram);
-                    if("soffice.exe".equals(programName)){   
-                        if("\"null\"".equals(pathProgram)){
-                            System.out.println(programName+" not found! switch to microsoft office...");
-                            programName = "office.exe";
-                        }
-                    }else{
-                        if("\"null\"".equals(pathProgram)){
-                            System.out.println(programName+" not found! switch to libreoffice...");
-                            programName = "soffice.exe";
-                        }
+         
+            if ("linux".equals(os) || "mac".equals(os)) {
+                editMode = "libreoffice";
+            } else {
+                programName = fM.findGoodProgramWithExt(fileExtension);
+                String pathProgram;
+                pathProgram = fM.findPathProgramInRegistry(programName);
+                System.out.println("check prog name : "+programName);
+                System.out.println("check path : "+pathProgram);
+                if("soffice.exe".equals(programName)){   
+                    if("\"null\"".equals(pathProgram)){
+                        System.out.println(programName+" not found! switch to microsoft office...");
+                        programName = "office.exe";
                     }
-                    if("soffice.exe".equals(programName)){
-                        editMode = "libreoffice";
-                    }else{
-                        editMode = "office"; 
+                }else{
+                    if("\"null\"".equals(pathProgram)){
+                        System.out.println(programName+" not found! switch to libreoffice...");
+                        programName = "soffice.exe";
                     }
                 }
+                if("soffice.exe".equals(programName)){
+                    editMode = "libreoffice";
+                }else{
+                    editMode = "office"; 
+                }
             }
+            
             boolean conversion = true;
             String cmd = "";
             if (docxFile.contains(".odt") || docxFile.contains(".ods") || docxFile.contains(".ODT") || docxFile.contains(".ODS")) {
-                logger.log("This is opendocument ! ", Level.INFO);
+                //logger.log("This is opendocument ! ", Level.INFO);
                 if (os == "linux") {
-                    cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp+idApplet+"_conv/ --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
+                    cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp + File.separator + idApplet+"_conv/ --headless --convert-to pdf --outdir \"" + userLocalDirTmp + "\" \"" + docxFile + "\"";
                 } else if (os == "mac") {
-                    cmd = "cd /Applications/LibreOffice.app/Contents/MacOs && ./soffice --headless --convert-to pdf:writer_pdf_Export --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
+                    cmd = "cd /Applications/LibreOffice.app/Contents/MacOs && ./soffice --headless --convert-to pdf:writer_pdf_Export --outdir \"" + userLocalDirTmp + "\" \"" + docxFile + "\"";
                 } else {
                     String convertProgram;
                     convertProgram = fM.findPathProgramInRegistry("soffice.exe");
-                    cmd = convertProgram + " \"-env:UserInstallation=file:///"+userLocalDirTmp.replace("\\", "/")+idApplet+"_conv/\" --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\" \r\n";
+                    cmd = convertProgram + " --headless --convert-to pdf --outdir \"" + userLocalDirTmp + "\" \"" + docxFile + "\" \r\n";
                 }
 
             } else if (docxFile.contains(".doc") || docxFile.contains(".docx") || docxFile.contains(".DOC") || docxFile.contains(".DOCX")) {
-                logger.log("This is MSOffice document ", Level.INFO);
+                //logger.log("This is MSOffice document ", Level.INFO);
                 if (useExeConvert.equals("false")) {
                     if (os == "linux") {
-                        cmd = "libreoffice -env:UserInstallation=file://"+userLocalDirTmp+idApplet+"_conv\\ --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
+                        cmd = "libreoffice --headless --convert-to pdf --outdir \"" + userLocalDirTmp + "\" \"" + docxFile + "\"";
                     }  else if (os == "mac") {
-                        cmd = "cd /Applications/LibreOffice.app/Contents/MacOs && ./soffice --headless --convert-to pdf:writer_pdf_Export --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\"";
+                        cmd = "cd /Applications/LibreOffice.app/Contents/MacOs && ./soffice --headless --convert-to pdf:writer_pdf_Export --outdir \"" + userLocalDirTmp + "\" \"" + docxFile + "\"";
                     } else if(editMode.equals("libreoffice")){
                         String convertProgram;
                         convertProgram = fM.findPathProgramInRegistry("soffice.exe");
-                        cmd = convertProgram + " \"-env:UserInstallation=file:///"+userLocalDirTmp.replace("\\", "/")+idApplet+"_conv/\" --headless --convert-to pdf --outdir \"" + userLocalDirTmp.substring(0, userLocalDirTmp.length() - 1) + "\" \"" + docxFile + "\" \r\n";
+                        cmd = convertProgram + " --headless --convert-to pdf --outdir \"" + userLocalDirTmp + "\" \"" + docxFile + "\" \r\n";
                     }else{
+                        vbsPath = userLocalDirTmp + File.separator + "DOC2PDF_VBS.vbs";
+                        fM.createFile(fileContentVbs, vbsPath);
+                        fileToDelete.add(vbsPath);
                         cmd = "cmd /C c:\\Windows\\System32\\cscript \"" + vbsPath + "\" \"" + docxFile + "\" /nologo \r\n";      
                     }
-                } else {
-
-                    StringBuffer buffer = new StringBuffer(docxFile);
-                    buffer.replace(buffer.lastIndexOf("."), buffer.length(), ".pdf");
-                    String pdfOut = buffer.toString();
-
-                    cmd = "cmd /C \"" + userLocalDirTmp + "Word2Pdf.exe\" \"" + docxFile + "\" \"" + pdfOut + "\" \r\n";
                 }
             } else {
                 conversion = false;
             }
 
             if (conversion) {
-                logger.log("EXEC PATH : " + cmd, Level.INFO);
-                FileManager fM = new FileManager();
-
                 Process proc_vbs;
+                appPath_convert = userLocalDirTmp + File.separator + "conversion_"+idApplet+".sh";
+                fileToDelete.add(appPath_convert);
+                logger.log("COMMAND : " + cmd, Level.INFO);
                 if (os == "linux" || os == "mac") {
-                    //cmd = "cscript \""+vbsPath+"\" \""+docxFile+"\" /nologo \r\n";
                     final Writer outBat;
                     outBat = new OutputStreamWriter(new FileOutputStream(appPath_convert), "CP850");
-                    logger.log("--- cmd sh  --- " + cmd, Level.INFO);
+                    //logger.log("--- cmd sh  --- " + cmd, Level.INFO);
                     outBat.write(cmd);
-                    //outBat.write("exit \r\n");
                     outBat.close();
 
                     File myFileBat = new File(appPath_convert);
@@ -420,27 +499,17 @@ public class MaarchCM {
                     myFileBat.setWritable(true, false);
                     myFileBat.setExecutable(true, false);
 
-                    /*String cmd2 = "start /WAIT /MIN "+appPath_convert+" \r\n";
-                    final Writer outBat2 = new OutputStreamWriter(new FileOutputStream(appPath), "CP850");
-                    outBat2.write(cmd2);
-                    outBat2.write("exit \r\n");
-                    outBat2.close();*/
-
-                    /*File myFileBat2 = new File(appPath);
-                    myFileBat2.setReadable(true, false);
-                    myFileBat2.setWritable(true, false);
-                    myFileBat2.setExecutable(true, false);*/
-
                     final String exec_vbs = "\"" + appPath + "\"";
                     proc_vbs = fM.launchApp(appPath_convert);
                 } else {
                     proc_vbs = fM.launchApp(cmd);
                 }
+                
                 proc_vbs.waitFor();
             }
 
         } catch (Throwable e) {
-            logger.log("Erreur ! : " + e, Level.SEVERE);
+            logger.log(e.toString(), Level.SEVERE);
             e.printStackTrace();
         }
     }
@@ -449,8 +518,8 @@ public class MaarchCM {
      * Retrieve the xml message from Maarch and parse it
      * @param flux_xml xml content message
      */
-    public void parse_xml(InputStream flux_xml) throws SAXException, IOException, ParserConfigurationException {
-        logger.log("----------BEGIN PARSE XML----------", Level.INFO);
+    public void parse_xml(InputStream flux_xml) throws SAXException, IOException, ParserConfigurationException, InterruptedException {
+        System.out.println("----------BEGIN PARSE XML----------");
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
         try {
@@ -473,25 +542,32 @@ public class MaarchCM {
             }
         } catch (SAXException | IOException e) {
 
-            logger.log("ERREUR : Le document n'a pas pu être transféré du coté client. Assurez-vous que le modèle n'est pas corrompu et que la zone de stockage des templates soit correct.", Level.SEVERE);
             messageStatus = "ERROR";
-            messageResult.put("ERROR", "ERREUR : Le document n'a pas pu être transféré du coté client. Assurez-vous que le modèle n'est pas corrompu et que la zone de stockage des templates soit correct.");
-            JOptionPane.showMessageDialog(null, "ERREUR ! L'édition de votre document a échoué. Assurez-vous que le modèle n'est pas corrompu et que la zone de stockage des modèles soit correct.");
+            messageResult.put("ERROR", "Réponse inattendue du serveur : " + flux_xml.toString());
+            processReturn(messageResult);
         }
-        logger.log("----------END PARSE XML----------", Level.INFO);
+        System.out.println("----------END PARSE XML----------");
     }
 
     /**
      * Manage the return of program execution
      * @param result result of the program execution
      */
-    public void processReturn(Hashtable result) {
+    public void processReturn(Hashtable result) throws InterruptedException, UnsupportedEncodingException {
+        logger.log("---------- RESPONSE SERVER ----------", Level.INFO);
+        
         Iterator itValue = result.values().iterator();
         Iterator itKey = result.keySet().iterator();
         while (itValue.hasNext()) {
             String value = (String) itValue.next();
             String key = (String) itKey.next();
-            logger.log(key + " : " + value, Level.INFO);
+
+            if (!value.isEmpty() && (!"ERROR".equals(key))) {
+                logger.log(key + " : " + value, Level.INFO);
+            } else if (!value.isEmpty() && "ERROR".equals(key)){
+                logger.log(value, Level.SEVERE);
+            }
+            
             if ("STATUS".equals(key)) status = value;
             if ("OBJECT_TYPE".equals(key)) objectType = value;
             if ("OBJECT_TABLE".equals(key)) objectTable = value;
@@ -511,276 +587,12 @@ public class MaarchCM {
         }
         //send message error to Maarch if necessary
         if (!error.isEmpty()) {
-            //TODO exit of the JNLP
-            //destroy();
-            //stop();
+            endRequestApplet();
+            trayIcon.displayMessage("Maarch content editor", error, TrayIcon.MessageType.ERROR);
+            Thread.sleep(5000);
             System.exit(0);
         }
-    }
-
-    /**
-     * Main function of the class
-     * enables you to edit document with the user favorit editor
-     * @return nothing
-     * @throws java.lang.Exception
-     */
-    public String editObject() throws Exception, InterruptedException, JSException {
-
-        System.out.println("----------BEGIN EDIT OBJECT---------- LGI by Maarch 02/10/2017");
-        System.out.println("----------BEGIN LOCAL DIR TMP IF NOT EXISTS----------");
-        os = System.getProperty("os.name").toLowerCase();
-        boolean isUnix = os.contains("nix") || os.contains("nux");
-        boolean isWindows = os.contains("win");
-        boolean isMac = os.contains("mac");
-        userLocalDirTmp = System.getProperty("user.home");
-
-        fM = new FileManager();
-
-        if (isWindows) {
-            System.out.println("This is Windows");
-            userLocalDirTmp = userLocalDirTmp + "\\maarchTmp\\";
-            appPath = userLocalDirTmp + "start.bat";
-            appPath_convert = userLocalDirTmp + "conversion_"+idApplet+".bat";
-            os = "win";
-        } else if (isMac) {
-            System.out.println("This is Mac");
-            userLocalDirTmp = userLocalDirTmp + "/maarchTmp/";
-            appPath = userLocalDirTmp + "start.sh";
-            appPath_convert = userLocalDirTmp + "conversion_"+idApplet+".sh";
-            os = "mac";
-        } else if (isUnix) {
-            System.out.println("This is Unix or Linux");
-            userLocalDirTmp = userLocalDirTmp + "/maarchTmp/";
-            appPath = userLocalDirTmp + "start.sh";
-            appPath_convert = userLocalDirTmp + "conversion_"+idApplet+".sh";
-            os = "linux";
-        } else {
-            System.out.println("Your OS is not supported!!");
-        }
-        fileToDelete.add(appPath_convert);
-        
-        System.out.println("Create the logger");
-        logger = new MyLogger(userLocalDirTmp);
-        
-        System.out.println("APP PATH: " + appPath);
-        System.out.println("----------BEGIN LOCAL DIR TMP IF NOT EXISTS----------");
-
-        String info = fM.createUserLocalDirTmp(userLocalDirTmp, os);
-
-        if (info == "ERROR") {
-            logger.log("ERREUR : Permissions insuffisante sur votre répertoire temporaire maarch", Level.SEVERE);
-            messageStatus = "ERROR";
-            messageResult.clear();
-            messageResult.put("ERROR", "ERREUR : Permissions insuffisante sur votre répertoire temporaire maarch");
-            JOptionPane.showMessageDialog(null, "ERREUR ! Permissions insuffisante sur votre répertoire temporaire maarch.");
-            processReturn(messageResult);
-        }
-
-        System.out.println("Create the logger");
-        logger = new MyLogger(userLocalDirTmp);
-
-        /*logger.log("Delete thefile if exists", Level.INFO);
-        FileManager.deleteFilesOnDir(userLocalDirTmp, "thefile");*/
-        
-        logger.log("----------PARAM ----------", Level.INFO);
-        logger.log("URL : " + url, Level.INFO);
-        logger.log("OBJECT TYPE : " + objectType, Level.INFO);
-        logger.log("ID APPLET : " + idApplet, Level.INFO);
-        logger.log("OBJECT TABLE : " + objectTable, Level.INFO);
-        logger.log("OBJECT ID : " + objectId, Level.INFO);
-        logger.log("UNIQUE ID : " + uniqueId, Level.INFO);
-        logger.log("COOKIE : " + cookie, Level.INFO);
-        logger.log("CLIENTSIDECOOKIES : " + clientSideCookies, Level.INFO);
-        logger.log("USERMAARCH : " + userMaarch, Level.INFO);
-        logger.log("ONLYCONVERT : " + onlyConvert, Level.INFO);
-
-        logger.log("----------BEGIN OPEN REQUEST----------", Level.INFO);
-        String urlToSend;
-        
-        urlToSend = url + "?action=editObject&objectType=" + objectType
-            + "&objectTable=" + objectTable + "&objectId=" + objectId
-            + "&uniqueId=" + uniqueId;
-        
-        
-        logger.log("FIRST URL CALL : " + urlToSend, Level.INFO);
-        sendHttpRequest(urlToSend, "none", false);
-        logger.log("MESSAGE STATUS : " + messageStatus, Level.INFO);
-        logger.log("MESSAGE RESULT : ", Level.INFO);
-        processReturn(messageResult);
-        logger.log("----------END OPEN REQUEST----------", Level.INFO);
-
-        fileToEdit = "thefile_" + idApplet + "." + fileExtension;
-            
-        logger.log("----------BEGIN CREATE THE BAT TO LAUNCH IF NECESSARY----------", Level.INFO);
-        logger.log("create the file : " + appPath, Level.INFO);
-        fM.createBatFile(
-                appPath,
-                userLocalDirTmp,
-                fileToEdit,
-                os,
-                idApplet
-        );
-        logger.log("----------END CREATE THE BAT TO LAUNCH IF NECESSARY----------", Level.INFO);
-
-        if ("ok".equals(status)) {
-            logger.log("RESPONSE OK", Level.INFO);
-            
-            if ("true".equals(convertPdf)) {
-                logger.log("CREATE FILE IN LOCAL PATH", Level.INFO);
-                if (useExeConvert.equals("false")) {
-                    logger.log("---------- VBS FILE ----------", Level.INFO);
-                    logger.log(" Path = " + vbsPath, Level.INFO);
-                    if (vbsPath.equals("")) vbsPath = userLocalDirTmp + "DOC2PDF_VBS.vbs";
-                    boolean isVbsExists = fM.isPsExecFileExists(vbsPath);
-                    if (!isVbsExists) fM.createFile(fileContentVbs, vbsPath);
-                } else {
-                    boolean isConvExecExists = fM.isPsExecFileExists(userLocalDirTmp + "Word2Pdf.exe");
-                    if (!isConvExecExists) fM.createFile(fileContentExe, userLocalDirTmp + "Word2Pdf.exe");
-                }
-            }
-
-            logger.log("----------BEGIN EXECUTION OF THE EDITOR----------", Level.INFO);
-            logger.log("CREATE FILE IN LOCAL PATH", Level.INFO);
-            fM.createFile(fileContent, userLocalDirTmp + fileToEdit);
-            fileToDelete.add(userLocalDirTmp + fileToEdit);
-            
-            fileContentTosend = "";
-            
-            if (onlyConvert.equals("false")) {
-                Thread theThread;
-                theThread = new Thread(new ProcessLoop(this));
-
-                theThread.start();
-
-                String actualContent;
-                
-                do {
-                    theThread.sleep(3000);
-                    File fileTotest = new File(userLocalDirTmp + fileToEdit);
-                    if (fileTotest.canRead()) {
-                        actualContent = FileManager.encodeFile(userLocalDirTmp + fileToEdit);
-                        if (!fileContentTosend.equals(actualContent)) {
-                            fileContentTosend = actualContent;
-                            logger.log("----------[SECURITY BACKUP] BEGIN SEND OF THE OBJECT----------", Level.INFO);
-                            String urlToSave = url + "?action=saveObject&objectType=" + objectType
-                                    + "&objectTable=" + objectTable + "&objectId=" + objectId
-                                    + "&uniqueId=" + uniqueId + "&step=backup&userMaarch=" + userMaarch;
-                            logger.log("[SECURITY BACKUP] URL TO SAVE : " + urlToSave, Level.INFO);
-                            sendHttpRequest(urlToSave, fileContentTosend, false);
-                            logger.log("[SECURITY BACKUP] MESSAGE STATUS : " + messageStatus, Level.INFO);
-                        }
-                    } else {
-                        logger.log(userLocalDirTmp + fileToEdit + " FILE NOT READABLE !!!!!!", Level.INFO);
-                    }
-                }
-                while (theThread.isAlive());
-            
-                theThread.interrupt();
-            }
-
-            
-
-            logger.log("----------END EXECUTION OF THE EDITOR----------", Level.INFO);
-
-            logger.log("----------BEGIN RETRIEVE CONTENT OF THE OBJECT----------", Level.INFO);
-
-            fileContentTosend = FileManager.encodeFile(userLocalDirTmp + fileToEdit);
-
-            logger.log("----------END RETRIEVE CONTENT OF THE OBJECT----------", Level.INFO);
-            
-            logger.log("conversion pdf ? " + convertPdf , Level.INFO);
-
-            if ("true".equals(convertPdf)) {
-                if ((fileExtension.equalsIgnoreCase("docx") || fileExtension.equalsIgnoreCase("doc") || fileExtension.equalsIgnoreCase("docm") || fileExtension.equalsIgnoreCase("odt") || fileExtension.equalsIgnoreCase("ott"))) {
-                    logger.log("----------CONVERSION PDF----------", Level.INFO);
-                    
-                    createPDF(userLocalDirTmp + fileToEdit, userLocalDirTmp, os);
-
-                    String pdfFile = userLocalDirTmp + "thefile_" + idApplet + ".pdf";
-
-                    logger.log("----------BEGIN RETRIEVE CONTENT OF THE OBJECT----------", Level.INFO);
-                    if (fM.isPsExecFileExists(pdfFile)) {
-                        pdfContentTosend = FileManager.encodeFile(pdfFile);
-                        fileToDelete.add(pdfFile);
-                    } else {
-                        pdfContentTosend = "null";
-                        logger.log("ERREUR DE CONVERSION PDF !", Level.WARNING);
-                        JOptionPane.showMessageDialog(null, "Attention ! La conversion PDF a échoué mais le document a bien été transféré.");
-                    }
-                    logger.log("----------END RETRIEVE CONTENT OF THE OBJECT----------", Level.INFO);
-
-                    logger.log("---------- FIN CONVERSION PDF----------", Level.INFO);
-                }else{
-                    pdfContentTosend = "not allowed";
-                    logger.log("Conversion not allowed for this extension : " + fileExtension, Level.INFO);
-                }
-            }
-            
-
-            String urlToSave = url + "?action=saveObject&objectType=" + objectType
-                    + "&objectTable=" + objectTable + "&objectId=" + objectId
-                    + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch
-                    + "&onlyConvert=" + onlyConvert;
-            logger.log("----------BEGIN SEND OF THE OBJECT----------", Level.INFO);
-            logger.log("URL TO SAVE : " + urlToSave, Level.INFO);
-            sendHttpRequest(urlToSave, fileContentTosend, true);
-            logger.log("MESSAGE STATUS : " + messageStatus, Level.INFO);
-            logger.log("LAST MESSAGE RESULT : ", Level.INFO);
-            processReturn(messageResult);
-
-            if ("true".equals(convertPdf)) {
-                if (pdfContentTosend == "null") {
-                    endMessage = endMessage + " mais la conversion pdf n'a pas fonctionné (le document ne pourra pas être signé)";
-                }
-            }
-
-            logger.log("----------END SEND OF THE OBJECT----------", Level.INFO);
-        } else {
-            logger.log("RESPONSE KO", Level.WARNING);
-        }
-        logger.log("----------END EDIT OBJECT----------", Level.INFO);
-        
-        //delete tmp files
-        FileManager.deleteSpecificFilesOnDir(fileToDelete);
-        
-        //delete env libreoffice instance
-        File dir_app = new File(userLocalDirTmp+idApplet);
-        if (dir_app.exists()) {
-            Path directory = Paths.get(userLocalDirTmp+idApplet);
-            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                        Files.delete(dir);
-                        return FileVisitResult.CONTINUE;
-                }
-            });
-        }
-        //delete env libreoffice convert instance
-        File dir_app_conv = new File(userLocalDirTmp+idApplet+"_conv");
-        if (dir_app_conv.exists()) {
-            Path directory = Paths.get(userLocalDirTmp+idApplet+"_conv");
-            Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                        Files.delete(dir);
-                        return FileVisitResult.CONTINUE;
-                }
-            });
-        }
-
-        return "ok";
+        logger.log("-------------------------------------", Level.INFO);
     }
 
     /**
@@ -788,16 +600,15 @@ public class MaarchCM {
      * @return boolean
      */
     public Boolean launchProcess() throws PrivilegedActionException, InterruptedException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        Process proc;
-
-        logger.log("LAUNCH THE EDITOR !", Level.INFO);
+        logger.log("LAUNCH THE EDITOR ...", Level.INFO);
         
-        if ("linux".equals(os) || "mac".equals(os)) {
+        if ("linux".equals(os)) {
             editMode = "libreoffice";
-            proc = fM.launchApp(appPath);
+            fM.launchApp("libreoffice --nolockcheck --nodefault --nofirststartwizard --nofirststartwizard --norestore " + userLocalDirTmp + File.separator + fileToEdit);
+        } else if ("mac".equals(os)) {
+            editMode = "libreoffice";
+            fM.launchApp("open -W " + userLocalDirTmp + File.separator + fileToEdit);
         } else {
-            logger.log("FILE TO EDIT : " + userLocalDirTmp + fileToEdit, Level.INFO);
-
             programName = fM.findGoodProgramWithExt(fileExtension);
             String pathProgram;
             pathProgram = fM.findPathProgramInRegistry(programName);
@@ -811,14 +622,14 @@ public class MaarchCM {
                     pathProgram = fM.findPathProgramInRegistry(programName);
                     options = fM.findGoodOptionsToEdit(fileExtension);
                 }else{
-                    options = "\"-env:UserInstallation=file:///" + userLocalDirTmp.replace("\\", "/") + idApplet +"/\" ";          
+                    options = " --nolockcheck --nodefault --nofirststartwizard --nofirststartwizard --norestore ";          
                 }
             }else{
                 if("\"null\"".equals(pathProgram)){
                     System.out.println(programName+" not found! switch to libreoffice...");
                     programName = "soffice.exe";
                     pathProgram = fM.findPathProgramInRegistry(programName);
-                    options = "\"-env:UserInstallation=file:///" + userLocalDirTmp.replace("\\", "/") + idApplet +"/\" ";
+                    options = " --nolockcheck --nodefault --nofirststartwizard --nofirststartwizard --norestore ";
                 }else{
                     options = fM.findGoodOptionsToEdit(fileExtension);
                 }
@@ -829,19 +640,16 @@ public class MaarchCM {
             }else{
                 editMode = "office"; 
             }
-            logger.log("PROGRAM NAME TO EDIT : " + programName, Level.INFO);
-            logger.log("OPTION PROGRAM TO EDIT " + options, Level.INFO);
-            logger.log("PROGRAM PATH TO EDIT : " + pathProgram, Level.INFO);
+            //logger.log("PROGRAM NAME TO EDIT : " + programName, Level.INFO);
+            //logger.log("OPTION PROGRAM TO EDIT " + options, Level.INFO);
+            //logger.log("PROGRAM PATH TO EDIT : " + pathProgram, Level.INFO);
             
             
             String pathCommand;
-            pathCommand = pathProgram + " " + options + "\"" + userLocalDirTmp + fileToEdit + "\"";
-            logger.log("PATH COMMAND TO EDIT " + pathCommand, Level.INFO);
-            proc = fM.launchApp(pathCommand);
+            pathCommand = pathProgram + " " + options + "\"" + userLocalDirTmp + File.separator + fileToEdit + "\"";
+            logger.log("COMMAND : " + pathCommand, Level.INFO);
+            fM.launchApp(pathCommand);
         }
-        proc.waitFor();
-        logger.log("END OF THE PROCESS", Level.INFO);
-
         return true;
     }
 
@@ -851,7 +659,7 @@ public class MaarchCM {
      * @param postRequest the request
      * @param endProcess end request
      */
-    public void sendHttpRequest(String theUrl, final String postRequest, final boolean endProcess) throws UnsupportedEncodingException {
+    public void sendHttpRequest(String theUrl, final String postRequest, final boolean endProcess) throws UnsupportedEncodingException, InterruptedException {
         System.out.println("URL request : " + theUrl);
 
         // Inner class representing the payload to be posted via HTTP
@@ -944,43 +752,312 @@ public class MaarchCM {
         try {
             System.out.println("COOKIES TO BE SENT: " + httpContext.getCookieStore().getCookies()); // Show the cookies to be sent
             CloseableHttpResponse response = httpClient.execute(request, httpContext); // Carry out the HTTP post request
-            System.out.println(response);
-            if (response == null) {
-                System.out.println("NO RESPONSE, THE APPLICATION WILL FAIL!");
-            } else {
+            //System.out.println(response);
+            if (response == null || response.toString().contains("401 Unauthorized")) {
+                logger.log("SERVER CONNEXION FAILED : " + response.toString(), Level.SEVERE);
+                trayIcon.displayMessage("Maarch content editor", "SERVER CONNEXION FAILED : " + response.toString(), TrayIcon.MessageType.ERROR);
+                logger.close();
+                Thread.sleep(5000);
+                System.exit(0);
+            } else{
                 parse_xml(response.getEntity().getContent()); // Process the response from the server
                 response.close();
             }
         } catch (Exception ex) {
-            logger.log("erreur: " + ex, Level.SEVERE);
-            JOptionPane.showMessageDialog(null, "ERREUR ! La connexion au serveur a été interrompue, le document édité n'a pas été sauvegardé !");
+            logger.log("SERVER CONNEXION FAILED : " + ex, Level.SEVERE);
+            trayIcon.displayMessage("Maarch content editor", "La connexion au serveur a été interrompue, le document édité n'a pas été sauvegardé !", TrayIcon.MessageType.ERROR);
+            logger.close();
+            Thread.sleep(5000);
+            System.exit(0);
         }
     }
     
-    /**
-     * Class to manage the execution of an external program
-     */
-    public class ProcessLoop extends Thread {
-        public MaarchCM MaarchCM;
+    public void editObject_v2() throws InterruptedException, IOException, PrivilegedActionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, Exception {
+        String urlToSend;
+        if (checksumFile(md5File) == false) {
+            logger.log("The file is not found in maarchTmp folder.", Level.INFO);
+            logger.log("RETRIEVE DOCUMENT ...", Level.INFO);
+            
+            urlToSend = url + "?action=editObject&objectType=" + objectType
+                + "&objectTable=" + objectTable + "&objectId=" + objectId
+                + "&uniqueId=" + uniqueId;
 
-        public ProcessLoop(MaarchCM MaarchCM){
-            this.MaarchCM = MaarchCM;
-        }
+            logger.log("CALL : " + urlToSend, Level.INFO);
+            sendHttpRequest(urlToSend, "none", false);
+            processReturn(messageResult);
 
-        public void run() {
-            try {
-                MaarchCM.launchProcess();
-            } catch (PrivilegedActionException ex) {
-                Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(MaarchCM.class.getName()).log(Level.SEVERE, null, ex);
+            //fileToEdit = "thefile_" + idApplet + "." + fileExtension;
+            if (md5File.equals("0")) {
+               md5File =  "thefile_" + idApplet;
             }
+            fileToEdit = md5File + "." + fileExtension;
+
+            fM.createFile(fileContent, userLocalDirTmp + File.separator + fileToEdit);
+        } else {
+            System.out.println("Document found in maarchTmp folder !");
+            logger.log("Document found in maarchTmp folder !", Level.INFO);
+        }   
+        
+        //fileToDelete.add(userLocalDirTmp + File.separator + fileToEdit);
+        fileContentTosend = "";
+        
+        logger.log("FILE TO EDIT : " + userLocalDirTmp + fileToEdit, Level.INFO);
+        
+        launchProcess();
+        try {
+            WatchService watcher = FileSystems.getDefault().newWatchService();
+            
+            Path dir = Paths.get(userLocalDirTmp);
+            dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+            String editor = "";
+
+            while (true) {
+                WatchKey key;
+                try {
+                    key = watcher.take();
+                } catch (InterruptedException ex) {
+                    return;
+                }
+                 
+                for (WatchEvent<?> event : key.pollEvents()) {
+                    WatchEvent.Kind<?> kind = event.kind();
+                     
+                    @SuppressWarnings("unchecked")
+                    WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                    Path fileName = ev.context();
+                     
+                    //System.out.println(kind.name() + ": " + fileName);
+
+                    if (kind == ENTRY_CREATE && fileName.toString().equals(".~lock." + fileToEdit + "#")) {
+                        editor = "libreoffice";
+                    }
+                    if (kind == ENTRY_CREATE && fileName.toString().equals("~$" + fileToEdit.substring(2, fileToEdit.length())) ) {
+                        editor = "office";
+                    }
+                    if (kind == ENTRY_MODIFY && fileName.toString().equals(fileToEdit)) {
+                        Thread.sleep(3000);
+                        File fileTotest = new File(userLocalDirTmp + File.separator + fileToEdit);
+                        if (fileTotest.canRead()) {
+                            String actualContent = FileManager.encodeFile(userLocalDirTmp + File.separator + fileToEdit);
+                            if (!fileContentTosend.equals(actualContent)) {
+                                fileContentTosend = actualContent;
+                                logger.log("BACKUP FILE SEND ...", Level.INFO);
+                                String urlToSave = url + "?action=saveObject&objectType=" + objectType
+                                        + "&objectTable=" + objectTable + "&objectId=" + objectId
+                                        + "&uniqueId=" + uniqueId + "&step=backup&userMaarch=" + userMaarch;
+                                logger.log("CALL : " + urlToSave, Level.INFO);
+                                trayIcon.displayMessage("Maarch content editor", "Envoi du brouillon ...", TrayIcon.MessageType.INFO);
+                                sendHttpRequest(urlToSave, fileContentTosend, false);
+                                processReturn(messageResult);
+                            }
+                        } else {
+                            logger.log(userLocalDirTmp + fileToEdit + " FILE NOT READABLE !!!!!!", Level.INFO);
+                        }
+                    }
+                    if (kind == ENTRY_CREATE && (fileName.toString().equals(".~lock." + fileToEdit + "#") || fileName.toString().equals("~$" + fileToEdit.substring(2, fileToEdit.length())))) {
+                        logger.log("FIRST BACKUP FILE SEND ...", Level.INFO);
+
+                        urlToSend = url + "?action=editObject&objectType=" + objectType
+                            + "&objectTable=" + objectTable + "&objectId=" + objectId
+                            + "&uniqueId=" + uniqueId;
+                        logger.log("CALL : " + urlToSend, Level.INFO);
+                        sendHttpRequest(urlToSend, "none", false);
+                        processReturn(messageResult);                        
+                    }
+
+                    if (kind == ENTRY_DELETE && (fileName.toString().equals(".~lock." + fileToEdit + "#") || fileName.toString().equals("~$" + fileToEdit.substring(2, fileToEdit.length())))) {
+                        Thread.sleep(500);
+                        File fileTotest = new File(userLocalDirTmp + File.separator +".~lock." + fileToEdit + "#");
+                        if(!fileTotest.exists() || editor.equals("office")) {
+                            logger.log("ENDING EDITING FILE ...", Level.INFO);
+                            logger.log("ENCODING DOCUMENT ...", Level.INFO);
+                            fileContentTosend = FileManager.encodeFile(userLocalDirTmp + File.separator + fileToEdit);
+
+                            if ("true".equals(convertPdf)) {
+                                if ((fileExtension.equalsIgnoreCase("docx") || fileExtension.equalsIgnoreCase("doc") || fileExtension.equalsIgnoreCase("docm") || fileExtension.equalsIgnoreCase("odt") || fileExtension.equalsIgnoreCase("ott"))) {
+                                    logger.log("CONVERT DOCUMENT TO PDF ...", Level.INFO);
+                                    //String pdfFile = userLocalDirTmp + File.separator + "thefile_" + idApplet + ".pdf";
+                                    String pdfFile = userLocalDirTmp + File.separator + md5File + ".pdf";                                    
+                                    createPDF(userLocalDirTmp + File.separator + fileToEdit, userLocalDirTmp, os);
+                                    File file=new File(pdfFile);
+                                    if (file.exists()) {
+                                        pdfContentTosend = FileManager.encodeFile(pdfFile);
+                                        fileToDelete.add(pdfFile);
+                                        
+                                    } else {
+                                        pdfContentTosend = "null";
+                                        logger.log("CONVERT PDF ERROR !", Level.WARNING); 
+                                    }
+                                }else{
+                                    pdfContentTosend = "not allowed";
+                                    logger.log("EXTENSION : " + fileExtension + " CANNOT BE CONVERTED", Level.WARNING);
+                                }
+                            }
+
+                            trayIcon.displayMessage("Maarch content editor", "Envoi du document ...", TrayIcon.MessageType.INFO);
+                            String urlToSave = url + "?action=saveObject&objectType=" + objectType
+                                    + "&objectTable=" + objectTable + "&objectId=" + objectId
+                                    + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch
+                                    + "&onlyConvert=" + onlyConvert;
+                            logger.log("CALL : " + urlToSave, Level.INFO);
+                            sendHttpRequest(urlToSave, fileContentTosend, true);
+                            processReturn(messageResult);
+
+                            if ("true".equals(convertPdf)) {
+                                if (pdfContentTosend == "null") {
+                                    endMessage = endMessage + " mais la conversion pdf n'a pas fonctionné (le document ne pourra pas être signé)";
+                                }
+                            }
+                            
+                            logger.log("CREATE BACKUP FILE IN TMP FOLDER ...", Level.INFO);
+                            String newMd5 = getchecksumFile(userLocalDirTmp + File.separator + fileToEdit);
+                            
+                            if (os.equals("win")) {
+                                fileContent = FileManager.encodeFile(userLocalDirTmp + File.separator + fileToEdit);
+                                fM.createFile(fileContent,userLocalDirTmp + File.separator + newMd5 + "." + fileExtension);
+                            } else {
+                                Files.move(new File(userLocalDirTmp + File.separator + fileToEdit).toPath(), new File(userLocalDirTmp + File.separator + newMd5 + "." + fileExtension).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                            }
+                            Thread.sleep(2000);
+                            logger.log("DELETE TMP FILES ...", Level.INFO);
+                            FileManager.deleteSpecificFilesOnDir(fileToDelete);
+                            logger.log("DELETE ENV FOLDER ...", Level.INFO);
+                            FileManager.deleteEnvDir(userLocalDirTmp + File.separator + idApplet + "_conv");
+                            logger.log("DELETE OLDEST FILES ...", Level.INFO);
+                            FileManager.deleteFilesOnDirWithTime(userLocalDirTmp);
+                         
+                            return;
+                        }
+                    }
+                }
+                 
+                boolean valid = key.reset();
+                if (!valid) {
+                    break;
+                }
+            }
+             
+        } catch (IOException ex) {
+            System.err.println(ex);
         }
     }
-}
+    
+    public void launchOnlyConvert() throws UnsupportedEncodingException, InterruptedException, IOException, PrivilegedActionException, Exception {
+
+        logger.log("RETRIEVE DOCUMENT ...", Level.INFO);
+        
+        String urlToSend = url + "?action=editObject&objectType=" + objectType
+            + "&objectTable=" + objectTable + "&objectId=" + objectId
+            + "&uniqueId=" + uniqueId;
+        
+        logger.log("CALL : " + urlToSend, Level.INFO);
+        
+        sendHttpRequest(urlToSend, "none", false);
+        processReturn(messageResult);
+        
+        fileToEdit = "thefile_" + idApplet + "." + fileExtension;
+        
+        logger.log("FILE TO CONVERT : " + userLocalDirTmp + fileToEdit, Level.INFO);
+        
+        fM.createFile(fileContent, userLocalDirTmp + File.separator + fileToEdit);
+        fileToDelete.add(userLocalDirTmp + File.separator + fileToEdit);
+        fileContentTosend = FileManager.encodeFile(userLocalDirTmp + File.separator + fileToEdit);
+        
+        if ((fileExtension.equalsIgnoreCase("docx") || fileExtension.equalsIgnoreCase("doc") || fileExtension.equalsIgnoreCase("docm") || fileExtension.equalsIgnoreCase("odt") || fileExtension.equalsIgnoreCase("ott"))) {
+            logger.log("CONVERT DOCUMENT TO PDF ...", Level.INFO);
+            String pdfFile = userLocalDirTmp + File.separator + "thefile_" + idApplet + ".pdf";
+            createPDF(userLocalDirTmp + File.separator + fileToEdit, userLocalDirTmp, os);
+            File file=new File(pdfFile);
+            if (file.exists()) {
+                pdfContentTosend = FileManager.encodeFile(pdfFile);
+                fileToDelete.add(pdfFile);
+
+            } else {
+                pdfContentTosend = "null";
+                logger.log("CONVERT PDF ERROR !", Level.WARNING); 
+            }
+
+        }else{
+            pdfContentTosend = "not allowed";
+            logger.log("EXTENSION : " + fileExtension + " CANNOT BE CONVERTED", Level.WARNING);  
+        }
+        String urlToSave = url + "?action=saveObject&objectType=" + objectType
+                + "&objectTable=" + objectTable + "&objectId=" + objectId
+                + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch
+                + "&onlyConvert=" + onlyConvert;
+        logger.log("----------BEGIN SEND OF THE OBJECT----------", Level.INFO);
+        logger.log("CALL : " + urlToSave, Level.INFO);
+        sendHttpRequest(urlToSave, fileContentTosend, true);
+        processReturn(messageResult);
+
+        Thread.sleep(2000);
+        logger.log("DELETE TMP FILES ...", Level.INFO);
+        FileManager.deleteSpecificFilesOnDir(fileToDelete);
+        logger.log("DELETE ENV FOLDER ...", Level.INFO);
+        FileManager.deleteEnvDir(userLocalDirTmp + File.separator + idApplet + "_conv");
+        return;
+    }
+    
+    public void endRequestApplet() throws UnsupportedEncodingException, InterruptedException {
+        logger.log("CLOSING APPLET ...", Level.INFO);
+        fileContentTosend = "";
+        String urlToSave = url + "?action=terminate&objectType=" + objectType
+            + "&objectTable=" + objectTable + "&objectId=" + objectId
+            + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch
+            + "&onlyConvert=" + onlyConvert;
+        logger.log("CALL : " + urlToSave, Level.INFO);
+        sendHttpRequest(urlToSave, "none", true);
+        logger.close();
+        return;
+    }
+    
+    public Boolean checksumFile(String md5) throws NoSuchAlgorithmException, FileNotFoundException, IOException {
+        if (md5.equals("0")) {
+            return false;
+        }
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        FileInputStream fis = null;
+        File dir = new File(userLocalDirTmp);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+          for (File child : directoryListing) {
+            if (child.toString().contains(md5)) {
+                
+                String checksum = getchecksumFile(child.toString());
+                System.out.println("MD5 checksum file found ! " + checksum);
+                if (checksum.equals(md5)) {
+                    fileToEdit = child.getName().toString();
+                    fileExtension = FileManager.getFileExtension(child);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+          }
+        }
+        return false;
+    }
+    
+    public String getchecksumFile(String fileName) throws NoSuchAlgorithmException, FileNotFoundException, IOException {
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        
+        FileInputStream fis = new FileInputStream(fileName);
+
+        byte[] dataBytes = new byte[1024];
+
+        int nread = 0; 
+        while ((nread = fis.read(dataBytes)) != -1) {
+          md.update(dataBytes, 0, nread);
+        };
+        byte[] mdbytes = md.digest();
+
+        //convert the byte to hex format method 1
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < mdbytes.length; i++) {
+          sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        System.out.println("MD5 checksum file : " + sb.toString());
+        return sb.toString();
+    }
+} 
