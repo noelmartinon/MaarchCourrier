@@ -127,8 +127,7 @@ if (($core_tools->test_service('join_res_case', 'cases', false) == 1) || ($core_
                     });
 
                     btn_search_case = window.opener.$j('#search_case');
-                    btn_search_case.after(btn_unlink_case);
-                    btn_search_case.after('<span> </span>');
+                    window.opener.$j('#unlink_case').html(btn_unlink_case);
                     
                 }
                 //self.close();
