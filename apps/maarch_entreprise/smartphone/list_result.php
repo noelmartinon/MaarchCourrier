@@ -67,20 +67,25 @@ if (isset($whereRequest) && !empty($whereRequest)) {
             if ($view == "view_folders") {
                 $line = '<li>';
             } else {
-                $action = \Action\models\ActionModel::getById(['id' => $_SESSION['current_basket']['default_action'], 'select' => ['action_page']]);
-                if ($i < $nombreDeLignesAffiche) {
-                    if (!empty($action) && $action['action_page'] == 'visa_mail' && $view != "res_view_attachments"){
-                        $line = '<li id=res_' . $i . ' style="display:block;"><a href="view_attachments.php?id=';
+                if(!empty($_REQUEST['baskets'])){
+                    $action = \Action\models\ActionModel::getById(['id' => $_SESSION['current_basket']['default_action'], 'select' => ['action_page']]);
+                    if ($i < $nombreDeLignesAffiche) {
+                        if (!empty($action) && $action['action_page'] == 'visa_mail' && $view != "res_view_attachments"){
+                            $line = '<li id=res_' . $i . ' style="display:block;"><a href="view_attachments.php?id=';
+                        } else {
+                            $line = '<li id=res_' . $i . ' style="display:block;"><a href="details.php?id=';
+                        }
                     } else {
-                        $line = '<li id=res_' . $i . ' style="display:block;"><a href="details.php?id=';
+                        if (!empty($action) && $action['action_page'] == 'visa_mail' && $view != "res_view_attachments"){
+                            $line = '<li id=res_' . $i . ' style="display:block;"><a href="view_attachments.php?id=';
+                        } else {
+                            $line = '<li id=res_' . $i . ' style="display:none;"><a href="details.php?id=';
+                        }
                     }
                 } else {
-                    if (!empty($action) && $action['action_page'] == 'visa_mail' && $view != "res_view_attachments"){
-                        $line = '<li id=res_' . $i . ' style="display:block;"><a href="view_attachments.php?id=';
-                    } else {
-                        $line = '<li id=res_' . $i . ' style="display:none;"><a href="details.php?id=';
-                    }
+                    $line = '<li id=res_'.$i.' style="display:block;"><a href="details.php?id=';
                 }
+                
             }
             for ($j = 0; $j < count($tab[$i]); $j++) {
                 foreach (array_keys($tab[$i][$j]) as $value) {
