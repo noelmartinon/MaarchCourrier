@@ -370,6 +370,30 @@ abstract class content_management_tools_Abstract
             $jar_path = (string) $loadedXml->CONFIG[0]->jar_path;
         }
 
+        $hashFile = 0;
+        if ($objectType == 'attachmentUpVersion') {
+            $dbAttachment = new Database();
+            $query = "SELECT relation, docserver_id, path, filename, format 
+            FROM res_view_attachments 
+            WHERE (res_id = ? OR res_id_version = ?) AND res_id_master = ? ORDER BY relation desc";
+
+            $stmt = $dbAttachment->query($query, array($objectId, $objectId, $_SESSION['doc_id']));
+
+            if ($stmt->rowCount() > 0) {
+                $line = $stmt->fetchObject();
+                $docserver = $line->docserver_id;
+                $path = $line->path;
+                $filename = $line->filename;
+                $query = "select path_template from docservers where docserver_id = ?";
+                $stmt = $dbAttachment->query($query, array($docserver));
+                $lineDoc = $stmt->fetchObject();
+                $docserver = $lineDoc->path_template;
+                $fileOnDs = $docserver . $path . $filename;
+                $fileOnDs = str_replace('#', DIRECTORY_SEPARATOR, $fileOnDs);
+                $hashFile = hash_file('md5', $fileOnDs);
+            }
+        }
+
         if ($_SESSION['config']['debug']) {
             $inF = fopen(
                 $_SESSION['config']['tmppath'] . 'log_jnlp_' . $_SESSION['user']['UserId'] . '.log',
@@ -552,7 +576,8 @@ abstract class content_management_tools_Abstract
             $onlyConvert = 'false';
         }
         $param11_balise=$docXML->createElement("argument", htmlentities($onlyConvert));
-        
+        $param12_balise=$docXML->createElement("argument", $hashFile);
+
 
         $jnlp_balise->appendChild($info_balise); 
         $info_balise->appendChild($title_balise); 
@@ -587,6 +612,7 @@ abstract class content_management_tools_Abstract
         $applet_balise->appendChild($param9_balise);
         $applet_balise->appendChild($param10_balise);
         $applet_balise->appendChild($param11_balise);
+        $applet_balise->appendChild($param12_balise);
 
         $docXML->appendChild($jnlp_balise);  
 

@@ -363,6 +363,13 @@ if (!empty($_REQUEST['action'])
             );
             createXML('ERROR', $result);
         }
+    } elseif ($_REQUEST['action'] == 'terminate') {
+        if (file_exists($file)) {
+            unset($_SESSION['cm_applet'][$_SESSION['user']['UserId']][$_REQUEST['idApplet']]);
+            unlink($file);
+        }
+
+        createXML('SUCCESS', ['END_MESSAGE' => 'Terminate ok']);
     } elseif ($_REQUEST['action'] == 'sendPsExec') {
         $pathToPsExec = 'modules/content_management/dist/PsExec.exe';
         if (file_exists($pathToPsExec)) {
