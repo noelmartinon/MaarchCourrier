@@ -39,22 +39,19 @@ if (input_res) {
             ?>
             input_chrono_id.value=<?php echo json_encode($arrayChrono); ?>;       
         <?php
+
         } ?>
 	window.opener.$('attach_link').click();
 } else { //INDEX_MLB
 	window.opener.$('res_id').value=<?php echo json_encode($_SESSION['stockCheckbox']); ?>;
-        <?php 
-        if (_ID_TO_DISPLAY == 'chrono_number') {
-            ?>
-            window.opener.$('chrono_id').value=<?php echo json_encode($arrayChrono); ?>;
-        <?php
-        } ?>
+    <?php 
+    if (_ID_TO_DISPLAY == 'chrono_number') {
+        ?>
+        window.opener.$('chrono_id').value=<?php echo json_encode($arrayChrono); ?>;
+    <?php
+
+    } ?>
 }
 
-<?php
-if ($_SESSION['current_basket']['id'] == 'IndexingBasket') {
-            ?>window.opener.$('attach_link').click();<?php
-        }
-?>
 self.close();
 </script>
