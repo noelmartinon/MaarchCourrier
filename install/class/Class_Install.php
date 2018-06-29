@@ -1064,7 +1064,7 @@ class Install extends functions
 ';
         fwrite($file, $cron);
         fclose($file);
-        exec('crontab '.$pathfile);
+        exec('cat ' . $pathfile . ' | crontab');
 
         $output = exec('crontab -l');
         //$fileCrontab = fopen("custom/cs_".$_SESSION['config']['databasename']."/crontabL_".$_SESSION['config']['databasename'], "a+");
@@ -1077,7 +1077,6 @@ class Install extends functions
     private function setLog4php()
     {
         $xmlconfig = simplexml_load_file('apps/maarch_entreprise/xml/log4php.default.xml');
-        $LOG4PHP = $xmlconfig->log4php;
         $appender = $xmlconfig->appender;
         $param = $appender->param;
         $appender->param['value'] = realpath('.').'/fonctionnel.log';
