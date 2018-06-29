@@ -46,6 +46,7 @@
 		<parameter name="fileplan_id" type="integer" />
 		<parameter name="url" type="url" />
 		<parameter name="param" type="string" />
+		<parameter name="actual_position_id" type="integer" />
 	</validationRule>
 	<validationRule name="positions_documents_list" extends="standardForm" mode="error">
 		<parameter name="module" type="identifier" />
