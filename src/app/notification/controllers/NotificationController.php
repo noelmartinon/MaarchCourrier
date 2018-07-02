@@ -280,7 +280,7 @@ class NotificationController
         if (!Validator::length(1, 254)->notEmpty()->validate($aArgs['description'])) {
             $errors[] = 'wrong format for description';
         }
-        if (!Validator::length(0, 254)->validate($dataArgsa['event_id'])) {
+        if (!Validator::length(0, 254)->validate($aArgs['event_id'])) {
             $errors[] = 'event_id is too long';
         }
         if (!Validator::length(0, 30)->validate($aArgs['notification_mode'])) {
