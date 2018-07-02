@@ -248,7 +248,7 @@ class NotificationController
             }
 
             $filePath = $pathToFolow.'modules/notifications/batch/scripts/'.$filename;
-            if (file_exist($filePath)) {
+            if (file_exists($filePath)) {
                 unlink($filePath);
             }
         }
