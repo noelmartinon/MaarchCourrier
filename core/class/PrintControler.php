@@ -232,7 +232,7 @@ class PrintControler extends PrintFunctions
 				$pdf->SetFont('Arial','B',11);
 				
 				//APPLICATION NAME
-				$pdf->Cell(140,5,$_SESSION['config']['applicationname'],0,0, 'L', false);
+				$pdf->Cell(140,5, utf8_decode($_SESSION['config']['applicationname']),0,0, 'L', false);
 				
 				$pdf->SetFont('Arial','',10);
 				
