@@ -69,6 +69,7 @@
       <enumeration value="apa_coll" />
       <enumeration value="templates" />
       <enumeration value="archive_transfer_coll" />
+      <enumeration value="attachments_version_coll" />
     </dataType>
     <dataType name="res_table_list" base="string">
       <enumeration value="res_letterbox" />
