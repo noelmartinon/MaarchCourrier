@@ -27,10 +27,9 @@ $_SESSION['attachmentInfo'][$attachNum]['back_date'] = $_REQUEST['back_date'];
 $_SESSION['attachmentInfo'][$attachNum]['backDateStatus'] = $_REQUEST['backDateStatus'];
 
 
-if (isset($_REQUEST['attachType']) && $_REQUEST['attachType'] == 'outgoing_mail'){
-	$objType = 'outgoingMail';
-}
-else {
+if (isset($_REQUEST['attachType']) && $_REQUEST['attachType'] == 'outgoing_mail' && $_REQUEST['objectType'] == 'attachmentVersion') {
+    $objType = 'outgoingMail';
+} else {
     $objType = $_REQUEST['objectType'];
 }
 
@@ -53,9 +52,9 @@ $content = '<style type="text/css">html{overflow:hidden}</style>'
             . '<div id="content">'
                 . '<div class="error" id="divError" name="divError"></div>'
                 . '<script language="javascript">'
-                    . 'loadApplet(\'' 
+                    . 'loadApplet(\''
                         . $_SESSION['config']['coreurl'] . '' . $path
-                        . '?objectType=attachment&objectId=' 
+                        . '?objectType=attachment&objectId='
                         . $_REQUEST['objectId']
                         . '&objectType='
                         . $objType
@@ -81,7 +80,8 @@ $content = '<style type="text/css">html{overflow:hidden}</style>'
     . '</body>';
 
 
-function _parse($text) {
+function _parse($text)
+{
     $text = str_replace("\r\n", "\n", $text);
     $text = str_replace("\r", "\n", $text);
     $text = str_replace("\n", "\\n ", $text);
@@ -93,4 +93,4 @@ $error = $_SESSION['error'];
 $js = '';
 
 echo "{status : " . $status . ", content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
-exit ();
+exit();
