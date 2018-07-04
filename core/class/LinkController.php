@@ -45,11 +45,14 @@ class LinkController
                 $contact = $infos['exp_user_id']['show_value'];
             } elseif (!empty($infos['dest_user_id']['show_value'])) {
                 $contact = $infos['dest_user_id']['show_value'];
-            } else {
+            } elseif ($infos['category_id']['value'] != 'attachment') {
                 $contact = _MULTI_CONTACT;
             }
 
             $infos['subject'] = preg_replace("/\r\n|\r|\n/", '<br/>', $infos['subject']);
+            if (!empty($infos['subject']['show_value'])) {
+                $subjectShowValue = $infos['subject']['show_value'];
+            }
 
             $return .= '<div id="ged_'.$key.$sens.'" class="linkDiv">';
             $return .= '<table style="width:100%;text-align:left;font-size:15px;cursor:pointer;" title="'._ACCESS_TO_DETAILS.'">';
@@ -60,7 +63,7 @@ class LinkController
             $return .= '<i class="'.$img_class.' '.$status['img_filename'].' '.$img_class.'-2x" ></i> ';
             $return .= '</td>';
             $return .= '<td colspan="2" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
-            $return .= '<b>'.$infos['subject']['show_value'].'</b>';
+            $return .= '<b>'.$subjectShowValue.'</b>';
             $return .= '</td>';
             $return .= '<td colspan="2" onclick="window.top.location.href=\'index.php?page=details&dir=indexing_searching&id='.$key.'\'">';
             $return .= '</td>';
@@ -193,7 +196,7 @@ class LinkController
     {
         $db = new Database();
 
-        $query = 'SELECT res_child FROM res_linked WHERE coll_id=? AND res_parent=?';
+        $query = 'SELECT res_child FROM res_linked, res_letterbox WHERE coll_id=? AND res_parent=? and res_letterbox.res_id = res_child and status != \'DEL\'';
         $stmt = $db->query($query, array($collection, $parentId));
         if ($stmt) {
             $i = 0;
@@ -216,7 +219,7 @@ class LinkController
     {
         $db = new Database();
 
-        $query = 'SELECT res_parent FROM res_linked WHERE coll_id=? AND res_child=?';
+        $query = 'SELECT res_parent FROM res_linked, res_letterbox WHERE coll_id=? AND res_child=? and res_letterbox.res_id = res_parent and status != \'DEL\'';
         $stmt = $db->query($query, array($collection, $parentId));
         if ($stmt) {
             $i = 0;
@@ -258,7 +261,7 @@ class LinkController
 
         $i = 0;
         if ($sens == 'desc' || $sens == 'all') {
-            $query = 'SELECT res_child FROM res_linked WHERE coll_id=? AND res_parent=?';
+            $query = 'SELECT res_child FROM res_linked, res_letterbox WHERE coll_id=? AND res_parent=? AND res_letterbox.res_id = res_child AND status != \'DEL\'';
             $stmt = $db->query($query, array($collection, $id));
             if ($stmt) {
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -267,7 +270,7 @@ class LinkController
             }
         }
         if ($sens == 'asc' || $sens == 'all') {
-            $query = 'SELECT res_parent FROM res_linked WHERE coll_id=? AND res_child=?';
+            $query = 'SELECT res_parent FROM res_linked, res_letterbox WHERE coll_id=? AND res_child=? AND res_letterbox.res_id = res_parent AND status != \'DEL\'';
             $stmt = $db->query($query, array($collection, $id));
             if ($stmt) {
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
