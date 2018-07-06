@@ -19,6 +19,7 @@ require_once("modules".DIRECTORY_SEPARATOR."cases".DIRECTORY_SEPARATOR."class".D
 $core_tools = new core_tools();
 $core_tools->test_user();
 $core_tools->load_lang();
+$core_tools->load_js();
 $core_tools->load_html();
 $core_tools->load_header('', true, false);
 $sec = new security();
@@ -54,6 +55,23 @@ if (($core_tools->test_service('join_res_case', 'cases', false) == 1) || ($core_
                     case_id.value = '<?php functions::xecho($case_id_newest );?>';
                     case_label.value = '<?php echo addslashes($case_label);?>';
                     case_description.value = '<?php echo addslashes($case_description);?>';
+                    lang_unlink_case = '<?php echo addslashes(_UNLINK_CASE);?>';
+                    url_script = '<?php echo $_SESSION['config']['businessappurl']?>'+'index.php?display=true&module=cases&page=unlink_case';
+                    case_id = '<?php echo $case_id_newest; ?>';
+                    res_id = '<?php echo $actual_res_id; ?>';
+                    strOnClick = 'if(confirm(\"'+lang_unlink_case+'?\")){unlink_case(\''+url_script+'\','+case_id+','+res_id+');}';
+                    
+                    var btn_unlink_case = $j(' <input/>').attr({
+                        type    : "button",
+                        id      : "btn_unlink_case",
+                        onclick : strOnClick,
+                        class   : 'button',
+                        value   : lang_unlink_case
+                    });
+
+                    btn_search_case = window.opener.$j('#search_case');
+                    window.opener.$j('#unlink_case').html(btn_unlink_case);
+
                 }
                 self.close();
                 </script>
@@ -86,5 +104,4 @@ if (($core_tools->test_service('join_res_case', 'cases', false) == 1) || ($core_
         <?php
     }
 }
-$core_tools->load_js();
 ?>
