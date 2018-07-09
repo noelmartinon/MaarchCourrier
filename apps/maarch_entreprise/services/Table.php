@@ -39,17 +39,6 @@ class Apps_Table_Service extends Core_Abstract_Service {
         return $aApiMethod;
     }
 
-    /**
-     * Permet de faire un select en BDD
-     * @api apiurl
-     * @param array $args donnée sur l'attachement
-     *  - from/table : FROM [table]
-     *  - string/array select : SELECT [select]
-     *  - string/array where : WHERE [where]
-     *  - data : for remplace ? on query
-     *  - array conditions : [condition => valeur]
-     * @return type       [description]
-     */
     public static function select(array $args=[]){
         // Table :
         if ( !empty($args['from']) ) {
@@ -184,13 +173,6 @@ class Apps_Table_Service extends Core_Abstract_Service {
         return $rowset;
     }
 
-    /**
-     * Ajoute un row dans la base de données
-     * @param array $aData donnée a ajouter
-     * @param array $table table de l'ajout
-     * @param string $getLastId
-     * @return type        [description]
-     */
     public static function insertInto(array $aData, $table, $getLastId = null){
         if ( ! is_string($table) ) {
             throw new Core_MaarchException_Service('$table is not a string');
@@ -288,12 +270,17 @@ class Apps_Table_Service extends Core_Abstract_Service {
         }
 
         $querySet  = [];
-        $setData = [];
+        $dataSet = [];
         foreach ($args['set'] as $key => $value) {
-            $querySet[] = "{$key} = ?";
-            $setData[] = $value;
+            if ($value == 'SYSDATE' || $value == 'CURRENT_TIMESTAMP') {
+                $querySet[] = "{$key} = {$value}";
+            } else {
+                $querySet[] = "{$key} = ?";
+                $dataSet[] = $value;
+            }
         }
-        $args['data'] = array_merge($setData, $args['data']);
+
+        $args['data'] = array_merge($dataSet, $args['data']);
 
         $queryExt = 'UPDATE ' .$args['table']. ' SET '.implode(',', $querySet). ' WHERE ' . implode(' AND ', $args['where']);
 

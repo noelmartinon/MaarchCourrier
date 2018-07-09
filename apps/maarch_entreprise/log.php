@@ -66,7 +66,7 @@ if(isset($_SESSION['web_cas_url'])){
     $login = '';
 }
 if (isset($_REQUEST['pass'])) {
-    $password = $func->wash($_REQUEST['pass'], 'no', _PASSWORD_FOR_USER, 'yes');
+    $password = $_REQUEST['pass'];
 } else {
     $password = '';
 }
@@ -272,6 +272,9 @@ if (! empty($_SESSION['error'])) {
             if ($res['error'] == '') {
                // $businessAppTools->load_app_var_session($_SESSION['user']);
                 //$core->load_var_session($_SESSION['modules'], $_SESSION['user']);
+                if (!empty($_SESSION['config']['enhancedPassword'])) {
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                }
                 $core->load_menu($_SESSION['modules']);
                // exit;
             }

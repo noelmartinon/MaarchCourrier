@@ -17,6 +17,7 @@ namespace Core\Controllers;
 
 use Baskets\Models\BasketsModel;
 use Core\Models\LangModel;
+use Core\Models\PasswordModel;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Respect\Validation\Validator;
@@ -97,8 +98,18 @@ class UserController
         } elseif (!UserModel::checkPassword(['userId' => $_SESSION['user']['UserId'],'password' => $data['currentPassword']])) {
             return $response->withJson(['errors' => _WRONG_PSW]);
         }
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            if (!PasswordController::isPasswordValid(['password' => $data['newPassword']])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Password does not match security criteria']);
+            } elseif (!PasswordModel::isPasswordHistoryValid(['password' => $data['newPassword'], 'userId' => $_SESSION['user']['UserId']])) {
+                return $response->withStatus(400)->withJson(['errors' => _ALREADY_USED_PSW]);
+            }
+        }
 
         $r = UserModel::updatePassword(['userId' => $_SESSION['user']['UserId'], 'password' => $data['newPassword']]);
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            PasswordModel::setHistoryPassword(['userId' => $_SESSION['user']['UserId'], 'password' => $data['newPassword']]);
+        }
 
         if (!$r) {
             return $response->withStatus(500)->withJson(['errors' => 'Password Update Error']);

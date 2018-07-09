@@ -78,14 +78,18 @@ class UserModelAbstract extends \Apps_Table_Service
         static::checkRequired($aArgs, ['userId', 'password']);
         static::checkString($aArgs, ['userId', 'password']);
 
+        $set = ['password'  => SecurityModel::getPasswordHash($aArgs['password'])];
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            $set['password_modification_date'] = 'CURRENT_TIMESTAMP';
+        }
+
         $isUpdated = parent::update([
             'table'     => 'users',
-            'set'       => [
-                'password'  => SecurityModel::getPasswordHash($aArgs['password'])
-            ],
+            'set'       => $set,
             'where'     => ['user_id = ?'],
             'data'      => [$aArgs['userId']]
         ]);
+
 
         return $isUpdated;
     }

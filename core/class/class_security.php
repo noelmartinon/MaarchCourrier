@@ -123,8 +123,11 @@ class security extends Database
                         'loginmode2'         => 'sso',
                     );
                 } else {
-                    $comp = " and password = :password and STATUS <> 'DEL' "
-                          . "and (loginmode in ('standard', 'sso', 'cas'))";
+                    if (!empty($_SESSION['config']['enhancedPassword'])) {
+                        $comp = " and password = :password and STATUS <> 'DEL' and (loginmode in ('standard', 'sso', 'cas')) and (locked_until is null OR locked_until < CURRENT_TIMESTAMP)";
+                    } else {
+                        $comp = " and password = :password and STATUS <> 'DEL' and (loginmode in ('standard', 'sso', 'cas'))";
+                    }
                     $params = array('password' => $pass);
                 }
             }
@@ -252,6 +255,24 @@ class security extends Database
                     );
                 }
 
+                if (!empty($_SESSION['config']['enhancedPassword'])) {
+                    $passwordRules = \Core\Models\PasswordModel::getEnabledRules();
+
+                    if (!empty($passwordRules['renewal'])) {
+                        $currentDate = new \DateTime();
+                        $lastModificationDate = new \DateTime($user->__get('password_modification_date'));
+                        $lastModificationDate->add(new DateInterval("P{$passwordRules['renewal']}D"));
+
+                        if ($currentDate > $lastModificationDate) {
+                            return [
+                                'user'  => $array,
+                                'error' => $error,
+                                'url'   => 'index.php?display=true&page=change_pass'
+                            ];
+                        }
+                    }
+                }
+
                 if ($array['change_pass'] == 'Y' && !isset($_SESSION['web_cas_url']) && !isset($_SESSION['web_sso_url'])) {
                     return array(
                         'user'  => $array,
@@ -284,7 +305,11 @@ class security extends Database
                 );
             }
         } else {
-            $error = _BAD_LOGIN_OR_PSW;
+            if (!empty($_SESSION['config']['enhancedPassword'])) {
+                $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $s_login]);
+            } else {
+                $error = _BAD_LOGIN_OR_PSW;
+            }
             return array(
                 'user'  => $array,
                 'error' => $error,

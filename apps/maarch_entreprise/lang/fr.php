@@ -1989,4 +1989,6 @@ if (!defined('_DOC_CREATED'))
     define('_DOC_CREATED', 'Document créé');
 if (!defined("_SAVE_POSITION"))
     define("_SAVE_POSITION", "Enregistrer");
-
+define('_ALREADY_USED_PSW', 'Le mot de passe a déjà été utilisé');
+define('_ACCOUNT_LOCKED_FOR', 'Nombre de tentatives de connexion dépassée. Votre compte est vérouillé pendant');
+define('_ACCOUNT_LOCKED_UNTIL', 'Nombre de tentatives de connexion dépassée. Compte vérouillé jusqu\'au');
