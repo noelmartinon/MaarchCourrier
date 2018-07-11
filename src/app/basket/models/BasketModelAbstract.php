@@ -348,6 +348,12 @@ class BasketModelAbstract
             ]);
 
             $user = UserModel::getByUserId(['userId' => $aArgs['userId'], 'select' => ['id']]);
+            $userPrefs = UserBasketPreferenceModel::get([
+                'select'    => ['group_serial_id', 'basket_id'],
+                'where'     => ['user_serial_id = ?'],
+                'data'      => [$user['id']]
+            ]);
+
             foreach ($aBaskets as $key => $value) {
                 unset($aBaskets[$key]['groupserialid']);
                 $aBaskets[$key]['groupSerialId'] = $value['groupserialid'];
@@ -361,12 +367,12 @@ class BasketModelAbstract
                 ]);
                 $aBaskets[$key]['userToDisplay'] = UserModel::getLabelledUserById(['userId' => $aBaskets2[0]['new_user']]);
                 $aBaskets[$key]['enabled'] = true;
-                $userPref = UserBasketPreferenceModel::get([
-                    'select'    => [1],
-                    'where'     => ['user_serial_id = ?', 'group_serial_id = ?', 'basket_id = ?'],
-                    'data'      => [$user['id'], $value['groupserialid'], $value['basket_id']]
-                ]);
-                $aBaskets[$key]['allowed'] = !empty($userPref);
+                $aBaskets[$key]['allowed'] = false;
+                foreach ($userPrefs as $userPref) {
+                    if ($userPref['group_serial_id'] == $value['groupserialid'] && $userPref['basket_id'] == $value['basket_id']) {
+                        $aBaskets[$key]['allowed'] = true;
+                    }
+                }
             }
             if (empty($aArgs['absenceUneeded'])) {
                 $aBaskets = array_merge($aBaskets, BasketModel::getAbsBasketsByUserId(['userId' => $aArgs['userId']]));

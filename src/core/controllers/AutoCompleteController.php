@@ -14,12 +14,12 @@
 
 namespace SrcCore\controllers;
 
-use Group\models\ServiceModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Entity\models\EntityModel;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
 use Status\models\StatusModel;
 use User\models\UserModel;
@@ -39,12 +39,11 @@ class AutoCompleteController
 
         $data = [];
         foreach ($users as $key => $value) {
-            $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $value['user_id']]);
             $data[] = [
                 'type'          => 'user',
                 'id'            => $value['user_id'],
                 'idToDisplay'   => "{$value['firstname']} {$value['lastname']}",
-                'otherInfo'     => $primaryEntity['entity_label']
+                'otherInfo'     => ''
             ];
         }
 
@@ -55,25 +54,29 @@ class AutoCompleteController
     {
         $excludedUsers = ['superadmin'];
 
-        $users = UserModel::get([
-            'select'    => ['user_id', 'firstname', 'lastname'],
-            'where'     => ['enabled = ?', 'status != ?', 'user_id not in (?)'],
-            'data'      => ['Y', 'DEL', $excludedUsers],
-            'orderBy'   => ['lastname']
+        $users = DatabaseModel::select([
+            'select'    => ['DISTINCT users.user_id', 'users.firstname', 'users.lastname'],
+            'table'     => ['users, usergroup_content, usergroups_services'],
+            'where'     => [
+                'usergroup_content.group_id = usergroups_services.group_id',
+                'usergroup_content.user_id = users.user_id',
+                'usergroups_services.service_id in (?)',
+                'users.user_id not in (?)',
+                'users.enabled = ?',
+                'users.status != ?'
+            ],
+            'data'      => [['visa_documents', 'sign_document'], $excludedUsers, 'Y', 'DEL'],
+            'order_by'  => ['users.lastname']
         ]);
 
         $data = [];
         foreach ($users as $key => $value) {
-            if (ServiceModel::hasService(['id' => 'visa_documents', 'userId' => $value['user_id'], 'location' => 'visa', 'type' => 'use'])
-                || ServiceModel::hasService(['id' => 'sign_document', 'userId' => $value['user_id'], 'location' => 'visa', 'type' => 'use'])) {
-                $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $value['user_id']]);
-                $data[] = [
-                    'type'          => 'user',
-                    'id'            => $value['user_id'],
-                    'idToDisplay'   => "{$value['firstname']} {$value['lastname']}",
-                    'otherInfo'     => $primaryEntity['entity_label']
-                ];
-            }
+            $data[] = [
+                'type'          => 'user',
+                'id'            => $value['user_id'],
+                'idToDisplay'   => "{$value['firstname']} {$value['lastname']}",
+                'otherInfo'     => ''
+            ];
         }
 
         return $response->withJson($data);
