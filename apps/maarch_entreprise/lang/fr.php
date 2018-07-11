@@ -613,7 +613,7 @@ if (!defined('_SEARCH_SCOPE')) {
     define('_SEARCH_SCOPE', 'Portée de la recherche');
 }
 if (!defined('_SEARCH_SCOPE_HELP')) {
-    define('_SEARCH_SCOPE_HELP', 'Etend la recherche aux bannettes; autorise les actions si une bannette particulière est sélectionnée');
+    define('_SEARCH_SCOPE_HELP', 'Le périmètre correspond aux courriers visibles par mon groupe ou dans mes bannettes');
 }
 if (!defined('_RESULTS')) {
     define('_RESULTS', 'Résultat(s)');

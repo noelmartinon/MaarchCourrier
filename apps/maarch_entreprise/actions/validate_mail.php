@@ -183,7 +183,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
             $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
         );
-        //echo "HELLO";
+
         //diffusion list in this basket ?
         if ($_SESSION['current_basket']['difflist_type'] == 'entity_id') {
             $target_model = 'document.getElementById(\'destination\').options[document.getElementById(\'destination\').selectedIndex]';
@@ -541,8 +541,6 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $frm_str .= '<td class="indexing_field"><input name="doc_date" type="text" id="doc_date" value="';
     if (isset($data['doc_date']) && !empty($data['doc_date'])) {
         $frm_str .= $data['doc_date'];
-    } else {
-        $frm_str .= $today;
     }
     $frm_str .= '" placeholder="JJ-MM-AAAA" onfocus="checkRealDate(\'docDate\');" onChange="checkRealDate(\'docDate\');" onclick="clear_error(\'frm_error_'.$id_action.'\');showCalender(this);"/></td>';
     $frm_str .= '<td><span class="red_asterisk" id="doc_date_mandatory" style="display:inline;"><i class="fa fa-star"></i></span>&nbsp;</td>';
@@ -570,7 +568,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     if (isset($data['admission_date']) && !empty($data['admission_date'])) {
         $frm_str .= $data['admission_date'];
     } else {
-        $frm_str .= $today;
+        $frm_str .= $creation_date;
     }
     $frm_str .= '" onclick="clear_error(\'frm_error_'.$actionId.'\');'
         .'showCalender(this);" onChange="checkRealDate(\'admissionDate\');updateProcessDate(\''
@@ -588,9 +586,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $frm_str .= '<td class="indexing_field"><input type="radio" name="type_contact" id="type_contact_internal" value="internal"  class="check" onclick="clear_error(\'frm_error_'.$id_action.'\');change_contact_type(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts\', false);update_contact_type_session(\''
         .$_SESSION['config']['businessappurl']
         .'index.php?display=true&dir=indexing_searching&page=autocomplete_contacts_prepare_multi\');reset_check_date_exp();"';
-    if ($data['type_contact'] == 'internal') {
-        $frm_str .= ' checked="checked" ';
-    }
+
     $frm_str .= ' /><label for="type_contact_internal">'._INTERNAL2.'</label></td></tr>';
 
     $frm_str .= '<tr id="contact_choose_2_tr" style="display:'.$display_value.';">';
@@ -654,11 +650,9 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
     $frm_str .= '<td class="indexing_field">';
     if ($data['type_contact'] == 'internal') {
-        //$frm_str .= '<i class="fa fa-user" title="'._INTERNAL2.'" style="cursor:pointer;color:#135F7F;" id="type_contact_internal_icon" onclick="$$(\'#type_contact_internal\')[0].click();$(\'type_contact_internal_icon\').setStyle({color: \'#135F7F\'});$(\'type_contact_external_icon\').setStyle({color: \'#666\'});$(\'type_multi_contact_external_icon\').setStyle({color: \'#666\'});"></i>';
         //MODIF:
         $frm_str .= ' <i class="fa fa-user" title="'._SINGLE_CONTACT.'" style="cursor:pointer;color:#135F7F;" id="type_contact_internal_icon" onclick="$j(\'#type_contact_internal\')[0].click();$j(\'#type_contact_internal_icon\').css(\'color\', \'#666\');$j(\'#type_contact_internal_icon\').css(\'color\', \'#135F7F\');$j(\'#type_multi_contact_internal_icon\').css(\'color\', \'#666\');"></i>';
     } elseif ($data['type_contact'] == 'external') {
-        //$frm_str .= '<i class="fa fa-user" title="'._INTERNAL2.'" style="cursor:pointer;" id="type_contact_internal_icon" onclick="$$(\'#type_contact_internal\')[0].click();$(\'type_contact_internal_icon\').setStyle({color: \'#135F7F\'});$(\'type_contact_external_icon\').setStyle({color: \'#666\'});$(\'type_multi_contact_external_icon\').setStyle({color: \'#666\'});"></i>';
         //MODIF:
         $frm_str .= ' <i class="fa fa-user" title="'._SINGLE_CONTACT.'" style="cursor:pointer;color:#135F7F;" id="type_contact_external_icon" onclick="$j(\'#type_contact_external\')[0].click();$j(\'#type_contact_internal_icon\').css(\'color\', \'#666\');$j(\'#type_contact_external_icon\').css(\'color\', \'#135F7F\');$j(\'#type_multi_contact_external_icon\').css(\'color\', \'#666\');"></i>';
     }

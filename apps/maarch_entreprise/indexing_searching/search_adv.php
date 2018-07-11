@@ -321,10 +321,10 @@ if($core_tools->is_module_loaded('entities'))
 
     $param['destination_mu'] = array('label' => _DESTINATION_SEARCH, 'type' => 'select_multiple', 'param' => array('field_label' => _DESTINATION_SEARCH, 'label_title' => _CHOOSE_ENTITES_SEARCH_TITLE,
     'id' => 'services','options' => $arr_tmp));
-    
-    $stmt = $conn->query("SELECT DISTINCT ".$table.".initiator, e.short_label FROM ".$table." join ".$_SESSION['tablename']['ent_entities']." e on e.entity_id = ".$table.".initiator 
-                            ".$where." group by e.short_label, ".$table.".initiator order by e.short_label");
     //Initiator
+    $stmt = $conn->query("SELECT DISTINCT ".$table.".initiator, e.short_label FROM ".$table." join ".$_SESSION['tablename']['ent_entities']." e on e.entity_id = ".$table.".initiator 
+    ".$where." group by e.short_label, ".$table.".initiator order by e.short_label");
+    
     $arr_tmp = array();
     while($res = $stmt->fetchObject())
     {
@@ -568,7 +568,7 @@ if(isset($_REQUEST['nodetails']))
                                 <input type="hidden" name="meta[]" value="baskets_clause#baskets_clause#select_simple" />
                                 <select name="baskets_clause" id="baskets_clause">
                                     <option id="true" value="true"><?php echo _ALL_BASKETS;?></option>
-                                    <option id="false" value="false"><?php echo _NO;?></option>
+                                    <!-- <option id="false" value="false"><?php echo _NO;?></option> -->
                                     <?php 
                                     if($_REQUEST['mode'] != 'popup') {
                                         for($i=0; $i< count($_SESSION['user']['baskets']);$i++) {
@@ -585,7 +585,7 @@ if(isset($_REQUEST['nodetails']))
                                                     functions::xecho($_SESSION['user']['baskets'][$i]['id']);
                                                     ?>" value="<?php 
                                                     functions::xecho($_SESSION['user']['baskets'][$i]['id']);
-                                                    ?>" ><?php 
+                                                    ?>" >[<?php echo _BASKET ;?>] <?php 
                                                     functions::xecho($_SESSION['user']['baskets'][$i]['desc']);
                                                 ?></option>
                                                 <?php

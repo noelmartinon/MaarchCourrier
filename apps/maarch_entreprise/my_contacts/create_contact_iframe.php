@@ -76,10 +76,12 @@ if ($_SESSION['AttachmentContact'] == "1") {
     $createContactDiv = "show_tab";
 }
 
-if (isset($_GET['created']) && $_GET['created'] <> '') { ?>
-    <script type="text/javascript">
-        set_new_contact_address("<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=false&dir=my_contacts&page=get_last_contact_address';?>", "<?php functions::xecho($createContactDiv);?>", "true", "<?php echo $_SESSION['transmissionInput'];?>");
-    </script>
+if (isset($_GET['created']) && $_GET['created'] <> '') {
+    ?>
+	<script type="text/javascript">
+		set_new_contact_address("<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=false&dir=my_contacts&page=get_last_contact_address'; ?>", "<?php functions::xecho($createContactDiv); ?>", "true", "<?php echo $_SESSION['transmissionInput']; ?>");
+		simpleAjax("<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&page=unsetAttachmentContact' ; ?>");
+	</script>
 <?php
+
 }
-?>

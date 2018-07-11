@@ -325,7 +325,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
             $frm_str .= '</tr>';
         }
     }
-    if ($chrono_number != '') {
+    if ($chrono_number != '' && _ID_TO_DISPLAY == 'res_id') {
         $frm_str .= '<tr>';
         $frm_str .= '<td width="50%" align="left"><span class="form_title_process">'
             ._CHRONO_NUMBER.' :</span></td>';

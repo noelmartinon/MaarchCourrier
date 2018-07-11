@@ -435,17 +435,18 @@ if ($mode == 'normal') {
                     $tab[$i][$j]['res_multi_contacts'] = $_SESSION['mlb_search_current_res_id'];
                 }
                 if ($tab[$i][$j][$value] == 'alt_identifier') {
-                    $tab[$i][$j]['value'] = $tab[$i][$j]['value'];
-                    $tab[$i][$j]['label'] = _CHRONO_NUMBER;
+                    $target_chrono = $_SESSION['searching']['where_request_parameters'][':chrono'];
+                    $target_chrono = str_replace('%', '', $target_chrono);
+                    $chrono = $tab[$i][$j]['value'];
+                    $chrono = str_replace($target_chrono, '<i style="background: #135F7F none repeat scroll 0 0;border-radius: 4px;color: white;padding: 3px;" title="mot cible">'.$target_chrono.'</i>', $chrono);
+                    $tab[$i][$j]['res_id'] = $tab[$i][$j]['value'];
+                    $tab[$i][$j]['label']=_CHRONO_NUMBER;
+                    $tab[$i][$j]['value'] = $chrono;
                     $tab[$i][$j]['size'] = '10';
                     $tab[$i][$j]['label_align'] = 'left';
                     $tab[$i][$j]['align'] = 'left';
                     $tab[$i][$j]['valign'] = 'bottom';
-                    if ($_REQUEST['mode'] == 'popup') {
-                        $tab[$i][$j]['show'] = true;
-                    } else {
-                        $tab[$i][$j]['show'] = false;
-                    }
+                    $tab[$i][$j]['show'] = true;
                     $tab[$i][$j]['order'] = 'alt_identifier';
                 }
                 if ($tab[$i][$j][$value] == 'type_label') {
@@ -598,6 +599,10 @@ if ($mode == 'normal') {
                     }
 
                     $priority = $fakeId;
+                    if(!empty($_SESSION['searching']['where_request_parameters'][':priority'])){
+                    
+                        $priority = '<i style="background: #009dc5 none repeat scroll 0 0;border-radius: 4px;color: white;padding: 3px;" title="mot cible">'.$_SESSION['mail_priorities'][$fakeId].'</i>';    
+                    }
                     $tab[$i][$j]['value'] = $_SESSION['mail_priorities'][$fakeId];
                     $tab[$i][$j]['label'] = _PRIORITY;
                     $tab[$i][$j]['size'] = '10';
@@ -609,9 +614,24 @@ if ($mode == 'normal') {
                 }
 
                 if ($tab[$i][$j][$value] == 'dest_user') {
-                    $tab[$i][$j]['label'] = 'dest_user';
-                    $tab[$i][$j]['size'] = '10';
+                    if(!empty($_SESSION['searching']['where_request_parameters'][':destinataireChosen'])){
+                        foreach ($_SESSION['searching']['where_request_parameters'][':destinataireChosen'] as $key => $value) {
+                            if($value == $tab[$i][$j]['value']){
+                                $target_dest = $value;
+                                $target_dest = str_replace('%', '', $target_dest);
+                                $dest = $tab[$i][$j]['value'];
+                                $dest = str_replace($target_dest, '<i style="background: #135F7F none repeat scroll 0 0;border-radius: 4px;color: white;padding: 3px;" title="mot cible">'.$target_dest.'</i>', $dest);
+                                break;
+                            }
+                        }  
+                    }else{
+                        $dest = $tab[$i][$j]['value'];
+                    }
+
+                    $tab[$i][$j]["label"]=_DEST_USER;
+                    $tab[$i][$j]["size"]="10";
                     $tab[$i][$j]['label_align'] = 'left';
+		    $tab[$i][$j]["value"]=$dest;
                     $tab[$i][$j]['align'] = 'left';
                     $tab[$i][$j]['valign'] = 'bottom';
                     $tab[$i][$j]['show'] = false;

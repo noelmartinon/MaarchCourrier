@@ -618,7 +618,7 @@ if (!defined('_SEARCH_SCOPE')) {
     define('_SEARCH_SCOPE', 'Search impact');
 }
 if (!defined('_SEARCH_SCOPE_HELP')) {
-    define('_SEARCH_SCOPE_HELP', 'Expand the search to baskets; authorizes the actions if a specific basket is selected');
+    define('_SEARCH_SCOPE_HELP', 'The scope corresponds to mails visible by my group or in my baskets');
 }
 if (!defined('_RESULTS')) {
     define('_RESULTS', 'Result(s)');

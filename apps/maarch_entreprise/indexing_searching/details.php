@@ -452,13 +452,13 @@ if ($stmt->rowCount() == 0) {
         $pathScriptTab = $_SESSION['config']['businessappurl']
                 .'index.php?display=true&page=show_diffList_tab&module=entities&resId='.$s_id.'&collId='.$coll_id.'&fromDetail=true&category='.$category.'&roles='.urlencode($roles_str).$onlyCC;
 
-        $diffList_frame .= '<div class="fa fa-share-alt DetailsTabFunc" id="DetailsGearTab" style="display:block !important;font-size:2em;padding-left: 15px;';
+        $diffList_frame .= '<div class="DetailsTabFunc" id="DetailsGearTab" style="display:block !important;font-size:2em;padding-left: 15px;';
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome')) {
             $diffList_frame .= 'padding-right: 0px;height: 29px;';
         } else {
-            $diffList_frame .= 'padding-right: 15px;height: auto;';
+            $diffList_frame .= 'padding-right: 15px;height: 30px;';
         }
-        $diffList_frame .= '" title="'._DIFF_LIST.'" onclick="loadSpecificTab(\'uniqueDetailsIframe\',\''.$pathScriptTab.'\');tabClicked(\'DetailsGearTab\',true);"><sup><span style="font-size: 10px;';
+        $diffList_frame .= '" title="'._DIFF_LIST.'" onclick="loadSpecificTab(\'uniqueDetailsIframe\',\''.$pathScriptTab.'\');tabClicked(\'DetailsGearTab\',true);"><i class="fa fa-share-alt" onclick="this.closest(\'div\').click()"></i> <sup><span style="font-size: 10px;';
         $diffList_frame .= $styleBadge.' class="nbResZero">0</span></sup></div>';
 
         echo $diffList_frame;
@@ -519,7 +519,7 @@ if ($stmt->rowCount() == 0) {
     //ATTACHMENTS TAB
     if ($core->is_module_loaded('attachments')) {
         $attachments_frame = '';
-        $extraParam = '&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder';
+        $extraParam = '&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp';
         $pathScriptTab = $_SESSION['config']['businessappurl']
                 .'index.php?display=true&page=show_attachments_details_tab&module=attachments&resId='
                 .$s_id.'&collId='.$coll_id.'&fromDetail=attachments'.$extraParam;
@@ -536,7 +536,7 @@ if ($stmt->rowCount() == 0) {
     //RESPONSES TAB
     if ($core->is_module_loaded('attachments')) {
         $responses_frame = '';
-        $extraParam = '&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail';
+        $extraParam = '&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp';
         $pathScriptTab = $_SESSION['config']['businessappurl']
                     .'index.php?display=true&page=show_attachments_details_tab&module=attachments&fromDetail=response&resId='
                     .$s_id.'&collId='.$coll_id.$extraParam;
@@ -986,15 +986,17 @@ if ($stmt->rowCount() == 0) {
     echo '</td>';
 
     //CHRONO NUMBER
-    echo '<th align="left" class="picto">';
-    echo '<i class="fa fa-compass fa-2x" title="'._CHRONO_NUMBER.'" ></i>';
-    echo '</th>';
-    echo '<td align="left" width="200px">';
-    echo _CHRONO_NUMBER;
-    echo '</td>';
-    echo '<td>';
-    echo "<input type='text' class='readonly' readonly='readonly' value='{$chrono_number}' title='{$chrono_number}' alt='{$chrono_number}' size='40'";
-    echo '</td>';
+    if (_ID_TO_DISPLAY == 'res_id') {
+        echo '<th align="left" class="picto">';
+        echo '<i class="fa fa-compass fa-2x" title="'._CHRONO_NUMBER.'" ></i>';
+        echo '</th>';
+        echo '<td align="left" width="200px">';
+        echo _CHRONO_NUMBER;
+        echo '</td>';
+        echo '<td>';
+        echo "<input type='text' class='readonly' readonly='readonly' value='{$chrono_number}' title='{$chrono_number}' alt='{$chrono_number}' size='40'";
+        echo '</td>';
+    }
     echo '</tr>';
 
     //OTHER DATAS INITIATOR, TYPIST

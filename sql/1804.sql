@@ -774,3 +774,5 @@ DELETE FROM parameters where id = 'database_version';
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '18.04.6', NULL, NULL);
 
 INSERT INTO templates_doctype_ext SELECT null, d.type_id, 'N' FROM doctypes d LEFT JOIN templates_doctype_ext tde ON d.type_id = tde.type_id WHERE tde.type_id IS NULL;
+
+UPDATE status set img_filename = 'fm-letter' where img_filename is null or img_filename = '';
