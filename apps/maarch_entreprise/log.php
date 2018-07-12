@@ -160,22 +160,33 @@ if (! empty($_SESSION['error'])) {
         }
         
         //Try to create a new ldap instance
-        if (strtolower($type_ldap) == 'openldap') {
-            try {
+        try {
+            if (strtolower($type_ldap) == 'openldap') {
                 $ad = new LDAP($domain, $login_admin, $pass, $ssl, $hostname);
-            } catch(Exception $conFailure) {
-                echo functions::xssafe($conFailure->getMessage());
-                exit;
-            }
-        }else{
-            try {
+            } else {
                 $ad = new LDAP($domain, $login_admin, $pass, $ssl);
-            } catch(Exception $conFailure) {
+            }
+        } catch (Exception $conFailure) {
+            if (!empty($standardConnect) && $standardConnect == 'true') {
+                $pass = $sec->getPasswordHash($password);
+                $res = $sec->login($login, $pass);
+                $_SESSION['user'] = $res['user'];
+                if (empty($res['error'])) {
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                    \Core\Models\UserModel::updatePassword(['userId' => $login, 'password' => $password]);
+                    $core->load_menu($_SESSION['modules']);
+                } else {
+                    $_SESSION['error'] = $res['error'];
+                }
+
+                header('location: '.$_SESSION['config']['businessappurl'].$res['url']);
+                exit();
+            } else {
                 echo functions::xssafe($conFailure->getMessage());
                 exit;
             }
         }
-        
+
         if ($prefix_login <> '') {
             $loginToAd = $prefix_login . "\\" . $login;
         } else {
