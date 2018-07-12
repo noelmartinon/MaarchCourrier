@@ -75,6 +75,13 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <div class="col-sm-12">
+                            <div class="alter alert-warning">
+                                    {{this.ruleText}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <div class="col-sm-6">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-key" aria-hidden="true"></i></span>
@@ -87,6 +94,13 @@
                                 <input type="password" [(ngModel)]="passwordModel.reNewPassword" class="form-control" name="reNewPassword" placeholder="{{user.lang.renewPsw}}">
                             </div>
                         </div>
+                        <div class="form-group">
+                                <div class="col-sm-12">
+                                    <div class="alter alert-warning">
+                                            {{this.otherRuleText}}
+                                    </div>
+                                </div>
+                            </div>
                     </div>
                     <div class="form-group">
                         <div style="text-align:center;">

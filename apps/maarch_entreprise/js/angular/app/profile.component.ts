@@ -43,6 +43,8 @@ export class ProfileComponent implements OnInit {
     };
 
     showPassword                : boolean   = false;
+    ruleText: string = '';
+    otherRuleText: string;
     selectedSignature           : number    = -1;
     selectedSignatureLabel      : string    = "";
     resultInfo                  : string    = "";
@@ -122,6 +124,34 @@ export class ProfileComponent implements OnInit {
             .subscribe((data) => {
                 this.user = data;
 
+                let ruleTextArr: String[] = [];
+                this.user.passwordRules.forEach((rule: any) => {
+
+
+                    if (rule.label == 'minLength') {
+                        ruleTextArr.push('<b>'+rule.value+'</b> caratère(s) minimum');
+
+                    } else if (rule.label == 'complexityUpper') {
+
+                        ruleTextArr.push('<b>1</b> majuscule minimum');
+                        
+
+                    } else if (rule.label == 'complexityNumber') {
+
+                        ruleTextArr.push('<b>1</b> chiffre minimum');
+                        
+
+                    } else if (rule.label == 'complexitySpecial') {
+
+                        ruleTextArr.push('<b>1</b> caratère spécial minimum');
+                        
+                    } else if (rule.label == 'renewal') {
+
+                        this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que '+rule.value+' jour(s).';
+                    }
+
+                });
+                this.ruleText = ruleTextArr.join(', ');
                 this.loading = false;
             });
     }
