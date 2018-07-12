@@ -29,6 +29,6 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 })
 export class AppComponent {
     constructor(iconReg: MatIconRegistry, sanitizer: DomSanitizer) {
-        iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('img/logo_white.svg')).addSvgIcon('maarchLogoOnly', sanitizer.bypassSecurityTrustResourceUrl('img/logo_only_white.svg'));
+        iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('static.php?filename=logo_white.svg')).addSvgIcon('maarchLogoOnly', sanitizer.bypassSecurityTrustResourceUrl('img/logo_only_white.svg'));
     }
 }
