@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
-import { Observable, empty } from 'rxjs';
+import { Observable } from 'rxjs';
 import { startWith, map, debounceTime, filter, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 declare const angularGlobals: any;

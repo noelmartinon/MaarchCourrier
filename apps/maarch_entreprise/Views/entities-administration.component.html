@@ -261,9 +261,9 @@
                         <div class="row" style="margin:0px;" id="visaCircuitContent">
                             <div class="col-md-12">
                                 <mat-form-field>
-                                    <input #autocompleteFilter class="autocompleteSearch" type="text"  placeholder="{{lang.addVisaSignUser}}" matInput [matAutocomplete]="auto" [formControl]="userCtrl">
+                                    <input #autocompleteFilter class="autocompleteSearch" type="text"  placeholder="{{lang.addVisaSignUser}}" matInput [matAutocomplete]="auto" [formControl]="visaUserCtrl">
                                     <mat-autocomplete #auto="matAutocomplete">
-                                        <mat-option *ngFor="let elem of filteredUsers | async" [value]="elem.id" (click)="addElemListModelVisa(elem);autocompleteFilter.isOpen=true">
+                                        <mat-option *ngFor="let elem of filteredVisaUsers | async" [value]="elem.id" (click)="addElemListModelVisa(elem);autocompleteFilter.isOpen=true">
                                             <p mat-line *ngIf="elem.type == 'user'" style="margin:0;">
                                                 <span class="col-xm-1" style="padding-right:5px;">
                                                     <mat-icon color="primary" class="fa fa-user fa-2x" style="margin-right:0px;"></mat-icon>
