@@ -21,24 +21,42 @@ use Entity\models\EntityModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
+use SrcCore\models\ValidatorModel;
 use Status\models\StatusModel;
 use User\models\UserModel;
 
 class AutoCompleteController
 {
+    const LIMIT = 50;
+
     public static function getUsers(Request $request, Response $response)
     {
+        $data = $request->getQueryParams();
+        $check = Validator::stringType()->notEmpty()->validate($data['search']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
         $excludedUsers = ['superadmin'];
+
+        $requestData = AutoCompleteController::getDataForRequest([
+            'search'        => $data['search'],
+            'fields'        => '(firstname ilike ? OR lastname ilike ?)',
+            'where'         => ['enabled = ?', 'status != ?', 'user_id not in (?)'],
+            'data'          => ['Y', 'DEL', $excludedUsers],
+            'fieldsNumber'  => 2,
+        ]);
 
         $users = UserModel::get([
             'select'    => ['user_id', 'firstname', 'lastname'],
-            'where'     => ['enabled = ?', 'status != ?', 'user_id not in (?)'],
-            'data'      => ['Y', 'DEL', $excludedUsers],
-            'orderBy'   => ['lastname']
+            'where'     => $requestData['where'],
+            'data'      => $requestData['data'],
+            'orderBy'   => ['lastname'],
+            'limit'     => self::LIMIT
         ]);
 
         $data = [];
-        foreach ($users as $key => $value) {
+        foreach ($users as $value) {
             $data[] = [
                 'type'          => 'user',
                 'id'            => $value['user_id'],
@@ -52,12 +70,18 @@ class AutoCompleteController
 
     public static function getUsersForVisa(Request $request, Response $response)
     {
+        $data = $request->getQueryParams();
+        $check = Validator::stringType()->notEmpty()->validate($data['search']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
         $excludedUsers = ['superadmin'];
 
-        $users = DatabaseModel::select([
-            'select'    => ['DISTINCT users.user_id', 'users.firstname', 'users.lastname'],
-            'table'     => ['users, usergroup_content, usergroups_services'],
-            'where'     => [
+        $requestData = AutoCompleteController::getDataForRequest([
+            'search'        => $data['search'],
+            'fields'        => '(users.firstname ilike ? OR users.lastname ilike ?)',
+            'where'         => [
                 'usergroup_content.group_id = usergroups_services.group_id',
                 'usergroup_content.user_id = users.user_id',
                 'usergroups_services.service_id in (?)',
@@ -65,8 +89,17 @@ class AutoCompleteController
                 'users.enabled = ?',
                 'users.status != ?'
             ],
-            'data'      => [['visa_documents', 'sign_document'], $excludedUsers, 'Y', 'DEL'],
-            'order_by'  => ['users.lastname']
+            'data'          => [['visa_documents', 'sign_document'], $excludedUsers, 'Y', 'DEL'],
+            'fieldsNumber'  => 2,
+        ]);
+
+        $users = DatabaseModel::select([
+            'select'    => ['DISTINCT users.user_id', 'users.firstname', 'users.lastname'],
+            'table'     => ['users, usergroup_content, usergroups_services'],
+            'where'     => $requestData['where'],
+            'data'      => $requestData['data'],
+            'order_by'  => ['users.lastname'],
+            'limit'     => self::LIMIT
         ]);
 
         $data = [];
@@ -84,15 +117,30 @@ class AutoCompleteController
 
     public static function getEntities(Request $request, Response $response)
     {
+        $data = $request->getQueryParams();
+        $check = Validator::stringType()->notEmpty()->validate($data['search']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $requestData = AutoCompleteController::getDataForRequest([
+            'search'        => $data['search'],
+            'fields'        => '(entity_label ilike ?)',
+            'where'         => ['enabled = ?'],
+            'data'          => ['Y'],
+            'fieldsNumber'  => 1,
+        ]);
+
         $entities = EntityModel::get([
             'select'    => ['entity_id', 'entity_label', 'short_label'],
-            'where'     => ['enabled = ?'],
-            'data'      => ['Y'],
-            'orderBy'   => ['entity_label']
+            'where'     => $requestData['where'],
+            'data'      => $requestData['data'],
+            'orderBy'   => ['entity_label'],
+            'limit'     => self::LIMIT
         ]);
 
         $data = [];
-        foreach ($entities as $key => $value) {
+        foreach ($entities as $value) {
             $data[] = [
                 'type'          => 'entity',
                 'id'            => $value['entity_id'],
@@ -180,5 +228,26 @@ class AutoCompleteController
         }
 
         return $response->withJson($addresses);
+    }
+
+    private static function getDataForRequest(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['search', 'fields', 'where', 'data', 'fieldsNumber']);
+        ValidatorModel::stringType($aArgs, ['search', 'fields']);
+        ValidatorModel::arrayType($aArgs, ['where', 'data']);
+        ValidatorModel::intType($aArgs, ['fieldsNumber']);
+
+        $searchItems = explode(' ', $aArgs['search']);
+
+        foreach ($searchItems as $item) {
+            if (strlen($item) >= 2) {
+                $aArgs['where'][] = $aArgs['fields'];
+                for ($i = 0; $i < $aArgs['fieldsNumber']; $i++) {
+                    $aArgs['data'][] = "%{$item}%";
+                }
+            }
+        }
+
+        return ['where' => $aArgs['where'], 'data' => $aArgs['data']];
     }
 }
