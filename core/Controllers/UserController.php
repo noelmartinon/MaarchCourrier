@@ -43,7 +43,7 @@ class UserController
         $user['lang'] = LangModel::getProfileLang();
         $user['passwordRules'] = [];
         if (!empty($_SESSION['config']['enhancedPassword'])) {
-            $user['passwordRules'] = PasswordModel::getEnabledRules();
+            $user['passwordRules'] = PasswordModel::getRules(['where' => ['enabled = ?'], 'data' => [true]]);
         }
 
         $basket = new \basket();
