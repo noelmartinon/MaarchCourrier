@@ -183,6 +183,12 @@ if (!empty($_SESSION['error'])) {
             $loginToAd = $login;
         }
 
+        if ($suffix_login != '') {
+            $loginToAd = $login . $suffix_login;
+        } else {
+            $loginToAd = $login;
+        }
+
         if ($ad->authenticate($loginToAd, $password)) {
             //TODO: protect sql injection with PDO
             require_once 'core/class/class_db_pdo.php';

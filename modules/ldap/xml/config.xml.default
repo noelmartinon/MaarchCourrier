@@ -9,6 +9,8 @@
         <domain>192.168.1.1</domain>
         <!-- prefixe les logins si saisi -->
         <prefix_login>MAARCH</prefix_login>
+        <!-- suffixe les logins si saisi -->
+        <suffix_login></suffix_login>
         <!-- login admnistrateur du domaine -->
         <login_admin>Administrateur</login_admin>
         <!-- mot de passe administrateur annuaire ldap -->
