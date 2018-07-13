@@ -49,27 +49,13 @@ if (!empty($_SESSION['config']['enhancedPassword'])) {
                     <br/>
                     <br/>
                     <?php
-                    if ($_SESSION['user']['cookie_date']) {
                         echo _MODIFICATION_PSW;
-                    } else {
-                        echo _FIRST_CONN;
-                    }
                     ?>
                 </h2>
                 <div class="block">
-                    <?php if (!$_SESSION['user']['cookie_date']) {
-                        ?>
-                    <h3>
-                        <?php echo _YOUR_FIRST_CONNEXION.", "._PLEASE_CHANGE_PSW.".<br/>"._ASKED_ONLY_ONCE."."; ?>
-                    </h3>
-                    <?php
-                    } else {
-                        ?>
                     <h3>
                         <?php echo _PSW_REINI; ?>
                     </h3>
-                    <?php
-                    } ?>
                     <div class="blank_space">&nbsp;</div>
                     <form name="frmuser" method="post" action="<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&page=verif_pass"
                      class="forms">
