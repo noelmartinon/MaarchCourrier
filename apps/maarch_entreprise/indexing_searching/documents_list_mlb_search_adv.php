@@ -598,12 +598,12 @@ if ($mode == 'normal') {
                         }
                     }
 
-                    $priority = $fakeId;
+                    $priority = $_SESSION['mail_priorities'][$fakeId];
                     if(!empty($_SESSION['searching']['where_request_parameters'][':priority'])){
                     
                         $priority = '<i style="background: #009dc5 none repeat scroll 0 0;border-radius: 4px;color: white;padding: 3px;" title="mot cible">'.$_SESSION['mail_priorities'][$fakeId].'</i>';    
                     }
-                    $tab[$i][$j]['value'] = $_SESSION['mail_priorities'][$fakeId];
+                    $tab[$i][$j]['value'] = $priority;
                     $tab[$i][$j]['label'] = _PRIORITY;
                     $tab[$i][$j]['size'] = '10';
                     $tab[$i][$j]['label_align'] = 'left';
