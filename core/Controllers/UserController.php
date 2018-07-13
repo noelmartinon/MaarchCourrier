@@ -104,7 +104,7 @@ class UserController
         }
         if (!empty($_SESSION['config']['enhancedPassword'])) {
             if (!PasswordController::isPasswordValid(['password' => $data['newPassword']])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Password does not match security criteria']);
+                return $response->withStatus(400)->withJson(['errors' => 'Le nouveau mot de passe ne respecte pas les critères de sécurité']);
             } elseif (!PasswordModel::isPasswordHistoryValid(['password' => $data['newPassword'], 'userId' => $_SESSION['user']['UserId']])) {
                 return $response->withStatus(400)->withJson(['errors' => _ALREADY_USED_PSW]);
             }
