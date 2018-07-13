@@ -123,10 +123,9 @@ export class ProfileComponent implements OnInit {
             .map(res => res.json())
             .subscribe((data) => {
                 this.user = data;
-
                 let ruleTextArr: String[] = [];
+                
                 this.user.passwordRules.forEach((rule: any) => {
-
 
                     if (rule.label == 'minLength') {
                         ruleTextArr.push('<b>'+rule.value+'</b> caratère(s) minimum');
@@ -147,7 +146,7 @@ export class ProfileComponent implements OnInit {
                         
                     } else if (rule.label == 'renewal') {
 
-                        this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que '+rule.value+' jour(s).';
+                        this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que <b>'+rule.value+'</b> jour(s).';
                     }
 
                 });
@@ -257,6 +256,12 @@ export class ProfileComponent implements OnInit {
                         $j("#resultInfo").slideUp(500);
                     });
                 }
+            }, (err) => {
+                this.resultInfo = JSON.parse(err._body).errors;
+                $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+                    $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function(){
+                        $j("#resultInfo").slideUp(500);
+                    });
             });
     }
 

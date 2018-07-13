@@ -122,7 +122,7 @@ var ProfileComponent = (function () {
                     ruleTextArr.push('<b>1</b> caratère spécial minimum');
                 }
                 else if (rule.label == 'renewal') {
-                    _this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que ' + rule.value + ' jour(s).';
+                    _this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que <b>' + rule.value + '</b> jour(s).';
                 }
             });
             _this.ruleText = ruleTextArr.join(', ');
@@ -222,6 +222,12 @@ var ProfileComponent = (function () {
                     $j("#resultInfo").slideUp(500);
                 });
             }
+        }, function (err) {
+            _this.resultInfo = JSON.parse(err._body).errors;
+            $j('#resultInfo').removeClass().addClass('alert alert-danger alert-dismissible');
+            $j("#resultInfo").fadeTo(3000, 500).slideUp(500, function () {
+                $j("#resultInfo").slideUp(500);
+            });
         });
     };
     ProfileComponent.prototype.submitEmailSignature = function () {
