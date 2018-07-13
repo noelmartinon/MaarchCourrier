@@ -39,6 +39,7 @@ var ProfileComponent = (function () {
             title: "",
         };
         this.showPassword = false;
+        this.ruleText = '';
         this.selectedSignature = -1;
         this.selectedSignatureLabel = "";
         this.resultInfo = "";
@@ -106,6 +107,25 @@ var ProfileComponent = (function () {
             .map(function (res) { return res.json(); })
             .subscribe(function (data) {
             _this.user = data;
+            var ruleTextArr = [];
+            _this.user.passwordRules.forEach(function (rule) {
+                if (rule.label == 'minLength') {
+                    ruleTextArr.push('<b>' + rule.value + '</b> caratère(s) minimum');
+                }
+                else if (rule.label == 'complexityUpper') {
+                    ruleTextArr.push('<b>1</b> majuscule minimum');
+                }
+                else if (rule.label == 'complexityNumber') {
+                    ruleTextArr.push('<b>1</b> chiffre minimum');
+                }
+                else if (rule.label == 'complexitySpecial') {
+                    ruleTextArr.push('<b>1</b> caratère spécial minimum');
+                }
+                else if (rule.label == 'renewal') {
+                    _this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que ' + rule.value + ' jour(s).';
+                }
+            });
+            _this.ruleText = ruleTextArr.join(', ');
             _this.loading = false;
         });
     };

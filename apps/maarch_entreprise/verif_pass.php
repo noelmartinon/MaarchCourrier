@@ -51,6 +51,13 @@ if($tmp <> false)
 {
 	$_SESSION['user']['Mail'] = $tmp;
 }
+if (empty($_SESSION['error']) && !empty($_SESSION['config']['enhancedPassword'])) {
+    if (!\Core\Controllers\PasswordController::isPasswordValid(['password' => $pass2])) {
+        $_SESSION['error'] = 'Le nouveau mot de passe ne respecte pas les critères de sécurité';
+    } elseif (!\Core\Models\PasswordModel::isPasswordHistoryValid(['password' => $pass2, 'userId' => $_SESSION['user']['UserId']])) {
+        $_SESSION['error'] = _ALREADY_USED_PSW;
+    }
+}
 if(!empty($_SESSION['error']))
 {
 	header("location: ".$_SESSION['config']['businessappurl']."index.php?display=true&page=change_pass");
@@ -67,7 +74,10 @@ else
     $db->query("UPDATE ".$_SESSION['tablename']['users']." SET firstname = ?, lastname = ?, phone = ?, mail = ? , change_password = 'N' where user_id = ?",
         array($tmp_fn, $tmp_ln, $_SESSION['user']['Phone'], $_SESSION['user']['Mail'], $_SESSION['user']['UserId']));
 
-    \Core\Models\UserModel::updatePassword(['user_id' => $_SESSION['user']['UserId'], 'password' => $pass2]);
+    \Core\Models\UserModel::updatePassword(['userId' => $_SESSION['user']['UserId'], 'password' => $pass2]);
+    if (!empty($_SESSION['config']['enhancedPassword'])) {
+        \Core\Models\PasswordModel::setHistoryPassword(['userId' => $_SESSION['user']['UserId'], 'password' => $pass2]);
+    }
 
     header("location: ".$_SESSION['config']['businessappurl']."index.php");
 	exit();

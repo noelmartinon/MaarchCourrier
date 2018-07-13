@@ -41,6 +41,10 @@ class UserController
         $user['groups'] = UserModel::getGroupsById(['userId' => $_SESSION['user']['UserId']]);
         $user['entities'] = UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
         $user['lang'] = LangModel::getProfileLang();
+        $user['passwordRules'] = [];
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            $user['passwordRules'] = PasswordModel::getEnabledRules();
+        }
 
         $basket = new \basket();
         $user['absence'] = $basket->redirect_my_baskets_list($_SESSION['user']['baskets'], count($_SESSION['user']['baskets']), $_SESSION['user']['UserId'], 'listingbasket specsmall');
