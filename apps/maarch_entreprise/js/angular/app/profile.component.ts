@@ -43,8 +43,9 @@ export class ProfileComponent implements OnInit {
     };
 
     showPassword                : boolean   = false;
-    ruleText: string = '';
-    otherRuleText: string;
+    ruleText                    : string    = '';
+    otherRuleText               : string;
+    otherRuleTextArr            : String[]  = [];
     selectedSignature           : number    = -1;
     selectedSignatureLabel      : string    = "";
     resultInfo                  : string    = "";
@@ -144,13 +145,20 @@ export class ProfileComponent implements OnInit {
 
                         ruleTextArr.push('<b>1</b> caratère spécial minimum');
                         
+                    } else if (rule.label == 'historyLastUse') {
+
+                        this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>'+rule.value+'</b> derniers mots de passe utilisés.');
+                    
                     } else if (rule.label == 'renewal') {
 
-                        this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que <b>'+rule.value+'</b> jour(s).';
+                        this.otherRuleTextArr.push('Veuillez noter que ce nouveau mot de passe ne sera valide que <b>'+rule.value+'</b> jour(s). Passé ce délai, vous devrez en choisir un nouveau.');
+
                     }
 
                 });
+                console.log(this.otherRuleTextArr.length);
                 this.ruleText = ruleTextArr.join(', ');
+                this.otherRuleText = this.otherRuleTextArr.join('<br/>');
                 this.loading = false;
             });
     }

@@ -40,6 +40,7 @@ var ProfileComponent = (function () {
         };
         this.showPassword = false;
         this.ruleText = '';
+        this.otherRuleTextArr = [];
         this.selectedSignature = -1;
         this.selectedSignatureLabel = "";
         this.resultInfo = "";
@@ -121,11 +122,16 @@ var ProfileComponent = (function () {
                 else if (rule.label == 'complexitySpecial') {
                     ruleTextArr.push('<b>1</b> caratère spécial minimum');
                 }
+                else if (rule.label == 'historyLastUse') {
+                    _this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>' + rule.value + '</b> derniers mots de passe utilisés.');
+                }
                 else if (rule.label == 'renewal') {
-                    _this.otherRuleText = 'Veuillez notez que ce nouveau mot de passe ne sera valide que <b>' + rule.value + '</b> jour(s).';
+                    _this.otherRuleTextArr.push('Veuillez noter que ce nouveau mot de passe ne sera valide que <b>' + rule.value + '</b> jour(s). Passé ce délai, vous devrez en choisir un nouveau.');
                 }
             });
+            console.log(_this.otherRuleTextArr.length);
             _this.ruleText = ruleTextArr.join(', ');
+            _this.otherRuleText = _this.otherRuleTextArr.join('<br/>');
             _this.loading = false;
         });
     };
