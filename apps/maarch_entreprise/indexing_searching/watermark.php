@@ -138,8 +138,15 @@ if ($watermarkTab['text_color'] == '') {
         $color = $colorDefault;
     }
 }
+
+// Get original PDF File size
+$pdf = new FPDI('P','pt');
+$pdf->setSourceFile($filePathOnTmp);
+$tplidx = $pdf->ImportPage(1);
+$size = $pdf->getTemplateSize($tplidx);
+
 // Create a PDF object and set up the properties
-$pdf = new PDF("p", "pt", "A4");
+$pdf = new PDF("p", "pt", array($size['h'],$size['w']));
 $pdf->SetAuthor("MAARCH");
 $pdf->SetTitle("MAARCH document");
 $pdf->SetTextColor($color['color1'],$color['color2'],$color['color3']);
