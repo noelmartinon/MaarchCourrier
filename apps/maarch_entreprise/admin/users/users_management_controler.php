@@ -183,7 +183,15 @@ function display_up($user_id)
             $where = " ((status = 'OK' or status = 'ABS') and users.user_id != 'superadmin') and ((users_entities.entity_id is NULL) or users_entities.entity_id in (".join(',', $my_tab_entities_id)."))";
             $orderstr = "order by user_id asc";
 
-            $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], 'default', 'users_entities', 'users', 'users_entities', 'user_id', true, false, true);
+            $rawCount = $db->query("select count(*) from users", []);
+            $count = $rawCount->fetchObject();
+
+            $limit = 'default';
+            if (is_numeric($count->count)) {
+                $limit = $count->count;
+            }
+
+            $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], $limit, 'users_entities', 'users', 'users_entities', 'user_id', true, false, true);
             if(!in_array_r($user_id,$tab)){
                 return false;
             }
@@ -309,16 +317,7 @@ function display_list()
         }
         $orderstr = $list->define_order($order, $field);
 
-        $db = new Database();
-        $rawCount = $db->query("select count(*) from users", []);
-        $count = $rawCount->fetchObject();
-
-        $limit = 'default';
-        if (is_numeric($count->count)) {
-            $limit = $count->count;
-        }
-
-        $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], $limit, 'users_entities', 'users','users_entities', 'user_id', true, false, true);
+        $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], 'default', 'users_entities', 'users','users_entities', 'user_id', true, false, true);
     }
     for ($i=0;$i<count($tab);$i++) {
         foreach ($tab[$i] as &$item) {
