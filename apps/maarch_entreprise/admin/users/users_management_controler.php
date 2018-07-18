@@ -308,8 +308,17 @@ function display_list()
             $field = trim($_REQUEST['order_field']);
         }
         $orderstr = $list->define_order($order, $field);
-        
-        $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], 'default', 'users_entities', 'users','users_entities', 'user_id', true, false, true);
+
+        $db = new Database();
+        $rawCount = $db->query("select count(*) from users", []);
+        $count = $rawCount->fetchObject();
+
+        $limit = 'default';
+        if (is_numeric($count->count)) {
+            $limit = $count->count;
+        }
+
+        $tab=$request->PDOselect($select, $where, $arrayPDO, $orderstr, $_SESSION['config']['databasetype'], $limit, 'users_entities', 'users','users_entities', 'user_id', true, false, true);
     }
     for ($i=0;$i<count($tab);$i++) {
         foreach ($tab[$i] as &$item) {
