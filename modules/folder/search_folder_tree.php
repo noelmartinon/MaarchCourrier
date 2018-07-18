@@ -413,9 +413,9 @@ $_SESSION['origin'] = "search_folder_tree";
         }
 
 </script>
-<script type="text/javascript" src="<?php
-echo $_SESSION['config']['businessappurl'] . 'tools/'
-?>MaarchJS/dist/maarch.js"></script>
-<script type="text/javascript" src="<?php
-echo $_SESSION['config']['businessappurl'] . 'js/'
-?>search_customer.js"></script>
+<!--<script type="text/javascript" src="<?php
+//echo $_SESSION['config']['businessappurl'] . 'tools/'
+?>MaarchJS/dist/maarch.js"></script>-->
+<!--<script type="text/javascript" src="<?php
+//echo $_SESSION['config']['businessappurl'] . 'js/'
+?>search_customer.js"></script>-->
