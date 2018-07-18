@@ -436,36 +436,43 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
 
             $old_dest = $stmt->fetchObject();
             
-            if($old_dest && isset($new_difflist['copy']['users'])) {
+            if ($old_dest) {
                 # try to find old dest in copies already
                 $found = false;
-                for($ci=0; $ci<count($new_difflist['copy']['users']);$ci++) {
+                if (isset($new_difflist['copy']['users'])) {
+                    for($ci=0; $ci<count($new_difflist['copy']['users']);$ci++) {
+                        
+                        # If in copies before, add number of views as dest to number of views as copy
+    					if($new_difflist['copy']['users'][$ci]['user_id'] == $old_dest->item_id) {
+                            $found = true;
+                            $new_difflist['copy']['users'][$ci]['viewed'] = 
+                                $new_difflist['copy']['users'][$ci]['viewed'] + (integer)$old_dest->viewed;
+                            break;
+                        }
+                    }
                     
-                    # If in copies before, add number of views as dest to number of views as copy
-					if($new_difflist['copy']['users'][$ci]['user_id'] == $old_dest->item_id) {
-                        $found = true;
-                        $new_difflist['copy']['users'][$ci]['viewed'] = 
-                            $new_difflist['copy']['users'][$ci]['viewed'] + (integer)$old_dest->viewed;
-                        break;
+                    //re-built session without dest in copy
+                    $tab=array();
+                    for($ci=0; $ci<count($new_difflist['copy']['users']);$ci++) {
+                        if($new_difflist['copy']['users'][$ci]['user_id'] != $new_dest){
+                        array_push(
+                            $tab, 
+                            array(
+    						'user_id' => $new_difflist['copy']['users'][$ci]['user_id'], 
+    						'viewed' => (integer)$new_difflist['copy']['users'][$ci]['viewed'],
+    						'visible' => 'Y',
+    						'difflist_type' => $new_difflist['copy']['users'][$ci]['viewed']
+                            )
+                        );
+                        }
                     }
-                }
-                
-                //re-built session without dest in copy
-                $tab=array();
-                for($ci=0; $ci<count($new_difflist['copy']['users']);$ci++) {
-                    if($new_difflist['copy']['users'][$ci]['user_id'] != $new_dest){
-                    array_push(
-                        $tab, 
-                        array(
-						'user_id' => $new_difflist['copy']['users'][$ci]['user_id'], 
-						'viewed' => (integer)$new_difflist['copy']['users'][$ci]['viewed'],
-						'visible' => 'Y',
-						'difflist_type' => $new_difflist['copy']['users'][$ci]['viewed']
-                        )
-                    );
+                    $new_difflist['copy']['users']=$tab;
+                } else {
+                    if (!isset($new_difflist['copy'])) {
+                        $new_difflist['copy'] = array();
                     }
+                    $new_difflist['copy']['users'] = array();
                 }
-                $new_difflist['copy']['users']=$tab;
                 
                 if(!$found) {
                     array_push(
@@ -480,7 +487,6 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 }
             }
         }
-        //print_r($_SESSION['redirect']['diff_list']['copy']['entities']);exit();
 
         # Save listinstance
         $diffList->save_listinstance(
