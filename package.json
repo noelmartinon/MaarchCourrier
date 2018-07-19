@@ -22,7 +22,9 @@
     "photoswipe": "^4.1.2",
     "tinymce": "^4.7.11",
     "tooltipster": "^4.2.6",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "uglify-es": "3.2.2",
+    "uglifyjs-webpack-plugin": "1.1.5"
   },
   "devDependencies": {
     "@angular/animations": "^5.2.10",
