@@ -203,77 +203,6 @@ $_ENV['categories']['incoming']['confidentiality'] = array(
     'modify' => true,
 );
 
-///////////////////////////// GED DOC ////////////////////////////////////////////////
-$_ENV['categories']['ged_doc'] = array();
-$_ENV['categories']['ged_doc']['img_cat'] = '<i class="fa fa-arrow-right fa-2x"></i>';
-$_ENV['categories']['ged_doc']['other_cases'] = array();
-$_ENV['categories']['ged_doc']['type_id'] = array(
-    'type_form' => 'integer',
-    'type_field' => 'integer',
-    'mandatory' => true,
-    'label' => _DOCTYPE,
-    'table' => 'res',
-    'img' => 'file',
-    'modify' => true,
-    'form_show' => 'select',
-);
-$_ENV['categories']['ged_doc']['doc_date'] = array(
-    'type_form' => 'date',
-    'type_field' => 'date',
-    'mandatory' => true,
-    'label' => _DOC_DATE,
-    'table' => 'res',
-    'img' => 'calendar-o',
-    'modify' => true,
-    'form_show' => 'date',
-);
-$_ENV['categories']['ged_doc']['subject'] = array(
-    'type_form' => 'string',
-    'type_field' => 'string',
-    'mandatory' => true,
-    'label' => _SUBJECT,
-    'table' => 'res',
-    'img' => 'info',
-    'modify' => true,
-    'form_show' => 'textarea',
-);
-$_ENV['categories']['ged_doc']['type_contact'] = array(
-    'type_form' => 'radio',
-    'mandatory' => true,
-    'label' => _CONTACT_TYPE,
-    'table' => 'none',
-    'values' => array(
-        'internal',
-        'external',
-    ),
-    'modify' => false,
-);
-$_ENV['categories']['ged_doc']['other_cases']['contact'] = array(
-    'type_form' => 'string',
-    'type_field' => 'string',
-    'mandatory' => true,
-    'label' => _AUTHOR_DOC,
-    'table' => 'coll_ext',
-    'special' => 'exp_user_id,exp_contact_id',
-    'modify' => true,
-    'img' => 'book',
-    'form_show' => 'textfield',
-);
-
-$_ENV['categories']['ged_doc']['confidentiality'] = array(
-    'type_form' => 'radio',
-    'type_field' => 'string',
-    'mandatory' => false,
-    'label' => _CONFIDENTIALITY,
-    'table' => 'res',
-    'values' => array(
-        'Y',
-        'N',
-    ),
-    'img' => 'exclamation-triangle',
-    'modify' => true,
-);
-
 ///////////////////////////// OUTGOING ////////////////////////////////////////////////
 $_ENV['categories']['outgoing'] = array();
 $_ENV['categories']['outgoing']['img_cat'] = '<i class="fa fa-arrow-left fa-2x"></i>';
@@ -576,7 +505,7 @@ $_ENV['categories']['ged_doc']['subject'] = array(
 $_ENV['categories']['ged_doc']['type_contact'] = array(
     'type_form' => 'radio',
     'mandatory' => true,
-    'label' => _AUTHOR_TYPE,
+    'label' => _CONTACT_TYPE,
     'table' => 'none',
     'values' => array(
         'internal',
@@ -584,14 +513,16 @@ $_ENV['categories']['ged_doc']['type_contact'] = array(
     ),
     'modify' => false,
 );
-$_ENV['categories']['ged_doc']['other_cases']['author'] = array(
+$_ENV['categories']['ged_doc']['other_cases']['contact'] = array(
     'type_form' => 'string',
     'type_field' => 'string',
     'mandatory' => true,
-    'label' => _AUTHOR,
+    'label' => _AUTHOR_DOC,
     'table' => 'coll_ext',
-    'special' => 'exp_user_id,exp_contact_id,author',
+    'special' => 'exp_user_id,exp_contact_id',
     'modify' => false,
+    'img' => 'book',
+    'form_show' => 'textfield',
 );
 
 $_ENV['categories']['ged_doc']['confidentiality'] = array(
