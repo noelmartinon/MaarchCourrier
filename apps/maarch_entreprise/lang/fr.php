@@ -261,6 +261,7 @@ if (!defined("_YOUR_FIRST_CONNEXION")) define("_YOUR_FIRST_CONNEXION", "Bienvenu
 if (!defined("_PLEASE_CHANGE_PSW")) define("_PLEASE_CHANGE_PSW", " veuillez définir votre mot de passe");
 if (!defined("_ASKED_ONLY_ONCE")) define("_ASKED_ONLY_ONCE", "Cela ne vous sera demandé qu'une seule fois");
 if (!defined("_PSW_REINI")) define("_PSW_REINI", "Votre mot de passe a été réinitialisé. Veuillez en définir un nouveau.");
+if (!defined("_PSW_REINI_2")) define("_PSW_REINI_2", "Votre mot de passe a été réinitialisé ou la date de renouvellement a été atteinte. Veuillez en définir un nouveau.");
 if (!defined("_FIRST_CONN")) define("_FIRST_CONN", "Première connexion");
 if (!defined("_LOGIN")) define("_LOGIN", "Connexion");
 if (!defined("_RELOGIN")) define("_RELOGIN", "Reconnexion");

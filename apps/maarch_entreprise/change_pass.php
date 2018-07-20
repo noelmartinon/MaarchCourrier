@@ -54,7 +54,12 @@ if (!empty($_SESSION['config']['enhancedPassword'])) {
                 </h2>
                 <div class="block">
                     <h3>
-                        <?php echo _PSW_REINI; ?>
+                        <?php 
+                        if (!empty($_SESSION['config']['enhancedPassword'])) {
+                            echo _PSW_REINI_2;
+                        } else {
+                            echo _PSW_REINI;
+                        } ?>
                     </h3>
                     <div class="blank_space">&nbsp;</div>
                     <form name="frmuser" method="post" action="<?php echo $_SESSION['config']['businessappurl'];?>index.php?display=true&page=verif_pass"
