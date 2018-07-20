@@ -183,7 +183,7 @@ function display_up($user_id)
             $where = " ((status = 'OK' or status = 'ABS') and users.user_id != 'superadmin') and ((users_entities.entity_id is NULL) or users_entities.entity_id in (".join(',', $my_tab_entities_id)."))";
             $orderstr = "order by user_id asc";
 
-            $rawCount = $db->query("select count(*) from users", []);
+            $rawCount = $db->query("select count(1) from users", []);
             $count = $rawCount->fetchObject();
 
             $limit = 'default';
