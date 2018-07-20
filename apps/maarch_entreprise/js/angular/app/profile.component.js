@@ -123,7 +123,7 @@ var ProfileComponent = (function () {
                     ruleTextArr.push('<b>1</b> caratère spécial minimum');
                 }
                 else if (rule.label == 'historyLastUse') {
-                    _this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>' + rule.value + '</b> derniers mots de passe utilisés.');
+                    _this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>' + rule.value + '</b> dernier(s) mot(s) de passe.');
                 }
                 else if (rule.label == 'renewal') {
                     _this.otherRuleTextArr.push('Veuillez noter que ce nouveau mot de passe ne sera valide que <b>' + rule.value + '</b> jour(s). Passé ce délai, vous devrez en choisir un nouveau.');

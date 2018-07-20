@@ -147,7 +147,7 @@ export class ProfileComponent implements OnInit {
                         
                     } else if (rule.label == 'historyLastUse') {
 
-                        this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>'+rule.value+'</b> derniers mots de passe utilisés.');
+                        this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>'+rule.value+'</b> dernier(s) mot(s) de passe.');
                     
                     } else if (rule.label == 'renewal') {
 
