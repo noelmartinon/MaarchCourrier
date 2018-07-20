@@ -19,6 +19,7 @@ $core_tools->load_header(_MODIFICATION_PSW);
 $time = $core_tools->get_session_time_expire();
 if (!empty($_SESSION['config']['enhancedPassword'])) {
     $passwordRules = \Core\Models\PasswordModel::getEnabledRules();
+    $msgText = [];
     if (in_array('minLength', array_keys($passwordRules))) {
         $msgText[] = '<b>'.$passwordRules['minLength'].'</b> caratère(s) minimum';
     }
