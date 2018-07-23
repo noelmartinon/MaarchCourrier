@@ -14,14 +14,14 @@ Démonstration : http://demo.maarchcourrier.com/
 
 <!-- VM : https://sourceforge.net/projects/maarch/files/Maarch%20Courrier/VMs/Maarch%20Courrier%2017.06%20Prod.ova -->
 
-Documentation : http://wiki.maarch.org/Maarch_Courrier
+Documentation : https://docs.maarch.org/MaarchCourrier/18.04/
 
 
 ## Installation
-1. Vérifiez que vous avez l'ensemble des [pré-requis](http://wiki.maarch.org/Maarch_Courrier/fr/Install/Prerequis/latest)
+1. Vérifiez que vous avez l'ensemble des [pré-requis](https://docs.maarch.org/MaarchCourrier/18.04/guat/guat_prerequisites/prerequisites.html)
 2. Décompressez *MaarchCourrier-18.04.tar.gz* dans votre zone web
 3. Vérifiez votre vhost Apache
-4. Laissez-vous guider par notre installeur à [http://IP.ouDomaine.tld/MaarchCourrier/install/](http://wiki.maarch.org/Maarch_Courrier/1.5/fr/Manuel_administrateur/Fonctionnalit%C3%A9s/Gestion_installeur$
+4. Laissez-vous guider par notre installeur à [http://IP.ouDomaine.tld/MaarchCourrier/install/](https://docs.maarch.org/MaarchCourrier/18.04/guat/guat_installation/online_install.html)
 
 
 ## Requis techniques
@@ -48,6 +48,6 @@ magic_quotes_gpc (Off)
 
 
 ## Le coin des developpeurs
-[Maarch Developer handbook](http://wiki.maarch.org/Maarch_Courrier/1.5/fr/Install/DeveloperHandbook)
+[Maarch Developer handbook](https://labs.maarch.org/maarch/MaarchCourrier/blob/master/CONTRIBUTING.md)
 
 
