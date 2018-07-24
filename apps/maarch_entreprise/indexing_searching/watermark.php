@@ -56,7 +56,7 @@ if ($watermarkTab['text'] == '') {
     	if ($matches[1][$z] == 'date_now') {
     		$currentText = date('d-m-Y');
     	} elseif ($matches[1][$z] == 'hour_now') {
-    		$currentText = date('H:m:i');
+    		$currentText = date('H:i');
     	} elseif($matches[1][$z] == 'alt_identifier'){
             
             if($_REQUEST['watermark_outgoing'] == "true"){
