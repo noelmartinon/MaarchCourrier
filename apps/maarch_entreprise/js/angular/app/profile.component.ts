@@ -151,12 +151,18 @@ export class ProfileComponent implements OnInit {
                         order: "asc",
                         display: "idToDisplay",
                         templateValue: "{{id}}",
+                        dynamic: true,
                         source: {
-                            ajax: {
-                                type: "GET",
-                                dataType: "json",
-                                url: this.coreUrl + "rest/autocomplete/users",
-                            }
+                            ajax: (query:any) => {
+                                return{
+                                        type: "GET",
+                                        dataType: "json",
+                                        url: this.coreUrl + "rest/autocomplete/users",
+                                        data: {
+                                            search : "{{query}}"
+                                        }
+                                    }
+                            }                            
                         }
                     });
                 }, 0);
