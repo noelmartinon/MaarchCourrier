@@ -1097,27 +1097,7 @@ abstract class basket_Abstract extends Database
     public function cancel_abs($userId)
     {
         $db = new Database();
-        $stmt = $db->query(
-            "delete from " . USER_ABS_TABLE . " where is_virtual = 'Y' "
-            . "and basket_owner = ?",array($userId));
-        //Then we search all the virtual baskets assigned to the user
-        $stmt = $db->query(
-            "select basket_owner, basket_id from " . USER_ABS_TABLE
-            . " where is_virtual='Y' and user_abs = ?",array($userId));
-        // and delete this baskets if they were reassigned to someone else
-        $i = 0;
-        while ($res = $stmt->fetchObject()) {
-            $stmt2 = $db->query(
-                "delete from " . USER_ABS_TABLE . " where is_virtual ='Y' "
-                . " and basket_id = ? and basket_owner = ? ",array($res->basket_id,$res->basket_owner));
-            $i ++;
-        }
-        // then we delete all baskets where the user was the missing user
-        $stmt = $db->query(
-            "DELETE  from " . USER_ABS_TABLE . " WHERE user_abs=?",array($userId)
-        );
-        $stmt = $db->query(
-            "update " . USERS_TABLE . " set status = 'OK' where user_id = ?",array($userId));
+        $db->query("update users set status = 'OK' where user_id = ?", [$userId]);
     }
 
     public function check_reserved_time($resId, $collId)
