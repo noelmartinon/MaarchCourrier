@@ -159,7 +159,7 @@ export class ProfileComponent implements OnInit {
                                         dataType: "json",
                                         url: this.coreUrl + "rest/autocomplete/users",
                                         data: {
-                                            search : "{{query}}"
+                                            search : query
                                         }
                                     }
                             }                            
