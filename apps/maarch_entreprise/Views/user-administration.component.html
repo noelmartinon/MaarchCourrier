@@ -197,7 +197,7 @@
                                             <mat-icon mat-list-icon color="primary" *ngIf="basket.enabled" style="margin-top:-60px;" class="fa fa-paper-plane-o">
                                             </mat-icon>
                                             <h4 mat-line [ngStyle]="{'opacity': basket.allowed ? '1' : '0.5'}" [attr.color]="basket.userToDisplay != '' ? 'primary': ''">{{basket.basket_name}}
-                                                <span class="label label-primary" style="font-weight:normal">{{basket.group_id}}</span>
+                                                <span class="label label-primary" style="font-weight:normal">{{basket.group_desc}}</span>
                                             </h4>
                                             <p mat-line [ngStyle]="{'opacity': basket.allowed ? '1' : '0.5'}">
                                                 <mat-form-field>
@@ -219,7 +219,7 @@
                                             <mat-icon mat-list-icon color="primary" style="margin-top:-60px;" class="fa fa-reply">
                                             </mat-icon>
                                             <h4 mat-line [attr.color]="basket.userToDisplay != '' ? 'primary': ''">{{basket.basket_name}}
-                                                <span class="label label-primary" style="font-weight:normal">{{basket.group_id}}</span>
+                                                <span class="label label-primary" style="font-weight:normal">{{basket.group_desc}}</span>
                                             </h4>
                                             <p mat-line>
                                                 <mat-form-field *ngIf="basket.userToDisplay == ''" floatLabel="never">
