@@ -74,7 +74,7 @@
             <label>_INCOMING_PJ</label>
             <process_mode/>
         </type>
-        <type show="true" with_chrono="true" get_chrono="response_project" icon="BE" sign="true">
+        <type show="true" with_chrono="false" get_chrono="response_project" icon="BE" sign="true">
             <id>waybill</id>
             <label>_WAYBILL</label>
             <process_mode/>
