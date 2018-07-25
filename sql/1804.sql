@@ -776,3 +776,10 @@ INSERT INTO parameters (id, param_value_string, param_value_int, param_value_dat
 INSERT INTO templates_doctype_ext SELECT null, d.type_id, 'N' FROM doctypes d LEFT JOIN templates_doctype_ext tde ON d.type_id = tde.type_id WHERE tde.type_id IS NULL;
 
 UPDATE status set img_filename = 'fm-letter' where img_filename is null or img_filename = '';
+
+DELETE FROM usergroups_services WHERE service_id in ('delete_document_in_detail', 'edit_document_in_detail');
+INSERT INTO usergroups_services (group_id, service_id)  
+SELECT group_id, 'delete_document_in_detail' FROM security WHERE rights_bitmask IN (16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31);
+
+INSERT INTO usergroups_services (group_id, service_id)  
+SELECT group_id, 'edit_document_in_detail' FROM security WHERE rights_bitmask IN (8,9,10,11,12,13,14,15,24,25,26,27,28,29,30,31);
