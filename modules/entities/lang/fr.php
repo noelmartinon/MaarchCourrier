@@ -45,7 +45,7 @@ if (!defined('_ENTITY_UPDATED')) {
     define('_ENTITY_UPDATED', 'Entité modifiée');
 }
 if (!defined('_ENTITY_AUTORIZED')) {
-    define('_ENTITY_AUTORIZED', 'Entité autorisé');
+    define('_ENTITY_AUTORIZED', 'Entité autorisée');
 }
 if (!defined('_ENTITY_SUSPENDED')) {
     define('_ENTITY_SUSPENDED', 'Entité suspendue');

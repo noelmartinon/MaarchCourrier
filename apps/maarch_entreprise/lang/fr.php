@@ -4527,7 +4527,7 @@ if (!defined('_PRINT_NOTES')) {
     define('_PRINT_NOTES', 'NOTES');
 }
 if (!defined('_PRINT_PROCESS_ENTITY')) {
-    define('_PRINT_PROCESS_ENTITY', 'SERVICE TRAITANT');
+    define('_PRINT_PROCESS_ENTITY', 'ENTITE TRAITANTE');
 }
 if (!defined('_PRINT_PRIVATE_NOTE')) {
     define('_PRINT_PRIVATE_NOTE', 'Note privée');
