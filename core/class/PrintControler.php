@@ -11,6 +11,7 @@ require_once('core/class/class_security.php');
 
 require_once('apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdf.php');
 require_once('apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdi.php');
+require_once('apps/maarch_entreprise/tools/phpqrcode/qrlib.php');
 
 class EmptyObject {
     function __construct()
@@ -51,7 +52,7 @@ class PrintControler extends PrintFunctions
 				$this->retrieve_datas($resId);
 			}
             $this->process_functions();
-            $_SESSION['print']['filename'] = $this->make_pdf();
+            $_SESSION['print']['filename'] = $this->make_pdf($resId);
         }
         
         // Private
@@ -177,7 +178,7 @@ class PrintControler extends PrintFunctions
             }
         }
         
-		private function make_pdf()
+		private function make_pdf($resId)
         {
             $functions = new functions();
 			$db = new Database();
@@ -232,7 +233,7 @@ class PrintControler extends PrintFunctions
 				$pdf->SetFont('Arial','B',11);
 				
 				//APPLICATION NAME
-				$pdf->Cell(140,5, utf8_decode($_SESSION['config']['applicationname']),0,0, 'L', false);
+				$pdf->Cell(140,5, utf8_decode($_SESSION['config']['applicationname']),0,0, 'C', false);
 				
 				$pdf->SetFont('Arial','',10);
 				
@@ -242,15 +243,20 @@ class PrintControler extends PrintFunctions
 				$pdf->SetFont('Arial','B',10);
 				
 				//INITIATOR
-				
+                if (!empty($resId)) {
+                    $filename_QR = $_SESSION['config']['tmppath'].DIRECTORY_SEPARATOR.$_SESSION['user']['UserId'] . time() . rand() ."_QRCODE.png";
+                    QRcode::png($resId, $filename_QR);
+
+                    $pdf->Image($filename_QR, 7, 3);
+                }
                 if ($this->array_print[$cpt]['initiator'] <> '') {
                     $stmt = $db->query(
                     	"select entity_label from entities where entity_id = ?", 
                     	array($this->array_print[$cpt]['initiator'])
                     );
                     $resultEntity = $stmt->fetchObject();
-                    $pdf->Cell(36,5,utf8_decode(_INITIATOR . ' : ' 
-                        . $resultEntity->entity_label . " (" . $this->array_print[$cpt]['initiator'] . ")"),0,1, 'L', false);
+                    $pdf->Cell(140,5,utf8_decode(_INITIATOR . ' : '
+                        . $resultEntity->entity_label . " (" . $this->array_print[$cpt]['initiator'] . ")"),0,1, 'C', false);
 				} elseif($this->array_print[$cpt]['typist'] <> '') {
                     require_once "modules/entities/class/class_manage_entities.php";
                     $entity = new entity();
