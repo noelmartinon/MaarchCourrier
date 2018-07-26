@@ -62,7 +62,7 @@ while ($state <> 'END') {
             $u=1;
             while ($line2 = $stmt2->fetchObject()) {
                 //echo "_".$line2->group_id."\n";
-                $stmt3 = $db->query("select usergroup_content.user_id,users.status from usergroup_content,users WHERE group_id = '".$line2->group_id."' and users.status in ('OK') and usergroup_content.user_id=users.user_id");
+                $stmt3 = $db->query("select usergroup_content.user_id,users.status from usergroup_content,users WHERE group_id = '".$line2->group_id."' and users.status in ('OK','ABS') and usergroup_content.user_id=users.user_id");
                 
                 $baskets_notif = array();
 		          $logger->write("GROUP: " . $line2->group_id . " ... " . $stmt3->rowCount() . " user(s) to notify", 'INFO');
@@ -76,12 +76,11 @@ while ($state <> 'END') {
                             $whereClause, $line3->user_id
                         );
                     $user_id =$line3->user_id;
-
+                                    
                     if($line3->status == 'ABS'){
                         $query= "SELECT * FROM user_abs WHERE user_abs = ?";
-                        $db2 = new Database();
-                        $testStmt = $db2->query($query,array($line3->user_id));
-                        $abs_user = $testStmt->fetchObject();
+                        $redirStmt = $db->query($query,array($line3->user_id));
+                        $abs_user = $redirStmt->fetchObject();
                         $user_id = $abs_user->new_user;
                     }
                     $stmt4 = $db->query("select * from res_view_letterbox ".$whereClause);
