@@ -55,8 +55,6 @@ if($_SESSION['features']['send_to_contact_with_mandatory_attachment'] == true){
 }
 
 
-
-
 $confirm = false;
 
 $frm_width='800px';
@@ -67,18 +65,12 @@ function get_attachment_txt($values, $path_manage_action,  $id_action, $table, $
     var_dump('ok get_attachment_txt');
 }
 
- function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
- {
-
+function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
+{
 
 $module='apps';
-//var_dump($_REQUEST['values']);
 $mode='add';
-
-
-
-
-
+$parameters='&action=send_to_contact_with_mandatory_attachment';
 
 $parameters = '&coll_id='.$_REQUEST['coll_id'].'&size=full';
         $frm_str .='<iframe name="form_mail" id="form_mail" src="'. $_SESSION['config']['businessappurl'].'index.php?display=true&module=sendmail&page=mail_form_to_contact&identifier='.$_REQUEST['values'].'&origin=document&coll_id=letterbox_coll&mode='.$mode.$parameters.'" frameborder="0" width="100%" style="height:540px;padding:0px;overflow-x:hidden;overflow-y: auto;"></iframe>';
@@ -94,7 +86,6 @@ $mode='page';
         $frm_str .='<div align="center">';
 
 
-
         $frm_str .=' <input type="button" name="redirect_dep" value="'._VALIDATE.'" id="redirect_dep" class="button" onclick="window.frames.form_mail.document.getElementsByName(\'valid\')[0].click();" />';
         // $frm_str .=' <input type="button" name="storage" class="button" id="storage" onclick="alert(\'TEST\')";/>';
         $frm_str .=' <input style="display:none;" type="button" name="storage" class="button" id="storage" onclick="valid_action_form( \'frm_redirect_dep\', \''.$path_manage_action.'\', \''. $id_action.'\', \''.$_REQUEST['values'].'\', \''.$table.'\', \''.$module.'\', \''.$coll_id.'\', \''.$mode.'\');";/>';
@@ -104,13 +95,10 @@ $mode='page';
     return addslashes($frm_str);
  }
 
-
-
-
- function check_form($form_id,$values)
- {
+function check_form($form_id,$values)
+{
     return true;
- }
+}
 
 function manage_form($arr_id, $history, $id_action, $label_action, $status, $coll_id, $table, $values_form )
 {
@@ -142,17 +130,17 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     $table = $sec->retrieve_table_from_coll($coll_id);
 
     # save note
-        if($formValues['note_content_to_users'] != ''){
-            //Add notes
-            $nb_avis = $sequence +1;
-            $userIdTypist = $_SESSION['user']['UserId'];
-            $content_note = $formValues['note_content_to_users'];
-            $content_note = str_replace(";", ".", $content_note);
-            $content_note = str_replace("--", "-", $content_note);
-            $content_note = $content_note;
-            $note->addNote($res_id, $coll_id, $content_note);
-            
-        }
+    if($formValues['note_content_to_users'] != ''){
+        //Add notes
+        $nb_avis = $sequence +1;
+        $userIdTypist = $_SESSION['user']['UserId'];
+        $content_note = $formValues['note_content_to_users'];
+        $content_note = str_replace(";", ".", $content_note);
+        $content_note = str_replace("--", "-", $content_note);
+        $content_note = $content_note;
+        $note->addNote($res_id, $coll_id, $content_note);
+        
+    }
     return array('result' => $res_id.'#', 'history_msg' => '');
 }
 
