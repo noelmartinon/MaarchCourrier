@@ -76,9 +76,9 @@ while ($state != 'END') {
                         if (empty($aRecipients)) {
                             $aRecipients = '0=1';
                         }
-                        $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK') and usergroup_content.user_id=users.user_id and users.user_id in (?)", array($line2->group_id, $aRecipients));
+                        $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK','ABS') and usergroup_content.user_id=users.user_id and users.user_id in (?)", array($line2->group_id, $aRecipients));
                     } else {
-                        $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK') and usergroup_content.user_id=users.user_id", array($line2->group_id));
+                        $stmt3 = $db->query("SELECT usergroup_content.user_id,users.status FROM usergroup_content, users WHERE group_id = ? and users.status in ('OK','ABS') and usergroup_content.user_id=users.user_id", array($line2->group_id));
                     }
 
                     $baskets_notif = array();
@@ -89,12 +89,14 @@ while ($state != 'END') {
                         $whereClause = $secCtrl->process_security_where_clause($line->basket_clause, $line3->user_id);
                         $whereClause = $entities->process_where_clause($whereClause, $line3->user_id);
                         $user_id = $line3->user_id;
-                        if ($line3->status == 'ABS') {
-                            $query = 'SELECT new_user FROM user_abs WHERE user_abs = ?';
-                            $testStmt = $db->query($query, array($line3->user_id));
-                            $abs_user = $testStmt->fetchObject();
+                        $query = 'SELECT new_user FROM user_abs WHERE user_abs = ?';
+                        $redirStmt = $db->query($query, array($line3->user_id));
+                        $queryResult = $redirStmt->fetchObject();
+                        if($queryResult){
+                            $abs_user = $queryResult;
                             $user_id = $abs_user->new_user;
                         }
+                             
 
                         $stmt4 = $db->query('SELECT res_id FROM res_view_letterbox '.$whereClause);
                         if (!empty($stmt4)) {
