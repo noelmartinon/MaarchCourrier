@@ -475,7 +475,7 @@ if ($mode == 'add') {
     //Send
     $id_action = 500;
     $content .=' <input style="display:none;" type="button" name="valid" value="&nbsp;'._SEND_EMAIL
-                .'&nbsp;" id="valid" class="button" onclick="validEmailFormForSendToContact(\''.$path_to_script.'&mode=added&for=send&action=send_to_contact_with_mandatory_attachment\', \'formEmail\',\''.$path_to_script_ajax.'&mode=added&for=send\', \''.$_SESSION['status'].'\');" />&nbsp;';
+                .'&nbsp;" id="valid" class="button" onclick="validEmailFormForSendToContact(\''.$path_to_script.'&mode=added&for=send&action='.$_GET['action'].'\', \'formEmail\',\''.$path_to_script_ajax.'&mode=added&for=send\', \''.$_SESSION['status'].'\');" />&nbsp;';
     $content .='</div>';
     $content .= '</form>';
     $content .= '</div>';

@@ -38,27 +38,17 @@ $etapes = array('form');
 $frm_width='800px';
 $frm_height = 'auto';
 
- function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
+function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
  {
 
 
 $module='apps';
-//var_dump($_REQUEST['values']);
 $mode='add';
-
-
-
-
-
+$parameters='&action=send_attachments_to_contact';
 
 $parameters = '&coll_id='.$_REQUEST['coll_id'].'&size=full';
         $frm_str .='<iframe name="form_mail" id="form_mail" src="'. $_SESSION['config']['businessappurl'].'index.php?display=true&module=sendmail&page=mail_form_to_contact&identifier='.$_REQUEST['values'].'&origin=document&coll_id=letterbox_coll&mode='.$mode.$parameters.'" frameborder="0" width="100%" style="height:540px;padding:0px;overflow-x:hidden;overflow-y: auto;"></iframe>';
 
-
-	// $frm_str .='<div align="center">';
-	// $frm_str .=' <input type="button" name="redirect_dep" value="'._VALIDATE.'" id="redirect_dep" class="button" onclick="valid_action_form( \'frm_redirect_dep\', \''.$path_manage_action.'\', \''. $id_action.'\', \''.$values_str.'\', \''.$table.'\', \''.$module.'\', \''.$coll_id.'\', \''.$mode.'\');" />';
-	// $frm_str .=' <input type="button" name="cancel" id="cancel" class="button"  value="'._CANCEL.'" onclick="pile_actions.action_pop();destroyModal(\'modal_'.$id_action.'\');"/>';
-	// $frm_str .='</div>';
 $mode='page';
  
         $frm_str .='<div id="form2" style="border:none;">';
@@ -69,15 +59,6 @@ $mode='page';
         $frm_str .='</div>';
     $frm_str .='<div align="center">';
 
-// $frm_str .= '<script type="text/javascript">function test() {';
-// $frm_str .= 'var f= window.frames.form_mail;';
-// $frm_str .= 'var e=f.document.getElementsByName("Macible");';
-// $frm_str .= 'e[0].value=\'Mavaleurc\';';
-// // $frm_str .= 'var e=f.document.getElementsByName("valid");';
-// // $frm_str .= 'e[0].value=\'Mavaleurc\';';
-// $frm_str .= '} </script>';
-//$frm_str .= '<a href="javascript:test();">remplir</a>';
-
 
         $frm_str .=' <input type="button" name="redirect_dep" value="'._VALIDATE.'" id="redirect_dep" class="button" onclick="window.frames.form_mail.document.getElementsByName(\'valid\')[0].click();valid_action_form( \'frm_redirect_dep\', \''.$path_manage_action.'\', \''. $id_action.'\', \''.$_REQUEST['values'].'\', \''.$table.'\', \''.$module.'\', \''.$coll_id.'\', \''.$mode.'\');" />';
         $frm_str .=' <input type="button" name="cancel" id="cancel" class="button"  value="'._CANCEL.'" onclick="pile_actions.action_pop();destroyModal(\'modal_'.$id_action.'\');"/>';
@@ -85,9 +66,6 @@ $mode='page';
 
     return addslashes($frm_str);
  }
-
-
-
 
  function check_form($form_id,$values)
  {
@@ -124,17 +102,17 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     $table = $sec->retrieve_table_from_coll($coll_id);
 
     # save note
-        if($formValues['note_content_to_users'] != ''){
-            //Add notes
-            $nb_avis = $sequence +1;
-            $userIdTypist = $_SESSION['user']['UserId'];
-            $content_note = $formValues['note_content_to_users'];
-            $content_note = str_replace(";", ".", $content_note);
-            $content_note = str_replace("--", "-", $content_note);
-            $content_note = $content_note;
-            $note->addNote($res_id, $coll_id, $content_note);
-            
-        }
+    if($formValues['note_content_to_users'] != ''){
+        //Add notes
+        $nb_avis = $sequence +1;
+        $userIdTypist = $_SESSION['user']['UserId'];
+        $content_note = $formValues['note_content_to_users'];
+        $content_note = str_replace(";", ".", $content_note);
+        $content_note = str_replace("--", "-", $content_note);
+        $content_note = $content_note;
+        $note->addNote($res_id, $coll_id, $content_note);
+        
+    }
     return array('result' => $res_id.'#', 'history_msg' => '');
 }
 
