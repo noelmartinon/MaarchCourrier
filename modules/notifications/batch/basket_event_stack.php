@@ -89,8 +89,8 @@ while ($state != 'END') {
                         $whereClause = $secCtrl->process_security_where_clause($line->basket_clause, $line3->user_id);
                         $whereClause = $entities->process_where_clause($whereClause, $line3->user_id);
                         $user_id = $line3->user_id;
-                        $query = 'SELECT new_user FROM user_abs WHERE user_abs = ?';
-                        $redirStmt = $db->query($query, array($line3->user_id));
+                        $query = 'SELECT new_user FROM user_abs WHERE user_abs = ? AND basket_id = ?';
+                        $redirStmt = $db->query($query, array($line3->user_id,$line->basket_id));
                         $queryResult = $redirStmt->fetchObject();
                         if($queryResult){
                             $abs_user = $queryResult;
