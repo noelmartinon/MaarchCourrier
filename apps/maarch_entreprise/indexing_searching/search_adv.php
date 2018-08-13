@@ -443,7 +443,7 @@ $arr_tmp2 = array('label' => _VISA_USER_SEARCH_MIN, 'type' => 'input_text', 'par
 $param['visa_user'] = $arr_tmp2;
 
  //Addresses contact externe
-    $arr_tmp2 = array('label' => _ADDRESSES_MAJ, 'type' => 'input_text', 'param' => array('field_label' => _ADDRESSES_MAJ));
+    $arr_tmp2 = array('label' => _MORAL_CONTACT, 'type' => 'input_text', 'param' => array('field_label' => _ADDRESSES_MAJ));
     $param['addresses_id'] = $arr_tmp2;
 
 //contact_type

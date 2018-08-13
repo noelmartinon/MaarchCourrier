@@ -2744,6 +2744,9 @@ if (!defined('_ADDRESSES')) {
 if (!defined('_ADDRESSES_MAJ')) {
     define('_ADDRESSES_MAJ', 'Adresse');
 }
+if (!defined('_MORAL_CONTACT')) {
+    define('_MORAL_CONTACT', 'Contact moral');
+}
 if (!defined('_DOC_S')) {
     define('_DOC_S', 'document(s)');
 }

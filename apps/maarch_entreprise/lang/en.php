@@ -2710,6 +2710,9 @@ if (!defined('_ADDRESSES')) {
 if (!defined('_ADDRESSES_MAJ')) {
     define('_ADDRESSES_MAJ', 'Address');
 }
+if (!defined('_MORAL_CONTACT')) {
+    define('_MORAL_CONTACT', 'Moral contact');
+}
 if (!defined('_DOC_S')) {
     define('_DOC_S', 'document(s)');
 }
