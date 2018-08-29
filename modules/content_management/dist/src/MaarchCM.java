@@ -115,7 +115,6 @@ public class MaarchCM {
     public String editMode;    
     public String programName;
     
-    SystemTray tray = SystemTray.getSystemTray();
     //If the icon is a file
     Image image = Toolkit.getDefaultToolkit().createImage(this.getClass().getResource("logo_only.png"));
     //Alternative (if the icon is on the classpath):
@@ -126,7 +125,7 @@ public class MaarchCM {
             System.exit(0);
         }
     };
-    TrayIcon trayIcon = new TrayIcon(image, "Tray Demo");
+    TrayIcon trayIcon = null;
 
 
     
@@ -146,18 +145,23 @@ public class MaarchCM {
         
         logger = new MyLogger(userLocalDirTmp + File.separator);
         FileManager.deleteLogsOnDirWithTime(userLocalDirTmp);
-        PopupMenu popup = new PopupMenu();
-        MenuItem defaultItem = new MenuItem("Fermer l'applet");
-        defaultItem.addActionListener(exitListener);
-        popup.add(defaultItem);
-        //Let the system resize the image if needed
-        trayIcon.setImageAutoSize(true);
-        //Set tooltip text for the tray icon
-        trayIcon.setToolTip("Maarch content editor");
-        tray.add(trayIcon);
         
-        trayIcon.setPopupMenu(popup);
-                
+        if (SystemTray.isSupported()) {
+            SystemTray tray = SystemTray.getSystemTray();
+            PopupMenu popup = new PopupMenu();
+            MenuItem defaultItem = new MenuItem("Fermer l'applet");
+            defaultItem.addActionListener(exitListener);
+            popup.add(defaultItem);
+            trayIcon = new TrayIcon(image, "Tray Demo");
+            //Let the system resize the image if needed
+            trayIcon.setImageAutoSize(true);
+            //Set tooltip text for the tray icon
+            trayIcon.setToolTip("Maarch content editor");
+            tray.add(trayIcon);
+
+            trayIcon.setPopupMenu(popup);
+        }
+        
         initDatas(args);
         
         initHttpRequest();
@@ -588,7 +592,9 @@ public class MaarchCM {
         //send message error to Maarch if necessary
         if (!error.isEmpty()) {
             endRequestApplet();
-            trayIcon.displayMessage("Maarch content editor", error, TrayIcon.MessageType.ERROR);
+            if (SystemTray.isSupported()) {
+                trayIcon.displayMessage("Maarch content editor", error, TrayIcon.MessageType.ERROR);
+            } 
             Thread.sleep(5000);
             System.exit(0);
         }
@@ -755,7 +761,9 @@ public class MaarchCM {
             //System.out.println(response);
             if (response == null || response.toString().contains("401 Unauthorized")) {
                 logger.log("SERVER CONNEXION FAILED : " + response.toString(), Level.SEVERE);
-                trayIcon.displayMessage("Maarch content editor", "SERVER CONNEXION FAILED : " + response.toString(), TrayIcon.MessageType.ERROR);
+                if (SystemTray.isSupported()) {
+                    trayIcon.displayMessage("Maarch content editor", "SERVER CONNEXION FAILED : " + response.toString(), TrayIcon.MessageType.ERROR);
+                }
                 logger.close();
                 Thread.sleep(5000);
                 System.exit(0);
@@ -765,7 +773,9 @@ public class MaarchCM {
             }
         } catch (Exception ex) {
             logger.log("SERVER CONNEXION FAILED : " + ex, Level.SEVERE);
-            trayIcon.displayMessage("Maarch content editor", "La connexion au serveur a été interrompue, le document édité n'a pas été sauvegardé !", TrayIcon.MessageType.ERROR);
+            if (SystemTray.isSupported()) {
+                trayIcon.displayMessage("Maarch content editor", "La connexion au serveur a été interrompue, le document édité n'a pas été sauvegardé !", TrayIcon.MessageType.ERROR);
+            }
             logger.close();
             Thread.sleep(5000);
             System.exit(0);
@@ -846,7 +856,9 @@ public class MaarchCM {
                                         + "&objectTable=" + objectTable + "&objectId=" + objectId
                                         + "&uniqueId=" + uniqueId + "&step=backup&userMaarch=" + userMaarch;
                                 logger.log("CALL : " + urlToSave, Level.INFO);
-                                trayIcon.displayMessage("Maarch content editor", "Envoi du brouillon ...", TrayIcon.MessageType.INFO);
+                                if (SystemTray.isSupported()) {
+                                    trayIcon.displayMessage("Maarch content editor", "Envoi du brouillon ...", TrayIcon.MessageType.INFO);
+                                }  
                                 sendHttpRequest(urlToSave, fileContentTosend, false);
                                 processReturn(messageResult);
                             }
@@ -893,8 +905,9 @@ public class MaarchCM {
                                     logger.log("EXTENSION : " + fileExtension + " CANNOT BE CONVERTED", Level.WARNING);
                                 }
                             }
-
-                            trayIcon.displayMessage("Maarch content editor", "Envoi du document ...", TrayIcon.MessageType.INFO);
+                            if (SystemTray.isSupported()) {
+                                trayIcon.displayMessage("Maarch content editor", "Envoi du document ...", TrayIcon.MessageType.INFO);
+                            }
                             String urlToSave = url + "?action=saveObject&objectType=" + objectType
                                     + "&objectTable=" + objectTable + "&objectId=" + objectId
                                     + "&uniqueId=" + uniqueId + "&idApplet=" + idApplet + "&step=end&userMaarch=" + userMaarch
