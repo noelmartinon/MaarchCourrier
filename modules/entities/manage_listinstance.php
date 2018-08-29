@@ -960,9 +960,7 @@ $linkwithwhat =
 		#******************************************************************************
 		# LIST OF AVAILABLE USERS
 		#******************************************************************************
-        if (count($users) > 0) {
-        	$usersListDiff = array();
-            ?>
+        if (count($users) > 0) { ?>
 			<div align="center">
 				<h3 class="tit"><?php echo _USERS_LIST;?></h3>
 				<table cellpadding="0" cellspacing="0" border="0" class="listing spec">
@@ -978,22 +976,18 @@ $linkwithwhat =
                         $available_roles_ids[]=$id;
                     }
 
-                    foreach ($user_roles as $key => $value) {
-                        $usersListDiff[]=$key;
-                    }
-					for ($j=0, $m=count($users);
-						$j<$m ;
-						$j++
-					) {
+					for ($j=0, $m=count($users); $j<$m; $j++) {
 						$user_id = $users[$j]['ID'];
 						$possible_roles = array();
 
-                        if(!in_array($user_id, $usersListDiff)){
-                            foreach($roles as $role_id => $role_label) {
-                                if(in_array($role_id, $available_roles_ids) || $usergroups_controler->inGroup($users[$j]['ID'], $role_id))
+                        foreach($roles as $role_id => $role_label) {
+                            if(in_array($role_id, $available_roles_ids) || $usergroups_controler->inGroup($users[$j]['ID'], $role_id)) {
+                                if ($user_roles[$user_id] == null || !in_array($role_id, $user_roles[$user_id])) {
                                     $possible_roles[$role_id] = $role_label;
-                          }
-                        } 
+                                }
+                            }         
+                        }
+
 						
                         //var_dump($roles);
 						if ($color == ' class="col"') $color = '';
