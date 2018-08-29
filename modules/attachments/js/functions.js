@@ -462,6 +462,11 @@ function addNewAttach() {
     $j("#formAttachment .transmissionDiv [name=chrono_display\\[\\]]").last().val('');
     $j("#formAttachment .transmissionDiv [name=chrono\\[\\]]").last().val('');
     $j("#formAttachment .transmissionDiv [name=back_date\\[\\]]").last().val('');
+    if($j("#selectContactIdRes option").length == 0) {
+        $j("#formAttachment .transmissionDiv [name=contact_attach\\[\\]]").last().val('');
+        $j("#formAttachment .transmissionDiv [name=contactidAttach\\[\\]]").last().val('');
+        $j("#formAttachment .transmissionDiv [name=addressidAttach\\[\\]]").last().val('');
+    }
     $j("#formAttachment .transmissionDiv #newAttachButton").css("visibility","hidden");
     $j("#formAttachment .transmissionDiv #newAttachButton").prop("disabled",true);
     $j("#formAttachment .transmissionDiv #newAttachButton").last().css("visibility","visible");
