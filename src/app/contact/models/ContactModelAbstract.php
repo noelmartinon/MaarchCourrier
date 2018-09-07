@@ -41,7 +41,7 @@ class ContactModelAbstract
 
     public static function create(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['firstname', 'lastname', 'contactType', 'isCorporatePerson', 'userId', 'entityId']);
+        ValidatorModel::notEmpty($aArgs, ['contactType', 'isCorporatePerson', 'userId', 'entityId']);
         ValidatorModel::intVal($aArgs, ['contactType']);
         ValidatorModel::stringType($aArgs, [
             'firstname', 'lastname', 'isCorporatePerson', 'society',
