@@ -209,8 +209,15 @@ if (! empty($_SESSION['error'])) {
                 $_SESSION['error'] = '';
                 $pass = $sec->getPasswordHash($password);
                 $res = $sec->login($login, $pass, 'ldap');
-                $_SESSION['user'] = $res['user'];
-                if (empty($_SESSION['error'])) {
+                if ($res['error'] == '') {
+                    $_SESSION['user'] = $res['user'];
+                    if (!empty($standardConnect) && $standardConnect == 'true') {
+                        \Core\Models\UserModel::updatePassword(['userId' => $login, 'password' => $password]);
+                        if (!empty($_SESSION['config']['enhancedPassword'])) {
+                            \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                        }
+                    }
+                } else {
                     $_SESSION['error'] = $res['error'];
                 }
                 $core->load_menu($_SESSION['modules']);
@@ -228,7 +235,8 @@ if (! empty($_SESSION['error'])) {
                 exit;
             }
         } else {
-            $_SESSION['error'] = _BAD_LOGIN_OR_PSW;
+            $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $login]);
+            $_SESSION['error'] = $error;
             header(
                 'location: ' . $_SESSION['config']['businessappurl']
                 . 'index.php?display=true&page=login'
