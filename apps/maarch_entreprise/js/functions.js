@@ -2311,15 +2311,17 @@ function get_opt_index(url, id_coll)
  * @param url String Url to the Ajax script
  * @param error_empty_type Message to displays if the type is empty
  **/
-function change_doctype_details(doctype_id, url, error_empty_type)
+function change_doctype_details(doctype_id, url, error_empty_type, res_id)
 {
     if(doctype_id != null && doctype_id != '' && doctype_id != NaN)
     {
         new Ajax.Request(url,
         {
             method:'post',
-            parameters: { type_id : doctype_id
-                        },
+            parameters: { 
+                    type_id: doctype_id,
+                    res_id: res_id
+                },
                 onSuccess: function(answer){
                 eval("response = "+answer.responseText);
                 //  alert(answer.responseText);

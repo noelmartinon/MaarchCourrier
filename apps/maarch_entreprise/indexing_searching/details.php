@@ -861,7 +861,7 @@ if ($stmt->rowCount() == 0) {
             } elseif ($data[$key]['field_type'] == 'select') {
                 $inputUrl = $_SESSION['config']['businessappurl'];
                 if ($key == 'type_id') {
-                    $inputAttr = 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\');"';
+                    $inputAttr = 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\', ' . $s_id . ');"';
                 } elseif ($key == 'priority') {
                     $inputAttr = 'onchange="updateProcessDate(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=update_process_date\', '.$s_id.')"';
                 }
