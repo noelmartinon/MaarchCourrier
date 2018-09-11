@@ -38,7 +38,9 @@ $dir = $path.'*.csv';
 $files = glob($dir, GLOB_BRACE);
 
 //GET MOST RECENT FILES
-$files = array_reverse($files);
+usort($files, function($x, $y) {
+    return filemtime($x) < filemtime($y);
+});
 
 //GET ONLY LAST 10 FILES
 $files = array_splice($files, 0, 10);
