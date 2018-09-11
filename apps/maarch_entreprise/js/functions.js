@@ -3822,6 +3822,25 @@ function toggleBlock(div, divIcon) {
     }
 }
 
+function loadTypeahead(input, order, dynamic, url) {
+    $j.typeahead({
+        input: input,
+        order: order,
+        dynamic: dynamic,
+        debug: false,
+        source: {
+            ajax: function(query){
+            return{
+                    type : 'POST',
+                    url  : url,
+                    data : {
+                        Input: "{{query}}"
+                    }
+                }
+            }
+        }
+    });
+}
 
 function reloadTypeahead(elem){
     $j(".typeahead__result").remove();
