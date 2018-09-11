@@ -756,11 +756,11 @@ if ((!empty($_SESSION['error']) && ! ($_SESSION['indexation'] ))  )
                                     ?>
                                     <select id="<?php functions::xecho($key);?>" name="<?php functions::xecho($key);?>"
                                     <?php if ($key == 'type_id'){
-                                        echo 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\' , \''._DOCTYPE.' '._MISSING.'\');"';
-                                    } else if ($key == 'priority') {
-                                        echo 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=indexing_searching&page=update_process_date\', ' . $s_id . ')"';
-                                    }
-									?>
+                                        echo 'onchange="change_doctype_details(this.options[this.options.selectedIndex].value, \''.$_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=change_doctype_details\'
+                                    , \''._DOCTYPE.' '._MISSING.' \', '.$s_id.' );"'; } else if ($key == 'priority') {
+                                    echo 'onchange="updateProcessDate(\'' . $_SESSION['config']['businessappurl'] .
+                                    'index.php?display=true&dir=indexing_searching&page=update_process_date\',
+                                    ' . $s_id . ' )"'; } ?>
                                     >
                                     <?php
                                         if ($key == 'type_id')

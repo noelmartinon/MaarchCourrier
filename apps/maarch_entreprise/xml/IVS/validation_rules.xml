@@ -560,6 +560,7 @@
     <validationRule name="type_id_integer" extends="standardForm" mode="error">  
       <parameter name="type_id" type="integer" />
       <parameter name="dir" type="identifier" />
+      <parameter name="res_id" type="integer" />
     </validationRule>
 
     <validationRule name="getContacts" extends="standardForm" mode="error">  
