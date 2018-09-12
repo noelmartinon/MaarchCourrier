@@ -66,7 +66,8 @@ if (!empty($res_id)) {
 
     if ($datasources['res_letterbox_contact'][0]['contact_id'] != '') {
         // $datasources['contact'] = array();
-        $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ', array($datasources['res_letterbox_contact'][0]['contact_id'], $datasources['res_letterbox_contact'][0]['address_id']));
+        $attachNum = $_SESSION['attachmentInfo']['attachNum'];
+        $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ', array($_SESSION['attachmentInfo'][$attachNum]['contactId'], $_SESSION['attachmentInfo'][$attachNum]['addressId']));
         $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
         $myContact['postal_address'] = \Contact\controllers\ContactController::formatContactAddressAfnor($myContact);
         $myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
