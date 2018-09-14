@@ -156,8 +156,12 @@ if (!empty($_SESSION['error'])) {
             }
         }
 
-        if ($prefix_login != '') {
-            $login_admin = $prefix_login.'\\'.$login_admin;
+        if (!empty($prefix_login)) {
+            $login_admin = $prefix_login . '\\' . $login_admin;
+        }
+
+        if (!empty($suffix_login)) {
+            $login_admin = $login_admin . $suffix_login;
         }
 
         //Try to create a new ldap instance
@@ -178,15 +182,13 @@ if (!empty($_SESSION['error'])) {
         }
 
         if ($prefix_login != '') {
-            $loginToAd = $prefix_login.'\\'.$login;
+            $loginToAd = $prefix_login . '\\' . $login;
         } else {
             $loginToAd = $login;
-        }
+            }
 
         if ($suffix_login != '') {
-            $loginToAd = $login . $suffix_login;
-        } else {
-            $loginToAd = $login;
+            $loginToAd = $loginToAd . $suffix_login;
         }
 
         if ($ad->authenticate($loginToAd, $password)) {
