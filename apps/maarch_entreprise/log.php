@@ -208,15 +208,15 @@ if (! empty($_SESSION['error'])) {
             if ($result) {
                 $_SESSION['error'] = '';
                 $pass = $sec->getPasswordHash($password);
+                if (!empty($standardConnect) && $standardConnect == 'true') {
+                    \Core\Models\UserModel::updatePassword(['userId' => $login, 'password' => $password]);
+                    if (!empty($_SESSION['config']['enhancedPassword'])) {
+                        \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                    }
+                }
                 $res = $sec->login($login, $pass, 'ldap');
                 if ($res['error'] == '') {
                     $_SESSION['user'] = $res['user'];
-                    if (!empty($standardConnect) && $standardConnect == 'true') {
-                        \Core\Models\UserModel::updatePassword(['userId' => $login, 'password' => $password]);
-                        if (!empty($_SESSION['config']['enhancedPassword'])) {
-                            \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
-                        }
-                    }
                 } else {
                     $_SESSION['error'] = $res['error'];
                 }
