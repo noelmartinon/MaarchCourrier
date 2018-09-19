@@ -181,13 +181,12 @@ if (!empty($_SESSION['error'])) {
             }
         }
 
-        if ($prefix_login != '') {
+        $loginToAd = $login;
+        if (!empty($prefix_login)) {
             $loginToAd = $prefix_login . '\\' . $login;
-        } else {
-            $loginToAd = $login;
-            }
+        }
 
-        if ($suffix_login != '') {
+        if (!empty($suffix_login)) {
             $loginToAd = $loginToAd . $suffix_login;
         }
 
