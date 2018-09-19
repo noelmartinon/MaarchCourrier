@@ -197,6 +197,9 @@ if (! empty($_SESSION['error'])) {
             //TODO: protect sql injection with PDO
                 require_once 'core/class/class_db_pdo.php';
 
+                if (!empty($_SESSION['config']['enhancedPassword'])) {
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                }
                 // Instantiate database.
                 $database = new Database();
                 $stmt = $database->query(
@@ -210,9 +213,6 @@ if (! empty($_SESSION['error'])) {
                 $pass = $sec->getPasswordHash($password);
                 if (!empty($standardConnect) && $standardConnect == 'true') {
                     \Core\Models\UserModel::updatePassword(['userId' => $login, 'password' => $password]);
-                    if (!empty($_SESSION['config']['enhancedPassword'])) {
-                        \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
-                    }
                 }
                 $res = $sec->login($login, $pass, 'ldap');
                 if ($res['error'] == '') {
