@@ -35,7 +35,7 @@
 */
 class IncludeFileError extends Exception
 {
-    public function __construct($file) 
+    public function __construct($file)
     {
         $this->file = $file;
         parent :: __construct('Include File \'$file\' is missing!', 1);
@@ -66,7 +66,7 @@ $logger->set_threshold_level('DEBUG');
 
 $logFile = 'logs' . DIRECTORY_SEPARATOR . $GLOBALS['batchName']
              . DIRECTORY_SEPARATOR . date('Y-m-d_H-i-s') . '.log';
-			 
+             
 $file = new FileHandler($logFile);
 $logger->add_handler($file);
 
@@ -77,7 +77,7 @@ include('batch_tools.php');
 $argsparser = new ArgsParser();
 // The config file
 $argsparser->add_arg(
-    'config', 
+    'config',
     array(
         'short' => 'c',
         'long' => 'config',
@@ -86,7 +86,7 @@ $argsparser->add_arg(
     )
 );
 $argsparser->add_arg(
-    'notif', 
+    'notif',
     array(
         'short' => 'n',
         'long' => 'notif',
@@ -130,34 +130,41 @@ $logger->write('Load xml config file:' . $GLOBALS['configFile'], 'INFO');
 // Tests existence of config file
 if (!file_exists($GLOBALS['configFile'])) {
     $logger->write(
-        'Configuration file ' . $GLOBALS['configFile'] 
-        . ' does not exist', 'ERROR', 102
+        'Configuration file ' . $GLOBALS['configFile']
+        . ' does not exist',
+        'ERROR',
+        102
     );
     exit(102);
 }
 // Loading config file
 $logger->write(
-    'Load xml config file:' . $GLOBALS['configFile'], 
+    'Load xml config file:' . $GLOBALS['configFile'],
     'INFO'
 );
 $xmlconfig = simplexml_load_file($GLOBALS['configFile']);
 
-if ($xmlconfig == FALSE) {
+if ($xmlconfig == false) {
     $logger->write(
-        'Error on loading config file:' 
-        . $GLOBALS['configFile'], 'ERROR', 103
+        'Error on loading config file:'
+        . $GLOBALS['configFile'],
+        'ERROR',
+        103
     );
     exit(103);
 }
 
 // Load config
-$config = $xmlconfig->CONFIG;
-$lang = (string)$config->Lang;
+$config          = $xmlconfig->CONFIG;
+$lang            = (string)$config->Lang;
 $maarchDirectory = (string)$config->MaarchDirectory;
-$customID = (string)$config->customID;
+$customID        = (string)$config->customID;
+$customIDPath    = '';
+
 if ($customID <> '') {
-     $_SESSION['config']['corepath'] = $maarchDirectory;
-     $_SESSION['custom_override_id'] = $customID;
+    $_SESSION['config']['corepath'] = $maarchDirectory;
+    $_SESSION['custom_override_id'] = $customID;
+    $customIDPath = $customID . '_';
 }
 chdir($maarchDirectory);
 $maarchUrl = (string)$config->MaarchUrl;
@@ -166,12 +173,12 @@ $maarchApps = (string) $config->MaarchApps;
 $_SESSION['config']['app_id'] = $maarchApps;
 
 $_SESSION['config']['tmppath'] = (string)$config->TmpDirectory;
-if(!is_dir($_SESSION['config']['tmppath'])) {
-	mkdir($_SESSION['config']['tmppath'], 0777);
+if (!is_dir($_SESSION['config']['tmppath'])) {
+    mkdir($_SESSION['config']['tmppath'], 0777);
 }
 
-$GLOBALS['batchDirectory'] = $maarchDirectory . 'modules' 
-                           . DIRECTORY_SEPARATOR . 'notifications' 
+$GLOBALS['batchDirectory'] = $maarchDirectory . 'modules'
+                           . DIRECTORY_SEPARATOR . 'notifications'
                            . DIRECTORY_SEPARATOR . 'batch';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $maarchDirectory);
@@ -179,61 +186,60 @@ set_include_path(get_include_path() . PATH_SEPARATOR . $maarchDirectory);
 //log4php params
 $log4phpParams = $xmlconfig->LOG4PHP;
 if ((string) $log4phpParams->enabled == 'true') {
-	$logger->set_log4PhpLibrary(
-		$maarchDirectory . 'apps/maarch_entreprise/tools/log4php/Logger.php'
-	);
-	$logger->set_log4PhpLogger((string) $log4phpParams->Log4PhpLogger);
-	$logger->set_log4PhpBusinessCode((string) $log4phpParams->Log4PhpBusinessCode);
-	$logger->set_log4PhpConfigPath((string) $log4phpParams->Log4PhpConfigPath);
-	$logger->set_log4PhpBatchName('process_event_stack');
+    $logger->set_log4PhpLibrary(
+        $maarchDirectory . 'apps/maarch_entreprise/tools/log4php/Logger.php'
+    );
+    $logger->set_log4PhpLogger((string) $log4phpParams->Log4PhpLogger);
+    $logger->set_log4PhpBusinessCode((string) $log4phpParams->Log4PhpBusinessCode);
+    $logger->set_log4PhpConfigPath((string) $log4phpParams->Log4PhpConfigPath);
+    $logger->set_log4PhpBatchName('process_event_stack');
 }
 
 $mailerParams = $xmlconfig->MAILER;
 
 // INCLUDES
 try {
-	Bt_myInclude(
-        'core' . DIRECTORY_SEPARATOR . 'class' 
+    Bt_myInclude(
+        'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_functions.php'
     );
     Bt_myInclude(
-        'core' . DIRECTORY_SEPARATOR . 'class' 
+        'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_db_pdo.php'
     );
-	Bt_myInclude(
-        'core' . DIRECTORY_SEPARATOR . 'class' 
+    Bt_myInclude(
+        'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_core_tools.php'
     );
-	// Notifications
-	Bt_myInclude(
-        "modules" . DIRECTORY_SEPARATOR . "notifications" 
-		. DIRECTORY_SEPARATOR . "notifications_tables_definition.php"
-	);
-	Bt_myInclude(
-        "modules" . DIRECTORY_SEPARATOR . "notifications" 
-		. DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . "notifications_controler.php"
-	);
-	Bt_myInclude(
-        "modules" . DIRECTORY_SEPARATOR . "notifications" 
-		. DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . "diffusion_type_controler.php"
-	);
-	Bt_myInclude(
-        "modules" . DIRECTORY_SEPARATOR . "notifications" 
-		. DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . "events_controler.php"
-	);
-	// Templates
+    // Notifications
     Bt_myInclude(
-        'modules' . DIRECTORY_SEPARATOR . 'templates' 
-		. DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'templates_controler.php'
-    );  
+        "modules" . DIRECTORY_SEPARATOR . "notifications"
+        . DIRECTORY_SEPARATOR . "notifications_tables_definition.php"
+    );
     Bt_myInclude(
-        'apps' . DIRECTORY_SEPARATOR . 'maarch_entreprise' 
+        "modules" . DIRECTORY_SEPARATOR . "notifications"
+        . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . "notifications_controler.php"
+    );
+    Bt_myInclude(
+        "modules" . DIRECTORY_SEPARATOR . "notifications"
+        . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . "diffusion_type_controler.php"
+    );
+    Bt_myInclude(
+        "modules" . DIRECTORY_SEPARATOR . "notifications"
+        . DIRECTORY_SEPARATOR . "class" . DIRECTORY_SEPARATOR . "events_controler.php"
+    );
+    // Templates
+    Bt_myInclude(
+        'modules' . DIRECTORY_SEPARATOR . 'templates'
+        . DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'templates_controler.php'
+    );
+    Bt_myInclude(
+        'apps' . DIRECTORY_SEPARATOR . 'maarch_entreprise'
         . DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'class_contacts_v2.php'
     );
-   
 } catch (IncludeFileError $e) {
     $logger->write(
-        'Problem with the php include path:' .$e .' '. get_include_path(), 
+        'Problem with the php include path:' .$e .' '. get_include_path(),
         'ERROR'
     );
     exit();
@@ -252,10 +258,10 @@ $coreTools = new core_tools();
 $coreTools->load_lang($lang, $maarchDirectory, $maarchApps);
 $func = new functions();
 
-$notifications_controler = new notifications_controler();
+$notifications_controler  = new notifications_controler();
 $diffusion_type_controler = new diffusion_type_controler();
-$events_controler = new events_controler();
-$templates_controler = new templates_controler();
+$events_controler         = new events_controler();
+$templates_controler      = new templates_controler();
 
 $db = new Database();
 
@@ -263,19 +269,20 @@ $databasetype = (string)$xmlconfig->CONFIG_BASE->databasetype;
 
 // Collection for res
 $collparams = $xmlconfig->COLLECTION;
-$coll_id = $collparams->Id;
+$coll_id    = $collparams->Id;
 $coll_table = $collparams->Table;
-$coll_view = $collparams->View;
+$coll_view  = $collparams->View;
 
-$GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR 
-                         . $GLOBALS['batchName'] . '_error.lck';
-$GLOBALS['lckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR 
-                    . $GLOBALS['batchName'] . '.lck';
-					
+$GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR
+                         . $customIDPath . $GLOBALS['batchName'] . '_error.lck';
+$GLOBALS['lckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR
+                    . $customIDPath . $GLOBALS['batchName'] . '.lck';
+                    
 if (file_exists($GLOBALS['errorLckFile'])) {
     $logger->write(
-        'Error persists, please solve this before launching a new batch', 
-        'ERROR', 13
+        'Error persists, please solve this before launching a new batch',
+        'ERROR',
+        13
     );
     exit(13);
 }

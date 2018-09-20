@@ -33,8 +33,10 @@
 * @brief  Class to include the file error
 *
 */
-class IncludeFileError extends Exception {
-    public function __construct($file) {
+class IncludeFileError extends Exception
+{
+    public function __construct($file)
+    {
         $this->file = $file;
         parent :: __construct('Include File \'$file\' is missing!', 1);
     }
@@ -75,7 +77,7 @@ include('batch_tools.php');
 $argsparser = new ArgsParser();
 // The config file
 $argsparser->add_arg(
-    'config', 
+    'config',
     array(
         'short' => 'c',
         'long' => 'config',
@@ -114,39 +116,51 @@ $logger->write('Load xml config file:' . $GLOBALS['configFile'], 'INFO');
 // Tests existence of config file
 if (!file_exists($GLOBALS['configFile'])) {
     $logger->write(
-        'Configuration file ' . $GLOBALS['configFile'] 
-        . ' does not exist', 'ERROR', 102
+        'Configuration file ' . $GLOBALS['configFile']
+        . ' does not exist',
+        'ERROR',
+        102
     );
     exit(102);
 }
 // Loading config file
 $logger->write(
-    'Load xml config file:' . $GLOBALS['configFile'], 
+    'Load xml config file:' . $GLOBALS['configFile'],
     'INFO'
 );
 $xmlconfig = simplexml_load_file($GLOBALS['configFile']);
 
-if ($xmlconfig == FALSE) {
+if ($xmlconfig == false) {
     $logger->write(
-        'Error on loading config file:' 
-        . $GLOBALS['configFile'], 'ERROR', 103
+        'Error on loading config file:'
+        . $GLOBALS['configFile'],
+        'ERROR',
+        103
     );
     exit(103);
 }
 
 // Load config
-$config = $xmlconfig->CONFIG;
-$lang = (string)$config->Lang;
-$maarchDirectory = (string)$config->MaarchDirectory; 
- 
+$config          = $xmlconfig->CONFIG;
+$lang            = (string)$config->Lang;
+$maarchDirectory = (string)$config->MaarchDirectory;
+$customID        = (string)$config->customID;
+$customIDPath    = '';
+
+if ($customID <> '') {
+    $_SESSION['config']['corepath'] = $maarchDirectory;
+    $_SESSION['custom_override_id'] = $customID;
+    $customIDPath = $customID . '_';
+}
+
 chdir($maarchDirectory);
 
 $maarchUrl = (string)$config->MaarchUrl;
 $maarchApps = (string) $config->MaarchApps;
 
 $GLOBALS['TmpDirectory'] = (string)$config->TmpDirectory;
-$GLOBALS['batchDirectory'] = $maarchDirectory . 'modules' 
-                           . DIRECTORY_SEPARATOR . 'notifications' 
+$GLOBALS['batchDirectory'] = $maarchDirectory . 'modules'
+                           . DIRECTORY_SEPARATOR . 'notifications'
                            . DIRECTORY_SEPARATOR . 'batch';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $maarchDirectory);
@@ -174,30 +188,29 @@ $collDoctypeExt = (string)$collParams->DoctypeExt;
 // INCLUDES
 try {
     Bt_myInclude(
-        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class' 
+        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_functions.php'
     );
     Bt_myInclude(
-        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class' 
+        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_db_pdo.php'
     );
     Bt_myInclude(
-        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class' 
+        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_core_tools.php'
     );
     Bt_myInclude(
-        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class' 
+        $maarchDirectory . 'core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_alert_engine.php'
     );
     // Notifications
     Bt_myInclude(
-        $maarchDirectory . "modules" . DIRECTORY_SEPARATOR . "notifications" 
+        $maarchDirectory . "modules" . DIRECTORY_SEPARATOR . "notifications"
         . DIRECTORY_SEPARATOR . "notifications_tables_definition.php"
     );
-   
 } catch (IncludeFileError $e) {
     $logger->write(
-        'Problem with the php include path:' .$e .' '. get_include_path(), 
+        'Problem with the php include path:' .$e .' '. get_include_path(),
         'ERROR'
     );
     exit();
@@ -214,15 +227,16 @@ $databasetype = (string)$xmlconfig->CONFIG_BASE->databasetype;
 
 $alert_engine = new alert_engine($GLOBALS['configFile']);
 
-$GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR 
-                         . $GLOBALS['batchName'] . '_error.lck';
-$GLOBALS['lckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR 
-                    . $GLOBALS['batchName'] . '.lck';
+$GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR
+                         . $customIDPath . $GLOBALS['batchName'] . '_error.lck';
+$GLOBALS['lckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR
+                    . $customIDPath . $GLOBALS['batchName'] . '.lck';
                     
 if (file_exists($GLOBALS['errorLckFile'])) {
     $logger->write(
-        'Error persists, please solve this before launching a new batch', 
-        'ERROR', 13
+        'Error persists, please solve this before launching a new batch',
+        'ERROR',
+        13
     );
     exit(13);
 }
@@ -230,7 +244,8 @@ if (file_exists($GLOBALS['errorLckFile'])) {
 if (file_exists($GLOBALS['lckFile'])) {
     $logger->write(
         'An instance of the batch is already in progress',
-        'ERROR', 109
+        'ERROR',
+        109
     );
     exit(109);
 }
