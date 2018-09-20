@@ -728,7 +728,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
     //RESOURCE FRAME
 
-    if ($data['category_id']['value'] == 'outgoing') {
+    if ($data['category_id']['value'] == 'outgoing' && $_SESSION['features']['watermark']['enabled'] == 'true') {
         $watermark_outgoing = 'true';
     } else {
         $watermark_outgoing = 'false';
