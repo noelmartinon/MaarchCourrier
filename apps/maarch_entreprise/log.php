@@ -197,19 +197,32 @@ if (! empty($_SESSION['error'])) {
             //TODO: protect sql injection with PDO
                 require_once 'core/class/class_db_pdo.php';
 
-                if (!empty($_SESSION['config']['enhancedPassword'])) {
-                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
-                }
-                // Instantiate database.
-                $database = new Database();
-                $stmt = $database->query(
-                    "SELECT * FROM users WHERE user_id ILIKE ?", 
-                    array($login)
-                ); //permet de rechercher les utilisateurs dans le LDAP sans prendre en compte la casse
-                $result = $stmt->fetch();
+            // Instantiate database.
+            $database = new Database();
+            $stmt = $database->query(
+                "SELECT * FROM users WHERE user_id ILIKE ?", 
+                array($login)
+            ); //permet de rechercher les utilisateurs dans le LDAP sans prendre en compte la casse
+            $result = $stmt->fetch();
 
             if ($result) {
                 $_SESSION['error'] = '';
+
+                if (!empty($_SESSION['config']['enhancedPassword'])) {
+                    if (!empty($result['locked_until'])) {
+                        $lockedDate = new \DateTime($result['locked_until']);
+                        $currentDate = new \DateTime();
+                        if ($currentDate < $lockedDate) {
+                            $_SESSION['error'] = _ACCOUNT_LOCKED_UNTIL . " {$lockedDate->format('d/m/Y H:i')}";
+                            header(
+                                'location: ' . $_SESSION['config']['businessappurl']
+                                . 'index.php?display=true&page=login'
+                            );
+                            exit;
+                        }
+                    }
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                }
                 $pass = $sec->getPasswordHash($password);
                 if (!empty($standardConnect) && $standardConnect == 'true') {
                     \Core\Models\UserModel::updatePassword(['userId' => $login, 'password' => $password]);
