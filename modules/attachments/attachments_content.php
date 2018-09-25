@@ -119,7 +119,8 @@ if (isset($_POST['add']) && $_POST['add']) {
                     } else {
                         //CHECK DOCSERVER SPACE
                         $newSize = $docserverControler->checkSize(
-                            $docserver, $_SESSION['upfile'][$numAttach]['size']
+                            $docserver,
+                            $_SESSION['upfile'][$numAttach]['size']
                         );
                         if ($newSize == 0) {
                             $error = _DOCSERVER_ERROR.' : '._NOT_ENOUGH_DISK_SPACE.'. '._MORE_INFOS; ?>
@@ -143,7 +144,8 @@ if (isset($_POST['add']) && $_POST['add']) {
                             //SAVE FILE ON DOCSERVER
                             $storeResult = array();
                             $storeResult = $docserverControler->storeResourceOnDocserver(
-                                $_SESSION['collection_id_choice'], $fileInfos
+                                $_SESSION['collection_id_choice'],
+                                $fileInfos
                             );
 
                             if ($attachment_types == 'outgoing_mail' && strpos($fileInfos['format'], 'xl') === false && strpos($fileInfos['format'], 'ppt') === false) {
@@ -484,7 +486,8 @@ if (isset($_POST['add']) && $_POST['add']) {
                                         $storeResult['destination_dir'],
                                         substr($storeResult['file_destination_name'], 0, strrpos($storeResult['file_destination_name'], '.')).'.pdf',
                                         $storeResult['path_template'],
-                                        $storeResult['docserver_id'], $_SESSION['data_pdf'],
+                                        $storeResult['docserver_id'],
+                                        $_SESSION['data_pdf'],
                                         $_SESSION['config']['databasetype']
                                     );
 
@@ -495,8 +498,10 @@ if (isset($_POST['add']) && $_POST['add']) {
                                     $error = $resAttach->get_error();
                                 } else {
                                     // Delete temporary backup
-                                    $db->query("DELETE FROM res_attachments WHERE res_id = ? and status = 'TMP' and typist = ?",
-                                                    array($_SESSION['attachmentInfo'][$attachNum]['inProgressResId'], $_SESSION['user']['UserId']));
+                                    $db->query(
+                                        "DELETE FROM res_attachments WHERE res_id = ? and status = 'TMP' and typist = ?",
+                                                    array($_SESSION['attachmentInfo'][$attachNum]['inProgressResId'], $_SESSION['user']['UserId'])
+                                    );
 
                                     if ($_SESSION['history']['attachadd'] == 'true') {
                                         $hist = new history();
@@ -504,7 +509,10 @@ if (isset($_POST['add']) && $_POST['add']) {
                                             $_SESSION['collection_id_choice']
                                         );
                                         $hist->add(
-                                            $view, $_SESSION['doc_id'], 'ADD', 'attachadd',
+                                            $view,
+                                            $_SESSION['doc_id'],
+                                            'ADD',
+                                            'attachadd',
                                             ucfirst(_DOC_NUM).$id.' '
                                             ._NEW_ATTACH_ADDED.' '._TO_MASTER_DOCUMENT
                                             .$_SESSION['doc_id'],
@@ -513,7 +521,10 @@ if (isset($_POST['add']) && $_POST['add']) {
                                         );
                                         $content = _NEW_ATTACH_ADDED;
                                         $hist->add(
-                                            RES_ATTACHMENTS_TABLE, $id, 'ADD', 'attachadd',
+                                            RES_ATTACHMENTS_TABLE,
+                                            $id,
+                                            'ADD',
+                                            'attachadd',
                                             $content.' ('.$title
                                             .') ',
                                             $_SESSION['config']['databasetype'],
@@ -573,7 +584,7 @@ if (isset($_POST['add']) && $_POST['add']) {
     }
     exit();
 
-    //BEGIN EDIT ATTACHMENT VALIDATE BUTTTON
+//BEGIN EDIT ATTACHMENT VALIDATE BUTTTON
 } elseif (isset($_POST['edit']) && $_POST['edit']) {
     $resAttach = new resource();
     $status = 0;
@@ -616,7 +627,8 @@ if (isset($_POST['add']) && $_POST['add']) {
         $storeResult = array();
 
         $storeResult = $docserverControler->storeResourceOnDocserver(
-            $_SESSION['collection_id_choice'], $fileInfos
+            $_SESSION['collection_id_choice'],
+            $fileInfos
         );
 
         if (isset($storeResult['error']) && $storeResult['error'] != '') {
@@ -842,7 +854,8 @@ if (isset($_POST['add']) && $_POST['add']) {
                 $storeResult['destination_dir'],
                 $storeResult['file_destination_name'],
                 $storeResult['path_template'],
-                $storeResult['docserver_id'], $_SESSION['data'],
+                $storeResult['docserver_id'],
+                $_SESSION['data'],
                 $_SESSION['config']['databasetype']
             );
 
@@ -885,16 +898,16 @@ if (isset($_POST['add']) && $_POST['add']) {
         //IF FILE IS EDITED
         if ($_SESSION['upfile'][0]['upAttachment'] != false) {
             //RETRIEVE CURRENT ATTACHMENT FILE
+            $stmt = $db->query('SELECT fingerprint, docserver_id FROM res_view_attachments WHERE '.$column_res." = ? and res_id_master = ? and status <> 'OBS'", array($_REQUEST['res_id'], $_SESSION['doc_id']));
+            $res = $stmt->fetchObject();
+
             require_once 'core/class/docserver_types_controler.php';
             require_once 'core/docservers_tools.php';
             $docserverTypeControler = new docserver_types_controler();
-            $docserverInfo = $docserverControler->getDocserverToInsert($collId);
-            $docserver = $docserverControler->get($docserverInfo->docserver_id);
-            $docserverTypeObject = $docserverTypeControler->get($docserver->docserver_type_id);
+            $docserver              = $docserverControler->get($res->docserver_id);
+            $docserverTypeObject    = $docserverTypeControler->get($docserver->docserver_type_id);
 
             //HASH OLD AND NEW ATTACHMENT FILE
-            $stmt = $db->query('SELECT fingerprint FROM res_view_attachments WHERE '.$column_res." = ? and res_id_master = ? and status <> 'OBS'", array($_REQUEST['res_id'], $_SESSION['doc_id']));
-            $res = $stmt->fetchObject();
             $NewHash = Ds_doFingerprint($_SESSION['upfile'][0]['tmp_name'], $docserverTypeObject->fingerprint_mode);
             $OriginalHash = $res->fingerprint;
 
@@ -910,7 +923,8 @@ if (isset($_POST['add']) && $_POST['add']) {
                 );
                 $storeResult = array();
                 $storeResult = $docserverControler->storeResourceOnDocserver(
-                    $_SESSION['collection_id_choice'], $fileInfos
+                    $_SESSION['collection_id_choice'],
+                    $fileInfos
                 );
                 if (isset($storeResult['error']) && $storeResult['error'] != '') {
                     $error = $storeResult['error'];
@@ -932,7 +946,8 @@ if (isset($_POST['add']) && $_POST['add']) {
                     $set_update .= ', path = :path';
                     $set_update .= ', filename = :filename';
                     $set_update .= ', docserver_id = :docserver_id';
-                    $arrayPDO = array_merge($arrayPDO,
+                    $arrayPDO = array_merge(
+                        $arrayPDO,
                         array(':fingerprint' => $fingerprint,
                                 ':filesize' => $filesize,
                                 ':path' => $storeResult['destination_dir'],
@@ -1108,7 +1123,8 @@ if (isset($_POST['add']) && $_POST['add']) {
             $storeResult['destination_dir'],
             substr($storeResult['file_destination_name'], 0, strrpos($storeResult['file_destination_name'], '.')).'.pdf',
             $storeResult['path_template'],
-            $storeResult['docserver_id'], $_SESSION['data_pdf'],
+            $storeResult['docserver_id'],
+            $_SESSION['data_pdf'],
             $_SESSION['config']['databasetype']
         );
     }
@@ -1129,7 +1145,10 @@ if (isset($_POST['add']) && $_POST['add']) {
                 $_SESSION['collection_id_choice']
             );
             $hist->add(
-                $view, $_SESSION['doc_id'], 'UP', 'attachup',
+                $view,
+                $_SESSION['doc_id'],
+                'UP',
+                'attachup',
                 ucfirst(_DOC_NUM).$id.' '
                 ._ATTACH_UPDATED,
                 $_SESSION['config']['databasetype'],
@@ -1137,7 +1156,10 @@ if (isset($_POST['add']) && $_POST['add']) {
             );
             $content = _ATTACH_UPDATED;
             $hist->add(
-                RES_ATTACHMENTS_TABLE, $id, 'UP', 'attachup',
+                RES_ATTACHMENTS_TABLE,
+                $id,
+                'UP',
+                'attachup',
                 $_SESSION['info'].' ('.$title
                 .') ',
                 $_SESSION['config']['databasetype'],
