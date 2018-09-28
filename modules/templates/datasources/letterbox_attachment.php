@@ -86,13 +86,6 @@ if (!empty($res_id)) {
         $stmt = $dbDatasource->query('SELECT firstname, lastname, user_id, mail, phone, initials FROM users WHERE user_id = ?', [$res_contact_id]);
         $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
         $datasources['contact'][] = $myContact;
-    } else {
-        $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ?', array($datasources['res_letterbox'][0]['contact_id'], $datasources['res_letterbox'][0]['address_id']));
-        $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
-        $myContact['postal_address'] = \Contact\controllers\ContactController::formatContactAddressAfnor($myContact);
-        $myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
-        $myContact['title'] = $contacts->get_civility_contact($myContact['title']);
-        $datasources['contact'][] = $myContact;
     }
 
     if (isset($datasources['contact'][0]['title']) && $datasources['contact'][0]['title'] == '') {
