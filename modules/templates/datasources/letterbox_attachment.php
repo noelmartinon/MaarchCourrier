@@ -59,6 +59,15 @@ if (!empty($res_id)) {
             $datasources['user'][0][$column] = $value;
         }
     }
+    
+    //COMPLEMENTARY CURRENT USER PARENT ENTITY INFO
+    $stmt2 = $dbDatasource->query('SELECT * FROM entities WHERE entity_id = ? ', array($datasources['user'][0]['parent_entity_id']));
+    $dest = $stmt2->fetch(PDO::FETCH_ASSOC);
+    if (!empty($dest)) {
+        foreach ($dest as $column => $value) {
+            $datasources['user'][0]['parent_'.$column] = $value;
+        }
+    }
 
     //multicontact
     $stmt = $dbDatasource->query('SELECT * FROM contacts_res WHERE res_id = ? AND contact_id = ? ', array($doc['res_id'], $res_contact_id));
