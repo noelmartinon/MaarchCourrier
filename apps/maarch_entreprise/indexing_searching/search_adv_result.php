@@ -456,7 +456,7 @@ if (count($_REQUEST['meta']) > 0) {
             {
                 $welcome = trim($_REQUEST['welcome']);
                 $json_txt .= "'multifield' : ['".addslashes($welcome)."'],";
-                if (is_numeric($_REQUEST['welcome']))
+                if (ctype_digit($_REQUEST['welcome']))
                 {
                     $where_request_welcome .= "(res_id = :resIdWelcome) or ";
                     $arrayPDO = array_merge($arrayPDO, array(":resIdWelcome" => $welcome));
