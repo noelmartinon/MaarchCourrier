@@ -420,10 +420,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
             $stmt = $db->query("update ".$table." set destination = ? where res_id = ?",array($entityId, $res_id)); 
         }
 
-        // Si on redirige en masse plusieurs courriers, on récupère automatiquement les roles persistent
-        if(count($arr_id) > 1){
-            $new_difflist = $diffList->list_difflist_roles_to_keep($res_id, $coll_id, $new_difflist['difflist_type'], $new_difflist);
-        }
+        $new_difflist = $diffList->list_difflist_roles_to_keep($res_id, $coll_id, $new_difflist['difflist_type'], $new_difflist);
         
         # If feature activated, put old dest in copy
         if($_SESSION['features']['dest_to_copy_during_redirection'] == 'true') {
