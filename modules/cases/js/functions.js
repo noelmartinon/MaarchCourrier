@@ -9,7 +9,7 @@ function unlink_case(path_manage_script,case_id,res_id){
 		onSuccess: function(answer){
 			eval('response='+answer.responseText);
 			if(response){
-				window.top.location.href='index.php?page=details&dir=indexing_searching&id='+res_id;
+				window.location.href=window.location.href;
 			}else{
 				alert('Something went wrong...');
 			}
