@@ -367,7 +367,7 @@ class ListTemplateController
         } else {
             ListTemplateModel::delete([
                 'where' => ['object_type = ?', 'item_mode not in (?)'],
-                'data'  => [$aArgs['typeId'], explode(' ', $roles)]
+                'data'  => [$aArgs['typeId'], explode(' ', str_replace('copy', 'cc', $roles))]
             ]);
         }
 
