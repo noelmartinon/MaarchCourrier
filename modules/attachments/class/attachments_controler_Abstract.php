@@ -47,16 +47,16 @@ abstract class attachments_controler_Abstract
         $table = $sec->retrieve_table_from_coll($collId);
         $db = new Database();
         $query = 'select res_id from ' . $table . ' where res_id = ?';
-        $stmt = $db->query($query,array($resId), true);
+        $stmt = $db->query($query, array($resId), true);
         if ($stmt->rowCount() == 0) {
             $returnCode = -2;
             $error .= 'res_id inexistant';
         } else {
             $fileContent = base64_decode($encodedContent);
             $tmpFileName = 'tmp_file_ws_'
-                 . rand() . "_" . md5($fileContent) 
+                 . rand() . "_" . md5($fileContent)
                  . "." . strtolower($fileFormat);
-            $Fnm = $_SESSION['config']['tmppath'] . $tmpFileName; 
+            $Fnm = $_SESSION['config']['tmppath'] . $tmpFileName;
             $inF = fopen($Fnm, "w");
             fwrite($inF, $fileContent);
             fclose($inF);
@@ -70,7 +70,8 @@ abstract class attachments_controler_Abstract
                     . _NO_AVAILABLE_DOCSERVER . ". " . _MORE_INFOS . ".";
             } else {
                 $newSize = $docserverControler->checkSize(
-                    $docserver, $_SESSION['upfile']['size']
+                    $docserver,
+                    $_SESSION['upfile']['size']
                 );
                 if ($newSize == 0) {
                     $returnCode = -4;
@@ -85,7 +86,8 @@ abstract class attachments_controler_Abstract
                     );
                     $storeResult = array();
                     $storeResult = $docserverControler->storeResourceOnDocserver(
-                        $collId, $fileInfos
+                        $collId,
+                        $fileInfos
                     );
                     if (isset($storeResult['error']) && $storeResult['error'] <> '') {
                         $returnCode = -5;
@@ -122,7 +124,7 @@ abstract class attachments_controler_Abstract
                             $_SESSION['data'],
                             array(
                                 'column' => "status",
-                                'value' => 'NEW',
+                                'value' => 'TRA',
                                 'type' => "string",
                             )
                         );
@@ -146,7 +148,7 @@ abstract class attachments_controler_Abstract
                             $_SESSION['data'],
                             array(
                                 'column' => "title",
-                                'value' => strtolower($title),
+                                'value' => $title,
                                 'type' => "string",
                             )
                         );
@@ -189,15 +191,32 @@ abstract class attachments_controler_Abstract
                             array(
                                 'column' => "type_id",
                                 'value' => 0,
-                                'type' => "int",
+                                'type' => "integer",
+                            )
+                        );
+                        array_push(
+                            $_SESSION['data'],
+                            array(
+                                'column' => "relation",
+                                'value' => 1,
+                                'type' => "integer",
+                            )
+                        );
+                        array_push(
+                            $_SESSION['data'],
+                            array(
+                                'column' => "attachment_type",
+                                'value' => 'simple_attachment',
+                                'type' => "string",
                             )
                         );
                         $id = $resAttach->load_into_db(
                             'res_attachments',
                             $storeResult['destination_dir'],
-                            $storeResult['file_destination_name'] ,
+                            $storeResult['file_destination_name'],
                             $storeResult['path_template'],
-                            $storeResult['docserver_id'], $_SESSION['data'],
+                            $storeResult['docserver_id'],
+                            $_SESSION['data'],
                             $_SESSION['config']['databasetype']
                         );
                         if ($id == false) {
@@ -211,7 +230,10 @@ abstract class attachments_controler_Abstract
                                     $collId
                                 );
                                 $users->add(
-                                    $view, $resId, "ADD", 'attachadd',
+                                    $view,
+                                    $resId,
+                                    "ADD",
+                                    'attachadd',
                                     ucfirst(_DOC_NUM) . $id . ' '
                                     . _NEW_ATTACH_ADDED . ' ' . _TO_MASTER_DOCUMENT
                                     . $resId,
@@ -219,7 +241,10 @@ abstract class attachments_controler_Abstract
                                     'apps'
                                 );
                                 $users->add(
-                                    RES_ATTACHMENTS_TABLE, $id, "ADD",'attachadd',
+                                    RES_ATTACHMENTS_TABLE,
+                                    $id,
+                                    "ADD",
+                                    'attachadd',
                                     _NEW_ATTACH_ADDED . " (" . $title
                                     . ") ",
                                     $_SESSION['config']['databasetype'],
