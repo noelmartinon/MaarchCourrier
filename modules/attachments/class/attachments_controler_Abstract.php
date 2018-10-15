@@ -47,16 +47,16 @@ abstract class attachments_controler_Abstract
         $table = $sec->retrieve_table_from_coll($collId);
         $db = new Database();
         $query = 'select res_id from ' . $table . ' where res_id = ?';
-        $stmt = $db->query($query,array($resId), true);
+        $stmt = $db->query($query, array($resId), true);
         if ($stmt->rowCount() == 0) {
             $returnCode = -2;
             $error .= 'res_id inexistant';
         } else {
             $fileContent = base64_decode($encodedContent);
             $tmpFileName = 'tmp_file_ws_'
-                 . rand() . "_" . md5($fileContent) 
+                 . rand() . "_" . md5($fileContent)
                  . "." . strtolower($fileFormat);
-            $Fnm = $_SESSION['config']['tmppath'] . $tmpFileName; 
+            $Fnm = $_SESSION['config']['tmppath'] . $tmpFileName;
             $inF = fopen($Fnm, "w");
             fwrite($inF, $fileContent);
             fclose($inF);
@@ -70,7 +70,8 @@ abstract class attachments_controler_Abstract
                     . _NO_AVAILABLE_DOCSERVER . ". " . _MORE_INFOS . ".";
             } else {
                 $newSize = $docserverControler->checkSize(
-                    $docserver, $_SESSION['upfile']['size']
+                    $docserver,
+                    $_SESSION['upfile']['size']
                 );
                 if ($newSize == 0) {
                     $returnCode = -4;
@@ -85,7 +86,8 @@ abstract class attachments_controler_Abstract
                     );
                     $storeResult = array();
                     $storeResult = $docserverControler->storeResourceOnDocserver(
-                        $collId, $fileInfos
+                        $collId,
+                        $fileInfos
                     );
                     if (isset($storeResult['error']) && $storeResult['error'] <> '') {
                         $returnCode = -5;
@@ -122,7 +124,7 @@ abstract class attachments_controler_Abstract
                             $_SESSION['data'],
                             array(
                                 'column' => "status",
-                                'value' => 'NEW',
+                                'value' => 'TRA',
                                 'type' => "string",
                             )
                         );
@@ -146,7 +148,7 @@ abstract class attachments_controler_Abstract
                             $_SESSION['data'],
                             array(
                                 'column' => "title",
-                                'value' => strtolower($title),
+                                'value' => $title,
                                 'type' => "string",
                             )
                         );
@@ -189,15 +191,32 @@ abstract class attachments_controler_Abstract
                             array(
                                 'column' => "type_id",
                                 'value' => 0,
-                                'type' => "int",
+                                'type' => "integer",
+                            )
+                        );
+                        array_push(
+                            $_SESSION['data'],
+                            array(
+                                'column' => "relation",
+                                'value' => 1,
+                                'type' => "integer",
+                            )
+                        );
+                        array_push(
+                            $_SESSION['data'],
+                            array(
+                                'column' => "attachment_type",
+                                'value' => 'simple_attachment',
+                                'type' => "string",
                             )
                         );
                         $id = $resAttach->load_into_db(
                             'res_attachments',
                             $storeResult['destination_dir'],
-                            $storeResult['file_destination_name'] ,
+                            $storeResult['file_destination_name'],
                             $storeResult['path_template'],
-                            $storeResult['docserver_id'], $_SESSION['data'],
+                            $storeResult['docserver_id'],
+                            $_SESSION['data'],
                             $_SESSION['config']['databasetype']
                         );
                         if ($id == false) {
@@ -211,7 +230,10 @@ abstract class attachments_controler_Abstract
                                     $collId
                                 );
                                 $users->add(
-                                    $view, $resId, "ADD", 'attachadd',
+                                    $view,
+                                    $resId,
+                                    "ADD",
+                                    'attachadd',
                                     ucfirst(_DOC_NUM) . $id . ' '
                                     . _NEW_ATTACH_ADDED . ' ' . _TO_MASTER_DOCUMENT
                                     . $resId,
@@ -219,7 +241,10 @@ abstract class attachments_controler_Abstract
                                     'apps'
                                 );
                                 $users->add(
-                                    RES_ATTACHMENTS_TABLE, $id, "ADD",'attachadd',
+                                    RES_ATTACHMENTS_TABLE,
+                                    $id,
+                                    "ADD",
+                                    'attachadd',
                                     _NEW_ATTACH_ADDED . " (" . $title
                                     . ") ",
                                     $_SESSION['config']['databasetype'],
@@ -239,37 +264,36 @@ abstract class attachments_controler_Abstract
         return $returnArray;
     }
     
-    public function initAttachmentInfos($resId){
-		$db = new Database();
-		
-		$stmt = $db->query("SELECT subject, exp_contact_id, dest_contact_id, exp_user_id, address_id, dest_user_id, alt_identifier FROM res_view_letterbox WHERE res_id = ?",array($resId));
+    public function initAttachmentInfos($resId)
+    {
+        $db = new Database();
+        $stmt = $db->query("SELECT subject, exp_contact_id, dest_contact_id, exp_user_id, address_id, dest_user_id, alt_identifier FROM res_view_letterbox WHERE res_id = ?", array($resId));
         $data_attachment = $stmt->fetchObject();
 
         $infos['title'] = $data_attachment->subject;
 
         if ($data_attachment->dest_contact_id <> "") {
-
             $infos['contact_id'] = $data_attachment->dest_contact_id;
             $infos['address_id'] = $data_attachment->address_id;
 
             $stmt = $db->query('SELECT is_corporate_person, is_private, contact_lastname, contact_firstname, society, society_short, address_num, address_street, address_town, lastname, firstname 
                                 FROM view_contacts 
                                 WHERE contact_id = ? and ca_id = ?', array($data_attachment->dest_contact_id,$data_attachment->address_id));
-        } else if ($data_attachment->exp_contact_id <> "") {
+        } elseif ($data_attachment->exp_contact_id <> "") {
             $infos['contact_id'] = $data_attachment->exp_contact_id;
             $infos['address_id'] = $data_attachment->address_id;
             $stmt = $db->query('SELECT is_corporate_person, is_private, contact_lastname, contact_firstname, society, society_short, address_num, address_street, address_town, lastname, firstname 
                                 FROM view_contacts 
-                                WHERE contact_id = ? and ca_id = ?', array($data_attachment->exp_contact_id,$data_attachment->address_id));       
-        } else if ($data_attachment->dest_user != '') {
+                                WHERE contact_id = ? and ca_id = ?', array($data_attachment->exp_contact_id,$data_attachment->address_id));
+        } elseif ($data_attachment->dest_user != '') {
             $infos['contact_id'] = $data_attachment->dest_user;
             $infos['address_id'] = $data_attachment->address_id;
             $stmt = $db->query('SELECT lastname, firstname FROM users WHERE user_id = ?', [$data_attachment->dest_user]);
-        } else if ($data_attachment->exp_user_id != '') {
+        } elseif ($data_attachment->exp_user_id != '') {
             $infos['contact_id'] = $data_attachment->exp_user_id;
             $infos['address_id'] = $data_attachment->address_id;
             $stmt = $db->query('SELECT lastname, firstname FROM users WHERE user_id = ?', [$data_attachment->exp_user_id]);
-        } else if ($data_attachment->dest_user_id != '') {
+        } elseif ($data_attachment->dest_user_id != '') {
             $infos['contact_id'] = $data_attachment->dest_user_id;
             $infos['address_id'] = $data_attachment->address_id;
             $stmt = $db->query('SELECT lastname, firstname FROM users WHERE user_id = ?', [$data_attachment->dest_user_id]);
@@ -279,7 +303,7 @@ abstract class attachments_controler_Abstract
             $res = $stmt->fetchObject();
             if ($res->is_corporate_person == 'Y') {
                 $data_contact = $res->society;
-                if (!empty ($res->society_short)) {
+                if (!empty($res->society_short)) {
                     $data_contact .= ' ('.$res->society_short.')';
                 }
                 if (!empty($res->lastname) || !empty($res->firstname)) {
@@ -288,7 +312,7 @@ abstract class attachments_controler_Abstract
                 $data_contact .= ', ';
             } else {
                 $data_contact .= $res->contact_lastname . ' ' . $res->contact_firstname;
-                if (!empty ($res->society)) {
+                if (!empty($res->society)) {
                     $data_contact .= ' (' .$res->society . ')';
                 }
                 $data_contact .= ', ';
@@ -299,7 +323,7 @@ abstract class attachments_controler_Abstract
                 $data_contact .= $res->address_num . ' ' . $res->address_street . ' ' . strtoupper($res->address_town);
             }
             $infos['contact_show'] = $data_contact;
-        } else if ($data_attachment->exp_user_id != '' || $data_attachment->dest_user != '' || $data_attachment->dest_user_id != '') {
+        } elseif ($data_attachment->exp_user_id != '' || $data_attachment->dest_user != '' || $data_attachment->dest_user_id != '') {
             $res = $stmt->fetchObject();
             if (!empty($res->lastname) || !empty($res->firstname)) {
                 $data_contact .= $res->lastname . ' ' . $res->firstname;
@@ -309,19 +333,19 @@ abstract class attachments_controler_Abstract
         } else {
             $stmt = $db->query("SELECT cr.address_id, c.contact_id, c.is_corporate_person, c.society, c.society_short, c.firstname, c.lastname,ca.is_private,ca.address_street, ca.address_num, ca.address_town 
                                 FROM contacts_res cr, contacts_v2 c, contact_addresses ca 
-                                WHERE cr.res_id = ? and cast(c.contact_id as char) = cast(cr.contact_id as char) and ca.contact_id=c.contact_id and ca.id=cr.address_id",array($_SESSION['doc_id']));
+                                WHERE cr.res_id = ? and cast(c.contact_id as char) = cast(cr.contact_id as char) and ca.contact_id=c.contact_id and ca.id=cr.address_id", array($_SESSION['doc_id']));
             $i=0;
-            while($multi_contacts_attachment = $stmt->fetchObject()){
-                if(is_integer($multi_contacts_attachment->contact_id)){
+            while ($multi_contacts_attachment = $stmt->fetchObject()) {
+                if (is_integer($multi_contacts_attachment->contact_id)) {
                     $format_contact='';
                     $stmt2 = $db->query('SELECT is_corporate_person, is_private, contact_lastname, contact_firstname, society, society_short, address_num, address_street, address_town, lastname, firstname 
                                     FROM view_contacts 
-                                    WHERE contact_id = ? and ca_id = ?',array($multi_contacts_attachment->contact_id,$multi_contacts_attachment->address_id));
+                                    WHERE contact_id = ? and ca_id = ?', array($multi_contacts_attachment->contact_id,$multi_contacts_attachment->address_id));
         
                     $res = $stmt2->fetchObject();
                     if ($res->is_corporate_person == 'Y') {
                         $format_contact = $res->society;
-                        if (!empty ($res->society_short)) {
+                        if (!empty($res->society_short)) {
                             $format_contact .= ' ('.$res->society_short.')';
                         }
                         if (!empty($res->lastname) || !empty($res->firstname)) {
@@ -330,7 +354,7 @@ abstract class attachments_controler_Abstract
                         $format_contact .= ', ';
                     } else {
                         $format_contact .= $res->contact_lastname . ' ' . $res->contact_firstname;
-                        if (!empty ($res->society)) {
+                        if (!empty($res->society)) {
                             $format_contact .= ' (' .$res->society . ')';
                         }
                         $format_contact .= ', ';
@@ -338,7 +362,7 @@ abstract class attachments_controler_Abstract
                     if ($res->is_private == 'Y') {
                         $format_contact .= '('._CONFIDENTIAL_ADDRESS.')';
                     } else {
-                        $format_contact .= $res->address_num .' ' . $res->address_street .' ' . strtoupper($res->address_town);                         
+                        $format_contact .= $res->address_num .' ' . $res->address_street .' ' . strtoupper($res->address_town);
                     }
                     $contacts[] = array(
                         'contact_id'     => $multi_contacts_attachment->contact_id,
@@ -349,30 +373,32 @@ abstract class attachments_controler_Abstract
                         'format_contact' => $format_contact
                     );
         
-                    if($i==0){
-                        $data_contact                    = $format_contact; 
+                    if ($i==0) {
+                        $data_contact                    = $format_contact;
                         $data_attachment->exp_contact_id = $multi_contacts_attachment->contact_id;
                     }
                     $i++;
-                } 
+                }
             }
             $infos['multi_contact'] = $contacts;
         }
-		
-		return $infos;
+        
+        return $infos;
     }
     
-	public function getAttachmentInfos($resId){
-		$db = new Database();
-		
-		$stmt = $db->query(
+    public function getAttachmentInfos($resId)
+    {
+        $db = new Database();
+        
+        $stmt = $db->query(
             "SELECT * 
                 FROM res_view_attachments 
-                WHERE (res_id = ? OR res_id_version = ?) and res_id_master = ? ORDER BY relation desc", array($resId, $resId, $_SESSION['doc_id'])
+                WHERE (res_id = ? OR res_id_version = ?) and res_id_master = ? ORDER BY relation desc",
+            array($resId, $resId, $_SESSION['doc_id'])
         );
-		
-		$infos = array();
-		if ($stmt->rowCount() == 0) {
+        
+        $infos = array();
+        if ($stmt->rowCount() == 0) {
             $_SESSION['error'] = _THE_DOC . " " . _EXISTS_OR_RIGHT . "&hellip;";
             header(
                 "location: " . $_SESSION['config']['businessappurl']
@@ -380,15 +406,16 @@ abstract class attachments_controler_Abstract
             );
             exit();
         } else {
-			$line = $stmt->fetchObject();
+            $line = $stmt->fetchObject();
             $docserver = $line->docserver_id;
             $path = $line->path;
             $filename = $line->filename;
             $format = $line->format;
             $stmt = $db->query(
-                "select path_template from docservers where docserver_id = ?",array($docserver)
+                "select path_template from docservers where docserver_id = ?",
+                array($docserver)
             );
-			
+            
             $lineDoc = $stmt->fetchObject();
             $docserver = $lineDoc->path_template;
             $file = $docserver . $path . $filename;
@@ -396,19 +423,19 @@ abstract class attachments_controler_Abstract
             $origin = explode(',', $line->origin);
             $target_table_origin = $origin[1];
             $res_id_origin = $origin[0];
-			
-			$file_pdf = str_replace(pathinfo($filename, PATHINFO_EXTENSION),'pdf',$file);
-			$infos['pathfile'] = $file;
-			$infos['path'] = $path;
+            
+            $file_pdf = str_replace(pathinfo($filename, PATHINFO_EXTENSION), 'pdf', $file);
+            $infos['pathfile'] = $file;
+            $infos['path'] = $path;
             $infos['format'] = $format;
-			$infos['pathfile_pdf'] = $file_pdf;
+            $infos['pathfile_pdf'] = $file_pdf;
             $infos['res_id_origin'] = $res_id_origin;
             $infos['target_table_origin'] = $target_table_origin;
-			$infos['status'] = $line->status;
-			$infos['attachment_type'] = $line->attachment_type;
-			$infos['creation_date'] = $line->creation_date;
-			$infos['type_id'] = $line->type_id;
-			$infos['title'] = $line->title;
+            $infos['status'] = $line->status;
+            $infos['attachment_type'] = $line->attachment_type;
+            $infos['creation_date'] = $line->creation_date;
+            $infos['type_id'] = $line->type_id;
+            $infos['title'] = $line->title;
             $infos['typist'] = $line->typist;
             $infos['validation_date'] = $line->validation_date;
             $infos['effective_date'] = $line->effective_date;
@@ -419,7 +446,7 @@ abstract class attachments_controler_Abstract
                 if (empty($infos['target_table_origin'])) {
                     $infos['target_table_origin'] = 'res_version_attachments';
                 }
-            }else{
+            } else {
                 $infos['is_version'] =  false;
                 if (empty($infos['target_table_origin'])) {
                     $infos['target_table_origin'] = 'res_attachments';
@@ -431,7 +458,8 @@ abstract class attachments_controler_Abstract
                 $stmt = $db->query(
                     "SELECT user_id,lastname,firstname 
                         FROM users 
-                        WHERE user_id = ?", array($line->dest_user)
+                        WHERE user_id = ?",
+                    array($line->dest_user)
                 );
                 $res = $stmt->fetchObject();
                 $data_contact = $res->lastname . ' ' . $res->firstname;
@@ -441,12 +469,13 @@ abstract class attachments_controler_Abstract
                 $stmt = $db->query(
                     "SELECT * 
                         FROM view_contacts 
-                        WHERE contact_id = ? and ca_id = ?", array($line->dest_contact_id,$line->dest_address_id)
+                        WHERE contact_id = ? and ca_id = ?",
+                    array($line->dest_contact_id,$line->dest_address_id)
                 );
                 $res = $stmt->fetchObject();
                 if ($res->is_corporate_person == 'Y') {
                     $data_contact = $res->society;
-                    if (!empty ($res->society_short)) {
+                    if (!empty($res->society_short)) {
                         $data_contact .= ' ('.$res->society_short.')';
                     }
                     if (!empty($res->lastname) || !empty($res->firstname)) {
@@ -455,7 +484,7 @@ abstract class attachments_controler_Abstract
                     $data_contact .= ', ';
                 } else {
                     $data_contact .= $res->contact_lastname . ' ' . $res->contact_firstname;
-                    if (!empty ($res->society)) {
+                    if (!empty($res->society)) {
                         $data_contact .= ' (' .$res->society . ')';
                     }
                     $data_contact .= ', ';
@@ -469,28 +498,31 @@ abstract class attachments_controler_Abstract
                 $infos['address_id'] = $line->dest_address_id;
                 $infos['contact_show'] = $data_contact;
             }
-
-		}
-		return $infos;
-	}
-	
-	public function getCorrespondingPdf($resId)
+        }
+        return $infos;
+    }
+    
+    public function getCorrespondingPdf($resId)
     {
-		$infos = $this->getAttachmentInfos($resId);
-        if ($infos['format'] == 'pdf') return $resId;
-		$db2 = new Database();
-		$result = 0;
-		$stmt2 = $db2->query(
+        $infos = $this->getAttachmentInfos($resId);
+        if ($infos['format'] == 'pdf') {
+            return $resId;
+        }
+        $db2 = new Database();
+        $result = 0;
+        $stmt2 = $db2->query(
             "SELECT res_id
                 FROM res_view_attachments 
-                WHERE path = ? AND filename = ? and attachment_type = 'converted_pdf' ORDER BY relation desc", 
+                WHERE path = ? AND filename = ? and attachment_type = 'converted_pdf' ORDER BY relation desc",
                 array($infos['path'],pathinfo($infos['pathfile_pdf'], PATHINFO_BASENAME))
         );
-		$line = $stmt2->fetchObject();
-		
-		if ($line->res_id != 0) $result = $line->res_id;
-		return $result;
-	}
+        $line = $stmt2->fetchObject();
+        
+        if ($line->res_id != 0) {
+            $result = $line->res_id;
+        }
+        return $result;
+    }
 
     public function getCorrespondingDocument($resId)
     {
@@ -498,24 +530,26 @@ abstract class attachments_controler_Abstract
         $db2 = new Database();
         $result = 0;
         //var_dump($infos);
-        if($infos['res_id_origin'] != ''){
-            if($infos['target_table_origin']=='res_attachments'){
+        if ($infos['res_id_origin'] != '') {
+            if ($infos['target_table_origin']=='res_attachments') {
                 $res = 'res_id';
-            }else{
+            } else {
                 $res = 'res_id_version';
             }
             $stmt2 = $db2->query(
                 "SELECT res_id, res_id_version, relation, attachment_type
                     FROM res_view_attachments 
                     WHERE ".$res." = ? "
-                    . "ORDER BY relation desc", 
+                    . "ORDER BY relation desc",
                     array(
                         $infos['res_id_origin']
                     )
             );
             $line = $stmt2->fetchObject();
             
-            if ($line->res_id != 0 || $line->res_id_version != 0) $result = $line;
+            if ($line->res_id != 0 || $line->res_id_version != 0) {
+                $result = $line;
+            }
         }
         
         return $result;
@@ -528,8 +562,8 @@ abstract class attachments_controler_Abstract
      * @param   string $userId user id who created the temporary attachment
      * @return  boolean if ok, return true.
      */
-    public function removeTemporaryAttachmentOnDocserver($resIdAttachment, $resIdMaster, $userId) {
-
+    public function removeTemporaryAttachmentOnDocserver($resIdAttachment, $resIdMaster, $userId)
+    {
         $db = new Database();
         $stmt = $db->query(
             "SELECT docserver_id, path, filename, fingerprint
@@ -548,7 +582,7 @@ abstract class attachments_controler_Abstract
             $filenameOld    = $line->filename;
             $fingerprintOld = $line->fingerprint;
 
-            $stmt = $db->query("SELECT path_template FROM " . _DOCSERVERS_TABLE_NAME . " WHERE docserver_id = ?", array($docserverOld) );
+            $stmt = $db->query("SELECT path_template FROM " . _DOCSERVERS_TABLE_NAME . " WHERE docserver_id = ?", array($docserverOld));
             $lineDoc   = $stmt->fetchObject();
             $docserver = $lineDoc->path_template;
             $file      = $docserver . $pathOld . $filenameOld;
@@ -570,5 +604,4 @@ abstract class attachments_controler_Abstract
             return true;
         }
     }
-
 }
