@@ -39,13 +39,12 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         $labelAction = functions::show_string($resAction->label_action);
     }
     
-    preg_match("'^ ,'", $_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities'], $out);
+    preg_match("'^ ,'", $_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities'], $out);
     if (count($out[0]) == 1) {
-        $_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities'] = substr($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities'], 2, strlen($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities']));
+        $_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities'] = substr($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities'], 2, strlen($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities']));
     }
-    if (!empty($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities'])) {
-
-        $stmt = $db->query("select entity_id, entity_label from ".ENT_ENTITIES." where entity_id in (".$_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities'].") and enabled= 'Y' order by entity_label");
+    if (!empty($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities'])) {
+        $stmt = $db->query("select entity_id, entity_label from ".ENT_ENTITIES." where entity_id in (".$_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities'].") and enabled= 'Y' order by entity_label");
         while ($res = $stmt->fetchObject()) {
 
             array_push($services, array( 'ID' => $res->entity_id, 'LABEL' => $db->show_string($res->entity_label)));
@@ -53,9 +52,9 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         }
     }
     $users = array();
-    if (!empty($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['users_entities']) ) {
+    if (!empty($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['users_entities']) ) {
 
-        $stmt = $db->query("select distinct ue.user_id, u.lastname, u.firstname from ".ENT_USERS_ENTITIES." ue, ".$_SESSION['tablename']['users']." u where ue.entity_id in (".$_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['users_entities'].") and u.user_id = ue.user_id and (u.status = 'OK' or u.status = 'ABS') and enabled = 'Y' order by u.lastname asc");
+        $stmt = $db->query("select distinct ue.user_id, u.lastname, u.firstname from ".ENT_USERS_ENTITIES." ue, ".$_SESSION['tablename']['users']." u where ue.entity_id in (".$_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['users_entities'].") and u.user_id = ue.user_id and (u.status = 'OK' or u.status = 'ABS') and enabled = 'Y' order by u.lastname asc");
         while ($res = $stmt->fetchObject()) {
 
             array_push($users, array( 'ID' => $res->user_id, 'NOM' => functions::show_string($res->lastname), "PRENOM" => functions::show_string($res->firstname)));
@@ -110,7 +109,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     $templatesControler = new templates_controler();
     $templates = array();
 
-    if (!empty($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities'])) {
+    if (!empty($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities'])) {
       
         $EntitiesIdExclusion = array();
         $entities            = $entity_ctrl->getAllEntities();
@@ -196,7 +195,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
         $frm_str .='</form>';
         $frm_str .='</div>';
     }
-    if (!empty($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['users_entities'])) {
+    if (!empty($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['users_entities'])) {
 
         $frm_str .='<hr />';
         $frm_str .='<div id="form3">';

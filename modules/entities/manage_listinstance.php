@@ -165,8 +165,8 @@ $noDelete = false;
 $redirect_groupbasket = false;
 
 if (isset($_SESSION['current_basket']) && count($_SESSION['current_basket']) > 0) {
-    if(is_array($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']])) {
-        $redirect_groupbasket = current($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']]);
+    if(is_array($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']])) {
+        $redirect_groupbasket = current($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']]);
     
         if(empty($redirect_groupbasket['entities'])) {
             $redirect_groupbasket['entities'] = '';

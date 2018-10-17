@@ -249,6 +249,10 @@ class Core_SessionAbstract_Service extends Core_Abstract_Service {
         if (isset($_SESSION['user']['redirect_groupbasket'])) {
             $array['redirect_groupbasket'] = $_SESSION['user']['redirect_groupbasket'];
         }
+
+        if (isset($_SESSION['user']['redirect_groupbasket_by_group'])) {
+            $array['redirect_groupbasket_by_group'] = $_SESSION['user']['redirect_groupbasket_by_group'];
+        }
         /*************************************/
         $array['services'] = $serv_controler->loadUserServices(
             $array['UserId']

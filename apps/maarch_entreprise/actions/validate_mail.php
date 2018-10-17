@@ -168,11 +168,11 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         $EntitiesIdExclusion = array();
         $load_listmodel = true;
 
-        if (count($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities']) > 0) {
+        if (count($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities']) > 0) {
             $stmt = $db->query(
                 'SELECT entity_id FROM '
                 .ENT_ENTITIES.' WHERE entity_id not in ('
-                .$_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$id_action]['entities']
+                .$_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$id_action]['entities']
                 .") and enabled= 'Y' order by entity_id"
             );
             while ($res = $stmt->fetchObject()) {

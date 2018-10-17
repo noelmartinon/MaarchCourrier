@@ -144,9 +144,11 @@ abstract class entities_Abstract extends functions
             	'level' => (string) $type -> typelevel,
             );
         }
+        // TODO: keep only by_group session array
         $core = new core_tools;
         if ($core->is_module_loaded('basket')) {
             $_SESSION['user']['redirect_groupbasket'] = array();
+            $_SESSION['user']['redirect_groupbasket_by_group'] = array();
             if (isset($userData)
             	&& isset($userData['primarygroup'])
             	&& isset($userData['UserId'])
@@ -154,37 +156,80 @@ abstract class entities_Abstract extends functions
 	            $arr1 = $this->load_redirect_groupbasket_session(
 	                $userData['primarygroup'],
 	                $userData['UserId']
+                );
+                $arr1ByGroup = $this->load_redirect_groupbasket_session_by_group(
+	                $userData['primarygroup'],
+	                $userData['UserId']
 	            );
 	            $arr2 = $this->load_redirect_groupbasket_session_for_abs(
 	                $userData['UserId']
-	            );
+                );
+                $arr2ByGroup = $this->load_redirect_groupbasket_session_for_abs_by_group(
+	                $userData['UserId']
+                );
+                
                 $arrSecondary = array();
+                $arrSecondaryByGroup = array();
                 for ($cptB=0;$cptB<count($_SESSION['user']['baskets']);$cptB++) {
                     $arrTmp = array();
+                    $arrTmpByGroup = array();
                     if ($_SESSION['user']['baskets'][$cptB]['is_secondary']) {
                         $arrTmp = $this->load_redirect_groupbasket_secondary_session(
                             $_SESSION['user']['baskets'][$cptB]['id'],
                             $_SESSION['user']['baskets'][$cptB]['group_id'],
                             $userData['UserId']
                         );
-                        //$this->show_array($arr3);
                     }
+                    //echo $_SESSION['user']['baskets'][$cptB]['id'] 
+                    //    . ' ' . $_SESSION['user']['baskets'][$cptB]['group_id'] . '<br/>';
+                    $arrTmpByGroup = $this->load_redirect_groupbasket_secondary_session_by_group(
+                                $_SESSION['user']['baskets'][$cptB]['id'],
+                                $_SESSION['user']['baskets'][$cptB]['group_id'],
+                                $userData['UserId']
+                    );
                     if (!empty($arrTmp[$_SESSION['user']['baskets'][$cptB]['id']])) {
                         $arrSecondary = array_merge($arrSecondary, $arrTmp);
                     }
+                    if (!empty($arrTmpByGroup[$_SESSION['user']['baskets'][$cptB]['id']])) {
+                        $arrSecondaryByGroup = array_merge_recursive($arrSecondaryByGroup, $arrTmpByGroup);
+                    }
                 }
                 if (!empty($arrSecondary)) {
-                    $_SESSION['user']['redirect_groupbasket']  = array_merge(
+                    $_SESSION['user']['redirect_groupbasket'] = array_merge(
                         $arr1, $arr2, $arrSecondary
                     );
+                    $_SESSION['user']['redirect_groupbasket_by_group'] = array_merge_recursive(
+                        $arr1ByGroup, $arr2ByGroup, $arrSecondaryByGroup
+                    );
                 } else {
-                    $_SESSION['user']['redirect_groupbasket']  = array_merge(
+                    $_SESSION['user']['redirect_groupbasket'] = array_merge(
                         $arr1, $arr2
+                    );
+                    $_SESSION['user']['redirect_groupbasket_by_group'] = array_merge_recursive(
+                        $arr1ByGroup, $arr2ByGroup
                     );
                 }
             }
+            //to delete duplicates entries due to array_merge_recursive fonction when digital key in an array
+            foreach($_SESSION['user']['redirect_groupbasket_by_group'] as $aBasketKey => $aBasketContent) {
+                foreach($aBasketContent as $aGroupKey => $aGroupContent) {
+                    $cptCtrl = 1;
+                    foreach ($aGroupContent as $aActionKey => $aActionContent) {
+                        if ($cptCtrl % 2 == 0) {
+                            unset($_SESSION['user']['redirect_groupbasket_by_group'][$aBasketKey][$aGroupKey][$aActionKey]);
+                        }
+                        $cptCtrl++;
+                    }
+                }
+            }
+            // echo '<pre>';
+            // print_r($_SESSION['user']['redirect_groupbasket']);
+            // echo '</pre>';
+            // echo '<pre>';
+            // print_r($_SESSION['user']['redirect_groupbasket_by_group']);
+            // echo '</pre>';
+            // exit;
         }
-
     }
 
     public function process_where_clause($whereClause, $userId)
@@ -631,12 +676,43 @@ abstract class entities_Abstract extends functions
         return $arr;
     }
 
+    public function load_redirect_groupbasket_session_by_group($primaryGroup, $userId)
+    {
+        $arr = array();
+        $db = new Database();
+        $stmt = $db->query(
+        	'select distinct basket_id from ' . ENT_GROUPBASKET_REDIRECT
+            . " where group_id = ?",array(trim($primaryGroup))
+        );
+
+     
+        while ($res = $stmt->fetchObject()) {
+            $basketId = $res->basket_id;
+            $arr[$basketId] = array();
+
+            $stmt2 = $db->query(
+            	"select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+                . " where group_id = ? and basket_id = ?",array(trim($primaryGroup),trim($basketId))
+            );
+            while ($line = $stmt2->fetchObject()) {
+                $actionId = $line->action_id;
+                $arr[$basketId][$primaryGroup][$actionId]['entities'] = '';
+                $arr[$basketId][$primaryGroup][$actionId]['users_entities'] = '';
+                $tmpArr = $this->get_redirect_groupbasket(
+                    $primaryGroup, $basketId, $userId, $actionId
+                );
+                $arr[$basketId][$primaryGroup][$actionId]['entities'] = $tmpArr['entities'];
+                $arr[$basketId][$primaryGroup][$actionId]['users_entities'] = $tmpArr['users'];
+            }
+        }
+        return $arr;
+    }
+
     public function load_redirect_groupbasket_secondary_session($basketId, $groupId, $userId)
     {
         $arr = array();
         $db = new Database();
 
-        
         $arr[$basketId] = array();
 
         $stmt = $db->query(
@@ -652,6 +728,31 @@ abstract class entities_Abstract extends functions
             );
             $arr[$basketId][$actionId]['entities'] = $tmpArr['entities'];
             $arr[$basketId][$actionId]['users_entities'] = $tmpArr['users'];
+        }
+
+        return $arr;
+    }
+
+    public function load_redirect_groupbasket_secondary_session_by_group($basketId, $groupId, $userId)
+    {
+        $arr = array();
+        $db = new Database();
+
+        $arr[$basketId] = array();
+
+        $stmt = $db->query(
+            "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+            . " where group_id = ? and basket_id = ?",array(trim($groupId),trim($basketId))
+        );
+        while ($line = $stmt->fetchObject()) {
+            $actionId = $line->action_id;
+            $arr[$basketId][$groupId][$actionId]['entities'] = '';
+            $arr[$basketId][$groupId][$actionId]['users_entities'] = '';
+            $tmpArr = $this->get_redirect_groupbasket(
+                $groupId, $basketId, $userId, $actionId
+            );
+            $arr[$basketId][$groupId][$actionId]['entities'] = $tmpArr['entities'];
+            $arr[$basketId][$groupId][$actionId]['users_entities'] = $tmpArr['users'];
         }
 
         return $arr;
@@ -701,6 +802,57 @@ abstract class entities_Abstract extends functions
                     $arr[$baskAbs[$i]['id']][$actionId]['entities'] =
                         $tmpArr['entities'];
                     $arr[$baskAbs[$i]['id']][$actionId]['users_entities'] =
+                        $tmpArr['users'];
+                }
+            }
+        }
+        return $arr;
+    }
+
+    public function load_redirect_groupbasket_session_for_abs_by_group($userId)
+    {
+        $arr = array();
+        $db = new Database();
+
+        if (! isset($_SESSION['user']['baskets'])) {
+            require_once('modules/basket/class/class_modules_tools.php');
+            $bask = new basket();
+            $baskAbs = $bask->load_basket_abs($userId);
+        } else {
+            $baskAbs = $_SESSION['user']['baskets'];
+        }
+        for ($i = 0; $i < count($baskAbs); $i ++) {
+            if ($baskAbs[$i]['abs_basket']) {
+                $stmt = $db->query(
+                	"select uc.group_id from " . USERGROUP_CONTENT_TABLE
+                    . " uc , " . USERGROUPS_TABLE . " u where uc.user_id = ? and u.group_id = "
+                    . "uc.group_id and u.enabled= 'Y' and "
+                    . "uc.primary_group = 'Y'",array($baskAbs[$i]['basket_owner'])
+                );
+                //$db->show();
+                $res = $stmt->fetchObject();
+                $primaryGroup = $res->group_id;
+                $tmpBasketId = preg_replace(
+                	'/_' . $baskAbs[$i]['basket_owner'] . '$/', '',
+                    $baskAbs[$i]['id']
+                );
+                $stmt = $db->query(
+                	"select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+                    . " where group_id = ? and basket_id = ?",array(trim($primaryGroup),trim($tmpBasketId))
+                );
+                //$db->show();
+                while ($line = $stmt->fetchObject()) {
+                    $actionId = $line->action_id;
+                    $arr[$baskAbs[$i]['id']][$primaryGroup][$actionId]['entities'] = '';
+                    $arr[$baskAbs[$i]['id']][$primaryGroup][$actionId]['users_entities'] = '';
+
+                    $tmpArr = $this->get_redirect_groupbasket(
+                        $primaryGroup, $tmpBasketId,
+                        $baskAbs[$i]['basket_owner'], $actionId
+                    );
+                    $arr[$baskAbs[$i]['id']][$primaryGroup][$actionId]['entities'] =
+                        $tmpArr['entities'];
+                    $arr[$baskAbs[$i]['id']][$primaryGroup][$actionId]['users_entities'] =
                         $tmpArr['users'];
                 }
             }

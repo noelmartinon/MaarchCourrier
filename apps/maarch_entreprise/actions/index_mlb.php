@@ -108,11 +108,11 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
         $allEntitiesTree = array();
         $EntitiesIdExclusion = array();
 
-        if (count($_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$actionId]['entities']) > 0) {
+        if (count($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$actionId]['entities']) > 0) {
             $stmt = $db->query(
                 'SELECT entity_id FROM '
                 .ENT_ENTITIES.' WHERE entity_id not in ('
-                .$_SESSION['user']['redirect_groupbasket'][$_SESSION['current_basket']['id']][$actionId]['entities']
+                .$_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$actionId]['entities']
                 .") and enabled= 'Y' order by entity_id"
             );
 
