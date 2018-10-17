@@ -32,6 +32,66 @@ class StoreController
 {
     public static function storeResource(array $aArgs)
     {
+        ValidatorModel::notEmpty($aArgs, ['encodedFile', 'format', 'status', 'type_id', 'category_id']);
+        ValidatorModel::stringType($aArgs, ['format', 'status']);
+
+        $mlbColumns = [
+            'category_id', 'exp_contact_id', 'exp_user_id', 'dest_contact_id', 'dest_user_id',
+            'nature_id', 'alt_identifier', 'admission_date', 'process_limit_date', 'recommendation_limit_date', 'closing_date', 'address_id'
+        ];
+        try {
+            $fileContent    = base64_decode(str_replace(['-', '_'], ['+', '/'], $aArgs['encodedFile']));
+            $fileName       = 'tmp_file_' . rand() . '.' . $aArgs['format'];
+            $tmpFilepath    = CoreConfigModel::getTmpPath() . $fileName;
+
+            $file = fopen($tmpFilepath, 'w');
+            fwrite($file, $fileContent);
+            fclose($file);
+
+            $storeResult = StoreController::storeResourceOnDocServer([
+                'collId'            => 'letterbox_coll',
+                'docserverTypeId'   => 'DOC',
+                'fileInfos'         => [
+                    'tmpDir'            => CoreConfigModel::getTmpPath(),
+                    'tmpFileName'       => $fileName
+                ]
+            ]);
+            if (!empty($storeResult['errors'])) {
+                return ['errors' => '[storeResource] ' . $storeResult['errors']];
+            }
+            unlink($tmpFilepath);
+            unset($aArgs['encodedFile']);
+
+            $data = [
+                'docserver_id'  => $storeResult['docserver_id'],
+                'filename'      => $storeResult['file_destination_name'],
+                'filesize'      => $storeResult['fileSize'],
+                'path'          => $storeResult['destination_dir'],
+                'fingerprint'   => $storeResult['fingerPrint']
+            ];
+            $data = array_merge($aArgs, $data);
+            $data = StoreController::prepareStorage($data);
+
+            $dataMlb = [];
+            foreach ($data as $key => $value) {
+                if (in_array($key, $mlbColumns)) {
+                    $dataMlb[$key] = $value;
+                    unset($data[$key]);
+                }
+            }
+            $resId = ResModel::create($data);
+
+            $dataMlb['res_id'] = $resId;
+            ResModel::createExt($dataMlb);
+
+            return $resId;
+        } catch (\Exception $e) {
+            return ['errors' => '[storeResource] ' . $e->getMessage()];
+        }
+    }
+
+    public static function storeResourceRes(array $aArgs)
+    {
         ValidatorModel::notEmpty($aArgs, ['encodedFile', 'data', 'collId', 'table', 'fileFormat', 'status']);
         ValidatorModel::stringType($aArgs, ['collId', 'table', 'fileFormat', 'status']);
         ValidatorModel::arrayType($aArgs, ['data']);
@@ -63,7 +123,7 @@ class StoreController
             }
             unlink($tmpFilepath);
 
-            $data = StoreController::prepareStorage([
+            $data = StoreController::prepareStorageRes([
                 'data'          => $aArgs['data'],
                 'docserverId'   => $storeResult['docserver_id'],
                 'status'        => $aArgs['status'],
@@ -189,6 +249,51 @@ class StoreController
     }
 
     public static function prepareStorage(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['docserver_id', 'filename', 'format', 'filesize', 'path', 'fingerprint', 'status']);
+        ValidatorModel::stringType($aArgs, ['docserver_id', 'filename', 'format', 'path', 'fingerprint', 'status']);
+        ValidatorModel::intVal($aArgs, ['filesize']);
+
+        $typistFound        = false;
+        $processLimitDateFound  = false;
+
+        foreach ($aArgs as $key => $value) {
+            if ($key == 'typist') {
+                $typistFound = true;
+            } elseif ($key == 'process_limit_date') {
+                $processLimitDateFound = true;
+            } elseif ($key == 'exp_contact_id' && !is_numeric($value)) {
+                $mail = explode('<', str_replace('>', '', $value));
+                $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contacts_v2.contact_id']]);
+                if (!empty($contact['contact_id'])) {
+                    $aArgs['exp_contact_id'] = $contact['contact_id'];
+                } else {
+                    $aArgs['exp_contact_id'] = 0;
+                }
+            } elseif ($key == 'address_id' && !is_numeric($value)) {
+                $mail = explode('<', str_replace('>', '', $value));
+                $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_addresses.id']]);
+                if (!empty($contact['id'])) {
+                    $aArgs['address_id'] = $contact['id'];
+                } else {
+                    $aArgs['address_id'] = 0;
+                }
+            }
+        }
+
+        if (!$typistFound) {
+            $aArgs['typist'] = 'auto';
+        }
+        if (!$processLimitDateFound) {
+            $processLimitDate = ResModel::getStoredProcessLimitDate(['typeId' => $aArgs['type_id'], 'admissionDate' => $aArgs['admission_date']]);
+            $aArgs['process_limit_date'] = $processLimitDate;
+        }
+        $aArgs['creation_date'] = 'CURRENT_TIMESTAMP';
+
+        return $aArgs;
+    }
+
+    public static function prepareStorageRes(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['data', 'docserverId', 'status', 'fileName', 'fileFormat', 'fileSize', 'path', 'fingerPrint']);
         ValidatorModel::stringType($aArgs, ['docserverId', 'status', 'fileName', 'fileFormat', 'path', 'fingerPrint']);

@@ -217,19 +217,23 @@ class ResModelAbstract
 
     public static function getStoredProcessLimitDate(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['resId']);
-        ValidatorModel::intVal($aArgs, ['resId']);
+        ValidatorModel::intVal($aArgs, ['resId', 'typeId']);
         ValidatorModel::stringType($aArgs, ['admissionDate']);
 
-        $document = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['creation_date', 'type_id']]);
+        if (!empty($aArgs['typeId'])) {
+            $typeId = $aArgs['type_id'];
+        } else {
+            $document = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['type_id']]);
+            $typeId = $document['type_id'];
+        }
 
         $processDelay = 30;
-        if (!empty($document['type_id'])) {
+        if (!empty($typeId)) {
             $doctypeExt = DatabaseModel::select([
                 'select'    => ['process_delay'],
                 'table'     => ['mlb_doctype_ext'],
                 'where'     => ['type_id = ?'],
-                'data'      => [$document['type_id']]
+                'data'      => [$typeId]
             ]);
             $processDelay = $doctypeExt[0]['process_delay'];
         }
@@ -240,8 +244,6 @@ class ResModelAbstract
             } else {
                 $defaultDate = $aArgs['admissionDate'];
             }
-        } elseif (!empty($document['creation_date'])) {
-            $defaultDate = $document['creation_date'];
         } else {
             $defaultDate = date('c');
         }

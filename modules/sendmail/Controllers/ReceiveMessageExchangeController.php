@@ -262,7 +262,7 @@ class ReceiveMessageExchangeController
             "status"      => $defaultConfig['status']
         ];
 
-        return StoreController::storeResource($allDatas);
+        return StoreController::storeResourceRes($allDatas);
     }
 
     protected static function saveContact($aArgs = [])
@@ -399,7 +399,7 @@ class ReceiveMessageExchangeController
                     "status"      => 'TRA'
                 ];
                 
-                $resId = StoreController::storeResource($allDatas);
+                $resId = StoreController::storeResourceRes($allDatas);
                 $countAttachment++;
             }
         }

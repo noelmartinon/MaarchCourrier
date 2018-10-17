@@ -48,7 +48,33 @@ class ResController
     // file_put_contents("storeResourceLogs.log", ob_get_flush());
     //END LOG FOR DEBUG ONLY
     //*****************************************************************************************
+
     public function create(Request $request, Response $response)
+    {
+        if (!ServiceModel::hasService(['id' => 'index_mlb', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'menu'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $data = $request->getParams();
+
+        $check = Validator::notEmpty()->validate($data['encodedFile']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['format']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['status']);
+        $check = $check && Validator::intVal()->notEmpty()->validate($data['type_id']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['category_id']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $resId = StoreController::storeResource($data);
+        if (empty($resId) || !empty($resId['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => '[ResController create] ' . $resId['errors']]);
+        }
+
+        return $response->withJson(['resId' => $resId]);
+    }
+
+    public function createRes(Request $request, Response $response)
     {
         if (!ServiceModel::hasService(['id' => 'index_mlb', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'menu'])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
@@ -66,7 +92,7 @@ class ResController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $resId = StoreController::storeResource($data);
+        $resId = StoreController::storeResourceRes($data);
 
         if (empty($resId) || !empty($resId['errors'])) {
             return $response->withStatus(500)->withJson(['errors' => '[ResController create] ' . $resId['errors']]);
