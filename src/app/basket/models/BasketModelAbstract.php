@@ -388,7 +388,7 @@ class BasketModelAbstract
         ValidatorModel::stringType($aArgs, ['userId']);
 
         $aBaskets = DatabaseModel::select([
-                'select'    => ['ba.basket_id', 'ba.basket_name', 'ua.user_abs', 'ua.basket_owner', 'ua.is_virtual'],
+                'select'    => ['ba.basket_id', 'ba.basket_name', 'ba.basket_clause', 'ua.user_abs', 'ua.basket_owner', 'ua.is_virtual'],
                 'table'     => ['baskets ba, user_abs ua'],
                 'where'     => ['ua.new_user = ?', 'ua.basket_id = ba.basket_id'],
                 'data'      => [$aArgs['userId']],

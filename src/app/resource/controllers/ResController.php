@@ -265,7 +265,7 @@ class ResController
         $basketsClause = '';
         foreach ($baskets as $key => $basket) {
             if (!empty($basket['basket_clause'])) {
-                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
+                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $basket['basket_owner']]);
                 if ($key > 0) {
                     $basketsClause .= ' or ';
                 }
