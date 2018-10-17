@@ -467,7 +467,7 @@ if ($mode == 'normal') {
                 }
 
                 if ($tab[$i][$j][$value] == 'status') {
-                    $style = "style='color:".$_SESSION['mail_priorities_color'][$priority].";'";
+                    $style = "style='color:".$_SESSION['mail_priorities_color'][$fakeId].";'";
 
                     $tab[$i][$j]['label'] = _STATUS;
                     $res_status = $status_obj->get_status_data($tab[$i][$j]['value'], $extension_icon);
