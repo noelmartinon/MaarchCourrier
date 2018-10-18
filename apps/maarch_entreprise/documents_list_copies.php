@@ -126,14 +126,22 @@ if (count($arr_order) == 1 ) {
 if (!empty($order_field) && !empty($order)) {
     if ($_REQUEST['order_field'] == 'alt_identifier') {
         $orderstr = "order by order_alphanum(alt_identifier)"." ".$order;
-    } else {
+    } else if ($_REQUEST['order_field'] == 'priority') {
+        $where .= ' and '.$table.'.priority = priorities.id';
+        $select['priorities'] = ['order', 'id'];
+        $orderstr = 'order by priorities.order '.$order;
+    }else {
         $orderstr = "order by ".$order_field." ".$order;
     }
     $_SESSION['last_order_basket'] = $orderstr;
 } else if (!empty($_SESSION['save_list']['order']) && !empty($_SESSION['save_list']['order_field'])) {
     if ($_SESSION['save_list']['order_field'] == 'alt_identifier') {
         $orderstr = "order by order_alphanum(alt_identifier)"." ".$_SESSION['save_list']['order'];
-    } else {
+    } else if ($_SESSION['save_list']['order_field'] == 'priority') {
+        $where .= ' and '.$table.'.priority = priorities.id';
+        $select['priorities'] = ['order', 'id'];
+        $orderstr = 'order by priorities.order '.$_SESSION['save_list']['order'];
+    }else {
         $orderstr = "order by ".$_SESSION['save_list']['order_field']." ".$_SESSION['save_list']['order'];
     }
     $_SESSION['last_order_basket'] = $orderstr;
@@ -145,7 +153,11 @@ if (!empty($order_field) && !empty($order)) {
         }
         if ($_SESSION['current_basket']['basket_res_order'] == 'alt_identifier') {
             $orderstr = 'order by order_alphanum(alt_identifier)'.' desc';
-        } else {
+        } else if ($_SESSION['current_basket']['basket_res_order'] == 'priority') {
+            $where .= ' and '.$table.'.priority = priorities.id';
+            $select['priorities'] = ['order', 'id'];
+            $orderstr = 'order by priorities.order desc';
+        }else {
             $orderstr = 'order by '.$_SESSION['current_basket']['basket_res_order'].' desc';
         }
         $_SESSION['last_order_basket'] = $orderstr;
