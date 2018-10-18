@@ -64,15 +64,18 @@ class alert_engine extends Database
         if ($calendarType <> 'calendar' && $calendarType <> 'workingDay') {
             $calendarType = $_SESSION['features']['type_calendar'];
         }
-        if($calendarType == 'calendar'){
+
+        if (empty($calendarType)) {
+            $calendarType = 'workingDay';
+        }
+
+        if($calendarType == 'calendar') {
             if ($isMinus) {
                 return date('Y-m-d H:i:s', $Date + (86400*-$Delta));
             } else {
                 return date('Y-m-d H:i:s', $Date + (86400*$Delta));
             }
-
-        }elseif($calendarType == 'workingDay'){
-
+        } elseif($calendarType == 'workingDay') {
             $Hollidays = array (
                 '1_1',
                 '1_5',
@@ -83,20 +86,23 @@ class alert_engine extends Database
                 '11_11',
                 '25_12'
             );
-            require_once 'core/class/class_db_pdo.php';
             
-            $db = new Database();
-            $stmt = $db->query("select * from parameters where id like 'alert_stop%'");
-            while ($result = $stmt->fetchObject()) {
-                if ($result->param_value_date <> '') {
-                    $compare = $this->compare_date($result->param_value_date, date("d-m-Y"));
-                    //take the alert stop only if > now
-                    if ($compare == 'date1' || $compare == 'equal') {
-                        $dateExploded = explode("-", str_replace(" 00:00:00", "", $result->param_value_date));
-                        array_push($Hollidays, (int)$dateExploded[2] . "_" . (int)$dateExploded[1]);
+            if (!empty($_SESSION['features']['type_calendar'])) {
+                require_once 'core/class/class_db_pdo.php';
+                $db = new Database();
+                $stmt = $db->query("select * from parameters where id like 'alert_stop%'");
+                while ($result = $stmt->fetchObject()) {
+                    if ($result->param_value_date <> '') {
+                        $compare = $this->compare_date($result->param_value_date, date("d-m-Y"));
+                        //take the alert stop only if > now
+                        if ($compare == 'date1' || $compare == 'equal') {
+                            $dateExploded = explode("-", str_replace(" 00:00:00", "", $result->param_value_date));
+                            array_push($Hollidays, (int)$dateExploded[2] . "_" . (int)$dateExploded[1]);
+                        }
                     }
                 }
             }
+            
             //var_dump($Hollidays);
             
             if (function_exists ('easter_date')) {
@@ -136,8 +142,7 @@ class alert_engine extends Database
             } else {
                 return date('Y-m-d H:i:s', $Date + (86400*$Delta));
             }
-
-        }  
+        }      
 
     }
 
