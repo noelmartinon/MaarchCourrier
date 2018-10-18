@@ -87,6 +87,7 @@ class alert_engine extends Database
                 '25_12'
             );
             
+            //TODO: Case to erase because not used
             if (!empty($_SESSION['features']['type_calendar'])) {
                 require_once 'core/class/class_db_pdo.php';
                 $db = new Database();
