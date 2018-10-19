@@ -253,40 +253,41 @@ class StoreController
         ValidatorModel::stringType($aArgs, ['docserver_id', 'filename', 'format', 'path', 'fingerprint', 'status']);
         ValidatorModel::intVal($aArgs, ['filesize']);
 
-        $typistFound        = false;
-        $processLimitDateFound  = false;
-
-        foreach ($aArgs as $key => $value) {
-            if ($key == 'typist') {
-                $typistFound = true;
-            } elseif ($key == 'process_limit_date') {
-                $processLimitDateFound = true;
-            } elseif ($key == 'exp_contact_id' && !is_numeric($value)) {
-                $mail = explode('<', str_replace('>', '', $value));
-                $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contacts_v2.contact_id']]);
-                if (!empty($contact['contact_id'])) {
-                    $aArgs['exp_contact_id'] = $contact['contact_id'];
-                } else {
-                    $aArgs['exp_contact_id'] = 0;
-                }
-            } elseif ($key == 'address_id' && !is_numeric($value)) {
-                $mail = explode('<', str_replace('>', '', $value));
-                $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_addresses.id']]);
-                if (!empty($contact['id'])) {
-                    $aArgs['address_id'] = $contact['id'];
-                } else {
-                    $aArgs['address_id'] = 0;
-                }
-            }
-        }
-
-        if (!$typistFound) {
+        if (empty($aArgs['typist'])) {
             $aArgs['typist'] = 'auto';
         }
-        if (!$processLimitDateFound) {
+
+        unset($aArgs['alt_identifier']);
+        if (!empty($aArgs['chrono'])) {
+            $aArgs['alt_identifier'] = ChronoModel::getChrono(['id' => $aArgs['category_id'], 'entityId' => $aArgs['destination'], 'typeId' => $aArgs['type_id']]);
+        }
+        unset($aArgs['chrono']);
+
+        if (empty($aArgs['process_limit_date'])) {
             $processLimitDate = ResModel::getStoredProcessLimitDate(['typeId' => $aArgs['type_id'], 'admissionDate' => $aArgs['admission_date']]);
             $aArgs['process_limit_date'] = $processLimitDate;
         }
+
+        if (!empty($aArgs['exp_contact_id']) && !is_numeric($aArgs['exp_contact_id'])) {
+            $mail = explode('<', str_replace('>', '', $aArgs['exp_contact_id']));
+            $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contacts_v2.contact_id']]);
+            if (!empty($contact['contact_id'])) {
+                $aArgs['exp_contact_id'] = $contact['contact_id'];
+            } else {
+                $aArgs['exp_contact_id'] = 0;
+            }
+        }
+        
+        if (!empty($aArgs['address_id']) && !is_numeric($aArgs['address_id'])) {
+            $mail = explode('<', str_replace('>', '', $aArgs['address_id']));
+            $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contact_addresses.id']]);
+            if (!empty($contact['id'])) {
+                $aArgs['address_id'] = $contact['id'];
+            } else {
+                $aArgs['address_id'] = 0;
+            }
+        }
+
         $aArgs['creation_date'] = 'CURRENT_TIMESTAMP';
 
         return $aArgs;
