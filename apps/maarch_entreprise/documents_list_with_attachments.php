@@ -146,21 +146,23 @@ if (!empty($order_field) && !empty($order)) {
     }
     $_SESSION['last_order_basket'] = $orderstr;
 } else {
-    if(!empty($_SESSION['current_basket']['basket_res_order'])) {
-        if (count($arr_order) == 1 ) {
-            $list->setOrder();
-            $list->setOrderField($arr_order[0]);
+    if (!empty($_SESSION['current_basket']['basket_res_order'])) {
+        if (count($arr_order) == 1) {
+            $orders = explode(' ', $arr_order[0]);
+            if (!empty($orders[1])) {
+                $list->setOrder($orders[1]);
+            } else {
+                $list->setOrder();
+            }
+            $list->setOrderField($orders[0]);
         }
-        if ($_SESSION['current_basket']['basket_res_order'] == 'alt_identifier') {
-            $orderstr = 'order by order_alphanum(alt_identifier)'.' desc';
-        } else if ($_SESSION['current_basket']['basket_res_order'] == 'priority') {
+        $orderstr = 'order by '.str_replace('alt_identifier', 'order_alphanum(alt_identifier)', $_SESSION['current_basket']['basket_res_order']);
+        if (strpos($_SESSION['current_basket']['basket_res_order'], 'priority') !== false) {
             $where .= ' and '.$table.'.priority = priorities.id';
             $select['priorities'] = ['order', 'id'];
-            $orderstr = 'order by priorities.order desc';
-        } else {
-            $orderstr = 'order by '.$_SESSION['current_basket']['basket_res_order'].' desc';
+            $orderstr = 'order by priorities.order '.$order;
         }
-        $_SESSION['last_order_basket'] = $orderstr;
+        $_SESSION['last_order_basket'] = $_SESSION['current_basket']['basket_res_order'];
     } else {
         $list->setOrder();
         $list->setOrderField('res_id');

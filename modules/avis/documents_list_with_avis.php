@@ -141,10 +141,29 @@ if (!empty($order_field) && !empty($order)) {
     }
     $_SESSION['last_order_basket'] = $orderstr;
 } else {
-    $list->setOrder();
-    $list->setOrderField('modification_date');
-    $orderstr = "order by modification_date desc";
-    $_SESSION['last_order_basket'] = $orderstr;
+    if (!empty($_SESSION['current_basket']['basket_res_order'])) {
+        if (count($arr_order) == 1) {
+            $orders = explode(' ', $arr_order[0]);
+            if (!empty($orders[1])) {
+                $list->setOrder($orders[1]);
+            } else {
+                $list->setOrder();
+            }
+            $list->setOrderField($orders[0]);
+        }
+        $orderstr = 'order by '.str_replace('alt_identifier', 'order_alphanum(alt_identifier)', $_SESSION['current_basket']['basket_res_order']);
+        if (strpos($_SESSION['current_basket']['basket_res_order'], 'priority') !== false) {
+            $where .= ' and '.$table.'.priority = priorities.id';
+            $select['priorities'] = ['order', 'id'];
+            $orderstr = 'order by priorities.order '.$order;
+        }
+        $_SESSION['last_order_basket'] = $_SESSION['current_basket']['basket_res_order'];
+    } else {
+        $list->setOrder();
+        $list->setOrderField('modification_date');
+        $orderstr = "order by modification_date desc";
+        $_SESSION['last_order_basket'] = $orderstr;
+    }
 }
 
 //Request
