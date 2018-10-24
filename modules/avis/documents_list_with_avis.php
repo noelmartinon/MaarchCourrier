@@ -147,6 +147,7 @@ if (!empty($order_field) && !empty($order)) {
             if (!empty($orders[1])) {
                 $list->setOrder($orders[1]);
             } else {
+                $orders[] = 'desc';
                 $list->setOrder();
             }
             $list->setOrderField($orders[0]);
@@ -155,7 +156,7 @@ if (!empty($order_field) && !empty($order)) {
         if (strpos($_SESSION['current_basket']['basket_res_order'], 'priority') !== false) {
             $where .= ' and '.$table.'.priority = priorities.id';
             $select['priorities'] = ['order', 'id'];
-            $orderstr = 'order by priorities.order '.$order;
+            $orderstr = 'order by priorities.order '.$orders[1];
         }
         $_SESSION['last_order_basket'] = $_SESSION['current_basket']['basket_res_order'];
     } else {
