@@ -447,6 +447,10 @@ abstract class content_management_tools_Abstract
         $jnlp_attribute2->value = $jar_url.'/apps/maarch_entreprise/tmp/';
         $jnlp_balise->appendChild($jnlp_attribute2);
 
+        $jnlp_attribute3 = $docXML->createAttribute('href');
+        $jnlp_attribute3->value = $jnlp_name;
+        $jnlp_balise->appendChild($jnlp_attribute3);
+
         $info_balise=$docXML->createElement("information");
 
         $title_balise=$docXML->createElement("title","Editeur de modèle de document");
