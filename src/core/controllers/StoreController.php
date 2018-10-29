@@ -40,6 +40,11 @@ class StoreController
             'nature_id', 'alt_identifier', 'admission_date', 'process_limit_date', 'recommendation_limit_date', 'closing_date', 'address_id'
         ];
         try {
+            foreach ($aArgs as $column => $value) {
+                if (empty($value)) {
+                    unset($aArgs[$column]);
+                }
+            }
             $fileContent    = base64_decode(str_replace(['-', '_'], ['+', '/'], $aArgs['encodedFile']));
             $fileName       = 'tmp_file_' . rand() . '.' . $aArgs['format'];
             $tmpFilepath    = CoreConfigModel::getTmpPath() . $fileName;
