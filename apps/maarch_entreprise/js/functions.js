@@ -3309,6 +3309,20 @@ function fill_field_input_text(values)
 }
 
 /**
+ * Fills inputs fields of text type in the search form whith value
+ *
+ * @param values Array Values of the search criteria which must be displayed
+ **/
+function fill_field_textarea(values)
+{
+    for( var key in values)
+    {
+        var tmp_elem = $(key);
+        tmp_elem.value = values[key];
+    }
+}
+
+/**
  * Fills date range in the search form whith value
  *
  * @param values Array Values of the search criteria which must be displayed
