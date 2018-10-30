@@ -6,7 +6,7 @@
         <file_prefix>seda</file_prefix>
         <loaded>true</loaded>
         <sae>MaarchRM</sae>
-        <token>phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoPlOsmSRZeZKpl6weZd+/0momU9JodKUyZDzvLCWOZ1sw==</token>
+        <token>phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCrrA61NWmmXVWU7AR5Sw+wq9eazIrIiGnLNDPB6BqMMum8fauclhcR2nklsEdTlveHjcGp/WIDlQ</token>
         <urlSAEService>http://demo-ap.maarchrm.com:81</urlSAEService>
         <urlSAE>https://demo-ap.maarchrm.com/transfer/sent</urlSAE>
         <directoryMessage>/tmp/</directoryMessage>
