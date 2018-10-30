@@ -249,14 +249,15 @@ class PrintControler extends PrintFunctions
 
                     $pdf->Image($filename_QR, 7, 3);
                 }
+                $pdf->Cell(20, 5, "", 0, 0, 'L', false);
                 if ($this->array_print[$cpt]['initiator'] <> '') {
                     $stmt = $db->query(
                     	"select entity_label from entities where entity_id = ?", 
                     	array($this->array_print[$cpt]['initiator'])
                     );
                     $resultEntity = $stmt->fetchObject();
-                    $pdf->Cell(140,5,utf8_decode(_INITIATOR . ' : '
-                        . $resultEntity->entity_label . " (" . $this->array_print[$cpt]['initiator'] . ")"),0,1, 'C', false);
+                    $pdf->MultiCell(100,5,utf8_decode(_INITIATOR . ' : '
+                        . $resultEntity->entity_label . " (" . $this->array_print[$cpt]['initiator'] . ")"),0, 'C', false);
 				} elseif($this->array_print[$cpt]['typist'] <> '') {
                     require_once "modules/entities/class/class_manage_entities.php";
                     $entity = new entity();
@@ -266,8 +267,8 @@ class PrintControler extends PrintFunctions
                     	array($initiator['ID'])
                     );
                     $resultEntity = $stmt->fetchObject();
-                    $pdf->Cell(36,5,utf8_decode(_INITIATOR . ' : ' 
-                        . $resultEntity->entity_label . " (" . $initiator['ID'] . ")"),0,1, 'L', false);
+                    $pdf->MultiCell(36,5,utf8_decode(_INITIATOR . ' : ' 
+                        . $resultEntity->entity_label . " (" . $initiator['ID'] . ")"),0, 'L', false);
                 }
 				$pdf->SetFont('Arial','B',14);
 				
