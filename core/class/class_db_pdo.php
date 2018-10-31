@@ -125,7 +125,7 @@ class Database extends functions
                 if (!isset($args[0]['password'])) {
                     $this->password = 'postgres';
                 } else {
-                    $this->password = $args[0]['pass'];
+                    $this->password = $args[0]['password'];
                 }
                 if (! isset($args[0]['base'])) {
                     $this->database = '';
@@ -190,11 +190,16 @@ class Database extends functions
             PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_CASE          => PDO::CASE_LOWER
         );
-        // Create a new PDO instanace
+        // Create a new PDO instance
         try {
             $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
         } catch (PDOException $PDOException) {
-            $this->error = $PDOException->getMessage();
+            try {
+                $options[PDO::ATTR_PERSISTENT] = false;
+                $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
+            } catch (\PDOException $PDOException) {
+                $this->error = $PDOException->getMessage();
+            }
         }
         
         if ($this->error && strstr($this->error, '08006') <> '') {
@@ -307,7 +312,9 @@ class Database extends functions
      */
     public function query($queryString, $parameters=null, $catchExceptions=false, $multi=false)
     {
+        $originalQuery = $queryString;
         if ($parameters) {
+            $originalData = $parameters;
             foreach ($parameters as $key => $value) {
                 if (is_array($value)) {
                     //echo $key . $value. '<br />';
@@ -370,10 +377,12 @@ class Database extends functions
             try {
                 $this->stmt = $this->prepare($queryString);
                 preg_match_all("/\?|\:/", $queryString, $matches, PREG_OFFSET_CAPTURE);
+                $withParams = false;
                 if (empty($matches[0])) {
                     //echo $queryString;
                     $executed = $this->stmt->execute();
                 } else {
+                    $withParams = true;
                     $executed = $this->stmt->execute($parameters);
                 }
             } catch (PDOException $PDOException) {
@@ -382,31 +391,41 @@ class Database extends functions
 
                     return false;
                 } else {
-                    if ($_SESSION['config']['debug'] == 'true') {
-                        $_SESSION['error'] = $PDOException->getMessage();
-                        $_SESSION['error'] .= ' ====================== ';
-                        $_SESSION['error'] .= $queryString;
-                        $_SESSION['error'] .= ' ====================== ';
-                        $_SESSION['error'] .= $PDOException->getTraceAsString();
-                        //echo $queryString;
-                        //var_export($parameters);
-                        $file = fopen('queries_error.log', a);
-                        fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $queryString . PHP_EOL);
-                        $param = explode('?', $queryString);
-                        $paramNew = [];
-                        $paramQuery = '';
-                        for ($i=1;$i<count($param);$i++) {
-                            if ($i==(count($param)-1)) {
-                                $paramQuery .= "'" . $parameters[$i-1] . "'";
-                            } else {
-                                $paramQuery .= "'" . $parameters[$i-1] . "', ";
-                            }
+                    if (strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false) {
+                        //echo 'catch error:' . $PDOException->getMessage() .  '<br />';
+                        $db = new Database();
+                        if ($originalData) {
+                            $db->query($originalQuery, $originalData);
+                        } else {
+                            $db->query($originalQuery);
                         }
-                        $queryString = $param[0] . ' ' . $paramQuery . ' ' . $param[count($param)-1];
-                        fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $queryString . PHP_EOL);
-                        fclose($file);
+                    } else {
+                        if ($_SESSION['config']['debug'] == 'true') {
+                            $_SESSION['error'] = $PDOException->getMessage();
+                            $_SESSION['error'] .= ' ====================== ';
+                            $_SESSION['error'] .= $queryString;
+                            $_SESSION['error'] .= ' ====================== ';
+                            $_SESSION['error'] .= $PDOException->getTraceAsString();
+                            //echo $queryString;
+                            //var_export($parameters);
+                            $file = fopen('queries_error.log', a);
+                            fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $queryString . PHP_EOL);
+                            $param = explode('?', $queryString);
+                            $paramNew = [];
+                            $paramQuery = '';
+                            for ($i=1;$i<count($param);$i++) {
+                                if ($i==(count($param)-1)) {
+                                    $paramQuery .= "'" . $parameters[$i-1] . "'";
+                                } else {
+                                    $paramQuery .= "'" . $parameters[$i-1] . "', ";
+                                }
+                            }
+                            $queryString = $param[0] . ' ' . $paramQuery . ' ' . $param[count($param)-1];
+                            fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $queryString . PHP_EOL);
+                            fclose($file);
+                        }
+                        throw $PDOException; 
                     }
-                    throw $PDOException;
                 }
             }
         }
@@ -486,7 +505,6 @@ class Database extends functions
                 ' ' . $order_by .
                 ' ' . $limit_clause;
         }
-        
         return $query;
         
     }
