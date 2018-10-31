@@ -57,7 +57,7 @@ foreach($events as $event) {
 	$note = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Lien vers la page détail
-    $urlToApp = str_replace('//', '/', $maarchUrl . '/apps/' . $maarchApps . '/index.php?');
+    $urlToApp = trim($maarchUrl, '/').'/apps/'.trim($maarchApps, '/').'/index.php?';
     $note['linktodoc'] = $urlToApp . 'display=true&page=view_resource_controler&dir=indexing_searching&id=' . $note['res_id'];
     $note['linktodetail'] = $urlToApp . 'page=details&dir=indexing_searching&id=' . $note['res_id'];
     $note['linktoprocess'] = $urlToApp . 'page=view_baskets&module=basket&baskets=MyBasket&directLinkToAction&resid=' . $note['res_id'];

@@ -86,17 +86,19 @@ while ($state != 'END') {
                     $logger->write('GROUP: '.$line2->group_id.' ... '.$rowCount3.' user(s) to notify', 'INFO');
                     $z = 1;
                     while ($line3 = $stmt3->fetchObject()) {
+                        $real_user_id = '';
                         $whereClause = $secCtrl->process_security_where_clause($line->basket_clause, $line3->user_id);
                         $whereClause = $entities->process_where_clause($whereClause, $line3->user_id);
                         $user_id = $line3->user_id;
                         $query = 'SELECT new_user FROM user_abs WHERE user_abs = ? AND basket_id = ?';
                         $redirStmt = $db->query($query, array($line3->user_id,$line->basket_id));
                         $queryResult = $redirStmt->fetchObject();
-                        if($queryResult){
+                        if ($queryResult) {
                             $abs_user = $queryResult;
+                            $real_user_id = $user_id;
                             $user_id = $abs_user->new_user;
                         }
-                             
+
 
                         $stmt4 = $db->query('SELECT res_id FROM res_view_letterbox '.$whereClause);
                         if (!empty($stmt4)) {
@@ -104,7 +106,11 @@ while ($state != 'END') {
                             $logger->write($userNbDoc.' document(s) to process for '.$line3->user_id, 'INFO');
                             $i = 1;
                             $info = 'Notification ['.$line->basket_id.'] pour '.$line3->user_id;
-                            $stmt6 = $db->query('SELECT record_id FROM notif_event_stack WHERE event_info = ? and user_id = ?', array($info, $line3->user_id));
+                            if (!empty($real_user_id)) {
+                                $stmt6 = $db->query('SELECT record_id FROM notif_event_stack WHERE event_info = ? and (user_id = ? OR user_id = ?)', array($info, $line3->user_id, $user_id));
+                            } else {
+                                $stmt6 = $db->query('SELECT record_id FROM notif_event_stack WHERE event_info = ? and user_id = ?', array($info, $line3->user_id));
+                            }
                             $aRecordId = [];
                             while ($line6 = $stmt6->fetchObject()) {
                                 $aRecordId[$line6->record_id] = $line6->record_id;
@@ -304,7 +310,9 @@ array_map('unlink', glob($_SESSION['config']['tmppath'].'/*.html'));
 
 $logger->write('End of process', 'INFO');
 Bt_logInDataBase(
-    $totalEventsToProcess, 0, $totalNotificationsToProcess.' notification(s) processed without error'
+    $totalEventsToProcess,
+    0,
+    $totalNotificationsToProcess.' notification(s) processed without error'
 );
 
 //unlink($GLOBALS['lckFile']);
