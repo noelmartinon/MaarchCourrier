@@ -77,8 +77,8 @@ foreach ($events as $event) {
     $stmt = $dbDatasource->query($query, $arrayPDO);
     $res = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Lien vers la page d�tail
-    $urlToApp = str_replace('//', '/', $maarchUrl.'/apps/'.$maarchApps.'/index.php?');
+    // Lien vers la page detail
+    $urlToApp = trim($maarchUrl, '/').'/apps/'.trim($maarchApps, '/').'/index.php?';
     $res['linktodoc'] = $urlToApp.'display=true&page=view_resource_controler&dir=indexing_searching&id='.$res['res_id'];
     $res['linktodetail'] = $urlToApp.'page=details&dir=indexing_searching&id='.$res['res_id'];
     $res['linktoprocess'] = $urlToApp.'page=view_baskets&module=basket&baskets=MyBasket&directLinkToAction&resid='.$res['res_id'];
