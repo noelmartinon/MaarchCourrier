@@ -35,9 +35,6 @@ $logFile = 'log/' . date('Y-m-d_H-i-s') . '.log';
 $file = new FileHandler($logFile);
 $GLOBALS['logger']->add_handler($file);
 
-//error mode and function
-error_reporting(E_ERROR);
-set_error_handler(errorHandler);
 // global vars of the program
 /**
 * Name of the config (usefull for multi instance)
