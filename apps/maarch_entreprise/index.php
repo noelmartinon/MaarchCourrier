@@ -352,6 +352,15 @@ if ($_REQUEST['page'] && empty($_REQUEST['triggerAngular'])) {
         }
     }
 
+    include_once 'core/init.php';
+
+    if (isset($_SESSION['HTTP_REFERER'])) {
+        $url = $_SESSION['HTTP_REFERER'];
+        unset($_SESSION['HTTP_REFERER']);
+        header('location: '.$url);
+        exit;
+    }
+
     //INIT ANGULAR MODE
     if (!empty($_REQUEST['triggerAngular']) && $_REQUEST['triggerAngular'] == 'changePass') {
         ?><script>triggerAngular('#/password-modification')</script><?php
