@@ -788,7 +788,7 @@ export class ProfileComponent extends AutoCompletePlugin implements OnInit {
                         }
                     } else if (rule.label == 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
-                        this.passwordRules.historyLastUse.value = rule.value
+                        this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
                             otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2']+'.');
                         }
@@ -798,40 +798,38 @@ export class ProfileComponent extends AutoCompletePlugin implements OnInit {
                 this.ruleText = ruleTextArr.join(', ');
                 this.otherRuleText = otherRuleTextArr.join('<br/>');
                 this.firstFormGroup.controls["newPasswordCtrl"].setValidators(valArr);
-            }, (err) => {
+            }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
 
-            this.firstFormGroup = this._formBuilder.group({
-                newPasswordCtrl: [
-                    ''
-                ],
-                retypePasswordCtrl: [
-                    '',
-                    Validators.compose([Validators.required])
-                ],
-                currentPasswordCtrl: [
-                    '',
-                    Validators.compose([Validators.required])
-                ]
-    
-            }, {
-                    validator: this.matchValidator
-                });
-        this.validPassword =false;
-        this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null)
-        this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null)
-        this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null)
+        this.firstFormGroup = this._formBuilder.group({
+            newPasswordCtrl: [
+                ''
+            ],
+            retypePasswordCtrl: [
+                '',
+                Validators.compose([Validators.required])
+            ],
+            currentPasswordCtrl: [
+                '',
+                Validators.compose([Validators.required])
+            ]
+        }, {
+            validator: this.matchValidator
+        });
+        this.validPassword = false;
+        this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null);
+        this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
+        this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         this.selectedIndex = 0;
         this.showPassword = true;
     }
 
     matchValidator(group: FormGroup) {
-
         if (group.controls['newPasswordCtrl'].value == group.controls['retypePasswordCtrl'].value) {
             return false;
         } else {
-            group.controls['retypePasswordCtrl'].setErrors({'mismatch': true})
+            group.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
             return {'mismatch': true};
         }
     }
@@ -858,7 +856,7 @@ export class ProfileComponent extends AutoCompletePlugin implements OnInit {
             return this.lang.passwordcomplexitySpecial + ' !';
 
         } else {
-            this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null)
+            this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
             this.validPassword = true;
             return '';
         }

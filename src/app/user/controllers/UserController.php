@@ -113,11 +113,15 @@ class UserController
         $user['allEntities'] = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']]);
         $user['baskets'] = BasketModel::getBasketsByUserId(['userId' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']]);
         $user['history'] = HistoryModel::getByUserId(['userId' => $user['user_id'], 'select' => ['event_type', 'event_date', 'info', 'remote_ip']]);
-        $user['canModifyPassword'] = true;
+        $user['canModifyPassword'] = false;
+        $user['canResetPassword'] = true;
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
-        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS)) {
-            $user['canModifyPassword'] = false;
+        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS) && $user['loginmode'] != 'restMode') {
+            $user['canResetPassword'] = false;
+        }
+        if ($user['loginmode'] == 'restMode') {
+            $user['canModifyPassword'] = true;
         }
 
         return $response->withJson($user);
@@ -292,6 +296,43 @@ class UserController
         }
 
         UserModel::resetPassword(['id' => $aArgs['id']]);
+
+        return $response->withJson(['success' => 'success']);
+    }
+
+    public function updatePassword(Request $request, Response $response, array $aArgs)
+    {
+        $error = $this->hasUsersRights(['id' => $aArgs['id']]);
+        if (!empty($error['error'])) {
+            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
+        }
+
+        $data = $request->getParams();
+
+        $check = Validator::stringType()->notEmpty()->validate($data['currentPassword']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['newPassword']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($data['reNewPassword']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id', 'loginmode']]);
+        if ($user['loginmode'] != 'restMode') {
+            return $response->withStatus(403)->withJson(['errors' => 'Not allowed']);
+        }
+
+        if ($data['newPassword'] != $data['reNewPassword']) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        } elseif (!AuthenticationModel::authentication(['userId' => $user['user_id'], 'password' => $data['currentPassword']])) {
+            return $response->withStatus(401)->withJson(['errors' => _WRONG_PSW]);
+        } elseif (!PasswordController::isPasswordValid(['password' => $data['newPassword']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Password does not match security criteria']);
+        } elseif (!PasswordModel::isPasswordHistoryValid(['password' => $data['newPassword'], 'userSerialId' => $aArgs['id']])) {
+            return $response->withStatus(400)->withJson(['errors' => _ALREADY_USED_PSW]);
+        }
+
+        UserModel::updatePassword(['id' => $aArgs['id'], 'password' => $data['newPassword']]);
+        PasswordModel::setHistoryPassword(['userSerialId' => $aArgs['id'], 'password' => $data['newPassword']]);
 
         return $response->withJson(['success' => 'success']);
     }

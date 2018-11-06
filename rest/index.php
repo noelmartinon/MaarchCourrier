@@ -283,6 +283,7 @@ $app->post('/users', \User\controllers\UserController::class . ':create');
 $app->get('/users/{id}/details', \User\controllers\UserController::class . ':getDetailledById');
 $app->put('/users/{id}', \User\controllers\UserController::class . ':update');
 $app->put('/users/{id}/password', \User\controllers\UserController::class . ':resetPassword');
+$app->put('/users/{id}/modifyPassword', \User\controllers\UserController::class . ':updatePassword');
 $app->get('/users/{userId}/status', \User\controllers\UserController::class . ':getStatusByUserId');
 $app->put('/users/{id}/status', \User\controllers\UserController::class . ':updateStatus');
 $app->delete('/users/{id}', \User\controllers\UserController::class . ':delete');

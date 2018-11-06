@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { MatSidenav, MatPaginator, MatTableDataSource, MatSort, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { FormControl, FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
 import { NotificationService } from '../../notification.service';
 import { HeaderService }        from '../../../service/header.service';
 
@@ -55,6 +56,25 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
     CurrentYear                     : number    = new Date().getFullYear();
     currentMonth                    : number    = new Date().getMonth() + 1;
     minDate                         : Date      = new Date();
+    firstFormGroup                  : FormGroup;
+    ruleText                        : string = '';
+    otherRuleText                   : string;
+    validPassword                   : boolean = false;
+    showPassword                    : boolean = false;
+    hidePassword                    : boolean = true;
+    passwordModel                   : any = {
+        currentPassword : "",
+        newPassword     : "",
+        reNewPassword   : ""
+    };
+    passwordRules                   : any = {
+        minLength           : { enabled: false, value: 0 },
+        complexityUpper     : { enabled: false, value: 0 },
+        complexityNumber    : { enabled: false, value: 0 },
+        complexitySpecial   : { enabled: false, value: 0 },
+        renewal             : { enabled: false, value: 0 },
+        historyLastUse      : { enabled: false, value: 0 }
+    };
 
     displayedColumns    = ['event_date', 'event_type', 'info', 'remote_ip'];
     dataSource          = new MatTableDataSource(this.data);
@@ -82,7 +102,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
     }
 
 
-    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, private route: ActivatedRoute, private router: Router, private zone: NgZone, private notify: NotificationService, public dialog: MatDialog, private headerService: HeaderService) {
+    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, private route: ActivatedRoute, private router: Router, private zone: NgZone, private notify: NotificationService, public dialog: MatDialog, private headerService: HeaderService, private _formBuilder: FormBuilder) {
         super(http, ['users']);
         $j("link[href='merged_css.php']").remove();
         this.mobileQuery = media.matchMedia('(max-width: 768px)');
@@ -235,7 +255,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         this.selectedSignatureLabel = this.user.signatures[index].signature_label;
     }
 
-    resetPassword(user: any) {
+    resetPassword() {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.resetPsw);
 
         if (r) {
@@ -523,7 +543,161 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
                 this.notify.success(this.lang.absOff);
-            }, (err) => {
+            }, (err: any) => {
+                this.notify.error(err.error.errors);
+            });
+    }
+
+    getErrorMessage() {
+        if (this.firstFormGroup.controls['newPasswordCtrl'].value != this.firstFormGroup.controls['retypePasswordCtrl'].value) {
+            this.firstFormGroup.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
+        } else {
+            this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
+        }
+        if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('required')) {
+            return this.lang.requiredField + ' !';
+
+        } else if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('minlength') && this.passwordRules.minLength.enabled) {
+            return this.passwordRules.minLength.value + ' ' + this.lang.passwordminLength + ' !';
+
+        } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityUpper !== undefined && this.passwordRules.complexityUpper.enabled) {
+            return this.lang.passwordcomplexityUpper + ' !';
+
+        } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityNumber !== undefined && this.passwordRules.complexityNumber.enabled) {
+            return this.lang.passwordcomplexityNumber + ' !';
+
+        } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexitySpecial !== undefined && this.passwordRules.complexitySpecial.enabled) {
+            return this.lang.passwordcomplexitySpecial + ' !';
+
+        } else {
+            this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
+            this.validPassword = true;
+            return '';
+        }
+    }
+
+    matchValidator(group: FormGroup) {
+        if (group.controls['newPasswordCtrl'].value == group.controls['retypePasswordCtrl'].value) {
+            return false;
+        } else {
+            group.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
+            return {'mismatch': true};
+        }
+    }
+
+    regexValidator(regex: RegExp, error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            const valid = regex.test(control.value);
+            return valid ? null : error;
+        };
+    }
+
+    changePasswd() {
+        this.http.get(this.coreUrl + 'rest/passwordRules')
+            .subscribe((data: any) => {
+                let valArr : ValidatorFn[] = [];
+                let ruleTextArr: String[] = [];
+                let otherRuleTextArr: String[] = [];
+
+                valArr.push(Validators.required);
+
+                data.rules.forEach((rule: any) => {
+                    if (rule.label == 'minLength') {
+                        this.passwordRules.minLength.enabled = rule.enabled;
+                        this.passwordRules.minLength.value = rule.value;
+                        if (rule.enabled) {
+                            valArr.push(Validators.minLength(this.passwordRules.minLength.value));
+                            ruleTextArr.push(rule.value + ' ' + this.lang['password' + rule.label]);
+                        }
+
+
+                    } else if (rule.label == 'complexityUpper') {
+                        this.passwordRules.complexityUpper.enabled = rule.enabled;
+                        this.passwordRules.complexityUpper.value = rule.value;
+                        if (rule.enabled) {
+                            valArr.push(this.regexValidator(new RegExp('[A-Z]'), { 'complexityUpper': '' }));
+                            ruleTextArr.push(this.lang['password' + rule.label]);
+                        }
+
+
+                    } else if (rule.label == 'complexityNumber') {
+                        this.passwordRules.complexityNumber.enabled = rule.enabled;
+                        this.passwordRules.complexityNumber.value = rule.value;
+                        if (rule.enabled) {
+                            valArr.push(this.regexValidator(new RegExp('[0-9]'), { 'complexityNumber': '' }));
+                            ruleTextArr.push(this.lang['password' + rule.label]);
+                        }
+
+
+                    } else if (rule.label == 'complexitySpecial') {
+                        this.passwordRules.complexitySpecial.enabled = rule.enabled;
+                        this.passwordRules.complexitySpecial.value = rule.value;
+                        if (rule.enabled) {
+                            valArr.push(this.regexValidator(new RegExp('[^A-Za-z0-9]'), { 'complexitySpecial': '' }));
+                            ruleTextArr.push(this.lang['password' + rule.label]);
+                        }
+                    } else if (rule.label == 'renewal') {
+                        this.passwordRules.renewal.enabled = rule.enabled;
+                        this.passwordRules.renewal.value = rule.value;
+                        if (rule.enabled) {
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label]+'.');
+                        }
+                    } else if (rule.label == 'historyLastUse') {
+                        this.passwordRules.historyLastUse.enabled = rule.enabled;
+                        this.passwordRules.historyLastUse.value = rule.value;
+                        if (rule.enabled) {
+                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2']+'.');
+                        }
+                    }
+
+                });
+                this.ruleText = ruleTextArr.join(', ');
+                this.otherRuleText = otherRuleTextArr.join('<br/>');
+                this.firstFormGroup.controls["newPasswordCtrl"].setValidators(valArr);
+            }, (err: any) => {
+                this.notify.error(err.error.errors);
+            });
+
+        this.firstFormGroup = this._formBuilder.group({
+            newPasswordCtrl: [
+                ''
+            ],
+            retypePasswordCtrl: [
+                '',
+                Validators.compose([Validators.required])
+            ],
+            currentPasswordCtrl: [
+                '',
+                Validators.compose([Validators.required])
+            ]
+        }, {
+            validator: this.matchValidator
+        });
+
+        this.validPassword = false;
+        this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null);
+        this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
+        this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
+        this.showPassword = true;
+    }
+
+    updatePassword() {
+        this.passwordModel.currentPassword = this.firstFormGroup.controls['currentPasswordCtrl'].value;
+        this.passwordModel.newPassword = this.firstFormGroup.controls['newPasswordCtrl'].value;
+        this.passwordModel.reNewPassword = this.firstFormGroup.controls['retypePasswordCtrl'].value;
+        this.http.put(this.coreUrl + 'rest/users/' + this.serialId + '/modifyPassword', this.passwordModel)
+            .subscribe(() => {
+                this.showPassword = false;
+                this.passwordModel = {
+                    currentPassword: "",
+                    newPassword: "",
+                    reNewPassword: "",
+                };
+                this.notify.success(this.lang.passwordUpdated);
+            }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
     }

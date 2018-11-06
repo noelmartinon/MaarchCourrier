@@ -85,6 +85,7 @@ export const LANG_FR = {
     "cases"                             : "Affaires",
     "case"                              : "Affaire",
     "changeMyPassword"                  : "Modifier mon mot de passe",
+    "changePassword"                    : "Modifier le mot de passe",
     "chooseBasket"                      : "Choisissez une bannette",
     "chooseCategoryAssociation"         : "Choisissez une ou plusieurs catégories associée",
     "chooseCategoryAssociationHelp"     : "Si aucune catégorie sélectionnée alors l'action est valable pour toutes les catégories",
