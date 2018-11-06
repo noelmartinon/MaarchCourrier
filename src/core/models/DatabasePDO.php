@@ -195,6 +195,12 @@ class DatabasePDO
         return ['where' => $where, 'limit' => $limit];
     }
 
+    public function reset()
+    {
+        $this->pdo = null;
+        self::$preparedQueries = [];
+    }
+
     public function getType()
     {
         return self::$type;

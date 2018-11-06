@@ -15,6 +15,10 @@ foreach ($customs as $custom) {
         continue;
     }
 
+    if (!empty($db)) {
+        $db->reset();
+    }
+
     $db = new \SrcCore\models\DatabasePDO(['customId' => $custom]);
 
     $query = "SELECT r2.res_id as convert_res_id from res_view_attachments r LEFT JOIN res_view_attachments r2 ON REGEXP_REPLACE(r.filename, '\.(.)*$', '') = REGEXP_REPLACE(r2.filename, '\.(.)*$', '') LEFT JOIN docservers d ON d.docserver_id = r2.docserver_id WHERE r.status in ('DEL', 'OBS', 'TMP') AND r.attachment_type <> 'converted_pdf' AND r2.attachment_type = 'converted_pdf' AND r.res_id <> 0";
