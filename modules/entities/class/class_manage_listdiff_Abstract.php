@@ -466,9 +466,24 @@ abstract class diffusion_list_Abstract extends functions
                 }
                 //Modification du dest_user dans la table res_letterbox
                 if ($role_id == 'dest' && $collId == 'letterbox_coll') {
-                    $stmt = $db->query("SELECT object_id FROM listmodels WHERE item_id = ?", [$userId]);
-                    $resEntityId = $stmt->fetch();
-                    $stmt = $db->query('update res_letterbox set dest_user = ?, destination = ? where res_id = ?', array($userId, $resEntityId['object_id'], $resId));
+                    $resEntities = \User\models\UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$userId]]);
+                    $mailDestination = \Resource\models\ResModel::getById(['select' => ['destination'], 'resId' => $resId]);
+
+                    $entityFound = false;
+                    $primaryEntity = '';
+                    foreach ($resEntities as $key => $value) {
+                        if ($mailDestination['destination'] == $value['entity_id']) {
+                            $entityFound = true;
+                        }
+                        if ($value['primary_entity'] == 'Y') {
+                            $primaryEntity = $value['entity_id'];
+                        }
+                    }
+                    if ($entityFound) {
+                        $stmt = $db->query('update res_letterbox set dest_user = ? where res_id = ?', array($userId, $resId));
+                    } else {
+                        $stmt = $db->query('update res_letterbox set dest_user = ?, destination = ? where res_id = ?', array($userId, $primaryEntity, $resId));
+                    }
                 }
 
                 if ($processDate != '') {

@@ -374,10 +374,26 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 );
             }
             
-            $stmt = $db->query("update ".$table." set dest_user = ? where res_id = ?", array($new_dest,$res_id));
-            $stmt = $db->query("SELECT object_id FROM listmodels WHERE item_id = ?", [$new_dest]);
-            $resEntityId = $stmt->fetch();
-            $entityId = $resEntityId['object_id'];
+            // Update destination if needed
+            $resEntities = \User\models\UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$new_dest]]);
+            $mailDestination = \Resource\models\ResModel::getById(['select' => ['destination'], 'resId' => $res_id]);
+
+            $entityFound = false;
+            $primaryEntity = '';
+            foreach ($resEntities as $key => $value) {
+                if ($mailDestination['destination'] == $value['entity_id']) {
+                    $entityFound = true;
+                }
+                if ($value['primary_entity'] == 'Y') {
+                    $primaryEntity = $value['entity_id'];
+                }
+            }
+            if ($entityFound) {
+                $stmt = $db->query('update res_letterbox set dest_user = ? where res_id = ?', array($new_dest, $res_id));
+            } else {
+                $stmt = $db->query('update res_letterbox set dest_user = ?, destination = ? where res_id = ?', array($new_dest, $primaryEntity, $res_id));
+            }
+
             // If new dest was in other roles, get number of views
             $stmt = $db->query(
                 "select viewed"
@@ -389,24 +405,20 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
             $viewed = $res->viewed;
             $new_difflist['dest']['users'][0]['viewed'] = (integer)$viewed;
         }
-        
-        // Update destination if needed
-        if ($entityId) {
-            if ($formValues['note_content_to_dep'] != '') {
-                //Add notes
-                $userIdTypist = $_SESSION['user']['UserId'];
-                $content_note = $formValues['note_content_to_dep'];
-                $content_note = str_replace(";", ".", $content_note);
-                $content_note = str_replace("--", "-", $content_note);
-                $content_note = str_replace("___", "\n", $content_note);
-                
-                $stmt = $db->query(
-                    "INSERT INTO notes (identifier, tablename, user_id, "
-                            . "date_note, note_text, coll_id ) VALUES (?,?,?,CURRENT_TIMESTAMP,?,?)",
-                    array($res_id, $table, $userIdTypist, $content_note, $coll_id)
-                );
-            }
-            $stmt = $db->query("update ".$table." set destination = ? where res_id = ?", array($entityId, $res_id));
+
+        if ($formValues['note_content_to_dep'] != '') {
+            //Add notes
+            $userIdTypist = $_SESSION['user']['UserId'];
+            $content_note = $formValues['note_content_to_dep'];
+            $content_note = str_replace(";", ".", $content_note);
+            $content_note = str_replace("--", "-", $content_note);
+            $content_note = str_replace("___", "\n", $content_note);
+            
+            $stmt = $db->query(
+                "INSERT INTO notes (identifier, tablename, user_id, "
+                        . "date_note, note_text, coll_id ) VALUES (?,?,?,CURRENT_TIMESTAMP,?,?)",
+                array($res_id, $table, $userIdTypist, $content_note, $coll_id)
+            );
         }
 
         $new_difflist = $diffList->list_difflist_roles_to_keep($res_id, $coll_id, $new_difflist['difflist_type'], $new_difflist);
