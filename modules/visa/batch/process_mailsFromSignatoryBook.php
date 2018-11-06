@@ -202,8 +202,8 @@ try {
     exit();
 }
 
-if (!empty($db)) {
-    $db->reset();
+if (!empty($GLOBALS['db'])) {
+    $GLOBALS['db']->reset();
 }
 
 $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
