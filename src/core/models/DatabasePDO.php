@@ -16,7 +16,6 @@ namespace SrcCore\models;
 
 class DatabasePDO
 {
-
     private $pdo;
     private static $type            = null;
     private static $preparedQueries = [];
@@ -194,12 +193,6 @@ class DatabasePDO
         }
 
         return ['where' => $where, 'limit' => $limit];
-    }
-
-    public static function reset()
-    {
-        $this->pdo = null;
-        self::$preparedQueries = [];
     }
 
     public function getType()
