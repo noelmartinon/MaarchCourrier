@@ -391,7 +391,9 @@ class Database extends functions
 
                     return false;
                 } else {
-                    if (strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false) {
+                    if (strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false || 
+                        strpos($PDOException->getMessage(), 'General error: 7') !== false
+                    ) {
                         //echo 'catch error:' . $PDOException->getMessage() .  '<br />';
                         $db = new Database();
                         if ($originalData) {
