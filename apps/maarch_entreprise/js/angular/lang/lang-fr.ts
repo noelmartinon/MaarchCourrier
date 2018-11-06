@@ -73,6 +73,7 @@ export const LANG_FR = {
     "cantMoveFirstLevel"                : "La sous-chemise peut uniquement être déplacée dans une chemise",
     "cases"                             : "Affaires",
     "changeMyPassword"                  : "Modifier mon mot de passe",
+    "changePassword"                    : "Modifier le mot de passe",
     "chooseBasket"                      : "Choisissez une bannette",
     "chooseCategoryAssociation"         : "Choisissez une ou plusieurs catégories associée",
     "chooseCategoryAssociationHelp"     : "Si aucune catégorie sélectionnée alors l'action est valable pour toutes les catégories",

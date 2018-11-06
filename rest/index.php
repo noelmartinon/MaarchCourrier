@@ -85,7 +85,15 @@ if (strpos(getcwd(), '/rest')) {
 $userId = null;
 if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
     if (\SrcCore\models\SecurityModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
-        $userId = $_SERVER['PHP_AUTH_USER'];
+        $loginMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
+        if ($loginMethod['id'] != 'standard') {
+            $user = \User\models\UserModel::getByUserId(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
+            if ($user['loginmode'] == 'restMode') {
+                $userId = $_SERVER['PHP_AUTH_USER'];
+            }
+        } else {
+            $userId = $_SERVER['PHP_AUTH_USER'];
+        }
     }
 } else {
     $cookie = \SrcCore\models\SecurityModel::getCookieAuth();
@@ -265,6 +273,7 @@ $app->post('/users', \User\controllers\UserController::class . ':create');
 $app->get('/users/{id}/details', \User\controllers\UserController::class . ':getDetailledById');
 $app->put('/users/{id}', \User\controllers\UserController::class . ':update');
 $app->put('/users/{id}/password', \User\controllers\UserController::class . ':resetPassword');
+$app->put('/users/{id}/modifyPassword', \User\controllers\UserController::class . ':updatePassword');
 $app->get('/users/{userId}/status', \User\controllers\UserController::class . ':getStatusByUserId');
 $app->put('/users/{id}/status', \User\controllers\UserController::class . ':updateStatus');
 $app->delete('/users/{id}', \User\controllers\UserController::class . ':delete');

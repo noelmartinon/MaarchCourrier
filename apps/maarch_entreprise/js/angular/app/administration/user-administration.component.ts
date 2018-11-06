@@ -50,6 +50,13 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
     CurrentYear                     : number    = new Date().getFullYear();
     currentMonth                    : number    = new Date().getMonth() + 1;
     minDate                         : Date      = new Date();
+    showPassword                    : boolean = false;
+    hidePassword                    : boolean = true;
+    passwordModel                   : any = {
+        currentPassword : "",
+        newPassword     : "",
+        reNewPassword   : ""
+    };
 
     displayedColumns    = ['event_date', 'event_type', 'info', 'remote_ip'];
     dataSource          = new MatTableDataSource(this.data);
@@ -474,6 +481,21 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                 this.user.status = data.user.status;
                 this.notify.success(this.lang.absOff);
             }, (err) => {
+                this.notify.error(err.error.errors);
+            });
+    }
+
+    updatePassword() {
+        this.http.put(this.coreUrl + 'rest/users/' + this.serialId + '/modifyPassword', this.passwordModel)
+            .subscribe(() => {
+                this.showPassword = false;
+                this.passwordModel = {
+                    currentPassword: "",
+                    newPassword: "",
+                    reNewPassword: "",
+                };
+                this.notify.success(this.lang.passwordUpdated);
+            }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
     }

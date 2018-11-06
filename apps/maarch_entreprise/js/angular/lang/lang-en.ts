@@ -62,6 +62,7 @@ export const LANG_EN = {
     "cancel"                            : "Cancel",
     "cases"                             : "Cases",
     "changeMyPassword"                  : "Change my password",
+    "changePassword"                    : "Change password",
     "chooseBasket"                      : "Choose a basket",
     "chooseCategoryAssociation"         : "Choose one or some associatedd categories",
     "chooseDefaultAction"               : "Choose main action",

@@ -34,10 +34,16 @@
                         {{lang.desactivateAbsence}}
                     </p>
                 </a>
-                <a mat-list-item *ngIf="!creationMode && !loading && user.canModifyPassword" (click)="resetPassword(user)">
+                <a mat-list-item *ngIf="!creationMode && !loading && user.canResetPassword" (click)="resetPassword(user)">
                     <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
                     <p mat-line>
                         {{lang.reinitPassword}}
+                    </p>
+                </a>
+                <a *ngIf="user.canModifyPassword" mat-list-item (click)="changePasswd();">
+                    <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
+                    <p mat-line>
+                        {{lang.changePassword}}
                     </p>
                 </a>
             </mat-nav-list>
@@ -50,8 +56,56 @@
             <mat-card *ngIf="!loading" class="card-app-content">
                 <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectChange)="initService()">
                     <mat-tab label="Informations">
-                        <div *ngIf="user.status == 'ABS'" class="text-warning" style="position: absolute;opacity: 0.25;font-size: 120px;transform: rotate(324deg);-webkit-transform: rotate(324deg);margin-left: 35%;margin-top: 90px;">{{user.status}}</div>
-                        <form class="form-horizontal" (ngSubmit)="onSubmit()" #profileForm="ngForm">
+                        <div *ngIf="showPassword" style="margin-bottom: 5%">
+                            <form [formGroup]="firstFormGroup">
+                                <div class="form-group">
+                                    <mat-form-field style="padding:10px;">
+                                        <input matInput placeholder="{{lang.typeCurrentPassword}}" formControlName="currentPasswordCtrl" required [type]="hidePassword ? 'password' : 'text'">
+                                        <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
+                                        <mat-error *ngIf="firstFormGroup.controls['currentPasswordCtrl'].hasError('required')">{{lang.requiredField}}</mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="form-group">
+                                    <div style="text-align:center;color: rgba(0,0,0,0.54);font-size: 75%;">{{this.ruleText}}</div>
+                                    <div class="col-sm-6" style="padding-left:0px;padding-right: 0px;">
+                                        <mat-form-field style="padding:10px;">
+                                            <input matInput #inputPasswd placeholder="{{lang.typeNewPassword}}" formControlName="newPasswordCtrl" required [type]="hidePassword ? 'password' : 'text'">
+                                            <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
+                                            <mat-hint *ngIf="validPassword">
+                                                <i color="accent" class="fa fa-check"></i>
+                                                <span color="accent">{{lang.passwordValid}}</span>
+                                            </mat-hint>
+                                            <mat-error>{{getErrorMessage()}}</mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-6" style="padding-left:0px;padding-right:0px;">
+                                        <mat-form-field style="padding:10px;">
+                                            <input matInput #inputPasswd2 placeholder="{{lang.retypeNewPassword}}" required [type]="hidePassword ? 'password' : 'text'"
+                                                   formControlName="retypePasswordCtrl">
+                                            <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
+                                            <mat-hint *ngIf="!firstFormGroup.controls['retypePasswordCtrl'].hasError('mismatch') && firstFormGroup.controls['retypePasswordCtrl'].value != ''">
+                                                <i color="accent" class="fa fa-check"></i>
+                                                <span color="accent">{{lang.passwordMatch}}</span>
+                                            </mat-hint>
+                                            <mat-error>{{lang.passwordNotMatch}} !</mat-error>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div *ngIf="passwordRules.renewal.enabled || passwordRules.historyLastUse.enabled" class="form-group">
+                                    <div class="col-sm-12" style="padding-left:0px;padding-right:0px;">
+                                        <div class="alert alert-warning" role="alert" [innerHTML]="otherRuleText" style="text-align:center;"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div style="text-align:center;">
+                                        <button mat-raised-button color="primary" type="button" (click)="updatePassword()" [disabled]="!firstFormGroup.valid">{{lang.update}}</button>
+                                        <button mat-raised-button color="default" type="button" (click)="showPassword=false">{{lang.cancel}}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div *ngIf="user.status == 'ABS' && !showPassword" class="text-warning" style="position: absolute;opacity: 0.25;font-size: 120px;transform: rotate(324deg);-webkit-transform: rotate(324deg);margin-left: 35%;margin-top: 90px;">{{user.status}}</div>
+                        <form class="form-horizontal" (ngSubmit)="onSubmit()" #profileForm="ngForm" *ngIf="!showPassword">
                             <div class="form-group">
                                 <div class="col-sm-12">
                                     <div class="pull-left">
