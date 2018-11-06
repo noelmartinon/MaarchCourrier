@@ -47,14 +47,13 @@ foreach ($customs as $custom) {
             }
         }
 
-        \SrcCore\models\DatabasePDO::reset();
         $db = new \SrcCore\models\DatabasePDO(['customId' => $custom]);
         foreach ($priorities as $key => $priority) {
             if ($priority['default_priority'] == 'true') {
                 $query = "UPDATE priorities SET default_priority = false WHERE default_priority = true";
                 $db->query($query, []);
             }
-                $id = \SrcCore\models\DatabaseModel::uniqueId();
+            $id = \SrcCore\models\DatabaseModel::uniqueId();
             $query = "INSERT INTO priorities (id, label, color, working_days, delays, default_priority, \"order\") VALUES (?, ?, ?, ?, ?, ?, ?)";
             $db->query($query, [
                 $id,
