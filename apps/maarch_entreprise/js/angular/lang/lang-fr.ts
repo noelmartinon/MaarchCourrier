@@ -465,4 +465,9 @@ export const LANG_FR = {
     'inactives'                         : 'Inactif(s)',
     'quota'                             : 'Quota',
     'quotaExceeded'                     : 'Quota dépassé',
+    "typeCurrentPassword"               : "Entrez le mot de passe actuel",
+    "typeNewPassword"                   : "Entrez un nouveau mot de passe",
+    "retypeNewPassword"                 : "Entrez de nouveau le mot de passe",
+    "passwordMatch"                     : "Les mots de passe sont identiques",
+    "passwordNotMatch"                  : "Les mots de passe ne correspondent pas",
 };

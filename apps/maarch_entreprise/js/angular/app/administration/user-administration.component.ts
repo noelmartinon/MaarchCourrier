@@ -543,6 +543,10 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
             this.user.loginmode = "standard";
         }
     }
+
+    changePasswd() {
+        this.showPassword = true;
+    }
 }
 
 @Component({

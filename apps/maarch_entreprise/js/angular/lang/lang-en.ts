@@ -445,4 +445,9 @@ export const LANG_EN = {
     "deleteAssignation"                 : "Delete assignation",
     "webserviceAccount"                 : "Webservice account",
     "webserviceAccountDesc"             : "If enabled, this account cannot be used to login in application (in graphic mode).",
+    "typeCurrentPassword"               : "Type current password",
+    "typeNewPassword"                   : "Type new password",
+    "retypeNewPassword"                 : "Retype new password",
+    "passwordMatch"                     : "Passwords match",
+    "passwordNotMatch"                  : "Passwords does not match",
 };

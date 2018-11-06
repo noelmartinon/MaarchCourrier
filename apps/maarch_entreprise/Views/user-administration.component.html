@@ -57,52 +57,48 @@
                 <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectChange)="initService()">
                     <mat-tab label="Informations">
                         <div *ngIf="showPassword" style="margin-bottom: 5%">
-                            <form [formGroup]="firstFormGroup">
                                 <div class="form-group">
                                     <mat-form-field style="padding:10px;">
-                                        <input matInput placeholder="{{lang.typeCurrentPassword}}" formControlName="currentPasswordCtrl" required [type]="hidePassword ? 'password' : 'text'">
+                                        <input matInput placeholder="{{lang.typeCurrentPassword}}" required [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="this.passwordModel.currentPassword">
                                         <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
-                                        <mat-error *ngIf="firstFormGroup.controls['currentPasswordCtrl'].hasError('required')">{{lang.requiredField}}</mat-error>
                                     </mat-form-field>
                                 </div>
                                 <div class="form-group">
-                                    <div style="text-align:center;color: rgba(0,0,0,0.54);font-size: 75%;">{{this.ruleText}}</div>
                                     <div class="col-sm-6" style="padding-left:0px;padding-right: 0px;">
                                         <mat-form-field style="padding:10px;">
-                                            <input matInput #inputPasswd placeholder="{{lang.typeNewPassword}}" formControlName="newPasswordCtrl" required [type]="hidePassword ? 'password' : 'text'">
+                                            <input matInput #inputPasswd placeholder="{{lang.typeNewPassword}}" required [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="this.passwordModel.newPassword">
                                             <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
-                                            <mat-hint *ngIf="validPassword">
+                                            <mat-hint *ngIf="this.passwordModel.reNewPassword == this.passwordModel.newPassword && this.passwordModel.newPassword.length > 0">
                                                 <i color="accent" class="fa fa-check"></i>
-                                                <span color="accent">{{lang.passwordValid}}</span>
+                                                <span color="accent">{{lang.passwordMatch}}</span>
                                             </mat-hint>
-                                            <mat-error>{{getErrorMessage()}}</mat-error>
+                                            <mat-hint *ngIf="this.passwordModel.reNewPassword != this.passwordModel.newPassword && this.passwordModel.newPassword.length > 0">
+                                                <i color="warn" class="fa fa-times"></i>
+                                                <span color="warn">{{lang.passwordNotMatch}} !</span>
+                                            </mat-hint>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-6" style="padding-left:0px;padding-right:0px;">
                                         <mat-form-field style="padding:10px;">
-                                            <input matInput #inputPasswd2 placeholder="{{lang.retypeNewPassword}}" required [type]="hidePassword ? 'password' : 'text'"
-                                                   formControlName="retypePasswordCtrl">
+                                            <input matInput #inputPasswd2 placeholder="{{lang.retypeNewPassword}}" required [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="this.passwordModel.reNewPassword">
                                             <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
-                                            <mat-hint *ngIf="!firstFormGroup.controls['retypePasswordCtrl'].hasError('mismatch') && firstFormGroup.controls['retypePasswordCtrl'].value != ''">
+                                            <mat-hint *ngIf="this.passwordModel.reNewPassword == this.passwordModel.newPassword && this.passwordModel.newPassword.length > 0">
                                                 <i color="accent" class="fa fa-check"></i>
                                                 <span color="accent">{{lang.passwordMatch}}</span>
                                             </mat-hint>
-                                            <mat-error>{{lang.passwordNotMatch}} !</mat-error>
+                                            <mat-hint *ngIf="this.passwordModel.reNewPassword != this.passwordModel.newPassword && this.passwordModel.newPassword.length > 0">
+                                                <i color="warn" class="fa fa-times"></i>
+                                                <span color="warn">{{lang.passwordNotMatch}} !</span>
+                                            </mat-hint>
                                         </mat-form-field>
-                                    </div>
-                                </div>
-                                <div *ngIf="passwordRules.renewal.enabled || passwordRules.historyLastUse.enabled" class="form-group">
-                                    <div class="col-sm-12" style="padding-left:0px;padding-right:0px;">
-                                        <div class="alert alert-warning" role="alert" [innerHTML]="otherRuleText" style="text-align:center;"></div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div style="text-align:center;">
-                                        <button mat-raised-button color="primary" type="button" (click)="updatePassword()" [disabled]="!firstFormGroup.valid">{{lang.update}}</button>
+                                        <button mat-raised-button color="primary" type="button" (click)="updatePassword()" [disabled]="this.passwordModel.reNewPassword != this.passwordModel.newPassword || this.passwordModel.newPassword.length == 0">{{lang.update}}</button>
                                         <button mat-raised-button color="default" type="button" (click)="showPassword=false">{{lang.cancel}}</button>
                                     </div>
                                 </div>
-                            </form>
                         </div>
                         <div *ngIf="user.status == 'ABS' && !showPassword" class="text-warning" style="position: absolute;opacity: 0.25;font-size: 120px;transform: rotate(324deg);-webkit-transform: rotate(324deg);margin-left: 35%;margin-top: 90px;">{{user.status}}</div>
                         <form class="form-horizontal" (ngSubmit)="onSubmit()" #profileForm="ngForm" *ngIf="!showPassword">
