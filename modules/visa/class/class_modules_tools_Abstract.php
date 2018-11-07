@@ -276,7 +276,7 @@ abstract class visa_Abstract extends Database
 
         $db = new Database();
         if (empty($noSignableAttachments)) {
-            $stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP') IN in_signature_book = ?", [$res_id, $coll_id, true]);
+            $stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP') AND in_signature_book = ?", [$res_id, $coll_id, true]);
         } else {
             $stmt = $db->query("SELECT * FROM res_view_attachments WHERE res_id_master = ? AND coll_id = ? AND status NOT IN ('DEL','OBS','TMP') AND attachment_type NOT IN (?) AND in_signature_book = ? ", [$res_id, $coll_id, $noSignableAttachments, true]);
         }

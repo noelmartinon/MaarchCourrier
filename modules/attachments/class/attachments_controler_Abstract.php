@@ -310,7 +310,7 @@ abstract class attachments_controler_Abstract
                                 WHERE cr.res_id = ? and cast(c.contact_id as char) = cast(cr.contact_id as char) and ca.contact_id=c.contact_id and ca.id=cr.address_id", array($_SESSION['doc_id']));
             $i=0;
             while ($multi_contacts_attachment = $stmt->fetchObject()) {
-                if (is_integer($multi_contacts_attachment->contact_id)) {
+                if (is_numeric($multi_contacts_attachment->contact_id)) {
                     $format_contact='';
                     $stmt2 = $db->query('SELECT is_corporate_person, is_private, contact_lastname, contact_firstname, society, society_short, address_num, address_street, address_town, lastname, firstname 
                                     FROM view_contacts 
