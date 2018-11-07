@@ -1417,7 +1417,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                 }
                 unset($data[$arr[$i]]);
             } elseif ($arr[$i] == 'is_multicontacts') {
-                if (!empty($line->{$arr[$i]})) {
+                if (!empty(trim($line->{$arr[$i]}))) {
                     $data['type_contact'] = 'multi_external';
                 }
                 unset($data[$arr[$i]]);
