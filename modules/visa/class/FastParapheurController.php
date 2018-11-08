@@ -55,17 +55,16 @@ class FastParapheurController
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->encodedFile = $response['b64FileContent'];
                     break;
                 }else if($state == $aArgs['config']['data']['refusedState']){
-                    $signatory = \SrcCore\models\DatabaseModel::select([
-                        'select'    => ['user_id', 'firstname', 'lastname'],
-                        'table'     => ['listinstance', 'users'],
-                        'left_join' => ['item_id = user_id',],
-                        'where'     => ['res_id = ?', 'item_mode = ?'],
-                        'data'      => [$aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->res_id_master, 'sign']
-                    ])[0];
+                    $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
+                    $query = $GLOBALS['db']->query(
+                        "SELECT user_id, firstname, lastname FROM listinstance LEFT JOIN users ON item_id = user_id WHERE res_id = ? AND item_mode = ?",
+                        [$aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->res_id_master, 'sign']
+                    );
+                    $res = $query->fetchObject();
 
                     $response = self::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $noVersion->external_id]);
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'refused';
-                    $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $signatory['lastname'] . ' ' . $signatory['firstname'] . ' : ' . $response;
+                    $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $res->lastname . ' ' . $res->firstname . ' : ' . $response;
                     break;
                 }else{
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'waiting';
@@ -94,34 +93,34 @@ class FastParapheurController
             ]);
 
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-            if(!empty($isError ->Fault[0])){
+            if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
                 echo _PJ_NUMBER . $isVersion->res_id . ' ' . _AND_DOC_ORIG . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
             }
 
             $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->historyResponse->children();
-            foreach ($response->return as $res){    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+            foreach ($response->return as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
                 $state = (string) $res->stateName;
-                if($state == $aArgs['config']['data']['validatedState']){
+                if ($state == $aArgs['config']['data']['validatedState']) {
                     $response = self::download(['config' => $aArgs['config'], 'documentId' => $isVersion->external_id]);
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'validated';
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->format = 'pdf';
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->encodedFile = $response['b64FileContent'];
                     break;
-                }else if($state == $aArgs['config']['data']['refusedState']){
-                    $signatory = \SrcCore\models\DatabaseModel::select([
-                        'select'    => ['user_id', 'firstname', 'lastname'],
-                        'table'     => ['listinstance', 'users'],
-                        'left_join' => ['item_id = user_id',],
-                        'where'     => ['res_id = ?', 'item_mode = ?'],
-                        'data'      => [$aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->res_id_master, 'sign']
-                    ])[0];
+                } elseif ($state == $aArgs['config']['data']['refusedState']) {
+                    $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
+                    $query = $GLOBALS['db']->query(
+                        "SELECT user_id, firstname, lastname FROM listinstance LEFT JOIN users ON item_id = user_id WHERE res_id = ? AND item_mode = ?",
+                        [$aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->res_id_master, 'sign']
+                    );
+                    $res = $query->fetchObject();
+
                     $response = self::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $isVersion->external_id]);
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'refused';
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $signatory['lastname'] . ' ' . $signatory['firstname'] . ' : ' . $response;
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $res->lastname . ' ' . $res->firstname . ' : ' . $response;
                     break;
-                }else{
+                } else {
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'waiting';
                 }
             }
@@ -129,7 +128,7 @@ class FastParapheurController
         return $aArgs['idsToRetrieve'];
     }
 
-    public static function upload($aArgs){
+    public static function upload($aArgs) {
         $circuitId          = $aArgs['circuitId'];
         $label              = $aArgs['label'];
         $subscriberId       = $aArgs['businessId'];
@@ -164,8 +163,8 @@ class FastParapheurController
 
         $attachments         = \Attachment\models\AttachmentModel::getOnView([
             'select'         => ['res_id', 'res_id_version', 'title', 'attachment_type','path', 'res_id_master', 'format'],
-            'where'         => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE', "format = 'pdf'"],
-            'data'          => [$aArgs['resIdMaster'], ['incoming_mail_attachment', 'print_folder', 'signed_response']]
+            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE', "format = 'pdf'"],
+            'data'           => [$aArgs['resIdMaster'], ['incoming_mail_attachment', 'print_folder', 'signed_response']]
         ]);
 
         $attachmentToFreeze = [];
