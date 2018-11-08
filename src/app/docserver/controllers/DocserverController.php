@@ -120,7 +120,7 @@ class DocserverController
         $data = $request->getParams();
 
         $check = Validator::stringType()->notEmpty()->validate($data['device_label']);
-        $check = $check && Validator::intVal()->notEmpty()->validate($data['size_limit_number']);
+        $check = $check && !empty($data['size_limit_number']) && is_numeric($data['size_limit_number']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['path_template']);
         $check = $check && Validator::boolType()->validate($data['is_readonly']);
         if (!$check) {
