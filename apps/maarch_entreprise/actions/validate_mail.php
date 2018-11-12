@@ -832,7 +832,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $frm_str .= '<span id="sr_sender_span">'._SHIPPER.'</span>';
     $frm_str .= '<span id="sr_recipient_span">'._DEST.'</span>';
     $frm_str .= '</label></td>';
-    if (!empty($sr['format'])) {
+    if (!empty($sr['format']) && $sr['type'] != 'entity') {
         $cardVisibility = 'visible';
     } else {
         $cardVisibility = 'hidden';
