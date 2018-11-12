@@ -120,6 +120,8 @@ class CoreConfigModel
     {
         if (isset($_SERVER['MAARCH_TMP_DIR'])) {
             $tmpDir = $_SERVER['MAARCH_TMP_DIR'];
+        } elseif (isset($_SERVER['REDIRECT_MAARCH_TMP_DIR'])) {
+            $tmpDir = $_SERVER['REDIRECT_MAARCH_TMP_DIR'];
         } else {
             $tmpDir = sys_get_temp_dir();
         }
