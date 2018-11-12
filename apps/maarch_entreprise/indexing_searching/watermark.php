@@ -140,13 +140,13 @@ if ($watermarkTab['text_color'] == '') {
 }
 
 // Get original PDF File size
-$pdf = new FPDI('P','pt');
-$pdf->setSourceFile($filePathOnTmp);
-$tplidx = $pdf->ImportPage(1);
-$size = $pdf->getTemplateSize($tplidx);
+//$pdf = new FPDI('P', 'pt');
+//$pdf->setSourceFile($filePathOnTmp);
+//$tplidx = $pdf->ImportPage(1);
+//$size = $pdf->getTemplateSize($tplidx);
 
 // Create a PDF object and set up the properties
-$pdf = new PDF("p", "pt", array($size['h'],$size['w']));
+$pdf = new PDF('P', 'pt');
 $pdf->SetAuthor("MAARCH");
 $pdf->SetTitle("MAARCH document");
 $pdf->SetTextColor($color['color1'],$color['color2'],$color['color3']);
@@ -162,7 +162,7 @@ for ($cpt=1;$cpt<=$nbPages;$cpt++) {
     $tplidx = $pdf->ImportPage($cpt);
     $specs = $pdf->getTemplateSize($tplidx);
      //Add new page & use the base PDF as template
-    $pdf->addPage($specs['h'] > $specs['w'] ? 'P' : 'L');
+    $pdf->addPage($specs['h'] > $specs['w'] ? 'P' : 'L', [$specs['w'], $specs['h']]);
     $pdf->useTemplate($tplidx);
     //Set opacity
     $pdf->SetAlpha($position['opacity']);
