@@ -177,11 +177,11 @@ try {
 
     if (!empty($configRemoteSignatoryBook)) {
         if ($configRemoteSignatoryBook['id'] == 'ixbus') {
-            $signatoryBook = "IxbusController.php";
+            $signatoryBook = "/modules/visa/class/IxbusController.php";
         } elseif ($configRemoteSignatoryBook['id'] == 'iParapheur') {
-            $signatoryBook = "IParapheurController.php";
+            $signatoryBook = "/modules/visa/class/IParapheurController.php";
         } elseif ($configRemoteSignatoryBook['id'] == 'fastParapheur') {
-            $signatoryBook = "FastParapheurController.php";
+            $signatoryBook = "/modules/visa/class/FastParapheurController.php";
         }
     } else {
         $GLOBALS['logger']->write('no signatory book enabled', 'ERROR', 102);
@@ -189,11 +189,17 @@ try {
         exit(102);
     }
 
-    // On inclus la classe du parapheur activé
-    Bt_myInclude(
-        $GLOBALS['MaarchDirectory'] . "modules" . DIRECTORY_SEPARATOR . "visa" . DIRECTORY_SEPARATOR . "class"
-        . DIRECTORY_SEPARATOR . $signatoryBook
-    );
+    // On inclut la classe du parapheur activé
+    if (file_exists($GLOBALS['MaarchDirectory'] . 'custom/' . $GLOBALS['CustomId'] . $signatoryBook)) {
+        $classToInclude = $GLOBALS['MaarchDirectory'] . 'custom/' . $GLOBALS['CustomId'] . $signatoryBook;
+    } elseif (file_exists($GLOBALS['MaarchDirectory'] . $signatoryBook)) {
+        $classToInclude = $GLOBALS['MaarchDirectory'] . $signatoryBook;
+    } else {
+        $GLOBALS['logger']->write('No class detected', 'ERROR', 102);
+        echo "\nNo class detected ! \nThe batch cannot be launched !\n\n";
+        exit(102);
+    }
+    Bt_myInclude($classToInclude);
 } catch (IncludeFileError $e) {
     $GLOBALS['logger']->write(
         'Problem with the php include path:' .$e .' '. get_include_path(),
