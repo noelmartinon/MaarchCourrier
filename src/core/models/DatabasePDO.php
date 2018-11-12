@@ -16,12 +16,16 @@ namespace SrcCore\models;
 
 class DatabasePDO
 {
-    private $pdo;
+    private static $pdo             = null;
     private static $type            = null;
     private static $preparedQueries = [];
 
     public function __construct(array $args = [])
     {
+        if (!empty(self::$pdo)) {
+            return;
+        }
+
         $server = '';
         $port = '';
         $name = '';
@@ -101,11 +105,11 @@ class DatabasePDO
         ];
 
         try {
-            $this->pdo = new \PDO($dsn, $user, $password, $options);
+            self::$pdo = new \PDO($dsn, $user, $password, $options);
         } catch (\PDOException $PDOException) {
             try {
                 $options[\PDO::ATTR_PERSISTENT] = false;
-                $this->pdo = new \PDO($dsn, $user, $password, $options);
+                self::$pdo = new \PDO($dsn, $user, $password, $options);
             } catch (\PDOException $PDOException) {
                 throw new \Exception($PDOException->getMessage());
             }
@@ -118,13 +122,11 @@ class DatabasePDO
 
     public function query($queryString, array $data = [])
     {
-        $originalQuery = $queryString;
         if (self::$type == 'ORACLE') {
             $queryString = str_ireplace('CURRENT_TIMESTAMP', 'SYSDATE', $queryString);
         }
 
         if (!empty($data)) {
-            $originalData = $data;
             $tmpData = [];
             foreach ($data as $key => $value) {
                 if (is_array($value)) {
@@ -142,7 +144,7 @@ class DatabasePDO
 
         try {
             if (empty(self::$preparedQueries[$queryString])) {
-                $query = $this->pdo->prepare($queryString);
+                $query = self::$pdo->prepare($queryString);
                 self::$preparedQueries[$queryString] = $query;
             } else {
                 $query = self::$preparedQueries[$queryString];
@@ -150,16 +152,10 @@ class DatabasePDO
 
             $query->execute($data);
         } catch (\PDOException $PDOException) {
-            if (
-                strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false ||
-                strpos($PDOException->getMessage(), 'General error: 7') !== false
-            ) {
+            if (strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false || strpos($PDOException->getMessage(), 'General error: 7') !== false) {
+                DatabasePDO::reset();
                 $db = new DatabasePDO();
-                if ($originalData) {
-                    $db->query($originalQuery, $originalData);
-                } else {
-                    $db->query($originalQuery);
-                }
+                $query = $db->query($queryString, $data);
             } else {
                 $param = implode(', ', $data);
                 $file = fopen('queries_error.log', 'a');
@@ -197,7 +193,7 @@ class DatabasePDO
 
     public function reset()
     {
-        $this->pdo = null;
+        self::$pdo = null;
         self::$preparedQueries = [];
     }
 
