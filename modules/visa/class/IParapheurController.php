@@ -15,7 +15,8 @@
 
 class IParapheurController
 {
-    public static function returnCurl($xmlPostString, $config){
+    public static function returnCurl($xmlPostString, $config)
+    {
         $curlReturn = \SrcCore\models\CurlModel::execSOAP([
             'xmlPostString' => $xmlPostString,
             'url'           => $config['data']['url'],
@@ -49,14 +50,15 @@ class IParapheurController
         $sousType   = self::getSousType(['config' => $config, 'sousType' => $signatory['item_id']]);
         $type       = self::getType(['config' => $config]);
 
-        if(!$type){
+        if (!$type) {
             // TODO gestion erreurs
             return false;
         }
         return self::upload(['config' => $config, 'resIdMaster' => $aArgs['resIdMaster'], 'sousType' => $sousType ]);
     }
 
-    public static function upload($aArgs){
+    public static function upload($aArgs)
+    {
         $typeTechnique  = $aArgs['config']['data']['defaultType'];
         $sousType       = $aArgs['sousType'];
 
@@ -76,8 +78,8 @@ class IParapheurController
             'data'          => [$aArgs['resIdMaster'], 'print_folder']
         ]);
 
-        if(!empty($annexes['attachments'])){
-            for($i =0; $i < count($annexes['attachments']); $i++){
+        if (!empty($annexes['attachments'])) {
+            for ($i =0; $i < count($annexes['attachments']); $i++) {
                 $annexAttachmentInfo                    = \Attachment\models\AttachmentModel::getById(['id' => $annexes['attachments'][$i]['res_id'], 'isVersion' => false]);
                 $annexAttachmentPath                    = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $annexAttachmentInfo['docserver_id'], 'select' => ['path_template']]);
                 $annexes['attachments'][$i]['filePath'] = $annexAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $annexes['attachments'][$i]['path']) . $annexes['attachments'][$i]['filename'];
@@ -88,15 +90,15 @@ class IParapheurController
         $attachments         = \Attachment\models\AttachmentModel::getOnView([
             'select'         => ['res_id', 'res_id_version', 'title', 'attachment_type','path'],
             'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE', "format = 'pdf'"],
-            'data'           => [$aArgs['resIdMaster'], ['incoming_mail_attachment', 'print_folder', 'signed_response']]
+            'data'           => [$aArgs['resIdMaster'], ['converted_pdf', 'incoming_mail_attachment', 'print_folder', 'signed_response']]
         ]);
 
-        for($i = 0; $i < count($attachments); $i++){
+        for ($i = 0; $i < count($attachments); $i++) {
             $resId                  = $attachments[$i]['res_id'];
             $attachmentInfo         = \Attachment\models\AttachmentModel::getById(['id' => $resId, 'isVersion' => false]);
             $attachmentPath         = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $attachmentInfo['docserver_id'], 'select' => ['path_template']]);
             $attachmentFilePath     = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachmentInfo['path']) . $attachmentInfo['filename'];
-            $dossierId              = $attachments[$i]['res_id'] . '_' . rand(0001,9999);
+            $dossierId              = $attachments[$i]['res_id'] . '_' . rand(0001, 9999);
             $dossierTitre           = _PROJECT_NUMBER . $attachments[$i]['res_id'];
 
             $mainResource = \Resource\models\ResModel::getExtById(['resId' => $aArgs['resIdMaster'], 'select' => ['process_limit_date']]);
@@ -116,7 +118,7 @@ class IParapheurController
                                     <ns:mimetype>application/pdf</ns:mimetype> 
                                     <ns:encoding>utf-8</ns:encoding>
                                 </ns:DocAnnexe>';
-            if(!empty($annexes['attachments'])) {
+            if (!empty($annexes['attachments'])) {
                 for ($i = 0; $i < count($annexes['attachments']); $i++) {
                     $b64AnnexesAttachment = base64_encode(file_get_contents($annexes['attachments'][$i]['filePath']));
                     $annexesXmlPostString .= '<ns:DocAnnexe> 
@@ -151,24 +153,25 @@ class IParapheurController
                                 </soapenv:Envelope>';
 
             $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
-            if(!$curlReturn['response']){
+            if (!$curlReturn['response']) {
                 // TODO gestin d'une erreur
                 echo $curlReturn['error'];
                 return false;
             }
             $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->CreerDossierResponse[0];
-            if($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode'] || $curlReturn['infos']['http_code'] >= 500){
+            if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode'] || $curlReturn['infos']['http_code'] >= 500) {
                 // TODO gestion d'une potentielle erreur
                 echo '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
                 return false;
-            }else{
+            } else {
                 $attachmentToFreeze[$resId] = $dossierId;
             }
         }
         return $attachmentToFreeze;
     }
 
-    public static function download($aArgs){
+    public static function download($aArgs)
+    {
         $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
                <soapenv:Header/>
@@ -179,23 +182,23 @@ class IParapheurController
 
         $curlReturn = $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-        if(!$curlReturn['response']){
+        if (!$curlReturn['response']) {
             // TODO gestin d'une erreur
             echo $curlReturn['error'];
             return false;
         }
 
         $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetDossierResponse[0];
-        if($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']){
+        if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
             // TODO gestion d'une potentielle erreur
             echo '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
             return false;
-        }else{
+        } else {
             $returnedDocumentId = (string) $response->DossierID;
-            if($aArgs['documentId'] !== $returnedDocumentId){
+            if ($aArgs['documentId'] !== $returnedDocumentId) {
                 // TODO gestion d'une potentielle erreur
                 return false;
-            }else{
+            } else {
                 $b64FileContent = (string)$response->DocPrincipal;
                 return ['b64FileContent' => $b64FileContent, 'documentId' => $returnedDocumentId];
             }
@@ -204,9 +207,9 @@ class IParapheurController
 
     public static function retrieveSignedMails($aArgs)
     {
-        foreach($aArgs['idsToRetrieve']['noVersion'] as $noVersion){
-           if(!empty($noVersion->external_id)){
-               $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
+        foreach ($aArgs['idsToRetrieve']['noVersion'] as $noVersion) {
+            if (!empty($noVersion->external_id)) {
+                $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
                     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
                         <soapenv:Header/> 
                         <soapenv:Body> 
@@ -214,52 +217,54 @@ class IParapheurController
                         </soapenv:Body> 
                     </soapenv:Envelope>';
 
-               $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
+                $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-               if(!$curlReturn['response']){
-                   // TODO gestin d'une erreur
-                   echo $curlReturn['error'];
-                   return false;
-               }
+                if (!$curlReturn['response']) {
+                    // TODO gestin d'une erreur
+                    echo $curlReturn['error'];
+                    return false;
+                }
 
-               $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
 
-               if($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']){
-                   // TODO gestion d'une potentielle erreur
-                   echo 'retrieveSignedMails noVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
-                   return false;
-               }else {
-                   $noteContent = '';
-                   foreach ($response->LogDossier as $res){    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
-                       $status = $res->status;
-                       if ($status == $aArgs['config']['data']['visaState'] || $status == $aArgs['config']['data']['signState']) {
-                           $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
+                if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
+                    // TODO gestion d'une potentielle erreur
+                    echo 'retrieveSignedMails noVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
+                    return false;
+                } else {
+                    $noteContent = '';
+                    foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+                        $status = $res->status;
+                        if ($status == $aArgs['config']['data']['visaState'] || $status == $aArgs['config']['data']['signState']) {
+                            $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
 
-                           $response = self::download([
+                            $response = self::download([
                                'config' => $aArgs['config'],
                                'documentId' => $noVersion->external_id
                            ]);
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'validated';
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->format = 'pdf';
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->encodedFile = $response['b64FileContent'];
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $noteContent;
-                           if($status == $aArgs['config']['data']['signState']) break;
-                       } else if ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
-                           $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'refused';
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $noteContent;
-                           break;
-                       } else {
-                           $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'waiting';
-                       }
-                   }
-               }
-           }else{
-               echo _EXTERNAL_ID_EMPTY;
-           }
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'validated';
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->format = 'pdf';
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->encodedFile = $response['b64FileContent'];
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $noteContent;
+                            if ($status == $aArgs['config']['data']['signState']) {
+                                break;
+                            }
+                        } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
+                            $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'refused';
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $noteContent;
+                            break;
+                        } else {
+                            $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'waiting';
+                        }
+                    }
+                }
+            } else {
+                echo _EXTERNAL_ID_EMPTY;
+            }
         }
-        foreach($aArgs['idsToRetrieve']['isVersion'] as $isVersion){
-            if(!empty($noVersion->external_id)){
+        foreach ($aArgs['idsToRetrieve']['isVersion'] as $isVersion) {
+            if (!empty($noVersion->external_id)) {
                 $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
                    <?xml version="1.0" encoding="utf-8"?>
                     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
@@ -271,7 +276,7 @@ class IParapheurController
 
                 $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-                if(!$curlReturn['response']){
+                if (!$curlReturn['response']) {
                     // TODO gestin d'une erreur
                     echo $curlReturn['error'];
                     return false;
@@ -279,13 +284,13 @@ class IParapheurController
 
                 $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
 
-                if($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']){
+                if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     // TODO gestion d'une potentielle erreur
                     echo 'retrieveSignedMails isVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
                     return false;
-                }else {
+                } else {
                     $noteContent = '';
-                    foreach ($response->LogDossier as $res){    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+                    foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
                         $status = $res->status;
                         if ($status == $aArgs['config']['data']['visaState'] || $status == $aArgs['config']['data']['signState']) {
                             $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
@@ -297,8 +302,10 @@ class IParapheurController
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->format = 'pdf';
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->encodedFile = $response['b64FileContent'];
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $noteContent;
-                            if($status == $aArgs['config']['data']['signState']) break;
-                        } else if ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
+                            if ($status == $aArgs['config']['data']['signState']) {
+                                break;
+                            }
+                        } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
                             $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'refused';
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $noteContent;
@@ -308,14 +315,15 @@ class IParapheurController
                         }
                     }
                 }
-            }else{
+            } else {
                 echo _EXTERNAL_ID_EMPTY;
             }
         }
         return $aArgs['idsToRetrieve'];
     }
 
-    public static function getType($aArgs){
+    public static function getType($aArgs)
+    {
         $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
                <soapenv:Header/>
@@ -326,7 +334,7 @@ class IParapheurController
 
         $curlReturn = $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-        if(!$curlReturn['response']){
+        if (!$curlReturn['response']) {
             // TODO gestin d'une erreur
             echo $curlReturn['error'];
             return false;
@@ -335,20 +343,22 @@ class IParapheurController
         $response   = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetListeTypesResponse[0];
 
         $typeExist  = false;
-        foreach ($response->TypeTechnique as $res){
-            if($res == $aArgs['config']['data']['defaultType']){
+        foreach ($response->TypeTechnique as $res) {
+            if ($res == $aArgs['config']['data']['defaultType']) {
                 $typeExist = true;
                 break;
             }
         }
-        if(!$typeExist) {
+        if (!$typeExist) {
             // TODO Gestion erreur
             return false;
-        }else
+        } else {
             return true;
+        }
     }
 
-    public static function getSousType($aArgs){
+    public static function getSousType($aArgs)
+    {
         $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
                <soapenv:Header/>
@@ -359,7 +369,7 @@ class IParapheurController
 
         $curlReturn = $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-        if(!$curlReturn['response']){
+        if (!$curlReturn['response']) {
             // TODO gestin d'une erreur
             echo $curlReturn['error'];
             return false;
@@ -368,17 +378,17 @@ class IParapheurController
         $response   = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetListeSousTypesResponse[0];
 
         $subTypeExist = false;
-        foreach ($response->SousType as $res){
-            if($res == $aArgs['sousType']){
+        foreach ($response->SousType as $res) {
+            if ($res == $aArgs['sousType']) {
                 $subTypeExist = true;
                 break;
             }
         }
 
-        if(!$subTypeExist) {
+        if (!$subTypeExist) {
             return $aArgs['config']['data']['defaultSousType'];
-        }else
+        } else {
             return $aArgs['sousType'];
-
+        }
     }
 }
