@@ -54,6 +54,14 @@ class SignatureBookController
             return $response->withJson($documents);
         }
 
+        $aBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($aBaskets as $basket) {
+            if ($aArgs['basketId'] == $basket['redirectedBasketName']) {
+                $aArgs['basketId'] = $basket['basket_id'];
+                break;
+            }
+        }
+
         $actions = [];
         $rawActions = ActionModel::getForBasketPage(['basketId' => $aArgs['basketId'], 'groupId' => $aArgs['groupId']]);
         foreach ($rawActions as $rawAction) {
@@ -366,9 +374,19 @@ class SignatureBookController
 
     public function getDetailledResList(Request $request, Response $response, array $aArgs)
     {
+        $userId = $GLOBALS['userId'];
+        $aBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($aBaskets as $basket) {
+            if ($aArgs['basketId'] == $basket['redirectedBasketName']) {
+                $aArgs['basketId'] = $basket['basket_id'];
+                $userId = $basket['basket_owner'];
+                break;
+            }
+        }
+
         $resList = BasketModel::getResListById([
             'basketId'  => $aArgs['basketId'],
-            'userId'    => $GLOBALS['userId'],
+            'userId'    => $userId,
             'select'    => ['res_id', 'alt_identifier', 'subject', 'creation_date', 'process_limit_date', 'priority', 'contact_id', 'address_id', 'user_lastname', 'user_firstname']
         ]);
 
@@ -418,9 +436,19 @@ class SignatureBookController
 
     public function getResList(Request $request, Response $response, array $aArgs)
     {
+        $userId = $GLOBALS['userId'];
+        $aBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($aBaskets as $basket) {
+            if ($aArgs['basketId'] == $basket['redirectedBasketName']) {
+                $aArgs['basketId'] = $basket['basket_id'];
+                $userId = $basket['basket_owner'];
+                break;
+            }
+        }
+
         $resList = BasketModel::getResListById([
             'basketId'  => $aArgs['basketId'],
-            'userId'    => $GLOBALS['userId'],
+            'userId'    => $userId,
             'select'    => ['res_id']
         ]);
 

@@ -32,8 +32,8 @@ export class BasketHomeComponent implements OnInit {
         window.location.href="index.php?page=view_baskets&fromV2=true&module=basket&baskets="+basketId+"&groupId="+groupId;
     }
 
-    goToRedirect(basketId:any,owner:any) {
-        window.location.href="index.php?page=view_baskets&fromV2=true&module=basket&baskets="+basketId+"_"+owner+"&groupId=";
+    goToRedirect(basketId:any,owner:any,groupId:any) {
+        window.location.href="index.php?page=view_baskets&fromV2=true&module=basket&baskets="+basketId+"_"+owner+"&groupId="+groupId;
     }
 
     closePanelLeft() {

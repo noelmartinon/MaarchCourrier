@@ -50,7 +50,7 @@
                 <mat-icon *ngIf="!mobileMode" style="color:#666" mat-list-icon class="fa fa-inbox"></mat-icon>
                 <span *ngIf="basket.resourceNumber==0" class="badge" style="min-width:auto;">{{basket.resourceNumber}}</span>
                 <span *ngIf="basket.resourceNumber!=0" bgcolor="warn" class="badge" style="min-width:auto;">{{basket.resourceNumber}}</span>
-                <p mat-line (click)="goToRedirect(basket.basket_id,basket.basket_owner)" title="{{basket.basket_name}}" style="color:#666">
+                <p mat-line (click)="goToRedirect(basket.basket_id,basket.basket_owner,basket.groupId)" title="{{basket.basket_name}}" style="color:#666">
                     {{basket.basket_name}}<br/><small color="primary">({{basket.userToDisplay}})</small>
                 </p>
             </a>

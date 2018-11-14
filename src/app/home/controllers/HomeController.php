@@ -15,6 +15,7 @@
 namespace Home\controllers;
 
 use Basket\models\BasketModel;
+use SrcCore\models\DatabaseModel;
 use Resource\models\ResModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -74,8 +75,16 @@ class HomeController
 
         $assignedBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
         foreach ($assignedBaskets as $key => $assignedBasket) {
+            $aGroups = DatabaseModel::select([
+                'select'    => ['usergroup_content.group_id'],
+                'table'     => ['usergroup_content, groupbasket'],
+                'where'     => ['groupbasket.group_id = usergroup_content.group_id', 'usergroup_content.user_id = ?', 'groupbasket.basket_id =  ?'],
+                'data'      => [$assignedBasket['basket_owner'], $assignedBasket['basket_id']]
+            ]);
+
             $basket = BasketModel::getById(['select' => ['basket_clause'], 'id' => $assignedBasket['basket_id']]);
             $assignedBaskets[$key]['resourceNumber'] = BasketModel::getResourceNumberByClause(['userId' => $assignedBasket['user_abs'], 'clause' => $basket['basket_clause']]);
+            $assignedBaskets[$key]['groupId'] = $aGroups[0]['group_id'];
         }
 
         return $response->withJson([

@@ -919,6 +919,15 @@ abstract class basket_Abstract extends Database
         $tab['basket_owner'] = $basketOwner;
         $tab['abs_basket'] = $absBasket;
 
+        $aGroups = \SrcCore\models\DatabaseModel::select([
+            'select'    => ['usergroup_content.group_id'],
+            'table'     => ['usergroup_content, groupbasket'],
+            'where'     => ['groupbasket.group_id = usergroup_content.group_id', 'usergroup_content.user_id = ?', 'groupbasket.basket_id =  ?'],
+            'data'      => [$basketOwner, $basketId]
+        ]);
+
+        $tab['group_id'] = $aGroups[0]['group_id'];
+
         $tab['clause'] = $secCtrl->process_security_where_clause(
             $tab['clause'],
             $basketOwner
