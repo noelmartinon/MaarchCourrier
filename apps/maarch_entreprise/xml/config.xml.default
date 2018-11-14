@@ -14,7 +14,7 @@
         <adminmail>support@maarch.fr</adminmail>
         <adminname>maarch</adminname>
         <debug>false</debug>
-        <applicationname>MAARCH 18.10</applicationname>
+        <applicationname>MAARCH COURRIER 18.10</applicationname>
         <defaultPage>welcome</defaultPage>
         <CookieTime>20</CookieTime> <!-- minutes -->
         <timezone>Europe/Paris</timezone>

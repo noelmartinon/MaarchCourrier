@@ -31,23 +31,20 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         $frm_str .= '<h2 class="title">' . _REDIRECT_MAIL . ' ' ._NUM;
     }
     $values_str = '';
-    if(empty($_SESSION['stockCheckbox'])) {
-        for($i=0; $i < count($values); $i++)
-        {
+    if (empty($_SESSION['stockCheckbox'])) {
+        for ($i=0; $i < count($values); $i++) {
             $values_str .= $values[$i] . ', ';
         }
     } else {
-
-        for($i=0; $i < count($_SESSION['stockCheckbox']); $i++)
-        {
+        for ($i=0; $i < count($_SESSION['stockCheckbox']); $i++) {
             $values_str .= $_SESSION['stockCheckbox'][$i].', ';
         }
     }
 
     $values_str = preg_replace('/, $/', '', $values_str);
-    if(_ID_TO_DISPLAY == 'res_id'){
+    if (_ID_TO_DISPLAY == 'res_id') {
         $frm_str .= $values_str;
-    } else if (_ID_TO_DISPLAY == 'chrono_number'){
+    } elseif (_ID_TO_DISPLAY == 'chrono_number') {
         $chrono_number = $cr7->get_chrono_number($values_str, 'res_view_letterbox');
         $frm_str .= $chrono_number;
     }
@@ -106,10 +103,11 @@ function check_form($form_id, $values)
     return true;
 }
 
-function manage_form($arr_id, $history, $id_action, $label_action, $status, $coll_id, $table, $values_form )
+function manage_form($arr_id, $history, $id_action, $label_action, $status, $coll_id, $table, $values_form)
 {
-    if(empty($values_form) || count($arr_id) < 1)
+    if (empty($values_form) || count($arr_id) < 1) {
         return false;
+    }
 
     require_once('modules/notes/class/notes_controler.php');
     $note = new notes_controler();
@@ -118,13 +116,13 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     $res_id     = $arr_id[0];
 
     $formValues = [];
-    for($i = 0; $i < count($values_form); $i++) {
+    for ($i = 0; $i < count($values_form); $i++) {
         $id = $values_form[$i]['ID'];
         $formValues[$id] = $values_form[$i]['VALUE'];
     }
 
     # save note
-    if($formValues['note_content_to_users'] != ''){
+    if ($formValues['note_content_to_users'] != '') {
         //Add notes
         $note->addNote($res_id, $coll_id, $formValues['note_content_to_users']);
     }
@@ -140,5 +138,5 @@ function manage_empty_error($arr_id, $history, $id_action, $label_action, $statu
 
     $db->query('UPDATE listinstance SET process_date = NULL WHERE res_id = ? AND difflist_type = ?', [$res_id, 'VISA_CIRCUIT']);
 
-    return array('result' => $res_id.'#', 'history_msg' => $label_action);
+    return array('result' => $res_id.'#', 'history_msg' => '');
 }
