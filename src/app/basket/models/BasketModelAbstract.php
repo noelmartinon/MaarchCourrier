@@ -397,6 +397,7 @@ class BasketModelAbstract
 
         foreach ($aBaskets as $key => $value) {
             $aBaskets[$key]['userToDisplay'] = UserModel::getLabelledUserById(['userId' => $value['user_abs']]);
+            $aBaskets[$key]['redirectedBasketName'] = $value['basket_id'] . '_' . $value['basket_owner'];
         }
 
         return $aBaskets;

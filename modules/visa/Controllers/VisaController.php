@@ -32,7 +32,6 @@ use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
-
 class VisaController
 {
     public function getSignatureBook(Request $request, Response $response, array $aArgs)
@@ -51,6 +50,14 @@ class VisaController
         $documents = VisaController::getIncomingMailAndAttachmentsForSignatureBook(['resId' => $resId]);
         if (!empty($documents['error'])) {
             return $response->withJson($documents);
+        }
+
+        $aBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($aBaskets as $basket) {
+            if ($aArgs['basketId'] == $basket['redirectedBasketName']) {
+                $aArgs['basketId'] = $basket['basket_id'];
+                break;
+            }
         }
 
         $actions = [];
@@ -313,7 +320,7 @@ class VisaController
 
             $attachments[$key]['thumbnailLink'] = "index.php?page=doc_thumb&module=thumbnails&res_id={$realId}&coll_id={$collId}&display=true&advanced=true";
 
-            if(!in_array(strtoupper($value['format']), ['PDF', 'JPG', 'JPEG', 'PNG', 'GIF']) ){
+            if (!in_array(strtoupper($value['format']), ['PDF', 'JPG', 'JPEG', 'PNG', 'GIF'])) {
                 $isVersion = 'false';
             }
             $attachments[$key]['viewerLink'] = "index.php?display=true&module=attachments&page=view_attachment&res_id_master={$aArgs['resId']}&id={$viewerId}&isVersion={$isVersion}";
@@ -356,9 +363,19 @@ class VisaController
 
     public function getDetailledResList(Request $request, Response $response, array $aArgs)
     {
+        $userId = $GLOBALS['userId'];
+        $aBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($aBaskets as $basket) {
+            if ($aArgs['basketId'] == $basket['redirectedBasketName']) {
+                $aArgs['basketId'] = $basket['basket_id'];
+                $userId = $basket['basket_owner'];
+                break;
+            }
+        }
+
         $resList = BasketModel::getResListById([
             'basketId'  => $aArgs['basketId'],
-            'userId'    => $GLOBALS['userId'],
+            'userId'    => $userId,
             'select'    => ['res_id', 'alt_identifier', 'subject', 'creation_date', 'process_limit_date', 'priority', 'contact_id', 'address_id', 'user_lastname', 'user_firstname']
         ]);
 
@@ -408,13 +425,22 @@ class VisaController
 
     public function getResList(Request $request, Response $response, array $aArgs)
     {
+        $userId = $GLOBALS['userId'];
+        $aBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($aBaskets as $basket) {
+            if ($aArgs['basketId'] == $basket['redirectedBasketName']) {
+                $aArgs['basketId'] = $basket['basket_id'];
+                $userId = $basket['basket_owner'];
+                break;
+            }
+        }
+
         $resList = BasketModel::getResListById([
             'basketId'  => $aArgs['basketId'],
-            'userId'    => $GLOBALS['userId'],
+            'userId'    => $userId,
             'select'    => ['res_id']
         ]);
 
         return $response->withJson(['resList' => $resList]);
     }
-
 }
