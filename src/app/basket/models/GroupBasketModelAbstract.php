@@ -128,4 +128,19 @@ abstract class GroupBasketModelAbstract
 
         return true;
     }
+
+    public static function getGroupsByBasketId(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['basketOwner', 'basketId']);
+        ValidatorModel::stringType($aArgs, ['basketOwner', 'basketId']);
+
+        $aGroups = DatabaseModel::select([
+            'select'    => ['usergroup_content.group_id'],
+            'table'     => ['usergroup_content, groupbasket'],
+            'where'     => ['groupbasket.group_id = usergroup_content.group_id', 'usergroup_content.user_id = ?', 'groupbasket.basket_id =  ?'],
+            'data'      => [$aArgs['basketOwner'], $aArgs['basketId']]
+        ]);
+
+        return $aGroups;
+    }
 }

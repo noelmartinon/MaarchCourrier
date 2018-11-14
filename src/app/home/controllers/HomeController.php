@@ -15,12 +15,12 @@
 namespace Home\controllers;
 
 use Basket\models\BasketModel;
-use SrcCore\models\DatabaseModel;
 use Resource\models\ResModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use User\models\UserModel;
 use Parameter\models\ParameterModel;
+use Basket\models\GroupBasketModel;
 
 class HomeController
 {
@@ -75,11 +75,9 @@ class HomeController
 
         $assignedBaskets = BasketModel::getAbsBasketsByUserId(['userId' => $GLOBALS['userId']]);
         foreach ($assignedBaskets as $key => $assignedBasket) {
-            $aGroups = DatabaseModel::select([
-                'select'    => ['usergroup_content.group_id'],
-                'table'     => ['usergroup_content, groupbasket'],
-                'where'     => ['groupbasket.group_id = usergroup_content.group_id', 'usergroup_content.user_id = ?', 'groupbasket.basket_id =  ?'],
-                'data'      => [$assignedBasket['basket_owner'], $assignedBasket['basket_id']]
+            $aGroups = GroupBasketModel::getGroupsByBasketId([
+                'basketOwner' => $assignedBasket['basket_owner'],
+                'basketId'    => $assignedBasket['basket_id']
             ]);
 
             $basket = BasketModel::getById(['select' => ['basket_clause'], 'id' => $assignedBasket['basket_id']]);
