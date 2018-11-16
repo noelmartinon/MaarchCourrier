@@ -7,21 +7,21 @@ require_once('core' . DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'cla
 $core = new core_tools();
 
 /**** RECUPERATION DU FICHIER DE CONFIG ****/
-if (file_exists($_SESSION['config']['corepath'] . 'custom' . 
-    DIRECTORY_SEPARATOR . $_SESSION['custom_override_id'] . 
-    DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR . 
-    $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR . 'xml' . 
+if (file_exists($_SESSION['config']['corepath'] . 'custom' .
+    DIRECTORY_SEPARATOR . $_SESSION['custom_override_id'] .
+    DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR .
+    $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR . 'xml' .
     DIRECTORY_SEPARATOR . 'cas_config.xml')
-){
+) {
     $xmlPath = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
     . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
     . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
     . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'cas_config.xml';
 } elseif (file_exists($_SESSION['config']['corepath'] . 'apps'
     . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-    . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 
+    . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR .
     'cas_config.xml')
-){
+) {
     $xmlPath = $_SESSION['config']['corepath'] . DIRECTORY_SEPARATOR . 'apps'
     . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
     . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'cas_config.xml';
@@ -52,10 +52,16 @@ phpCAS::setDebug();
 phpCAS::setVerbose(true);
 
 // Initialisation phpCAS
-phpCAS::client(constant($loginRequestArray['CAS_VERSION']), $cas_serveur, (int)$cas_port, $cas_context, true);
+if ($loginRequestArray['CAS_VERSION'] == 'CAS_VERSION_3_0') {
+    $changeSessionId = false;
+} else {
+    $changeSessionId = true;
+}
+
+phpCAS::client(constant($loginRequestArray['CAS_VERSION']), $cas_serveur, (int)$cas_port, $cas_context, $changeSessionId);
 
 // Le certificat de l'autorité racine
-if(!empty($certificate)){
+if (!empty($certificate)) {
     phpCAS::setCasServerCACert($certificate);
 } else {
     phpCAS::setNoCasServerValidation();
@@ -64,24 +70,22 @@ if(!empty($certificate)){
 // L'authentification.
 phpCAS::forceAuthentication();
 
-if($loginRequestArray['CAS_VERSION'] == 'CAS_VERSION_2_0'){
+if (in_array($loginRequestArray['CAS_VERSION'], ['CAS_VERSION_2_0', 'CAS_VERSION_3_0'])) {
     // Lecture identifiant utilisateur (courriel)
     $Id = phpCAS::getUser();
     echo 'Identifiant : ' . phpCAS::getUser();
     echo '<br/> phpCAS version : ' . phpCAS::getVersion();
-    if(!empty($id_separator)){
+    if (!empty($id_separator)) {
         $tmpId = explode($id_separator, $Id);
         $userId = $tmpId[0];
     } else {
         $userId = $Id;
     }
-    
-} elseif($loginRequestArray['CAS_VERSION'] == 'SAML_VERSION_1_1'){
+} elseif ($loginRequestArray['CAS_VERSION'] == 'SAML_VERSION_1_1') {
     // $attrSAML = phpCAS::getAttributes();
     echo _CAS_SAML_NOT_SUPPORTED;
     exit;
-
-}else {
+} else {
     echo _PROTOCOL_NOT_SUPPORTED;
     exit;
 }
@@ -98,7 +102,7 @@ if ($stmt->rowCount() == 0) {
 $loginArray['password'] = 'maarch';
 
 $protocol = 'http://';
-if((int)$cas_port == 443){
+if ((int)$cas_port == 443) {
     $protocol = 'https://';
 }
 
