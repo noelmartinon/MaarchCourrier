@@ -89,13 +89,20 @@ class IParapheurController
 
         $attachments         = \Attachment\models\AttachmentModel::getOnView([
             'select'         => ['res_id', 'res_id_version', 'title', 'attachment_type','path'],
-            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE', "format = 'pdf'"],
+            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS', 'FRZ', 'TMP')", 'in_signature_book = TRUE'],
             'data'           => [$aArgs['resIdMaster'], ['converted_pdf', 'incoming_mail_attachment', 'print_folder', 'signed_response']]
         ]);
 
         for ($i = 0; $i < count($attachments); $i++) {
-            $resId                  = $attachments[$i]['res_id'];
-            $attachmentInfo         = \Attachment\models\AttachmentModel::getById(['id' => $resId, 'isVersion' => false]);
+            if (!empty($attachments[$i]['res_id'])) {
+                $resId  = $attachments[$i]['res_id'];
+                $collId = 'attachments_coll';
+            } else {
+                $resId  = $attachments[$i]['res_id_master'];
+                $collId = 'attachments_version_coll';
+            }
+            $attachmentInfo         = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF']);
+
             $attachmentPath         = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $attachmentInfo['docserver_id'], 'select' => ['path_template']]);
             $attachmentFilePath     = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachmentInfo['path']) . $attachmentInfo['filename'];
             $dossierId              = $attachments[$i]['res_id'] . '_' . rand(0001, 9999);
