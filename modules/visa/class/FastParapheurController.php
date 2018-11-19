@@ -130,7 +130,7 @@ class FastParapheurController
 
     public static function upload($aArgs)
     {
-        $circuitId          = /*$aArgs['circuitId']*/ 'bureautique';
+        $circuitId          = $aArgs['circuitId'];
         $label              = $aArgs['label'];
         $subscriberId       = $aArgs['businessId'];
 
