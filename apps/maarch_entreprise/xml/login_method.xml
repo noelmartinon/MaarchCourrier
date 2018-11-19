@@ -16,7 +16,7 @@
         <ID>restMode</ID>
         <NAME>_SERVICE_REST_LOGIN</NAME>
         <SCRIPT>standard_connect.php</SCRIPT>
-        <ENABLED>true</ENABLED>
+        <ENABLED>false</ENABLED>
     </METHOD>
     <!--<METHOD>
         <ID>sso</ID>

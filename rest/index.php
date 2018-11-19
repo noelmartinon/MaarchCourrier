@@ -86,7 +86,8 @@ $userId = null;
 if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
     if (\SrcCore\models\SecurityModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
         $loginMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
-        if ($loginMethod['id'] != 'standard') {
+        $loadedXml = \SrcCore\models\CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        if ($loginMethod['id'] != 'standard' || (string)$loadedXml->CONFIG->ldap == 'true') {
             $user = \User\models\UserModel::getByUserId(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
             if ($user['loginmode'] == 'restMode') {
                 $userId = $_SERVER['PHP_AUTH_USER'];
