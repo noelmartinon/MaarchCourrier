@@ -139,12 +139,6 @@ if ($watermarkTab['text_color'] == '') {
     }
 }
 
-// Get original PDF File size
-//$pdf = new FPDI('P', 'pt');
-//$pdf->setSourceFile($filePathOnTmp);
-//$tplidx = $pdf->ImportPage(1);
-//$size = $pdf->getTemplateSize($tplidx);
-
 // Create a PDF object and set up the properties
 $pdf = new PDF('P', 'pt');
 $pdf->SetAuthor("MAARCH");
