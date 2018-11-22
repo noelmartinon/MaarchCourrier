@@ -97,11 +97,13 @@ class IParapheurController
             if (!empty($attachments[$i]['res_id'])) {
                 $resId  = $attachments[$i]['res_id'];
                 $collId = 'attachments_coll';
+                $is_version = false;
             } else {
-                $resId  = $attachments[$i]['res_id_master'];
+                $resId  = $attachments[$i]['res_id_version'];
                 $collId = 'attachments_version_coll';
+                $is_version = true;
             }
-            $attachmentInfo         = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF']);
+            $attachmentInfo         = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => $collId, 'isVersion' => $is_version]);
 
             $attachmentPath         = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $attachmentInfo['docserver_id'], 'select' => ['path_template']]);
             $attachmentFilePath     = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachmentInfo['path']) . $attachmentInfo['filename'];
@@ -171,7 +173,7 @@ class IParapheurController
                 echo '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
                 return false;
             } else {
-                $attachmentToFreeze[$resId] = $dossierId;
+                $attachmentToFreeze[$collId][$resId] = $dossierId;
             }
         }
         return $attachmentToFreeze;

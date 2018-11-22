@@ -228,7 +228,7 @@ if (file_exists($GLOBALS['errorLckFile'])) {
 
 Bt_getWorkBatch();
 
-$GLOBALS['logger']->write('Retrieve mails sent to remote signatory book', 'INFO');
+$GLOBALS['logger']->write('Retrieve attachments sent to remote signatory book', 'INFO');
 $query = "SELECT res_id, res_id_version, external_id, format, res_id_master, title, identifier, type_id, attachment_type, dest_contact_id, dest_address_id, dest_user, typist 
         FROM res_view_attachments WHERE status = 'FRZ' AND external_id IS NOT NULL AND external_id <> ''";
 $stmt = $GLOBALS['db']->query($query, []);
@@ -266,6 +266,8 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
             'dest_address_id' => $value->dest_address_id,
             'dest_user'       => $value->dest_user,
             'typist'          => $value->typist,
+            'format'          => $value->format,
+            'encodedFile'     => $value->encodedFile,
             'noteContent'     => $value->noteContent
         ]);
 

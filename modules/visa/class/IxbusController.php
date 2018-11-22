@@ -271,11 +271,13 @@ class IxbusController
             if (!empty($value['res_id'])) {
                 $resId  = $value['res_id'];
                 $collId = 'attachments_coll';
+                $is_version = false;
             } else {
-                $resId  = $value['res_id_master'];
+                $resId  = $value['res_id_version'];
                 $collId = 'attachments_version_coll';
+                $is_version = true;
             }
-            $adrInfo       = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF']);
+            $adrInfo       = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => $collId, 'isVersion' => $is_version]);
             $docserverInfo = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
             $filePath      = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
 
@@ -331,7 +333,7 @@ class IxbusController
             $data = simplexml_load_string($rawResponse);
             $response = $data->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children()->SendDossierResponse->SendDossierResult;
 
-            $attachmentToFreeze[$value['res_id']] = (string)$response;
+            $attachmentToFreeze[$collId][$resId] = (string)$response;
         }
 
         return $attachmentToFreeze;
@@ -348,7 +350,7 @@ class IxbusController
         if ($zip->open($zipFilename, ZipArchive::CREATE) === true) {
             $zip->addFile($aArgs['filepath'], $aArgs['filename']);
             
-            $adrInfo             = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $aArgs['res_id_master'], 'collId' => 'letterbox_coll', 'type' => 'PDF']);
+            $adrInfo             = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['res_id_master'], 'collId' => 'letterbox_coll']);
             $docserverInfo       = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
             $arrivedMailfilePath = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
             $zip->addFile($arrivedMailfilePath, 'courrier_arrivee.pdf');

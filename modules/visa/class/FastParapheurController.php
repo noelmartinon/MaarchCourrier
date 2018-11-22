@@ -173,11 +173,13 @@ class FastParapheurController
             if (!empty($attachments[$i]['res_id'])) {
                 $resId  = $attachments[$i]['res_id'];
                 $collId = 'attachments_coll';
+                $is_version = false;
             } else {
-                $resId  = $attachments[$i]['res_id_master'];
+                $resId  = $attachments[$i]['res_id_version'];
                 $collId = 'attachments_version_coll';
+                $is_version = true;
             }
-            $adrInfo                = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF']);
+            $adrInfo                = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => $collId, 'isVersion' => $is_version]);
             $attachmentPath         = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
             $attachmentFilePath     = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
             $attachmentFileName     = 'projet_courrier_' . $attachments[$i]['res_id_master'] . '_' . rand(0001, 9999) . '.pdf';
@@ -244,7 +246,7 @@ class FastParapheurController
                 return false;
             } else {
                 $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
-                $attachmentToFreeze[$resId] = (string) $documentId;
+                $attachmentToFreeze[$collId][$resId] = (string) $documentId;
             }
         }
         return $attachmentToFreeze;

@@ -133,6 +133,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     $coll_id = $_SESSION['current_basket']['coll_id'];
 
     foreach ($arr_id as $res_id) {
+        $result .= $res_id.'#';
         \Attachment\controllers\AttachmentController::generateAttachForMailing(['resIdMaster' => $res_id, 'userId' => $_SESSION['user']['UserId']]);
         
         if (!empty($config)) {
@@ -144,7 +145,14 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 $nature             = get_value_fields($values_form, 'nature');
                 $messageModel       = get_value_fields($values_form, 'messageModel');
                 $manSignature       = get_value_fields($values_form, 'mansignature');
-                $attachmentToFreeze = IxbusController::sendDatas(['config' => $config, 'resIdMaster' => $res_id, 'loginIxbus' => $loginIxbus, 'passwordIxbus' => $passwordIxbus, 'classeurName' => $nature, 'messageModel' => $messageModel, 'manSignature' => $manSignature]);
+                $attachmentToFreeze = IxbusController::sendDatas([
+                    'config'        => $config, 'resIdMaster' => $res_id,
+                    'loginIxbus'    => $loginIxbus,
+                    'passwordIxbus' => $passwordIxbus,
+                    'classeurName'  => $nature,
+                    'messageModel'  => $messageModel,
+                    'manSignature'  => $manSignature
+                ]);
             } elseif ($config['id'] == 'iParapheur') {
                 include_once 'modules/visa/class/IParapheurController.php';
                 $attachmentToFreeze = IParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
@@ -155,13 +163,20 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         }
 
         if (!empty($attachmentToFreeze)) {
-            foreach ($attachmentToFreeze as $resId => $externalId) {
-                \Attachment\models\AttachmentModel::freezeAttachment([
-                    'resId' => $resId,
-                    'table' => 'res_attachments',
-                    'externalId' => $externalId
-                ]);
-            }
+		foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
+		    \Attachment\models\AttachmentModel::freezeAttachment([
+			'resId' => $resId,
+			'table' => 'res_attachments',
+			'externalId' => $externalId
+		    ]);
+		}
+		foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
+		    \Attachment\models\AttachmentModel::freezeAttachment([
+			'resId' => $resId,
+			'table' => 'res_version_attachments',
+			'externalId' => $externalId
+		    ]);
+		}
 
             $stmt = $db->query('SELECT status FROM res_letterbox WHERE res_id = ?', array($res_id));
             $resource = $stmt->fetchObject();
