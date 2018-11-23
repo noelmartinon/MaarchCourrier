@@ -128,10 +128,10 @@ class IParapheurController
                                     <ns:encoding>utf-8</ns:encoding>
                                 </ns:DocAnnexe>';
             if (!empty($annexes['attachments'])) {
-                for ($i = 0; $i < count($annexes['attachments']); $i++) {
-                    $b64AnnexesAttachment = base64_encode(file_get_contents($annexes['attachments'][$i]['filePath']));
+                for ($j = 0; $j < count($annexes['attachments']); $j++) {
+                    $b64AnnexesAttachment = base64_encode(file_get_contents($annexes['attachments'][$j]['filePath']));
                     $annexesXmlPostString .= '<ns:DocAnnexe> 
-                                    <ns:nom>PJ_' . ($i + 1) . '</ns:nom> 
+                                    <ns:nom>PJ_' . ($j + 1) . '</ns:nom> 
                                     <ns:fichier xm:contentType="application/pdf">' . $b64AnnexesAttachment . '</ns:fichier> 
                                     <ns:mimetype>application/pdf</ns:mimetype> 
                                     <ns:encoding>utf-8</ns:encoding>
@@ -162,12 +162,14 @@ class IParapheurController
                                 </soapenv:Envelope>';
 
             $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
-            if (!$curlReturn['response']) {
+
+            if (!empty($curlReturn['error'])) {
                 // TODO gestin d'une erreur
                 echo $curlReturn['error'];
                 return false;
             }
             $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->CreerDossierResponse[0];
+
             if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode'] || $curlReturn['infos']['http_code'] >= 500) {
                 // TODO gestion d'une potentielle erreur
                 echo '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
@@ -228,7 +230,7 @@ class IParapheurController
 
                 $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-                if (!$curlReturn['response']) {
+                if (!empty($curlReturn['response'])) {
                     // TODO gestin d'une erreur
                     echo $curlReturn['error'];
                     return false;
@@ -285,7 +287,7 @@ class IParapheurController
 
                 $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-                if (!$curlReturn['response']) {
+                if (!empty($curlReturn['response'])) {
                     // TODO gestin d'une erreur
                     echo $curlReturn['error'];
                     return false;
@@ -343,7 +345,7 @@ class IParapheurController
 
         $curlReturn = $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-        if (!$curlReturn['response']) {
+        if (!empty($curlReturn['error'])) {
             // TODO gestin d'une erreur
             echo $curlReturn['error'];
             return false;
@@ -378,7 +380,7 @@ class IParapheurController
 
         $curlReturn = $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-        if (!$curlReturn['response']) {
+        if (!empty($curlReturn['error'])) {
             // TODO gestin d'une erreur
             echo $curlReturn['error'];
             return false;

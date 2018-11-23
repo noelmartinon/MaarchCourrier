@@ -123,6 +123,9 @@ class CurlModel
             $rawResponse = substr($rawResponse, $infos['header_size']);
         } elseif (!empty($aArgs['delete_header'])) { // Delete header for iparapheur
             $body = explode(PHP_EOL . PHP_EOL, $rawResponse)[1]; // put the header ahead
+            if (empty($body)) {
+                $body = explode(PHP_EOL, $rawResponse)[5];
+            }
             $pattern = '/--uuid:[0-9a-f-]+--/';                  // And also the footer
             $rawResponse = preg_replace($pattern, '', $body);
         }
