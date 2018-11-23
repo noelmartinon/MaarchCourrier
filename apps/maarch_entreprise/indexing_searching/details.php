@@ -386,12 +386,15 @@ if ($stmt->rowCount() == 0) {
                 }
             } ?>
         </p>
-        <p id="viewdoc">
+        <p id="viewdoc" style="margin-top: -1px">
             <?php if ($info_mail->filename) {
                 ?>
                 <a href="../../rest/res/<?php functions::xecho($s_id); ?>/content" target="_blank">
                     Voir le document
-                    <i class="tooltip visaPjUp tooltipstered fa fa-download fa-2x" style="height: 16px; width: 16px;font-size: 19px;padding-bottom: 11px;padding-left: 9px;margin-right:6px;padding-top:7px;margin-top: -9px;" title="<?php echo _VIEW_DOC; ?>"></i>
+                    <i class="tooltip visaPjUp tooltipstered fa fa-eye fa-2x" style="height: auto; width: auto;font-size: 14px;margin-right:6px;margin-top: -9px;" title="<?php echo _VIEW_DOC; ?>"></i>
+                </a>
+                <a href="../../rest/res/<?php functions::xecho($s_id); ?>/originalContent" target="_blank">
+                    <i class="tooltip visaPjUp tooltipstered fa fa-download fa-2x" style="height: auto; width: auto;font-size: 14px;margin-right:6px;margin-top: -9px;" title="Télécharger le document original"></i>
                 </a>
             <?php
             } ?>

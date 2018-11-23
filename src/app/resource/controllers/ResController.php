@@ -386,6 +386,80 @@ class ResController
         return $response->withHeader('Content-Type', $mimeType);
     }
 
+    public function getOriginalFileContent(Request $request, Response $response, array $aArgs)
+    {
+        if (!Validator::intVal()->validate($aArgs['resId']) || !ResController::hasRightByResId(['resId' => $aArgs['resId'], 'userId' => $GLOBALS['userId']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename'], 'resId' => $aArgs['resId']]);
+        $extDocument = ResModel::getExtById(['select' => ['category_id', 'alt_identifier'], 'resId' => $aArgs['resId']]);
+        if (empty($document) || empty($extDocument)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
+        }
+
+        if ($extDocument['category_id'] == 'outgoing') {
+            $attachment = AttachmentModel::getOnView([
+                'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename', 'fingerprint'],
+                'where'     => ['res_id_master = ?', 'attachment_type = ?', 'status not in (?)'],
+                'data'      => [$aArgs['resId'], 'outgoing_mail', ['DEL', 'OBS']],
+                'limit'     => 1
+            ]);
+            if (!empty($attachment[0])) {
+                $document['docserver_id'] = $attachment[0]['docserver_id'];
+                $document['path'] = $attachment[0]['path'];
+                $document['filename'] = $attachment[0]['filename'];
+                $document['fingerprint'] = $attachment[0]['fingerprint'];
+            }
+        }
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+
+        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+        if (!file_exists($pathToDocument)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        }
+
+        $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+        $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+            return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
+        }
+
+        if (empty($fileContent)) {
+            $fileContent = file_get_contents($pathToDocument);
+        }
+        if ($fileContent === false) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        }
+
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
+        $pathInfo = pathinfo($pathToDocument);
+
+        $response->write($fileContent);
+        $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
+
+        ListInstanceModel::update([
+            'postSet'   => ['viewed' => 'viewed + 1'],
+            'where'     => ['item_id = ?', 'item_mode = ?', 'res_id = ?'],
+            'data'      => [$GLOBALS['userId'], 'cc', $aArgs['resId']]
+        ]);
+        HistoryController::add([
+            'tableName' => 'res_letterbox',
+            'recordId'  => $aArgs['resId'],
+            'eventType' => 'VIEW',
+            'info'      => _DOC_DISPLAYING . " : {$aArgs['resId']}",
+            'moduleId'  => 'res',
+            'eventId'   => 'resview',
+        ]);
+
+        return $response->withHeader('Content-Type', $mimeType);
+    }
+
     public function getThumbnailContent(Request $request, Response $response, array $aArgs)
     {
         if (!Validator::intVal()->validate($aArgs['resId'])) {
