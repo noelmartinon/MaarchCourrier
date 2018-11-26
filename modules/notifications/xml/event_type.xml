@@ -25,11 +25,11 @@
         <label>Courrier en copie</label>
     </event_type>
     <event_type>
-        <id>usersup</id>
+        <id>userModification</id>
         <label>Modification d'un utilisateur</label>
     </event_type>
     <event_type>
-        <id>users%</id>
+        <id>user%</id>
         <label>Actions sur utilisateur</label>
     </event_type>
     <event_type>
