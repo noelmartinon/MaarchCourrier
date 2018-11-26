@@ -1324,9 +1324,13 @@ switch ($mode) {
 				$actual_position_id = '';
 				
 				if(!$_REQUEST['position']){
-				
-					foreach ($_SESSION['origin_positions'] as $key => $value) {
-						$fileplan->remove($fileplan_id, $value, $res_array);
+					if (!empty($_SESSION['origin_positions'])) {
+						foreach ($_SESSION['origin_positions'] as $key => $value) {
+							$fileplan->remove($fileplan_id, $value, $res_array);
+						}
+					} else {
+						$error = functions::wash_html(_POSITION . ' ' . _IS_EMPTY . '!','NONE');
+                        $status = 1;
 					}
 				}else{
 					if(!$_SESSION['origin_positions']){
