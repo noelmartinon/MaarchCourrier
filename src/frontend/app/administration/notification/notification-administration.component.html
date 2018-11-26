@@ -139,7 +139,7 @@
                             <mat-form-field *ngIf="notification.diffusion_type == 'user'">
                                 <mat-select id="diffusion_properties" name="diffusion_properties" title="{{lang.memberDiffTypeUsers}}" placeholder="{{lang.memberDiffTypeUsers}}"
                                     required multiple [(ngModel)]="notification.diffusion_properties">
-                                    <mat-option *ngFor="let user of notification.data.users" [value]="user.user_id">
+                                    <mat-option *ngFor="let user of notification.data.users" [value]="user.id">
                                         {{user.label}}
                                     </mat-option>
                                 </mat-select>
