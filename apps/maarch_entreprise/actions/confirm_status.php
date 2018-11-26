@@ -69,12 +69,16 @@ $frm_height = 'auto';
     $templatesControler = new templates_controler();
     $templates = array();
 
-        if ($destination <> '') {
+     $stmt = $db->query("SELECT destination FROM res_letterbox WHERE res_id = (?)", [$res_id]);
+     $resultDest = $stmt->fetchObject();
+     $destination = $resultDest->destination;
+
+     if ($destination <> '') {
             $templates = $templatesControler->getAllTemplatesForProcess($destination);
         } else {
             $templates = $templatesControler->getAllTemplatesForSelect();
         }
-        $frm_str .='<center style="font-size:15px;">'._ACTION_CONFIRM.'<br/><br/><b>'.$labelAction.' ?</b></center><br/>';
+        $frm_str ='<center style="font-size:15px;">'._ACTION_CONFIRM.'<br/><br/><b>'.$labelAction.' ?</b></center><br/>';
         if($_SESSION['current_basket']['id'] != 'IndexingBasket'){
             $frm_str .='<b>'._PROCESS_NOTES.':</b><br/>';
             $frm_str .= '<select name="templateNotes" id="templateNotes" style="width:98%;margin-bottom: 10px;background-color: White;border: 1px solid #999;color: #666;text-align: left;" '
