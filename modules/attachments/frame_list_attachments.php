@@ -173,11 +173,10 @@ if (isset($_REQUEST['load'])) {
 <body>
     <?php
     $core->load_js();
-    if (isset($_REQUEST['attach_type'])) {
-        echo '<script>loadToolbarBadge(\'responses_tab\',\''.$_SESSION['config']['businessappurl'] . 'index.php?display=true&module=attachments&page=load_toolbar_attachments&responses&origin=parent&resId='.$resId.'&collId=letterbox_coll\');</script>';
-    } else {
-        echo '<script>loadToolbarBadge(\'attachments_tab\',\''.$_SESSION['config']['businessappurl'] . 'index.php?display=true&module=attachments&page=load_toolbar_attachments&origin=parent&resId='.$resId.'&collId=letterbox_coll\');</script>';
-    }
+
+    echo '<script>loadToolbarBadge(\'responses_tab\',\'index.php?display=true&module=attachments&page=load_toolbar_attachments&responses&origin=parent&resId='.$resId.'&collId=letterbox_coll\');</script>';
+    echo '<script>loadToolbarBadge(\'attachments_tab\',\'index.php?display=true&module=attachments&page=load_toolbar_attachments&origin=parent&resId='.$resId.'&collId=letterbox_coll\');</script>';
+
     //Load list
     $target = $_SESSION['config']['businessappurl']
         .'index.php?module=attachments&page=frame_list_attachments'.$parameters;

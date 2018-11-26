@@ -553,9 +553,9 @@ if (isset($_POST['add']) && $_POST['add']) {
                                 $js .= "window.parent.top.location.href = 'index.php?page=view_baskets&module=basket&baskets=MyBasket&resid=".$_SESSION['doc_id']."&directLinkToAction';";
                             } else {
                                 if ($attachment_types == 'response_project' || $attachment_types == 'outgoing_mail' || $attachment_types == 'signed_response' || $attachment_types == 'aihp') {
-                                    $js .= 'loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&view_only=true&load&fromDetail=response&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp\');';
+                                    $js .= '$j(\'#responses_tab\').click();loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&view_only=true&load&fromDetail=response&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp\');';
                                 } else {
-                                    $js .= 'loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&page=show_attachments_details_tab&module=attachments&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll&fromDetail=attachments&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp\');';
+                                    $js .= '$j(\'#attachments_tab\').click();loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&page=show_attachments_details_tab&module=attachments&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll&fromDetail=attachments&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp\');';
                                 }
                             }
                         } else {
@@ -1059,16 +1059,6 @@ if (isset($_POST['add']) && $_POST['add']) {
             $js .= 'eleframe1[0].src = \''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&attach_type_exclude=converted_pdf,print_folder&load';
         }
         $js .= '\';';
-        $js .= 'loadToolbarBadge(\'attachments_tab\',\''.$_SESSION['config']['businessappurl'] . 'index.php?display=true&module=attachments&page=load_toolbar_attachments&origin=parent&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll\');';
-        $js .= 'loadToolbarBadge(\'responses_tab\',\''.$_SESSION['config']['businessappurl'] . 'index.php?display=true&module=attachments&page=load_toolbar_attachments&responses&origin=parent&resId='.$_SESSION['doc_id'].'&collId=letterbox_coll\');';
-
-        if ($_REQUEST['attachment_types'][0] == 'simple_attachment') {
-            $js .= '$j(\'#responses_tab\').click();';
-            $js .= '$j(\'#attachments_tab\').click();';
-        } else {
-            $js .= '$j(\'#attachments_tab\').click();';
-            $js .= '$j(\'#responses_tab\').click();';
-        }
 
         //RAZ SESSIONS
         if (!isset($_SESSION['new_id'])) {
@@ -1408,9 +1398,9 @@ $content .= '<div id="transmission"></div>';
         $content .= '<input type="button" value="';
         $content .= _VALIDATE;
         if (isset($_REQUEST['id'])) {
-            $content .= '" name="edit" id="edit" class="button" onclick="refreshAttachmentsTab();ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
+            $content .= '" name="edit" id="edit" class="button" onclick="ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
         } else {
-            $content .= '" name="add" id="add" class="button" onclick="refreshAttachmentsTab();simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
+            $content .= '" name="add" id="add" class="button" onclick="simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
         }
         $content .= 'index.php?display=true&module=attachments&page=attachments_content\', \'formAttachment\'';
 
