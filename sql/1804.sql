@@ -86,6 +86,7 @@ DO $$ BEGIN
     ALTER TABLE user_signatures DROP COLUMN IF EXISTS user_serial_id;
     ALTER TABLE user_signatures ADD COLUMN user_serial_id integer;
     UPDATE user_signatures set user_serial_id = (select id FROM users where users.user_id = user_signatures.user_id);
+    DELETE from user_signatures where user_serial_id is NULL;
     ALTER TABLE user_signatures ALTER COLUMN user_serial_id set not null;
     ALTER TABLE user_signatures DROP COLUMN IF EXISTS user_id;
   END IF;
