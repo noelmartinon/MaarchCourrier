@@ -2248,11 +2248,12 @@ function hideIndex(mode_hide, display_val) {
 function checkAll() {
     $$('input[type=checkbox]').without($('all')).each(
         function (e) {
-            if (e.checked != true) {
-                stockCheckbox('index.php?display=true&dir=indexing_searching&page=multiLink', e.value);
+            if(e.id != ''){ // No check subentities checkbox
+                if (e.checked != true) {
+                    stockCheckbox('index.php?display=true&dir=indexing_searching&page=multiLink', e.value);
+                }
+                e.checked = true;
             }
-            e.checked = true;
-
         }
     )
 }
