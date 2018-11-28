@@ -367,4 +367,16 @@ if ($_SESSION['cpt_info_basket'] > 0) {
     $_SESSION['cpt_info_basket']++;
 }
 
+if(!empty($_GET['resId']) && !empty($_GET['defaultAction'])){
+    echo '<script language="javascript">';
+    echo 'setTimeout(function(){validForm(\'page\', \''.$_GET['resId'].'\', \''.$_GET['defaultAction'].'\');}, 800);';
+    echo '</script>';
+}
+
+if ($_SESSION['cpt_info_basket'] > 0) {
+    //$_SESSION['info_basket'] = '';
+} else {
+    $_SESSION['cpt_info_basket']++;
+}
+
 ?></div>
