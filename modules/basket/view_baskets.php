@@ -367,10 +367,13 @@ if ($_SESSION['cpt_info_basket'] > 0) {
     $_SESSION['cpt_info_basket']++;
 }
 
-if(!empty($_GET['resId']) && !empty($_GET['defaultAction'])){
+if (!empty($_GET['resId']) && !empty($_GET['defaultAction']) && $_SESSION['alreadyDefaultAction'] == false) {
+    $_SESSION['alreadyDefaultAction'] = true;
     echo '<script language="javascript">';
     echo 'setTimeout(function(){validForm(\'page\', \''.$_GET['resId'].'\', \''.$_GET['defaultAction'].'\');}, 800);';
     echo '</script>';
+} else {
+    $_SESSION['alreadyDefaultAction'] = false;
 }
 
 if ($_SESSION['cpt_info_basket'] > 0) {
