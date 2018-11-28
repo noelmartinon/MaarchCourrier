@@ -66,7 +66,10 @@
                 <value>address_id</value>
             </rawData>
         </sendInObject>
-        <return>id</return>
+        <return>
+            <key>id</key>
+            <value>custom_t1</value>
+        </return>
     </call>
     <call>
         <id>sendAttachmentToExternalApplication</id>
@@ -114,6 +117,10 @@
                 <value>address_town</value>
             </rawData>
             <rawData>
+                <key>email</key>
+                <value>email</value>
+            </rawData>
+            <rawData>
                 <key>usualName</key>
                 <value>contact_lastname</value>
             </rawData>
@@ -126,20 +133,32 @@
                 <value>73</value>
             </data>
         </sendInObject>
-        <return>id</return>
+        <return>
+            <key>id</key>
+            <value>external_contact_id</value>
+        </return>
     </call>
     <call>
         <id>closeResource</id>
         <enabled>false</enabled>
         <url></url>
         <method>POST</method>
-        <rawData>
-            <key>status</key>
-            <value>status</value>
-        </rawData>
-        <data>
-            <key>message</key>
-            <value>Close</value>
-        </data>
+        <header>Api-Key: 7a1167abe554c90584c2541ecs3a0f99</header>
+        <header>appName: Maarch</header>
+        <sendInObject>
+            <objectName>requete</objectName>
+            <rawData>
+                <key>id</key>
+                <value>custom_t1</value>
+            </rawData>
+            <rawData>
+                <key>note</key>
+                <value>note</value>
+            </rawData>
+            <data>
+                <key>statusId</key>
+                <value>7</value>
+            </data>
+        </sendInObject>
     </call>
 </ROOT>

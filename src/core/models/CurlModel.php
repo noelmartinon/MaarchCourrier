@@ -194,7 +194,8 @@ class CurlModel
                         }
                     }
                     if (!empty($call->return)) {
-                        $curlConfig['return'] = (string)$call->return;
+                        $curlConfig['return']['key'] = (string)$call->return->key;
+                        $curlConfig['return']['value'] = (string)$call->return->value;
                     }
                 }
             }

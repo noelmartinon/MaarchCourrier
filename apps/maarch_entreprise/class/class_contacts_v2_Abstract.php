@@ -2308,7 +2308,7 @@ abstract class contacts_v2_Abstract extends Database
 
                     $response = \SrcCore\models\CurlModel::exec(['curlCallId' => 'sendContactToExternalApplication', 'bodyData' => $bodyData, 'multipleObject' => $multipleObject, 'noAuth' => true]);
 
-                    \Contact\models\ContactModel::updateAddress(['set' => ['external_contact_id' => $response[$config['return']]], 'where' => ['id = ?'], 'data' => [$document[0]['ca_id']]]);
+                    \Contact\models\ContactModel::updateAddress(['set' => [$config['return']['value'] => $response[$config['return']['key']]], 'where' => ['id = ?'], 'data' => [$document[0]['ca_id']]]);
                 }
 
                 if ($iframe) {

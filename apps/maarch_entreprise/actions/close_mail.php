@@ -138,10 +138,11 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         if (\SrcCore\models\CurlModel::isEnabled(['curlCallId' => 'closeResource'])) {
             $bodyData = [];
             $config = \SrcCore\models\CurlModel::getConfigByCallId(['curlCallId' => 'closeResource']);
+            $configResource = \SrcCore\models\CurlModel::getConfigByCallId(['curlCallId' => 'sendResourceToExternalApplication']);
 
-            $resource = \Resource\models\ResModel::getOnView(['select' => ['external_id'], 'where' => ['res_id = ?'], 'data' => [$res_id]]);
+            $resource = \Resource\models\ResModel::getOnView(['select' => ['doc_' . $configResource['return']['value']], 'where' => ['res_id = ?'], 'data' => [$res_id]]);
 
-            if (!empty($resource[0]['external_id'])) {
+            if (!empty($resource[0]['doc_' . $configResource['return']['value']])) {
                 if (!empty($config['inObject'])) {
                     $multipleObject = true;
 
@@ -149,7 +150,9 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                         $select = [];
                         $tmpBodyData = [];
                         foreach ($object['rawData'] as $value) {
-                            if ($value != 'note') {
+                            if ($value == $configResource['return']['value']) {
+                                $select[] = 'doc_' . $configResource['return']['value'];
+                            } elseif ($value != 'note') {
                                 $select[] = $value;
                             }
                         }
@@ -159,6 +162,8 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                             foreach ($object['rawData'] as $key => $value) {
                                 if ($value == 'note') {
                                     $tmpBodyData[$key] = $formValues['note_content_to_users'];
+                                } elseif ($value == $configResource['return']['value']) {
+                                    $tmpBodyData[$key] = $document[0]['doc_' . $value];
                                 } else {
                                     $tmpBodyData[$key] = $document[0][$value];
                                 }

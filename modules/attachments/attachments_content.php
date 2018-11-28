@@ -378,11 +378,12 @@ if (isset($_POST['add']) && $_POST['add']) {
                                     if (\SrcCore\models\CurlModel::isEnabled(['curlCallId' => 'sendAttachmentToExternalApplication'])) {
                                         $bodyData = [];
                                         $config = \SrcCore\models\CurlModel::getConfigByCallId(['curlCallId' => 'sendAttachmentToExternalApplication']);
+                                        $configResource = \SrcCore\models\CurlModel::getConfigByCallId(['curlCallId' => 'sendResourceToExternalApplication']);
 
                                         $columnsInContact = ['external_contact_id'];
-                                        $resource = \Resource\models\ResModel::getOnView(['select' => ['external_id', 'address_id'], 'where' => ['res_id = ?'], 'data' => [$_SESSION['doc_id']]]);
+                                        $resource = \Resource\models\ResModel::getOnView(['select' => ['doc_' . $configResource['return']['value'], 'address_id'], 'where' => ['res_id = ?'], 'data' => [$_SESSION['doc_id']]]);
 
-                                        if (!empty($resource[0]['external_id']) && !empty($resource[0]['address_id'])) {
+                                        if (!empty($resource[0]['doc_' . $configResource['return']['value']]) && !empty($resource[0]['address_id'])) {
                                             if (!empty($config['inObject'])) {
                                                 $multipleObject = true;
 
@@ -393,7 +394,7 @@ if (isset($_POST['add']) && $_POST['add']) {
                                                     foreach ($object['rawData'] as $value) {
                                                         if (in_array($value, $columnsInContact)) {
                                                             $getContact = true;
-                                                        } elseif (!in_array($value, ['external_id', 'address_id'])) {
+                                                        } elseif (!in_array($value, [$configResource['return']['value'], 'address_id'])) {
                                                             $select[] = $value;
                                                         }
                                                     }
@@ -407,8 +408,12 @@ if (isset($_POST['add']) && $_POST['add']) {
                                                     foreach ($object['rawData'] as $key => $value) {
                                                         if (in_array($value, $columnsInContact)) {
                                                             $tmpBodyData[$key] = $contact[0][$value];
-                                                        } elseif (in_array($value, ['external_id', 'address_id'])) {
-                                                            $tmpBodyData[$key] = $resource[0][$value];
+                                                        } elseif (in_array($value, [$configResource['return']['value'], 'address_id'])) {
+                                                            if ($value == $configResource['return']['value']) {
+                                                                $tmpBodyData[$key] = $resource[0]['doc_' . $value];
+                                                            } else {
+                                                                $tmpBodyData[$key] = $resource[0][$value];
+                                                            }
                                                         } else {
                                                             $tmpBodyData[$key] = $document[0][$value];
                                                         }
@@ -433,7 +438,7 @@ if (isset($_POST['add']) && $_POST['add']) {
                                                 foreach ($config['rawData'] as $value) {
                                                     if (in_array($value, $columnsInContact)) {
                                                         $getContact = true;
-                                                    } elseif (!in_array($value, ['external_id', 'address_id'])) {
+                                                    } elseif (!in_array($value, [$configResource['return']['value'], 'address_id'])) {
                                                         $select[] = $value;
                                                     }
                                                 }
@@ -446,7 +451,7 @@ if (isset($_POST['add']) && $_POST['add']) {
                                                     foreach ($config['rawData'] as $key => $value) {
                                                         if (in_array($value, $columnsInContact)) {
                                                             $bodyData[$key] = $contact[0][$value];
-                                                        } elseif (in_array($value, ['external_id', 'address_id'])) {
+                                                        } elseif (in_array($value, [$configResource['return']['value'], 'address_id'])) {
                                                             $bodyData[$key] = $resource[0][$value];
                                                         } else {
                                                             $bodyData[$key] = $document[0][$value];
