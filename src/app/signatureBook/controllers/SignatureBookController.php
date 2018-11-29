@@ -19,7 +19,6 @@ use Attachment\models\AttachmentModel;
 use Basket\models\BasketModel;
 use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
-use Docserver\models\DocserverModel;
 use Entity\models\ListInstanceModel;
 use Group\models\ServiceModel;
 use Link\models\LinkModel;
@@ -43,10 +42,6 @@ class SignatureBookController
 
         if (!ResController::hasRightByResId(['resId' => $resId, 'userId' => $GLOBALS['userId']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
-        }
-        $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
-        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-            return $response->withStatus(500)->withJson(['errors' => _UNREACHABLE_DOCSERVER]);
         }
 
         $documents = SignatureBookController::getIncomingMailAndAttachmentsForSignatureBook(['resId' => $resId]);

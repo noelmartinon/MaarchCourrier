@@ -143,8 +143,7 @@
         <enabled>false</enabled>
         <url></url>
         <method>POST</method>
-        <header>Api-Key: 7a1167abe554c90584c2541ecs3a0f99</header>
-        <header>appName: Maarch</header>
+        <header></header>
         <sendInObject>
             <objectName>requete</objectName>
             <rawData>
