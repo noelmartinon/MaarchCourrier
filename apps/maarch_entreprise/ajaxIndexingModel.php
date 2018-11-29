@@ -55,5 +55,11 @@ if ($mode == 'up') {
     $result_txt = 'Modèle ajouté';
 }
 
-echo '{"status" : 0,"result" : "'.addslashes($result).'","result_txt" : "'.addslashes($result_txt).'"}';
+$return = [
+    "status"     => 0,
+    "result"     => $result,
+    "result_txt" => $result_txt
+];
+
+echo json_encode($return);
 exit();
