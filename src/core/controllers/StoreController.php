@@ -520,7 +520,7 @@ class StoreController
             }
             if ($value['column'] == 'alt_identifier' && empty($value['value']) && !empty($categoryId)) {
                 $document = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['destination, type_id']]);
-                $aArgs['data'][$key]['value'] = ChronoModel::getChrono(['id' => $categoryId, 'entityId' => $document['destination'], 'typeId' => $document['type_id']]);
+                $aArgs['data'][$key]['value'] = ChronoModel::getChrono(['id' => $categoryId, 'entityId' => $document['destination'], 'typeId' => $document['type_id'], 'resId' => $aArgs['resId']]);
             } elseif ($value['column'] == 'exp_contact_id' && !empty($value['value']) && !is_numeric($value['value'])) {
                 $mail = explode('<', str_replace('>', '', $value['value']));
                 $contact = ContactModel::getByEmail(['email' => $mail[count($mail) - 1], 'select' => ['contacts_v2.contact_id']]);
