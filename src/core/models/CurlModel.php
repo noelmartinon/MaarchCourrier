@@ -14,6 +14,8 @@
 
 namespace SrcCore\models;
 
+use SrcCore\controllers\LogsController;
+
 class CurlModel
 {
     public static function exec(array $aArgs)
@@ -75,6 +77,16 @@ class CurlModel
         $rawResponse = curl_exec($curl);
         curl_close($curl);
 
+        LogsController::add([
+            'isTech'    => true,
+            'moduleId'  => 'curl',
+            'level'     => 'DEBUG',
+            'tableName' => '',
+            'recordId'  => '',
+            'eventType' => 'Exec Curl : ' . $aArgs['url'],
+            'eventId'   => $rawResponse
+        ]);
+
         return json_decode($rawResponse, true);
     }
 
@@ -129,6 +141,16 @@ class CurlModel
             $pattern = '/--uuid:[0-9a-f-]+--/';                  // And also the footer
             $rawResponse = preg_replace($pattern, '', $body);
         }
+
+        LogsController::add([
+            'isTech'    => true,
+            'moduleId'  => 'curl',
+            'level'     => 'DEBUG',
+            'tableName' => '',
+            'recordId'  => '',
+            'eventType' => 'Exec Curl : ' . $aArgs['url'],
+            'eventId'   => $rawResponse
+        ]);
 
         return ['response' => simplexml_load_string($rawResponse), 'infos' => $infos, 'cookies' => $cookies, 'raw' => $rawResponse, 'error' => $error];
     }

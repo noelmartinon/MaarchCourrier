@@ -2064,7 +2064,7 @@ function manage_form($arrId, $history, $actionId, $label_action, $status, $collI
     $_SESSION['action_error'] = _NEW_DOC_ADDED;
     $_SESSION['indexation'] = true;
 
-    if ($catId != 'outgoing') {
+    if ($catId == 'incoming') {
         if (\SrcCore\models\CurlModel::isEnabled(['curlCallId' => 'sendResourceToExternalApplication'])) {
             $bodyData = [];
             $config = \SrcCore\models\CurlModel::getConfigByCallId(['curlCallId' => 'sendResourceToExternalApplication']);

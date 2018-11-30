@@ -2072,7 +2072,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         require 'modules/attachments/remove_letterbox.php';
     }
 
-    if ($cat_id != 'outgoing' && $cat_id != 'attachment') {
+    if ($cat_id == 'incoming') {
         if (\SrcCore\models\CurlModel::isEnabled(['curlCallId' => 'sendResourceToExternalApplication'])) {
             $bodyData = [];
             $config = \SrcCore\models\CurlModel::getConfigByCallId(['curlCallId' => 'sendResourceToExternalApplication']);
