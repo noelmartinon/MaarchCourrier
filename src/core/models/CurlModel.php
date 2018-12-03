@@ -51,9 +51,9 @@ class CurlModel
             $opts[CURLOPT_HTTPHEADER] = array_merge($opts[CURLOPT_HTTPHEADER], $curlConfig['header']);
         }
 
+        $bodyData = [];
         if ($curlConfig['method'] == 'POST' || $curlConfig['method'] == 'PUT') {
             if (is_array($aArgs['bodyData']) && !empty($aArgs['bodyData']) && $aArgs['multipleObject']) {
-                $bodyData = [];
                 foreach ($aArgs['bodyData'] as $key => $value) {
                     if (is_object($value)) {
                         $bodyData[$key] = $value;
@@ -82,8 +82,8 @@ class CurlModel
             'moduleId'  => 'curl',
             'level'     => 'DEBUG',
             'tableName' => '',
-            'recordId'  => '',
-            'eventType' => 'Exec Curl : ' . $aArgs['url'],
+            'recordId'  => 'Body : ' . json_encode($bodyData),
+            'eventType' => 'Exec Curl : ' . $curlConfig['url'],
             'eventId'   => $rawResponse
         ]);
 
