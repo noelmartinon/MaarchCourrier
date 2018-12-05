@@ -56,7 +56,7 @@ export class ReportsAdministrationComponent implements OnInit {
         this.http.get(this.coreUrl + 'rest/reports/groups')
             .subscribe((data: any) => {
                 this.groups = data['groups'];
-                this.loadReports(0)
+                this.loadReports(0);
                 this.loading = false;
             }, () => {
                 location.href = "index.php";
