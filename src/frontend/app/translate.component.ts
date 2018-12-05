@@ -1,13 +1,16 @@
 import { LANG_EN } from '../lang/lang-en';
 import { LANG_FR } from '../lang/lang-fr';
+import { LANG_NL } from '../lang/lang-nl';
 
 declare var angularGlobals : any;
 
-var dictionnary = {};
+var dictionary = {};
 if (angularGlobals.lang == "en") {
-    dictionnary = LANG_EN;
+    dictionary = LANG_EN;
 } else if (angularGlobals.lang == "fr") {
-    dictionnary = LANG_FR;
+    dictionary = LANG_FR;
+} else if (angularGlobals.lang == "nl") {
+    dictionary = LANG_NL;
 }
 
-export const LANG = dictionnary;
+export const LANG = dictionary;

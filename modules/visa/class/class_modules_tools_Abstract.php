@@ -1181,7 +1181,7 @@ abstract class visa_Abstract extends Database
         $str .= '<div class="error" id="divErrorPrint" name="divErrorPrint" onclick="this.hide();"></div>';
 
         $str .= '<p><b>Requérant</b> : '.$res->contact_society.'</p>';
-        $str .= '<p><b>Objet</b> : '.$res->subject.'</p>';
+        $str .= '<p><b>'._SUBJECT.'</b> : '.$res->subject.'</p>';
         $str .= '<hr/>';
         $str .= '<form style="width:99%;" name="print_folder_form" id="print_folder_form" action="#" method="post">';
         $str .= '<table style="width:99%;" name="print_folder" id="print_folder" >';

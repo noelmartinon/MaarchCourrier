@@ -438,7 +438,7 @@
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
                                 <mat-tab-group (selectedIndexChange)="changeTabContactGrp($event);createGrpContPan.close();" [selectedIndex]="selectedIndexContactsGrp">
-                                    <mat-tab label="Liste des groupements">
+                                    <mat-tab label="{{lang.contactGroupList}}">
                                         <mat-accordion>
                                             <mat-expansion-panel #createGrpContPan (opened)="initGroupsContact()">
                                                 <mat-expansion-panel-header>
@@ -679,7 +679,7 @@
                             </mat-expansion-panel>
                         </mat-accordion>
                     </mat-tab>
-                    <mat-tab label="Mon historique">
+                    <mat-tab label="{{lang.myHistoric}}">
                         <ng-template matTabContent>
                             <div class="row">
                                 <div class="col-md-6 col-xs-6">

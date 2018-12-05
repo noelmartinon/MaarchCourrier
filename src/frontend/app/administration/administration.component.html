@@ -15,7 +15,7 @@
                         <div style="font-size: 20px;
                         font-weight: bolder;
                         opacity: 0.2;
-                        text-align: center">ORGANISATION</div>
+                        text-align: center">{{lang.organization}}</div>
                         <button style="white-space:inherit;height: 100px;line-height:20px;" class="col-md-4 col-xs-6" mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of organisationServices"
                             (click)="goToSpecifiedAdministration(modService)">
                             <i class="{{modService.style}} fa-4x"></i>
@@ -26,7 +26,7 @@
                         <div style="font-size: 20px;
                         font-weight: bolder;
                         opacity: 0.2;
-                        text-align: center">PRODUCTION</div>
+                        text-align: center">{{lang.production}}</div>
                         <button style="white-space:inherit;height: 100px;line-height:20px;" class="col-md-4 col-xs-6" mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of productionServices"
                             (click)="goToSpecifiedAdministration(modService)">
                             <i class="{{modService.style}} fa-4x"></i>
@@ -36,7 +36,7 @@
                         <div style="font-size: 20px;
                         font-weight: bolder;
                         opacity: 0.2;
-                        text-align: center">CLASSEMENT</div>
+                        text-align: center">{{lang.classement}}</div>
                         <button style="white-space:inherit;height: 100px;line-height:20px;" class="col-md-4 col-xs-6" mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of classementServices"
                             (click)="goToSpecifiedAdministration(modService)">
                             <i class="{{modService.style}} fa-4x"></i>
@@ -47,7 +47,7 @@
                         <div style="font-size: 20px;
                         font-weight: bolder;
                         opacity: 0.2;
-                        text-align: center">SUPERVISION</div>
+                        text-align: center">{{lang.supervision}}</div>
                         <button style="white-space:inherit;height: 100px;line-height:20px;" class="col-md-4 col-xs-6" mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of supervisionServices"
                             (click)="goToSpecifiedAdministration(modService)">
                             <i class="{{modService.style}} fa-4x"></i>
