@@ -5217,3 +5217,6 @@ if (!defined('_CONTACTS_USERS_SEARCH')) {
 if (!defined('_CONTACTS_USERS_GROUPS_SEARCH')) {
     define('_CONTACTS_USERS_GROUPS_SEARCH', 'Rechercher un contact / utilisateur / groupement de contacts');
 }
+if (!defined('_USE_MODEL_MAILING')) {
+    define('_USE_MODEL_MAILING', 'Utiliser un modèle d\'enregistrement');
+}

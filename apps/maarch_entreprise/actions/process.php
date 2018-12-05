@@ -476,7 +476,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
             $frm_str .= ' disabled="disabled"';
         }
 
-        $frm_str .= ' onchange="displayFatherFolder(\'folder\')" style="width:95%;"><option value="">Sélectionnez un dossier</option>';
+        $frm_str .= ' onchange="displayFatherFolder(\'folder\')" style="width:95%;"><option value="">'._SELECT_FOLDER_TITLE.'</option>';
         foreach ($folder_info as $key => $value) {
             if ($value['folders_system_id'] == $folder_id) {
                 $frm_str .= '<option selected="selected" value="'.$value['folders_system_id'].'" parent="'.$value['parent_id'].'">'.$value['folder_name'].'</option>';

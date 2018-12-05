@@ -313,7 +313,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
     $frm_str .= '<div style="display:table;width:100%;">';
     $frm_str .= '<div style="display:table-cell;vertical-align:middle;">';
-    $frm_str .= '<select id="indexing_models_select" data-placeholder="Utiliser un modèle d\'enregistrement..." onchange="loadIndexingModel();"><option value="none"></option>';
+    $frm_str .= '<select id="indexing_models_select" data-placeholder="'._USE_MODEL_MAILING.'" onchange="loadIndexingModel();"><option value="none"></option>';
     while ($resIndexingModels = $stmt->fetchObject()) {
         $frm_str .= '<option value="'.$resIndexingModels->id.'">'.$resIndexingModels->label.'</option>';
     }
@@ -1115,7 +1115,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         }
         $frm_str .= '<tr id="folder_tr" style="display:'.$display_value.';">';
         $frm_str .= '<td><label for="folder" class="form_title" >'._FOLDER_OR_SUBFOLDER.'</label></td>';
-        $frm_str .= '<td class="indexing_field" style="text-align:right;"><select id="folder" name="folder" onchange="displayFatherFolder(\'folder\')"><option value="">Sélectionnez un dossier</option>';
+        $frm_str .= '<td class="indexing_field" style="text-align:right;"><select id="folder" name="folder" onchange="displayFatherFolder(\'folder\')"><option value="">'._SELECT_FOLDER_TITLE.'</option>';
 
         foreach ($folder_info as $key => $value) {
             if ($value['folders_system_id'] == $folder_id) {
