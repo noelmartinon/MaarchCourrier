@@ -163,20 +163,24 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         }
 
         if (!empty($attachmentToFreeze)) {
-		foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
-		    \Attachment\models\AttachmentModel::freezeAttachment([
-			'resId' => $resId,
-			'table' => 'res_attachments',
-			'externalId' => $externalId
-		    ]);
-		}
-		foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
-		    \Attachment\models\AttachmentModel::freezeAttachment([
-			'resId' => $resId,
-			'table' => 'res_version_attachments',
-			'externalId' => $externalId
-		    ]);
-		}
+            if (!empty($attachmentToFreeze['attachments_coll'])) {
+                foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
+                    \Attachment\models\AttachmentModel::freezeAttachment([
+                'resId' => $resId,
+                'table' => 'res_attachments',
+                'externalId' => $externalId
+                ]);
+                }
+            }
+            if (!empty($attachmentToFreeze['attachments_version_coll'])) {
+                foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
+                    \Attachment\models\AttachmentModel::freezeAttachment([
+                'resId' => $resId,
+                'table' => 'res_version_attachments',
+                'externalId' => $externalId
+                ]);
+                }
+            }
 
             $stmt = $db->query('SELECT status FROM res_letterbox WHERE res_id = ?', array($res_id));
             $resource = $stmt->fetchObject();
