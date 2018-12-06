@@ -208,4 +208,3 @@ if (!defined('_TRANSFERRING_AGENCY_SIREN_REQUIRED')) {
 if (!defined('_ARCHIVAL_AGENCY_SIREN_REQUIRED')) {
     define('_ARCHIVAL_AGENCY_SIREN_REQUIRED', 'SIREN-nummer archiefeenheid verplicht');
 }
-

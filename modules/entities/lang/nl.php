@@ -672,4 +672,3 @@ if (!defined('_RES_ID')) {
 if (!defined('_UPDATED_BY_USER')) {
     define('_UPDATED_BY_USER', 'Bijgewerkt door');
 }
-

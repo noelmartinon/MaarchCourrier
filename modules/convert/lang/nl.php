@@ -5,5 +5,3 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
-
- 

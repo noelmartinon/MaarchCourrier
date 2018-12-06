@@ -212,4 +212,3 @@ if (!defined('_POSITION_NOT_EXISTS')) {
 if (!defined('_POSITION_ALREADY_EXISTS')) {
     define('_POSITION_ALREADY_EXISTS', 'Deze gebruikersnaam van de positie bestaat reeds');
 }
-

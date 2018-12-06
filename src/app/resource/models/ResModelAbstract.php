@@ -142,17 +142,18 @@ abstract class ResModelAbstract
     {
         ValidatorModel::notEmpty($aArgs, ['format', 'typist', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'filesize', 'status']);
         ValidatorModel::stringType($aArgs, ['format', 'typist', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'status']);
-        ValidatorModel::intVal($aArgs, ['filesize']);
+        ValidatorModel::intVal($aArgs, ['filesize', 'res_id']);
 
-        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_id_mlb_seq']);
-        $aArgs['res_id'] = $nextSequenceId;
+        if (empty($aArgs['res_id'])) {
+            $aArgs['res_id'] = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_id_mlb_seq']);
+        }
 
         DatabaseModel::insert([
             'table'         => 'res_letterbox',
             'columnsValues' => $aArgs
         ]);
 
-        return $nextSequenceId;
+        return $aArgs['res_id'];
     }
 
     public static function createExt(array $aArgs)

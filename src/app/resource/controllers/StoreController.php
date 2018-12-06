@@ -19,6 +19,7 @@ use Attachment\models\AttachmentModel;
 use Contact\models\ContactModel;
 use Docserver\controllers\DocserverController;
 use Resource\models\ChronoModel;
+use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use Entity\models\EntityModel;
 use Resource\models\ResModel;
@@ -64,12 +65,15 @@ class StoreController
             unlink($tmpFilepath);
             unset($aArgs['encodedFile']);
 
+            $resId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_id_mlb_seq']);
+
             $data = [
                 'docserver_id'  => $storeResult['docserver_id'],
                 'filename'      => $storeResult['file_destination_name'],
                 'filesize'      => $storeResult['fileSize'],
                 'path'          => $storeResult['destination_dir'],
-                'fingerprint'   => $storeResult['fingerPrint']
+                'fingerprint'   => $storeResult['fingerPrint'],
+                'res_id'        => $resId
             ];
             $data = array_merge($aArgs, $data);
             $data = StoreController::prepareStorage($data);
@@ -81,7 +85,7 @@ class StoreController
                     unset($data[$key]);
                 }
             }
-            $resId = ResModel::create($data);
+            ResModel::create($data);
 
             $dataMlb['res_id'] = $resId;
             ResModel::createExt($dataMlb);
@@ -184,9 +188,9 @@ class StoreController
 
     public static function prepareStorage(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['docserver_id', 'filename', 'format', 'filesize', 'path', 'fingerprint', 'status']);
+        ValidatorModel::notEmpty($aArgs, ['docserver_id', 'filename', 'format', 'filesize', 'path', 'fingerprint', 'status', 'res_id']);
         ValidatorModel::stringType($aArgs, ['docserver_id', 'filename', 'format', 'path', 'fingerprint', 'status']);
-        ValidatorModel::intVal($aArgs, ['filesize']);
+        ValidatorModel::intVal($aArgs, ['filesize', 'res_id']);
 
         if (empty($aArgs['typist'])) {
             $aArgs['typist'] = 'auto';
@@ -194,7 +198,7 @@ class StoreController
 
         unset($aArgs['alt_identifier']);
         if (!empty($aArgs['chrono'])) {
-            $aArgs['alt_identifier'] = ChronoModel::getChrono(['id' => $aArgs['category_id'], 'entityId' => $aArgs['destination'], 'typeId' => $aArgs['type_id']]);
+            $aArgs['alt_identifier'] = ChronoModel::getChrono(['id' => $aArgs['category_id'], 'entityId' => $aArgs['destination'], 'typeId' => $aArgs['type_id'], 'resId' => $aArgs['res_id']]);
         }
         unset($aArgs['chrono']);
 

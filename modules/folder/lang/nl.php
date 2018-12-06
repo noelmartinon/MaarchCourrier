@@ -462,4 +462,3 @@ if (!defined('_LABEL')) {
 if (!defined('_THE_FOLDER')) {
     define('_THE_FOLDER', 'De map');
 }
-
