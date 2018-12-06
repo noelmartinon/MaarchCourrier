@@ -270,8 +270,12 @@ if ($mode == 'list') {
                             <label><?php echo _EDIT_TEMPLATE; ?> :</label>
                   
                                 <?php
-                                $strAction .= 'showAppletLauncher(this,\''.$objectId.'\',\''.$objectTable.'\',\''.$objectType.'\',\'template\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';'; ?>
-                                <a href="#" onClick="<?php functions::xecho($strAction); ?>">
+                               // $strAction .= 'showAppletLauncher(this,\''.$objectId.'\',\''.$objectTable.'\',\''.$objectType.'\',\'template\', \'100px\', \'500px\');$(\'add\').value=\'Edition en cours ...\';editingDoc(\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';';
+
+                            $strAction .= 'modifyAttachmentsForm2(\''. $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=doceditor&objectType='.$objectType.'&objectId='.$objectId.'&attachType='.$_SESSION['m_admin']['templates']['template_attachment_type'].'&objectTable='.$objectTable.'\', \'80%\',\'90%\',\'' . $_SESSION['config']['businessappurl'] . 'index.php?display=true&module=content_management&page=applet_controller_oo&action=saveObject&objectType='.$objectType.'&objectTable='.$objectTable.'&objectId='.$objectId.'&uniqueId=0&step=end&userMaarch=superadmin\',\'' . $_SESSION['user']['UserId'] . '\');$(\'add\').disabled = \'disabled\';$(\'add\').value=\'Edition en cours ...\';$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';';
+
+                               	?>
+                            <a href="#" onClick="<?php functions::xecho($strAction); ?>">
                                 
                                     <i class="fa fa-pencil fa-2x"></i>
                                 <?php echo _EDIT_TEMPLATE; ?>

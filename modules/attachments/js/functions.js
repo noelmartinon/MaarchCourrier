@@ -227,7 +227,71 @@ function modifyAttachmentsForm(path, width, height) {
         }
     });
 }
+/****modifiAttachmentsForm avec OnlyOffice***/
+function modifyAttachmentsForm2(path, width, height, path2, userId) {
 
+    if(typeof(width)==='undefined'){
+        var width = '800';
+    }
+    if(typeof(height)==='undefined'){
+        var height = '480';
+    }
+    var modal_content = '<input type="button" value="Valider"  onclick="destroyModal(\'form_editorl\');window.winterv=setInterval(function() {finishedit(\''+path2+'\')}, 700)"   /> &nbsp;&nbsp;<input type="button" value="Annuler"  onclick="destroyModal(\'form_editorl\');annulEdit();"   /> <iframe src="'+path+'" width="100%" height="100%" align="top" frameborder="0" name="frameEditorl" allowfullscreen="" onmousewheel=""></iframe>';
+    createModalinAttachmentList(modal_content, 'form_editorl', height, width, 'fullscreen');
+}
+/***annuler Edition***/
+function annulEdit() {
+    if($('add')) {
+        var target = $('add');
+    }else{
+        var target = $('edit');
+    }
+    console.log('Editing annuler !');
+    //target.removeAttribute('disabled');
+    target.style.opacity='0.5';
+    target.value='Edition';
+    target.disabled=true;
+
+}
+/*********finish Edit avec OnlyOffice***********/
+function finishedit(path) {
+//	console.log("in finishedit ...");
+    if($('add')) {
+        var target = $('add');
+    }else{
+        var target = $('edit');
+    }
+    var path_manage_script = "index.php?display=true&page=checkEditingligDoc&module=content_management";
+    new Ajax.Request(path_manage_script,
+        { method:'post',asynchronous:false,
+            onSuccess: function(answer){
+                eval("response = "+answer.responseText);
+                //	console.log("response.status = "+response.status);
+                if(response.status == 0) {
+                    console.log('no lck found##!'+target.value);
+                    target.removeAttribute('disabled');
+                    target.style.opacity='1';
+                    target.value='Valider';
+                    clearInterval(window.winterv);
+                    console.log('finishedit clearInterval path2! '+ path);
+                    new Ajax.Request(path,
+                        {
+                            asynchronous:false,
+                            method:'post',
+                            encoding: 'UTF-8',
+                            onSuccess: function(answer){
+                                console.log('## finishedit success !!!...');
+                            }
+                        });
+                } else {
+                    target.style.opacity='0.5';
+                    target.value='Edition en cours ...';
+                    console.log('lck found! finishedit Editing in progress !'+target.value+'###');
+                    target.disabled=true;
+                }
+            }
+        });
+}
 function setFinalVersion(path) {  
 
     new Ajax.Request(path,

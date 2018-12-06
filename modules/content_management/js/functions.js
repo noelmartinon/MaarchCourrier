@@ -191,6 +191,67 @@ function showDiv(divName, spanNb, divCreate, path_manage_script)
         }
     });
 }
+function checkEditingligDoc(ido,usr) {
+
+    var lck_name = 'cm_tmp_file_pdf_' +usr+ '_' + ido + '.lck';
+    console.log("###- "+lck_name);
+    if($j('#add').length){
+        var target = $j('#add');
+        //alert(target);
+    }else{
+        var target = $j('#templateOffice_edit');
+    }
+    //LOCK VALIDATE BUTTON
+    target.prop('disabled', true);
+    target.css({"opacity":"0.5"});
+    target.val('Edition l en cours ...');
+
+    //LOCK EDIT BUTTON TRANSMISSION
+    $j(".transmissionEdit").css({"opacity":"0.5"});
+    $j(".transmissionEdit").prop('disabled', true);
+
+    $j.ajax({
+        url : 'index.php?display=true&page=checkEditingligDoc&module=content_management',
+        type : 'POST',
+        dataType : 'JSON',
+        success : function(response){
+            if (response.status == 0) {
+                console.log('no lck found lig!');
+
+                //UNLOCK VALIDATE BUTTON
+                target.prop('disabled', false);
+                target.css({"opacity":"1"});
+                target.val('Valider');
+
+                //UNLOCK EDIT2 BUTTON TRANSMISSION
+                $j(".transmissionEdit, #templateOffice_edit").css({"opacity":"1"});
+                $j(".transmissionEdit, #templateOffice_edit").prop('disabled', false);
+
+                //END OF CHECKING APPLET
+                console.log('clearInterval');
+                clearInterval(editing);
+            } else {
+                console.log('lck found! Editing in progress !');
+
+                //LOCK VALIDATE BUTTON
+                target.prop('disabled', true);
+                target.css({"opacity":"0.5"});
+                target.val('Edition en cours ...');
+
+                //LOCK EDIT2 BUTTON TRANSMISSION
+                $j(".transmissionEdit, #templateOffice_edit").css({"opacity":"0.5"});
+                $j(".transmissionEdit, #templateOffice_edit").prop('disabled', true);
+
+            }
+        },
+        error : function(error){
+            console.log(error);
+            //alert(error);
+        }
+
+    });
+
+}
 
 function checkEditingDoc(elem, userId) {
 
@@ -296,7 +357,8 @@ function showAppletLauncher(target, resId, objectTable, objectType, mode) {
 
     if (mode == 'template') {
         var path = 'index.php?display=true&module=content_management&page=applet_modal_launcher&uniqueId=0&objectType=' + objectType + '&objectId=' + resId + '&objectTable=' + objectTable;
-    
+        //var path = 'index.php?display=true&module=content_management&page=doceditor&uniqueId=0&objectType=' + objectType + '&objectId=' + resId + '&objectTable=' + objectTable;
+
     } else {
         //Num of Attachment
         var attachNum = $j('#'+target.id).parent().parent().find('[name=attachNum\\[\\]]').val();

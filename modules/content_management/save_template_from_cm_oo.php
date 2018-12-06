@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 /*
 *
@@ -55,8 +55,10 @@ $newfilePdfOnDs = $docserver .$path.  $NewPdfFile;
 
 $filetmpdoc = $_SESSION['config']['tmppath'].$fileName;
 //$filetmppdf = $fileName.".pdf";
-$cmd = 'C:\WordConverter\Word2Pdf.exe /source "'.$filetmpdoc.'" /target "C:\wamp\www\sygec-fimf\apps\maarch_entreprise\tmp\"';
-exec($cmd); 
+//$cmd = 'C:\WordConverter\Word2Pdf.exe /source "'.$filetmpdoc.'" /target "C:\wamp\www\sygec-fimf\apps\maarch_entreprise\tmp\"';
+$cmd = 'cd C:\Program Files\LibreOffice\program  && soffice --convert-to pdf --outdir  C:\wamp\www\maarch_onlyoffice\apps\maarch_entreprise\tmp  '.$filetmpdoc.' ';
+
+exec($cmd);
 
 $filetmppdf = str_replace('.doc','.pdf',str_replace('.docx','.pdf',$fileName));
 
