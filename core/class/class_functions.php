@@ -405,7 +405,7 @@ class functions
     {
         //INIT LOCATION BAR
         if (empty($_SESSION['location_bar_label'])) {
-            $_SESSION['location_bar_label'][0] = "Accueil";
+            $_SESSION['location_bar_label'][0] = _WELCOME_TITLE;
             $_SESSION['location_bar_path'][0] = 'index.php?reinit=true';
         } if (!empty($level)) {
             //IF USER CLICKED ON LOCATION BAR
@@ -425,7 +425,7 @@ class functions
             array_shift($_SESSION['location_bar_label']);
             array_shift($_SESSION['location_bar_path']);
 
-            $_SESSION['location_bar_label'][0] = "Accueil";
+            $_SESSION['location_bar_label'][0] = _WELCOME_TITLE;
             $_SESSION['location_bar_path'][0] = 'index.php?reinit=true';
 
         }
