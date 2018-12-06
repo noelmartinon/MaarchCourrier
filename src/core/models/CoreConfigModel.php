@@ -81,7 +81,7 @@ class CoreConfigModel
     {
         /*$tmpPath = str_replace('src/core/models', '', dirname(__FILE__));
         $tmpPath .= 'apps/maarch_entreprise/tmp/';*/
-        //correction psur le chemin du repertoire image de la signature
+        //correction pour le chemin du repertoire image de la signature
         // $tmpPath renvoie comme chemin src/core/modelsapps/maarch_entreprise/tmp/
         $tmpPath = 'apps/maarch_entreprise/tmp/';
         return $tmpPath;
