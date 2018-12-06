@@ -1454,7 +1454,7 @@ $content .= '<div style="float: right; width: 65%">';
 //TABS
 $content .= '<div id="menuOnglet">';
     $content .= '<ul id="ongletAttachement" style="cursor:pointer;width:auto;">';
-        $content .= '<li id="MainDocument" onclick="activePjTab(this)"><span> Document principal </span></li>';
+        $content .= '<li id="MainDocument" onclick="activePjTab(this)"><span> '._MAIN_DOCUMENT.' </span></li>';
         if ($mode == 'edit') {
             $content .= '<li id="PjDocument_0" onclick="activePjTab(this)"><span> PJ n°1 </span></li>';
         }

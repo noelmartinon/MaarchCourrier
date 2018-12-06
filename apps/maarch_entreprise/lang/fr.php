@@ -11,7 +11,7 @@
 * @ingroup lang
 */
 if (!defined('_MEP_VERSION')) {
-    define('_MEP_VERSION', 'Maarch v18.04');
+    define('_MEP_VERSION', 'Maarch v18.10');
 }
 
 if (!defined('_ID_TO_DISPLAY')) { // value res_id || chrono_number
@@ -5219,4 +5219,13 @@ if (!defined('_CONTACTS_USERS_GROUPS_SEARCH')) {
 }
 if (!defined('_USE_MODEL_MAILING')) {
     define('_USE_MODEL_MAILING', 'Utiliser un modèle d\'enregistrement');
+}
+if (!defined('_PUT_IN_SIGNATORY_BOOK')) {
+    define('_PUT_IN_SIGNATORY_BOOK', 'Intégrer au parapheur');
+}
+if (!defined('_MAIN_DOCUMENT')) {
+    define('_MAIN_DOCUMENT', 'Document principal');
+}
+if (!defined('_DOWNLOAD_MAIN_DOCUMENT')) {
+    define('_DOWNLOAD_MAIN_DOCUMENT', 'Télécharger le document original');
 }

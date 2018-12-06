@@ -10,7 +10,7 @@
 * @author  dev <dev@maarch.org>
 * @ingroup lang
 */
-if (!defined('_MEP_VERSION')) { define('_MEP_VERSION', 'Maarch v18.04');}
+if (!defined('_MEP_VERSION')) { define('_MEP_VERSION', 'Maarch v18.10');}
 if (!defined('_ID_TO_DISPLAY')) { define('_ID_TO_DISPLAY', 'chrono_number');}
 if (!defined('_SVR')) { define('_SVR', 'Stilzwijgende weigering');}
 if (!defined('_SVA')) { define('_SVA', 'Stilzwijgende aanvaarding');}
@@ -1705,3 +1705,12 @@ if (!defined('_CONTACTS_USERS_GROUPS_SEARCH')) { define('_CONTACTS_USERS_GROUPS_
 if (!defined('_USER_MAARCH_PARAPHEUR')) { define('_USER_MAARCH_PARAPHEUR', 'Maarch vloeiboek gebruiker');}
 if (!defined('_DOCUMENT_WITH_NOTES')) { define('_DOCUMENT_WITH_NOTES', 'Document met opmerkingen');}
 if (!defined('_USE_MODEL_MAILING')) { define('_USE_MODEL_MAILING', 'Use model mailing');}
+if (!defined('_PUT_IN_SIGNATORY_BOOK')) {
+    define('_PUT_IN_SIGNATORY_BOOK', 'integreren in de elektronische handtekening');
+}
+if (!defined('_MAIN_DOCUMENT')) {
+    define('_MAIN_DOCUMENT', 'Hoofddocument');
+}
+if (!defined('_DOWNLOAD_MAIN_DOCUMENT')) {
+    define('_DOWNLOAD_MAIN_DOCUMENT', 'Download het hoofddocument');
+}

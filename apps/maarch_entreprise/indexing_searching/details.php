@@ -390,11 +390,11 @@ if ($stmt->rowCount() == 0) {
             <?php if ($info_mail->filename) {
                 ?>
                 <a href="../../rest/res/<?php functions::xecho($s_id); ?>/content" target="_blank">
-                    Voir le document
+                    <?php echo _VIEW_DOC;?>
                     <i class="tooltip visaPjUp tooltipstered fa fa-eye fa-2x" style="height: auto; width: auto;font-size: 14px;margin-right:6px;margin-top: -9px;" title="<?php echo _VIEW_DOC; ?>"></i>
                 </a>
                 <a href="../../rest/res/<?php functions::xecho($s_id); ?>/originalContent" target="_blank">
-                    <i class="tooltip visaPjUp tooltipstered fa fa-download fa-2x" style="height: auto; width: auto;font-size: 14px;margin-right:6px;margin-top: -9px;" title="Télécharger le document original"></i>
+                    <i class="tooltip visaPjUp tooltipstered fa fa-download fa-2x" style="height: auto; width: auto;font-size: 14px;margin-right:6px;margin-top: -9px;" title="<?php echo _DOWNLOAD_MAIN_DOCUMENT; ?>"></i>
                 </a>
             <?php
             } ?>

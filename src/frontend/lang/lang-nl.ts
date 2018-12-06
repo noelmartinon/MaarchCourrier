@@ -336,6 +336,7 @@ export const LANG_NL = {
     "records" : "resultaten",
     "recordsPerPage" : "resultaten per pagina",
     "redirectBasket" : "Het bakje doorsturen",
+    "redirectBaskets" : "De bakjes doorsturen",
     "redirectConfidentialInfo" : "Deze gebruiker heeft <b>vertrouwelijke brieven</b> die aan deze dienst gekoppeld zijn.<br/>Het is beter om deze aan een andere gebruiker van de dienst toe te wijzen.",
     "redirectedTo" : "Doorgestuurd aan",
     "redirectModelInfo" : "Deze gebruiker is aanwezig in het <b>verdelingsmodel</b> van de eenheid.",

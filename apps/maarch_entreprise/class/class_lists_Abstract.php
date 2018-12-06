@@ -1625,7 +1625,7 @@ abstract class lists_Abstract extends Database
         if ($resultTheLine[1]['value'] > 1) {
             $isVersion = 'true';
         }
-        $return .= 'onclick="setAttachmentInSignatureBook('.$resultTheLine[0]['value'].', '.$isVersion.');"/>Intégrer au parapheur';
+        $return .= 'onclick="setAttachmentInSignatureBook('.$resultTheLine[0]['value'].', '.$isVersion.');"/>'._PUT_IN_SIGNATORY_BOOK;
 
         return $return;
     }

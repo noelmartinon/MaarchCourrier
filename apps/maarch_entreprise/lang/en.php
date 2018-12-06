@@ -20,7 +20,7 @@
  */
 
 if (!defined('_MEP_VERSION')) {
-    define('_MEP_VERSION', 'Maarch v17.06');
+    define('_MEP_VERSION', 'Maarch v18.10');
 }
 
 //if (!defined("_ID_TO_DISPAY")) define("_ID_TO_DISPAY", "res_id"); // value res_id || chrono_number
@@ -3026,7 +3026,7 @@ if (!defined('_FULLTEXT_HELP')) {
     define('_FULLTEXT_HELP', 'Search in the mails content');
 }
 if (!defined('_FULLTEXT_ERROR')) {
-    define('_FULLTEXT_ERROR', 'Invalid enters for the full text search. If you put the sign ' * ", it has to be three characters at least before ans no signs like ,':!+");
+    define('_FULLTEXT_ERROR', 'Invalid enters for the full text search. If you put the sign " * ", it has to be three characters at least before ans no signs like ,\':!+');
 }
 if (!defined('_FILE_NOT_SEND')) {
     define('_FILE_NOT_SEND', "The file wasn't sent");
@@ -5057,4 +5057,13 @@ if (!defined('_CONTACTS_USERS_GROUPS_SEARCH')) {
 }
 if (!defined('_USE_MODEL_MAILING')) {
     define('_USE_MODEL_MAILING', 'Use model mailing');
+}
+if (!defined('_PUT_IN_SIGNATORY_BOOK')) {
+    define('_PUT_IN_SIGNATORY_BOOK', 'Put in signatory book');
+}
+if (!defined('_MAIN_DOCUMENT')) {
+    define('_MAIN_DOCUMENT', 'Main document');
+}
+if (!defined('_DOWNLOAD_MAIN_DOCUMENT')) {
+    define('_DOWNLOAD_MAIN_DOCUMENT', 'Download main document');
 }

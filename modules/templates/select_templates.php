@@ -16,7 +16,7 @@ if (isset($_SESSION['destination_entity']) && !empty($_SESSION['destination_enti
 	$templates = $templatesControler->getAllTemplatesForProcess($destination_entity);
 }
 $frmStr ="";
-$frmStr .= '<option value="">S&eacute;lectionnez le mod&egrave;le</option>';  
+$frmStr .= '<option value="">'._CHOOSE_MODEL.'</option>';  
 for ($i=0;$i<count($templates);$i++) {
 	if (!file_exists($templates[$i]['FILE'])) {
 		$disabled = 'disabled="disabled"';
