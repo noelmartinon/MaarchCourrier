@@ -1,7 +1,11 @@
 [![build status](https://labs.maarch.org/maarch/MaarchCourrier/badges/develop/build.svg)](https://labs.maarch.org/maarch/MaarchCourrier/commits/develop)
 [![coverage report](https://labs.maarch.org/maarch/MaarchCourrier/badges/develop/coverage.svg)](https://labs.maarch.org/maarch/MaarchCourrier/commits/develop)
-
-
+Installation de OnlyOffice :
+Télécharger onlyoffice-documentserver : https://www.onlyoffice.com/fr/download-developer-edition.aspx
+suivre l'installation selon votre OS : https://helpcenter.onlyoffice.com/fr/server/document.aspx
+NB : pour une installation sur un port spécial, il faut s'assurer  que le port soit libre
+Editer le fichier config  dans modules/content_management
+changer localhost par l'adresse ou est installé OnlyOffice en changeant aussi le port
 
 # Maarch Courrier
 Gestionnaire Électronique de Correspondances – Libre et Open Source –
