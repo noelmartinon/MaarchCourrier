@@ -48,7 +48,8 @@ foreach ($queryChildInfos as $key => $value) {
         && $key != 'tablename'
         && $key != 'locker_user_id'
         && $key != 'locker_time'
-        && $key != 'confidentiality') {
+        && $key != 'confidentiality'
+        && substr($key, 0, 7) != 'custom_') {
         if (is_numeric($value)) {
             array_push(
                 $aArgs['data'],
