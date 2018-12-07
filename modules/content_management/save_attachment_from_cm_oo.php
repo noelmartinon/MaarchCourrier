@@ -60,8 +60,8 @@ $filetmpdoc = $_SESSION['config']['tmppath'].$fileName;
  */
 //commande pour windows
   $cmd = 'cd C:\Program Files\LibreOffice\program  && soffice --convert-to pdf --outdir  C:\wamp\www\maarch_onlyoffice\apps\maarch_entreprise\tmp  '.$filetmpdoc.' ';
-exec($cmd);
-if(exec($cmd)){
+$exec = exec($cmd);
+if($exec){
 	echo "conversion ok";
 	//exit;
 }else{
