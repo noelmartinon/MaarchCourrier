@@ -18,7 +18,6 @@ use Basket\models\BasketModel;
 use Action\models\ActionModel;
 use Contact\models\ContactModel;
 use Core\Models\LangModel;
-use Docserver\models\DocserverModel;
 use Entity\models\ListInstanceModel;
 use Group\models\ServiceModel;
 use Link\models\LinkModel;
@@ -41,10 +40,6 @@ class VisaController
 
         if (!ResController::hasRightByResId(['resId' => $resId, 'userId' => $GLOBALS['userId']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
-        }
-        $docserver = DocserverModel::getByTypeId(['docserver_type_id' => 'TEMPLATES', 'select' => ['path_template']]);
-        if (!file_exists($docserver['path_template'])) {
-            return $response->withStatus(500)->withJson(['errors' => _UNREACHABLE_DOCSERVER]);
         }
 
         $documents = VisaController::getIncomingMailAndAttachmentsForSignatureBook(['resId' => $resId]);
