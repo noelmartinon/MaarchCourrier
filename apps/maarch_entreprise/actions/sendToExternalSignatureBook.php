@@ -67,27 +67,40 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
     $html .= '<form name="sendToExternalSB" id="sendToExternalSB" method="post" class="forms" action="#">';
     $html .= '<input type="hidden" name="chosen_action" id="chosen_action" value="end_action" />';
+    $htmlModal = '';
     if (!empty($config)) {
         if ($config['id'] == 'ixbus') {
             include_once 'modules/visa/class/IxbusController.php';
 
-            $html .= IxbusController::getModal($config);
+            $htmlModal = IxbusController::getModal($config);
         } elseif ($config['id'] == 'iParapheur') {
             include_once 'modules/visa/class/IParapheurController.php';
 
-            $html .= IParapheurController::getModal($config);
+            $htmlModal = IParapheurController::getModal($config);
         } elseif ($config['id'] == 'fastParapheur') {
             include_once 'modules/visa/class/FastParapheurController.php';
 
-            $html .= FastParapheurController::getModal($config);
+            $htmlModal = FastParapheurController::getModal($config);
         }
+
+        if (!empty($htmlModal['error'])) {
+            $error = $htmlModal['error'];
+        } else {
+            $html .= $htmlModal;
+        }
+    } else {
+        $error = _FILE . ' modules/visa/xml/remoteSignatoryBooks.xml' . ' ' . _NOT_EXISTS;
     }
 
     $html .='<div align="center">';
-    $html .=' <input type="button" name="validate" id="validate" value="'._VALIDATE.'" class="button" ' .
-            'onclick="valid_action_form(\'sendToExternalSB\', \'' . $path_manage_action .
-            '\', \'' . $id_action . '\', \'' . $values_str . '\', \'res_letterbox\', \'null\', \'letterbox_coll\', \'' .
-            $mode . '\');" />&nbsp;';
+    if (empty($error)) {
+        $html .=' <input type="button" name="validate" id="validate" value="'._VALIDATE.'" class="button" ' .
+                'onclick="valid_action_form(\'sendToExternalSB\', \'' . $path_manage_action .
+                '\', \'' . $id_action . '\', \'' . $values_str . '\', \'res_letterbox\', \'null\', \'letterbox_coll\', \'' .
+                $mode . '\');" />&nbsp;';
+    } else {
+        $html .= '<br>' . $error . '<br><br>';
+    }
     $html .='<input type="button" name="cancel" id="cancel" class="button" value="'._CANCEL.'" onclick="pile_actions.action_pop();destroyModal(\'modal_'.$id_action.'\');"/>';
 
     $html .='</div>';

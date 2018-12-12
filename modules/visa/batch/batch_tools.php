@@ -201,6 +201,11 @@ function Bt_createAttachment($aArgs = [])
     $curl = curl_init();
     curl_setopt_array($curl, $opts);
     $rawResponse = curl_exec($curl);
+    $error = curl_error($curl);
+    if (!empty($error)) {
+        $GLOBALS['logger']->write($error, 'ERROR');
+        exit;
+    }
 
     return json_decode($rawResponse, true);
 }

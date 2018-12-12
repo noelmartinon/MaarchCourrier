@@ -152,6 +152,18 @@ class CurlModel
             'eventId'   => $rawResponse
         ]);
 
+        if (!empty($error)) {
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'curl',
+                'level'     => 'ERROR',
+                'tableName' => '',
+                'recordId'  => '',
+                'eventType' => 'Error Exec Curl : ' . $error,
+                'eventId'   => $rawResponse
+            ]);
+        }
+
         return ['response' => simplexml_load_string($rawResponse), 'infos' => $infos, 'cookies' => $cookies, 'raw' => $rawResponse, 'error' => $error];
     }
 

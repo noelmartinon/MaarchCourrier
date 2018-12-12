@@ -18,7 +18,15 @@ class IxbusController
     public static function getModal($config)
     {
         $initializeDatas = IxbusController::getInitializeDatas($config);
-
+        if (!empty($initializeDatas['error'])) {
+            return ['error' => $initializeDatas['error']];
+        }
+        if (empty($initializeDatas['natures'])) {
+            return ['error' => _NATURE . ' ' . _IS_EMPTY ];
+        }
+        if (empty($initializeDatas['messagesModel'])) {
+            return ['error' => _VISA_WORKFLOW . ' ' . _IS_EMPTY ];
+        }
         $html .= '<label for="nature">' . _NATURE_IXBUS . '</label><select name="nature" id="nature">';
         if (!empty($initializeDatas['natures']->Classeur)) {
             foreach ($initializeDatas['natures']->Classeur as $value) {
@@ -67,30 +75,36 @@ class IxbusController
             'options'       => [CURLOPT_HEADER => 1]
         ]);
 
-        $cookie = '';
-        foreach ($data['cookies'] as $key => $value) {
-            $cookie = $key . '=' . $value . ';';
+        if (!empty($data['cookies'])) {
+            $cookie = '';
+            foreach ($data['cookies'] as $key => $value) {
+                $cookie = $key . '=' . $value . ';';
+            }
+        } elseif (!empty($data['error'])) {
+            return ["error" => $data['error']];
         }
 
-        return $cookie;
+        return ["cookie" => $cookie];
     }
 
     public static function getInitializeDatas($config)
     {
         $sessionId = IxbusController::createSession($config);
-        $rawResponse['natures']       = IxbusController::getNature(['config' => $config, 'sessionId' => $sessionId]);
-        // $rawResponse['usersList']     = IxbusController::getUsersList(['config' => $config, 'sessionId' => $sessionId]);
-        $messagesModels = IxbusController::getMessagesModel(['config' => $config, 'sessionId' => $sessionId]);
+        if (!empty($sessionId['error'])) {
+            return ['error' => $sessionId['error']];
+        }
+        $rawResponse['natures']       = IxbusController::getNature(['config' => $config, 'sessionId' => $sessionId['cookie']]);
+        // $rawResponse['usersList']     = IxbusController::getUsersList(['config' => $config, 'sessionId' => $sessionId['cookie']]);
+        $userInfo  = IxbusController::getInfoUtilisateur(['config' => $config, 'login' => $config['data']['userId'], 'password' => $config['data']['password']]);
+        $messagesModels = IxbusController::getMessagesModel(['config' => $config, 'sessionId' => $sessionId['cookie'], 'userIdentifiant' => $userInfo->Identifiant]);
 
         $rawResponse['messagesModel'] = [];
         if (!empty($rawResponse['natures']->Classeur)) {
             foreach ($rawResponse['natures']->Classeur as $nature) {
                 foreach ($messagesModels->Message as $message) {
-                    if ($message->Identifiant == 392213) {
-                        $messageModel = IxbusController::getMessageNature(['config' => $config, 'messageId' => $message->Identifiant, 'sessionId' => $sessionId]);
-                        if ((string)$messageModel->IdentifiantClasseur == (string)$nature->Identifiant) {
-                            $rawResponse['messagesModel'][(string)$messageModel->IdentifiantMessage] = (string)$message->IdentifiantSpecifique;
-                        }
+                    $messageModel = IxbusController::getMessageNature(['config' => $config, 'messageId' => $message->Identifiant, 'sessionId' => $sessionId['cookie']]);
+                    if ((string)$messageModel->IdentifiantClasseur == (string)$nature->Identifiant) {
+                        $rawResponse['messagesModel'][(string)$messageModel->IdentifiantMessage] = (string)$message->IdentifiantSpecifique;
                     }
                 }
             }
@@ -142,7 +156,7 @@ class IxbusController
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
           <soap:Body>
             <GetMessagesModel xmlns="http://www.srci.fr">
-              <utilisateurID>8</utilisateurID>
+              <utilisateurID>'.$aArgs['userIdentifiant'].'</utilisateurID>
               <organisationID>'.$aArgs['config']['data']['organizationId'].'</organisationID>
               <serviceID>-1</serviceID>
               <typeMessage>Production</typeMessage>
@@ -253,6 +267,9 @@ class IxbusController
     public static function sendDatas($aArgs)
     {
         $sessionId = IxbusController::createSession($aArgs['config']);
+        if (!empty($sessionId['error'])) {
+            return ['error' => $sessionId['error']];
+        }
         $userInfo  = IxbusController::getInfoUtilisateur(['config' => $aArgs['config'], 'login' => $aArgs['loginIxbus'], 'password' => $aArgs['passwordIxbus']]);
 
         $attachments = \Attachment\models\AttachmentModel::getOnView([
@@ -318,7 +335,7 @@ class IxbusController
                     "Cache-Control: no-cache",
                     "Pragma: no-cache",
                     "Content-length: ".strlen($xmlPostString),
-                    "Cookie:".$sessionId,
+                    "Cookie:".$sessionId['cookie'],
                     "SOAPAction: \"http://www.srci.fr/SendDossier\""
                 ],
                 CURLOPT_RETURNTRANSFER => true,
@@ -368,24 +385,26 @@ class IxbusController
     public static function retrieveSignedMails($aArgs)
     {
         $sessionId = IxbusController::createSession($aArgs['config']);
-
+        if (!empty($sessionId['error'])) {
+            return ['error' => $sessionId['error']];
+        }
         foreach (['noVersion', 'isVersion'] as $version) {
             foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                $etatDossier = IxbusController::getEtatDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId, 'dossier_id' => $value->external_id]);
+                $etatDossier = IxbusController::getEtatDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
     
                 // Refused
                 if ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatRefused']) {
                     $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
-                    $notes = IxbusController::getDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId, 'dossier_id' => $value->external_id]);
+                    $notes = IxbusController::getDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
                     $aArgs['idsToRetrieve'][$version][$resId]->noteContent = (string)$notes->MotifRefus;
                 // Validated
                 } elseif ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatValidated']) {
                     $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
-                    $signedDocument = IxbusController::getAnnexes(['config' => $aArgs['config'], 'sessionId' => $sessionId, 'dossier_id' => $value->external_id]);
+                    $signedDocument = IxbusController::getAnnexes(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
                     $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf'; // format du fichier récupéré
                     $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = (string)$signedDocument->Fichier;
 
-                    $notes = IxbusController::getAnnotations(['config' => $aArgs['config'], 'sessionId' => $sessionId, 'dossier_id' => $value->external_id]);
+                    $notes = IxbusController::getAnnotations(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
                     $aArgs['idsToRetrieve'][$version][$resId]->noteContent = (string)$notes->Annotation->Texte;
                 } else {
                     unset($aArgs['idsToRetrieve'][$version][$resId]);

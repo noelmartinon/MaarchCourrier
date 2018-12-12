@@ -253,10 +253,16 @@ if ($configRemoteSignatoryBook['id'] == 'ixbus') {
     $retrievedMails = FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
 }
 
+if (!empty($retrievedMails['error'])) {
+    $GLOBALS['logger']->write($retrievedMails['error'], 'ERROR');
+    exit;
+}
+
 // On dégele les pj et on créé une nouvelle ligne si le document a été signé
 foreach ($retrievedMails['isVersion'] as $resId => $value) {
-    $GLOBALS['logger']->write('Update version attachment', 'INFO');
+    $GLOBALS['logger']->write('Update res_version_attachments : ' . $resId . '. ExternalId : ' . $value->external_id, 'INFO');
     if ($value->status == 'validated') {
+        $GLOBALS['logger']->write('Document validated', 'INFO');
         Bt_createAttachment([
             'res_id_master'   => $value->res_id_master,
             'title'           => $value->title,
@@ -290,6 +296,7 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
             'event_id'   => '1'
         ]);
     } elseif ($value->status == 'refused') {
+        $GLOBALS['logger']->write('Document refused', 'INFO');
         Bt_refusedSignedMail([
             'tableAttachment' => 'res_version_attachments',
             'resIdAttachment' => $resId,
@@ -301,8 +308,9 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
 }
 
 foreach ($retrievedMails['noVersion'] as $resId => $value) {
-    $GLOBALS['logger']->write('Update attachment', 'INFO');
+    $GLOBALS['logger']->write('Update res_attachments : ' . $resId . '. ExternalId : ' . $value->external_id, 'INFO');
     if ($value->status == 'validated') {
+        $GLOBALS['logger']->write('Document validated', 'INFO');
         Bt_createAttachment([
             'res_id_master'   => $value->res_id_master,
             'title'           => $value->title,
@@ -336,6 +344,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             'event_id'   => '1'
         ]);
     } elseif ($value->status == 'refused') {
+        $GLOBALS['logger']->write('Document refused', 'INFO');
         Bt_refusedSignedMail([
             'tableAttachment' => 'res_attachments',
             'resIdAttachment' => $resId,
@@ -346,7 +355,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
     }
 }
 
-$GLOBALS['logger']->write('end of process', 'INFO');
+$GLOBALS['logger']->write('End of process', 'INFO');
 $nbMailsRetrieved = count($retrievedMails['noVersion']) + count($retrievedMails['isVersion']);
 $GLOBALS['logger']->write($nbMailsRetrieved.' mail(s) retrieved', 'INFO');
 
