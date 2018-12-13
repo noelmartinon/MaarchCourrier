@@ -525,8 +525,12 @@ for ($i = 0; $i < $tabI; ++$i) {
                     $arrayPDO = array($return_stmt->item_id);
                     $stmt2 = $db->query($query, $arrayPDO);
                     $return_stmt = $stmt2->fetch(PDO::FETCH_ASSOC);
-                    $formattedContact = \SrcCore\controllers\AutoCompleteController::getFormattedContact(['contact' => $return_stmt]);
-                    $tab[$i][$j]['value'] = $formattedContact['contact']['contact'];
+                    if ($return_stmt == false) {
+                        $tab[$i][$j]['value'] = '';
+                    } else {
+                        $formattedContact = \SrcCore\controllers\AutoCompleteController::getFormattedContact(['contact' => $return_stmt]);
+                        $tab[$i][$j]['value'] = $formattedContact['contact']['contact'];
+                    }
                 } else if ($return_stmt->type == 'entity') {
                     $query = 'SELECT short_label FROM entities WHERE id = ?';
                     $arrayPDO = array($return_stmt->item_id);
