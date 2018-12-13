@@ -153,7 +153,7 @@ class FastParapheurController
             'data'                  => [$aArgs['resIdMaster'], 'print_folder']
         ]);
 
-        if (isset($annexes['attachments'])) {
+        if (!empty($annexes['attachments'])) {
             for ($i = 0; $i < count($annexes['attachments']); $i++) {
                 $annexAttachmentInfo                    = \Attachment\models\AttachmentModel::getById(['id' => $annexes['attachments'][$i]['res_id'], 'isVersion' => false]);
                 $annexAttachmentPath                    = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $annexAttachmentInfo['docserver_id'], 'select' => ['path_template']]);
