@@ -1104,12 +1104,12 @@ class Install extends functions
         //$ipconfig = shell_exec($path);
         //$ipconfig = trim($ipconfig);
         //$chemin = $ipconfig . dirname($_SERVER['PHP_SELF'] .'cs_'.$_SESSION['config']['databasename']);
-        if ($_SERVER['REMOTE_ADDR'] == '::1') {
-            $REMOTE_ADDR = 'localhost';
+        if ($_SERVER['SERVER_ADDR'] == '::1') {
+            $SERVER_ADDR = 'localhost';
         } else {
-            $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
+            $SERVER_ADDR = $_SERVER['SERVER_ADDR'];
         }
-        $chemin = $REMOTE_ADDR.dirname($_SERVER['PHP_SELF'].'cs_'.$_SESSION['config']['databasename']);
+        $chemin = $SERVER_ADDR.dirname($_SERVER['PHP_SELF'].'cs_'.$_SESSION['config']['databasename']);
         $maarchUrl = rtrim($chemin, 'install');
         $maarchUrl = $maarchUrl.'cs_'.$_SESSION['config']['databasename'].'/';
         $CONFIG->MaarchUrl = $maarchUrl;
@@ -1149,13 +1149,13 @@ class Install extends functions
 
         $chemin_core = realpath('.').'/core/';
 
-        if ($_SERVER['REMOTE_ADDR'] == '::1') {
-            $REMOTE_ADDR = 'localhost';
+        if ($_SERVER['SERVER_ADDR'] == '::1') {
+            $SERVER_ADDR = 'localhost';
         } else {
-            $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
+            $SERVER_ADDR = $_SERVER['SERVER_ADDR'];
         }
         $CONFIG->MaarchDirectory = realpath('.').'/';
-        $chemin = $REMOTE_ADDR.dirname($_SERVER['PHP_SELF'].'cs_'.$_SESSION['config']['databasename']);
+        $chemin = $SERVER_ADDR.dirname($_SERVER['PHP_SELF'].'cs_'.$_SESSION['config']['databasename']);
         $maarchUrl = rtrim($chemin, 'install');
         $maarchUrl = $maarchUrl.'cs_'.$_SESSION['config']['databasename'].'/';
         $CONFIG->MaarchUrl = $maarchUrl;
