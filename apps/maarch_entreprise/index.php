@@ -183,7 +183,9 @@ if (!empty($_REQUEST['code']) || !empty($_REQUEST['state'])) {
 if (
     !isset($_SESSION['user']['UserId']) 
     && $_REQUEST['page'] <> 'login' 
-    && $_REQUEST['page'] <> 'log'
+    && $_REQUEST['page'] <> 'log'        
+    && $_REQUEST['page'] <> 'logout'
+
 ) {
     $_SESSION['HTTP_REFERER'] = Url::requestUri();
     if (trim($_SERVER['argv'][0]) <> '') {
