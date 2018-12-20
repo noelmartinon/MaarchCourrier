@@ -761,7 +761,7 @@ switch ($mode) {
 					//Position label
 					$content .= '<label>'._POSITION_NAME.': </label><br/>';
 					$content .= '<input type="text" name="position_label"  id="position_label" '
-						.'value="'.$positionArray[0]['LABEL'].'" class="fileplan_position" /><br/><br/>';
+						.'value="'.functions::xssafe($positionArray[0]['LABEL']).'" class="fileplan_position" /><br/><br/>';
 					//Nest position under parent
 					$content .= _NEST_POSITION_UNDER.' : <br/>';
 					$content .='<select name="parent_id" id="parent_id" class="fileplan_position">'; 
