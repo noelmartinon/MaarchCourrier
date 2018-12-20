@@ -201,7 +201,7 @@ if (!empty($fileplan_id) && $fileplan->isPersonnalFileplan($fileplan_id) === fal
                             $tab[$i][$j]['order'] = 'position_label';
                         }
                         if ($tab[$i][$j][$value] == 'parent_id') {
-                            $tab[$i][$j]['value'] = $fileplan->getPosition($fileplan_id, $tab[$i][$j]['value'], 'position_label');
+                            $tab[$i][$j]['value']= functions::xssafe($fileplan->getPosition($fileplan_id, $tab[$i][$j]['value'], 'position_label'));
                             $tab[$i][$j]['label'] = _POSITION_PARENT;
                             $tab[$i][$j]['size'] = '25';
                             $tab[$i][$j]['label_align'] = 'left';
@@ -211,7 +211,7 @@ if (!empty($fileplan_id) && $fileplan->isPersonnalFileplan($fileplan_id) === fal
                             $tab[$i][$j]['order'] = 'parent_position_id';
                         }
                         if ($tab[$i][$j][$value] == 'position_path') {
-                            $tab[$i][$j]['value'] = $fileplan->getPositionPath($fileplan_id, $tab[$i][$j]['value']);
+                            $tab[$i][$j]['value']= functions::xssafe($fileplan->getPositionPath($fileplan_id, $tab[$i][$j]['value']));
                             $tab[$i][$j]['label'] = _POSITION_PATH;
                             $tab[$i][$j]['size'] = '50';
                             $tab[$i][$j]['label_align'] = 'left';

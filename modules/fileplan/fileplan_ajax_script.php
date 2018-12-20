@@ -616,7 +616,7 @@ switch ($mode) {
 			$content .= '<input type="text" name="position_label"  id="position_label" '
 				.'value="" class="fileplan_position" /><br/><br/>';
 			//Nest position under parent
-			$content .= _NEST_POSITION_UNDER.': <br/>';
+			$content .= _NEST_POSITION_UNDER.' : <br/>';
 			$content .='<select name="parent_id" id="parent_id" class="fileplan_position">'; 
 			$content .='<option value="">'._CHOOSE_PARENT_POSITION.'</option>';
 			//Get positions tree
@@ -625,13 +625,13 @@ switch ($mode) {
 			(count($positions_array) == 0)? $rootSelected = ' selected="selected"' : $rootSelected = '';
 			$fileplan_array = $fileplan->getFileplan($fileplan_id);
 			$content .='<option value="'.$fileplan_array['ID'].'"'.$rootSelected.'>'
-				.$fileplan_array['LABEL'].'</option>';
+				. functions::xssafe($fileplan_array['LABEL']).'</option>';
 			//Show positions
 			for($i=0; $i < count($positions_array); $i++) {
 				//Is enable ?
 				if ($fileplan->isEnable($fileplan_id, $positions_array[$i]['ID'])) { 
 					$content .='<option value="'.$positions_array[$i]['ID'].'" >'
-						.$positions_array[$i]['LABEL'].'</option>';
+						. str_replace("---", "&nbsp;&nbsp;", functions::xssafe(str_replace("&emsp;", "---", $positions_array[$i]['LABEL']))).'</option>';
 				}
 			}
 			$content .='</select>';
@@ -720,7 +720,7 @@ switch ($mode) {
 									."&module=fileplan".$parameters."');";
 						}
 						$js .= "window.top.$('main_info').innerHTML = '"._POSITION_ADDED.': '
-							.$_REQUEST['position_label']."';";
+							.addslashes($_REQUEST['position_label'])."';";
 					}
 				}
 			} else {
@@ -761,9 +761,9 @@ switch ($mode) {
 					//Position label
 					$content .= '<label>'._POSITION_NAME.': </label><br/>';
 					$content .= '<input type="text" name="position_label"  id="position_label" '
-						.'value="'.$positionArray[0]['LABEL'].'" class="fileplan_position" /><br/><br/>';
+						.'value="'.functions::xssafe($positionArray[0]['LABEL']).'" class="fileplan_position" /><br/><br/>';
 					//Nest position under parent
-					$content .= _NEST_POSITION_UNDER.': <br/>';
+					$content .= _NEST_POSITION_UNDER.' : <br/>';
 					$content .='<select name="parent_id" id="parent_id" class="fileplan_position">'; 
 					$content .='<option value="">'._CHOOSE_PARENT_POSITION.'</option>';
 					//Init with fileplan
@@ -771,7 +771,7 @@ switch ($mode) {
 					//Selected?
 					(empty($positionArray[0]['PARENT_ID']))? $rootSelected = ' selected="selected"' : $rootSelected = '';
 					$content .='<option value="'.$fileplan_array['ID'].'" '.$rootSelected.'>'
-						.$fileplan_array['LABEL'].'</option>';
+						.functions::xssafe($fileplan_array['LABEL']).'</option>';
 					//Get positions tree
 					$positions_array = $fileplan->getPositionsTree($fileplan_id, $positions_array);
 					for($i=0; $i < count($positions_array); $i++) {
@@ -781,7 +781,7 @@ switch ($mode) {
 							($positionArray[0]['PARENT_ID'] == $positions_array[$i]['ID'])?
 								$selected = ' selected="selected"' : $selected = '';
 							$content .='<option value="'.$positions_array[$i]['ID'].'" '.$selected.'>'
-								.$positions_array[$i]['LABEL'].'</option>';
+								.str_replace("---", "&nbsp;&nbsp;", functions::xssafe(str_replace("&emsp;", "---", $positions_array[$i]['LABEL']))).'</option>';
 						}
 					}
 					$content .='</select>';
@@ -1272,7 +1272,7 @@ switch ($mode) {
 					//Selected?
 					($fileplan_id == $fileplan_array[$i]['ID'] || count($fileplan_array) == 1)? $selected = ' selected="selected"' : $selected = '';
 					$content .='<option value="'.$fileplan_array[$i]['ID'].'"'.$selected.' >'
-						.$fileplan_array[$i]['LABEL'].'</option>';
+						.functions::xssafe($fileplan_array[$i]['LABEL']).'</option>';
 				}
 			}
 			

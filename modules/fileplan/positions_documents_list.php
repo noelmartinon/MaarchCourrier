@@ -123,7 +123,7 @@ if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
             $start
         );
 
-        $description = $fileplan->getPositionPath($fileplan_id, $position_id, true);
+        $description = functions::xssafe($fileplan->getPositionPath($fileplan_id, $position_id, true));
 
         //Result Array
         if (!empty($tab)) {
