@@ -120,18 +120,18 @@ if (!empty($_REQUEST['fileplan_id'])) {
 					if(!$row2){
 						$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
 							."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . functions::xssafe($noeud['nom_fileplan']);
 					}else{
 						$_SESSION['origin_positions'][]=$noeud['fileplan_id'];
 						$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' checked='checked' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
 							."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . functions::xssafe($noeud['nom_fileplan']);
 					}
 
 				}else{
 					$html .= "<li style='margin-left:10px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
 							."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+							. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . functions::xssafe($noeud['nom_fileplan']);
 				}
 
 
@@ -190,17 +190,17 @@ function afficher_arbo($parent, $niveau, $array, $multi_doc)
 			if(!$row2){
 				$html .= "<li style='margin-left:20px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
 					."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-					. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . functions::xssafe($noeud['nom_fileplan']);
 			}else{
 				$_SESSION['origin_positions'][]=$noeud['fileplan_id'];
 				$html .= "<li style='margin-left:20px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' checked='checked' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
 					."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-					. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . functions::xssafe($noeud['nom_fileplan']);
 			}
 		}else{
 			$html .= "<li style='margin-left:20px;'><input type='checkbox' name='position[]' id='position_".$noeud['fileplan_id']."' value='".$noeud['fileplan_id']."' onClick=\"saveCheckedState('". $_SESSION['config']['businessappurl']
 					."index.php?display=true&module=fileplan&page=fileplan_ajax_script"
-					. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . $noeud['nom_fileplan'];
+					. "&fileplan_id=".$_REQUEST['fileplan_id']."&mode=checkPosition', this);\"/>" . functions::xssafe($noeud['nom_fileplan']);
 		}
 
 		$niveau_precedent = $niveau;

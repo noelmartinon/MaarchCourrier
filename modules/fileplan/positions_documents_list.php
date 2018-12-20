@@ -95,7 +95,7 @@ if(isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
 		,array($fileplan_id,$position_id));
 
 		
-		$description = $fileplan->getPositionPath($fileplan_id, $position_id, true);
+		$description = functions::xssafe($fileplan->getPositionPath($fileplan_id, $position_id, true));
 		
 		$resId_array = array();
 		//
@@ -112,7 +112,7 @@ if(isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
 				$stmt2 = $db->query(
 					"SELECT res_id, alt_identifier, res_id as right_doc, status, type_label,"
 					." category_id, subject, creation_date FROM "
-                    . $view . " WHERE res_id = ?"
+					. $view . " WHERE res_id = ?"
 				,array($line->res_id));
 
 				$res = $stmt2->fetch(PDO::FETCH_ASSOC);
