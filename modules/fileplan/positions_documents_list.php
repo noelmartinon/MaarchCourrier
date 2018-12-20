@@ -95,7 +95,7 @@ if(isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
 		,array($fileplan_id,$position_id));
 
 		
-		$description = $fileplan->getPositionPath($fileplan_id, $position_id, true);
+		$description = functions::xssafe($fileplan->getPositionPath($fileplan_id, $position_id, true));
 		
 		$resId_array = array();
 		//

@@ -142,10 +142,10 @@ if (count($fileplans_array) > 0)  {
 														?>
 														{
 														'id' : '<?php functions::xecho($fileplans_array[$i]['ID'].'@@'.$level_1[$ii]['id']);?>',
-														'title' : '<?php echo addslashes($level_1[$ii]['tooltip_value']);?>',
+														'title' : '<?php functions::xecho($level_1[$ii]['tooltip_value']);?>',
 														'canhavechildren' : true,
 														'onclick' : 'view_document_list',
-														'txt' : '<?php echo "&nbsp;".addslashes($level_1[$ii]['label_value']);?>',
+														'txt' : '<?php echo "&nbsp;"; functions::xecho($level_1[$ii]['label_value']);?>',
 														'style': 'tree_branch'
 														
 														},
