@@ -276,34 +276,35 @@ if (!empty($_REQUEST['action'])
             $inF = fopen($_SESSION['config']['tmppath'] . $tmpFileName, 'w');
             fwrite($inF, $fileContent);
             fclose($inF);
-			
-			//Récupération de la version pdf du document
-			if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == "true" && ($objectType == 'attachmentFromTemplate' || $objectType == 'attachment' || $objectType == 'attachmentUpVersion' || $objectType == 'attachmentVersion' || $objectType == 'outgoingMail' || $objectType == 'resourceEdit' || $objectType == 'transmission') && isset($_REQUEST['pdfContent'])){
-				$pdfEncodedContent = str_replace(
-					' ',
-					'+',
-					$_REQUEST['pdfContent']
-				);
-				$pdfContent = base64_decode($pdfEncodedContent);
-				//copy file on Maarch tmp dir
-				$tmpFilePdfName = 'cm_tmp_file_pdf_' . $_SESSION['user']['UserId']
-					. '_' . rand() . '.pdf';
-				$inFpdf = fopen($_SESSION['config']['tmppath'] . $tmpFilePdfName, 'w');
-				fwrite($inFpdf, $pdfContent);
-				fclose($inFpdf);
-			}
-			
+            
             $arrayIsAllowed = array();
             $arrayIsAllowed = Ds_isFileTypeAllowed(
                 $_SESSION['config']['tmppath'] . $tmpFileName
             );
             if ($arrayIsAllowed['status'] == false) {
+                unlink($_SESSION['config']['tmppath'] . $tmpFileName);
                 $result = array(
                     'ERROR' => _WRONG_FILE_TYPE
                     . ' ' . $arrayIsAllowed['mime_type']
                 );
                 createXML('ERROR', $result);
             } else {
+                //Récupération de la version pdf du document
+                if ($_SESSION['modules_loaded']['attachments']['convertPdf'] == "true" && ($objectType == 'attachmentFromTemplate' || $objectType == 'attachment' || $objectType == 'attachmentUpVersion' || $objectType == 'attachmentVersion' || $objectType == 'attachmentMailing' || $objectType == 'outgoingMail' || $objectType == 'resourceEdit' || $objectType == 'transmission' || $objectType == 'newAttachment') && isset($_REQUEST['pdfContent'])) {
+                    $pdfEncodedContent = str_replace(
+                        ' ',
+                        '+',
+                        $_REQUEST['pdfContent']
+                    );
+                    $pdfContent = base64_decode($pdfEncodedContent);
+                    //copy file on Maarch tmp dir
+                    $tmpFilePdfName = 'cm_tmp_file_pdf_' . $_SESSION['user']['UserId']
+                        . '_' . rand() . '.pdf';
+                    $inFpdf = fopen($_SESSION['config']['tmppath'] . $tmpFilePdfName, 'w');
+                    fwrite($inFpdf, $pdfContent);
+                    fclose($inFpdf);
+                }
+            
                 //depending on the type of object, the action is not the same
                 if ($objectType == 'resource') {
                     include 'modules/content_management/save_new_version_from_cm.php';
