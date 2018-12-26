@@ -1971,7 +1971,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     }
 
     //store the initiator entity
-    $initiator = get_value_fields($values, 'initiator');
+    $initiator = get_value_fields($values_form, 'initiator');
     if (!empty($initiator)) {
         $query_res .= ', initiator = ?';
         $arrayPDOres = array_merge($arrayPDOres, array($initiator));
