@@ -58,10 +58,13 @@ class UserController
             ]);
         } else {
             $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
-            $users = UserEntityModel::getUsersByEntities([
-                'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'enabled', 'mail'],
-                'entities'  => $entities
-            ]);
+            $users = [];
+            if (!empty($entities)) {
+                $users = UserEntityModel::getUsersByEntities([
+                    'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'enabled', 'mail'],
+                    'entities'  => $entities
+                ]);
+            }
             $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'status', 'enabled', 'mail']]);
             $users = array_merge($users, $usersNoEntities);
         }
