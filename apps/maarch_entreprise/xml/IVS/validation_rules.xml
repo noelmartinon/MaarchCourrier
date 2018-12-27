@@ -7,7 +7,7 @@
       <parameter name="display" type="boolean" />
       <parameter name="reinit" type="boolean" />
       <parameter name="what" type="string" />
-      <parameter name="order_field" type="string" />
+      <parameter name="order_field" type="identifier" />
       <parameter name="module" type="identifier" />
       <parameter name="level" type="identifier" />
       <parameter name="dir" type="identifier" />
