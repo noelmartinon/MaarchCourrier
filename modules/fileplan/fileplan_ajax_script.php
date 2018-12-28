@@ -239,7 +239,7 @@ switch ($mode) {
 			$content .='<label nowrap>'._FILEPLAN_NAME.': </label>';
 			$content .='<input name="fileplan_label" type="text" '
 				.'id="fileplan_label" class="fileplan_position" value="'
-				.$fileplan_array['LABEL']
+				. functions::xssafe($fileplan_array['LABEL'])
 				.'" /><span class="red_asterisk"><i class="fa fa-star"></i></span>';
 			$content .='</p>';
 			//Entity if needed
@@ -288,7 +288,9 @@ switch ($mode) {
 				$content .='<input name="is_serial" type="radio" id="is_serial" value="N" '.$checkedNo.' />'._NO;
 				$content .='<span class="red_asterisk"><i class="fa fa-star"></i></span>';
 				$content .='</p>';
-			}
+			} else {
+                $content .= '<input type="hidden" value="'.$fileplan_array['IS_SERIAL'].'" name="is_serial"/>';
+            }
 			$content .= '</div>';
 			//Buttons
 			$content .='<hr />';
@@ -312,8 +314,8 @@ switch ($mode) {
 			//Get fileplan name
 			if (strlen(trim($_REQUEST['fileplan_label'])) > 0) {
 				//Init
-				$user_id = 'NULL';
-				$entity_id = 'NULL';
+				$user_id = '';
+				$entity_id = '';
 				
 				//Get fileplan scope
 				if ($origin == "admin" 
@@ -890,7 +892,7 @@ switch ($mode) {
 											."&module=fileplan".$parameters."');";
 								}
 								$js .= "window.top.$('main_info').innerHTML = '"._POSITION_UPDATED.': '
-									.$_REQUEST['position_label']."';";
+									.addslashes($_REQUEST['position_label'])."';";
 							}
 						} else {
 							$error = functions::wash_html($old_position_id.': '._POSITION_NOT_EXISTS.'!','NONE');
