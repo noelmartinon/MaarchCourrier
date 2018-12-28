@@ -18,14 +18,7 @@ if (isset($_REQUEST['dir']) && !empty($_REQUEST['dir'])) {
     $_REQUEST['dir'] = str_replace("..", "", $_REQUEST['dir']);
 }
 
-//Ozwillo
-if (!empty($_REQUEST['code']) && !empty($_REQUEST['state'])) {
-    $_SESSION['ozwillo']['code'] = $_REQUEST['code'];
-    $_SESSION['ozwillo']['state'] = $_REQUEST['state'];
-}
-
 //reset orders in previous basket list
-
 if (empty($_SESSION['current_basket'])) {
     $_SESSION['save_list']['start'] = 0;
     $_SESSION['save_list']['lines'] = "";
@@ -59,40 +52,30 @@ if (isset($_SESSION['user']['UserId'])
 /**
  * [Includes]
  */
-if ($_REQUEST['page'] && empty($_REQUEST['triggerAngular'])) {
-    //V1
-    include_once '../../core/class/class_functions.php';
-    include_once '../../core/class/class_db_pdo.php';
-    include_once '../../core/init.php';
-    include 'apps/maarch_entreprise/tools/maarchIVS/MaarchIVS.php';
+include_once '../../core/class/class_functions.php';
+include_once '../../core/class/class_db_pdo.php';
+include_once '../../core/init.php';
+include 'apps/maarch_entreprise/tools/maarchIVS/MaarchIVS.php';
 
-    if ($_SESSION['config']['usePHPIDS'] == 'true') {
-        include 'apps/maarch_entreprise/phpids_control.php';
-    }
+//Ozwillo
+if (!empty($_REQUEST['code']) && !empty($_REQUEST['state'])) {
+    $_SESSION['ozwillo']['code'] = $_REQUEST['code'];
+    $_SESSION['ozwillo']['state'] = $_REQUEST['state'];
+}
 
-    //SET custom path
-    if (isset($_SESSION['config']['corepath'])) {
-        require_once 'core/class/class_db.php';
-        require_once 'core/class/class_core_tools.php';
-        $core = new core_tools();
-        if (! isset($_SESSION['custom_override_id'])
-            || empty($_SESSION['custom_override_id'])
-        ) {
-            $_SESSION['custom_override_id'] = $core->get_custom_id();
-            if (! empty($_SESSION['custom_override_id'])) {
-                $path = $_SESSION['config']['corepath'] . 'custom/'
-                      . $_SESSION['custom_override_id'] . '/';
-                set_include_path(
-                    $path . '/' . $_SESSION['config']['corepath']
-                );
-            }
-        }
-    } else {
-        require_once '../../core/class/class_db.php';
-        require_once '../../core/class/class_core_tools.php';
-        $core = new core_tools();
+if ($_SESSION['config']['usePHPIDS'] == 'true') {
+    include 'apps/maarch_entreprise/phpids_control.php';
+}
+
+//SET custom path
+if (isset($_SESSION['config']['corepath'])) {
+    require_once 'core/class/class_db.php';
+    require_once 'core/class/class_core_tools.php';
+    $core = new core_tools();
+    if (! isset($_SESSION['custom_override_id'])
+        || empty($_SESSION['custom_override_id'])
+    ) {
         $_SESSION['custom_override_id'] = $core->get_custom_id();
-        chdir('../..');
         if (! empty($_SESSION['custom_override_id'])) {
             $path = $_SESSION['config']['corepath'] . 'custom/'
                   . $_SESSION['custom_override_id'] . '/';
@@ -102,8 +85,32 @@ if ($_REQUEST['page'] && empty($_REQUEST['triggerAngular'])) {
         }
     }
 } else {
-    //V2
-    require_once '../../vendor/autoload.php';
+    require_once '../../core/class/class_db.php';
+    require_once '../../core/class/class_core_tools.php';
+    $core = new core_tools();
+    $_SESSION['custom_override_id'] = $core->get_custom_id();
+    chdir('../..');
+    if (! empty($_SESSION['custom_override_id'])) {
+        $path = $_SESSION['config']['corepath'] . 'custom/'
+              . $_SESSION['custom_override_id'] . '/';
+        set_include_path(
+            $path . '/' . $_SESSION['config']['corepath']
+        );
+    }
+}
+
+if (!isset($_SESSION['user']['UserId'])
+    && $_REQUEST['page'] <> 'login'
+    && $_REQUEST['page'] <> 'log'
+    && $_REQUEST['page'] <> 'logout'
+) {
+    $_SESSION['HTTP_REFERER'] = Url::requestUri();
+    if (trim($_SERVER['argv'][0]) <> '') {
+        header('location: reopen.php?' . $_SERVER['argv'][0]);
+    } else {
+        header('location: reopen.php');
+    }
+    exit();
 }
 
 if ($_REQUEST['page'] && empty($_REQUEST['triggerAngular'])) {
@@ -328,7 +335,6 @@ if ($_REQUEST['page'] && empty($_REQUEST['triggerAngular'])) {
         header('location: index.php?display=true&page=logout&logout=true');
         exit();
     }
-    chdir('../..');
     $user = \User\models\UserModel::getByUserId(['userId' => $cookie['userId'], 'select' => ['password_modification_date', 'change_password', 'status']]);
 
     //HTML CONTENT OF ANGULAR
@@ -353,7 +359,6 @@ if ($_REQUEST['page'] && empty($_REQUEST['triggerAngular'])) {
         }
     }
 
-    include_once 'core/init.php';
 
     if (isset($_SESSION['HTTP_REFERER'])) {
         $url = $_SESSION['HTTP_REFERER'];
