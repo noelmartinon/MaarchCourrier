@@ -119,7 +119,7 @@ class PreparedClauseController
             for ($i = 0; $i < $total; $i++) {
                 $aEntities = [];
                 $tmpImmediateChildrens = str_replace("'", '', $immediateChildrens[1][$i]);
-                if (preg_match('/,/' , $tmpImmediateChildrens)) {
+                if (preg_match('/,/', $tmpImmediateChildrens)) {
                     $aEntities = preg_split('/,/', $tmpImmediateChildrens);
                 } else {
                     $aEntities[] = $tmpImmediateChildrens;
@@ -225,7 +225,13 @@ class PreparedClauseController
             return false;
         }
 
-        if (empty($aArgs['select'])) {
+        if (!empty($aArgs['select'])) {
+            $select = implode(" AND ", $aArgs['select']);
+            $preg = preg_match('#\b(?:abort|alter|copy|create|delete|disgard|drop|execute|grant|insert|load|lock|move|reset|truncate|update|select)\b#i', $select);
+            if ($preg === 1) {
+                return false;
+            }
+        } else {
             $aArgs['select'] = [1];
         }
 

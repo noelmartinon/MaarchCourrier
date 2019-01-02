@@ -4,8 +4,8 @@ $s_id = $_REQUEST['resId'];
 $category = $_REQUEST['category'];
 $coll_id = $_REQUEST['collId'];
 
-if (isset($_REQUEST['onlyCC'])) {
-    $onlyCC = 'onlyCC';
+if (isset($_REQUEST['only_cc'])) {
+    $onlyCC = '&only_cc';
 } else {
     $onlyCC = '';
 }
