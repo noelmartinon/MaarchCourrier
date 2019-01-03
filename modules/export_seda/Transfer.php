@@ -101,7 +101,7 @@ class Transfer
                     $res['content'] = $curlError;
                 } elseif (!empty($data->errors)) {
                     $res['content'] = $data->errors;
-                } elseif (!empty($data->error) {
+                } elseif (!empty($data->error)) {
                     $res['content'] = serialize($data->error);
                 }
             } else {
