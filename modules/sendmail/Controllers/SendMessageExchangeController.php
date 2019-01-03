@@ -280,7 +280,8 @@ class SendMessageExchangeController
         $messageObject->ArchivalAgency = self::getArchivalAgencyObject(['ArchivalAgency' => $aArgs['ArchivalAgency']]);
 
         /********* TRANSFERRING AGENCY *********/
-        $messageObject->TransferringAgency = self::getTransferringAgencyObject(['TransferringAgency' => $aArgs['TransferringAgency']]);
+        $channelType = $messageObject->ArchivalAgency->OrganizationDescriptiveMetadata->Communication[0]->Channel;
+        $messageObject->TransferringAgency = self::getTransferringAgencyObject(['TransferringAgency' => $aArgs['TransferringAgency'], 'ChannelType' => $channelType]);
 
         return $messageObject;
     }
@@ -453,8 +454,9 @@ class SendMessageExchangeController
         $traCommunicationObject          = new stdClass();
 
         $aDefaultConfig = \Sendmail\Controllers\ReceiveMessageExchangeController::readXmlConfig();
-        $traCommunicationObject->Channel = $aDefaultConfig['m2m_communication_type'][0];
-        $traCommunicationObject->value   = $aDefaultConfig['m2m_communication'][0];
+
+        $traCommunicationObject->Channel = $aArgs['ChannelType'];
+        $traCommunicationObject->value   = $aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']];
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Communication = [$traCommunicationObject];
 

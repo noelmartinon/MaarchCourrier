@@ -94,12 +94,15 @@ class Transfer
             $exec = curl_exec($curl);
             $data = json_decode($exec);
 
-            if (!$data || !empty($data->errors)) {
+            if (!$data || !empty($data->errors) || !empty($data->error)) {
                 $res['status'] = 1;
-                if (curl_error($curl)) {
-                    $res['content'] = curl_error($curl);
-                } else {
+                $curlError = curl_error($curl);
+                if ($curlError) {
+                    $res['content'] = $curlError;
+                } elseif (!empty($data->errors)) {
                     $res['content'] = $data->errors;
+                } elseif (!empty($data->error)) {
+                    $res['content'] = serialize($data->error);
                 }
             } else {
                 $res['content'] = $data;

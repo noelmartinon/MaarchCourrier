@@ -31,6 +31,53 @@ class RequestSeda
 
     public function __construct($db = null)
     {
+
+        //create session if NO SESSION
+        if (empty($_SESSION['user'])) {
+            require_once('core/class/class_functions.php');
+            include_once('core/init.php');
+            require_once('core/class/class_portal.php');
+            require_once('core/class/class_db.php');
+            require_once('core/class/class_request.php');
+            require_once('core/class/class_core_tools.php');
+            require_once('core/class/web_service/class_web_service.php');
+
+            //load Maarch session vars
+            $portal = new portal();
+            $portal->unset_session();
+            $portal->build_config();
+            $coreTools = new core_tools();
+            $_SESSION['custom_override_id'] = $coreTools->get_custom_id();
+            if (isset($_SESSION['custom_override_id'])
+                && ! empty($_SESSION['custom_override_id'])
+                && isset($_SESSION['config']['corepath'])
+                && ! empty($_SESSION['config']['corepath'])
+            ) {
+                $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                    . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR;
+                set_include_path(
+                    $path . PATH_SEPARATOR . $_SESSION['config']['corepath']
+                    . PATH_SEPARATOR . get_include_path()
+                );
+            } elseif (isset($_SESSION['config']['corepath'])
+                && ! empty($_SESSION['config']['corepath'])
+            ) {
+                set_include_path(
+                    $_SESSION['config']['corepath'] . PATH_SEPARATOR . get_include_path()
+                );
+            }
+            // Load configuration from xml into session
+            $_SESSION['config']['app_id'] = $_SESSION['businessapps'][0]['appid'];
+            require_once('apps/maarch_entreprise/class/class_business_app_tools.php');
+
+            $businessAppTools = new business_app_tools();
+            $coreTools->build_core_config('core/xml/config.xml');
+
+            $businessAppTools->build_business_app_config();
+            $coreTools->load_modules_config($_SESSION['modules']);
+            $coreTools->load_menu($_SESSION['modules']);
+        }
+
         $this->statement = [];
         if ($db) {
             $this->db = $db;
@@ -482,8 +529,8 @@ class RequestSeda
                 'fileInfos'         => $aFileInfo['fileInfos']
             ]);
 
-            if(!empty($storeResult['error'])){
-                var_dump($storeResult['error']);
+            if (!empty($storeResult['errors'])) {
+                var_dump($storeResult['errors']);
             }
             $docserver_id = $storeResult['docserver_id'];
             $filepath     = $storeResult['destination_dir'];
@@ -498,7 +545,6 @@ class RequestSeda
                 'filePath' => $filePath,
                 'mode'     => $docserverType['fingerprint_mode'],
             ]);
-
         }
 
         try {
@@ -553,7 +599,6 @@ class RequestSeda
             $queryParams[] = $filesize;
 
             $res = $this->db->query($query, $queryParams);
-
         } catch (Exception $e) {
             return false;
         }
@@ -721,7 +766,6 @@ class RequestSeda
                 $_SESSION['data'],
                 $_SESSION['config']['databasetype']
             );
-
         }
         return true;
     }
@@ -746,7 +790,6 @@ class RequestSeda
 
     public function updateDataMessage($reference, $data)
     {
-
         $queryParams = [];
         $queryParams[] = $data;
         $queryParams[] = $reference;
@@ -877,7 +920,8 @@ class RequestSeda
         return $message;
     }
 
-    public function getEntitiesByBusinessId($businessId) {
+    public function getEntitiesByBusinessId($businessId)
+    {
         $queryParams = [];
 
         $queryParams[] = $businessId;
@@ -892,7 +936,8 @@ class RequestSeda
 
         return $entities;
     }
-    public function updateOperationDateMessage($aArgs = []){
+    public function updateOperationDateMessage($aArgs = [])
+    {
         $queryParams = [];
         $queryParams[] = $aArgs['operation_date'];
         $queryParams[] = $aArgs['message_id'];
@@ -908,7 +953,8 @@ class RequestSeda
         return true;
     }
 
-    public function updateReceptionDateMessage($aArgs = []){
+    public function updateReceptionDateMessage($aArgs = [])
+    {
         $queryParams = [];
         $queryParams[] = $aArgs['reception_date'];
         $queryParams[] = $aArgs['message_id'];
@@ -923,5 +969,4 @@ class RequestSeda
 
         return true;
     }
-
 }
