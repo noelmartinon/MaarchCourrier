@@ -53,7 +53,7 @@ class NotificationScheduleController
                 if (($key == 'cmd' || $key == 'state') && !Validator::notEmpty()->validate($value)) {
                     $errors[] = $key.' is empty';
                 }
-                if ($key != 'cmd' && $key != 'state' && $key != 'description' && !Validator::intVal()->validate($value) && $value != '*') {
+                if ($key != 'cmd' && $key != 'state' && $key != 'description' && !preg_match('#^[0-9\/*][0-9]?[,\/-]?([0-9]?){2}#', $value) ) {
                     $errors[] = 'wrong format for '.$key;
                 }
             }
