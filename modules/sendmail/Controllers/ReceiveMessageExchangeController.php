@@ -295,8 +295,8 @@ class ReceiveMessageExchangeController
             'limit'     => 1
         ]);
         if (!empty($contactAlreadyCreated)) {
-            $contact['contactId'] = $contactAlreadyCreated['contact_id'];
-            $contact['addressId'] = $contactAlreadyCreated['ca_id'];
+            $contact['contactId'] = $contactAlreadyCreated[0]['contact_id'];
+            $contact['addressId'] = $contactAlreadyCreated[0]['ca_id'];
         } else {
             $contact = ContactModel::CreateContactM2M(['data' => $aDataContact, 'contactCommunication' => $transferringAgencyMetadata->Communication[0]->value]);
         }
