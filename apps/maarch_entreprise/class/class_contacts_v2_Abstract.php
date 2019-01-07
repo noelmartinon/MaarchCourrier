@@ -1137,6 +1137,24 @@ abstract class contacts_v2_Abstract extends Database
                 $nb_docs = $nb_docs + $stmt->rowCount();
             }
 
+            $aAddressesTmp = \SrcCore\models\DatabaseModel::select([
+                'select'    => ['id'],
+                'table'     => ['contact_addresses'],
+                'where'     => ['contact_id = ?'],
+                'data'      => [$id],
+            ]);
+
+            $aAddresses = [];
+            if (!empty($aAddressesTmp)) {
+                foreach ($aAddressesTmp as $value) {
+                    $aAddresses[] = $value['id'];
+                }
+                $stmt = $db->query("SELECT DISTINCT rl.res_id FROM resource_contacts cr LEFT JOIN res_letterbox rl ON rl.res_id = cr.res_id WHERE rl.status <> 'DEL' AND cr.type = 'contact' AND cr.item_id IN (?)", array($aAddresses));
+                if ($stmt->rowCount() > 0) {
+                    $nb_docs = $nb_docs + $stmt->rowCount();
+                }
+            }
+
             if ($nb_docs == 0) {
                 $query = 'SELECT contact_id FROM '.$_SESSION['tablename']['contacts_v2'].' WHERE contact_id = ? ';
                 $arrayPDO = array($id);
@@ -2644,19 +2662,27 @@ abstract class contacts_v2_Abstract extends Database
             } elseif ($mode == 'contact_purpose') {
                 $stmt = $db->query('SELECT id FROM '.$_SESSION['tablename']['contact_addresses']
                     .' WHERE contact_purpose_id = ?', array($id));
-            } elseif ($mode == 'contact_address') {
-                $stmt = $db->query("SELECT mlb.address_id FROM mlb_coll_ext mlb LEFT JOIN res_letterbox rl ON rl.res_id = mlb.res_id WHERE rl.status <> 'DEL' AND mlb.address_id = ?", array($id));
             }
 
-            if ($stmt->rowCount() > 0) {
+            if (!empty($stmt) && $stmt->rowCount() > 0) {
                 $nb_elements = $nb_elements + $stmt->rowCount();
             }
 
             if ($mode == 'contact_address') {
-                $stmt = $db->query("SELECT DISTINCT cr.address_id FROM contacts_res cr LEFT JOIN res_letterbox rl ON rl.res_id = cr.res_id WHERE rl.status <> 'DEL' AND cr.address_id = ?", array($id));
-                if ($stmt->rowCount() > 0) {
-                    $nb_elements = $nb_elements + $stmt->rowCount();
+                $aRes = [];
+                $stmt = $db->query("SELECT mlb.res_id FROM mlb_coll_ext mlb LEFT JOIN res_letterbox rl ON rl.res_id = mlb.res_id WHERE rl.status <> 'DEL' AND mlb.address_id = ?", array($id));
+                while($object = $stmt->fetchObject()){
+                    $aRes[$object->res_id] = $object->res_id;
                 }
+                $stmt = $db->query("SELECT DISTINCT rl.res_id FROM contacts_res cr LEFT JOIN res_letterbox rl ON rl.res_id = cr.res_id WHERE rl.status <> 'DEL' AND cr.address_id = ?", array($id));
+                while($object = $stmt->fetchObject()){
+                    $aRes[$object->res_id] = $object->res_id;
+                }
+                $stmt = $db->query("SELECT DISTINCT rl.res_id FROM resource_contacts cr LEFT JOIN res_letterbox rl ON rl.res_id = cr.res_id WHERE rl.status <> 'DEL' AND cr.type = 'contact' AND cr.item_id = ?", array($id));
+                while($object = $stmt->fetchObject()){
+                    $aRes[$object->res_id] = $object->res_id;
+                }
+                $nb_elements = count($aRes);
             } ?>
 
 <div class="error">

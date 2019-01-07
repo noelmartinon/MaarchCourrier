@@ -77,6 +77,22 @@ if(isset($_REQUEST['valid']))
         $db->query("UPDATE ".$_SESSION['collections'][$i]['extensions'][$i] 
             . " SET dest_contact_id = ?, address_id = ? WHERE dest_contact_id = ?", array($new_contact, $new_address, $s_id));
         $db->query("UPDATE contacts_res SET contact_id = ?, address_id = ? WHERE contact_id = ?", array($new_contact, $new_address, $s_id));
+
+		$aAddressesTmp = \SrcCore\models\DatabaseModel::select([
+			'select'    => ['id'],
+			'table'     => ['contact_addresses'],
+			'where'     => ['contact_id = ?'],
+			'data'      => [$s_id],
+		]);
+
+		$aAddresses = [];
+		if (!empty($aAddressesTmp)) {
+			foreach ($aAddressesTmp as $value) {
+				$aAddresses[] = $value['id'];
+			}
+            $db->query("UPDATE resource_contacts SET item_id = ? WHERE item_id in (?)", array($new_address, $aAddresses));
+		}
+
         $db->query("DELETE FROM " . $_SESSION['tablename']['contacts_v2']
             . " WHERE contact_id = ?", array($s_id));
         $db->query("DELETE FROM " . $_SESSION['tablename']['contact_addresses']
@@ -94,11 +110,10 @@ if(isset($_REQUEST['valid']))
                 ."&what=".functions::xssafe($_REQUEST['what']);?>";
         </script>
         <?php
-
-    } elseif(empty($_REQUEST['contact'])) {
+    } elseif (empty($_REQUEST['contact'])) {
         $_SESSION['error'] = _NEW_CONTACT.' '._IS_EMPTY.". ". _USE_AUTOCOMPLETION;
         $contact->delcontact($s_id);
-    } elseif(empty($_REQUEST['address'])) {
+    } elseif (empty($_REQUEST['address'])) {
         $_SESSION['error'] = _NEW_ADDRESS.' '._IS_EMPTY.". ". _USE_AUTOCOMPLETION;
         $contact->delcontact($s_id);
     }

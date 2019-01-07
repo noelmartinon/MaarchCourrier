@@ -2493,7 +2493,7 @@ if (!defined('_YOU_MUST_SELECT_CONTACT')) {
     define('_YOU_MUST_SELECT_CONTACT', 'Vous devez sélectionner un contact ');
 }
 if (!defined('_DOC_SENDED_BY_CONTACT')) {
-    define('_DOC_SENDED_BY_CONTACT', '<b>Documents et/ou courriers envoyés par ce contact</b>');
+    define('_DOC_SENDED_BY_CONTACT', '<b>Documents et/ou courriers liés à ce contact</b>');
 }
 if (!defined('_CONTACT_INFO')) {
     define('_CONTACT_INFO', 'Fiche contact');
