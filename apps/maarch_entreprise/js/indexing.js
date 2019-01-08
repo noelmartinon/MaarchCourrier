@@ -1766,7 +1766,11 @@ function loadIndexingModel(actionId) {
 
                     $j.each(content, function( index, value ) {
                         if ($j('#'+index).length) {
-                            $j('#'+index).val(value);
+                            if (index == 'destination' && $j('#'+index+' option[value="'+value+'"]').is(':disabled')) {
+                                //do nothing
+                            } else {
+                                $j('#'+index).val(value);
+                            }
                             $j('#category_id').change();
 
                             if ($j('#'+index).is('select') && index != 'thesaurus') {
