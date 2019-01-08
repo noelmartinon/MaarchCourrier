@@ -61,17 +61,16 @@ abstract class entities_Abstract extends functions
         }
         $xmlconfig = simplexml_load_file($path);
         foreach ($xmlconfig->TABLENAME as $tablename) {
-
             $_SESSION['tablename']['ent_entities'] =
                 (string) $tablename->ent_entities;
             $_SESSION['tablename']['ent_users_entities'] =
                 (string) $tablename->ent_users_entities;
             $_SESSION['tablename']['ent_listmodels'] =
                 (string) $tablename->ent_listmodels;
-           	$_SESSION['tablename']['ent_listinstance'] =
-           	    (string) $tablename->ent_listinstance;
-           	$_SESSION['tablename']['ent_groupbasket_redirect'] =
-           	     (string) $tablename->ent_groupbasket_redirect;
+            $_SESSION['tablename']['ent_listinstance'] =
+                   (string) $tablename->ent_listinstance;
+            $_SESSION['tablename']['ent_groupbasket_redirect'] =
+                    (string) $tablename->ent_groupbasket_redirect;
         }
 
         $history = $xmlconfig->HISTORY;
@@ -91,7 +90,7 @@ abstract class entities_Abstract extends functions
             $type = 'root';
             $db = new Database();
             $stmt = $db->query(
-            	'SELECT ue.entity_id, ue.user_role, ue.primary_entity, '
+                'SELECT ue.entity_id, ue.user_role, ue.primary_entity, '
                 . 'e.entity_label, e.short_label, e.entity_type FROM '
                 . ENT_USERS_ENTITIES . ' ue, ' . $_SESSION['tablename']['users']
                 . ' u,'. ENT_ENTITIES ." e WHERE ue.user_id = u.user_id and "
@@ -104,11 +103,11 @@ abstract class entities_Abstract extends functions
             array_push(
                 $_SESSION['user']['entities'],
                 array(
-                	'ENTITY_ID'	   => $line -> entity_id,
-                	'ENTITY_LABEL' => $line -> entity_label,
-                	'SHORT_LABEL'  => $line -> short_label,
-                	'ROLE'         => $line -> user_role,
-                	'ENTITY_TYPE'  => $line -> entity_type
+                    'ENTITY_ID'	   => $line -> entity_id,
+                    'ENTITY_LABEL' => $line -> entity_label,
+                    'SHORT_LABEL'  => $line -> short_label,
+                    'ROLE'         => $line -> user_role,
+                    'ENTITY_TYPE'  => $line -> entity_type
                 )
             );
 
@@ -139,9 +138,9 @@ abstract class entities_Abstract extends functions
 
         foreach ($xmltype->TYPE as $type) {
             $_SESSION['entities_types'][] = array(
-            	'id'    => (string) $type -> id,
-            	'label' => (string) $type -> label,
-            	'level' => (string) $type -> typelevel,
+                'id'    => (string) $type -> id,
+                'label' => (string) $type -> label,
+                'level' => (string) $type -> typelevel,
             );
         }
         // TODO: keep only by_group session array
@@ -150,22 +149,22 @@ abstract class entities_Abstract extends functions
             $_SESSION['user']['redirect_groupbasket'] = array();
             $_SESSION['user']['redirect_groupbasket_by_group'] = array();
             if (isset($userData)
-            	&& isset($userData['primarygroup'])
-            	&& isset($userData['UserId'])
+                && isset($userData['primarygroup'])
+                && isset($userData['UserId'])
             ) {
-	            $arr1 = $this->load_redirect_groupbasket_session(
-	                $userData['primarygroup'],
-	                $userData['UserId']
+                $arr1 = $this->load_redirect_groupbasket_session(
+                    $userData['primarygroup'],
+                    $userData['UserId']
                 );
                 $arr1ByGroup = $this->load_redirect_groupbasket_session_by_group(
-	                $userData['primarygroup'],
-	                $userData['UserId']
-	            );
-	            $arr2 = $this->load_redirect_groupbasket_session_for_abs(
-	                $userData['UserId']
+                    $userData['primarygroup'],
+                    $userData['UserId']
+                );
+                $arr2 = $this->load_redirect_groupbasket_session_for_abs(
+                    $userData['UserId']
                 );
                 $arr2ByGroup = $this->load_redirect_groupbasket_session_for_abs_by_group(
-	                $userData['UserId']
+                    $userData['UserId']
                 );
                 
                 $arrSecondary = array();
@@ -180,7 +179,7 @@ abstract class entities_Abstract extends functions
                             $userData['UserId']
                         );
                     }
-                    //echo $_SESSION['user']['baskets'][$cptB]['id'] 
+                    //echo $_SESSION['user']['baskets'][$cptB]['id']
                     //    . ' ' . $_SESSION['user']['baskets'][$cptB]['group_id'] . '<br/>';
                     $arrTmpByGroup = $this->load_redirect_groupbasket_secondary_session_by_group(
                                 $_SESSION['user']['baskets'][$cptB]['id'],
@@ -196,23 +195,29 @@ abstract class entities_Abstract extends functions
                 }
                 if (!empty($arrSecondary)) {
                     $_SESSION['user']['redirect_groupbasket'] = array_merge(
-                        $arr1, $arr2, $arrSecondary
+                        $arr1,
+                        $arr2,
+                        $arrSecondary
                     );
                     $_SESSION['user']['redirect_groupbasket_by_group'] = array_merge_recursive(
-                        $arr1ByGroup, $arr2ByGroup, $arrSecondaryByGroup
+                        $arr1ByGroup,
+                        $arr2ByGroup,
+                        $arrSecondaryByGroup
                     );
                 } else {
                     $_SESSION['user']['redirect_groupbasket'] = array_merge(
-                        $arr1, $arr2
+                        $arr1,
+                        $arr2
                     );
                     $_SESSION['user']['redirect_groupbasket_by_group'] = array_merge_recursive(
-                        $arr1ByGroup, $arr2ByGroup
+                        $arr1ByGroup,
+                        $arr2ByGroup
                     );
                 }
             }
             //to delete duplicates entries due to array_merge_recursive fonction when digital key in an array
-            foreach($_SESSION['user']['redirect_groupbasket_by_group'] as $aBasketKey => $aBasketContent) {
-                foreach($aBasketContent as $aGroupKey => $aGroupContent) {
+            foreach ($_SESSION['user']['redirect_groupbasket_by_group'] as $aBasketKey => $aBasketContent) {
+                foreach ($aBasketContent as $aGroupKey => $aGroupContent) {
                     $cptCtrl = 1;
                     foreach ($aGroupContent as $aActionKey => $aActionContent) {
                         if ($cptCtrl % 2 == 0) {
@@ -249,8 +254,9 @@ abstract class entities_Abstract extends functions
         if (preg_match('/@my_entities/', $where)) {
             $entities = '';
             $stmt = $db->query(
-            	"select entity_id from " . ENT_USERS_ENTITIES
-                . " where user_id = ? ",array(trim($userId))
+                "select entity_id from " . ENT_USERS_ENTITIES
+                . " where user_id = ? ",
+                array(trim($userId))
             );
             while ($res = $stmt->fetchObject()) {
                 $entities .= "'"  . $res->entity_id . "', ";
@@ -258,7 +264,7 @@ abstract class entities_Abstract extends functions
 
             $entities = preg_replace('/, $/', '', $entities);
 
-            if ($entities == '' && $userId == 'superadmin') {
+            if ($entities == '') {
                 $entities = $this->empty_list();
             }
             $where = str_replace("@my_entities", $entities, $where);
@@ -266,7 +272,7 @@ abstract class entities_Abstract extends functions
         if (preg_match('/@all_entities/', $where)) {
             $entities = '';
             $stmt = $db->query(
-            	"select entity_id from " . ENT_ENTITIES . " where enabled ='Y'"
+                "select entity_id from " . ENT_ENTITIES . " where enabled ='Y'"
             );
             while ($res = $stmt->fetchObject()) {
                 $entities .= "'" . $res->entity_id . "', ";
@@ -284,8 +290,9 @@ abstract class entities_Abstract extends functions
                             . "'";
             } else {
                 $stmt = $db->query(
-                	"select entity_id from " . ENT_USERS_ENTITIES
-                    . " where user_id = ? and primary_entity = 'Y'",array(trim($userId))
+                    "select entity_id from " . ENT_USERS_ENTITIES
+                    . " where user_id = ? and primary_entity = 'Y'",
+                    array(trim($userId))
                 );
                 //$db->show();
                 $res = $stmt->fetchObject();
@@ -293,7 +300,7 @@ abstract class entities_Abstract extends functions
                     $primEntity = "'" . $res->entity_id . "'";
                 }
             }
-            if ($primEntity == '' && $userId == 'superadmin') {
+            if ($primEntity == '') {
                 $primEntity = $this->empty_list();
             }
             $where = str_replace("@my_primary_entity", $primEntity, $where);
@@ -301,7 +308,9 @@ abstract class entities_Abstract extends functions
         }
 
         $total = preg_match_all(
-            "|@entity_type\[('[^\]]*')\]|", $where, $tmpArr,
+            "|@entity_type\[('[^\]]*')\]|",
+            $where,
+            $tmpArr,
             PREG_PATTERN_ORDER
         );
         if ($total > 0) {
@@ -311,11 +320,11 @@ abstract class entities_Abstract extends functions
                 $tmpEntities = array();
 
                 $db = new Database();
-                if(!empty($tmp))
-                {
+                if (!empty($tmp)) {
                     $stmt = $db->query('select entity_id from '.ENT_ENTITIES." where entity_type = ?", array(trim($tmp)));
-                    while($res = $stmt->fetchObject())
+                    while ($res = $stmt->fetchObject()) {
                         array_push($tmpEntities, "'".$res->entity_id."'");
+                    }
                 }
                 $entities = "";
                 for ($j = 0; $j < count($tmpEntities); $j++) {
@@ -327,13 +336,19 @@ abstract class entities_Abstract extends functions
                     $entities = $this->empty_list();
                 }
                 $where = preg_replace(
-                    "|@entity_type\['[^\]]*'\]|", $entities, $where, 1
+                    "|@entity_type\['[^\]]*'\]|",
+                    $entities,
+                    $where,
+                    1
                 );
             }
         }
 
         $total = preg_match_all(
-        	"|@subentities\[('[^\]]*')\]|", $where, $tmpArr, PREG_PATTERN_ORDER
+            "|@subentities\[('[^\]]*')\]|",
+            $where,
+            $tmpArr,
+            PREG_PATTERN_ORDER
         );
         if ($total > 0) {
             //$this->show_array( $tmpArr);
@@ -350,7 +365,8 @@ abstract class entities_Abstract extends functions
                 for ($j = 0; $j < count($entitiesArr); $j ++) {
                     $tabChildren = array();
                     $arr = $obj->getTabChildrenId(
-                        $tabChildren, $entitiesArr[$j]
+                        $tabChildren,
+                        $entitiesArr[$j]
                     );
                     $children = array_merge($children, $arr);
                 }
@@ -364,12 +380,17 @@ abstract class entities_Abstract extends functions
                     $entities = $this->empty_list();
                 }
                 $where = preg_replace(
-                	"|@subentities\['[^\]]*'\]|", $entities, $where, 1
+                    "|@subentities\['[^\]]*'\]|",
+                    $entities,
+                    $where,
+                    1
                 );
             }
         }
         $total = preg_match_all(
-        	"|@immediate_children\[('[^\]]*')\]|", $where, $tmpArr,
+            "|@immediate_children\[('[^\]]*')\]|",
+            $where,
+            $tmpArr,
             PREG_PATTERN_ORDER
         );
         if ($total > 0) {
@@ -377,7 +398,7 @@ abstract class entities_Abstract extends functions
             for ($i = 0; $i < $total; $i ++) {
                 $entitiesArr = array();
                 $tmp = str_replace("'", '', $tmpArr[1][$i]);
-                if (preg_match('/,/' , $tmp)) {
+                if (preg_match('/,/', $tmp)) {
                     $entitiesArr = preg_split('/,/', $tmp);
                 } else {
                     array_push($entitiesArr, $tmp);
@@ -387,7 +408,10 @@ abstract class entities_Abstract extends functions
                 for ($j = 0; $j < count($entitiesArr); $j ++) {
                     $tabChildren = array();
                     $arr = $obj->getTabChildrenId(
-                        $tabChildren, $entitiesArr[$j], '', true
+                        $tabChildren,
+                        $entitiesArr[$j],
+                        '',
+                        true
                     );
                     $children = array_merge($children, $arr);
                 }
@@ -403,13 +427,18 @@ abstract class entities_Abstract extends functions
                 }
 
                 $where = preg_replace(
-                	"|@immediate_children\['[^\]]*'\]|", $entities, $where, 1
+                    "|@immediate_children\['[^\]]*'\]|",
+                    $entities,
+                    $where,
+                    1
                 );
             }
         }
 
         $total = preg_match_all(
-        	"|@sisters_entities\[('[^\]]*')\]|", $where, $tmpArr,
+            "|@sisters_entities\[('[^\]]*')\]|",
+            $where,
+            $tmpArr,
             PREG_PATTERN_ORDER
         );
         if ($total > 0) {
@@ -423,16 +452,21 @@ abstract class entities_Abstract extends functions
                     $sisters .= $entities[$j].", ";
                 }
                 $sisters = preg_replace("|, $|", '', $sisters);
-                if ($sisters == '' && $userId == 'superadmin') {
+                if ($sisters == '') {
                     $sisters = $this->empty_list();
                 }
                 $where = preg_replace(
-                	"|@sisters_entities\['[^\]]*'\]|", $sisters, $where, 1
+                    "|@sisters_entities\['[^\]]*'\]|",
+                    $sisters,
+                    $where,
+                    1
                 );
             }
         }
         $total = preg_match_all(
-        	"|@parent_entity\[('[^\]]*')\]|", $where, $tmpArr,
+            "|@parent_entity\[('[^\]]*')\]|",
+            $where,
+            $tmpArr,
             PREG_PATTERN_ORDER
         );
         if ($total > 0) {
@@ -442,18 +476,23 @@ abstract class entities_Abstract extends functions
                 $tmp = trim($tmp);
                 $entity = $obj->getParentEntityId($tmp);
                 $entity = "'" . $entity . "'";
-                if ($entity == '' && $userId == 'superadmin') {
+                if ($entity == '') {
                     $entity = $this->empty_list();
                 }
                 $where = preg_replace(
-                	"|@parent_entity\['[^\]]*'\]|", $entity, $where, 1
+                    "|@parent_entity\['[^\]]*'\]|",
+                    $entity,
+                    $where,
+                    1
                 );
             }
         }
         
-        /* CV 1.5 : ancestors up to depth n*/        
+        /* CV 1.5 : ancestors up to depth n*/
         $total = preg_match_all(
-        	"|@ancestor_entities\[('[^\]]*')\](?:\[(\d)\])?|", $where, $tmpArr,
+            "|@ancestor_entities\[('[^\]]*')\](?:\[(\d)\])?|",
+            $where,
+            $tmpArr,
             PREG_PATTERN_ORDER
         );
         if ($total > 0) {
@@ -461,20 +500,27 @@ abstract class entities_Abstract extends functions
             for ($i = 0; $i < $total; $i ++) {
                 $entity = trim(str_replace("'", '', $tmpArr[1][$i]));
                 $max_depth = false;
-                if(isset($tmpArr[2][$i]) && $tmpArr[2][$i] > 0)
+                if (isset($tmpArr[2][$i]) && $tmpArr[2][$i] > 0) {
                     $max_depth = $tmpArr[2][$i];
+                }
                 $ancestors = array();
-                while (($entity = $obj->getParentEntityId($entity)) && (!$max_depth || $depth < $max_depth)) { 
+                while (($entity = $obj->getParentEntityId($entity)) && (!$max_depth || $depth < $max_depth)) {
                     $ancestors[] = $entity;
                     $depth++;
                 }
-                if(count($ancestors))
+                if (count($ancestors)) {
                     $entity = "'" . implode("', '", $ancestors) . "'";
-                else $entity = $this->empty_list();;
-                if($userId == 'superadmin')
+                } else {
                     $entity = $this->empty_list();
+                }
+                if ($userId == 'superadmin') {
+                    $entity = $this->empty_list();
+                }
                 $where = preg_replace(
-                    "|@ancestor_entities\[('[^\]]*')\](?:\[(\d)\])?|", $entity, $where, 1
+                    "|@ancestor_entities\[('[^\]]*')\](?:\[(\d)\])?|",
+                    $entity,
+                    $where,
+                    1
                     );
             }
         }
@@ -484,29 +530,34 @@ abstract class entities_Abstract extends functions
         return $where;
     }
 
-    public function update_redirect_groupbasket_db($groupId, $basketId,
-        $actionId, $entities = array(), $usersEntities = array()
+    public function update_redirect_groupbasket_db(
+        $groupId,
+        $basketId,
+        $actionId,
+        $entities = array(),
+        $usersEntities = array()
     ) {
         //$this->show_array($usersEntities);
         $db = new Database();
         $stmt = $db->query(
-        	"DELETE FROM " . ENT_GROUPBASKET_REDIRECT
-            . " where basket_id= ? and group_id = ? and action_id = ?",array(trim($basketId), trim($groupId), $actionId)
+            "DELETE FROM " . ENT_GROUPBASKET_REDIRECT
+            . " where basket_id= ? and group_id = ? and action_id = ?",
+            array(trim($basketId), trim($groupId), $actionId)
         );
         $redirectMode = 'ENTITY';
         for ($i = 0; $i < count($entities); $i ++) {
             if ($entities[$i]['KEYWORD'] == true) {
                 $keyword = $entities[$i]['ID'];
                 $entityId = '';
-
             } else {
                 $keyword = '';
                 $entityId = $entities[$i]['ID'];
             }
             $stmt = $db->query(
-            	"INSERT INTO " . ENT_GROUPBASKET_REDIRECT
+                "INSERT INTO " . ENT_GROUPBASKET_REDIRECT
                 . " (group_id, basket_id, action_id, entity_id, keyword,"
-                . " redirect_mode ) values ( ?, ?, ?, ?, ?, ?)",array(trim($groupId), trim($basketId), $actionId, trim($entityId), trim($keyword), $redirectMode)
+                . " redirect_mode ) values ( ?, ?, ?, ?, ?, ?)",
+                array(trim($groupId), trim($basketId), $actionId, trim($entityId), trim($keyword), $redirectMode)
             );
         }
 
@@ -520,15 +571,18 @@ abstract class entities_Abstract extends functions
                 $entityId = $usersEntities[$i]['ID'];
             }
             $stmt = $db->query(
-            	"INSERT INTO " . ENT_GROUPBASKET_REDIRECT . " (group_id, "
+                "INSERT INTO " . ENT_GROUPBASKET_REDIRECT . " (group_id, "
                 . "basket_id, action_id, entity_id, keyword, redirect_mode ) "
-                . "values ( ?, ?, ?, ?, ?, ?)",array(trim($groupId), trim($basketId), $actionId, trim($entityId), trim($keyword), $redirectMode)
+                . "values ( ?, ?, ?, ?, ?, ?)",
+                array(trim($groupId), trim($basketId), $actionId, trim($entityId), trim($keyword), $redirectMode)
             );
         }
     }
 
     public function get_values_redirect_groupbasket_db(
-        $groupId, $basketId, $actionId
+        $groupId,
+        $basketId,
+        $actionId
     ) {
         $db = new Database();
         
@@ -536,26 +590,28 @@ abstract class entities_Abstract extends functions
 
         $arr['ENTITY'] = array();
         $stmt = $db->query(
-        	"select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
+            "select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
             . "  where  group_id = ? and basket_id = ? and redirect_mode "
-            . "= 'ENTITY' and action_id = ?",array($groupId,trim($basketId),$actionId)
+            . "= 'ENTITY' and action_id = ?",
+            array($groupId,trim($basketId),$actionId)
         );
 
         while ($res = $stmt->fetchObject()) {
             if ($res->entity_id <> '') {
                 $stmt2 = $db->query(
-                	"select entity_label from " . ENT_ENTITIES
-                    . " where entity_id = ? ",array(trim($res->entity_id))
+                    "select entity_label from " . ENT_ENTITIES
+                    . " where entity_id = ? ",
+                    array(trim($res->entity_id))
                 );
                 $line = $stmt2->fetchObject();
                 $label = functions::show_string($line->entity_label);
                 $tab = array(
-                	'ID' => $res->entity_id,
-                	'LABEL' => $label,
-                	'KEYWORD' => false,
+                    'ID' => $res->entity_id,
+                    'LABEL' => $label,
+                    'KEYWORD' => false,
                 );
-                array_push($arr['ENTITY'] , $tab);
-            } else if ($res->keyword <> '') {
+                array_push($arr['ENTITY'], $tab);
+            } elseif ($res->keyword <> '') {
                 for ($i = 0; $i < count(
                     $_SESSION['m_admin']['redirect_keywords']
                 ); $i ++
@@ -570,37 +626,39 @@ abstract class entities_Abstract extends functions
                     }
                 }
                 $tab = array(
-                	'ID'      => $res->keyword,
-                	'LABEL'   => $label,
-                	'KEYWORD' => true,
+                    'ID'      => $res->keyword,
+                    'LABEL'   => $label,
+                    'KEYWORD' => true,
                 );
-                array_push($arr['ENTITY'] , $tab);
+                array_push($arr['ENTITY'], $tab);
             }
         }
 
         $arr['USERS'] = array();
         $stmt = $db->query(
-        	"select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
-            . "  where  group_id = ? and basket_id = ? and redirect_mode = 'USERS' and action_id = ?",array(trim($groupId),trim($basketId),$actionId)
+            "select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
+            . "  where  group_id = ? and basket_id = ? and redirect_mode = 'USERS' and action_id = ?",
+            array(trim($groupId),trim($basketId),$actionId)
         );
 
 
         while ($res = $stmt->fetchObject()) {
             if ($res->entity_id <> '') {
                 $stmt2 = $db->query(
-                	"select entity_label from " . ENT_ENTITIES
-                    . " where entity_id = ?",array(trim($res->entity_id))
+                    "select entity_label from " . ENT_ENTITIES
+                    . " where entity_id = ?",
+                    array(trim($res->entity_id))
                 );
                 $line = $stmt2->fetchObject();
                 $label = functions::show_string($line->entity_label);
                 $tab = array(
-                	'ID'      => $res->entity_id,
-                	'LABEL'   => $label,
-                	'KEYWORD' => false,
+                    'ID'      => $res->entity_id,
+                    'LABEL'   => $label,
+                    'KEYWORD' => false,
                 );
                 array_push($arr['USERS'], $tab);
                 array_push($arr['USERS'], $tab);
-            } else if ($res->keyword <> '') {
+            } elseif ($res->keyword <> '') {
                 for ($i = 0; $i < count(
                     $_SESSION['m_admin']['redirect_keywords']
                 ); $i ++
@@ -615,11 +673,11 @@ abstract class entities_Abstract extends functions
                     }
                 }
                 $tab = array(
-                	'ID'      => $res->keyword,
-                	'LABEL'   => $label,
-                	'KEYWORD' => true,
+                    'ID'      => $res->keyword,
+                    'LABEL'   => $label,
+                    'KEYWORD' => true,
                 );
-                array_push($arr['USERS'] , $tab);
+                array_push($arr['USERS'], $tab);
             }
         }
         return $arr;
@@ -649,8 +707,9 @@ abstract class entities_Abstract extends functions
         $arr = array();
         $db = new Database();
         $stmt = $db->query(
-        	'select distinct basket_id from ' . ENT_GROUPBASKET_REDIRECT
-            . " where group_id = ?",array(trim($primaryGroup))
+            'select distinct basket_id from ' . ENT_GROUPBASKET_REDIRECT
+            . " where group_id = ?",
+            array(trim($primaryGroup))
         );
 
      
@@ -659,15 +718,19 @@ abstract class entities_Abstract extends functions
             $arr[$basketId] = array();
 
             $stmt2 = $db->query(
-            	"select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
-                . " where group_id = ? and basket_id = ?",array(trim($primaryGroup),trim($basketId))
+                "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+                . " where group_id = ? and basket_id = ?",
+                array(trim($primaryGroup),trim($basketId))
             );
             while ($line = $stmt2->fetchObject()) {
                 $actionId = $line->action_id;
                 $arr[$basketId][$actionId]['entities'] = '';
                 $arr[$basketId][$actionId]['users_entities'] = '';
                 $tmpArr = $this->get_redirect_groupbasket(
-                    $primaryGroup, $basketId, $userId, $actionId
+                    $primaryGroup,
+                    $basketId,
+                    $userId,
+                    $actionId
                 );
                 $arr[$basketId][$actionId]['entities'] = $tmpArr['entities'];
                 $arr[$basketId][$actionId]['users_entities'] = $tmpArr['users'];
@@ -681,8 +744,9 @@ abstract class entities_Abstract extends functions
         $arr = array();
         $db = new Database();
         $stmt = $db->query(
-        	'select distinct basket_id from ' . ENT_GROUPBASKET_REDIRECT
-            . " where group_id = ?",array(trim($primaryGroup))
+            'select distinct basket_id from ' . ENT_GROUPBASKET_REDIRECT
+            . " where group_id = ?",
+            array(trim($primaryGroup))
         );
 
      
@@ -691,15 +755,19 @@ abstract class entities_Abstract extends functions
             $arr[$basketId] = array();
 
             $stmt2 = $db->query(
-            	"select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
-                . " where group_id = ? and basket_id = ?",array(trim($primaryGroup),trim($basketId))
+                "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+                . " where group_id = ? and basket_id = ?",
+                array(trim($primaryGroup),trim($basketId))
             );
             while ($line = $stmt2->fetchObject()) {
                 $actionId = $line->action_id;
                 $arr[$basketId][$primaryGroup][$actionId]['entities'] = '';
                 $arr[$basketId][$primaryGroup][$actionId]['users_entities'] = '';
                 $tmpArr = $this->get_redirect_groupbasket(
-                    $primaryGroup, $basketId, $userId, $actionId
+                    $primaryGroup,
+                    $basketId,
+                    $userId,
+                    $actionId
                 );
                 $arr[$basketId][$primaryGroup][$actionId]['entities'] = $tmpArr['entities'];
                 $arr[$basketId][$primaryGroup][$actionId]['users_entities'] = $tmpArr['users'];
@@ -717,14 +785,18 @@ abstract class entities_Abstract extends functions
 
         $stmt = $db->query(
             "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
-            . " where group_id = ? and basket_id = ?",array(trim($groupId),trim($basketId))
+            . " where group_id = ? and basket_id = ?",
+            array(trim($groupId),trim($basketId))
         );
         while ($line = $stmt->fetchObject()) {
             $actionId = $line->action_id;
             $arr[$basketId][$actionId]['entities'] = '';
             $arr[$basketId][$actionId]['users_entities'] = '';
             $tmpArr = $this->get_redirect_groupbasket(
-                $groupId, $basketId, $userId, $actionId
+                $groupId,
+                $basketId,
+                $userId,
+                $actionId
             );
             $arr[$basketId][$actionId]['entities'] = $tmpArr['entities'];
             $arr[$basketId][$actionId]['users_entities'] = $tmpArr['users'];
@@ -742,14 +814,18 @@ abstract class entities_Abstract extends functions
 
         $stmt = $db->query(
             "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
-            . " where group_id = ? and basket_id = ?",array(trim($groupId),trim($basketId))
+            . " where group_id = ? and basket_id = ?",
+            array(trim($groupId),trim($basketId))
         );
         while ($line = $stmt->fetchObject()) {
             $actionId = $line->action_id;
             $arr[$basketId][$groupId][$actionId]['entities'] = '';
             $arr[$basketId][$groupId][$actionId]['users_entities'] = '';
             $tmpArr = $this->get_redirect_groupbasket(
-                $groupId, $basketId, $userId, $actionId
+                $groupId,
+                $basketId,
+                $userId,
+                $actionId
             );
             $arr[$basketId][$groupId][$actionId]['entities'] = $tmpArr['entities'];
             $arr[$basketId][$groupId][$actionId]['users_entities'] = $tmpArr['users'];
@@ -773,21 +849,24 @@ abstract class entities_Abstract extends functions
         for ($i = 0; $i < count($baskAbs); $i ++) {
             if ($baskAbs[$i]['abs_basket']) {
                 $stmt = $db->query(
-                	"select uc.group_id from " . USERGROUP_CONTENT_TABLE
+                    "select uc.group_id from " . USERGROUP_CONTENT_TABLE
                     . " uc , " . USERGROUPS_TABLE . " u where uc.user_id = ? and u.group_id = "
                     . "uc.group_id and u.enabled= 'Y' and "
-                    . "uc.primary_group = 'Y'",array($baskAbs[$i]['basket_owner'])
+                    . "uc.primary_group = 'Y'",
+                    array($baskAbs[$i]['basket_owner'])
                 );
                 //$db->show();
                 $res = $stmt->fetchObject();
                 $primaryGroup = $res->group_id;
                 $tmpBasketId = preg_replace(
-                	'/_' . $baskAbs[$i]['basket_owner'] . '$/', '',
+                    '/_' . $baskAbs[$i]['basket_owner'] . '$/',
+                    '',
                     $baskAbs[$i]['id']
                 );
                 $stmt = $db->query(
-                	"select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
-                    . " where group_id = ? and basket_id = ?",array(trim($primaryGroup),trim($tmpBasketId))
+                    "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+                    . " where group_id = ? and basket_id = ?",
+                    array(trim($primaryGroup),trim($tmpBasketId))
                 );
                 //$db->show();
                 while ($line = $stmt->fetchObject()) {
@@ -796,8 +875,10 @@ abstract class entities_Abstract extends functions
                     $arr[$baskAbs[$i]['id']][$actionId]['users_entities'] = '';
 
                     $tmpArr = $this->get_redirect_groupbasket(
-                        $primaryGroup, $tmpBasketId,
-                        $baskAbs[$i]['basket_owner'], $actionId
+                        $primaryGroup,
+                        $tmpBasketId,
+                        $baskAbs[$i]['basket_owner'],
+                        $actionId
                     );
                     $arr[$baskAbs[$i]['id']][$actionId]['entities'] =
                         $tmpArr['entities'];
@@ -824,21 +905,24 @@ abstract class entities_Abstract extends functions
         for ($i = 0; $i < count($baskAbs); $i ++) {
             if ($baskAbs[$i]['abs_basket']) {
                 $stmt = $db->query(
-                	"select uc.group_id from " . USERGROUP_CONTENT_TABLE
+                    "select uc.group_id from " . USERGROUP_CONTENT_TABLE
                     . " uc , " . USERGROUPS_TABLE . " u where uc.user_id = ? and u.group_id = "
                     . "uc.group_id and u.enabled= 'Y' and "
-                    . "uc.primary_group = 'Y'",array($baskAbs[$i]['basket_owner'])
+                    . "uc.primary_group = 'Y'",
+                    array($baskAbs[$i]['basket_owner'])
                 );
                 //$db->show();
                 $res = $stmt->fetchObject();
                 $primaryGroup = $res->group_id;
                 $tmpBasketId = preg_replace(
-                	'/_' . $baskAbs[$i]['basket_owner'] . '$/', '',
+                    '/_' . $baskAbs[$i]['basket_owner'] . '$/',
+                    '',
                     $baskAbs[$i]['id']
                 );
                 $stmt = $db->query(
-                	"select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
-                    . " where group_id = ? and basket_id = ?",array(trim($primaryGroup),trim($tmpBasketId))
+                    "select distinct action_id from " . ENT_GROUPBASKET_REDIRECT
+                    . " where group_id = ? and basket_id = ?",
+                    array(trim($primaryGroup),trim($tmpBasketId))
                 );
                 //$db->show();
                 while ($line = $stmt->fetchObject()) {
@@ -847,8 +931,10 @@ abstract class entities_Abstract extends functions
                     $arr[$baskAbs[$i]['id']][$primaryGroup][$actionId]['users_entities'] = '';
 
                     $tmpArr = $this->get_redirect_groupbasket(
-                        $primaryGroup, $tmpBasketId,
-                        $baskAbs[$i]['basket_owner'], $actionId
+                        $primaryGroup,
+                        $tmpBasketId,
+                        $baskAbs[$i]['basket_owner'],
+                        $actionId
                     );
                     $arr[$baskAbs[$i]['id']][$primaryGroup][$actionId]['entities'] =
                         $tmpArr['entities'];
@@ -866,8 +952,9 @@ abstract class entities_Abstract extends functions
         $arr = array();
         $db = new Database();
         $stmt = $db->query(
-        	"select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
-            . " where basket_id = ? and group_id = ? and redirect_mode = 'ENTITY' and action_id = ?",array(trim($basketId),trim($groupId),$actionId)
+            "select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
+            . " where basket_id = ? and group_id = ? and redirect_mode = 'ENTITY' and action_id = ?",
+            array(trim($basketId),trim($groupId),$actionId)
         );
         
         $entities = '';
@@ -888,8 +975,9 @@ abstract class entities_Abstract extends functions
         $entities = preg_replace("/, $/", '', $entities);
 
         $stmt = $db->query(
-        	"select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
-            . " where basket_id = ? and group_id = ? and redirect_mode = 'USERS' and action_id = ?",array(trim($basketId),trim($groupId),$actionId)
+            "select entity_id, keyword from " . ENT_GROUPBASKET_REDIRECT
+            . " where basket_id = ? and group_id = ? and redirect_mode = 'USERS' and action_id = ?",
+            array(trim($basketId),trim($groupId),$actionId)
         );
         //$db->show();
         $users = '';
@@ -918,19 +1006,19 @@ abstract class entities_Abstract extends functions
     {
         if ($keyword == 'ALL_ENTITIES') {
             return '@all_entities';
-        } else if ($keyword == 'ENTITIES_JUST_BELOW') {
+        } elseif ($keyword == 'ENTITIES_JUST_BELOW') {
             return '@immediate_children[@my_primary_entity]';
-        } else if ($keyword == 'ENTITIES_BELOW') {
+        } elseif ($keyword == 'ENTITIES_BELOW') {
             return '@subentities[@my_entities]';
-        } else if ($keyword == 'ALL_ENTITIES_BELOW') {
+        } elseif ($keyword == 'ALL_ENTITIES_BELOW') {
             return '@subentities[@my_primary_entity]';
-        } else if ($keyword == 'ENTITIES_JUST_UP') {
+        } elseif ($keyword == 'ENTITIES_JUST_UP') {
             return '@parent_entity[@my_primary_entity]';
-        } else if ($keyword == 'MY_ENTITIES') {
+        } elseif ($keyword == 'MY_ENTITIES') {
             return '@my_entities';
-        } else if ($keyword == 'MY_PRIMARY_ENTITY') {
+        } elseif ($keyword == 'MY_PRIMARY_ENTITY') {
             return '@my_primary_entity';
-        } else if ($keyword == 'SAME_LEVEL_ENTITIES') {
+        } elseif ($keyword == 'SAME_LEVEL_ENTITIES') {
             return '@sisters_entities[@my_primary_entity]';
         } else {
             return '';
