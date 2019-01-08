@@ -96,14 +96,13 @@ class SecondLevelController
 
         $data                             = $request->getParams();
         $data['doctypes_second_level_id'] = $aArgs['id'];
+        unset($data['hasChildren']);
 
         $data   = $this->manageValue($data);
         $errors = $this->control($data, 'update');
       
         if (!empty($errors)) {
-            return $response
-                ->withStatus(500)
-                ->withJson(['errors' => $errors]);
+            return $response->withStatus(500)->withJson(['errors' => $errors]);
         }
 
         SecondLevelModel::update($data);
@@ -116,12 +115,10 @@ class SecondLevelController
             'info'      => _DOCTYPE_SECONDLEVEL_UPDATED. ' : ' . $data['doctypes_second_level_label']
         ]);
 
-        return $response->withJson(
-            [
+        return $response->withJson([
             'secondLevelId' => $data,
-            'doctypeTree'   => FirstLevelController::getTreeFunction(),
-            ]
-        );
+            'doctypeTree'   => FirstLevelController::getTreeFunction()
+        ]);
     }
 
     public function delete(Request $request, Response $response, $aArgs)
