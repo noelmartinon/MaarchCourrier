@@ -257,11 +257,15 @@ if (!empty($tab)) {
                     $query .= '( ';
                     $query .= 'item_id IN (';
 
-                    foreach ($_SESSION['user']['entities'] as $entitiestmpnote) {
-                        $query .= '?, ';
-                        $arrayPDOnotes = array_merge($arrayPDOnotes, array($entitiestmpnote['ENTITY_ID']));
+                   if(!empty($_SESSION['user']['entities'])){
+                        foreach ($_SESSION['user']['entities'] as $entitiestmpnote) {
+                            $query .= '?, ';
+                            $arrayPDOnotes = array_merge($arrayPDOnotes, array($entitiestmpnote['ENTITY_ID']));
+                        }
+                        $query = substr($query, 0, -2);
+                    } else {
+                        $query .= "''";
                     }
-                    $query = substr($query, 0, -2);
 
                     $query .= ') ';
                     $query .= 'OR ';

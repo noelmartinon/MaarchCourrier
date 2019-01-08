@@ -53,15 +53,14 @@ if (isset($_REQUEST['identifier'])) {
     $query .= "( ";
     $query .= "item_id IN (";
           
-    foreach ($_SESSION['user']['entities'] as $entitiestmpnote) {
-        $query .= "?, ";
-        $arrayPDO = array_merge($arrayPDO, array($entitiestmpnote['ENTITY_ID']));
-    }
-
-    if ($_SESSION['user']['UserId'] == 'superadmin') {
-        $query .= " null ";
-    } else {
+   if(!empty($_SESSION['user']['entities'])){
+        foreach ($_SESSION['user']['entities'] as $entitiestmpnote) {
+            $query .= "?, ";
+            $arrayPDO = array_merge($arrayPDO, array($entitiestmpnote['ENTITY_ID']));
+        }
         $query = substr($query, 0, -2);
+    } else {
+        $query .= "''";
     }
           
     $query .= ") ";
