@@ -757,7 +757,7 @@ class list_show_Abstract extends functions
   
         $start = $_REQUEST['start'];
       
-        $param_comp .= '&amp;start='.$start;
+        $param_comp .= '&amp;start=0';
         if ($name == 'structures' || $name == 'subfolders' || $name == 'types' || $name == 'contact_types' || $name == 'contact_purposes' || $name == 'contacts_v2' || $name == 'contacts_v2_up' || $name == 'contact_addresses_list') {
             $link = $_SESSION['config']['businessappurl'].'index.php?page='.$name;
         } else {
