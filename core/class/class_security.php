@@ -114,7 +114,7 @@ class security extends Database
             } else {
                 $comp = " and STATUS <> 'DEL' "
                       .'and loginmode in (:loginmode1)';
-                $params = ['loginmode1' => ['standard', 'sso', 'cas']];
+                $params = ['loginmode1' => ['standard', 'sso', 'cas', 'ozwillo']];
                 if ($method == 'restMode') {
                     array_push($params['loginmode1'], 'restMode');
                 }
