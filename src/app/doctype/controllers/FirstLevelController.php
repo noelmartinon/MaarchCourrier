@@ -177,6 +177,7 @@ class FirstLevelController
 
         $obj = $request->getParams();
         $obj['doctypes_first_level_id'] = $aArgs['id'];
+        unset($obj['hasChildren']);
 
         $obj = $this->manageValue($obj);
         $errors = $this->control($obj, 'update');
