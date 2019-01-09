@@ -1349,7 +1349,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     //PJ SUBJECT
     $content .= '<p>';
     $content .= '<label>'._OBJECT.'</label>';
-    $content .= "<input type='text' name='title[]' id='title' maxlength='250' value=\"" . htmlentities($infoAttach->title) ."\"/> ";
+    $content .= "<input type='text' name='title[]' id='title' maxlength='250' value=\"".htmlentities(substr($infoAttach->title, 0, 250)).'"/> ';
     $content .= '&nbsp;<span class="red_asterisk" id="templateOffice_mandatory"><i class="fa fa-star"></i></span>';
     $content .= '</p>';
 
