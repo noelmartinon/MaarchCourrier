@@ -204,6 +204,7 @@ export class NotificationsAdministrationComponent implements OnInit {
         this.crontab[i].state = 'deleted';
         this.http.post(this.coreUrl + 'rest/notifications/schedule', this.crontab)
             .subscribe((data: any) => {
+                this.crontab.splice(i,1);
                 this.notify.success(this.lang.notificationScheduleUpdated);
             }, (err) => {
                 this.notify.error(err.error.errors);
