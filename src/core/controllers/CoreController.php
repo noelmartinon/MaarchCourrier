@@ -36,12 +36,26 @@ class CoreController
         $aInit['user'] = UserModel::getByUserId(['userId' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
 
         $aInit['scriptsToinject'] = [];
+        $aInit['scriptsInjected'] = [];
+
         $scriptsToInject = [];
         $scripts = scandir('dist');
         foreach ($scripts as $value) {
             if (strstr($value, 'runtime.') !== false || strstr($value, 'main.') !== false || strstr($value, 'vendor.') !== false || strstr($value, 'scripts.') !== false) {
                 if (strstr($value, '.js.map') === false) {
-                    $scriptsToInject[] = $value;
+                    $scriptName          = explode(".", $value);
+                    $modificationDate    = filemtime(realpath("dist/" . $value));
+                    $idArrayTime         = $scriptName[0] . "." . pathinfo($value, PATHINFO_EXTENSION);
+
+                    if (!isset($aInit['scriptsInjected'][$idArrayTime]) || $modificationDate > $aInit['scriptsInjected'][$idArrayTime][0]) {
+                        if (isset($aInit['scriptsInjected'][$idArrayTime])) {
+                            array_pop($scriptsToInject);
+                        }
+                        $aInit['scriptsInjected'][$idArrayTime][0] = filemtime(realpath("dist/" . $value));
+                        $aInit['scriptsInjected'][$idArrayTime][1] = $value;
+
+                        $scriptsToInject[] = $value;
+                    }
                 }
             }
         }
