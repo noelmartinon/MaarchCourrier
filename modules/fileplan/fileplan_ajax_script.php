@@ -1036,7 +1036,7 @@ switch ($mode) {
 								."&module=fileplan".$parameters."');";
 					}
 					$js .= "window.top.$('main_info').innerHTML = '"._POSITION_REMOVED.': '
-						.$position_label."';";
+						.addslashes($position_label)."';";
 				} else {
 					$error = functions::wash_html($position_id.': '._POSITION_NOT_EXISTS.'!','NONE');
 					$status = 1;
@@ -1513,4 +1513,3 @@ switch ($mode) {
 echo "{status : " . $status . ", content : '" . addslashes($debug.$content) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
 ?>
-
