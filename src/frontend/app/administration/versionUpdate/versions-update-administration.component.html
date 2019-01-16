@@ -40,19 +40,19 @@
                 <mat-spinner style="margin:auto;"></mat-spinner>
             </div>
             <mat-card *ngIf="!loading" class="card-app-content">
-                <div class="alert alert-info" *ngIf="versions.currentMinorVersions.length == 0" style="display: flex;">
+                <div class="alert alert-info" *ngIf="versions.lastAvailableMinorVersion == null" style="display: flex;">
                     <mat-icon class="fa fa-check fa-2x" style="flex: 1;text-align: left;"></mat-icon> 
                     <span style="flex: 1;text-align: center;">{{lang.appUpToDate}} !</span>
                     <mat-icon class="fa fa-check fa-2x" style="flex: 1;text-align: right;"></mat-icon>
                 </div>
-                <div class="alert alert-success" *ngIf="versions.currentMinorVersions.length > 0" style="display: flex;">
+                <div class="alert alert-success" *ngIf="versions.lastAvailableMinorVersion != null" style="display: flex;">
                     <mat-icon class="fa fa-info-circle fa-2x" style="flex: 1;text-align: left;"></mat-icon> 
                     <span style="flex: 1;text-align: center;">
-                        {{lang.newVersionAvailable}} ! <a style="font-weight: bold;" href="https://labs.maarch.org/maarch/MaarchCourrier/tags/{{versions.currentMinorVersions[versions.currentMinorVersions.length-1]}}" target="_blank">{{versions.currentMinorVersions[versions.currentMinorVersions.length-1]}}</a>
+                        {{lang.newVersionAvailable}} ! <a style="font-weight: bold;" href="https://labs.maarch.org/maarch/MaarchCourrier/tags/{{versions.lastAvailableMinorVersion}}" target="_blank">{{versions.lastAvailableMinorVersion}}</a>
                     </span>
                     <mat-icon class="fa fa-info-circle fa-2x" style="flex: 1;text-align: right;"></mat-icon>
                 </div>
-                <div class="col-sm-12" style="text-align:center;" *ngIf="versions.currentMinorVersions.length > 0">
+                <div class="col-sm-12" style="text-align:center;" *ngIf="versions.lastAvailableMinorVersion != null">
                     <button mat-raised-button color="primary" (click)="updateVersionAccess();">{{lang.accessUpdateWizard}}</button>
                 </div>
             </mat-card>

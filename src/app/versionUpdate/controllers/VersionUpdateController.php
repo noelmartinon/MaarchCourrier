@@ -42,7 +42,7 @@ class VersionUpdateController
         $currentVersionBranchMonth = substr($parameter['param_value_string'], 3, 2);
         $currentVersionTag = substr($parameter['param_value_string'], 6);
 
-        $currentMinorVersions = [];
+        $availableMinorVersions = [];
         $availableMajorVersions = [];
 
         foreach ($tags as $value) {
@@ -59,14 +59,18 @@ class VersionUpdateController
                 }
             } else {
                 if ($tag > $currentVersionTag) {
-                    $currentMinorVersions[] = $value['name'];
+                    $availableMinorVersions[] = $value['name'];
                 }
             }
         }
 
+        //Sort array using a case insensitive "natural order" algorithm
+        natcasesort($availableMinorVersions);
+        natcasesort($availableMajorVersions);
+
         return $response->withJson([
-            'currentMinorVersions'      => $currentMinorVersions,
-            'availableMajorVersions'    => $availableMajorVersions,
+            'lastAvailableMinorVersion' => $availableMinorVersions,
+            'lastAvailableMajorVersion' => $availableMajorVersions,
             'currentVersion'            => $parameter['param_value_string']
         ]);
     }

@@ -21,10 +21,20 @@ class VersionUpdateControllerTest extends TestCase
         $response       = $versionUpdateController->get($request, new \Slim\Http\Response());
         $responseBody   = json_decode((string)$response->getBody());
 
-        $this->assertInternalType('array', $responseBody->currentMinorVersions);
-        $this->assertNotNull($responseBody->currentMinorVersions);
-        $this->assertInternalType('array', $responseBody->availableMajorVersions);
         $this->assertInternalType('string', $responseBody->currentVersion);
         $this->assertNotNull($responseBody->currentVersion);
+        $this->assertRegExp('/^\d{2}\.\d{2}\.\d+$/', $responseBody->currentVersion, 'Invalid current version');
+
+        if( $responseBody->lastAvailableMinorVersion != null ) {
+            $this->assertInternalType('string', $responseBody->lastAvailableMinorVersion);
+            $this->assertRegExp('/^\d{2}\.\d{2}\.\d+$/', $responseBody->lastAvailableMinorVersion, 'Invalid available minor version');
+        }
+        
+        if( $responseBody->lastAvailableMajorVersion != null ) {
+            $this->assertInternalType('string', $responseBody->lastAvailableMajorVersion);
+            $this->assertRegExp('/^\d{2}\.\d{2}\.\d+$/', $responseBody->lastAvailableMajorVersion, 'Invalid available major version');
+        }
+
+        $this->assertNotNull($responseBody->lastAvailableMinorVersion);
     }
 }
