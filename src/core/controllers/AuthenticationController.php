@@ -56,7 +56,7 @@ class AuthenticationController
         if ($aArgs['currentRoute'] != '/initialize') {
             $user = UserModel::getByUserId(['select' => ['status', 'change_password'], 'userId' => $aArgs['userId']]);
 
-            if ($user['status'] == 'ABS' && $aArgs['currentRoute'] != "/users/{id}/status") {
+            if ($user['status'] == 'ABS' && !in_array($aArgs['currentRoute'], ['/users/{id}/status', '/header', '/passwordRules', '/currentUser/password'])) {
                 return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
             }
 
