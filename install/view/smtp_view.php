@@ -64,9 +64,9 @@
             if (oneIsEmpty) {
                 $('#ajaxReturn_testConnect_ko').html('<?php echo _ONE_FIELD_EMPTY;?>');
                 return;
-             }
-             $('.wait').css('display','block');
-             $('#ajaxReturn_testConnect_ko').html('');
+            }
+            $('.wait').css('display','block');
+            $('#ajaxReturn_testConnect_ko').html('');
 
             ajaxDB(
                 'testSmtp',
@@ -84,10 +84,10 @@
                 'false'
             );
 
-            if (oneIsEmpty) {
+            if (!oneIsEmpty) {
                 $('#ajaxReturn_testConnect_ok').html('<?php echo "connexion ok";?>');
                 return;
-             }
+            }
 
         });
  
@@ -192,9 +192,9 @@
                         <td>
                             <input type="button" id="ajaxReturn_testConnect_button" onClick="$('.wait').css('display','block');envoiMailTestSmtp( 'testSmtp','test', $('#smtpHost').val(), $('#smtpType').val(), $('#smtpPort').val(), $('#smtpUser').val(), $('#smtpPassword').val(), $('#smtpAuth').val(), $('#smtpMailTo').val(), $('#smtpDomains').val(), $('#smtpMailFrom').val());" value="<?php echo _VERIF_SMTP;?>"/>
                         </td>
-    <td>
-        <input type="button" id="ajaxReturn_testConnect_button" onClick="$('.wait').css('display','block');envoiMailTestSmtp( 'testSmtp','add', $('#smtpHost').val(), $('#smtpType').val(), $('#smtpPort').val(), $('#smtpUser').val(), $('#smtpPassword').val(), $('#smtpAuth').val(), $('#smtpMailTo').val(), $('#smtpDomains').val(), $('#smtpMailFrom').val());" value="<?php echo _ADD_INFO_SMTP;?>"/>
-    </td>
+                        <!-- <td>
+                            <input type="button" id="ajaxReturn_testConnect_button" onClick="$('.wait').css('display','block');envoiMailTestSmtp( 'testSmtp','add', $('#smtpHost').val(), $('#smtpType').val(), $('#smtpPort').val(), $('#smtpUser').val(), $('#smtpPassword').val(), $('#smtpAuth').val(), $('#smtpMailTo').val(), $('#smtpDomains').val(), $('#smtpMailFrom').val());" value="<?php echo _ADD_INFO_SMTP;?>"/>
+                        </td> -->
                     </tr>
                 </table>
             </form>
@@ -228,7 +228,7 @@
                     </a>
                 </div-->
                 <div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=password');">
+                    <a href="#" onClick="envoiMailTestSmtp( 'testSmtp','add', $('#smtpHost').val(), $('#smtpType').val(), $('#smtpPort').val(), $('#smtpUser').val(), $('#smtpPassword').val(), $('#smtpAuth').val(), $('#smtpMailTo').val(), $('#smtpDomains').val(), $('#smtpMailFrom').val());goTo('index.php?step=password');">
                         <?php echo _NEXT_INSTALL;?>
                     </a>
                 </div>
