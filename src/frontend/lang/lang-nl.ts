@@ -652,7 +652,7 @@ export const LANG_NL = {
     "maarchLicence" : "Maarch Courrier wordt verspreid onder de voorwaarden van de",
     "groupeCompany" : "vennootschap van de Archiveco groep",
     "welcomeInGEC" : "Welkom bij uw <b>E</b>lektronisch <b>E</b>-mail<b>b</b>eheer,<br/><br/>we zijn",
-    "myLastResources" : "Mijn laatste mails",
+    "myLastResources" : "Mijn laatste geraadpleegde mails",
     "shortcut" : "Sneltoetsen",
     "searchMails" : "Mails zoeken",
     "noAvailableBasket" : "Geen bakje beschikbaar",

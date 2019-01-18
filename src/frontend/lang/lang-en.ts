@@ -624,7 +624,7 @@ export const LANG_EN = {
     "maarchLicence"                     : "Maarch Courrier is circulated under the terms of",
     "groupeCompany"                     : ", Archiveco group company",
     "welcomeInGEC"                      : "Welcome to your GEC app, today is",
-    "myLastResources"                   : "My last mails",
+    "myLastResources"                   : "My last consulted mails",
     "shortcut"                          : "Shortcut",
     "searchMails"                       : "Search mails",
     "noAvailableBasket"                 : "No available basket",
