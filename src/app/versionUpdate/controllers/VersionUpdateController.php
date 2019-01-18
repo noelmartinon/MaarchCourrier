@@ -38,11 +38,10 @@ class VersionUpdateController
 
         $applicationVersion = CoreConfigModel::getApplicationVersion();
 
-        if($applicationVersion) {
-            $currentVersion = $applicationVersion['applicationMinorVersion'];
+        if(!$applicationVersion) {
+            return $response->withStatus(400)->withJson(['errors' => "Can't load xml applicationVersion"]);
         } else {
-            $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'database_version']);
-            $currentVersion = $parameter['param_value_string'];
+            $currentVersion = $applicationVersion['applicationMinorVersion'];
         }
 
         $currentVersionBranch = substr($currentVersion, 0, 5);
