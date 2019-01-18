@@ -19,6 +19,7 @@ use Group\models\ServiceModel;
 use Parameter\models\ParameterModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\CoreConfigModel;
 
 class VersionUpdateController
 {
@@ -35,12 +36,19 @@ class VersionUpdateController
             return $response->withJson(['errors' => $e->getMessage()]);
         }
 
-        $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'database_version']);
+        $applicationVersion = CoreConfigModel::getApplicationVersion();
 
-        $currentVersionBranch = substr($parameter['param_value_string'], 0, 5);
-        $currentVersionBranchYear = substr($parameter['param_value_string'], 0, 2);
-        $currentVersionBranchMonth = substr($parameter['param_value_string'], 3, 2);
-        $currentVersionTag = substr($parameter['param_value_string'], 6);
+        if($applicationVersion) {
+            $currentVersion = $applicationVersion['applicationMinorVersion'];
+        } else {
+            $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'database_version']);
+            $currentVersion = $parameter['param_value_string'];
+        }
+
+        $currentVersionBranch = substr($currentVersion, 0, 5);
+        $currentVersionBranchYear = substr($currentVersion, 0, 2);
+        $currentVersionBranchMonth = substr($currentVersion, 3, 2);
+        $currentVersionTag = substr($currentVersion, 6);
 
         $availableMinorVersions = [];
         $availableMajorVersions = [];
@@ -83,7 +91,7 @@ class VersionUpdateController
         return $response->withJson([
             'lastAvailableMinorVersion' => $lastAvailableMinorVersion,
             'lastAvailableMajorVersion' => $lastAvailableMajorVersion,
-            'currentVersion'            => $parameter['param_value_string']
+            'currentVersion'            => $currentVersion
         ]);
     }
 }
