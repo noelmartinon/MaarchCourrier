@@ -422,16 +422,16 @@ class AttachmentController
                     ];
 
                     StoreController::storeResourceRes($allDatas);
-
-                    AttachmentModel::update([
-                        'table'     => $table,
-                        'set'       => [
-                            'status'  => 'DEL',
-                        ],
-                        'where'     => ['res_id = ?'],
-                        'data'      => [$resId]
-                    ]);
                 }
+                
+                AttachmentModel::update([
+                    'table'     => $table,
+                    'set'       => [
+                        'status'  => 'DEL',
+                    ],
+                    'where'     => ['res_id = ?'],
+                    'data'      => [$resId]
+                ]);
             }
         }
 

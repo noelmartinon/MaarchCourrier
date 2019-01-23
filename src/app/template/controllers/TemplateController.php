@@ -369,40 +369,20 @@ class TemplateController
         $pathToTemplateInfo = pathinfo($pathToTemplate);
         $datasources = TemplateController::getDatas(["id" => 'letterbox_attachment', 'resId' => $aArgs['res_id'], 'contactId' => (int)$aArgs['res_contact_id'], 'addressId' => (int)$aArgs['res_address_id'], 'chronoAttachment' => $aArgs['chronoAttachment']]);
     
+        if (in_array($pathToTemplateInfo['extension'], ['odt', 'ods', 'odp', 'xlsx', 'pptx', 'docx', 'odf'])) {
+            $fileNameOnTmp = 'tmp_file_' . $aArgs['userId'] . '_' . rand() . '.' . $pathToTemplateInfo['extension'];
+            $tmpPath = CoreConfigModel::getTmpPath();
+            $myFile = $tmpPath . $fileNameOnTmp;
 
-        // Merge with TBS
-        $TBS = new \clsTinyButStrong;
-        $TBS->NoErr = true;
-
-        //LOAD PLUGIN FOR ODT/DOCX DOCUMENT
-        $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
-        $TBS->LoadTemplate($pathToTemplate, OPENTBS_ALREADY_UTF8);
-
-        
-        foreach ($datasources as $name => $datasource) {
-            if (!is_array($datasource)) {
-                $TBS->MergeField($name, $datasource);
-            } else {
-                $TBS->MergeBlock($name, 'array', $datasource);
-            }
-        }
-
-        
-        if ($pathToTemplateInfo['extension'] == 'odt') {
-            $TBS->LoadTemplate('#styles.xml');
-        } elseif ($pathToTemplateInfo['extension'] == 'docx') {
-            $TBS->LoadTemplate('#word/header1.xml');
-        }
-        foreach ($datasources as $name => $datasource) {
-            if (!is_array($datasource)) {
-                $TBS->MergeField($name, $datasource);
-            } else {
-                $TBS->MergeBlock($name, 'array', $datasource);
-            }
-        }
-
-        if ($pathToTemplateInfo['extension'] == 'docx') {
-            $TBS->LoadTemplate('#word/footer1.xml');
+            // Merge with TBS
+            $TBS = new \clsTinyButStrong;
+            $TBS->NoErr = true;
+    
+            //LOAD PLUGIN FOR ODT/DOCX DOCUMENT
+            $TBS->Plugin(TBS_INSTALL, OPENTBS_PLUGIN);
+            $TBS->LoadTemplate($pathToTemplate, OPENTBS_ALREADY_UTF8);
+    
+            
             foreach ($datasources as $name => $datasource) {
                 if (!is_array($datasource)) {
                     $TBS->MergeField($name, $datasource);
@@ -410,13 +390,35 @@ class TemplateController
                     $TBS->MergeBlock($name, 'array', $datasource);
                 }
             }
+    
+            if ($pathToTemplateInfo['extension'] == 'odt') {
+                $TBS->LoadTemplate('#styles.xml');
+            } elseif ($pathToTemplateInfo['extension'] == 'docx') {
+                $TBS->LoadTemplate('#word/header1.xml');
+            }
+            foreach ($datasources as $name => $datasource) {
+                if (!is_array($datasource)) {
+                    $TBS->MergeField($name, $datasource);
+                } else {
+                    $TBS->MergeBlock($name, 'array', $datasource);
+                }
+            }
+    
+            if ($pathToTemplateInfo['extension'] == 'docx') {
+                $TBS->LoadTemplate('#word/footer1.xml');
+                foreach ($datasources as $name => $datasource) {
+                    if (!is_array($datasource)) {
+                        $TBS->MergeField($name, $datasource);
+                    } else {
+                        $TBS->MergeBlock($name, 'array', $datasource);
+                    }
+                }
+            }
+    
+            $TBS->Show(OPENTBS_FILE, $myFile);
+        } else {
+            $myFile = $pathToTemplate;
         }
-
-        $fileNameOnTmp = 'tmp_file_' . $aArgs['userId'] . '_' . rand() . '.' . $pathToTemplateInfo['extension'];
-        $tmpPath = CoreConfigModel::getTmpPath();
-        $myFile = $tmpPath . $fileNameOnTmp;
-
-        $TBS->Show(OPENTBS_FILE, $myFile);
 
         return $myFile;
     }
