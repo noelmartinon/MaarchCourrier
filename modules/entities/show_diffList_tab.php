@@ -4,11 +4,8 @@ $s_id = $_REQUEST['resId'];
 $category = $_REQUEST['category'];
 $coll_id = $_REQUEST['collId'];
 
-if (isset($_REQUEST['only_cc'])) {
-    $onlyCC = '&only_cc';
-} else {
-    $onlyCC = '';
-}
+$onlyCC = '';
+
 $roles = json_decode(urldecode($_REQUEST['roles']));
 
 require_once 'core'.DIRECTORY_SEPARATOR.'class'.DIRECTORY_SEPARATOR.'class_request.php';
@@ -34,7 +31,10 @@ if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == true) {
 }
 
 if ($from_detail == true) {
-    if ($core_tools->test_service('update_list_diff_in_details', 'entities', false) || $core_tools->test_service('add_copy_in_indexing_validation', 'entities', false)) {
+    if ($core_tools->test_service('update_list_diff_in_details', 'entities', false)) {
+        if ($core_tools->test_service('add_copy_in_indexing_validation', 'entities', false)) {
+            $onlyCC = '&only_cc';
+        }
         $frm_str .= '<br />';
         $frm_str .= '<div style="text-align:center;">';
 
@@ -49,6 +49,9 @@ if ($from_detail == true) {
     }
     $difflist = $_SESSION['details']['diff_list'];
 } else {
+    if (isset($_REQUEST['only_cc'])) {
+        $onlyCC = '&only_cc';
+    }
     if ($core_tools->test_service('add_copy_in_process', 'entities', false)) {
         $frm_str .= '<div style="text-align:center;"><input type="button" class="button" title="'._UPDATE_LIST_DIFF.'" value="'._UPDATE_LIST_DIFF.'" onclick="window.open(\''
                 .$_SESSION['config']['businessappurl']
