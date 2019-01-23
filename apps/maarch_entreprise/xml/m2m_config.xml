@@ -15,5 +15,5 @@
         <contact_purpose_id>1</contact_purpose_id>
     </contact_addresses>
     <basketRedirection_afterUpload>NumericBasket</basketRedirection_afterUpload><!--basketId-->
-    <m2m_communication>https://cchaplin:maarch@demo.maarchcourrier.com</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
+    <m2m_communication>https://cchaplin:maarch@demo.maarchcourrier.com</m2m_communication><!--moyen(s) de communication de l'instance : email,uri -->
 </ROOT>
