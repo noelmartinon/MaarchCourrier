@@ -81,7 +81,8 @@ abstract class tag_controler_Abstract extends ObjectControler
         
         if($core->test_service('private_tag', 'tags',false) == 1){
             $entitiesRestriction = array();
-            $userEntities = users_controler::getEntities($_SESSION['user']['UserId']);
+            $uc = new users_controler();
+            $userEntities = $uc->getEntities($_SESSION['user']['UserId']);
 
             foreach ($userEntities as $entity) {
                 $entity_id = $entity['ENTITY_ID'];
