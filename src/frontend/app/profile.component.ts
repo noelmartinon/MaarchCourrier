@@ -576,9 +576,8 @@ export class ProfileComponent extends AutoCompletePlugin implements OnInit {
         if (r) {
             this.http.put(this.coreUrl + 'rest/users/' + this.user.id + '/status', { "status": "ABS" })
                 .subscribe(() => {
-                    location.hash = "";
                     location.search = "?display=true&page=logout&abs_mode";
-                }, (err) => {
+                }, (err: any) => {
                     this.notify.error(err.error.errors);
                 });
         }
