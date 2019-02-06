@@ -251,6 +251,7 @@ function loadSelectedContact() {
 
     if (ContactAndAddress == 'mailing') {
         $j("#contactDiv").hide();
+        $j("#addMailing").show();
         $j("#newAttachDiv").hide();
         $j('#contactidAttach').val('mailing');
         $j('#mailingInfo').slideToggle("slow");
@@ -258,6 +259,7 @@ function loadSelectedContact() {
         if ($j('#mailingInfo').is(':visible')) {
             $j('#mailingInfo').slideToggle("slow");
         }
+        $j("#addMailing").hide();
         $j("#contactDiv").show();
         $j("#newAttachDiv").show();
         var value = ContactAndAddress.split("#");
@@ -269,6 +271,7 @@ function loadSelectedContact() {
     
     if ($j("#choose_file").css("display") !== "inline-block") {
         $j("#add").hide();
+        $j("#addMailing").hide();
     }
     
     if ($j("#templateOffice option:selected").val() !== "" && $j("#templateOffice_edit").css("display") == "none") {

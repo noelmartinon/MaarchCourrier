@@ -261,7 +261,7 @@ if (!defined('_MAILING_INFO_2')) {
     define('_MAILING_INFO_2', 'Een <b>hoofd</b> bijlage zal aangemaakt worden zonder de fusievelden <b>contacten</b> en <b>chrono</b>.');
 }
 if (!defined('_MAILING_INFO_3')) {
-    define('_MAILING_INFO_3', 'De bijlagen zullen aangemaakt worden <b>NA</b> validering van de <b>goedkeurders</b> van het goedkeuringscircuit.');
+    define('_MAILING_INFO_3', 'De bijlagen zullen aangemaakt worden <b>NA</b> validering van de <b>goedkeurders</b> van het goedkeuringscircuit.'); //TO TRANSLATE
 }
 if (!defined('_MAILING_INFO_4')) {
     define('_MAILING_INFO_4', '<b>Er zal een</b> bijlage aangemaakt worden <b>per contact</b> dat aan de brief gekoppeld is.');

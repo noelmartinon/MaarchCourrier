@@ -74,7 +74,7 @@ if (!empty($res_id)) {
     $datasources['res_letterbox_contact'][] = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (empty($params['mailing'])) {
-        if ($datasources['res_letterbox_contact'][0]['contact_id'] != '' && $_SESSION['attachmentInfo'][$_SESSION['attachmentInfo']['attachNum']]['contactId'] != '') {
+        if ($datasources['res_letterbox_contact'][0]['contact_id'] != '' && $_SESSION['attachmentInfo'][$_SESSION['attachmentInfo']['attachNum']]['contactId'] != '' && $_SESSION['attachmentInfo'][$_SESSION['attachmentInfo']['attachNum']]['contactId'] != 'mailing') {
             // $datasources['contact'] = array();
             $attachNum = $_SESSION['attachmentInfo']['attachNum'];
             $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ', array($_SESSION['attachmentInfo'][$attachNum]['contactId'], $_SESSION['attachmentInfo'][$attachNum]['addressId']));

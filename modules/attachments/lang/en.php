@@ -212,7 +212,7 @@ if (!defined('_MAILING_INFO_2')) {
     define('_MAILING_INFO_2', 'A  <b>master</b> attachment will be created without <b>contacts</b> and <b>chrono</b> merge fields.');
 }
 if (!defined('_MAILING_INFO_3')) {
-    define('_MAILING_INFO_3', 'Attachments will be generated <b>AFTER</b> validation by <b>visa users</b> in visa circuit.');
+    define('_MAILING_INFO_3', 'If you click Mailing, attachments are going to be generated <b>NOW</b>.<br>If you click on Validate, attachments will be generated <b>AFTER</b> validation by <b>visa users</b> in visa circuit.');
 }
 if (!defined('_MAILING_INFO_4')) {
     define('_MAILING_INFO_4', '<b>1</b> attachment will be generated <b>each contact</b> linked to document.');

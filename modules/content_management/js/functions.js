@@ -85,6 +85,9 @@ function checkEditingDoc(elem, userId) {
                 target.prop('disabled', false);
                 target.css({"opacity":"1"});
                 target.val('Valider');
+                if ($j("#mailingInfo").is(":visible")) {
+                    $j("#addMailing").show();
+                }
 
                 //UNLOCK EDIT BUTTON (IF MULTI ATTACHMENT)
                 $j("[name=templateOffice_edit\\[\\]], #edit").css({"opacity":"1"});

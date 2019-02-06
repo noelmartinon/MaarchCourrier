@@ -294,7 +294,7 @@ if (!defined('_MAILING_INFO_2')) {
     define('_MAILING_INFO_2', 'Un attachement <b>maître</b> sera créé sans les champs de fusion <b>contacts</b> et <b>chrono</b>.');
 }
 if (!defined('_MAILING_INFO_3')) {
-    define('_MAILING_INFO_3', 'Les attachements seront générés <b>APRÈS</b> validation des <b>viseurs</b> du circuit de visa.');
+    define('_MAILING_INFO_3', 'Si vous cliquez sur Publipostage, les attachements seront générés <b>TOUT DE SUITE</b>.<br>Si vous cliquez sur Valider ils seront générés <b>APRÈS</b> validation des <b>viseurs</b> du circuit de visa.');
 }
 if (!defined('_MAILING_INFO_4')) {
     define('_MAILING_INFO_4', '<b>Un</b> attachement sera généré <b>par contact</b> associé au courrier.');
