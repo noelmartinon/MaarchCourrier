@@ -385,6 +385,8 @@ if (!empty($tab)) {
                     $tab[$i][$j]['show'] = false;
                 }
                 if ($tab[$i][$j][$value] == 'exp_user_id') {
+                    $itContactI = $i;
+                    $itContactJ = $j;
                     if (empty($contact_lastname) && empty($contact_firstname) && empty($user_lastname) && empty($user_firstname) && !empty($addressId)) {
                         $query = 'SELECT ca.firstname, ca.lastname FROM contact_addresses ca WHERE ca.id = ?';
                         $arrayPDO = array($addressId);
@@ -501,7 +503,6 @@ if (!empty($tab)) {
                     $tab[$i][$j]['value_export'] = $tab[$i][$j]['value'];
                     $my_imgcat = get_img_cat($tab[$i][$j]['value'], $extension_icon);
                     $tab[$i][$j]['value'] = $my_imgcat;
-                    $tab[$i][$j]['value'] = $tab[$i][$j]['value'];
                     $tab[$i][$j]['order'] = 'category_id';
                 }
                 if ($tab[$i][$j][$value] == 'count_attachment') {
