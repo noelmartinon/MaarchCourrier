@@ -2097,7 +2097,7 @@ abstract class lists_Abstract extends Database
                 }
             }
             //Eval disabled rule
-            if (!empty($disabledRules) && preg_match("/^\d+\s*==\s*\d+$/", $disabledRules)) {
+            if (!empty($disabledRules)) {
                 $rules = "return($disabledRules);";
                 //echo $rules."<br>\n";
                 if (@eval($rules)) {
