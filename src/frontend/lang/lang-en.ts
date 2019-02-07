@@ -698,8 +698,7 @@ export const LANG_EN = {
     "classement"                                        : "RANKING",
     "supervision"                                       : "SUPERVISION", 
     "redirectUserListInstances"                         : "Change of recipient for mail being processed",
-    "isResDest"                                         : "is the recipient of mail being processed",
-    "chooseNewDestUser"                                 : "please select a replacement user", 
+    "chooseNewDestUser"                                 : "is the recipient of mail being processed, please select a replacement user",
     "newDest"                                           : "New recipient for",
     "newDestRes"                                        : "New recipient for mails"
 };

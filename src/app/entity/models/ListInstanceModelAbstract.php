@@ -214,8 +214,8 @@ abstract class ListInstanceModelAbstract
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['listinstance li', 'res_letterbox res', 'mlb_coll_ext mlb'],
             'left_join' => ['li.res_id = res.res_id', 'res.res_id = mlb.res_id'],
-            'where'     => ['res.dest_user = ?', 'li.difflist_type = ?', 'mlb.closing_date is null'],
-            'data'      => [$aArgs['id'], 'entity_id'],
+            'where'     => ['res.dest_user = ?', 'li.difflist_type = ?', 'mlb.closing_date is null', 'res.status not in (?)'],
+            'data'      => [$aArgs['id'], 'entity_id', ['END', 'DEL']],
             'order_by'  => ['res_id ASC']
         ]);
 

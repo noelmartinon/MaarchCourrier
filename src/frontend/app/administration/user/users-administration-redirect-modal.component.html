@@ -39,7 +39,7 @@
             <div class="modal-body" *ngIf="data.userDestRedirect.isResDestUser">
                 <h2 mat-dialog-title>{{lang.redirectUserListInstances}}</h2>
                 <div class="alert alert-warning" role="alert">
-                    <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span> {{lang.isResDest}}, {{lang.chooseNewDestUser}}</span> :
+                    <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span [innerHTML]="lang.chooseNewDestUser"></span> :
                 </div>
 
                 <div id="{{this.data.userDestRedirect.user_id}}" class="form-group">
