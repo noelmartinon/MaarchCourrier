@@ -130,7 +130,7 @@ export class TemplateAdministrationComponent implements OnInit {
                     'bdesk_photo': "../../apps/maarch_entreprise/tools/tinymce/bdesk_photo/plugin.min.js"
                 },
                 menubar: false,
-                toolbar: "undo | bold italic underline | alignleft aligncenter alignright | bdesk_photo | forecolor",
+                toolbar: "undo | bold italic underline | alignleft aligncenter alignright | bdesk_photo | forecolor | code",
                 theme_buttons1_add: "fontselect,fontsizeselect",
                 theme_buttons2_add_before: "cut,copy,paste,pastetext,pasteword,separator,search,replace,separator",
                 theme_buttons2_add: "separator,insertdate,inserttime,preview,separator,forecolor,backcolor",
