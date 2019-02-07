@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <div class="modal-body" *ngIf="data.userDestRedirect.isResDestUser">
+            <!-- <div class="modal-body" *ngIf="data.userDestRedirect.isResDestUser">
                 <h2 mat-dialog-title>{{lang.redirectUserListInstances}}</h2>
                 <div class="alert alert-warning" role="alert">
                     <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span [innerHTML]="lang.chooseNewDestUser"></span> :
@@ -64,7 +64,7 @@
                         </mat-autocomplete>
                     </mat-form-field>
                 </div>
-            </div>
+            </div> -->
 
             <div class="modal-body" *ngIf="!data.userDestRedirect.inDiffListDest && !data.userDestRedirect.isResDestUser">
                 <h2 mat-dialog-title>{{lang.confirmAction}}</h2>

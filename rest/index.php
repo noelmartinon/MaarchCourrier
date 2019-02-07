@@ -187,8 +187,8 @@ $app->get('/listinstance/{id}', \Entity\controllers\ListInstanceController::clas
 $app->get('/res/{resId}/listinstance', \Entity\controllers\ListInstanceController::class . ':getListByResId');
 $app->get('/res/{resId}/visaCircuit', \Entity\controllers\ListInstanceController::class . ':getVisaCircuitByResId');
 $app->get('/res/{resId}/avisCircuit', \Entity\controllers\ListInstanceController::class . ':getAvisCircuitByResId');
-$app->get('/listinstances/dest/itemId/{itemId}', \Entity\controllers\ListInstanceController::class . ':getListWhereUserIsDest');
-$app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');
+// $app->get('/listinstances/dest/itemId/{itemId}', \Entity\controllers\ListInstanceController::class . ':getListWhereUserIsDest');
+// $app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');
 
 //ListTemplates
 $app->get('/listTemplates', \Entity\controllers\ListTemplateController::class . ':get');
