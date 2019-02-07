@@ -735,7 +735,7 @@ class functions
     * Returns a string without the escaping characters
     *
     * @param  $string string String to format
-    * @return Formated string
+    * @return string
     */
     public static function show_string($string, $replace_CR = false, $chars_to_escape = array(), $databasetype = '', $escape_quote = true)
     {

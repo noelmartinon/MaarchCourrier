@@ -455,7 +455,8 @@ abstract class fileplan_Abstract
     protected function _getChildrensTree($fileplan_id, $positions, $parent = '', $tabspace = '') {
 
         $db = new Database();
-        if (functions::protect_string_db(trim($parent)) == '') {
+        $f = new functions();
+        if ($f->protect_string_db(trim($parent)) == '') {
 
             $stmt = $db->query(
                     "select position_id, position_label, parent_id, count_document from "
@@ -482,7 +483,7 @@ abstract class fileplan_Abstract
                         $positions, 
                         array(
                             'ID' =>$line->position_id, 
-                            'LABEL' =>  $espace.functions::show_string($line->position_label), 
+                            'LABEL' =>  $espace. $f->show_string($line->position_label),
                             'PARENT_ID' =>$line->parent_id,
                             'COUNT_DOCUMENT' => $line->count_document
                             )
