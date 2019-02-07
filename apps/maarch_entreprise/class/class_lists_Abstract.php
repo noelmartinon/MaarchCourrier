@@ -1182,20 +1182,24 @@ abstract class lists_Abstract extends Database
 
     protected function _tmplt_showIconDocument($resultTheLine, $listKey)
     {
-        $core = new core_tools();
         $return = '';
         //Show document icon
-        foreach ($resultTheLine as $r) {
-            if (isset($r['res_id'])) {
-                $res_id = $r['res_id'];
-                break;
+        if (is_array($resultTheLine)) {
+            foreach ($resultTheLine as $r) {
+                if (isset($r['res_id'])) {
+                    $res_id = $r['res_id'];
+                    break;
+                }
             }
+
         }
         $isAttachment = false;
-        foreach ($resultTheLine as $r) {
-            if ($r['column'] === 'attachment_type') {
-                $isAttachment = true;
-                break;
+        if (is_array($resultTheLine)) {
+            foreach ($resultTheLine as $r) {
+                if ($r['column'] === 'attachment_type') {
+                    $isAttachment = true;
+                    break;
+                }
             }
         }
 
@@ -1964,9 +1968,11 @@ abstract class lists_Abstract extends Database
         if (!empty($listKey)) {
             //Get the ListKey value
             $keyValue = '';
-            for ($i = 0; $i <= count($resultTheLine); ++$i) {
-                if ($resultTheLine[$i]['column'] == $listKey) {
-                    $keyValue = $resultTheLine[$i]['value'];
+            if (is_array($resultTheLine)) {
+                for ($i = 0; $i <= count($resultTheLine); ++$i) {
+                    if ($resultTheLine[$i]['column'] == $listKey) {
+                        $keyValue = $resultTheLine[$i]['value'];
+                    }
                 }
             }
             $link .= '&id='.$keyValue;
@@ -2091,7 +2097,7 @@ abstract class lists_Abstract extends Database
                 }
             }
             //Eval disabled rule
-            if (!empty($disabledRules)) {
+            if (!empty($disabledRules) && preg_match("/^\d+\s*==\s*\d+$/", $disabledRules)) {
                 $rules = "return($disabledRules);";
                 //echo $rules."<br>\n";
                 if (@eval($rules)) {
