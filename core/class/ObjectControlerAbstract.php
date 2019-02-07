@@ -300,7 +300,7 @@ abstract class ObjectControler
         //$theQuery = "SELECT * FROM $table_name WHERE $table_id = :id " . $whereComp;
         $queryParams = array(':id' => $id);
 
-        if (!empty($params) && is_array($params) && count($params > 0)) {
+        if (!empty($params) && is_array($params) && count($params) > 0) {
             foreach ($params as $keyParam => $keyValue) {
                 $queryParams[":" . $keyParam] = $keyValue;
             }
