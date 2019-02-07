@@ -1057,20 +1057,22 @@ abstract class lists_Abstract extends Database
             return _WRONG_PARAM_FOR_LOAD_VALUE;
         } else {
             $column = $my_explode[1];
-            for ($i = 0; $i <= count($resultTheLine); ++$i) {
-                if ($resultTheLine[$i]['column'] == $column) {
-                    if (is_bool($resultTheLine[$i]['value'])) {
-                        //If boolean (convert to string)
-                        if ($resultTheLine[$i]['value']) {
-                            return 'true';
+            if (is_array($resultTheLine)) {
+                for ($i = 0; $i <= count($resultTheLine); ++$i) {
+                    if ($resultTheLine[$i]['column'] == $column) {
+                        if (is_bool($resultTheLine[$i]['value'])) {
+                            //If boolean (convert to string)
+                            if ($resultTheLine[$i]['value']) {
+                                return 'true';
+                            } else {
+                                return 'false';
+                            }
                         } else {
-                            return 'false';
-                        }
-                    } else {
-                        if ($resultTheLine[$i]['column'] == 'subject') {
-                            return preg_replace('/\s+/', ' ', $resultTheLine[$i]['value']);
-                        } else {
-                            return $resultTheLine[$i]['value'];
+                            if ($resultTheLine[$i]['column'] == 'subject') {
+                                return preg_replace('/\s+/', ' ', $resultTheLine[$i]['value']);
+                            } else {
+                                return $resultTheLine[$i]['value'];
+                            }
                         }
                     }
                 }
@@ -1089,9 +1091,11 @@ abstract class lists_Abstract extends Database
     {
         //Get the ListKey value
         $keyValue = '';
-        for ($i = 0; $i <= count($resultTheLine); ++$i) {
-            if ($resultTheLine[$i]['column'] == $listKey) {
-                $keyValue = $resultTheLine[$i]['value'];
+        if (is_array($resultTheLine)) {
+            for ($i = 0; $i <= count($resultTheLine); ++$i) {
+                if ($resultTheLine[$i]['column'] == $listKey) {
+                    $keyValue = $resultTheLine[$i]['value'];
+                }
             }
         }
 
@@ -1144,9 +1148,11 @@ abstract class lists_Abstract extends Database
 
         //Get the ListKey value
         $keyValue = '';
-        for ($i = 0; $i <= count($resultTheLine); ++$i) {
-            if ($resultTheLine[$i]['column'] == $listKey) {
-                $keyValue = $resultTheLine[$i]['value'];
+        if (is_array($resultTheLine)) {
+            for ($i = 0; $i <= count($resultTheLine); ++$i) {
+                if ($resultTheLine[$i]['column'] == $listKey) {
+                    $keyValue = $resultTheLine[$i]['value'];
+                }
             }
         }
         //If radio button is activated (is it important if template???)
@@ -1413,9 +1419,11 @@ abstract class lists_Abstract extends Database
         ) {
             //Get the ListKey value
             $keyValue = '';
-            for ($i = 0; $i <= count($resultTheLine); ++$i) {
-                if ($resultTheLine[$i]['column'] == $listKey) {
-                    $keyValue = $resultTheLine[$i]['value'];
+            if (is_array($resultTheLine)) {
+                for ($i = 0; $i <= count($resultTheLine); ++$i) {
+                    if ($resultTheLine[$i]['column'] == $listKey) {
+                        $keyValue = $resultTheLine[$i]['value'];
+                    }
                 }
             }
             $sAction = \Action\models\ActionModel::getActionPageById(['id' => $this->params['defaultAction']]);
@@ -1633,7 +1641,7 @@ abstract class lists_Abstract extends Database
     public function tmplt_func_bool_see_multi_contacts($resultTheLine)
     {
         $return = '';
-        $nbresult_I = count($resultTheLine);
+        $nbresult_I = is_array($resultTheLine) ? count($resultTheLine) : 0;
 
         for ($iresults = 0; $iresults < $nbresult_I; ++$iresults) {
             if ($resultTheLine[$iresults]['is_multi_contacts']) {

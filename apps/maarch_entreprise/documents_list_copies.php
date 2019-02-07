@@ -223,6 +223,9 @@ $addressId = 0;
 //Result Array
 if (!empty($tab)) {
     for ($i = 0; $i < count($tab); ++$i) {
+        if (empty($tab[$i])) {
+            break;
+        }
         for ($j = 0; $j < count($tab[$i]); ++$j) {
             foreach (array_keys($tab[$i][$j]) as $value) {
                 if ($tab[$i][$j][$value] == 'res_id') {

@@ -124,7 +124,8 @@ export class TemplateAdministrationComponent implements OnInit {
                 height: "200",
                 plugins: [
                     "textcolor",
-                    "autoresize"
+                    "autoresize",
+                    "code"
                 ],
                 external_plugins: {
                     'bdesk_photo': "../../apps/maarch_entreprise/tools/tinymce/bdesk_photo/plugin.min.js"
