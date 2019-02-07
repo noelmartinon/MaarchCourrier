@@ -3908,3 +3908,9 @@ function openSenderInfoContact(id, type) {
         window.open('index.php?display=true&dir=my_contacts&page=info_contact_iframe&mode=editDetailSender&editDetailSender&popup&sender_recipient_id='+id+'&sender_recipient_type='+type, 'contact_info', 'height='+height+', width=1000,scrollbars=yes,resizable=yes');
     }
 }
+
+function displayAddMailing() {
+    if ($j("#mailingInfo").is(":visible")) {
+        $j("#addMailing").show();
+    }
+}

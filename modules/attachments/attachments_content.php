@@ -1046,7 +1046,10 @@ if (isset($_POST['add']) && $_POST['add']) {
             'typist', 'format', 'status', 'title', 'attachment_type', 'in_signature_book', 'res_id_master',
             'validation_date', 'effective_date', 'identifier', 'docserver_id', 'path', 'filename'
         ];
-        if ($is_new_version) {
+        if ($is_new_version || $_REQUEST['relation'] != 1) {
+            if ($_REQUEST['relation'] != 1) {
+                $id = $_REQUEST['res_id'];
+            }
             $attachmentToProcess = \Attachment\models\AttachmentModel::getById([
                 'select'    => $select,
                 'id'        => $id,
@@ -1497,7 +1500,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
     //FILE
     if ($mode == 'add') {
         $content .= '<p>';
-        $content .= '<label id="file_label">'._FILE.' <span id="templateOfficeTool"><i class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" style="cursor:pointer;" id="attachment_type_icon" onclick="$j(\'#add\').css(\'display\', \'inline\');$(\'attachment_type_icon\').setStyle({color: \'#135F7F\'});$(\'attachment_type_icon2\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'none\'});$(\'templateOffice\').disabled=true;$(\'templateOffice_edit\').setStyle({display: \'none\'});$(\'choose_file\').setStyle({display: \'inline-block\'});document.getElementById(\'choose_file\').contentDocument.getElementById(\'file\').click();"></i> <i class="fa fa-file-alt fa-lg" title="'._GENERATED_FILE.'" style="cursor:pointer;color:#135F7F;" id="attachment_type_icon2" onclick="$(\'attachment_type_icon2\').setStyle({color: \'#135F7F\'});$(\'attachment_type_icon\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'inline-block\'});$(\'templateOffice\').disabled=false;$(\'choose_file\').setStyle({display: \'none\'});"></i></span></label>';
+        $content .= '<label id="file_label">'._FILE.' <span id="templateOfficeTool"><i class="fa fa-paperclip fa-lg" title="'._LOADED_FILE.'" style="cursor:pointer;" id="attachment_type_icon" onclick="$j(\'#add\').css(\'display\', \'inline\');$(\'attachment_type_icon\').setStyle({color: \'#135F7F\'});$(\'attachment_type_icon2\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'none\'});$(\'templateOffice\').disabled=true;$(\'templateOffice_edit\').setStyle({display: \'none\'});$(\'choose_file\').setStyle({display: \'inline-block\'});document.getElementById(\'choose_file\').contentDocument.getElementById(\'file\').click();displayAddMailing()"></i> <i class="fa fa-file-alt fa-lg" title="'._GENERATED_FILE.'" style="cursor:pointer;color:#135F7F;" id="attachment_type_icon2" onclick="$(\'attachment_type_icon2\').setStyle({color: \'#135F7F\'});$(\'attachment_type_icon\').setStyle({color: \'#666\'});$(\'templateOffice\').setStyle({display: \'inline-block\'});$(\'templateOffice\').disabled=false;$(\'choose_file\').setStyle({display: \'none\'});"></i></span></label>';
         $content .= '<select name="templateOffice[]" id="templateOffice" style="display:inline-block;" onchange="showEditButton(this);">';
         $content .= '<option value="">'._CHOOSE_MODEL.'</option>';
 
