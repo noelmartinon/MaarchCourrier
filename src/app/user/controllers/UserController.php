@@ -75,17 +75,29 @@ class UserController
         }
 
         $listModels = ListTemplateModel::get(['select' => ['item_id'], 'where' => ['item_id in (?)', 'object_type = ?', 'item_mode = ?'], 'data' => [$usersIds, 'entity_id', 'dest']]);
+        $listInstances = ListInstanceModel::get(['select' => ['item_id'], 'where' => ['item_id in (?)', 'item_mode = ?'], 'data' => [$usersIds, 'dest'], 'groupBy' => ['item_id']]);
 
         $usersListModels = [];
         foreach ($listModels as $value) {
             $usersListModels[] = $value['item_id'];
         }
 
+        $usersListInstances = [];
+        foreach ($listInstances as $value) {
+            $usersListInstances[] = $value['item_id'];
+        }
+
         foreach ($users as $key => $value) {
             if (in_array($value['user_id'], $usersListModels)) {
-                $users[$key]['inDiffListDest'] = 'Y';
+                $users[$key]['inDiffListDest'] = true;
             } else {
-                $users[$key]['inDiffListDest'] = 'N';
+                $users[$key]['inDiffListDest'] = false;
+            }
+
+            if (in_array($value['user_id'], $usersListInstances)) {
+                $users[$key]['isResDestUser'] = true;
+            } else {
+                $users[$key]['isResDestUser'] = false;
             }
         }
 

@@ -67,23 +67,20 @@
                         <mat-header-cell *matHeaderCellDef>
                         </mat-header-cell>
                         <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
-                            <button mat-icon-button color="primary" [disabled]="element.user_id==user.user_id" *ngIf="element.enabled == 'Y' && element.inDiffListDest == 'Y'" matTooltip="{{lang.suspend}}"
+                            <button mat-icon-button color="primary" [disabled]="element.user_id==user.user_id" *ngIf="element.enabled == 'Y' && element.inDiffListDest" matTooltip="{{lang.suspend}}"
                                 (click)="$event.stopPropagation();suspendUser(element)">
                                 <mat-icon class="fa fa-pause fa-2x" aria-hidden="true"></mat-icon>
                             </button>
-                            <button mat-icon-button color="primary" [disabled]="element.user_id==user.user_id" *ngIf="element.enabled == 'Y' && element.inDiffListDest == 'N'" matTooltip="{{lang.suspend}}"
+                            <button mat-icon-button color="primary" [disabled]="element.user_id==user.user_id" *ngIf="element.enabled == 'Y' && !element.inDiffListDest" matTooltip="{{lang.suspend}}"
                                 (click)="$event.stopPropagation();suspendUser(element)">
                                 <mat-icon class="fa fa-pause fa-2x" aria-hidden="true"></mat-icon>
                             </button>
                             <button mat-icon-button color="accent" *ngIf="element.enabled == 'N'" matTooltip="{{lang.authorize}}" (click)="$event.stopPropagation();activateUser(element)">
                                 <mat-icon class="fa fa-check fa-2x" aria-hidden="true"></mat-icon>
                             </button>
-                            <button mat-icon-button color="warn" [disabled]="element.user_id==user.user_id" *ngIf="element.inDiffListDest == 'Y'" matTooltip="{{lang.delete}}" data-toggle="modal"
+                            <button mat-icon-button color="warn" [disabled]="element.user_id==user.user_id" matTooltip="{{lang.delete}}" data-toggle="modal"
                                 data-target="#changeDiffListDest" (click)="$event.stopPropagation();deleteUser(element)">
-                                <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
-                            </button>
-                            <button mat-icon-button color="warn" [disabled]="element.user_id==user.user_id" *ngIf="element.inDiffListDest == 'N'" matTooltip="{{lang.delete}}" (click)="$event.stopPropagation();deleteUser(element)">
-                                <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
+                                <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>
                             </button>
                         </mat-cell>
                     </ng-container>

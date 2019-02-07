@@ -1,40 +1,84 @@
-<h2 mat-dialog-title>{{lang.redirectUserListDiff}}</h2>
-<mat-dialog-content>
-    <form #changeDiffListDestForm="ngForm">
-        <div class="modal-body">
-            <div class="alert alert-warning" role="alert">
-                <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span [innerHTML]="lang.chooseNewDest"></span> :
-            </div>
-            <div *ngFor="let userDestRedirectModel of data.userDestRedirectModels; index as i" id="{{userDestRedirectModel.object_id}}"
-                class="form-group">
+<form #changeDiffListDestForm="ngForm">
+    <div *ngIf="loadModel && loadInstance" style="display:flex;height:100%;">
+        <mat-spinner style="margin:auto;"></mat-spinner>
+    </div>
+    <div *ngIf="!loadModel && !loadInstance">
+        <mat-dialog-content>    
+            <div class="modal-body" *ngIf="data.userDestRedirect.inDiffListDest">
+                <h2 mat-dialog-title>{{lang.redirectUserListDiff}}</h2>
+                <div class="alert alert-warning" role="alert">
+                    <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span [innerHTML]="lang.chooseNewDest"></span> :
+                </div>
 
-                <mat-form-field class="example-full-width">
-                    <input name="userDestRedirectModel_{{i}}" id="userDestRedirectModel_{{i}}" [(ngModel)]="userDestRedirectModel.redirectUserId"
-                        type="text" placeholder="Nouveau destinataire pour : {{userDestRedirectModel.title}}" matInput [matAutocomplete]="auto"
-                        [formControl]="userCtrl" required>
-                    <mat-autocomplete #auto="matAutocomplete">
-                        <ng-container *ngFor="let user of filteredUsers | async">
-                            <mat-option [value]="user.id" *ngIf="this.data.userDestRedirect.user_id != user.id">
-                                <div class="container-fluid">
-                                    <span class="col-xm-1">
-                                        <mat-icon color="primary" class="fa fa-user fa-2x" style="margin-right:0px;"></mat-icon>
-                                    </span>
-                                    <span class="col-xm-11">
-                                        {{ user.idToDisplay }}
-                                        <small>{{ user.otherInfo }}</small>
-                                    </span>
-                                </div>
-                            </mat-option>
-                        </ng-container>
-                    </mat-autocomplete>
-                </mat-form-field>
+                <div *ngFor="let userDestRedirectModel of data.userDestRedirectModels; index as i" id="{{userDestRedirectModel.object_id}}"
+                    class="form-group">
+
+                    <mat-form-field class="example-full-width">
+                        <input name="userDestRedirectModel_{{i}}" id="userDestRedirectModel_{{i}}" [(ngModel)]="userDestRedirectModel.redirectUserId"
+                            type="text" placeholder="{{lang.newDest}} : {{userDestRedirectModel.title}}" matInput [matAutocomplete]="auto"
+                            [formControl]="userCtrl" required>
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <ng-container *ngFor="let user of filteredUsers | async">
+                                <mat-option [value]="user.id" *ngIf="this.data.userDestRedirect.user_id != user.id">
+                                    <div class="container-fluid">
+                                        <span class="col-xm-1">
+                                            <mat-icon color="primary" class="fa fa-user fa-2x" style="margin-right:0px;"></mat-icon>
+                                        </span>
+                                        <span class="col-xm-11">
+                                            {{ user.idToDisplay }}
+                                            <small>{{ user.otherInfo }}</small>
+                                        </span>
+                                    </div>
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
             </div>
-        </div>
+
+            <div class="modal-body" *ngIf="data.userDestRedirect.isResDestUser">
+                <h2 mat-dialog-title>{{lang.redirectUserListInstances}}</h2>
+                <div class="alert alert-warning" role="alert">
+                    <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span> {{lang.isResDest}}, {{lang.chooseNewDestUser}}</span> :
+                </div>
+
+                <div id="{{this.data.userDestRedirect.user_id}}" class="form-group">
+                    <mat-form-field class="example-full-width">
+                        <input name="userDestRedirectModel_resDest" id="userDestRedirectModel_resDest" [(ngModel)]="this.data.redirectDestResUserId"
+                            type="text" placeholder="{{lang.newDestRes}} : " matInput [matAutocomplete]="auto"
+                            [formControl]="userCtrl" required>
+                        <mat-autocomplete #auto="matAutocomplete">
+                            <ng-container *ngFor="let user of filteredUsers | async">
+                                <mat-option [value]="user.id" *ngIf="this.data.userDestRedirect.user_id != user.id">
+                                    <div class="container-fluid">
+                                        <span class="col-xm-1">
+                                            <mat-icon color="primary" class="fa fa-user fa-2x" style="margin-right:0px;"></mat-icon>
+                                        </span>
+                                        <span class="col-xm-11">
+                                            {{ user.idToDisplay }}
+                                            <small>{{ user.otherInfo }}</small>
+                                        </span>
+                                    </div>
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="modal-body" *ngIf="!data.userDestRedirect.inDiffListDest && !data.userDestRedirect.isResDestUser">
+                <h2 mat-dialog-title>{{lang.confirmAction}}</h2>
+                <div class="alert" role="alert">
+                    <b>{{lang.delete}} {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
+                </div>
+            </div>
+
+        </mat-dialog-content>
         <mat-dialog-actions>
-            <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.mode == 'del'" type="submit" class="btn btn-danger" (click)="dialogRef.close(this.data.userDestRedirectModels)"
+            <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.mode == 'del'" type="submit" class="btn btn-danger" (click)="dialogRef.close(this.data)"
                 [disabled]="!sendFunction()">{{lang.delete}} {{lang.user}}</button>
             <button mat-raised-button color="primary" *ngIf="data.userDestRedirect.mode == 'up'" type="submit" (click)="dialogRef.close(this.data.userDestRedirectModels)"
                 [disabled]="!sendFunction()">{{lang.suspend}} {{lang.user}}</button>
         </mat-dialog-actions>
-    </form>
-</mat-dialog-content>
+    </div>
+</form>

@@ -20,6 +20,9 @@ use Slim\Http\Response;
 use Respect\Validation\Validator;
 use Resource\controllers\ResController;
 use Entity\models\EntityModel;
+use SrcCore\models\DatabaseModel;
+use User\models\UserModel;
+use Resource\models\ResModel;
 
 class ListInstanceController
 {
@@ -67,5 +70,77 @@ class ListInstanceController
         $listinstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
         
         return $response->withJson($listinstances);
+    }
+
+    public function getListWhereUserIsDest(Request $request, Response $response, array $aArgs) {
+        
+        $data = ListInstanceModel::getListWhereUserIsDest(['select' => ['li.*'], 'id' => $aArgs['itemId']]);
+
+        if($data) {
+            $res_id = 0;
+            $array=[];
+            foreach($data as $value) {
+                if($res_id == 0) {
+                    $res_id = $value['res_id'];
+                } else if( $res_id != $value['res_id']) {
+                    $listinstances[] = ['resId' => $res_id, "listinstances" => $array];
+                    $res_id = $value['res_id'];
+                    $array = [];
+                }
+                array_push($array, $value);
+            }
+            $listinstances[] = ['resId' => $res_id, "listinstances" => $array];
+        }
+            
+        return $response->withJson(['listinstances' => $listinstances]);   
+    }
+
+    public function update(Request $request, Response $response)
+    {
+        $data = $request->getParams();
+
+        if(empty($data['listinstances'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'listinstance is missing or is empty']);
+        }
+
+        foreach ($data['listinstances'] as $ListInstanceByRes) {
+
+            foreach($ListInstanceByRes['listinstances'] as $instance) {
+
+                if( empty($instance['res_id']) || empty($instance['item_id']) || empty($instance['item_type']) || empty($instance['item_mode']) || empty($instance['difflist_type']) ) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Some data are empty']);
+                }
+                
+                if( isset($instance['listinstance_id']) && !empty($instance['listinstance_id']) ) {
+                    $check = ListInstanceModel::getById(['select' => ['listinstance_id'], 'id' => $instance['listinstance_id']]);
+                    if( !$check) {
+                        return $response->withStatus(400)->withJson(['errors' => 'listinstance_id is not correct']);
+                    }
+    
+                    ListInstanceModel::delete(['listinstance_id' => $instance['listinstance_id']]);
+                }
+                
+                $user = UserModel::getByUserId(['userId' => $instance['item_id']]);
+                if (empty($user) || $user['status'] != "OK") {
+                    return $response->withStatus(400)->withJson(['errors' => 'User not found or not active']);
+                }
+
+                unset($instance['listinstance_id']);
+                unset($instance['requested_signature']);
+                unset($instance['signatory']);
+                
+                ListInstanceModel::create($instance);
+
+                if($instance['item_mode'] == 'dest') {
+                    ResModel::update([
+                        'set'   => ['dest_user' => $instance['item_id']],
+                        'where' => ['res_id = ?'],
+                        'data'  => [$instance['res_id']]
+                    ]);
+                 }
+            }
+        }
+
+        return $response->withJson(['success' => 'success']);
     }
 }

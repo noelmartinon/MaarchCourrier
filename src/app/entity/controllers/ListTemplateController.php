@@ -275,8 +275,8 @@ class ListTemplateController
 
         foreach ($data['redirectListModels'] as $listModel) {
             $user = UserModel::getByUserId(['userId' => $listModel['redirectUserId']]);
-            if (empty($user)) {
-                return $response->withStatus(400)->withJson(['errors' => 'User not found']);
+            if (empty($user) || $user['status'] != "OK") {
+                return $response->withStatus(400)->withJson(['errors' => 'User not found or not active']);
             }
 
             ListTemplateModel::update([

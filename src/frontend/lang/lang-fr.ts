@@ -721,5 +721,10 @@ export const LANG_FR = {
     "organization"                                      : "ORGANISATION",
     "production"                                        : "PRODUCTION",
     "classement"                                        : "CLASSEMENT",
-    "supervision"                                       : "SUPERVISION"
+    "supervision"                                       : "SUPERVISION",
+    "redirectUserListInstances"                         : "Changement de destinataire pour les courriers en cours de traitement",
+    "isResDest"                                         : "est destinataire de courriers en cours de traitement",
+    "chooseNewDestUser"                                 : "veuillez choisir un utilisateur de remplacement", 
+    "newDest"                                           : "Nouveau destinataire pour",
+    "newDestRes"                                        : "Nouveau destinataire pour les courriers"
 };

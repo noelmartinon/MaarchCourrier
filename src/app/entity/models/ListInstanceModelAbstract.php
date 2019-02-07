@@ -136,6 +136,20 @@ abstract class ListInstanceModelAbstract
         return true;
     }
 
+    public static function delete(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['listinstance_id']);
+        ValidatorModel::intVal($aArgs, ['listinstance_id']);
+
+        DatabaseModel::delete([
+            'table' => 'listinstance',
+            'where'  => ['listinstance_id = ?'],
+            'data'   => [$aArgs['listinstance_id']]
+        ]);
+
+        return true;
+    }
+
     public static function update(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['where', 'data']);
@@ -188,5 +202,23 @@ abstract class ListInstanceModelAbstract
         ]);
 
         return $aListInstances;
+    }
+
+    public static function getListWhereUserIsDest(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['id']);
+        ValidatorModel::stringType($aArgs, ['id']);
+        ValidatorModel::arrayType($aArgs, ['select']);
+
+        $aListinstance = DatabaseModel::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['listinstance li', 'res_letterbox res', 'mlb_coll_ext mlb'],
+            'left_join' => ['li.res_id = res.res_id', 'res.res_id = mlb.res_id'],
+            'where'     => ['res.dest_user = ?', 'li.difflist_type = ?', 'mlb.closing_date is null'],
+            'data'      => [$aArgs['id'], 'entity_id'],
+            'order_by'  => ['res_id ASC']
+        ]);
+
+        return $aListinstance;
     }
 }

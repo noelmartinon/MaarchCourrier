@@ -725,5 +725,10 @@ export const LANG_NL = {
     "production" : "PRODUCTIE",
     "classement" : "STANDEN",
     "supervision" : "TOEZICHT",
+    "redirectUserListInstances"                 : "_TO_TRANSLATE_Change of recipient for mail being processed",
+    "isResDest"                                 : "_TO_TRANSLATE_is the recipient of mail being processed",
+    "chooseNewDestUser"                         : "_TO_TRANSLATE_please select a replacement user", 
+    "newDest"                                   : "_TO_TRANSLATE_New recipient for",
+    "newDestRes"                                : "_TO_TRANSLATE_New recipient for mails"
     
 };
