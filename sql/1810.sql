@@ -19,9 +19,9 @@ ALTER TABLE groupbasket_status DROP COLUMN IF EXISTS "order";
 ALTER TABLE groupbasket_status ADD COLUMN "order" integer;
 UPDATE groupbasket_status SET "order" = 0 WHERE status_id = 'NEW';
 UPDATE groupbasket_status SET "order" = 1 WHERE status_id != 'NEW';
-UPDATE baskets SET basket_res_order = 'res_id' WHERE basket_res_order IS NULL;
+UPDATE baskets SET basket_res_order = 'res_id desc' WHERE basket_res_order IS NULL;
 ALTER TABLE baskets ALTER COLUMN basket_res_order SET NOT NULL;
-ALTER TABLE baskets ALTER COLUMN basket_res_order SET DEFAULT 'res_id';
+ALTER TABLE baskets ALTER COLUMN basket_res_order SET DEFAULT 'res_id desc';
 ALTER TABLE groupbasket_status ALTER COLUMN "order" SET NOT NULL;
 DO $$ BEGIN
   IF (SELECT count(TABLE_NAME)  FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'users_baskets') = 1 THEN
