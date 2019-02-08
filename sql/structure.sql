@@ -344,7 +344,7 @@ CREATE TABLE baskets
   enabled character(1) NOT NULL DEFAULT 'Y'::bpchar,
   basket_order integer,
   color character varying(16),
-  basket_res_order character varying(255) NOT NULL DEFAULT 'res_id',
+  basket_res_order character varying(255) NOT NULL DEFAULT 'res_id desc',
   flag_notif character varying(1),
   CONSTRAINT baskets_pkey PRIMARY KEY (coll_id, basket_id)
 )
