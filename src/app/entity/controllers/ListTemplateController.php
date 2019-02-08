@@ -271,6 +271,10 @@ class ListTemplateController
 
     public function updateByUserWithEntityDest(Request $request, Response $response)
     {
+        if (!ServiceModel::hasService(['id' => 'admin_users', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $data = $request->getParams();
 
         foreach ($data['redirectListModels'] as $listModel) {
