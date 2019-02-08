@@ -87,6 +87,7 @@ function checkEditingDoc(elem, userId) {
                 target.val('Valider');
                 if ($j("#mailingInfo").is(":visible")) {
                     $j("#addMailing").show();
+                    $j("#editMailing").show();
                 }
 
                 //UNLOCK EDIT BUTTON (IF MULTI ATTACHMENT)
