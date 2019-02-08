@@ -5067,3 +5067,6 @@ if (!defined('_MAIN_DOCUMENT')) {
 if (!defined('_DOWNLOAD_MAIN_DOCUMENT')) {
     define('_DOWNLOAD_MAIN_DOCUMENT', 'Download main document');
 }
+if (!defined('_MAILING_CONFIRMATION')) {
+    define('_MAILING_CONFIRMATION', 'Do you want to generate all attachments ?');
+}

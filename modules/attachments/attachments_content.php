@@ -1508,7 +1508,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         $content .= ' <input type="button" value="';
         $content .= _EDIT_MODEL;
         $content .= '" name="templateOffice_edit[]" id="templateOffice_edit" style="display:none;margin-top: 0" class="button" '
-            .'onclick="$j(\'#add\').css(\'display\',\'inline\');showAppletLauncher(this, \''.$_SESSION['doc_id'].'\',\''.$objectTable.'\',\'attachmentVersion\',\'attachment\');$(\'add\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';this.hide();$j(\'#\'+this.id).parent().find(\'[name=templateOffice\\\\[\\\\]]\').css(\'width\',\'206px\');"/>';
+            .'onclick="$j(\'#addMailing\').hide();$j(\'#add\').css(\'display\',\'inline\');showAppletLauncher(this, \''.$_SESSION['doc_id'].'\',\''.$objectTable.'\',\'attachmentVersion\',\'attachment\');$(\'add\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'add\').disabled=\'disabled\';$(\'add\').style.opacity=\'0.5\';this.hide();$j(\'#\'+this.id).parent().find(\'[name=templateOffice\\\\[\\\\]]\').css(\'width\',\'206px\');"/>';
         $content .= '<iframe style="display:none; width:210px" name="choose_file" id="choose_file" frameborder="0" scrolling="no" height="25" src="'.$_SESSION['config']['businessappurl']
             .'index.php?display=true&module=attachments&page=choose_attachment"></iframe>';
 
@@ -1619,7 +1619,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         if (!in_array($infoAttach->format, ['pdf', 'jpg', 'jpeg', 'png'])) {
             $content .= '$j(\'#edit\').css(\'visibility\',\'hidden\');';
         }
-        $content .= '$j(\'#editModel\').css(\'display\',\'inline-block\');"/>'._YES;
+        $content .= '$j(\'#editModel\').css(\'display\',\'inline-block\');$j(\'#editMailing\').hide();"/>'._YES;
         $content .= '&nbsp;&nbsp;';
         $content .= '<input type="radio" name="new_version" id="new_version_no" checked value="no" onclick="$j(\'#edit\').css(\'visibility\',\'visible\');"/>'._NO;
         $content .= '</p>';
@@ -1632,7 +1632,7 @@ $content .= '<div id="transmission"></div>';
         if ($mode == 'edit' && !in_array($infoAttach->format, ['pdf', 'jpg', 'jpeg', 'png'])) {
             $content .= '<input type="button" value="';
             $content .= _EDIT_MODEL;
-            $content .= '" name="editModel" id="editModel" class="button" onclick="$(\'edit\').style.visibility=\'visible\';showAppletLauncher(this, \''.$_SESSION['doc_id'].'\',\''.$objectTable.'\',\'attachmentUpVersion\',\'attachment\');$(\'edit\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'edit\').disabled=\'disabled\';$(\'edit\').style.opacity=\'0.5\';this.hide();"/>';
+            $content .= '" name="editModel" id="editModel" class="button" onclick="$j(\'#editMailing\').hide();$(\'edit\').style.visibility=\'visible\';showAppletLauncher(this, \''.$_SESSION['doc_id'].'\',\''.$objectTable.'\',\'attachmentUpVersion\',\'attachment\');$(\'edit\').value=\'Edition en cours ...\';editingDoc(this,\''.$_SESSION['user']['UserId'].'\');$(\'edit\').disabled=\'disabled\';$(\'edit\').style.opacity=\'0.5\';this.hide();"/>';
         }
 
     if (!isset($_REQUEST['id']) || (isset($_REQUEST['id']) && $infoAttach->status == 'SEND_MASS')) {
@@ -1642,9 +1642,9 @@ $content .= '<div id="transmission"></div>';
         $content .= '<input type="button" value="';
         $content .= 'Publipostage';
         if (isset($_REQUEST['id'])) {
-            $content .= '" name="editMailing" id="editMailing" class="button" onclick="ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
+            $content .= '" name="editMailing" id="editMailing" class="button" onclick="if(confirm(\'' . _MAILING_CONFIRMATION .'\')){ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
         } else {
-            $content .= '" name="addMailing" id="addMailing" class="button" style="display:none;" onclick="simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
+            $content .= '" name="addMailing" id="addMailing" class="button" style="display:none;" onclick="if(confirm(\'' . _MAILING_CONFIRMATION .'\')){simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetReservedChronoNumber\');ValidAttachmentsForm(\''.$_SESSION['config']['businessappurl'];
         }
 
         $content .= 'index.php?display=true&module=attachments&page=attachments_content&mailing=true\', \'formAttachment\'';
@@ -1654,7 +1654,7 @@ $content .= '<div id="transmission"></div>';
             $content .= ", '{$mode}'";
         }
 
-        $content .= ');simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\')"/>';
+        $content .= ');simpleAjax(\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=unsetTemporarySaved&mode='.$mode.'\')}"/>';
     }
         $content .= '&nbsp;';
         $content .= '&nbsp;';

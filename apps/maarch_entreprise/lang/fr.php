@@ -5229,3 +5229,6 @@ if (!defined('_MAIN_DOCUMENT')) {
 if (!defined('_DOWNLOAD_MAIN_DOCUMENT')) {
     define('_DOWNLOAD_MAIN_DOCUMENT', 'Télécharger le document original');
 }
+if (!defined('_MAILING_CONFIRMATION')) {
+    define('_MAILING_CONFIRMATION', 'Voulez-vous générer toutes les pièces jointes ?');
+}
