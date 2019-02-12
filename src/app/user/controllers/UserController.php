@@ -159,7 +159,16 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $existingUser = UserModel::getByUserId(['userId' => $data['userId'], 'select' => ['id', 'status']]);
+        $existingUser = UserModel::get([
+            'select'    => ['id', 'status',],
+            'where'     => ['lower(user_id) = lower(?)'],
+            'data'      => [$data['userId']],
+        ]);
+
+        if(!empty($existingUser)){
+            $existingUser = $existingUser[0];
+        }
+
         if (!empty($existingUser) && $existingUser['status'] == 'DEL') {
             UserModel::updateStatus(['id' => $existingUser['id'], 'status' => 'OK']);
             $data['enabled'] = 'Y';
@@ -488,9 +497,19 @@ class UserController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $user = UserModel::getByUserId(['userId' => $aArgs['userId'], 'select' => ['status']]);
+        $user = UserModel::get([
+            'select'    => ['status'],
+            'where'     => ['lower(user_id) = lower(?)'],
+            'data'      => [$aArgs['userId']]
+        ]);
 
-        return $response->withJson(['status' => $user['status']]);
+        if(!empty($user)){
+            $user = $user[0];
+            return $response->withJson(['status' => $user['status']]);
+        } 
+
+        return $response->withJson(['status' => null]);
+
     }
 
     public function updateStatus(Request $request, Response $response, array $aArgs)

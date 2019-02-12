@@ -706,6 +706,8 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         if (this.creationMode) {
             var r = true;
 
+            this.user.userId = this.user.userId.toLowerCase();
+
             this.http.get(this.coreUrl + "rest/users/" + this.user.userId + "/status")
                 .subscribe((data: any) => {
                     var deletedUser = false;
@@ -744,6 +746,10 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         } else {
             this.user.loginmode = "standard";
         }
+    }
+
+    setLowerUserId() {
+        this.user.userId = this.user.userId.toLowerCase();
     }
 }
 

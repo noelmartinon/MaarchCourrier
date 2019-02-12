@@ -100,7 +100,7 @@
                                     <div class="input-group">
                                         <mat-form-field>
                                             <input matInput *ngIf="creationMode" type="text" title="{{lang.id}}" name="user_id" [(ngModel)]="user.userId" placeholder="{{lang.id}}"
-                                                pattern="^[\w.@-]*$" required>
+                                                pattern="^[\w.@-]*$" required (keyup)="setLowerUserId()">
                                             <input matInput *ngIf="!creationMode" type="text" title="{{lang.id}}" value="{{user.user_id}}" placeholder="{{lang.id}}"
                                                 disabled>
                                         </mat-form-field>
