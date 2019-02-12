@@ -65,7 +65,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     $templatesControler = new templates_controler();
     $templates = array();
 
-    if(is_integer($res_id)){
+    if (is_numeric($res_id)) {
         $stmt = $db->query("SELECT destination FROM res_letterbox WHERE res_id = (?)", [$res_id]);
         $resultDest = $stmt->fetchObject();
         $destination = $resultDest->destination;
