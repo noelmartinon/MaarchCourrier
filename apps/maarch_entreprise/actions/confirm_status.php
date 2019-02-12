@@ -69,9 +69,13 @@ $frm_height = 'auto';
     $templatesControler = new templates_controler();
     $templates = array();
 
-     $stmt = $db->query("SELECT destination FROM res_letterbox WHERE res_id = (?)", [$res_id]);
-     $resultDest = $stmt->fetchObject();
-     $destination = $resultDest->destination;
+    if (is_numeric($res_id)) {
+        $stmt = $db->query("SELECT destination FROM res_letterbox WHERE res_id = (?)", [$res_id]);
+        $resultDest = $stmt->fetchObject();
+        $destination = $resultDest->destination;
+    } else {
+        $destination = '';
+    }
 
      if ($destination <> '') {
             $templates = $templatesControler->getAllTemplatesForProcess($destination);
