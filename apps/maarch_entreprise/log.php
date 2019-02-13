@@ -179,6 +179,7 @@ if (!empty($_SESSION['error'])) {
                 if (!empty($standardConnect) && $standardConnect == 'true') {
                     $res = $sec->login($login, $password, 'ldap', $standardConnect);
                     $_SESSION['user'] = $res['user'];
+                    $login = $res['user']['UserId'];
                     if (empty($res['error'])) {
                         \SrcCore\models\AuthenticationModel::setCookieAuth(['userId' => $login]);
                         \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
@@ -283,6 +284,7 @@ if (!empty($_SESSION['error'])) {
         $_SESSION['error'] = '';
         $res = $sec->login($login, $password);
         $_SESSION['user'] = $res['user'];
+        $login = $res['user']['UserId'];
         if (empty($res['error'])) {
             \SrcCore\models\AuthenticationModel::setCookieAuth(['userId' => $login]);
             \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
