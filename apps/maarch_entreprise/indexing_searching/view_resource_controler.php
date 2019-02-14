@@ -131,7 +131,7 @@ if ($s_id == '') {
                 }
             } else {
             $stmt = $db->query("SELECT res_id FROM res_view_attachments WHERE status <> 'DEL' and status <> 'OBS' "
-                . "and res_id_master = ? and coll_id = ? and ((attachment_type = 'converted_pdf' and type_id = 1) "
+                . "and res_id_master = ? and coll_id = ? and ((attachment_type = 'converted_pdf' and (type_id = 1 or type_id = 0)) "
                 . "OR (attachment_type = 'outgoing_mail' and format = 'pdf')"
                 . "OR (attachment_type = 'signed_response' and format = 'pdf')) order by res_id desc", 
                 array($s_id, $_SESSION['collection_id_choice']));
