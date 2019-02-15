@@ -61,7 +61,7 @@ class AuthenticationModel
         $aReturn = DatabaseModel::select([
             'select'    => [1],
             'table'     => ['users'],
-            'where'     => ['user_id = ?', 'cookie_key = ?', 'cookie_date > CURRENT_TIMESTAMP'],
+            'where'     => ['lower(user_id) = lower(?)', 'cookie_key = ?', 'cookie_date > CURRENT_TIMESTAMP'],
             'data'      => [$args['userId'], $args['cookieKey']]
         ]);
 
@@ -87,7 +87,7 @@ class AuthenticationModel
         $user = DatabaseModel::select([
             'select'    => ['cookie_key'],
             'table'     => ['users'],
-            'where'     => ['user_id = ?', 'cookie_date > CURRENT_TIMESTAMP'],
+            'where'     => ['lower(user_id) = lower(?)', 'cookie_date > CURRENT_TIMESTAMP'],
             'data'      => [$args['userId']]
         ]);
         if (empty($user[0]['cookie_key'])) {
@@ -105,7 +105,7 @@ class AuthenticationModel
                 'cookie_key'    => $cookieKey,
                 'cookie_date'   => date('Y-m-d H:i:s', $cookieTime),
             ],
-            'where' => ['user_id = ?'],
+            'where' => ['lower(user_id) = lower(?)'],
             'data'  => [$args['userId']]
         ]);
 
@@ -138,7 +138,7 @@ class AuthenticationModel
                 'failed_authentication' => 0,
                 'locked_until'          => null,
             ],
-            'where'     => ['user_id = ?'],
+            'where'     => ['lower(user_id) = lower(?)'],
             'data'      => [$aArgs['userId']]
         ]);
 
@@ -156,7 +156,7 @@ class AuthenticationModel
             'set'       => [
                 'failed_authentication' => $aArgs['tentatives']
             ],
-            'where'     => ['user_id = ?'],
+            'where'     => ['lower(user_id) = lower(?)'],
             'data'      => [$aArgs['userId']]
         ]);
 
@@ -173,7 +173,7 @@ class AuthenticationModel
             'set'   => [
                 'locked_until'  => date('Y-m-d H:i:s', $aArgs['lockedUntil'])
             ],
-            'where' => ['user_id = ?'],
+            'where' => ['lower(user_id) = lower(?)'],
             'data'  => [$aArgs['userId']]
         ]);
 

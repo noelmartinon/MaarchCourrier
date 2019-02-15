@@ -40,7 +40,7 @@ class UserControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'userId'    => 'TEST-CKENT',
+            'userId'    => 'test-ckent',
             'firstname' => 'TEST-CLARK',
             'lastname'  => 'TEST-KENT'
         ];
@@ -60,7 +60,7 @@ class UserControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame(self::$id, $responseBody->id);
-        $this->assertSame('TEST-CKENT', $responseBody->user_id);
+        $this->assertSame('test-ckent', $responseBody->user_id);
         $this->assertSame('TEST-CLARK', $responseBody->firstname);
         $this->assertSame('TEST-KENT', $responseBody->lastname);
         $this->assertSame('OK', $responseBody->status);
@@ -79,7 +79,7 @@ class UserControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $aArgs = [
-            'user_id'    => 'TEST-CKENT',
+            'user_id'    => 'test-ckent',
             'firstname' => 'TEST-CLARK2',
             'lastname'  => 'TEST-KENT2',
             'mail'      => 'ck@dailyP.com',
@@ -101,7 +101,7 @@ class UserControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame(self::$id, $responseBody->id);
-        $this->assertSame('TEST-CKENT', $responseBody->user_id);
+        $this->assertSame('test-ckent', $responseBody->user_id);
         $this->assertSame('TEST-CLARK2', $responseBody->firstname);
         $this->assertSame('TEST-KENT2', $responseBody->lastname);
         $this->assertSame('OK', $responseBody->status);
@@ -346,7 +346,7 @@ class UserControllerTest extends TestCase
 
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response     = $userController->getStatusByUserId($request, new \Slim\Http\Response(), ['userId' => 'TEST-CKENT']);
+        $response     = $userController->getStatusByUserId($request, new \Slim\Http\Response(), ['userId' => 'test-ckent']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('OK', $responseBody->status);
@@ -385,7 +385,7 @@ class UserControllerTest extends TestCase
 
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response     = $userController->getStatusByUserId($request, new \Slim\Http\Response(), ['userId' => 'TEST-CKENT']);
+        $response     = $userController->getStatusByUserId($request, new \Slim\Http\Response(), ['userId' => 'test-ckent']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('ABS', $responseBody->status);
@@ -449,7 +449,7 @@ class UserControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'userId'    => 'TEST-CKENTquota',
+            'userId'    => 'test-ckentquota',
             'firstname' => 'TEST-CLARKquota',
             'lastname'  => 'TEST-KENTquota'
         ];
@@ -465,7 +465,7 @@ class UserControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $aArgs = [
-            'user_id'    => 'TEST-CKENTquota',
+            'user_id'    => 'test-ckentquota',
             'firstname' => 'TEST-CLARKquota2',
             'lastname'  => 'TEST-KENTquota2',
             'mail'      => 'ck@dailyP.com',
@@ -482,7 +482,7 @@ class UserControllerTest extends TestCase
 
         //  UPDATE disabled user for user_quota (avoid notification sending)
         $aArgs = [
-            'user_id'    => 'TEST-CKENTquota',
+            'user_id'    => 'test-ckentquota',
             'firstname' => 'TEST-CLARKquota2',
             'lastname'  => 'TEST-KENTquota2',
             'mail'      => 'ck@dailyP.com',
@@ -635,7 +635,7 @@ class UserControllerTest extends TestCase
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertSame(self::$id, $responseBody->id);
-        $this->assertSame('TEST-CKENT', $responseBody->user_id);
+        $this->assertSame('test-ckent', $responseBody->user_id);
         $this->assertSame('TEST-CLARK2', $responseBody->firstname);
         $this->assertSame('TEST-KENT2', $responseBody->lastname);
         $this->assertSame('DEL', $responseBody->status);

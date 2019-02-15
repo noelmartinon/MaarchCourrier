@@ -67,7 +67,7 @@ abstract class UserModelAbstract
         DatabaseModel::insert([
             'table'         => 'users',
             'columnsValues' => [
-                'user_id'                       => $aArgs['user']['userId'],
+                'user_id'                       => strtolower($aArgs['user']['userId']),
                 'firstname'                     => $aArgs['user']['firstname'],
                 'lastname'                      => $aArgs['user']['lastname'],
                 'mail'                          => $aArgs['user']['mail'],
@@ -138,6 +138,25 @@ abstract class UserModelAbstract
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users'],
             'where'     => ['user_id = ?'],
+            'data'      => [$aArgs['userId']]
+        ]);
+
+        if (empty($aUser)) {
+            return [];
+        }
+
+        return $aUser[0];
+    }
+
+    public static function getByLowerUserId(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId']);
+        ValidatorModel::stringType($aArgs, ['userId']);
+
+        $aUser = DatabaseModel::select([
+            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'table'     => ['users'],
+            'where'     => ['lower(user_id) = lower(?)'],
             'data'      => [$aArgs['userId']]
         ]);
 
