@@ -132,8 +132,8 @@ class request extends dbquery
         if ($distinct_argument == true) {
             $dist = " distinct ";
         }
-        
-        $query = $db->limit_select($start, $limit, $field_string, $table_string." ".$join, $where_string, $other, $dist);
+        //LIMIT 500
+        $query = $db->limit_select($start, 500, $field_string, $table_string." ".$join, $where_string, $other, $dist);
 
         if (preg_match('/_view/i', $query)) {
             $_SESSION['last_select_query'] = $query;
@@ -146,7 +146,11 @@ class request extends dbquery
             return false;
         }
         $result=array();
+        $i = 0;
         while ($line = $res_query->fetch(PDO::FETCH_ASSOC)) {
+            if ($i > $limit) {
+                break;
+            }
             $temp= array();
             foreach (array_keys($line) as $resval) {
                 if ($resval == '__full_count') {
@@ -162,6 +166,7 @@ class request extends dbquery
                 }
             }
             array_push($result, $temp);
+            ++$i;
         }
         if (count($result) == 0 && $catch_error) {
             return true;
