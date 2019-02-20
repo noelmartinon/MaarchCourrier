@@ -1,21 +1,16 @@
 <form #changeDiffListDestForm="ngForm">
-    <div *ngIf="loadModel && loadInstance" style="display:flex;height:100%;">
-        <mat-spinner style="margin:auto;"></mat-spinner>
-    </div>
-    <div *ngIf="!loadModel && !loadInstance">
-        <mat-dialog-content>    
-            <div class="modal-body" *ngIf="data.userDestRedirect.inDiffListDest">
+    <div>
+        <mat-dialog-content *ngIf="data.isDeletable">    
+            <div class="modal-body" *ngIf="data.inDiffListDest">
                 <h2 mat-dialog-title>{{lang.redirectUserListDiff}}</h2>
                 <div class="alert alert-warning" role="alert">
                     <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span [innerHTML]="lang.chooseNewDest"></span> :
                 </div>
 
-                <div *ngFor="let userDestRedirectModel of data.userDestRedirectModels; index as i" id="{{userDestRedirectModel.object_id}}"
-                    class="form-group">
-
+                <div *ngFor="let redirectModel of data.redirectListModels; index as i" id="{{redirectModel.object_id}}" class="form-group">
                     <mat-form-field class="example-full-width">
-                        <input name="userDestRedirectModel_{{i}}" id="userDestRedirectModel_{{i}}" [(ngModel)]="userDestRedirectModel.redirectUserId"
-                            type="text" placeholder="{{lang.newDest}} : {{userDestRedirectModel.title}}" matInput [matAutocomplete]="auto"
+                        <input name="redirectModel_{{i}}" id="redirectModel_{{i}}" [(ngModel)]="redirectModel.redirectUserId"
+                            type="text" placeholder="{{lang.newDest}} : {{redirectModel.title}}" matInput [matAutocomplete]="auto"
                             [formControl]="userCtrl" required>
                         <mat-autocomplete #auto="matAutocomplete">
                             <ng-container *ngFor="let user of filteredUsers | async">
@@ -36,7 +31,7 @@
                 </div>
             </div>
 
-            <!-- <div class="modal-body" *ngIf="data.userDestRedirect.isResDestUser">
+            <div class="modal-body" *ngIf="data.isResDestUser">
                 <h2 mat-dialog-title>{{lang.redirectUserListInstances}}</h2>
                 <div class="alert alert-warning" role="alert">
                     <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span [innerHTML]="lang.chooseNewDestUser"></span> :
@@ -44,7 +39,7 @@
 
                 <div id="{{this.data.userDestRedirect.user_id}}" class="form-group">
                     <mat-form-field class="example-full-width">
-                        <input name="userDestRedirectModel_resDest" id="userDestRedirectModel_resDest" [(ngModel)]="this.data.redirectDestResUserId"
+                        <input name="redirectModel_resDest" id="redirectModel_resDest" [(ngModel)]="this.data.redirectDestResUserId"
                             type="text" placeholder="{{lang.newDestRes}} : " matInput [matAutocomplete]="auto"
                             [formControl]="userCtrl" required>
                         <mat-autocomplete #auto="matAutocomplete">
@@ -64,21 +59,56 @@
                         </mat-autocomplete>
                     </mat-form-field>
                 </div>
-            </div> -->
+            </div>
 
-            <div class="modal-body" *ngIf="!data.userDestRedirect.inDiffListDest && !data.userDestRedirect.isResDestUser">
+            <div class="modal-body" *ngIf="!data.inDiffListDest && !data.isResDestUser">
                 <h2 mat-dialog-title>{{lang.confirmAction}}</h2>
                 <div class="alert" role="alert">
-                    <b>{{lang.delete}} {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
+                    <b *ngIf="data.userDestRedirect.mode == 'delete'">{{lang.delete}} {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
+                    <b *ngIf="data.userDestRedirect.mode == 'suspend'">{{lang.suspend}} {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
                 </div>
             </div>
 
         </mat-dialog-content>
+
+        <mat-dialog-content *ngIf="!data.isDeletable">   
+                <div class="modal-body">
+                    <h2 mat-dialog-title *ngIf="this.data.userDestRedirect.mode == 'delete'">{{lang.unableToDelete}}</h2>
+                    <h2 mat-dialog-title *ngIf="this.data.userDestRedirect.mode == 'suspend'">{{lang.unableToSuspend}}</h2>
+                    <div class="alert alert-warning" role="alert">
+                        <p><span [innerHTML]="lang.userIsNotDeletable"></span> <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;</p>
+                        <p><span [innerHTML]="lang.userIsDeletableBy"></span></p>
+                    </div>
+                </div>
+
+                <div class="modal-body" *ngIf="data.inTemplateList" class="col-md-6">                       
+                    <mat-list>
+                        <p mat-line>{{lang.diffusionList}}</p>
+                        <mat-list-item *ngFor="let templateEntity of data.listTemplateEntities">
+                            <mat-icon mat-list-icon><i class="fa fa-share-alt" color="primary"></i></mat-icon>
+                            <p mat-line><span> {{templateEntity}} </span></p>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+
+                <div class="modal-body" *ngIf="data.inInstanceList" class="col-md-6">
+                    <mat-list>
+                        <p mat-line>{{lang.mailEntitiesList}}</p>
+                        <mat-list-item *ngFor="let instanceEntity of data.listInstanceEntities">
+                            <mat-icon mat-list-icon><i class="fa fa-inbox" color="primary"></i></mat-icon>
+                            <p mat-line><span> {{instanceEntity}} </span></p>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+        </mat-dialog-content>    
+           
         <mat-dialog-actions>
-            <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.mode == 'del'" type="submit" class="btn btn-danger" (click)="dialogRef.close(this.data)"
+            <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.mode == 'delete' && data.isDeletable" type="submit" class="btn btn-danger" (click)="dialogRef.close(this.data)"
                 [disabled]="!sendFunction()">{{lang.delete}} {{lang.user}}</button>
-            <button mat-raised-button color="primary" *ngIf="data.userDestRedirect.mode == 'up'" type="submit" (click)="dialogRef.close(this.data.userDestRedirectModels)"
+            <button mat-raised-button color="primary" *ngIf="data.userDestRedirect.mode == 'suspend' && data.isDeletable" type="submit" (click)="dialogRef.close(this.data)"
                 [disabled]="!sendFunction()">{{lang.suspend}} {{lang.user}}</button>
+            <button mat-raised-button color="primary" *ngIf="!data.isDeletable" type="submit" (click)="dialogRef.close()"
+                                            >{{lang.close}}</button>    
         </mat-dialog-actions>
     </div>
 </form>

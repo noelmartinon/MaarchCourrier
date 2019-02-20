@@ -447,13 +447,13 @@ abstract class BasketModelAbstract
 
     public static function deleteBasketRedirection(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId', 'basketId']);
-        ValidatorModel::stringType($aArgs, ['userId', 'basketId']);
+        ValidatorModel::notEmpty($aArgs, ['where', 'data']);
+        ValidatorModel::arrayType($aArgs, ['where', 'data']);
 
         DatabaseModel::delete([
             'table' => 'user_abs',
-            'where' => ['(user_abs = ? OR basket_owner = ?)', 'basket_id = ?'],
-            'data'  => [$aArgs['userId'], $aArgs['userId'], $aArgs['basketId']]
+            'where' => $aArgs['where'],
+            'data'  => $aArgs['data']
         ]);
 
         return true;

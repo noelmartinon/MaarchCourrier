@@ -69,6 +69,7 @@ define('_UPDATE_STATUS', 'Wijziging van status');
 define('_USER_ID_ALREADY_EXISTS', 'De gebruikersnaam van de gebruiker bestaat reeds');
 define('_USER_CREATED', 'Toegevoegde gebruiker');
 define('_USER_UPDATED', 'Gewijzigde gebruiker');
+define('_USER_SUSPENDED', 'Utilisateur suspendu TO TRANSLATE');
 define('_USER_DELETED', 'Verwijderde gebruiker');
 define('_USER_GROUP_CREATION', 'Toegevoegde groep voor gebruiker');
 define('_USER_GROUP_MODIFICATION', 'Gewijzigde groep voor gebruiker');

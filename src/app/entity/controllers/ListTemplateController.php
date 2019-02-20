@@ -258,17 +258,6 @@ class ListTemplateController
         return $response->withJson(['success' => 'success']);
     }
 
-    public function getByUserWithEntityDest(Request $request, Response $response, array $aArgs)
-    {
-        $listTemplates = ListTemplateModel::get([
-            'select'    => ['object_id', 'title'],
-            'where'     => ['item_id = ?', 'object_type = ?', 'item_mode = ?'],
-            'data'      => [$aArgs['itemId'], 'entity_id', 'dest']
-        ]);
-
-        return $response->withJson(['listTemplates' => $listTemplates]);
-    }
-
     public function updateByUserWithEntityDest(Request $request, Response $response)
     {
         if (!ServiceModel::hasService(['id' => 'admin_users', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin'])) {
@@ -326,7 +315,7 @@ class ListTemplateController
             $roles[$key]['usedIn'] = [];
             $listTemplates = ListTemplateModel::get(['select' => ['object_id'], 'where' => ['object_type = ?', 'item_mode = ?'], 'data' => [$aArgs['typeId'], $roles[$key]['id']]]);
             foreach ($listTemplates as $listTemplate) {
-                $entity = entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listTemplate['object_id']]);
+                $entity = Entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listTemplate['object_id']]);
                 $roles[$key]['usedIn'][] = $entity['short_label'];
             }
         }

@@ -105,6 +105,7 @@ export const LANG_EN = {
     "default"                           : "default",
     "defaultAction"                     : "Default action",
     "delete"                            : "Delete",
+    "unableToDelete"                    : "Unable to delete",
     "deleteAtt"                         : "Delete the attachment",
     "deleteMsg"                         : "Do you really want to delete this element",
     "desactivateAbsence"                : "Deactivate absence",
@@ -383,6 +384,7 @@ export const LANG_EN = {
     "string"                            : "String",
     "sunday"                            : "Sunday",
     "suspend"                           : "Suspend",
+    "unableToSuspend"                   : "Unable to suspend",
     "suspended"                         : "Suspended",
     "suspendNotification"               : "Suspend notification",
     "system"                            : "System",
@@ -700,5 +702,8 @@ export const LANG_EN = {
     "redirectUserListInstances"                         : "Change of recipient for mail being processed",
     "chooseNewDestUser"                                 : "is the recipient of mail being processed, please select a replacement user",
     "newDest"                                           : "New recipient for",
-    "newDestRes"                                        : "New recipient for mails"
+    "newDestRes"                                        : "New recipient for mails",
+    "userIsNotDeletable"                                : "You do not have <b>full access rights</b> to diffusion list or mails for the user ",
+    "userIsDeletableBy"                                 : "Only a user with the <b>totality of access rights</b> can delete or suspend this user.",
+    "mailEntitiesList"                                  : "List of entities attached to mails"
 };

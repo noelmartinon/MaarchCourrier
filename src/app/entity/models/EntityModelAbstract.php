@@ -247,14 +247,22 @@ abstract class EntityModelAbstract
         return $entities;
     }
 
-    public static function getAllEntitiesByUserId(array $aArgs = [])
+    public static function getAllEntitiesByUserId(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['userId']);
         ValidatorModel::stringType($aArgs, ['userId']);
 
-        $aReturn = UserModel::getEntitiesById(['userId' => $aArgs['userId']]);
-
         $entities = [];
+
+        if ($aArgs['userId'] == 'superadmin') {
+            $rawEntities = EntityModel::get(['select' => ['entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y']]);
+            foreach ($rawEntities as $value) {
+                $entities[] = $value['entity_id'];
+            }
+            return $entities;
+        }
+
+        $aReturn = UserModel::getEntitiesById(['userId' => $aArgs['userId']]);
         foreach ($aReturn as $value) {
             $entities = array_merge($entities, EntityModel::getEntityChildren(['entityId' => $value['entity_id']]));
         }

@@ -87,6 +87,7 @@ define('_UPDATE_STATUS', 'Modification du statut');
 define('_USER_ID_ALREADY_EXISTS', 'L\'identifiant utilisateur existe déjà');
 define('_USER_CREATED', 'Utilisateur ajouté');
 define('_USER_UPDATED', 'Utilisateur modifié');
+define('_USER_SUSPENDED', 'Utilisateur suspendu');
 define('_USER_DELETED', 'Utilisateur supprimé');
 define('_USER_GROUP_CREATION', 'Groupe ajouté pour utilisateur');
 define('_USER_GROUP_MODIFICATION', 'Groupe modifié pour utilisateur');

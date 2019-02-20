@@ -27,6 +27,7 @@ use History\controllers\HistoryController;
 use History\models\HistoryModel;
 use Notification\controllers\NotificationsEventsController;
 use Parameter\models\ParameterModel;
+use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -72,33 +73,6 @@ class UserController
         $usersIds = [];
         foreach ($users as $value) {
             $usersIds[] = $value['user_id'];
-        }
-
-        $listModels = ListTemplateModel::get(['select' => ['item_id'], 'where' => ['item_id in (?)', 'object_type = ?', 'item_mode = ?'], 'data' => [$usersIds, 'entity_id', 'dest']]);
-        //$listInstances = ListInstanceModel::get(['select' => ['item_id'], 'where' => ['item_id in (?)', 'item_mode = ?'], 'data' => [$usersIds, 'dest'], 'groupBy' => ['item_id']]);
-
-        $usersListModels = [];
-        foreach ($listModels as $value) {
-            $usersListModels[] = $value['item_id'];
-        }
-
-        // $usersListInstances = [];
-        // foreach ($listInstances as $value) {
-        //     $usersListInstances[] = $value['item_id'];
-        // }
-
-        foreach ($users as $key => $value) {
-            if (in_array($value['user_id'], $usersListModels)) {
-                $users[$key]['inDiffListDest'] = true;
-            } else {
-                $users[$key]['inDiffListDest'] = false;
-            }
-
-            // if (in_array($value['user_id'], $usersListInstances)) {
-            //     $users[$key]['isResDestUser'] = true;
-            // } else {
-            //     $users[$key]['isResDestUser'] = false;
-            // }
         }
 
         $quota = [];
@@ -163,8 +137,13 @@ class UserController
 
         if (!empty($existingUser) && $existingUser['status'] == 'DEL') {
             UserModel::updateStatus(['id' => $existingUser['id'], 'status' => 'OK']);
-            $data['enabled'] = 'Y';
-            UserModel::update(['id' => $existingUser['id'], 'user' => $data]);
+            UserModel::update([
+                'set'   => [
+                    'enabled'   => 'Y'
+                ],
+                'where' => ['id = ?'],
+                'data'  => [$existingUser['id']]
+            ]);
 
             return $response->withJson(['user' => $existingUser]);
         } elseif (!empty($existingUser)) {
@@ -211,8 +190,7 @@ class UserController
 
         $data = $request->getParams();
 
-        $check = Validator::stringType()->notEmpty()->validate($data['user_id']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['firstname']);
+        $check = Validator::stringType()->notEmpty()->validate($data['firstname']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['lastname']);
         $check = $check && (empty($data['mail']) || filter_var($data['mail'], FILTER_VALIDATE_EMAIL));
         $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone']));
@@ -220,15 +198,32 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['enabled']]);
+        $set = [
+            'firstname' => $data['firstname'],
+            'lastname'  => $data['lastname'],
+            'mail'      => $data['mail'],
+            'phone'     => $data['phone'],
+            'initials'  => $data['initials'],
+            'loginmode' => empty($data['loginmode']) ? 'standard' : $data['loginmode'],
+        ];
+        if (!empty($data['enabled']) && $data['enabled'] == 'Y') {
+            $set['enabled'] = 'Y';
+        }
 
-        UserModel::update(['id' => $aArgs['id'], 'user' => $data]);
+        UserModel::update([
+            'set'   => $set,
+            'where' => ['id = ?'],
+            'data'  => [$aArgs['id']]
+        ]);
 
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
-        if (!empty($userQuota['param_value_int']) && $user['enabled'] == 'N' && $data['enabled'] == 'Y') {
-            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['enabled = ?', 'status = ?', 'user_id <> ?'], 'data' => ['Y', 'OK','superadmin']]);
-            if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
-                NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => 'superadmin', 'info' => _QUOTA_EXCEEDED]);
+        if (!empty($userQuota['param_value_int'])) {
+            $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['enabled']]);
+            if ($user['enabled'] == 'N' && $data['enabled'] == 'Y') {
+                $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['enabled = ?', 'status = ?', 'user_id != ?'], 'data' => ['Y', 'OK', 'superadmin']]);
+                if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
+                    NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => 'superadmin', 'info' => _QUOTA_EXCEEDED]);
+                }
             }
         }
 
@@ -237,10 +232,143 @@ class UserController
             'recordId'     => $GLOBALS['userId'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
-            'info'         => _USER_UPDATED . " {$data['user_id']}"
+            'info'         => _USER_UPDATED . " {$data['firstname']} {$data['lastname']}"
         ]);
 
-        return $response->withJson(['success' => 'success']);
+        return $response->withStatus(204);
+    }
+
+    public function isDeletable(Request $request, Response $response, array $aArgs)
+    {
+        $error = $this->hasUsersRights(['id' => $aArgs['id'], 'delete' => true, 'himself' => true]);
+        if (!empty($error['error'])) {
+            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
+        }
+
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
+
+        $isListInstanceDeletable = true;
+        $isListTemplateDeletable = true;
+
+        $listInstanceEntities = [];
+        $listInstanceResIds = [];
+        $listInstances = ListInstanceModel::getWhenOpenMailsByLogin(['select' => ['listinstance.res_id', 'res_letterbox.destination'], 'login' => $user['user_id'], 'itemMode' => 'dest']);
+        foreach ($listInstances as $listInstance) {
+            if (!ResController::hasRightByResId(['resId' => $listInstance['res_id'], 'userId' => $GLOBALS['userId']])) {
+                $isListInstanceDeletable = false;
+            }
+            $listInstanceResIds[] = $listInstance['res_id'];
+            $listInstanceEntities[] = $listInstance['destination'];
+        }
+
+        $listTemplateEntities = [];
+        $listTemplates = ListTemplateModel::get([
+            'select'    => ['object_id', 'title'],
+            'where'     => ['item_id = ?', 'object_type = ?', 'item_mode = ?', 'item_type = ?'],
+            'data'      => [$user['user_id'], 'entity_id', 'dest', 'user_id']
+        ]);
+        $allEntities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        foreach ($listTemplates as $listTemplate) {
+            if (!in_array($listTemplate['object_id'], $allEntities)) {
+                $isListTemplateDeletable = false;
+            }
+            $listTemplateEntities[] = $listTemplate['object_id'];
+        }
+
+        if (!$isListInstanceDeletable || !$isListTemplateDeletable) {
+            $formattedLIEntities = [];
+            $listInstanceEntities = array_unique($listInstanceEntities);
+            foreach ($listInstanceEntities as $listInstanceEntity) {
+                $entity = Entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listInstanceEntity]);
+                $formattedLIEntities[] = $entity['short_label'];
+            }
+            $formattedLTEntities = [];
+            $listTemplateEntities = array_unique($listTemplateEntities);
+            foreach ($listTemplateEntities as $listTemplateEntity) {
+                $entity = Entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listTemplateEntity]);
+                $formattedLTEntities[] = $entity['short_label'];
+            }
+
+            return $response->withJson(['isDeletable' => false, 'listInstanceEntities' => $formattedLIEntities, 'listTemplateEntities' => $formattedLTEntities]);
+        }
+
+        $listInstances = [];
+        foreach ($listInstanceResIds as $listInstanceResId) {
+            $rawListInstances = ListInstanceModel::get([
+                'select'    => ['*'],
+                'where'     => ['res_id = ?', 'difflist_type = ?'],
+                'data'      => [$listInstanceResId, 'entity_id'],
+                'orderBy'   => ['listinstance_id']
+            ]);
+            $listInstances[] = [
+                'resId'         => $listInstanceResId,
+                'listInstances' => $rawListInstances
+            ];
+        }
+
+        return $response->withJson(['isDeletable' => true, 'listTemplates' => $listTemplates, 'listInstances' => $listInstances]);
+    }
+
+    public function suspend(Request $request, Response $response, array $aArgs)
+    {
+        print_r($user['user_id']);
+        print_r($aArgs['id']);
+        $error = $this->hasUsersRights(['id' => $aArgs['id'], 'delete' => true, 'himself' => true]);
+        if (!empty($error['error'])) {
+            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
+        }
+
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
+
+        $listInstances = ListInstanceModel::get([
+            'select'    => [1],
+            'where'     => ['item_id = ?', 'difflist_type = ?', 'item_type = ?', 'item_mode = ?'],
+            'data'      => [$user['user_id'], 'entity_id', 'user_id', 'dest']
+        ]);
+        if (!empty($listInstances)) {
+            return $response->withStatus(403)->withJson(['errors' => 'User is still present in listInstances']);
+        }
+
+        $listTemplates = ListTemplateModel::get([
+            'select'    => [1],
+            'where'     => ['item_id = ?', 'object_type = ?', 'item_type = ?', 'item_mode = ?'],
+            'data'      => [$user['user_id'], 'entity_id', 'user_id', 'dest']
+        ]);
+        if (!empty($listTemplates)) {
+            return $response->withStatus(403)->withJson(['errors' => 'User is still present in listTemplates']);
+        }
+
+        ListInstanceModel::delete([
+            'where' => ['item_id = ?', 'difflist_type = ?', 'item_type = ?'],
+            'data'  => [$user['user_id'], 'entity_id', 'user_id']
+        ]);
+        ListTemplateModel::delete([
+            'where' => ['item_id = ?', 'object_type = ?', 'item_type = ?'],
+            'data'  => [$user['user_id'], 'entity_id', 'user_id']
+        ]);
+
+        BasketModel::deleteBasketRedirection([
+            'where' => ['user_abs = ? OR basket_owner = ?'],
+            'data'  => [$user['user_id'], $user['user_id']]
+        ]);
+
+        UserModel::update([
+            'set'   => [
+                'enabled'   => 'N'
+            ],
+            'where' => ['id = ?'],
+            'data'  => [$aArgs['id']]
+        ]);
+
+        HistoryController::add([
+            'tableName'    => 'users',
+            'recordId'     => $GLOBALS['userId'],
+            'eventType'    => 'DEL',
+            'eventId'      => 'userSuppression',
+            'info'         => _USER_SUSPENDED . " {$user['firstname']} {$user['lastname']}"
+        ]);
+
+        return $response->withStatus(204);
     }
 
     public function delete(Request $request, Response $response, array $aArgs)
@@ -249,8 +377,40 @@ class UserController
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
-        
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname']]);
+
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
+
+        $listInstances = ListInstanceModel::get([
+            'select'    => [1],
+            'where'     => ['item_id = ?', 'difflist_type = ?', 'item_type = ?', 'item_mode = ?'],
+            'data'      => [$user['user_id'], 'entity_id', 'user_id', 'dest']
+        ]);
+        if (!empty($listInstances)) {
+            return $response->withStatus(403)->withJson(['errors' => 'User is still present in listInstances']);
+        }
+
+        $listTemplates = ListTemplateModel::get([
+            'select'    => [1],
+            'where'     => ['item_id = ?', 'object_type = ?', 'item_type = ?', 'item_mode = ?'],
+            'data'      => [$user['user_id'], 'entity_id', 'user_id', 'dest']
+        ]);
+        if (!empty($listTemplates)) {
+            return $response->withStatus(403)->withJson(['errors' => 'User is still present in listTemplates']);
+        }
+
+        ListInstanceModel::delete([
+            'where' => ['item_id = ?', 'difflist_type = ?', 'item_type = ?'],
+            'data'  => [$user['user_id'], 'entity_id', 'user_id']
+        ]);
+        ListTemplateModel::delete([
+            'where' => ['item_id = ?', 'object_type = ?', 'item_type = ?'],
+            'data'  => [$user['user_id'], 'entity_id', 'user_id']
+        ]);
+
+        BasketModel::deleteBasketRedirection([
+            'where' => ['user_abs = ? OR basket_owner = ?'],
+            'data'  => [$user['user_id'], $user['user_id']]
+        ]);
 
         UserModel::delete(['id' => $aArgs['id']]);
 
@@ -262,7 +422,7 @@ class UserController
             'info'         => _USER_DELETED . " {$user['firstname']} {$user['lastname']}"
         ]);
 
-        return $response->withJson(['success' => 'success']);
+        return $response->withStatus(204);
     }
 
     public function getProfile(Request $request, Response $response)
@@ -288,7 +448,7 @@ class UserController
 
     public function updateProfile(Request $request, Response $response)
     {
-        $user = UserModel::getByUserId(['userId' => $GLOBALS['userId'], 'select' => ['id', 'enabled']]);
+        $user = UserModel::getByUserId(['userId' => $GLOBALS['userId'], 'select' => ['id']]);
 
         $data = $request->getParams();
 
@@ -301,7 +461,17 @@ class UserController
         }
         $data['enabled'] = $user['enabled'];
 
-        UserModel::update(['id' => $user['id'], 'user' => $data]);
+        UserModel::update([
+            'set'   => [
+                'firstname' => $data['firstname'],
+                'lastname'  => $data['lastname'],
+                'mail'      => $data['mail'],
+                'phone'     => $data['phone'],
+                'initials'  => $data['initials']
+            ],
+            'where' => ['id = ?'],
+            'data'  => [$user['id']]
+        ]);
 
         return $response->withJson(['success' => 'success']);
     }
@@ -465,9 +635,15 @@ class UserController
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
 
         if ($data['basketOwner'] != $user['user_id']) {
-            BasketModel::deleteBasketRedirection(['userId' => $data['basketOwner'], 'basketId' => $aArgs['basketId']]);
+            BasketModel::deleteBasketRedirection([
+                'where' => ['(user_abs = ? OR basket_owner = ?)', 'basket_id = ?'],
+                'data'  => [$data['basketOwner'], $data['basketOwner'], $aArgs['basketId']]
+            ]);
         } else {
-            BasketModel::deleteBasketRedirection(['userId' => $user['user_id'], 'basketId' => $aArgs['basketId']]);
+            BasketModel::deleteBasketRedirection([
+                'where' => ['(user_abs = ? OR basket_owner = ?)', 'basket_id = ?'],
+                'data'  => [$user['user_id'], $user['user_id'], $aArgs['basketId']]
+            ]);
         }
 
         HistoryController::add([

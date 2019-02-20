@@ -728,6 +728,10 @@ export const LANG_NL = {
     "redirectUserListInstances"                 : "_TO_TRANSLATE_Change of recipient for mail being processed",
     "chooseNewDestUser"                         : "_TO_TRANSLATE_is the recipient of mail being processed, please select a replacement user", 
     "newDest"                                   : "_TO_TRANSLATE_New recipient for",
-    "newDestRes"                                : "_TO_TRANSLATE_New recipient for mails"
-    
+    "newDestRes"                                : "_TO_TRANSLATE_New recipient for mails",
+    "userIsNotDeletable"                        : "You do not have <b>full access rights</b> to diffusion list or mails for the user ", //_TO_TRANSLATE
+    "userIsDeletableBy"                         : "Only a user with the <b>totality of access rights</b> can delete or suspend this user.", //_TO_TRANSLATE
+    "mailEntitiesList"                          : "List of entities attached to mails", //_TO_TRANSLATE,
+    "unableToSuspend"                           : "Schorsing onmogelijk", //_TO_TRANSLATE
+    "unableToDelete"                            : "Niet te onderdrukken" //_TO_TRANSLATE
 };

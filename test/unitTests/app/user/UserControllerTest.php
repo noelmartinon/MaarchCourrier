@@ -84,15 +84,12 @@ class UserControllerTest extends TestCase
             'lastname'  => 'TEST-KENT2',
             'mail'      => 'ck@dailyP.com',
             'phone'     => '0122334455',
-            'initials'  => 'CK',
-            'enabled'   => 'N',
+            'initials'  => 'CK'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $userController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
         $responseBody = json_decode((string)$response->getBody());
-
-        $this->assertSame('success', $responseBody->success);
 
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
@@ -105,7 +102,6 @@ class UserControllerTest extends TestCase
         $this->assertSame('TEST-CLARK2', $responseBody->firstname);
         $this->assertSame('TEST-KENT2', $responseBody->lastname);
         $this->assertSame('OK', $responseBody->status);
-        $this->assertSame('N', $responseBody->enabled);
         $this->assertSame('0122334455', $responseBody->phone);
         $this->assertSame('ck@dailyP.com', $responseBody->mail);
         $this->assertSame('CK', $responseBody->initials);
@@ -409,7 +405,7 @@ class UserControllerTest extends TestCase
         // READ in case of deactivated user_quota
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $userController->get($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $response       = $userController->get($request, new \Slim\Http\Response());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->users);
@@ -429,7 +425,7 @@ class UserControllerTest extends TestCase
         // READ in case of enabled user_quotat
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $userController->get($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $response       = $userController->get($request, new \Slim\Http\Response());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->users);
@@ -626,8 +622,6 @@ class UserControllerTest extends TestCase
         $response       = $userController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
         $responseBody   = json_decode((string)$response->getBody());
 
-        $this->assertSame('success', $responseBody->success);
-
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
@@ -639,7 +633,6 @@ class UserControllerTest extends TestCase
         $this->assertSame('TEST-CLARK2', $responseBody->firstname);
         $this->assertSame('TEST-KENT2', $responseBody->lastname);
         $this->assertSame('DEL', $responseBody->status);
-        $this->assertSame('N', $responseBody->enabled);
         $this->assertSame('0122334455', $responseBody->phone);
         $this->assertSame('ck@dailyP.com', $responseBody->mail);
         $this->assertSame('CK', $responseBody->initials);
