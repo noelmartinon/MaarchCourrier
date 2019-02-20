@@ -82,13 +82,19 @@ $businessAppTools = new business_app_tools();
 
 if (count($_SESSION['config']) <= 0) {
     $tmpPath = explode(
-        DIRECTORY_SEPARATOR, str_replace(
-            '/', DIRECTORY_SEPARATOR, $_SERVER['SCRIPT_FILENAME']
+        DIRECTORY_SEPARATOR,
+        str_replace(
+            '/',
+            DIRECTORY_SEPARATOR,
+            $_SERVER['SCRIPT_FILENAME']
         )
     );
     $serverPath = implode(
-        DIRECTORY_SEPARATOR, array_slice(
-            $tmpPath, 0, array_search('apps', $tmpPath)
+        DIRECTORY_SEPARATOR,
+        array_slice(
+            $tmpPath,
+            0,
+            array_search('apps', $tmpPath)
         )
     ).DIRECTORY_SEPARATOR;
 
@@ -178,8 +184,8 @@ if (!empty($_SESSION['error'])) {
             } catch (Exception $conFailure) {
                 if (!empty($standardConnect) && $standardConnect == 'true') {
                     $res = $sec->login($login, $password, 'ldap', $standardConnect);
-                    $_SESSION['user'] = $res['user'];
                     $login = $res['user']['UserId'];
+                    $_SESSION['user'] = $res['user'];
                     if (empty($res['error'])) {
                         \SrcCore\models\AuthenticationModel::setCookieAuth(['userId' => $login]);
                         \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
@@ -213,7 +219,6 @@ if (!empty($_SESSION['error'])) {
             }
 
             if ($ad->authenticate($loginToAd, $password)) {
-                //TODO: protect sql injection with PDO
                 require_once 'core/class/class_db_pdo.php';
 
                 // Instantiate database.
@@ -223,6 +228,7 @@ if (!empty($_SESSION['error'])) {
                     array($login)
                 ); //permet de rechercher les utilisateurs dans le LDAP sans prendre en compte la casse
                 $result = $stmt->fetch();
+                $login = $result['user_id'];
 
                 if (!empty($result['locked_until'])) {
                     $lockedDate = new \DateTime($result['locked_until']);
