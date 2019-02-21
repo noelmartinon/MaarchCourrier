@@ -203,8 +203,13 @@ if (! empty($_SESSION['error'])) {
                     if ($_SESSION['history']['attachview'] == "true") {
                         $hist = new history();
                         $hist->add(
-                            $table, $sId, "VIEW", 'attachview', _VIEW_DOC_NUM . "" . $sId,
-                            $_SESSION['config']['databasetype'], 'apps'
+                            'res_attachments',
+                            $sId,
+                            "VIEW",
+                            'attachview',
+                            _VIEW_DOC_NUM . "" . $sId,
+                            $_SESSION['config']['databasetype'],
+                            'apps'
                         );
                     }
                     //WATERMARK
