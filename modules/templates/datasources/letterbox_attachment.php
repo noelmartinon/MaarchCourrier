@@ -84,7 +84,7 @@ if (!empty($res_id)) {
             $myContact['title'] = $contacts->get_civility_contact($myContact['title']);
             $datasources['contact'][] = $myContact;
     
-            // single Contact
+        // single Contact
         } elseif (isset($res_contact_id) && isset($res_address_id) && is_numeric($res_contact_id)) {
             $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ? ', array($res_contact_id, $res_address_id));
             $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -95,6 +95,13 @@ if (!empty($res_id)) {
         } elseif (!empty($res_contact_id) && !is_numeric($res_contact_id)) {
             $stmt = $dbDatasource->query('SELECT firstname, lastname, user_id, mail, phone, initials FROM users WHERE user_id = ?', [$res_contact_id]);
             $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
+            $datasources['contact'][] = $myContact;
+        } elseif (!empty($context)) {
+            $stmt = $dbDatasource->query('SELECT * FROM view_contacts WHERE contact_id = ? and ca_id = ?', array($datasources['res_letterbox'][0]['contact_id'], $datasources['res_letterbox'][0]['address_id']));
+            $myContact = $stmt->fetch(PDO::FETCH_ASSOC);
+            $myContact['postal_address'] = \Contact\controllers\ContactController::formatContactAddressAfnor($myContact);
+            $myContact['contact_title'] = $contacts->get_civility_contact($myContact['contact_title']);
+            $myContact['title'] = $contacts->get_civility_contact($myContact['title']);
             $datasources['contact'][] = $myContact;
         }
     
@@ -236,7 +243,6 @@ if (!empty($res_id)) {
         $copiesContact = false;
         $copiesEntity = false;
         if ($copies->item_type == 'user_id') {
-            
             $stmt2 = $dbDatasource->query('SELECT * FROM users WHERE user_id = ?', [$copies->item_id]);
             $copiesContact = $stmt2->fetchObject();
             $stmt3 = $dbDatasource->query('SELECT en.entity_id, en.entity_label FROM entities en, users_entities ue '

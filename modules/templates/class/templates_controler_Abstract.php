@@ -898,7 +898,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param string $outputType : save to 'file', retrieve 'content'
     * @return merged content or path to file
     */
-    public function merge($templateId, $params = array(), $outputType)
+    public function merge($templateId, $params = array(), $outputType, $context = '')
     {
         include_once 'core/class/class_functions.php';
         include_once 'modules/templates/templates_tables_definition.php';
