@@ -102,8 +102,7 @@ class ListInstanceController
                     
                     $listControl = ['res_id', 'item_id', 'item_type', 'item_mode', 'difflist_type'];
                     foreach($listControl as $itemControl){
-                        if (empty($itemControl)) {
-        
+                        if (empty($instance[$itemControl])) {
                             return $response->withStatus(400)->withJson(['errors' => $itemControl . ' are empty']);
                         }
                     }
