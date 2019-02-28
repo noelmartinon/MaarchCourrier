@@ -47,6 +47,17 @@ TRUNCATE TABLE res_attachments;
 ALTER SEQUENCE res_attachment_res_id_seq restart WITH 1;
 
 TRUNCATE TABLE res_version_attachments;
+ALTER SEQUENCE res_id_version_attachments_seq restart WITH 1;
+
+TRUNCATE TABLE adr_letterbox;
+ALTER SEQUENCE adr_letterbox_id_seq restart WITH 1;
+
+TRUNCATE TABLE adr_attachments;
+ALTER SEQUENCE adr_attachments_id_seq restart WITH 1;
+
+TRUNCATE TABLE adr_attachments_version;
+ALTER SEQUENCE adr_attachments_version_id_seq restart WITH 1;
+
 TRUNCATE TABLE res_linked;
 TRUNCATE TABLE res_mark_as_read;
 
