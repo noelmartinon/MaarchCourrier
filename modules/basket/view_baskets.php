@@ -155,7 +155,18 @@ if (isset($_REQUEST['baskets']) && ! empty($_REQUEST['baskets'])) {
 }
 
 if ((isset($_REQUEST['id']) && !empty($_REQUEST['id'])) && !isset($_REQUEST['resid'])) {
-	$_REQUEST['resid'] = $_REQUEST['id'];
+    $_REQUEST['resid'] = $_REQUEST['id'];
+}
+
+if (!empty($_GET['resId'])) {
+    require_once 'core/class/class_security.php';
+    $security = new security();
+    $aResId = explode(',', $_GET['resId']);
+    foreach ($aResId as $value) {
+        if (!$security->test_right_doc('letterbox_coll', $value)) {
+            exit(_NO_RIGHT_TXT);
+        };
+    }
 }
 
 if (
