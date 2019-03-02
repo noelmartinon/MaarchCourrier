@@ -30,6 +30,13 @@ if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
     exit();
 }
 
+$security = new security();
+$right = $security->test_right_doc('letterbox_coll', $id);
+
+if (!$right) {
+    exit(_NO_RIGHT_TXT);
+}
+
 //var_dump($_REQUEST);
 $small = false;
 $smallQuery = '';

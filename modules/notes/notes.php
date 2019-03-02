@@ -40,6 +40,13 @@ if (isset($_REQUEST['identifier']) && !empty($_REQUEST['identifier'])) {
     exit();
 }
 
+$security = new security();
+$right = $security->test_right_doc('letterbox_coll', $identifier);
+
+if (!$right) {
+    exit(_NO_RIGHT_TXT);
+}
+
 //Origin
 if (isset($_REQUEST['origin']) && !empty($_REQUEST['origin'])) $origin = $_REQUEST['origin'];
  
@@ -284,4 +291,3 @@ if (isset($_REQUEST['load'])) {
 
     echo "{status : " . $status . ", content : '" . addslashes($debug.$content) . "', error : '" . addslashes($error) . "'}";
 }
-
