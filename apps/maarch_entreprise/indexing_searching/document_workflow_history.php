@@ -50,6 +50,13 @@ if(isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
     exit();
 }
 
+$security = new security();
+$right = $security->test_right_doc('letterbox_coll', $id);
+
+if (!$right) {
+    exit(_NO_RIGHT_TXT);
+}
+
 //Collection ID
 if(isset($_REQUEST['coll_id']) && !empty($_REQUEST['coll_id'])) {
     $table = $sec->retrieve_table_from_coll($_REQUEST['coll_id']);
@@ -214,8 +221,8 @@ if (isset($_REQUEST['load'])) {
             }
 
         //List
-            $listKey = 'id';                                                            //Clé de la liste
-            $paramsTab = array();                                                       //Initialiser le tableau de paramètres
+            $listKey = 'id';                                                            //Cl\E9 de la liste
+            $paramsTab = array();                                                       //Initialiser le tableau de param\E8tres
             $paramsTab['bool_sortColumn'] = true;                                       //Affichage Tri
             $paramsTab['pageTitle'] ='';                                                //Titre de la page
             $paramsTab['bool_bigPageTitle'] = false;                                    //Affichage du titre en grand
