@@ -149,7 +149,7 @@ class request extends dbquery
         $result=array();
         $i = 0;
         while ($line = $res_query->fetch(PDO::FETCH_ASSOC)) {
-            if ($i > $limit) {
+            if ($i >= $limit) {
                 break;
             }
             $temp= array();
