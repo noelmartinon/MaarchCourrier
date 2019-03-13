@@ -69,7 +69,7 @@ if (isset($_SESSION['web_cas_url'])) {
     $login = '';
 }
 if (isset($_REQUEST['pass'])) {
-    $password = $func->wash($_REQUEST['pass'], 'no', _PASSWORD_FOR_USER, 'yes');
+    $password = $_REQUEST['pass'];
 } else {
     $password = '';
 }
@@ -204,9 +204,29 @@ if (!empty($_SESSION['error'])) {
 
             if ($result) {
                 $_SESSION['error'] = '';
+                
+                if (!empty($_SESSION['config']['enhancedPassword'])) {
+                    if (!empty($result['locked_until'])) {
+                        $lockedDate = new \DateTime($result['locked_until']);
+                        $currentDate = new \DateTime();
+                        if ($currentDate < $lockedDate) {
+                            $_SESSION['error'] = _ACCOUNT_LOCKED_UNTIL . " {$lockedDate->format('d/m/Y H:i')}";
+                            header(
+                                'location: ' . $_SESSION['config']['businessappurl']
+                                . 'index.php?display=true&page=login'
+                            );
+                            exit;
+                        }
+                    }
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                }
+
+                if (!empty($standardConnect) && $standardConnect == 'true') {
+                    \User\models\UserModel::updatePasswordByUserId(['userId' => $login, 'password' => $password]);
+                }
                 $res = $sec->login($login, $password, 'ldap');
-                $_SESSION['user'] = $res['user'];
                 if ($res['error'] == '') {
+                    $_SESSION['user'] = $res['user'];
                     \SrcCore\models\SecurityModel::setCookieAuth(['userId' => $login]);
                 } else {
                     $_SESSION['error'] = $res['error'];
@@ -226,7 +246,8 @@ if (!empty($_SESSION['error'])) {
                 exit;
             }
         } else {
-            $_SESSION['error'] = _BAD_LOGIN_OR_PSW;
+            $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $login]);
+            $_SESSION['error'] = $error;
             header(
                 'location: '.$_SESSION['config']['businessappurl']
                 .'index.php?display=true&page=login'
@@ -277,6 +298,9 @@ if (!empty($_SESSION['error'])) {
                 \SrcCore\models\SecurityModel::setCookieAuth(['userId' => $login]);
                 // $businessAppTools->load_app_var_session($_SESSION['user']);
                 //$core->load_var_session($_SESSION['modules'], $_SESSION['user']);
+                if (!empty($_SESSION['config']['enhancedPassword'])) {
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                }
                 $core->load_menu($_SESSION['modules']);
                 // exit;
             } else {

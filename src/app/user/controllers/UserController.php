@@ -14,27 +14,29 @@
 
 namespace User\controllers;
 
-use Basket\models\BasketModel;
-use Basket\models\GroupBasketModel;
-use Entity\models\ListInstanceModel;
-use Group\models\ServiceModel;
-use Entity\models\EntityModel;
-use Entity\models\ListTemplateModel;
-use Group\models\GroupModel;
-use History\controllers\HistoryController;
-use History\models\HistoryModel;
-use Notification\controllers\NotificationsEventsController;
-use Parameter\models\ParameterModel;
-use Resource\models\ResModel;
-use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\CoreConfigModel;
-use SrcCore\controllers\StoreController;
-use SrcCore\models\SecurityModel;
-use User\models\UserBasketPreferenceModel;
-use User\models\UserEntityModel;
 use User\models\UserModel;
+use Group\models\GroupModel;
+use Resource\models\ResModel;
+use Basket\models\BasketModel;
+use Core\Models\PasswordModel;
+use Entity\models\EntityModel;
+use Group\models\ServiceModel;
+use History\models\HistoryModel;
+use User\models\UserEntityModel;
+use Respect\Validation\Validator;
+use SrcCore\models\SecurityModel;
+use Basket\models\GroupBasketModel;
+use SrcCore\models\CoreConfigModel;
+use Entity\models\ListInstanceModel;
+use Entity\models\ListTemplateModel;
+use Parameter\models\ParameterModel;
+use Core\Controllers\PasswordController;
+use SrcCore\controllers\StoreController;
+use History\controllers\HistoryController;
+use User\models\UserBasketPreferenceModel;
+use Notification\controllers\NotificationsEventsController;
 
 class UserController
 {
@@ -254,6 +256,10 @@ class UserController
         $user['redirectedBaskets'] = BasketModel::getRedirectedBasketsByUserId(['userId' => $user['user_id']]);
         $user['regroupedBaskets'] = BasketModel::getRegroupedBasketsByUserId(['userId' => $user['user_id']]);
         $user['canModifyPassword'] = true;
+        $user['passwordRules'] = [];
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            $user['passwordRules'] = PasswordModel::getRules(['where' => ['enabled = ?'], 'data' => [true]]);
+        }
 
         $baskets = [];
         foreach ($user['baskets'] as $key => $basket) {
@@ -351,8 +357,20 @@ class UserController
             return $response->withStatus(401)->withJson(['errors' => _WRONG_PSW]);
         }
 
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            if (!PasswordController::isPasswordValid(['password' => $data['newPassword']])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Le nouveau mot de passe ne respecte pas les critères de sécurité']);
+            } elseif (!PasswordModel::isPasswordHistoryValid(['password' => $data['newPassword'], 'userId' => $_SESSION['user']['UserId']])) {
+                return $response->withStatus(400)->withJson(['errors' => _ALREADY_USED_PSW]);
+            }
+        }
+
         $user = UserModel::getByUserId(['userId' => $GLOBALS['userId'], 'select' => ['id']]);
         UserModel::updatePassword(['id' => $user['id'], 'password' => $data['newPassword']]);
+
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            PasswordModel::setHistoryPassword(['userId' => $_SESSION['user']['UserId'], 'password' => $data['newPassword']]);
+        }
 
         return $response->withJson(['success' => 'success']);
     }

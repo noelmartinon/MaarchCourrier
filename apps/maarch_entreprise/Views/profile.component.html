@@ -90,7 +90,11 @@
                             </div>
                         </div>
                     </div>
+   
+                    <p style="color:#1B99C4;padding-bottom:0px;text-align:center;" [innerHTML]="this.ruleText"></p>
+               
                     <div class="form-group">
+
                         <div class="col-sm-6">
                             <div class="input-group">
                                 <span class="input-group-addon">
@@ -106,6 +110,12 @@
                                 </span>
                                 <input type="password" [(ngModel)]="passwordModel.reNewPassword" class="form-control" name="reNewPassword" placeholder="{{lang.renewPsw}}">
                             </div>
+                        </div>
+
+                    </div>
+                    <div *ngIf="this.otherRuleTextArr.length > 0" class="form-group">
+                        <div class="col-sm-12 text-center">
+                            <div class="alert alert-warning" [innerHTML]="this.otherRuleText"></div>
                         </div>
                     </div>
                     <div class="form-group">

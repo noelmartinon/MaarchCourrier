@@ -674,6 +674,9 @@ if (!defined('_ASKED_ONLY_ONCE')) {
 if (!defined('_PSW_REINI')) {
     define('_PSW_REINI', 'Votre mot de passe a été réinitialisé. Veuillez en définir un nouveau.');
 }
+if (!defined("_PSW_REINI_2")) {
+    define("_PSW_REINI_2", "Votre mot de passe a été réinitialisé ou la date de renouvellement a été atteinte. Veuillez en définir un nouveau.");
+}
 if (!defined('_FIRST_CONN')) {
     define('_FIRST_CONN', 'Première connexion');
 }
@@ -5247,3 +5250,7 @@ if (!defined('_IMG_ALREADY_UPLOADED')) {
 if (!defined('_FILE_FORMAT_NOT_ALLOWED')) {
     define('_FILE_FORMAT_NOT_ALLOWED', "Format d'image non autorisé");
 }
+
+define('_ALREADY_USED_PSW', 'Le mot de passe a déjà été utilisé');
+define('_ACCOUNT_LOCKED_FOR', 'Nombre de tentatives de connexion dépassée. Votre compte est vérouillé pendant');
+define('_ACCOUNT_LOCKED_UNTIL', 'Nombre de tentatives de connexion dépassée. Compte vérouillé jusqu\'au');

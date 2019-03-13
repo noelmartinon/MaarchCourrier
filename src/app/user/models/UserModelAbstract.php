@@ -165,17 +165,40 @@ class UserModelAbstract
         return $aUser;
     }
 
+    public static function updatePasswordByUserId(array $aArgs = [])
+    {
+        ValidatorModel::notEmpty($aArgs, ['userId', 'password']);
+        ValidatorModel::stringType($aArgs, ['userId', 'password']);
+
+        $set = ['password'  => SecurityModel::getPasswordHash($aArgs['password'])];
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            $set['password_modification_date'] = 'CURRENT_TIMESTAMP';
+        }
+
+        DatabaseModel::update([
+            'table'     => 'users',
+            'set'       => $set,
+            'where'     => ['user_id = ?'],
+            'data'      => [$aArgs['userId']]
+        ]);
+
+        return true;
+    }
+
     public static function updatePassword(array $aArgs = [])
     {
         ValidatorModel::notEmpty($aArgs, ['id', 'password']);
         ValidatorModel::intVal($aArgs, ['id']);
         ValidatorModel::stringType($aArgs, ['password']);
 
+        $set = ['password'  => SecurityModel::getPasswordHash($aArgs['password'])];
+        if (!empty($_SESSION['config']['enhancedPassword'])) {
+            $set['password_modification_date'] = 'CURRENT_TIMESTAMP';
+        }
+
         DatabaseModel::update([
             'table'     => 'users',
-            'set'       => [
-                'password'  => SecurityModel::getPasswordHash($aArgs['password'])
-            ],
+            'set'       => $set,
             'where'     => ['id = ?'],
             'data'      => [$aArgs['id']]
         ]);

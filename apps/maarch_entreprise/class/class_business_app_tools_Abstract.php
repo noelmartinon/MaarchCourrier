@@ -112,6 +112,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['config']['ldap']                = (string) $config->ldap;
             $_SESSION['config']['userdefaultpassword'] = (string) $config->userdefaultpassword;
             $_SESSION['config']['usePHPIDS']           = (string) $config->usePHPIDS;
+            $_SESSION['config']['enhancedPassword']    = (string) $config->enhancedPassword;
             if (isset($config->showfooter)) {
                 $_SESSION['config']['showfooter'] = (string) $config->showfooter;
             } else {

@@ -46,6 +46,9 @@ export class ProfileComponent implements OnInit {
     basketsToRedirect           : string[]  = [];
 
     showPassword                : boolean   = false;
+    ruleText                    : string    = '';
+    otherRuleText               : string;
+    otherRuleTextArr            : String[]  = [];
     selectedSignature           : number    = -1;
     selectedSignatureLabel      : string    = "";
     loading                     : boolean   = false;
@@ -137,6 +140,40 @@ export class ProfileComponent implements OnInit {
         this.http.get('../../rest/currentUser/profile')
             .subscribe((data : any) => {
                 this.user = data;
+
+                let ruleTextArr: String[] = [];
+                this.user.passwordRules.forEach((rule: any) => {
+
+                    if (rule.label == 'minLength') {
+                        ruleTextArr.push('<b>'+rule.value+'</b> caratère(s) minimum');
+
+                    } else if (rule.label == 'complexityUpper') {
+
+                        ruleTextArr.push('<b>1</b> majuscule minimum');
+                        
+
+                    } else if (rule.label == 'complexityNumber') {
+
+                        ruleTextArr.push('<b>1</b> chiffre minimum');
+                        
+
+                    } else if (rule.label == 'complexitySpecial') {
+
+                        ruleTextArr.push('<b>1</b> caratère spécial minimum');
+                        
+                    } else if (rule.label == 'historyLastUse') {
+
+                        this.otherRuleTextArr.push('Vous ne pouvez pas utiliser les <b>'+rule.value+'</b> dernier(s) mot(s) de passe.');
+                    
+                    } else if (rule.label == 'renewal') {
+
+                        this.otherRuleTextArr.push('Veuillez noter que ce nouveau mot de passe ne sera valide que <b>'+rule.value+'</b> jour(s). Passé ce délai, vous devrez en choisir un nouveau.');
+                    }
+
+                });
+                this.ruleText = ruleTextArr.join(', ');
+                this.otherRuleText = this.otherRuleTextArr.join('<br/>');
+
 
                 this.user.baskets.forEach((value: any, index: number) => {
                     this.user.baskets[index]['disabled'] = false;
@@ -329,13 +366,17 @@ export class ProfileComponent implements OnInit {
     updatePassword() {
         this.http.put(this.coreUrl + 'rest/currentUser/password', this.passwordModel)
             .subscribe((data : any) => {
-                this.showPassword = false;
-                this.passwordModel = {
-                    currentPassword         : "",
-                    newPassword             : "",
-                    reNewPassword           : "",
-                };
-                this.notify.success(this.lang.passwordUpdated);
+                if (data.errors) {
+                    this.notify.error(data.errors);
+                } else {
+                    this.showPassword = false;
+                    this.passwordModel = {
+                        currentPassword         : "",
+                        newPassword             : "",
+                        reNewPassword           : "",
+                    };
+                    this.notify.success(this.lang.passwordUpdated);
+                }
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
