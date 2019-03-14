@@ -170,18 +170,29 @@ if (!empty($_SESSION['error'])) {
             $login_admin = $login_admin . $suffix_login;
         }
 
-        //Try to create a new ldap instance
-        if (strtolower($type_ldap) == 'openldap') {
-            try {
+       //Try to create a new ldap instance
+        try {
+            if (strtolower($type_ldap) == 'openldap') {
                 $ad = new LDAP($domain, $login_admin, $pass, $ssl, $hostname);
-            } catch (Exception $conFailure) {
-                echo functions::xssafe($conFailure->getMessage());
-                exit;
-            }
-        } else {
-            try {
+            } else {
                 $ad = new LDAP($domain, $login_admin, $pass, $ssl);
-            } catch (Exception $conFailure) {
+            }
+        } catch (Exception $conFailure) {
+            if (!empty($standardConnect) && $standardConnect == 'true') {
+                $res = $sec->login($login, $password);
+                $_SESSION['user'] = $res['user'];
+                if (empty($res['error'])) {
+                    \SrcCore\models\SecurityModel::setCookieAuth(['userId' => $login]);
+                    \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+                    \User\models\UserModel::updatePasswordByUserId(['userId' => $login, 'password' => $password]);
+                    $core->load_menu($_SESSION['modules']);
+                } else {
+                    $_SESSION['error'] = $res['error'];
+                }
+
+                header('location: '.$_SESSION['config']['businessappurl'].$res['url']);
+                exit();
+            } else {
                 echo functions::xssafe($conFailure->getMessage());
                 exit;
             }
