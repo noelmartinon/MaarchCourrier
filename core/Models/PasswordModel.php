@@ -67,7 +67,7 @@ class PasswordModel
             ]);
 
             foreach ($passwordHistory as $value) {
-                if (hash('sha512', $aArgs['password']) == $value['password']) {
+                if (password_verify($aArgs['password'], $value['password'])) {
                     return false;
                 }
             }
@@ -87,7 +87,7 @@ class PasswordModel
         ]);
 
         if (count($passwordHistory) >= 10) {
-            DatabaseModel::deleteFrom([
+            DatabaseModel::delete([
                 'table'     => 'password_history',
                 'where'     => ['id < ?', 'user_id = ?'],
                 'data'      => [$passwordHistory[8], $aArgs['userId']]
@@ -98,7 +98,7 @@ class PasswordModel
             'table'         => 'password_history',
             'columnsValues' => [
                 'user_id'    => $aArgs['userId'],
-                'password'          => SecurityModel::getPasswordHash($aArgs['password'])
+                'password'   => SecurityModel::getPasswordHash($aArgs['password'])
             ]
         ]);
 
