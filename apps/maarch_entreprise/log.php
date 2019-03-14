@@ -87,13 +87,19 @@ $businessAppTools = new business_app_tools();
 
 if (count($_SESSION['config']) <= 0) {
     $tmpPath = explode(
-        DIRECTORY_SEPARATOR, str_replace(
-            '/', DIRECTORY_SEPARATOR, $_SERVER['SCRIPT_FILENAME']
+        DIRECTORY_SEPARATOR,
+        str_replace(
+            '/',
+            DIRECTORY_SEPARATOR,
+            $_SERVER['SCRIPT_FILENAME']
         )
     );
     $serverPath = implode(
-        DIRECTORY_SEPARATOR, array_slice(
-            $tmpPath, 0, array_search('apps', $tmpPath)
+        DIRECTORY_SEPARATOR,
+        array_slice(
+            $tmpPath,
+            0,
+            array_search('apps', $tmpPath)
         )
     ).DIRECTORY_SEPARATOR;
 
@@ -246,7 +252,11 @@ if (!empty($_SESSION['error'])) {
                 exit;
             }
         } else {
-            $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $login]);
+            if (!empty($_SESSION['config']['enhancedPassword'])) {
+                $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $login]);
+            } else {
+                $error = _BAD_LOGIN_OR_PSW;
+            }
             $_SESSION['error'] = $error;
             header(
                 'location: '.$_SESSION['config']['businessappurl']
@@ -302,7 +312,7 @@ if (!empty($_SESSION['error'])) {
                     \Core\Models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
                 }
                 $core->load_menu($_SESSION['modules']);
-                // exit;
+            // exit;
             } else {
                 $_SESSION['error'] = $res['error'];
             }
