@@ -40,16 +40,19 @@ if (isset($_REQUEST['identifier']) && !empty($_REQUEST['identifier'])) {
     exit();
 }
 
-$security = new security();
-$right = $security->test_right_doc('letterbox_coll', $identifier);
-
-if (!$right) {
-    exit(_NO_RIGHT_TXT);
-}
 
 //Origin
-if (isset($_REQUEST['origin']) && !empty($_REQUEST['origin'])) $origin = $_REQUEST['origin'];
- 
+if (isset($_REQUEST['origin']) && !empty($_REQUEST['origin'])) {
+    $origin = $_REQUEST['origin'];
+}
+if (empty($origin) || $origin != 'folder') {
+    $security = new security();
+    $right = $security->test_right_doc('letterbox_coll', $identifier);
+    if (!$right) {
+        exit(_NO_RIGHT_TXT);
+    }
+}
+
 //Extra parameters
 if (isset($_REQUEST['size']) && !empty($_REQUEST['size'])) $parameters .= '&size='.$_REQUEST['size'];
 if (isset($_REQUEST['order']) && !empty($_REQUEST['order'])) $parameters .= '&order='.$_REQUEST['order'];
