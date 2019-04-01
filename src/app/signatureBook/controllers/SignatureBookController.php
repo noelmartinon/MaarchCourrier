@@ -279,7 +279,7 @@ class SignatureBookController
                 if ($value['status'] == 'SIGN' && $tmpValue['attachment_type'] == 'signed_response' && !empty($tmpValue['origin'])) {
                     $signDaddy = explode(',', $tmpValue['origin']);
                     if (($signDaddy[0] == $value['res_id'] && $signDaddy[1] == "res_attachments")
-                        || ($signDaddy[0] == $value['res_id_version'] && $signDaddy[1] == "res_attachments")
+                        || ($signDaddy[0] == $value['res_id_version'] && $signDaddy[1] == "res_version_attachments")
                     ) {
                         $viewerId = $tmpValue['res_id'];
                         unset($attachments[$tmpKey]);
