@@ -18,7 +18,10 @@ require_once 'modules/attachments/attachments_tables.php';
 require_once 'modules/attachments/class/attachments_controler.php';
 $core = new core_tools();
 $core->load_lang();
-$core->load_js();
+
+if (empty($_REQUEST['rest'])) {
+    $core->load_js();
+}
 
 $func = new functions();
 $ac = new attachments_controler();
@@ -57,7 +60,9 @@ if ($_SESSION['history']['attachdel'] == 'true') {
         RES_ATTACHMENTS_TABLE, $_REQUEST['id'], 'DEL', 'attachdel', _ATTACH_DELETED.' : '
         .$_REQUEST['id'], $_SESSION['config']['databasetype'], 'attachments'
     );
-    echo '<script>$j("#main_error",window.parent.document).html(\''._ATTACH_DELETED.' : '.$_REQUEST['id'].'\').show().delay(5000).fadeOut();</script>';
+    if (empty($_REQUEST['rest'])) {
+        echo '<script>$j("#main_error",window.parent.document).html(\''._ATTACH_DELETED.' : '.$_REQUEST['id'].'\').show().delay(5000).fadeOut();</script>';
+    }
 }
 
 //SIGNATURE BOOK
@@ -67,34 +72,37 @@ if (!empty($_REQUEST['rest'])) {
 }
 
 //REFRESH TABS
-$query = "SELECT count(1) as total FROM res_view_attachments WHERE status NOT IN ('DEL','OBS','TMP') and res_id_master = ?";
-if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'attachments') {
-    $query .= " and (attachment_type <> 'response_project' and attachment_type <> 'outgoing_mail_signed' and attachment_type <> 'signed_response' and attachment_type <> 'converted_pdf' and attachment_type <> 'outgoing_mail' and attachment_type <> 'print_folder' and attachment_type <> 'aihp')";
-} elseif (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'response') {
-    $query .= " and (attachment_type = 'response_project' or attachment_type = 'outgoing_mail_signed' or attachment_type = 'outgoing_mail' or attachment_type = 'signed_response' or attachment_type = 'aihp')";
-} else {
-    $query .= " and attachment_type NOT IN ('converted_pdf','print_folder')";
-}
-$stmt = $db->query($query, array($info_doc['res_id_master']));
-$new_nb_attach = $stmt->total;
-?>
-<script type="text/javascript">
-    var eleframe1 =  parent.document.getElementsByName('list_attach');
-    if(eleframe1[0] === undefined){
-        eleframe1 =  parent.document.getElementsByName('uniqueDetailsIframe');
-    }
-    var nb_attach = '<?php functions::xecho($new_nb_attach); ?>';
-    <?php if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'attachments') {
-    ?>
-        eleframe1[0].src = "<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&load&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp&fromDetail=attachments'; ?>";
-    <?php
-} elseif (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'response') {
-        ?>
-        eleframe1[0].src = "<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&load&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp&fromDetail=response'; ?>";
-    <?php
+if (empty($_REQUEST['rest'])) {
+    $query = "SELECT count(1) as total FROM res_view_attachments WHERE status NOT IN ('DEL','OBS','TMP') and res_id_master = ?";
+    if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'attachments') {
+        $query .= " and (attachment_type <> 'response_project' and attachment_type <> 'outgoing_mail_signed' and attachment_type <> 'signed_response' and attachment_type <> 'converted_pdf' and attachment_type <> 'outgoing_mail' and attachment_type <> 'print_folder' and attachment_type <> 'aihp')";
+    } elseif (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'response') {
+        $query .= " and (attachment_type = 'response_project' or attachment_type = 'outgoing_mail_signed' or attachment_type = 'outgoing_mail' or attachment_type = 'signed_response' or attachment_type = 'aihp')";
     } else {
+        $query .= " and attachment_type NOT IN ('converted_pdf','print_folder')";
+    }
+    $stmt = $db->query($query, array($info_doc['res_id_master']));
+    $new_nb_attach = $stmt->total;
+    ?>
+    <script type="text/javascript">
+        var eleframe1 =  parent.document.getElementsByName('list_attach');
+        if(eleframe1[0] === undefined){
+            eleframe1 =  parent.document.getElementsByName('uniqueDetailsIframe');
+        }
+        var nb_attach = '<?php functions::xecho($new_nb_attach); ?>';
+        <?php if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'attachments') {
         ?>
-        parent.document.getElementById('list_attach').src = "<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&template_selected=documents_list_attachments_simple&page=frame_list_attachments&load&attach_type_exclude=converted_pdf,print_folder'; ?>";
-    <?php
-    } ?>
-</script>
+            eleframe1[0].src = "<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&load&attach_type_exclude=response_project,signed_response,outgoing_mail_signed,converted_pdf,outgoing_mail,print_folder,aihp&fromDetail=attachments'; ?>";
+        <?php
+    } elseif (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'response') {
+            ?>
+            eleframe1[0].src = "<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&load&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp&fromDetail=response'; ?>";
+        <?php
+        } else {
+            ?>
+            parent.document.getElementById('list_attach').src = "<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&template_selected=documents_list_attachments_simple&page=frame_list_attachments&load&attach_type_exclude=converted_pdf,print_folder'; ?>";
+        <?php
+        } ?>
+    </script>
+<?php
+}
