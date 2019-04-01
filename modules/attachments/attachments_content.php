@@ -1572,7 +1572,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         $content .= '<div id="contactDiv" style="margin-bottom:10px;">';
         $content .= '<label>'._DEST_USER_PJ;
         if ($core->test_admin('my_contacts', 'apps', false)) {
-            $content .= ' <a href="#" id="create_multi_contact" title="'._CREATE_CONTACT
+            $content .= ' <a id="create_multi_contact" title="'._CREATE_CONTACT
                     .'" onclick="new Effect.toggle(\'create_contact_div_attach\', '
                     .'\'blind\', {delay:0.2});return false;" '
                     .'style="display:inline;" ><i class="fa fa-pencil-alt fa-lg" title="'._CREATE_CONTACT.'"></i></a>';
@@ -1581,7 +1581,7 @@ $content .= '<div class="transmissionDiv" id="addAttach1">';
         $content .= '<span style="position:relative;"><input type="text" name="contact_attach[]" onblur="display_contact_card(\'visible\', \'contact_card_attach\');" onkeyup="erase_contact_external_id(\'contact_attach\', \'contactidAttach\');erase_contact_external_id(\'contact_attach\', \'addressidAttach\');" id="contact_attach" onchange="saveContactToSession(this);" value="';
         $content .= $infoAttach->contact_show;
         $content .= '"/><div id="show_contacts_attach" class="autocomplete autocompleteIndex" style="width: 100%;left: 0px;"></div><div class="autocomplete autocompleteIndex" id="searching_autocomplete" style="display: none;text-align:left;padding:5px;width: 100%;left: 0px;"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> chargement ...</div></span>';
-        $content .= '<a href="#" id="contact_card_attach" name="contact_card_attach" title="'._CONTACT_CARD.'" onclick="showContactInfo(this,document.getElementById(\'contactidAttach\'),document.getElementById(\'addressidAttach\'));" style=""> <i class="fa fa-book fa-lg"></i></a>';
+        $content .= '<a id="contact_card_attach" name="contact_card_attach" title="'._CONTACT_CARD.'" onclick="showContactInfo(this,document.getElementById(\'contactidAttach\'),document.getElementById(\'addressidAttach\'));" style="cursor:pointer;"> <i class="fa fa-book fa-lg"></i></a>';
         $content .= '</div>';
         $content .= "<input type='hidden' id='contactidAttach' name='contactidAttach[]' value='{$infoAttach->contact_id}' />";
         $content .= "<input type='hidden' id='addressidAttach' name='addressidAttach[]' value='{$infoAttach->address_id}' />";
