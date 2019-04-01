@@ -48,10 +48,6 @@ $fileplan_id = $fileplanArray[0]['ID'];
 $fileplan_label = $fileplanArray[0]['LABEL'];
 
 if (empty($fileplan_id)) {
-    // echo '<script type="text/javascript">window.top.location.href=\''
-    // . $_SESSION['config']['businessappurl']
-    // . 'index.php?page=fileplan&module=fileplan'
-    // . '&reinit=true\';</script>';
     /****************Management of the location bar  ************/
     $init = false;
     if (isset($_REQUEST['reinit']) && $_REQUEST['reinit'] == 'true') {
@@ -72,37 +68,39 @@ if (empty($fileplan_id)) {
     //Path to ajax script
     $path_to_script = $_SESSION['config']['businessappurl']
         .'index.php?display=true&module=fileplan&page=fileplan_ajax_script'.$parameters; ?>
-	<div id="inner_content">
-	<h1><i class="fa fa-copy fa-2x" title="<?php
-        echo _ADD_FILEPLAN; ?>"></i><?php echo _ADD_FILEPLAN; ?></h1>
-	<h3> <?php echo _CREATE_YOUR_PERSONNAL_FILEPLAN.'.<br/><br/>'._ASKED_ONLY_ONCE.'.'; ?>  </h3>
-	<div class="blank_space">&nbsp;</div>
-	
-	<form name="formFileplan" id="formFileplan" method="post"  action="#">
-	<em><?php echo _CHANGE_DEFAULT_FILEPLAN_NAME; ?></em><br /><br />
-	<p>
-		<label ><?php echo _FILEPLAN_NAME; ?> : </label>
-		<input name="fileplan_label" type="text" id="fileplan_label" class="fileplan_position" value="<?php 
+<div id="inner_content">
+    <h1><i class="fa fa-copy fa-2x" title="<?php
+        echo _ADD_FILEPLAN; ?>"></i><?php echo _ADD_FILEPLAN; ?>
+    </h1>
+    <h3> <?php echo _CREATE_YOUR_PERSONNAL_FILEPLAN.'.<br/><br/>'._ASKED_ONLY_ONCE.'.'; ?>
+    </h3>
+    <div class="blank_space">&nbsp;</div>
+
+    <form name="formFileplan" id="formFileplan" method="post" action="#">
+        <em><?php echo _CHANGE_DEFAULT_FILEPLAN_NAME; ?></em><br /><br />
+        <p>
+            <label><?php echo _FILEPLAN_NAME; ?> : </label>
+            <input name="fileplan_label" type="text" id="fileplan_label" class="fileplan_position" value="<?php
             echo _PERSONNAL_FILEPLAN.' ('.$userInfo['FirstName'].' '.$userInfo['LastName']
             .')'; ?>" /><span class="red_asterisk"><i class="fa fa-star"></i></span>
-	</p>
-	<p>
-		<label ><?php echo _IS_SERIAL_ID; ?> : </label>
-		<input name="is_serial" type="radio" id="is_serial" value="Y" checked="ckecked" /><?php echo _YES; ?>
-		<input name="is_serial" type="radio" id="is_serial" value="N" /><?php echo _NO; ?>
-		<span class="red_asterisk"><i class="fa fa-star"></i></span>
-	</p>
-	<p class="buttons">
-		<input type="button" name="valid" value="<?php 
-            echo _VALIDATE; ?>" class="button" onClick="validFileplanForm('<?php 
+        </p>
+        <p>
+            <label><?php echo _IS_SERIAL_ID; ?> : </label>
+            <input name="is_serial" type="radio" id="is_serial" value="Y" checked="ckecked" /><?php echo _YES; ?>
+            <input name="is_serial" type="radio" id="is_serial" value="N" /><?php echo _NO; ?>
+            <span class="red_asterisk"><i class="fa fa-star"></i></span>
+        </p>
+        <p class="buttons">
+            <input type="button" name="valid" value="<?php
+            echo _VALIDATE; ?>" class="button" onClick="validFileplanForm('<?php
         echo $path_to_script.'&origin=manage&mode=saveFileplan'; ?>', 'formFileplan');" />
-        <input type="button" name="cancel" value="<?php echo
-            _CANCEL; ?>" class="button" onclick="window.top.location.href='<?php 
+            <input type="button" name="cancel" value="<?php echo
+            _CANCEL; ?>" class="button" onclick="window.top.location.href='<?php
             echo $_SESSION['config']['businessappurl']; ?>index.php?module=fileplan&page=fileplan'" />
-	</p>
-	</form>
-	</div>
-	<?php
+        </p>
+    </form>
+</div>
+<?php
     exit();
 } else {
     $pathArray = array();
@@ -124,43 +122,46 @@ if (empty($fileplan_id)) {
         $page_id = 'fileplan_managment';
         $core_tools->manage_location_bar($page_path, $page_label, $page_id, $init, $level);
         /***********************************************************/ ?>
-		<h1><!-- i class="fa fa-copy fa-2x" title=""></i-->
-			<?php //echo _FILEPLAN;?></h1>
-		<div id="inner_content">
-			<div class="block">
-				<b>
-				<p id="back_list">
-					<a href="<?php echo $_SESSION['config']['businessappurl']; ?>index.php?page=fileplan&module=fileplan&reinit=true" class="back"><?php 
+<h1>
+    <!-- i class="fa fa-copy fa-2x" title=""></i-->
+    <?php //echo _FILEPLAN;?>
+</h1>
+<div id="inner_content">
+    <div class="block">
+        <b>
+            <p id="back_list">
+                <a href="<?php echo $_SESSION['config']['businessappurl']; ?>index.php?page=fileplan&module=fileplan&reinit=true" class="back"><?php
                     echo _VIEW_FILEPLAN; ?></a>&nbsp;/&nbsp;
-					<span class="selected_link"><?php echo _MANAGE_PERSONNAL_FILEPLAN; ?></span>            
-				</p>
-				</b>&nbsp;
-			</div>
-			<br />
-			<table cellspacing="0" cellpadding="5" border="0" width="100%">
-				<tr>
-				<td nowrap><b><?php echo _FILEPLAN_NAME; ?> : </b></td>
-				<td nowrap><?php functions::xecho($fileplan_label); ?></td>
-				<td><a href="javascript://" onClick="showFileplanForm('<?php 
+                <span class="selected_link"><?php echo _MANAGE_PERSONNAL_FILEPLAN; ?></span>
+            </p>
+        </b>&nbsp;
+    </div>
+    <br />
+    <table cellspacing="0" cellpadding="5" border="0" width="100%">
+        <tr>
+            <td nowrap><b><?php echo _FILEPLAN_NAME; ?> : </b></td>
+            <td nowrap><?php functions::xecho($fileplan_label); ?>
+            </td>
+            <td><a href="javascript://" onClick="showFileplanForm('<?php
                     echo $_SESSION['config']['businessappurl']
                     .'index.php?display=true&module=fileplan&page=fileplan_ajax_script'
-                    .'&origin=manage&mode=upFileplan&fileplan_id='.$fileplan_id; ?>');" class="change"title="<?php echo _EDIT_FILEPLAN; ?>"></a></td>
-				<!--<td><a href="javascript://" onClick="showFileplanForm('<?php 
+                    .'&origin=manage&mode=upFileplan&fileplan_id='.$fileplan_id; ?>');" class="change" title="<?php echo _EDIT_FILEPLAN; ?>"></a></td>
+            <!--<td><a href="javascript://" onClick="showFileplanForm('<?php
                     echo $_SESSION['config']['businessappurl']
                     .'index.php?display=true&module=fileplan&page=fileplan_ajax_script'
-                    .'&origin=manage&mode=disFileplan&fileplan_id='.$fileplan_id; ?>', false, '500px', '350px');" class="suspend" title="<?php 
+                    .'&origin=manage&mode=disFileplan&fileplan_id='.$fileplan_id; ?>', false, '500px', '350px');" class="suspend" title="<?php
                     echo _DISABLE_FILEPLAN; ?>"></a></td>-->
-				<td><a href="javascript://" onClick="showFileplanForm('<?php 
+            <td><a href="javascript://" onClick="showFileplanForm('<?php
                     echo $_SESSION['config']['businessappurl']
                     .'index.php?display=true&module=fileplan&page=fileplan_ajax_script'
-                    .'&origin=manage&mode=delFileplan&fileplan_id='.$fileplan_id; ?>', false, '500px', '350px');" class="delete" title="<?php 
+                    .'&origin=manage&mode=delFileplan&fileplan_id='.$fileplan_id; ?>', false, '500px', '350px');" class="delete" title="<?php
                     echo _DELETE_FILEPLAN; ?>"></a></td>
-				<td width="50%"></td>
-				
-				</tr>
-			</table>
-			<hr />
-			<?php
+            <td width="50%"></td>
+
+        </tr>
+    </table>
+    <hr />
+    <?php
             $parameters = '';
         if (isset($_REQUEST['order']) && !empty($_REQUEST['order'])) {
             $parameters .= '&order='.$_REQUEST['order'];
@@ -182,15 +183,16 @@ if (empty($fileplan_id)) {
 
         //Reset error
         $_SESSION['error'] = ''; ?>
-		</div>
-	<?php
+</div>
+<?php
     } else {
         //Table
         $table = FILEPLAN_VIEW;
         $select[$table] = array();
 
         //Fields
-        array_push($select[$table],
+        array_push(
+            $select[$table],
                 'position_id',
                 'fileplan_id',
                 'fileplan_label',
@@ -200,7 +202,8 @@ if (empty($fileplan_id)) {
                 'parent_id',
                 'position_id as position_path',
                 'position_enabled',
-                'count_document');
+                'count_document'
+        );
         //Where clause
         $where_tab = array();
         $array_what = array();
@@ -277,7 +280,7 @@ if (empty($fileplan_id)) {
                             $tab[$i][$j]['order'] = 'position_label';
                         }
                         if ($tab[$i][$j][$value] == 'parent_id') {
-                            $tab[$i][$j]['value'] = $fileplan->getPosition($fileplan_id, $tab[$i][$j]['value'], 'position_label');
+                            $tab[$i][$j]['value'] = functions::xssafe($fileplan->getPosition($fileplan_id, $tab[$i][$j]['value'], 'position_label'));
                             $tab[$i][$j]['label'] = _POSITION_PARENT;
                             $tab[$i][$j]['size'] = '25';
                             $tab[$i][$j]['label_align'] = 'left';
@@ -287,7 +290,7 @@ if (empty($fileplan_id)) {
                             $tab[$i][$j]['order'] = 'parent_position_id';
                         }
                         if ($tab[$i][$j][$value] == 'position_path') {
-                            $tab[$i][$j]['value'] = $fileplan->getPositionPath($fileplan_id, $tab[$i][$j]['value']);
+                            $tab[$i][$j]['value'] = functions::xssafe($fileplan->getPositionPath($fileplan_id, $tab[$i][$j]['value']));
                             $tab[$i][$j]['label'] = _POSITION_PATH;
                             $tab[$i][$j]['size'] = '50';
                             $tab[$i][$j]['label_align'] = 'left';
