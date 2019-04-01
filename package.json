@@ -20,6 +20,8 @@
     "jquery-typeahead": "^2.10.6",
     "jquery.nicescroll": "~3.6.8",
     "jstree-bootstrap-theme": "^1.0.1",
+    "ng2-pdf-viewer": "^5.2.4",
+    "pdfjs-dist": "^2.0.943",
     "photoswipe": "^4.1.2",
     "tinymce": "^4.8.5",
     "tooltipster": "^4.2.6",

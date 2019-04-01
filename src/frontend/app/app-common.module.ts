@@ -10,6 +10,7 @@ import { HttpClientModule }                     from '@angular/common/http';
 import { RouterModule }                         from '@angular/router';
 
 /*PLUGINS IMPORTS*/
+import { PdfViewerModule }                      from 'ng2-pdf-viewer';
 import { TimeAgoPipe }                          from '../plugins/timeAgo.pipe';
 import { TimeLimitPipe }                        from '../plugins/timeLimit.pipe';
 import { FilterListPipe }                       from '../plugins/filterList.pipe';
@@ -40,6 +41,7 @@ import { BasketHomeComponent }                        from './basket/basket-home
         FormsModule,
         HttpClientModule,
         RouterModule,
+        PdfViewerModule,
         AppMaterialModule,
     ],
     declarations: [
@@ -75,6 +77,7 @@ import { BasketHomeComponent }                        from './basket/basket-home
         TimeAgoPipe,
         TimeLimitPipe,
         FilterListPipe,
+        PdfViewerModule,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialTrigger,
         SmdFabSpeedDialActions,

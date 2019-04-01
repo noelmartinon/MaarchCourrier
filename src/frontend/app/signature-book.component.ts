@@ -70,7 +70,6 @@ export class SignatureBookComponent implements OnInit {
     linksViewerLink             : string    = "";
     attachmentsViewerLink       : string    = "";
 
-
     constructor(public http: HttpClient, private route: ActivatedRoute, private router: Router, private zone: NgZone, private notify: NotificationService) {
         
         $j("head style").remove();
@@ -89,6 +88,7 @@ export class SignatureBookComponent implements OnInit {
             componentAfterNotes: () => this.processAfterNotes(),
             componentAfterLinks: () => this.processAfterLinks()
         };
+        (<any>window).pdfWorkerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
 
     prepareSignatureBook() {

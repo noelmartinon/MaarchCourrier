@@ -85,7 +85,11 @@
                     <sup *ngIf="!showTopLeftPanel" class="nbRes" style="position: absolute;right: 6px;top: 5px;">{{signatureBook.documents.length - 1}}</sup>
                     <i *ngIf="showTopLeftPanel" class="fa fa-chevron-up" aria-hidden="true"></i>
                 </div>
-                <iframe *ngIf="leftViewerLink != '' && (leftSelectedThumbnail == 0 || signatureBook.documents[leftSelectedThumbnail].format == 'pdf' || signatureBook.documents[leftSelectedThumbnail].isConverted)" id="leftPanelShowDocumentIframe" [src]="leftViewerLink | safeUrl" [ngStyle]="{'height': showTopLeftPanel ? '84%' : '99%'}"></iframe>
+                <pdf-viewer *ngIf="leftViewerLink != '' && (leftSelectedThumbnail == 0 || signatureBook.documents[leftSelectedThumbnail].format == 'pdf' || signatureBook.documents[leftSelectedThumbnail].isConverted)" id="leftPanelShowDocumentIframe" #leftPanelShowDocumentIframe [src]="leftViewerLink" 
+                                        [render-text]="true" [fit-to-page]="false" [original-size]="true" 
+                                        [ngStyle]="{'height': showTopLeftPanel ? '84%' : '99%'}" [show-all]="true"
+                            ></pdf-viewer>
+                <!-- <iframe *ngIf="leftViewerLink != '' && (leftSelectedThumbnail == 0 || signatureBook.documents[leftSelectedThumbnail].format == 'pdf' || signatureBook.documents[leftSelectedThumbnail].isConverted)" id="leftPanelShowDocumentIframe" [src]="leftViewerLink | safeUrl" [ngStyle]="{'height': showTopLeftPanel ? '84%' : '99%'}"></iframe> -->
                 <div *ngIf="leftSelectedThumbnail > 0 && signatureBook.documents[leftSelectedThumbnail].format != 'pdf' && !signatureBook.documents[leftSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopLeftPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
                     <div style="padding-top: 25%;">Aucun aperçu disponible<br/><sub>La version PDF du fichier "{{signatureBook.documents[leftSelectedThumbnail].title}}.{{signatureBook.documents[leftSelectedThumbnail].format}}" n'est pas disponible.</sub></div>
                     <div class="visaPjView">
@@ -118,7 +122,7 @@
                 <i class="fa fa-chevron-right" aria-hidden="true" *ngIf="!showLeftPanel"></i>
             </div>
             <div *ngIf="signatureBook.hasWorkflow" class="contentShow">
-                <div *ngIf="signatureBook.attachments[rightSelectedThumbnail] && !showAttachmentPanel" style="height:100%;">
+                <div *ngIf="signatureBook.attachments[rightSelectedThumbnail] && !showAttachmentPanel" style="height:100%;overflow: auto;">
                     <div [ngStyle]="{'display': showTopRightPanel ? 'block' : 'none'}" class="pjDetails">
                         <div class="infoPj" title="{{signatureBook.attachments[rightSelectedThumbnail].attachment_type}}">
                             <label>Type : </label>
@@ -168,7 +172,11 @@
                         <i *ngIf="!showTopRightPanel" class="fa fa-list-alt fa-2x" aria-hidden="true"></i>
                         <i *ngIf="showTopRightPanel" class="fa fa-chevron-up" aria-hidden="true"></i>
                     </div>
-                    <iframe id="rightPanelShowDocumentIframe" [src]="rightViewerLink | safeUrl" [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}"></iframe>
+                    <pdf-viewer #rightPanelShowDocumentIframe  id="rightPanelShowDocumentIframe" [src]="rightViewerLink" 
+                                        [render-text]="true" [autoresize]="true" [original-size]="false"
+                                        [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}" [show-all]="true"
+                            ></pdf-viewer>
+                    <!-- <iframe id="rightPanelShowDocumentIframe" [src]="rightViewerLink | safeUrl" [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}"></iframe> -->
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
                         <div style="padding-top: 25%;">Aucun aperçu disponible<br/><sub>La version PDF du fichier "{{signatureBook.attachments[rightSelectedThumbnail].title}}.{{signatureBook.attachments[rightSelectedThumbnail].format}}" n'est pas disponible.</sub></div>
                         <div class="visaPjView">
