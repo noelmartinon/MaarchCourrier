@@ -266,7 +266,9 @@ class UserController
                 $isListInstanceDeletable = false;
             }
             $listInstanceResIds[] = $listInstance['res_id'];
-            $listInstanceEntities[] = $listInstance['destination'];
+            if (!empty($listInstance['destination'])) {
+                $listInstanceEntities[] = $listInstance['destination'];
+            }
         }
 
         $listTemplateEntities = [];
