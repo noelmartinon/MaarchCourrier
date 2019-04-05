@@ -8,6 +8,7 @@ apps/maarch_entreprise/xml/log4php.xml
 *.log
 xdelete.sh
 test/unitTests/build/
+modules/ldap/xml/config.xml
 apps/maarch_entreprise/js/angular/main.bundle.js
 modules/convert/batch/scripts/launch_fulltext_letterbox.sh
 modules/convert/batch/scripts/launch_convert_letterbox.sh
