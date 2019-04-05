@@ -18,9 +18,12 @@ class ServiceController
             $servicesStoredInDB[] = $value['service_id'];
         }
 
-        $menu = ServiceModel::getApplicationServicesByUserServices(['userServices' => $servicesStoredInDB, 'type' => 'menu']);
-        $menuModules = ServiceModel::getModulesServicesByUserServices(['userServices' => $servicesStoredInDB, 'type' => 'menu']);
-        $menu = array_merge($menu, $menuModules);
+        $menu = [];
+        if (!empty($servicesStoredInDB)) {
+            $menu = ServiceModel::getApplicationServicesByUserServices(['userServices' => $servicesStoredInDB, 'type' => 'menu']);
+            $menuModules = ServiceModel::getModulesServicesByUserServices(['userServices' => $servicesStoredInDB, 'type' => 'menu']);
+            $menu = array_merge($menu, $menuModules);
+        }
 
         return $menu;
     }
