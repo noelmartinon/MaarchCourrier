@@ -754,7 +754,7 @@ switch ($mode) {
                     $positions_array = $fileplan->getPositionsTree($fileplan_id, $positions_array);
                     for ($i=0; $i < count($positions_array); $i++) {
                         //Is enable ?
-                        if ($fileplan->isEnable($fileplan_id, $positions_array[$i]['ID'])) {
+                        if ($fileplan->isEnable($fileplan_id, $positions_array[$i]['ID']) && $position_id != $positions_array[$i]['ID']) {
                             //Is Selected?
                             ($positionArray[0]['PARENT_ID'] == $positions_array[$i]['ID'])?
                                 $selected = ' selected="selected"' : $selected = '';
