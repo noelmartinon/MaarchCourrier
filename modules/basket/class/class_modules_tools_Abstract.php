@@ -972,21 +972,23 @@ abstract class basket_Abstract extends Database
             || (!isset($_SESSION['user']['UserId']))
         ) {
             $stmt = $db->query(
-                "select group_id from " . USERGROUP_CONTENT_TABLE
-                . " where primary_group = 'Y' and user_id = ?",array($tmpUser));
+                "select group_id from usergroup_content where user_id = ?",array($tmpUser));
 
+            $groups = [];
+            while ($res = $stmt->fetchObject()) {
+                $groups[] = $res->group_id;
+            }
+            $stmt = $db->query("select group_id, sequence, can_redirect, can_delete, can_insert, result_page, redirect_basketlist, list_lock_clause, sublist_lock_clause, redirect_grouplist from groupbasket where group_id in (?) and basket_id = ?", array($groups, $basketId));
             $res = $stmt->fetchObject();
             $primaryGroup = $res->group_id;
         } else {
             $primaryGroup = $_SESSION['user']['primarygroup'];
+            $stmt = $db->query(
+                "select sequence, can_redirect, can_delete, can_insert, result_page, redirect_basketlist, list_lock_clause, "
+                ."sublist_lock_clause, redirect_grouplist from groupbasket where group_id = ? and basket_id = ? ",array($primaryGroup,$basketId));
+            $res = $stmt->fetchObject();
         }
-        $stmt = $db->query(
-            "select  sequence, can_redirect, can_delete, can_insert, "
-            . "result_page, redirect_basketlist, list_lock_clause, "
-            ."sublist_lock_clause, redirect_grouplist from "
-            . GROUPBASKET_TABLE . " where group_id = ? and basket_id = ? ",array($primaryGroup,$basketId));
 
-        $res = $stmt->fetchObject();
 
         $basketIdPage = $res->result_page;
         $tab['id_page'] = $basketIdPage;
