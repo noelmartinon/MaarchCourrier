@@ -37,9 +37,7 @@ class ContactController
 
         $data = $request->getParams();
 
-        $check = Validator::notEmpty()->validate($data['firstname']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['lastname']);
-        $check = $check && Validator::intVal()->notEmpty()->validate($data['contactType']);
+        $check = Validator::intVal()->notEmpty()->validate($data['contactType']);
         $check = $check && Validator::intVal()->notEmpty()->validate($data['contactPurposeId']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['isCorporatePerson']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['email']);
