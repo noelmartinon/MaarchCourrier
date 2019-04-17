@@ -248,7 +248,11 @@ if (! empty($_SESSION['error'])) {
                 exit;
             }
         } else {
-            $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $login]);
+            if (!empty($_SESSION['config']['enhancedPassword'])) {
+                $error = \Core\Controllers\AuthenticationController::handleFailedAuthentication(['userId' => $login]);
+            } else {
+                $error = _BAD_LOGIN_OR_PSW;
+            }
             $_SESSION['error'] = $error;
             header(
                 'location: ' . $_SESSION['config']['businessappurl']
