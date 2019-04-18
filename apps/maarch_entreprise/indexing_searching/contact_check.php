@@ -40,7 +40,7 @@ if(empty($_POST['contact_id']) || $_POST['category'] == 'outgoing'){
 	$whereSec = $user->get_global_security();
 
 	//IF EXTERNAL CONTACT
-	if (is_numeric($_POST['contact_id'])) {
+	if (!empty(trim($_POST['address_id']))) {
 		$where = "status <> 'DEL' AND contact_id = ".$_POST['contact_id']." AND address_id = ".$_POST['address_id']
 			." AND (creation_date >= " . $db->current_datetime() . " - INTERVAL '".$_SESSION['check_days_before']."' DAY)";
 		$wherePDO = "status <> 'DEL' AND contact_id = ? AND address_id = ? AND (creation_date >= " . $db->current_datetime() . " - INTERVAL '".$_SESSION['check_days_before']."' DAY)";
