@@ -53,6 +53,9 @@ class ContactController
         }
         if ($data['isCorporatePerson'] != 'Y') {
             $data['isCorporatePerson'] = 'N';
+            if (!Validator::stringType()->notEmpty()->validate($data['lastname'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body lastname is empty or not a string']);
+            }
         } else {
             $data['addressFirstname'] = $data['firstname'];
             $data['addressLastname'] = $data['lastname'];
