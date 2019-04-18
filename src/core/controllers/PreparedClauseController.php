@@ -119,7 +119,7 @@ class PreparedClauseController
             for ($i = 0; $i < $total; $i++) {
                 $aEntities = [];
                 $tmpImmediateChildrens = str_replace("'", '', $immediateChildrens[1][$i]);
-                if (preg_match('/,/' , $tmpImmediateChildrens)) {
+                if (preg_match('/,/', $tmpImmediateChildrens)) {
                     $aEntities = preg_split('/,/', $tmpImmediateChildrens);
                 } else {
                     $aEntities[] = $tmpImmediateChildrens;
@@ -169,8 +169,13 @@ class PreparedClauseController
         if ($total > 0) {
             for ($i = 0; $i < $total; $i++) {
                 $tmpSisterEntity = trim(str_replace("'", '', $sistersEntities[1][$i]));
-                $sisterEntity = EntityModel::getById(['entityId' => $tmpSisterEntity, 'select' => ['parent_entity_id']]);
-                $allSisterEntities = EntityModel::get(['select' => ['entity_id'], 'where' => ['parent_entity_id = ?'], 'data' => [$sisterEntity['parent_entity_id']]]);
+                if (!empty($tmpSisterEntity)) {
+                    $sisterEntity = Entitymodel::getById(['entityId' => $tmpSisterEntity, 'select' => ['parent_entity_id']]);
+                }
+                $allSisterEntities = [];
+                if (!empty($sisterEntity)) {
+                    $allSisterEntities = EntityModel::get(['select' => ['entity_id'], 'where' => ['parent_entity_id = ?'], 'data' => [$sisterEntity['parent_entity_id']]]);
+                }
 
                 $allSisterEntitiesClause = '';
                 foreach ($allSisterEntities as $key => $allSisterEntity) {
@@ -208,7 +213,7 @@ class PreparedClauseController
             }
         }
 
-        return $clause;
+        return "({$clause})";
     }
 
     public static function isRequestValid(array $aArgs)
@@ -236,5 +241,4 @@ class PreparedClauseController
 
         return true;
     }
-
 }
