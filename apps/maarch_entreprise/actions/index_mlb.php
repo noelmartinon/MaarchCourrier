@@ -1799,8 +1799,9 @@ function manage_form($arrId, $history, $actionId, $label_action, $status, $collI
             $queryExtValues .= "'Y',";
         } else {
             $contactId = get_value_fields($formValues, 'contactid');
+            $addressId = get_value_fields($formValues, 'addressid');
 
-            if (!ctype_digit($contactId)) {
+            if (empty(trim($addressId))) {
                 $contactType = 'internal';
             } else {
                 $contactType = 'external';
@@ -1826,7 +1827,6 @@ function manage_form($arrId, $history, $actionId, $label_action, $status, $collI
                     $queryExtValues .= ' ?,';
                     $arrayPDO = array_merge($arrayPDO, array($contactId));
                 }
-                $addressId = get_value_fields($formValues, 'addressid');
                 $queryExtFields .= 'address_id,';
                 $queryExtValues .= ' ?,';
                 $arrayPDO = array_merge($arrayPDO, array($addressId));
