@@ -92,12 +92,15 @@ class DoctypeIndexesModelAbstract
                     $order        = (string) $tableXml->order;
 
 
-                    $res = DatabaseModel::select([
-                        'select'   => [$foreignKey, $foreignLabel],
-                        'table'    => [$tableName],
-                        'where'    => [$whereClause],
-                        'order_by' => [str_ireplace("order by", "", $order)]
-                    ]);
+                    $res = [];
+                    if (!empty($tableName)) {
+                        $res = DatabaseModel::select([
+                            'select'   => [$foreignKey, $foreignLabel],
+                            'table'    => [$tableName],
+                            'where'    => empty($whereClause) ? [] : [$whereClause],
+                            'order_by' => [str_ireplace("order by", "", $order)]
+                        ]);
+                    }
 
                     foreach ($res as $value) {
                         $values[] = [
