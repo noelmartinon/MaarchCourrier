@@ -129,12 +129,13 @@ if (empty($userEntities)) {
     $userEntities = [''];
 }
 
-$userTemplates = \SrcCore\models\DatabaseModel::select(['select' => ['distinct t.template_id', 't.template_label', 't.template_content'],
-                                                    'table' => ['templates t', 'templates_association ta'],
-                                                    'left_join' => ['t.template_id = ta.template_id'],
-                                                    'where' => ['t.template_target = \'sendmail\'', '(ta.value_field is null or value_field in (?))'],
-                                                    'data' => [$userEntities],
-                                                ]);
+$userTemplates = \SrcCore\models\DatabaseModel::select([
+    'select'    => ['distinct t.template_id', 't.template_label', 't.template_content'],
+    'table'     => ['templates t', 'templates_association ta'],
+    'left_join' => ['t.template_id = ta.template_id'],
+    'where'     => ['t.template_target = \'sendmail\'', 'value_field in (?)'],
+    'data'      => [$userEntities],
+]);
 
 //ADD
 if ($mode == 'add') {
