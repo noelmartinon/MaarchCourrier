@@ -72,20 +72,27 @@ while ($state <> 'END') {
                 //--> Set from
                 $userInfo = $users->get_user($email->user_id);
 
+                $unwantedArray = ['Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+                    'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
+                    'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
+                    'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
+                    'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y'];
                 if ($userInfo['mail'] == $email->sender_email) {
                     if (!empty($mailfrom_generic)) {
                         $GLOBALS['logger']->write('process e-mail '.($currentEmail+1)."/".$totalEmailsToProcess.' (FROM => '.$userInfo['firstname'].' '.$userInfo['lastname'].' <'.$mailfrom_generic.'>'.', TO => '.$email->to_list.', SUBJECT => '.$email->email_object.', CC =>'.$email->cc_list.', CCI => '.$email->cci_list.') ...', 'INFO');
 
-                        $GLOBALS['mailer']->setFrom($userInfo['firstname'].' '
-                            . $userInfo['lastname'].' <'.$mailfrom_generic.'> ');
+                        $setFrom = $userInfo['firstname'].' ' . $userInfo['lastname'].' <'.$mailfrom_generic.'> ';
+                        $setFrom = strtr($setFrom, $unwantedArray);
+                        $GLOBALS['mailer']->setFrom($setFrom);
                         $emailFrom = $mailfrom_generic;
                         $email->email_body = 'Courriel envoyé par : ' . $userInfo['firstname'].' '
                             . $userInfo['lastname'] . ' ' . $email->sender_email . ' ' .  '.<br/><br/>' . $email->email_body;
                     } else {
                         $GLOBALS['logger']->write('process e-mail '.($currentEmail+1)."/".$totalEmailsToProcess.' (FROM => '.$userInfo['firstname'].' '.$userInfo['lastname'].' <'.$email->sender_email.'>'.', TO => '.$email->to_list.', SUBJECT => '.$email->email_object.', CC =>'.$email->cc_list.', CCI => '.$email->cci_list.') ...', 'INFO');
 
-                        $GLOBALS['mailer']->setFrom($userInfo['firstname'].' '
-                            . $userInfo['lastname'].' <'.$email->sender_email.'> ');
+                        $setFrom = $userInfo['firstname'].' ' . $userInfo['lastname'].' <'.$email->sender_email.'> ';
+                        $setFrom = strtr($setFrom, $unwantedArray);
+                        $GLOBALS['mailer']->setFrom($setFrom);
                         $emailFrom = $email->sender_email;
                     }
                     $GLOBALS['mailer']->setReplyTo($email->sender_email);
@@ -93,15 +100,19 @@ while ($state <> 'END') {
                     if (!empty($mailfrom_generic)) {
                         $mailsEntities = $sendmail_tools->getAttachedEntitiesMails();
                         $entityShortLabel = substr($mailsEntities[$email->sender_email], 0, strrpos($mailsEntities[$email->sender_email], "("));
-                            
-                        $GLOBALS['mailer']->setFrom($entityShortLabel . ' <' . $mailfrom_generic. '> ');
+
+                        $setFrom = $entityShortLabel . ' <' . $mailfrom_generic. '> ';
+                        $setFrom = strtr($setFrom, $unwantedArray);
+                        $GLOBALS['mailer']->setFrom($setFrom);
                         $emailFrom = $mailfrom_generic;
                         $email->email_body = 'Courriel envoyé par : ' . $entityShortLabel . ' ' . $sendmail_tools->explodeSenderEmail($email->sender_email) . ' ' .  '.<br/><br/>' . $email->email_body;
                     } else {
                         $mailsEntities = $sendmail_tools->getAttachedEntitiesMails();
                         $entityShortLabel = substr($mailsEntities[$email->sender_email], 0, strrpos($mailsEntities[$email->sender_email], "("));
 
-                        $GLOBALS['mailer']->setFrom($entityShortLabel . ' <' . $sendmail_tools->explodeSenderEmail($email->sender_email) . '> ');
+                        $setFrom = $entityShortLabel . ' <' . $sendmail_tools->explodeSenderEmail($email->sender_email) . '> ';
+                        $setFrom = strtr($setFrom, $unwantedArray);
+                        $GLOBALS['mailer']->setFrom($setFrom);
                         $emailFrom = $sendmail_tools->explodeSenderEmail($email->sender_email);
                     }
                     $GLOBALS['mailer']->setReplyTo($sendmail_tools->explodeSenderEmail($email->sender_email));
