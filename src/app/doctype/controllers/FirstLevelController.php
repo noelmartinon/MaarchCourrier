@@ -34,16 +34,19 @@ class FirstLevelController
 
     public static function getTreeFunction()
     {
-        $firstLevels = FirstLevelModel::get(['where' => ['enabled = ?'], 'data' => ['Y'], 'order_by' => ['doctypes_first_level_id asc']]);
+        $firstLevels = FirstLevelModel::get([
+            'where'    => ['enabled = ?'],
+            'data'     => ['Y'],
+            'orderBy'  => ['doctypes_first_level_label asc']]);
         $secondLevels = SecondLevelModel::get([
             'where'    => ['enabled = ?'],
             'data'     => ['Y'],
-            'order_by' => ['doctypes_second_level_label asc']
+            'orderBy'  => ['doctypes_second_level_label asc']
         ]);
         $docTypes = DoctypeModel::get([
             'where'    => ['enabled = ?'],
             'data'     => ['Y'],
-            'order_by' => ['description asc']
+            'orderBy'  => ['description asc']
         ]);
 
         $structure = [];
