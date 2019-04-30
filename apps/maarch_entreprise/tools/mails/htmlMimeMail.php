@@ -687,12 +687,12 @@ class htmlMimeMail
     * Function to encode a header if necessary
     * according to RFC2047
     */
-    public function _encodeHeader($input, $charset = 'ISO-8859-1')
+    public function _encodeHeader($input, $charset = 'ISO-8859-15')
     {
-        preg_match_all('/(\s?\w*[\x80-\xFF]+\w*\s?)/', $input, $matches);
-        foreach ($matches[1] as $value) {
-            $replacement = @preg_replace('/([\x20\x80-\xFF])/e', '"=" . strtoupper(dechex(ord("\1")))', $value);
-            $input = str_replace($value, '=?' . $charset . '?Q?' . $replacement . '?=', $input);
+        $m = preg_match_all('/(\w*[\x80-\xFF]+\w*)/', $input, $matches);
+        if ($m) {
+            mb_internal_encoding('UTF-8');
+            $input=mb_encode_mimeheader($input,$charset, 'Q');
         }
         
         return $input;
@@ -719,15 +719,13 @@ class htmlMimeMail
             case 'mail':
                 $subject = '';
                 if (!empty($this->headers['Subject'])) {
-                    //subject = $this->_encodeHeader($this->header['Subject'], $this->build_params['head_charset']);
-                    $subject = $this->headers['Subject'];
+                    $subject = $this->_encodeHeader($this->header['Subject'], $this->build_params['head_charset']);
                     unset($this->headers['Subject']);
                 }
 
                 // Get flat representation of headers
                 foreach ($this->headers as $name => $value) {
-                    //$headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
-                    $headers[] = $name . ': ' . $value;
+                    $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
                 }
 
                 //$to = $this->_encodeHeader(implode(', ', $recipients), $this->build_params['head_charset']);
@@ -750,8 +748,7 @@ class htmlMimeMail
             case 'sendmail':
                 // Get flat representation of headers
                 foreach ($this->headers as $name => $value) {
-                    //$headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
-                    $headers[] = $name . ': ' . $value;
+                    $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
                 }
     
                 // Encode To:
@@ -807,12 +804,7 @@ class htmlMimeMail
                     if ($name == 'Bcc') {
                         continue;
                     }
-                    //ajout d'une condition pour subject, car _encodeHeader ne prend pas les caract�res sp�ciaux avec php7 en revanche fonctionne tr�s bien avec php5.6
-                    if ($name == 'Subject') {
-                        $headers[] = $name . ': ' . $value;
-                    } else {
-                        $headers[] = $name . ': ' . $value;
-                    }
+                    $headers[] = $name . ': ' . $this->_encodeHeader($value, $this->build_params['head_charset']);
                 }
                 // Add To header based on $recipients argument
                 //$headers[] = 'To: ' . $this->_encodeHeader(implode(', ', $recipients), $this->build_params['head_charset']);

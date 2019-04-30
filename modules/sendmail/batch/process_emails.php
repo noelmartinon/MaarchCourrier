@@ -5,6 +5,18 @@
 // load the config and prepare to process
 include('load_process_emails.php');
 
+require '../../../vendor/autoload.php';
+
+new \SrcCore\models\DatabasePDO([
+    'server'   => $_SESSION['config']['databaseserver'],
+    'port'     => $_SESSION['config']['databaseserverport'],
+    'user'     => $_SESSION['config']['databaseuser'],
+    'password' => $_SESSION['config']['databasepassword'],
+    'name'     => $_SESSION['config']['databasename'],
+    'type'     => $_SESSION['config']['databasetype'],
+]);
+
+
 /* begin */
 $state = 'LOAD_EMAILS';
 while ($state <> 'END') {
