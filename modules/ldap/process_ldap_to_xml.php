@@ -43,7 +43,7 @@ function fusionTableau($list_users,$user_fields_nodename){
 //Arguments
 
 if( !isset($argv) )
-	exit(htmlentities("Ce script ne peut-etre appelé qu'en PHP CLI"));
+	exit(htmlentities("Ce script ne peut-etre appelÃ© qu'en PHP CLI"));
 
 else if( isset($argv) && count($argv) < 2)
 	exit("Erreur de Syntaxe !\nLa syntaxe est $argv[0] <fichier de conf xml> <xml de sortie>");
@@ -68,15 +68,15 @@ catch(Exception $e)
 
 $xp_ldap_conf = new domxpath($ldap_conf);
 
-foreach($xp_ldap_conf->query("/root/config/*") as $cf)
+foreach($xp_ldap_conf->query("/root/config/ldap/*") as $cf)
 	${$cf->nodeName} = $cf->nodeValue;
 
-//Si une class custom est définie
+//Si une class custom est dÃ©finie
 echo "type ldap : ".$type_ldap."\n";
 if( file_exists(dirname($ldap_conf_file)."/../class/class_".$type_ldap.".php") )
 	include(dirname($ldap_conf_file)."/../class/class_".$type_ldap.".php");
 
-//Sinon si la class est définie pour le module	
+//Sinon si la class est dÃ©finie pour le module	
 else if( file_exists(dirname($ldap_conf_file)."/../../../../../modules/ldap/class/class_".$type_ldap.".php") )
 	include(dirname($ldap_conf_file)."/../../../../../modules/ldap/class/class_".$type_ldap.".php");
 
@@ -99,7 +99,7 @@ try
 }
 catch(Exception $con_failure)
 {
-	exit("Impossible de se connecter à l'annuaire\n
+	exit("Impossible de se connecter Ã  l'annuaire\n
 		Erreur : ".$con_failure->getMessage()."\n");
 }
 
@@ -170,7 +170,7 @@ foreach( $xp_ldap_conf->query("/root/filter/dn/@id") as $dn)
 }
 unset($i);
 
-//Aucun DN de défini : on prend tout l'annuaire en mode organization
+//Aucun DN de dÃ©fini : on prend tout l'annuaire en mode organization
 if(count($dn_and_filter) < 1)
 {   
 	//echo "dn and filter <1 \n";
@@ -230,11 +230,11 @@ function createUserNode($parent,$user)
 		}
 		else if($k_fd == "memberof" && count($v_fd) < 1)
 		{
-			//Si l'utilisateur n'est membre d'aucun groupe : Rien à faire
+			//Si l'utilisateur n'est membre d'aucun groupe : Rien Ã  faire
 		}
 		else if($k_fd == 'role')
 		{
-			//Traité dans memberof
+			//TraitÃ© dans memberof
 		}	
 		else{
 			//var_dump($out_xml);
@@ -281,7 +281,7 @@ function createGroupNode($parent,$group)
 		}
 		else if($k_fd == "memberof" && count($v_fd) < 1)
 		{
-			//Si le groupe n'est membre d'aucun groupe : Rien à faire
+			//Si le groupe n'est membre d'aucun groupe : Rien Ã  faire
 		}
 		else
 			$g_node->appendChild($out_xml->createElement($k_fd,$v_fd));

@@ -85,7 +85,7 @@ catch(PDOException $e) {
 
 $xp_ldap_conf = new domxpath($ldap_conf);
 
-foreach($xp_ldap_conf->query("/root/config/*") as $cf)
+foreach($xp_ldap_conf->query("/root/config/ldap/*") as $cf)
     ${$cf->nodeName} = $cf->nodeValue;
 
 //Si une class custom est définie
