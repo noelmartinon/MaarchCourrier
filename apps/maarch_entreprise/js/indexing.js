@@ -771,9 +771,18 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
                     }
 
                     if(cat_id != 'outgoing'){
-                        $('choose_file_div').show();
+                        $j("#choose_file").on("load", function () {
+                            $j("#choose_file").off();
+                            $j('#choose_file_div').show();
+                            $j('#choose_file').contents().find('#with_file').click();
+                        });                        
                     }else{
-                        $('choose_file_div').hide();
+                        $j("#choose_file").on("load", function () {
+                            $j("#choose_file").off();
+                            $j('#choose_file').contents().find('#with_file2')[0].click();
+                            $j('#choose_file_div').hide();
+                            console.log('o');
+                        });
                     }
 
                     if(origin != 'init'){
