@@ -5,7 +5,7 @@
         <Lang>fr</Lang> <!-- fr, en-->
         <MaarchDirectory>/var/www/html/MaarchCourrier/</MaarchDirectory>
         <customID></customID>
-        <MaarchUrl>http://preview.maarchcourrier.com</MaarchUrl>
+        <MaarchUrl>https://demo.maarchcourrier.com</MaarchUrl>
         <MaarchApps>maarch_entreprise</MaarchApps>
         <TmpDirectory>/var/www/html/MaarchCourrier/modules/notifications/batch/tmp/</TmpDirectory>
         <debugmode>
