@@ -333,8 +333,8 @@ class EntityModelAbstract
         $aUsers = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users_entities, users'],
-            'where'     => ['users_entities.entity_id = ?', 'users_entities.user_id = users.user_id'],
-            'data'      => [$aArgs['id']]
+            'where'     => ['users_entities.entity_id = ?', 'users_entities.user_id = users.user_id', 'users.status != ?'],
+            'data'      => [$aArgs['id'], 'DEL']
         ]);
 
         return $aUsers;
