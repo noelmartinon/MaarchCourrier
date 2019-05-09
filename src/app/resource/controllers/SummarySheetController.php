@@ -21,6 +21,7 @@ use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
+use Parameter\models\ParameterModel;
 use Priority\models\PriorityModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
@@ -205,7 +206,12 @@ class SummarySheetController
             $units[$key] = (array)$unit;
             $unit        = (array)$unit;
             if ($unit['unit'] == 'qrcode') {
-                $qrCode = new QrCode($resource['res_id']);
+                $parameter = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
+                $prefix = '';
+                if ($parameter['param_value_int'] == 1) {
+                    $prefix = 'Maarch_';
+                }
+                $qrCode = new QrCode($prefix . $resource['res_id']);
                 $qrCode->setSize(110);
                 $qrCode->setMargin(25);
                 $pdf->Image('@'.$qrCode->writeString(), 21, 10, 50, 50);

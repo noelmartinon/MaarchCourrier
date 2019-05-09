@@ -245,7 +245,12 @@ class PrintControler extends PrintFunctions
 				//INITIATOR
                 if (!empty($resId)) {
                     $filename_QR = $_SESSION['config']['tmppath'].DIRECTORY_SEPARATOR.$_SESSION['user']['UserId'] . time() . rand() ."_QRCODE.png";
-                    QRcode::png($resId, $filename_QR);
+                    $parameter = \Parameter\models\ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
+                    $prefix = '';
+                    if ($parameter['param_value_int'] == 1) {
+                        $prefix = 'Maarch_';
+                    }
+                    QRcode::png($prefix . $resId, $filename_QR);
 
                     $pdf->Image($filename_QR, 7, 3);
                 }
