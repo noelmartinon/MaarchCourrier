@@ -1126,7 +1126,7 @@ abstract class visa_Abstract extends Database
 
             if ($pdf_exist == false) {
                 $isVersionString = ($isVersion) ? 'true' : 'false';
-                $collIdConv = ($from_res_attachment) ? 'attachments_coll' : 'leterbox_coll';
+                $collIdConv = ($from_res_attachment) ? 'attachments_coll' : 'letterbox_coll';
                 
                 $viewLinkHtml = '<a id="gen_'.$idFile.'" style="cursor:pointer;" title="'._GENERATE_PDF .'" target="_blank" onclick="generatePdf(\''.$idFile.'\',\''.$collIdConv.'\',\''.$isVersionString.'\')">'
                     .'<i id="spinner_'.$idFile.'" class="fa fa-sync-alt fa-2x" title="'._GENERATE_PDF.'"></i>'
