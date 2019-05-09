@@ -189,13 +189,13 @@ else if($period_type == 'custom_period')
 
 	if(isset($_REQUEST['date_start']) && $_REQUEST['date_start'] <> '')
 	{
-		$where_date  .= " AND ".$req->extract_date('creation_date')." > '".$db->format_date_db($_REQUEST['date_start'])."'";
+		$where_date  .= " AND ".$req->extract_date('creation_date')." >= '".$db->format_date_db($_REQUEST['date_start'])."'";
 		$date_title .= strtolower(_SINCE).' '.$_REQUEST['date_start'].' ';
 	}
 
 	if(isset($_REQUEST['date_fin']) && $_REQUEST['date_fin'] <> '')
 	{
-		$where_date  .= " AND ".$req->extract_date('creation_date')." < '".$db->format_date_db($_REQUEST['date_fin'])."'";
+		$where_date  .= " AND ".$req->extract_date('creation_date')." <= '".$db->format_date_db($_REQUEST['date_fin'])."'";
 		$date_title.= strtolower(_FOR).' '.$_REQUEST['date_fin'].' ';
 	}
 	if(empty($where_date))
