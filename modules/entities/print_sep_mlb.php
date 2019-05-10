@@ -58,7 +58,13 @@ if(isset($_REQUEST['entitieslist']) && !empty($_REQUEST['entitieslist'])) {
             $code = "*MAARCH " . $entity . "*";
             // create a QR Code with this text and display it
             $filename_QR = $_SESSION['config']['tmppath'].DIRECTORY_SEPARATOR.$_SESSION['user']['UserId'] . time() . rand() ."_QRCODE.png";
-            QRcode::png($entity,$filename_QR, QR_ECLEVEL_L, 4);
+
+            $parameter = \Parameter\models\ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
+            $prefix = '';
+            if ($parameter['param_value_int'] == 1) {
+                $prefix = 'MAARCH_';
+            }
+            QRcode::png($prefix . $entity, $filename_QR, QR_ECLEVEL_L, 4);
 
         }else{
             $code = "MAARCH " . $entity;

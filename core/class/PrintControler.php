@@ -248,7 +248,7 @@ class PrintControler extends PrintFunctions
                     $parameter = \Parameter\models\ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
                     $prefix = '';
                     if ($parameter['param_value_int'] == 1) {
-                        $prefix = 'Maarch_';
+                        $prefix = 'MAARCH_';
                     }
                     QRcode::png($prefix . $resId, $filename_QR);
 

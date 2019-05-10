@@ -209,7 +209,7 @@ class SummarySheetController
                 $parameter = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
                 $prefix = '';
                 if ($parameter['param_value_int'] == 1) {
-                    $prefix = 'Maarch_';
+                    $prefix = 'MAARCH_';
                 }
                 $qrCode = new QrCode($prefix . $resource['res_id']);
                 $qrCode->setSize(110);
