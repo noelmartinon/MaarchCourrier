@@ -19,7 +19,6 @@ use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
-use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
@@ -59,9 +58,9 @@ class ConvertPdfController
         ValidatorModel::boolType($aArgs, ['isVersion']);
 
         if ($aArgs['collId'] == 'letterbox_coll') {
-            $resource = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['docserver_id', 'path', 'filename']]);
+            $resource = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['docserver_id', 'path', 'filename', 'format']]);
         } else {
-            $resource = AttachmentModel::getById(['id' => $aArgs['resId'], 'isVersion' => $aArgs['isVersion'], 'select' => ['docserver_id', 'path', 'filename']]);
+            $resource = AttachmentModel::getById(['id' => $aArgs['resId'], 'isVersion' => $aArgs['isVersion'], 'select' => ['docserver_id', 'path', 'filename', 'format']]);
         }
 
         if (empty($resource)) {
@@ -80,6 +79,9 @@ class ConvertPdfController
         }
 
         $docInfo = pathinfo($pathToDocument);
+        if (empty($docInfo['extension'])) {
+            $docInfo['extension'] = $resource['format'];
+        }
 
         $canConvert = ConvertPdfController::canConvert(['extension' => $docInfo['extension']]);
         if (!$canConvert) {
