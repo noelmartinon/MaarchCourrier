@@ -146,7 +146,18 @@ export class TemplateAdministrationComponent implements OnInit {
                 theme_buttons3_add: "separator,print,separator,ltr,rtl,separator,fullscreen,separator,insertlayer,moveforward,movebackward,absolut",
                 theme_toolbar_align: "left",
                 theme_advanced_toolbar_location: "top",
-                theme_styles: "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1"
+                theme_styles: "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1",
+                setup: (ed :any) => {
+                    ed.on('keyup', (e: any) => {
+                        if (this.template.template_type == 'HTML' && tinymce.get('templateHtml') != null) {
+                            this.template.template_content = tinymce.get('templateHtml').getContent();
+                        }
+                        if (this.template.template_type == 'OFFICE_HTML' && tinymce.get('templateOfficeHtml') != null) {
+                            this.template.template_content = tinymce.get('templateOfficeHtml').getContent();
+                        }
+                    });
+                }
+                
             });
         }, 20);
     }
@@ -286,22 +297,25 @@ export class TemplateAdministrationComponent implements OnInit {
             this.template.template_datasource = 'letterbox_attachment';
         }
 
-        if (this.template.template_style != 'uploadFile' && !this.template.jnlpUniqueId && !this.template.template_file_name && this.template.template_style && (this.template.template_type == 'OFFICE' || this.template.template_type == 'OFFICE_HTML')) {
-            alert(this.lang.editModelFirst);
-            return;
-        }
-
         if (this.template.template_type == 'HTML') {
             this.template.template_content = tinymce.get('templateHtml').getContent();
-        }
-        if (this.template.template_type == 'OFFICE_HTML') {
-            this.template.template_content = tinymce.get('templateOfficeHtml').getContent();
 
-            if (this.template.template_content == '' && !this.template.template_style) {
+        } else if (this.template.template_type == 'OFFICE_HTML') {
+            this.template.template_content = tinymce.get('templateOfficeHtml').getContent();
+        }
+
+        if (this.template.template_target == 'acknowledgementReceipt') {
+            if (this.template.template_content == '' && (!this.template.template_style || (this.template.template_style && !this.template.jnlpUniqueId && !this.template.uploadedFile && !this.template.template_file_name))) {
                 alert(this.lang.mustCompleteAR);
                 return;
             }
+        } else if (this.template.template_target != 'acknowledgementReceipt' && this.template.template_type == 'OFFICE') {
+            if (!this.template.template_style || (this.template.template_style && !this.template.jnlpUniqueId && !this.template.template_file_name)) {
+                alert(this.lang.editModelFirst);
+                return;
+            }
         }
+        
         if (this.creationMode) {
             if (this.template.template_style == 'uploadFile') {
                 this.template.template_style = '';
@@ -344,6 +358,15 @@ export class TemplateAdministrationComponent implements OnInit {
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
+        }
+    }
+
+    checkArMode() {
+        if (this.template.template_content == '' && !this.template.template_style && this.template.target === 'acknowledgementReceipt') {
+            alert(this.lang.mustCompleteAR);
+            return true;
+        } else {
+            return false;
         }
     }
 

@@ -106,7 +106,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field *ngIf="creationMode || template.template_style">
                                     <mat-select id="template_style" [disabled]="!creationMode" name="template_style" title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
-                                        [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()">
+                                        [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()" [required]="template.template_target!='acknowledgementReceipt'">
                                         <mat-optgroup label="{{lang.loadedFile}} :">
                                             <mat-option class="selectFile" (click)="clickOnUploader('uploadSignFileOffice')" value="uploadFile">
                                                 <mat-icon class="fa fa-paperclip" color="primary" style="height:auto;"></mat-icon> {{buttonFileName}}
@@ -131,7 +131,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <textarea matInput [(ngModel)]="template.template_content" name="templateTxt" id="templateTxt" placeholder="{{lang.contentTxtTemplate}}"
-                                        title="{{lang.contentTxtTemplate}}" matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="5">
+                                        title="{{lang.contentTxtTemplate}}" matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="5" [required]="template.template_target!='acknowledgementReceipt'">
                                     </textarea>
                                 </mat-form-field>
                             </div>
@@ -139,7 +139,7 @@
                         <div class="form-group" *ngIf="template.template_type=='HTML'">
                             <div class="col-sm-12">
                                 <div id="html_mode" style="display: block; width:100%;">
-                                    <textarea [(ngModel)]="template.template_content" name="templateHtml" id="templateHtml" style="width:100%" rows="15" cols="60"></textarea>
+                                    <textarea [(ngModel)]="template.template_content" name="templateHtml" id="templateHtml" style="width:100%" rows="15" cols="60" [required]="template.template_target!='acknowledgementReceipt'"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -162,7 +162,7 @@
                                 <mat-tab label="{{lang.electronicTemplate}}">
                                     <div class="col-sm-12">
                                         <div id="html_mode" style="display: block; width:100%;">
-                                            <textarea [(ngModel)]="template.template_content" name="templateOfficeHtml" id="templateOfficeHtml" style="width:100%" rows="15" cols="60"></textarea>
+                                            <textarea [(ngModel)]="template.template_content" name="templateOfficeHtml" id="templateOfficeHtml" style="width:100%" rows="15" cols="60" [required]="template.template_target!='acknowledgementReceipt'"></textarea>
                                         </div>
                                     </div>
                                 </mat-tab>
@@ -177,7 +177,7 @@
                                     <div class="col-sm-12">
                                         <mat-form-field>
                                             <mat-select id="template_style" [disabled]="!creationMode && template.template_file_name != null" name="template_style" title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
-                                                [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()">
+                                                [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()" [required]="template.template_target!='acknowledgementReceipt'">
                                                 <mat-optgroup label="{{lang.loadedFile}} :">
                                                     <mat-option (click)="clickOnUploader('uploadSignFileOfficeHtml')" style="text-align: center;" value="uploadFile">
                                                         <mat-icon class="fa fa-paperclip" color="primary" style="height:auto;"></mat-icon> {{buttonFileName}}
