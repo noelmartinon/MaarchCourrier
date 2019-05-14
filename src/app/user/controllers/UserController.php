@@ -230,15 +230,19 @@ class UserController
             $set['change_password']= 'N';
         }
 
+        $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
+        $user = [];
+        if (!empty($userQuota['param_value_int'])) {
+            $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['enabled']]);
+        }
+
         UserModel::update([
             'set'   => $set,
             'where' => ['id = ?'],
             'data'  => [$aArgs['id']]
         ]);
 
-        $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         if (!empty($userQuota['param_value_int'])) {
-            $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['enabled']]);
             if ($user['enabled'] == 'N' && $data['enabled'] == 'Y') {
                 $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['enabled = ?', 'status = ?', 'user_id != ?'], 'data' => ['Y', 'OK', 'superadmin']]);
                 if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
