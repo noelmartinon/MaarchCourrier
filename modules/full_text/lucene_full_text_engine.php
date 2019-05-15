@@ -1,52 +1,29 @@
 <?php
-/*
-*   Copyright 2008 - 2015 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
 /**
-* @defgroup full_text Full-text Module
-*/
+ * Copyright Maarch since 2008 under licence GPLv3.
+ * See LICENCE.txt file at the root folder for more details.
+ * This file is part of Maarch software.
+ *
+ */
 
 /**
-* Full-text is a Maarch module which allows you to make full text indexing
-* with the Lucene engine.<br>
-* We use PHP version of Lucene integrated into the ZEND framework.<br>
-* This Maarch module proposes a batch allowing the full text indexing.<br>
-* This batch is launched for each collection of Maarch and works on Linux
-* or Windows OS.<br>
-* It course a resources table and brings out documents candidates for full
-* text.<br><br>
-* A user exit code is stored in fulltext_result column of the document in
-* "res_x" :
-* <ul>
-*   <li>1 : Full Text extraction successfull</li>
-*   <li>-1 : No file found</li>
-*   <li>-2 : File extension not allowed for lucene</li>
-*   <li>2 : no result for this extraction</li>
-* </ul>
-* @file
-* @author Mathieu Donzel <mathieu.donzel@sages-informatique.com>
-* @author Laurent Giovannoni <dev@maarch.org>
-* @date $date$
-* @version $Revision$
-* @ingroup full_text
-* @brief Extraction of information on PDF with lucene functions of Zend Framework
-*/
+ * @brief Extraction of information on PDF / HTML / TXT with lucene functions of Zend Framework
+ * @author dev@maarch.org
+ * @ingroup full_text
+ *
+ * A user exit code is stored in fulltext_result column of the document in
+ * "res_letterbox" or  "res_attachments" or "res_version_attachments":
+ *   1 : Full Text extraction successfull
+ *  -1 : No file found
+ *  -2 : File extension not allowed for lucene
+ *   2 : no result for this extraction
+ *
+ *  You can use "--debugMode" in command to display more process informations (/!\ log might be heavy !)
+ *  You can use "--noLimit" in command to process all documents in one batch (be carefull !)
+ *  You can use "--limit {n}" in command to process {n} documents in one batch
+ *  You can use "--failed" in command to re analyse documents with -1 result
+ */
 
 try {
     include('Maarch_CLITools/ArgsParser.php');
@@ -68,51 +45,43 @@ include('batch_tools.php');
 
 // Open Logger
 $_ENV['logger'] = new Logger4Php();
-$_ENV['logger']->set_threshold_level('DEBUG');
 
-$logFile = 'log/' . date('Y-m-d_H-i-s') . '.log';
-
-$file = new FileHandler($logFile);
-$_ENV['logger']->add_handler($file);
-
-
-//error mode and function
-error_reporting(E_ERROR);
-set_error_handler(errorHandler);
+$logLevel = array_search('--debugMode', $argv);
+if ($logLevel > 0) {
+    $_ENV['logger']->set_threshold_level('DEBUG');
+} else {
+    $_ENV['logger']->set_threshold_level('INFO');
+}
 
 // global vars of the program
 /**
-* Name of the config (usefull for multi instance)
-*/
+ * Name of the config (usefull for multi instance)
+ */
 $_ENV['config_name'] = "";
 /**
-* Path to the log file
-*/
+ * Path to the log file
+ */
 $_ENV['log'] = "";
 /**
-* User exit of the program, contains 1 if any problem appears
-*/
+ * User exit of the program, contains 1 if any problem appears
+ */
 $_ENV['ErrorLevel'] = 0;
 
 /**
-* Managing of errors
-* @param  $errno integer number of the error
-* @param  $errstr string text of the error
-* @param  $errfile string file concerned with the error
-* @param  $errline integer line of the error
-* @param  $errcontext string context of the error
-*/
-function errorHandler($errno, $errstr, $errfile, $errline, $errcontext)
+ * Managing of errors
+ * @param  $errMsg string text of the error
+ */
+function errorHandler($errMsg)
 {
-    $_ENV['logger']->write('from  line ' . $errline . ' : ' . $errstr, 'ERROR', 1);
+    $_ENV['logger']->write($errMsg, 'ERROR');
     $_ENV['ErrorLevel'] = 1;
 }
 
 /**
-* Check if a folder is empty
-* @param  $dir string path of the directory to chek
-* @return boolean true if the directory exists
-*/
+ * Check if a folder is empty
+ * @param  $dir string path of the directory to chek
+ * @return boolean true if the directory exists
+ */
 function isDirEmpty($dir)
 {
     $dir = opendir($dir);
@@ -120,7 +89,7 @@ function isDirEmpty($dir)
     while (($entry = readdir($dir)) !== false) {
         if ($entry !== '.' && $entry !== '..') {
             $isEmpty = false;
-        break;
+            break;
         }
     }
     closedir($dir);
@@ -128,41 +97,80 @@ function isDirEmpty($dir)
 }
 
 /**
-* Launch the lucene engine if it's a pdf file
-* @param  $pathToFile string path of the file to index
-* @param  $indexFileDirectory string directory of the lucene index
-* @param  $format string format of the document to index
-* @param  $id integer id of the document to index
-* @return integer  user exit code stored in fulltext_result column of the
-* document in "res_x"
-*/
+ * Launch the lucene engine if it's a pdf / html / txt file
+ * @param  $pathToFile string path of the file to index
+ * @param  $indexFileDirectory string directory of the lucene index
+ * @param  $format string format of the document to index
+ * @param  $id integer id of the document to index
+ * @return integer  user exit code stored in fulltext_result column of the
+ * document in "res_letterbox" or  "res_attachments" or "res_version_attachments"
+ */
 function indexFullText($pathToFile, $indexFileDirectory, $format, $Id)
 {
     $result = -1;
-    if (is_file($pathToFile)) {
+
+    $fh = @fopen($pathToFile, 'r');
+
+    if (!$fh && strstr(error_get_last()['message'], 'Permission denied') !== false) {
+        errorHandler("{$pathToFile} permission denied!");
+    } elseif (!$fh && strstr(error_get_last()['message'], 'No such file or directory') !== false) {
+        errorHandler("{$pathToFile} not found!");
+    } else {
+        fclose($fh);
         switch (strtoupper($format)) {
             case "PDF":
-                //$_ENV['logger']->write("it's a PDF file", 'INFO');
                 $result = prepareIndexFullTextPdf($pathToFile, $indexFileDirectory, $Id);
                 break;
             case "HTML":
                 libxml_use_internal_errors(true);
-                //$_ENV['logger']->write("it's a HTML file", 'INFO');
                 $result = prepareIndexFullTextHtml($pathToFile, $indexFileDirectory, $Id);
                 break;
             case "MAARCH":
-                //$_ENV['logger']->write("it's a MAARCH file", 'INFO');
                 $result = prepareIndexFullTextHtml($pathToFile, $indexFileDirectory, $Id);
                 break;
             case "TXT":
-                //$_ENV['logger']->write("it's a TXT file", 'INFO');
                 $result = prepareIndexFullTextTxt($pathToFile, $indexFileDirectory, $Id);
                 break;
             default:
-            $result = -2;
+                $_ENV['logger']->write(strtoupper($format) . " not allowed for lucene");
+                $result = -2;
         }
     }
     return $result;
+}
+
+/**
+ * Remove word less than two chars and extra white spaces
+ * @param  $fileContent text content
+
+ * @return string cleaned text content
+ *
+ */
+function cleanFileContent($fileContent)
+{
+    $func = new functions();
+
+    $fileContent = $func->normalize($fileContent);
+
+    $fileContent = preg_replace('/[[:cntrl:]]/', ' ', $fileContent);
+    
+
+    $fileContent = trim(preg_replace('/[[:punct:]]/', ' ', $fileContent));
+    
+    
+
+    $tmpArrFileContent = explode(' ', $fileContent);
+    $arrFileContent = [];
+    
+    foreach ($tmpArrFileContent as $key => $value) {
+        if (strlen($value) > 2) {
+            array_push($arrFileContent, $value);
+        }
+    }
+
+    $fileContent = implode(' ', $arrFileContent);
+
+    return $fileContent;
 }
 
 function prepareIndexFullTextPdf($pathToFile, $indexFileDirectory, $Id)
@@ -170,27 +178,37 @@ function prepareIndexFullTextPdf($pathToFile, $indexFileDirectory, $Id)
     if (is_file($pathToFile)) {
         $tmpFile = $_ENV["base_directory"] . "tmp"
             . DIRECTORY_SEPARATOR . basename($pathToFile) . ".ftx";
-        if ($_ENV['osname'] == "WINDOWS") {
-            $resultExtraction = exec(escapeshellarg($_ENV['maarch_tools_path'] . "pdftotext"
-                . DIRECTORY_SEPARATOR . $_ENV['pdftotext']) . " "
-                . escapeshellarg($pathToFile) . " " . escapeshellarg($tmpFile)
-            );
-            $_ENV['logger']->write(escapeshellarg($_ENV['maarch_tools_path'] . "pdftotext"
-                . DIRECTORY_SEPARATOR . $_ENV['pdftotext']) . " "
-                . escapeshellarg($pathToFile) . " " . escapeshellarg($tmpFile)
-            );
-        } elseif ($_ENV['osname'] == "UNIX") {
-            $resultExtraction = exec("pdftotext " . escapeshellarg($pathToFile)
-                . " " . escapeshellarg($tmpFile) 
-            );
-            $_ENV['logger']->write("pdftotext " . escapeshellarg($pathToFile) . " " . escapeshellarg($tmpFile));
-            echo "pdftotext " . escapeshellarg($pathToFile) . " " . escapeshellarg($tmpFile) . PHP_EOL;
+
+        $_ENV['logger']->write("pdftotext " . escapeshellarg($pathToFile) . " " . escapeshellarg($tmpFile), 'DEBUG');
+        $resultExtraction = exec("pdftotext " . escapeshellarg($pathToFile)
+            . " " . escapeshellarg($tmpFile).' 2>&1', $output, $return);
+
+        if (in_array("Syntax Error: Couldn't read xref table", $output)) {
+            errorHandler("{$pathToFile} is corrupted !");
+            $result = 2;
+        } else if (!empty($output)) {
+            errorHandler("Extract text of document failed : " . implode(' ', $output));
+            $result = 2;
+        } else {
+            $fileContent = readFileF($tmpFile);
+            $fileContent = cleanFileContent($fileContent);
+    
+    
+            $_ENV['logger']->write("content file : " . $fileContent, 'DEBUG');
+            if (is_file($tmpFile)) {
+                unlink($tmpFile);
+            }
+    
+            if (empty($fileContent)) {
+                $_ENV['logger']->write("it is not an OCR pdf");
+                $result = 2;
+            } else {
+                $result = launchIndexFullText($fileContent, $indexFileDirectory, $Id);
+            }
         }
-        $fileContent = trim(readFileF($tmpFile));
-        if (is_file($tmpFile)) unlink($tmpFile);
-        $result = launchIndexFullText($fileContent, $indexFileDirectory, $Id);
     } else {
-        $result = 2;
+        errorHandler("{$pathToFile} not found !");
+        $result = -1;
     }
     return $result;
 }
@@ -199,12 +217,15 @@ function prepareIndexFullTextHtml($pathToFile, $indexFileDirectory, $Id)
 {
     if (is_file($pathToFile)) {
         $fileContent = trim(readFileF($pathToFile));
-        //remove html tags
-        //$fileContent = strip_tags($fileContent);
+
         $fileContent = convert_html_to_text($fileContent);
+
+        $fileContent = cleanFileContent($fileContent);
+
+        $_ENV['logger']->write("content file : " . $fileContent, 'DEBUG');
         $result = launchIndexFullText($fileContent, $indexFileDirectory, $Id);
     } else {
-        $result = 2;
+        $result = -1;
     }
     return $result;
 }
@@ -213,65 +234,93 @@ function prepareIndexFullTextTxt($pathToFile, $indexFileDirectory, $Id)
 {
     if (is_file($pathToFile)) {
         $fileContent = trim(readFileF($pathToFile));
+        $fileContent = cleanFileContent($fileContent);
+        $_ENV['logger']->write("content file : " . $fileContent, 'DEBUG');
         $result = launchIndexFullText($fileContent, $indexFileDirectory, $Id);
     } else {
-        $result = 2;
+        $result = -1;
     }
     return $result;
 }
 
 /**
-* Retrieve the text of a pdftext and launch the lucene engine
-* @param  $pathToFile string path of the file to index
-* @param  $indexFileDirectory string directory of the lucene index
-* @param  $id integer id of the document to index
-* @return integer user exit code is stored in fulltext_result column of the
-* document in "res_x"
-*/
+ * Retrieve the text of a pdftext and launch the lucene engine
+ * @param  $pathToFile string path of the file to index
+ * @param  $indexFileDirectory string directory of the lucene index
+ * @param  $id integer id of the document to index
+ * @return integer user exit code is stored in fulltext_result column of the
+ * document in "res_x"
+ */
 function launchIndexFullText($fileContent, $tempIndexFileDirectory, $Id) // $IndexFileDirectory is replace by tempIndexFileDirectory
 {
-    $func = new functions();
-
-    $fileContent = $func->normalize($fileContent);
-    $indexFileDirectory = (string) $tempIndexFileDirectory; // with version 1.12, we need a string, not an XML element
+    $indexFileDirectory = (string)$tempIndexFileDirectory; // with version 1.12, we need a string, not an XML element
     $result = -1;
+    $luceneErr = false;
     if (strlen($fileContent) > 20) {
         if (!is_dir($indexFileDirectory)) {
-            $_ENV['logger']->write($indexFileDirectory . " not exists !", "ERROR", 2);
-            $index = Zend_Search_Lucene::create($indexFileDirectory);
+            $_ENV['logger']->write($indexFileDirectory . " will be created !", "DEBUG");
+            try {
+                $index = @Zend_Search_Lucene::create($indexFileDirectory);
+            } catch (Exception $e) {
+                $luceneErr = true;
+                errorHandler($e->getMessage());
+            }
         } else {
             if (isDirEmpty($indexFileDirectory)) {
-                $_ENV['logger']->write($indexFileDirectory . " empty !");
-                $index = Zend_Search_Lucene::create($indexFileDirectory);
+                $_ENV['logger']->write('lucene files in ' . $indexFileDirectory . "  will be created !", "DEBUG");
+                try {
+                    $index = @Zend_Search_Lucene::create($indexFileDirectory);
+                } catch (Exception $e) {
+                    $luceneErr = true;
+                    errorHandler($e->getMessage());
+                }
             } else {
-                $index = Zend_Search_Lucene::open($indexFileDirectory);
+                $_ENV['logger']->write('open lucene files in ' . $indexFileDirectory, "DEBUG");
+                try {
+                    $index = @Zend_Search_Lucene::open($indexFileDirectory);
+                } catch (Exception $e) {
+                    $luceneErr = true;
+                    errorHandler($e->getMessage());
+                }
             }
         }
-        $index->setFormatVersion(Zend_Search_Lucene::FORMAT_2_3); // we set the lucene format to 2.3
-        Zend_Search_Lucene_Analysis_Analyzer::setDefault(
-            new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive() // we need utf8 for accents
-        );
-        $term = new Zend_Search_Lucene_Index_Term($Id, 'Id');
-        foreach ($index->termDocs($term) as $id) {
-            $index->delete($id);
+        if ($luceneErr === false) {
+            try {
+                $index->setFormatVersion(Zend_Search_Lucene::FORMAT_2_3); // we set the lucene format to 2.3
+                Zend_Search_Lucene_Analysis_Analyzer::setDefault(
+                    new Zend_Search_Lucene_Analysis_Analyzer_Common_Utf8Num_CaseInsensitive() // we need utf8 for accents
+                );
+                $term = new Zend_Search_Lucene_Index_Term($Id, 'Id');
+                foreach ($index->termDocs($term) as $id) {
+                    $index->delete($id);
+                }
+                $doc = new Zend_Search_Lucene_Document();
+                $doc->addField(Zend_Search_Lucene_Field::UnIndexed('Id', $Id));
+                $doc->addField(Zend_Search_Lucene_Field::UnStored(
+                    'contents',
+                    $fileContent
+                ));
+                $index->addDocument($doc);
+                $index->commit();
+                $_ENV['logger']->write('link res_id to lucene indexes', "DEBUG");
+
+                $result = 1;
+            } catch (Exception $e) {
+                errorHandler($e->getMessage());
+            }
         }
-        $doc = new Zend_Search_Lucene_Document();
-        $doc->addField(Zend_Search_Lucene_Field::UnIndexed('Id', $Id));
-        $doc->addField(Zend_Search_Lucene_Field::UnStored(
-            'contents', $fileContent)
-        );
-        $index->addDocument($doc);
-        $index->commit();
-        $result = 1;
+    } else {
+        $result = 2;
+        $_ENV['logger']->write('Content has too few characters (<20)');
     }
     return $result;
 }
 
 /**
-* Read a txt file
-* @param  $file string path of the file to read
-* @return string contents of the file
-*/
+ * Read a txt file
+ * @param  $file string path of the file to read
+ * @return string contents of the file
+ */
 function readFileF($file)
 {
     $result = "";
@@ -285,18 +334,16 @@ function readFileF($file)
 
 // Begin
 date_default_timezone_set('Europe/Paris');
-if ($argc != 2) {
-    echo "You must specify the configuration file." . $argc;
+
+if ($argc < 2) {
+    echo "You must specify the configuration file " . $argc . "\n\n";
     exit;
 }
-$conf = $argv[1];
-$xmlconfig = simplexml_load_file($conf);
 
-if ($xmlconfig == FALSE) {
-    $_ENV['logger']->write(
-        'Error on loading config file:' 
-        . $_ENV['configFile'], 'ERROR', 103
-    );
+$conf = $argv[1];
+$xmlconfig = @simplexml_load_file($conf);
+
+if ($xmlconfig == false) {
     echo "\nError on loading config file: " . $conf . "\n\n";
     exit(103);
 }
@@ -308,40 +355,59 @@ foreach ($xmlconfig->CONFIG as $CONFIG) {
     $_ENV['base_directory'] = $_ENV['maarch_directory'] . '/modules/full_text/';
     $indexFileDirectory = $CONFIG->INDEX_FILE_DIRECTORY;
     $_ENV['tablename'] = $CONFIG->TABLE_NAME;
-    $fulltextColumnName = $CONFIG->FULLTEXT_COLUMN_NAME;
-    $_ENV['maarch_tools_path'] = $CONFIG->MAARCH_TOOLS_PATH;
     $_ENV['max_batch_size'] = $CONFIG->MAX_BATCH_SIZE;
 }
-if (DIRECTORY_SEPARATOR == "/") {
-    $_ENV['osname'] = "UNIX";
-    $_ENV['pdftotext'] = "pdftotext";
+
+$_ENV['maarch_tools_path'] = $_ENV['maarch_directory'] . '/apps/maarch_entreprise/tools/';
+
+if (!file_exists('log/'.$_ENV['tablename']. '/')) {
+    mkdir('log/'.$_ENV['tablename']. '/');
+}
+
+$_ENV['logFile'] = 'log/'.$_ENV['tablename']. '/' .$_ENV['config_name'].'_'. date('Y-m-d_H-i-s');
+
+$file = new FileHandler($_ENV['logFile'] . '.log');
+$_ENV['logger']->add_handler($file);
+
+if (array_search('--noLimit', $argv) > 0) {
+    $limit = '';
+} else if (array_search('--limit', $argv) > 0) {
+    $cmdLimit = array_search('--limit', $argv);
+    $limit = ' LIMIT ' . $argv[$cmdLimit+1];
 } else {
-    $_ENV['osname'] = "WINDOWS";
-    $_ENV['pdftotext'] = "pdftotext.exe";
+    $limit = ' LIMIT ' . $_ENV['max_batch_size'];
 }
 
 $log4phpParams = $xmlconfig->LOG4PHP;
-if ((string) $log4phpParams->enabled == 'true') {
+if ((string)$log4phpParams->enabled == 'true') {
     $_ENV['logger']->set_log4PhpLibrary(
         $_ENV['maarch_directory'] . 'apps/maarch_entreprise/tools/log4php/Logger.php'
     );
-    $_ENV['logger']->set_log4PhpLogger((string) $log4phpParams->Log4PhpLogger);
-    $_ENV['logger']->set_log4PhpBusinessCode((string) $log4phpParams->Log4PhpBusinessCode);
-    $_ENV['logger']->set_log4PhpConfigPath((string) $log4phpParams->Log4PhpConfigPath);
+    $_ENV['logger']->set_log4PhpLogger((string)$log4phpParams->Log4PhpLogger);
+    $_ENV['logger']->set_log4PhpBusinessCode((string)$log4phpParams->Log4PhpBusinessCode);
+    $_ENV['logger']->set_log4PhpConfigPath((string)$log4phpParams->Log4PhpConfigPath);
     $_ENV['logger']->set_log4PhpBatchName('full_text');
 }
 
-$_ENV['logger']->write("Launch of Lucene full text engine");
-$_ENV['logger']->write("Loading the xml config file");
+$_ENV['logger']->write("Loading the xml config file : " . $conf, 'DEBUG');
+
 $_ENV['logger']->write("Config name : " . $_ENV['config_name']);
+
 $_ENV['logger']->write("Full text engine launched for table : " . $_ENV['tablename']);
+
+if (array_search('--failed', $argv) > 0) {
+    $_ENV['logger']->write("RE ANALYZE FAILED DOCUMENTS MODE");
+    $fulltextTarget = "fulltext_result = '-1'";
+} else {
+    $fulltextTarget = "(fulltext_result IN ('0', '') or fulltext_result is null)";
+}
+
 require("../../core/class/class_functions.php");
 require("../../core/class/class_db_pdo.php");
 
 // Storing text in lucene index
 set_include_path($_ENV['maarch_tools_path'] . DIRECTORY_SEPARATOR
-    . PATH_SEPARATOR . get_include_path()
-);
+    . PATH_SEPARATOR . get_include_path());
 require_once('Zend/Search/Lucene.php');
 include_once('html2text/html2text.php');
 
@@ -349,7 +415,6 @@ $_ENV['db'] = new Database($conf);
 
 Bt_getWorkBatch();
 
-//$_ENV['logger']->write("connection on the DB server OK !");
 $docServers = "SELECT docserver_id, path_template FROM docservers";
 
 $stmt = $_ENV['db']->query($docServers);
@@ -357,85 +422,97 @@ $stmt = $_ENV['db']->query($docServers);
 $err = 0;
 $errInfo = '';
 
-while ($queryResult=$stmt->fetch(PDO::FETCH_NUM)) {
-  $pathToDocServer[$queryResult[0]] = $queryResult[1];
-  //$_ENV['logger']->write($queryResult[1]);
+while ($queryResult = $stmt->fetch(PDO::FETCH_NUM)) {
+    $pathToDocServer[$queryResult[0]] = $queryResult[1];
 }
 if ($_ENV['tablename'] == 'res_attachments' || $_ENV['tablename'] == 'res_version_attachments') {
-
-    $_ENV['logger']->write("docServers ".$_ENV['tablename']." found !");
+    $_ENV['logger']->write("docServers " . $_ENV['tablename'] . " found !", 'DEBUG');
 
     $queryIndexFullText = "SELECT res_id, docserver_id, path, filename, format FROM "
-        . $_ENV['tablename'] . " WHERE (" . $fulltextColumnName . " = '0' or "
-        . $fulltextColumnName . " = '' or " . $fulltextColumnName . " is null) AND format = 'pdf'";
+        . $_ENV['tablename'] . " WHERE ".$fulltextTarget
+        . " AND lower(format) = 'pdf' AND attachment_type <> 'print_folder' AND status NOT IN ('DEL','OBS','TMP')"
+        . " GROUP BY res_id ORDER BY res_id ASC" . $limit;
 } else {
-    
-    $_ENV['logger']->write("docServers ".$_ENV['tablename']." found !");
+    $_ENV['logger']->write("docServers " . $_ENV['tablename'] . " found !", 'DEBUG');
 
     $queryIndexFullText = "SELECT res_id, docserver_id, path, filename, format FROM "
-        . $_ENV['tablename'] . " WHERE " . $fulltextColumnName . " = '0' or "
-        . $fulltextColumnName . " = '' or " . $fulltextColumnName . " is null ";
+        . $_ENV['tablename'] . " WHERE ".$fulltextTarget
+        . " AND (source <> 'with_empty_file' or source is null) AND status NOT IN ('DEL')"
+        . " GROUP BY res_id ORDER BY res_id ASC" . $limit;
 }
 
-//$_ENV['logger']->write("query to found document with no full text : ".$queryIndexFullText);
+$_ENV['logger']->write($queryIndexFullText, 'DEBUG');
+
 $stmt = $_ENV['db']->query($queryIndexFullText);
-$cpt_batch_size=0;
-//$_ENV['logger']->write("max_batch_size : ".$_ENV['max_batch_size']);
+$queryResult = $stmt->fetchAll();
 
-if ($stmt->rowCount() === 0) {
+$nbResToFulltext = count($queryResult);
+
+if ($nbResToFulltext === 0) {
     Bt_exitBatch(0, 'No document to process');
-}else{
-    $_ENV['logger']->write($stmt->rowCount().' document(s) to proceed.');
+} else {
+    $_ENV['logger']->write($nbResToFulltext . ' document(s) to proceed');
 }
 
-while ($queryResult=$stmt->fetch(PDO::FETCH_NUM)) {
-    if ($_ENV['max_batch_size'] >= $cpt_batch_size) {
-        $pathToFile = $pathToDocServer[$queryResult[1]]
-            . str_replace("#", DIRECTORY_SEPARATOR, $queryResult[2])
-            . DIRECTORY_SEPARATOR . $queryResult[3];
-        $_ENV['logger']->write("processing of document ".($cpt_batch_size+1)."/".$stmt->rowCount()." (RES_ID => ". $queryResult[0] . ", FORMAT => ".$queryResult[4].", FILE => " . $pathToFile.")");
-        $result = indexFullText(
-            $pathToFile, $indexFileDirectory, $queryResult[4], $queryResult[0]
-        );
-        if ($result <> 1) {
-            if($result == -1){
-                $resultTxt = 'document n°'.$queryResult[0].' cannot be converted';
-            }elseif ($result == -2) {
-                $resultTxt = 'document not found';
-            }else{
-                $resultTxt = 'unknow error';
-            }
-            $_ENV['logger']->write("FULLTEXT ERROR : " . $resultTxt, "ERROR", $result);
-            $err++;
-            $errInfo = ' (Last Error : '.$resultTxt.')';
-        }else{
-            $_ENV['logger']->write("FULLTEXT OK");
-        }
-        
-        $updateDoc = "UPDATE " . $_ENV['tablename'] . " SET " . $fulltextColumnName . " = ? WHERE res_id = ?";
-        $_ENV['db']->query($updateDoc, array($result, $queryResult[0]));
+$converted_doc = 0;
+
+foreach ($queryResult as $docNum => $data) {
+    $pathToFile = $pathToDocServer[$data["docserver_id"]]
+        . str_replace("#", DIRECTORY_SEPARATOR, $data["path"])
+        . DIRECTORY_SEPARATOR . $data["filename"];
+
+    if (!empty(pathinfo($pathToFile, PATHINFO_EXTENSION))) {
+        $extension = pathinfo($pathToFile, PATHINFO_EXTENSION);
     } else {
-        $converted_doc = $cpt_batch_size - $err;
-        $_ENV['logger']->write($converted_doc.' document(s) with fulltext, MAX BATCH SIZE EXCEDEED !'.$errInfo);
-        Bt_logInDataBase(
-            $cpt_batch_size, $err, $cpt_batch_size.' document(s) with fulltext, MAX BATCH SIZE EXCEDEED !'.$errInfo
-        );
-        break;
-  }
-  $cpt_batch_size++;
+        $extension = $data["format"];
+    }
+    
+
+    $_ENV['logger']->write("processing of document " . ($docNum + 1) . "/" . $nbResToFulltext . " (RES_ID => " . $data["res_id"] . ", FORMAT => " . $extension . ", FILE => " . $pathToFile . ")");
+
+    $result = indexFullText(
+        $pathToFile,
+        $indexFileDirectory,
+        $extension,
+        $data["res_id"]
+    );
+
+    $_ENV['logger']->write("result : " . $result);
+
+    $updateDoc = "UPDATE " . $_ENV['tablename'] . " SET fulltext_result = ? WHERE res_id = ?";
+
+    $_ENV['logger']->write("UPDATE " . $_ENV['tablename'] . " SET fulltext_result = '" . $result . "' WHERE res_id = '" . $data["res_id"] . "'", 'DEBUG');
+
+    $_ENV['db']->query($updateDoc, array($result, $data["res_id"]));
+
+    if ($result == 1) {
+        $converted_doc++;
+    }
 }
 
-$cpt_batch_size--;
-
-$converted_doc = $cpt_batch_size - $err;
-$_ENV['logger']->write($converted_doc.' document(s) with fulltext');
+$_ENV['logger']->write($converted_doc . ' document(s) with fulltext');
 
 Bt_logInDataBase(
-    $cpt_batch_size, $err, $converted_doc.' document(s) with fulltext'.$errInfo
+    $docNum+1,
+    $err,
+    $converted_doc . ' document(s) with fulltext' . $errInfo
 );
 
 Bt_updateWorkBatch();
 
+$_ENV['logger']->write('Optimize Lucene index');
+try {
+    $index = @Zend_Search_Lucene::open((string)$indexFileDirectory);
+    $index->optimize();
+} catch (Exception $e) {
+    $luceneErr = true;
+    errorHandler($e->getMessage());
+}
+
+
 $_ENV['logger']->write("End of application !");
 
+if ($_ENV['ErrorLevel'] > 0) {
+    rename($_ENV['logFile'] . ".log", $_ENV['logFile'] . "_ERR.log");
+}
 exit($_ENV['ErrorLevel']);
