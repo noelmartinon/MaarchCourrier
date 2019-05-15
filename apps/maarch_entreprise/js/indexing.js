@@ -814,13 +814,13 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
                         document.getElementById("subject_tr").style.display = 'table-row';
                     }
                     
-                    if(cat_id != 'outgoing'){
+                    if(cat_id != 'outgoing' && origin != 'scan'){
                         $j("#choose_file").on("load", function () {
                             $j("#choose_file").off();
                             $j('#choose_file_div').show();
                             $j('#choose_file').contents().find('#with_file').click();
                         });                        
-                    }else{
+                    } else if (origin != 'scan') {
                         $j("#choose_file").on("load", function () {
                             $j("#choose_file").off();
                             $j('#choose_file').contents().find('#with_file2').click();
