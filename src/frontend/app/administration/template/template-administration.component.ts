@@ -310,7 +310,7 @@ export class TemplateAdministrationComponent implements OnInit {
                 return;
             }
         } else if (this.template.template_target != 'acknowledgementReceipt' && this.template.template_type == 'OFFICE') {
-            if (!this.template.template_style || (this.template.template_style && !this.template.jnlpUniqueId && !this.template.template_file_name)) {
+            if (!this.template.template_style || (this.template.template_style && !this.template.jnlpUniqueId && !this.template.template_file_name && !this.template.uploadedFile)) {
                 alert(this.lang.editModelFirst);
                 return;
             }
