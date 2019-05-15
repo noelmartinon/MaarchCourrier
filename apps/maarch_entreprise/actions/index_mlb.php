@@ -107,9 +107,7 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
 
         $allEntitiesTree = array();
         $EntitiesIdExclusion = array();
-        if (!empty($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$actionId]['entities']))
-        {
-            
+        if (!empty($_SESSION['user']['redirect_groupbasket_by_group'][$_SESSION['current_basket']['id']][$_SESSION['current_basket']['group_id']][$actionId]['entities'])) {
             $stmt = $db->query(
                 'SELECT entity_id FROM '
                 .ENT_ENTITIES.' WHERE entity_id not in ('
@@ -134,7 +132,11 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
 
         //var_dump($EntitiesIdExclusion);
         $allEntitiesTree = $ent->getShortEntityTreeAdvanced(
-            $allEntitiesTree, 'all', '', $EntitiesIdExclusion, 'all'
+            $allEntitiesTree,
+            'all',
+            '',
+            $EntitiesIdExclusion,
+            'all'
         );
     }
 
@@ -481,7 +483,7 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
             .$actionId.'\');showCalender(this);" /></td>';
     $frmStr .= '<td><span class="red_asterisk" id="doc_date_mandatory" '
             .'style="display:inline;vertical-align:text-top"><i class="fa fa-star"></i></span></td>';
-    $frmStr .= '</tr >';    
+    $frmStr .= '</tr >';
 
     /*** Author ***/
     $frmStr .= '<tr id="author_tr" style="display:'.$displayValue.';">';
@@ -535,7 +537,7 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
     $frmStr .= '<td><span class="red_asterisk" id="departure_date_mandatory" '
             . 'style="display:inline;vertical-align:text-top"><i class="fa fa-star"></i></span></td>';
     $frmStr .= '</tr>';
-	
+    
     /*** Contact ***/
     $frmStr .= '<tr id="contact_choose_tr" style="display:'.$displayValue
             .';">';
@@ -1010,12 +1012,14 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
                 .'file_iframe&#navpanes=0" name="file_iframe" id="file_iframe"'
                 .' scrolling="auto" frameborder="0" style="display:block;">'
                 .'</iframe>';
+        $origin = 'scan';
     } else {
         $frmStr .= '<iframe src="'.$_SESSION['config']['businessappurl']
                 .'index.php?display=true&dir=indexing_searching&page='
                 .'file_iframe" name="file_iframe" id="file_iframe" '
                 .'scrolling="auto" frameborder="0" style="display:block;" >'
                 .'</iframe>';
+        $origin = '';
     }
     $frmStr .= '</div>';
 
@@ -1034,7 +1038,7 @@ function get_form_txt($values, $pathManageAction, $actionId, $table, $module, $c
             .'\', \''.$_SESSION['config']['businessappurl']
             .'index.php?display=true&dir=indexing_searching&page='
             .'change_category\',  \''.$_SESSION['config']['businessappurl']
-            .'index.php?display=true&page=get_content_js\');change_category_actions(\''
+            .'index.php?display=true&page=get_content_js\', \'\', \''.$origin.'\');change_category_actions(\''
             .$_SESSION['config']['businessappurl']
             .'index.php?display=true&dir=indexing_searching&page=change_category_actions'
             .'&resId='.$resId.'&collId='.$collId.'\',\'none\',\''.$collId.'\',document.getElementById(\'category_id\').options[document.getElementById(\'category_id\').selectedIndex].value);'
