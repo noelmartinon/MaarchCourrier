@@ -154,11 +154,9 @@ ALTER TABLE groupbasket ADD COLUMN list_display json DEFAULT '[]';
 DO $$ BEGIN
   IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'mlb_coll_ext') AND attname = 'recommendation_limit_date') = 1 THEN
     ALTER TABLE res_letterbox ADD COLUMN opinion_limit_date TIMESTAMP without TIME ZONE DEFAULT NULL;
-    UPDATE res_letterbox SET opinion_limit_date =
-    (
-      SELECT recommendation_limit_date FROM mlb_coll_ext
-      WHERE res_letterbox.res_id = mlb_coll_ext.res_id
-    );
+    UPDATE res_letterbox SET opinion_limit_date = mlb_coll_ext.recommendation_limit_date 
+    FROM mlb_coll_ext
+    WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND recommendation_limit_date IS NOT NULL;
     ALTER TABLE mlb_coll_ext DROP COLUMN IF EXISTS recommendation_limit_date;
   END IF;
 END$$;
