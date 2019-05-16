@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '19.04.1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '19.04.2' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 DROP VIEW IF EXISTS view_contacts;
