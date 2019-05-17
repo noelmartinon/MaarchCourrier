@@ -99,7 +99,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     }
 
     //$config = parse_ini_file(__DIR__.'/config.ini');
-    $frm_str .= '<div align="center"  name="valid" id="valid" style="display: none "><br><input type="button" class="button" name="validateReload" id="validateReload" value="'._VALIDATE.'" onclick="window.location.reload()"/></div>';
+    $frm_str .= '<div align="center"  name="valid" id="valid" style="display: none "><br><input type="button" class="button" name="validateReload" id="validateReload" value="'._VALIDATE.'" onclick="triggerAngular(\'#/basketList/users/'.$_SESSION['urlV2Basket']['userId'].'/groups/'.$_SESSION['urlV2Basket']['groupIdSer'].'/baskets/'.$_SESSION['urlV2Basket']['basketId'].'\');"/></div>';
     $frm_str .= '<hr />';
 
     $frm_str .= '<div align="center">';

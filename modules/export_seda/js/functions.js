@@ -57,7 +57,7 @@ function actionSeda(path,type) {
     );
 }
 
-function actionValidation(path,type) {
+function actionValidation(path, userId, groupIdSer, basketId) {
     new Ajax.Request(path,
         {
             method:'post',
@@ -69,7 +69,7 @@ function actionValidation(path,type) {
                 } else {
                     alert(response.error);
                 }
-                location.reload();
+                triggerAngular('#/basketList/users/' + userId + '/groups/' + groupIdSer + '/baskets/' + basketId);
             }
         });
 }

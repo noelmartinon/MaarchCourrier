@@ -4,7 +4,8 @@ require_once __DIR__ . '/RequestSeda.php';
 require_once __DIR__ . '/class/AbstractMessage.php';
 require_once __DIR__ . '/class/ArchiveTransferReply.php';
 
-Class CheckReply {
+class CheckReply
+{
     protected $token;
     protected $SAE;
     protected $db;
@@ -19,14 +20,13 @@ Class CheckReply {
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
             . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
             . DIRECTORY_SEPARATOR . 'config.xml'
-        ))
-        {
+        )) {
             $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                 . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
                 . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
-        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+        } elseif (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
             $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
                 . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
@@ -41,7 +41,6 @@ Class CheckReply {
         $this->token = "LAABS-AUTH=". $tokenEncode;
         $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/message/reference";
         $this->db = new RequestSeda();
-
     }
 
     public function checkAll()
@@ -55,7 +54,7 @@ Class CheckReply {
             $unitIdentifier = $this->db->getUnitIdentifierByResId($letter->res_id);
             $message = $this->db->getMessageByIdentifier($unitIdentifier->message_id);
 
-            if(array_key_exists($message->reference, $unitIdentifiers)) {
+            if (array_key_exists($message->reference, $unitIdentifiers)) {
                 $unitIdentifiers[$message->reference] .= "," . $unitIdentifier->res_id;
             } else {
                 $unitIdentifiers[$message->reference] = $unitIdentifier->res_id;
@@ -81,14 +80,15 @@ Class CheckReply {
         return true;
     }
 
-    public function checkAttachment($resId) {
+    public function checkAttachment($resId)
+    {
         $reply = $this->db->getReply($resId);
         if (!$reply) {
             $_SESSION['error'] = _ERROR_NO_REPLY . $resId;
             return false;
         }
 
-        $tabDir = explode('#',$reply->path);
+        $tabDir = explode('#', $reply->path);
 
         $dir = '';
         for ($i = 0; $i < count($tabDir); $i++) {
@@ -120,10 +120,12 @@ Class CheckReply {
         return $resId;
     }
 
-    public function getReply($reference) {
+    public function getReply($reference)
+    {
         $header = [
             'accept:application/json',
-            'content-type:application/json'
+            'content-type:application/json',
+            'user-agent:maarchrestclient'
         ];
 
         $refEncode = str_replace('.', '%2E', urlencode($reference));

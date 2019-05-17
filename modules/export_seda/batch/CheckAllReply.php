@@ -4,11 +4,13 @@ $checkAllReply = new CheckAllReply();
 require_once __DIR__ . '/../RequestSeda.php';
 require_once __DIR__ . '/../class/AbstractMessage.php';
 require_once __DIR__ . '/../CheckReply.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 $CheckReply = new CheckReply();
 $CheckReply->checkAll();
 
-Class CheckAllReply {
+class CheckAllReply
+{
     protected $token;
     protected $SAE;
     protected $db;
@@ -19,9 +21,11 @@ Class CheckAllReply {
         $this->initSession();
     }
 
-    private function initSession() {
+    private function initSession()
+    {
         try {
-            include('Maarch_CLITools/ArgsParser.php');;
+            include('Maarch_CLITools/ArgsParser.php');
+            ;
         } catch (IncludeFileError $e) {
             echo 'Maarch_CLITools required ! \n (pear.maarch.org)\n';
             exit(106);
@@ -30,7 +34,7 @@ Class CheckAllReply {
         // Defines scripts arguments
         $argsparser = new ArgsParser();
         // The config file
-                $argsparser->add_arg(
+        $argsparser->add_arg(
                     'config',
                     array(
                         'short' => 'c',

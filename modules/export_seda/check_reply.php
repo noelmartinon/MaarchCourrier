@@ -27,9 +27,8 @@ $etapes = array('form');
 $frm_width='285px';
 $frm_height = 'auto';
 
-function get_form_txt($values, $path_manage_action,  $id_action, $table, $module, $coll_id, $mode )
+function get_form_txt($values, $path_manage_action, $id_action, $table, $module, $coll_id, $mode)
 {
-
     $res_id = $values[0];
     $db = new Database();
     $labelAction = '';
@@ -45,7 +44,6 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
             $values_str .= $values[$i] . ', ';
         }
     } else {
-
         for ($i = 0; $i < count($_SESSION['stockCheckbox']); $i++) {
             $values_str .= $_SESSION['stockCheckbox'][$i] . ', ';
         }
@@ -61,7 +59,7 @@ function get_form_txt($values, $path_manage_action,  $id_action, $table, $module
     $frm_str .='</form>';
     $frm_str .='</div>';
     $frm_str .='<div align="center">';
-    $frm_str .=' <input type="button" name="redirect_dep" value="'._VALIDATE.'" id="redirect_dep" class="button" onclick="actionValidation(\''.$path_to_script.'&page=Ajax_validation&type=reply&reference='.$values_str.'\');" />';
+    $frm_str .=' <input type="button" name="redirect_dep" value="'._VALIDATE.'" id="redirect_dep" class="button" onclick="actionValidation(\''.$path_to_script.'&page=Ajax_validation&type=reply&reference='.$values_str.'\', \''. $_SESSION['urlV2Basket']['userId'] .'\', \''. $_SESSION['urlV2Basket']['groupIdSer'] .'\', \''. $_SESSION['urlV2Basket']['basketId'] .'\');" />';
     $frm_str .=' <input type="button" name="cancel" id="cancel" class="button"  value="'._CANCEL.'" onclick="pile_actions.action_pop();actions_status.action_pop();destroyModal(\'modal_'.$id_action.'\');"/>';
     $frm_str .='</div>';
 
