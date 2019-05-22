@@ -48,6 +48,11 @@
     <signatoryBook>
         <id>xParaph</id>
         <url>https://preprodssl.ssl.spl-xdemat.fr/Xparaph/wsdl/wsdl.php</url>
+        <userGeneric>
+            <siret></siret>
+            <login></login>
+            <password></password>
+        </userGeneric>
         <docutype>101</docutype>
         <docustype>9</docustype>
     </signatoryBook>

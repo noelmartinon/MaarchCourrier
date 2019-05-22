@@ -1,5 +1,5 @@
-<form *ngIf="!addAccountMode && additionalsInfos.attachments.length > 0" (ngSubmit)="getUsersWorkflowList(currentAccount);" #accountForm="ngForm">
-    <div class="col-md-5" style="padding-top: 10px;">
+<form *ngIf="!addAccountMode && additionalsInfos.attachments.length > 0" #accountForm="ngForm">
+    <div class="col-md-12" style="padding-top: 10px;">
         <mat-form-field>
             <mat-label>{{lang.selectedAccount}}</mat-label>
             <mat-select name="loginAccount" (selectionChange)="selectAccount($event)" required>
@@ -14,17 +14,6 @@
             <mat-hint><a (click)="initNewAccount()" style="cursor: pointer;">{{lang.addNewAccount}}</a>
             </mat-hint>
         </mat-form-field>
-    </div>
-    <div *ngIf="currentAccount != null" class="col-md-5" style="padding-top: 10px;">
-        <mat-form-field>
-            <input matInput name="passwordAccount" placeholder="{{lang.password}}" [(ngModel)]="currentAccount.password"
-                required [type]="hidePassword ? 'password' : 'text'" [disabled]="loading">
-        </mat-form-field>
-    </div>
-    <div *ngIf="currentAccount != null" class="col-md-2" style="padding-top: 10px;">
-        <button mat-icon-button color="primary" type="submit" [disabled]="!accountForm.form.valid || loading">
-            <mat-icon class="fa fa-check"></mat-icon>
-        </button>
     </div>
 </form>
 <form *ngIf="addAccountMode && additionalsInfos.attachments.length > 0" (ngSubmit)="addNewAccount();" #newAccountForm="ngForm">

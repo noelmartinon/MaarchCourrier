@@ -25,7 +25,6 @@ export class XParaphComponent implements OnInit {
     usersWorkflowList: any[] = [];
     currentWorkflow: any[] = [];
     contextList = ['FON','PER','SPH','DIR','DLP','EXE'];
-    hidePassword: boolean = true;
     addAccountMode: boolean = false;
 
     usersCtrl = new FormControl();
@@ -49,7 +48,7 @@ export class XParaphComponent implements OnInit {
         this.currentAccount = account.value;
         this.usersWorkflowList = [];
         this.currentWorkflow = [];
-        this.currentAccount.password = '';
+        this.getUsersWorkflowList(this.currentAccount);
     }
 
     getUsersWorkflowList(account: any) {
@@ -59,7 +58,7 @@ export class XParaphComponent implements OnInit {
                 startWith(''),
                 map(state => state ? this._filterUsers(state) : this.usersWorkflowList.slice())
             );
-        this.http.get('../../rest/xParaphWorkflow?login=' + account.login + '&password=' + account.password + '&siret=' + account.siret)
+        this.http.get('../../rest/xParaphWorkflow?login=' + account.login + '&siret=' + account.siret)
             .subscribe((data: any) => {
                 this.usersWorkflowList = data.workflow;
                 this.usersWorkflowList.forEach(element => {
@@ -103,7 +102,7 @@ export class XParaphComponent implements OnInit {
     }
 
     checkValidParaph() {
-        if (this.additionalsInfos.attachments.length > 0 && this.currentWorkflow.length > 0 && this.currentAccount.login != '' && this.currentAccount.password != '' && this.currentAccount.siret != '') {
+        if (this.additionalsInfos.attachments.length > 0 && this.currentWorkflow.length > 0 && this.currentAccount.login != '' && this.currentAccount.siret != '') {
             return false;
         } else {
             return true;
@@ -119,8 +118,7 @@ export class XParaphComponent implements OnInit {
             {
                 "info": {
                     "siret": this.currentAccount.siret,
-                    "login": this.currentAccount.login,
-                    "password": this.currentAccount.password
+                    "login": this.currentAccount.login
                 },
                 "steps": []
             };
