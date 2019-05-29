@@ -364,7 +364,7 @@ export const LANG_FR = {
     "scriptCreated"                     : "Script créé",
     "search"                            : "Chercher",
     "searchEntities"                    : "Rechercher une entité",
-    "secondaryEntity"                   : "Entitté secondaire",
+    "secondaryEntity"                   : "Entité secondaire",
     "secondLevelAdded"                  : "Sous-chemise créée",
     "secondLevelAttached"               : "Rattacher à la sous-chemise",
     "secondLevelDeleted"                : "Sous-chemise supprimée",
