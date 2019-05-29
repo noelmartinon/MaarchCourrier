@@ -62,6 +62,7 @@
 		<parameter name="fromDetail" type="identifier" />
 		<parameter name="id" type="integer" />
 		<parameter name="relation" type="integer" />
+		<parameter name="docId" type="integer" />
 		<parameter name="rest" type="boolean" />
 	</validationRule>
 

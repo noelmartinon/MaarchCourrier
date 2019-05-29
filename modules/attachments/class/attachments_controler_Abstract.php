@@ -498,37 +498,6 @@ abstract class attachments_controler_Abstract
         return $result;
     }
 
-    public function getCorrespondingDocument($resId)
-    {
-        $infos = $this->getAttachmentInfos($resId);
-        $db2 = new Database();
-        $result = 0;
-        //var_dump($infos);
-        if ($infos['res_id_origin'] != '') {
-            if ($infos['target_table_origin']=='res_attachments') {
-                $res = 'res_id';
-            } else {
-                $res = 'res_id_version';
-            }
-            $stmt2 = $db2->query(
-                "SELECT res_id, res_id_version, relation, attachment_type
-                    FROM res_view_attachments 
-                    WHERE ".$res." = ? "
-                    . "ORDER BY relation desc",
-                    array(
-                        $infos['res_id_origin']
-                    )
-            );
-            $line = $stmt2->fetchObject();
-            
-            if ($line->res_id != 0 || $line->res_id_version != 0) {
-                $result = $line;
-            }
-        }
-        
-        return $result;
-    }
-
     /**
      * Remove temporary attachment file on docserver
      * @param   bigint $resIdAttachment id of the attachment resource

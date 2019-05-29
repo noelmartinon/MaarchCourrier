@@ -1564,7 +1564,7 @@ abstract class lists_Abstract extends Database
         $core_tools = new core_tools();
         if (($core_tools->test_service('delete_attachments', 'attachments', false) || $typist == $_SESSION['user']['UserId']) && $status != 'FRZ') {
             $return = '<a href="index.php?display=true'
-                            .'&module=attachments&page=del_attachment&relation='.$resultTheLine[1]['value'].'&id='.$resultTheLine[0]['value'].'&fromDetail='.$fromDetail.'"'
+                            .'&module=attachments&page=del_attachment&docId='.$_SESSION['doc_id'].'&relation='.$resultTheLine[1]['value'].'&id='.$resultTheLine[0]['value'].'&fromDetail='.$fromDetail.'"'
                             .'onclick="return(confirm(\''._REALLY_DELETE.' ?\n\r\n\r'
                             ._DEFINITIVE_ACTION.'\'));"><i class="tooltip fa fa-trash-alt fa-2x visaPjDel" style="color:white;font-size: 21px;padding-right: 12px;padding-bottom: 12px;padding-top:11px;margin-right:10px;" title="'._DELETE.'"></i></a>';
         } else {

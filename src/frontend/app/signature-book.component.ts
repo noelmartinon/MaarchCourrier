@@ -371,7 +371,7 @@ export class SignatureBookComponent implements OnInit {
                     resId = attachment.res_id;
                 }
 
-                this.http.get('index.php?display=true&module=attachments&page=del_attachment&id=' + resId + '&relation=' + attachment.relation + '&rest=true')
+                this.http.get('index.php?display=true&module=attachments&page=del_attachment&id=' + resId + '&relation=' + attachment.relation + '&docId=' + this.resId + '&rest=true')
                     .subscribe(() => {
                         this.refreshAttachments('del');
                     });

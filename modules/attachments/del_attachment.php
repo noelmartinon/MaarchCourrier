@@ -27,6 +27,10 @@ $func = new functions();
 $ac = new attachments_controler();
 $db = new Database();
 
+if (!empty($_REQUEST['docId'])) {
+    $_SESSION['doc_id'] = $_REQUEST['docId'];
+}
+
 //RETRIEVE INFO CURRENT ATTACHMENT
 $info_doc = $ac->getAttachmentInfos($_REQUEST['id']);
 $pdf_id = $ac->getCorrespondingPdf($_REQUEST['id']);
@@ -52,13 +56,24 @@ if ($info_doc['is_version'] == true && $info_doc['status'] != 'TMP') {
 if ($_SESSION['history']['attachdel'] == 'true') {
     $hist = new history();
     $hist->add(
-        $view, $resIdMaster, 'DEL', 'attachdel', _ATTACH_DELETED.' '._ON_DOC_NUM
+        $view,
+        $resIdMaster,
+        'DEL',
+        'attachdel',
+        _ATTACH_DELETED.' '._ON_DOC_NUM
         .$info_doc['res_id_master'].'  ('.$_REQUEST['id'].')',
-        $_SESSION['config']['databasetype'], 'attachments'
+        $_SESSION['config']['databasetype'],
+        'attachments'
     );
     $hist->add(
-        RES_ATTACHMENTS_TABLE, $_REQUEST['id'], 'DEL', 'attachdel', _ATTACH_DELETED.' : '
-        .$_REQUEST['id'], $_SESSION['config']['databasetype'], 'attachments'
+        RES_ATTACHMENTS_TABLE,
+        $_REQUEST['id'],
+        'DEL',
+        'attachdel',
+        _ATTACH_DELETED.' : '
+        .$_REQUEST['id'],
+        $_SESSION['config']['databasetype'],
+        'attachments'
     );
     if (empty($_REQUEST['rest'])) {
         echo '<script>$j("#main_error",window.parent.document).html(\''._ATTACH_DELETED.' : '.$_REQUEST['id'].'\').show().delay(5000).fadeOut();</script>';
