@@ -43,18 +43,21 @@ export class SendmailAdministrationComponent implements OnInit {
     smtpTypeList = [
         {
             id: 'smtp',
-            label: this.lang.smtp
+            label: this.lang.smtpclient
         },
         {
             id: 'sendmail',
-            label: 'Sendmail'
+            label: this.lang.smtprelay
         },
         {
             id: 'qmail',
-            label: 'Qmail'
+            label: this.lang.qmail
+        },
+        {
+            id: 'mail',
+            label: this.lang.phpmail
         }
     ];
-    smtpTypeDesc = '';
     smtpSecList = [
         {
             id : '',
@@ -103,7 +106,6 @@ export class SendmailAdministrationComponent implements OnInit {
             .subscribe((data: any) => {
                 this.sendmail = data.configuration.value
                 this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
-                this.smtpTypeDesc = this.lang[this.sendmail.type + 'Desc'];
                 
                 this.loading = false;
             }, (err) => {
@@ -113,10 +115,6 @@ export class SendmailAdministrationComponent implements OnInit {
 
     cancelModification() {
         this.sendmail = JSON.parse(JSON.stringify(this.sendmailClone));
-    }
-
-    changeDesc(e: any) {
-        this.smtpTypeDesc = this.lang[e.selected.value + 'Desc'];
     }
 
     onSubmit() {

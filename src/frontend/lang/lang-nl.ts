@@ -878,9 +878,11 @@ export const LANG_NL = {
     "since"                                 : "Sinds",
     "siret"                                 : "SIRET number", //_TO_TRANSLATE
     "siretCode"                             : "SIRET-nummer",
-    "smtp"                                  : "_TO_TRANSLATE",
+    "phpmail"                               : "Function php 'mail'", //_TO_TRANSLATE
+    "qmail"                                 : "Qmail",
+    "smtprelay"                             : "Sendmail",
+    "smtpclient"                            : "Smtp",
     "smtpAuth"                              : "_TO_TRANSLATE",
-    "smtpDesc"                              : "_TO_TRANSLATE",
     "status"                                : "Status",
     "statusAdded"                           : "Status toegevoegd",
     "statusCreation"                        : "Aanmaak van een status",

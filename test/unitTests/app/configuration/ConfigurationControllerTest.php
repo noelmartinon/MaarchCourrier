@@ -195,7 +195,7 @@ class ConfigurationControllerTest extends TestCase
         $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
-        $this->assertSame('smtp configuration data is missing or not well formatted', $responseBody->errors);
+        $this->assertSame('Configuration data is missing or not well formatted', $responseBody->errors);
     }
 
     public function testReset()

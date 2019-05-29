@@ -83,7 +83,7 @@ class ConfigurationController
             return ['errors' => 'Configuration type is missing', 'code' => 400];
         }
         
-        if ($aArgs['type'] == 'smtp') {
+        if (in_array($aArgs['type'], ['smtp', 'mail'])) {
             $check = Validator::stringType()->notEmpty()->validate($aArgs['host']);
             $check = $check && Validator::intVal()->notEmpty()->validate($aArgs['port']);
             $check = $check && Validator::boolType()->validate($aArgs['auth']);
@@ -94,7 +94,7 @@ class ConfigurationController
             $check = $check && Validator::stringType()->validate($aArgs['secure']);
             $check = $check && Validator::stringType()->validate($aArgs['from']);
             if (!$check) {
-                return ['errors' => "smtp configuration data is missing or not well formatted", 'code' => 400];
+                return ['errors' => "Configuration data is missing or not well formatted", 'code' => 400];
             }
         }
 
