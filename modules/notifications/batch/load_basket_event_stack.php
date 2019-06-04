@@ -287,6 +287,9 @@ $templates_controler      = new templates_controler();
 
 $db = new Database();
 
+\SrcCore\models\DatabasePDO::reset();
+new \SrcCore\models\DatabasePDO(['customId' => $_SESSION['custom_override_id']]);
+
 $databasetype = (string)$xmlconfig->CONFIG_BASE->databasetype;
 
 // Collection for res
