@@ -36,6 +36,7 @@ class CurlModel
         $opts = [
             CURLOPT_URL => $curlConfig['url'],
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
         ];
 
         if (empty($aArgs['multipleObject'])) {
@@ -261,7 +262,7 @@ class CurlModel
         ValidatorModel::stringType($args, ['url', 'method', 'user', 'password']);
         ValidatorModel::arrayType($args, ['headers', 'queryParams', 'basicAuth', 'bearerAuth']);
 
-        $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true];
+        $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false];
 
         //Headers
         if (!empty($args['headers'])) {
