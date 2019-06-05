@@ -48,7 +48,7 @@ if ($category_id == "incoming" || $category_id == 'attachment' || ($category_id 
         echo "{status: 1, chronoNB: '".functions::xssafe($myChrono)."'}";
     }
 } elseif ($category_id == "outgoing" && $nb_attachment == 0) {
-    $stmt = $db->query("SELECT alt_identifier FROM ".$view." WHERE res_id = ?", array($_SESSION['doc_id']));
+    $stmt = $db->query("SELECT alt_identifier FROM mlb_coll_ext WHERE res_id = ?", array($_SESSION['doc_id']));
     $chronoMaster = $stmt->fetchObject();
     echo "{status: 1, chronoNB: '".functions::xssafe($chronoMaster->alt_identifier)."'}";
 }
