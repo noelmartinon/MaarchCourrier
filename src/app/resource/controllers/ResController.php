@@ -754,7 +754,7 @@ class ResController
         $select = explode(',', $data['select']);
 
         $sve_start_date = false;
-        if ($keySve = array_search('sve_start_date', $select)) {
+        if ($keySve = array_search('sve_start_date', array_map('trim', $select))) {
             unset($select[$keySve]);
             $sve_start_date = true;
         }

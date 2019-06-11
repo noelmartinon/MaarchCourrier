@@ -60,7 +60,7 @@ class AcknowledgementReceiptModel
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['acknowledgement_receipts'],
             'where'     => ['res_id in (?)'],
-            'data'      => $aArgs['resIds'],
+            'data'      => [$aArgs['resIds']],
             'order_by'  => empty($aArgs['orderBy']) ? [] : $aArgs['orderBy'],
             'groupBy'   => empty($aArgs['groupBy']) ? [] : $aArgs['groupBy']
         ]);
