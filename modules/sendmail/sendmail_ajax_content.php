@@ -301,7 +301,7 @@ switch ($mode) {
                                     $userInfo = \User\models\UserModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['id', 'mail']]);
                                     
                                     $aSenderInfo = explode(",", $_REQUEST['sender_email']);
-                                    if (!empty($aSenderInfo[1])) {
+                                    if (!empty($aSenderInfo[1]) && !empty($aSenderInfo[0])) {
                                         $entityInfo = \Entity\models\EntityModel::getByEntityId(['entityId' => $aSenderInfo[0], 'select' => ['id']]);
                                     }
                                     $isSent = \Email\controllers\EmailController::createEmail([

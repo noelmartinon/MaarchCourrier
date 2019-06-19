@@ -103,7 +103,7 @@
             (opened)="onSubmit();initEmailSend()">
             <mat-nav-list disableRipple="true" style="display: flex;flex-direction: column;">
                 <h3 mat-subheader>{{lang.emailSendTest}}</h3>
-                <div class="form-group" [style.opacity]="['smtp', 'mail'].indexOf(sendmail.type) > -1 ? '1' : '0.5'">
+                <div class="form-group">
                     <div class="col-md-12">
                         <form #testSendmailForm="ngForm">
                             <mat-form-field>

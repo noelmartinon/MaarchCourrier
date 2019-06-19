@@ -247,6 +247,17 @@ class EmailController
 
         $phpmailer = new PHPMailer();
 
+        $emailFrom = empty($configuration['from']) ? $email['sender']['email'] : $configuration['from'];
+        if (empty($email['sender']['entityId'])) {
+            // Usefull for old sendmail server which doesn't support accent encoding
+            $setFrom = TextFormatModel::normalize(['string' => "{$user['firstname']} {$user['lastname']}"]);
+            $phpmailer->setFrom($emailFrom, ucwords($setFrom));
+        } else {
+            $entity = EntityModel::getById(['id' => $email['sender']['entityId'], 'select' => ['short_label']]);
+            // Usefull for old sendmail server which doesn't support accent encoding
+            $setFrom = TextFormatModel::normalize(['string' => $entity['short_label']]);
+            $phpmailer->setFrom($emailFrom, ucwords($setFrom));
+        }
         if (in_array($configuration['type'], ['smtp', 'mail'])) {
             if ($configuration['type'] == 'smtp') {
                 $phpmailer->isSMTP();
@@ -266,18 +277,6 @@ class EmailController
                 if (!empty($configuration['password'])) {
                     $phpmailer->Password = PasswordModel::decrypt(['cryptedPassword' => $configuration['password']]);
                 }
-            }
-
-            $emailFrom = empty($configuration['from']) ? $email['sender']['email'] : $configuration['from'];
-            if (empty($email['sender']['entityId'])) {
-                // Usefull for old sendmail server which doesn't support accent encoding
-                $setFrom = TextFormatModel::normalize(['string' => "{$user['firstname']} {$user['lastname']}"]);
-                $phpmailer->setFrom($emailFrom, ucwords($setFrom));
-            } else {
-                $entity = EntityModel::getById(['id' => $email['sender']['entityId'], 'select' => ['short_label']]);
-                // Usefull for old sendmail server which doesn't support accent encoding
-                $setFrom = TextFormatModel::normalize(['string' => $entity['short_label']]);
-                $phpmailer->setFrom($emailFrom, ucwords($setFrom));
             }
         } elseif ($configuration['type'] == 'sendmail') {
             $phpmailer->isSendmail();
