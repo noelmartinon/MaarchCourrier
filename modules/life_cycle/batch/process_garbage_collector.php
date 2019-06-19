@@ -71,9 +71,7 @@ while ($GLOBALS['state'] <> "END") {
         /**********************************************************************/
         case 'SELECT_RES' :
             if (isset($GLOBALS['dateToPurgeDEL']) && !empty($GLOBALS['dateToPurgeDEL'])) {
-                //$where_clause = "STATUS = 'DEL' and creation_date <= '" . $GLOBALS['dateToPurgeDEL'] . "'";
-                // ONLY FOR TEST
-                $where_clause = "creation_date <= '" . $GLOBALS['dateToPurgeDEL'] . "'";
+                $where_clause = "STATUS = 'DEL' and creation_date <= '" . $GLOBALS['dateToPurgeDEL'] . "'";
                 if ($GLOBALS['resAlreadyDone']) {
                     echo 'attach turn' . PHP_EOL;
                     //SECOND SELECT THE ATTACH IN DEL STATUS
@@ -92,7 +90,7 @@ while ($GLOBALS['state'] <> "END") {
                     $GLOBALS['adrTable'] = 'adr_letterbox';
                     $GLOBALS['resAlreadyDone'] = true;
                 }
-                if(!$GLOBALS['resAlreadyDone'] && !$GLOBALS['attachAlreadyDone']) {
+                if (!$GLOBALS['resAlreadyDone'] && !$GLOBALS['attachAlreadyDone']) {
                     echo 'resAlreadyDone and attachAlreadyDone' . PHP_EOL;
                     $state = 'SELECT_RES';
                     break;
