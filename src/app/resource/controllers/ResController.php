@@ -754,11 +754,16 @@ class ResController
         $select = explode(',', $data['select']);
 
         $sve_start_date = false;
-        if ($keySve = array_search('sve_start_date', array_map('trim', $select))) {
+        $keySve = array_search('sve_start_date', array_map('trim', $select));
+        if ($keySve !== false) {
             unset($select[$keySve]);
             $sve_start_date = true;
         }
         
+        if ($sve_start_date && empty($select)) {
+            $select[] = 'res_id';
+        }
+
         if (!PreparedClauseController::isRequestValid(['select' => $select, 'clause' => $data['clause'], 'orderBy' => $data['orderBy'], 'limit' => $data['limit'], 'userId' => $GLOBALS['userId']])) {
             return $response->withStatus(400)->withJson(['errors' => _INVALID_REQUEST]);
         }
