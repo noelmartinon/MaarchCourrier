@@ -719,7 +719,7 @@ class htmlMimeMail
             case 'mail':
                 $subject = '';
                 if (!empty($this->headers['Subject'])) {
-                    $subject = $this->_encodeHeader($this->header['Subject'], $this->build_params['head_charset']);
+                    $subject = $this->_encodeHeader($this->headers['Subject'], $this->build_params['head_charset']);
                     unset($this->headers['Subject']);
                 }
 
