@@ -740,4 +740,17 @@ abstract class SendmailAbstract extends Database
             return _EMAIL_DRAFT;
         }
     }
+
+    public function messageExchangeStatus(array $args)
+    {
+        if ($args['status'] == 'S') {
+            return _EMAIL_SENT;
+        } elseif ($args['status'] == 'E') {
+            return _EMAIL_ERROR;
+        } elseif ($args['status'] == 'W') {
+            return _EMAIL_WAIT;
+        } else {
+            return _EMAIL_DRAFT;
+        }
+    }
 }

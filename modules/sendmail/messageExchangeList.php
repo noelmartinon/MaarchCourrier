@@ -135,7 +135,7 @@ if (!empty($tab)) {
                     $tab[$i][$j]["order"]       = 'account_id';
                 }
                 if ($tab[$i][$j][$value]=="status_label") {
-                    $tab[$i][$j]['value']       = $sendmail_tools->emailStatus(['status' => $tab[$i][$j]['value']]);
+                    $tab[$i][$j]['value']       = $sendmail_tools->messageExchangeStatus(['status' => $tab[$i][$j]['value']]);
                     $tab[$i][$j]["label"]       = _STATUS;
                     $tab[$i][$j]["size"]        = "1";
                     $tab[$i][$j]["label_align"] = "left";

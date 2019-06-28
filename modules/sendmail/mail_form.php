@@ -457,7 +457,7 @@ if ($mode == 'add') {
                 }
 
                 $content .= '><span style="font-size: 10px;color: rgb(22, 173, 235);">'.$attachment_type.'</span> <span style="font-size: 10px;color: grey;">('.$att_type.' - '.$filesize.')</span><br/><strong>'.$description.'</strong>';
-                if ($attachment_files[$i]['pdf_exist'] && $format != 'pdf') {
+                if ($attachment_files[$i]['pdf_exist'] && $format != 'pdf' && $formContent != 'messageExchange') {
                     $content .= ' (<input style="margin: 0px" title="envoyer la version PDF" type="checkbox" id="join_attachment_'.$i.'" name="'.$inputName.'"'
                     .' class="check" value="'
                     .$id.'#PDF" />version pdf)';

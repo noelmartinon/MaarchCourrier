@@ -242,9 +242,13 @@ class SendMessageExchangeController
 
                     $oComment        = new stdClass();
                     $date            = new DateTime($value['creation_date']);
-                    $entityRoot      = \Entity\models\EntityModel::getEntityRootById(['entityId' => $value['entity_id']]);
-                    $userEntity      = \Entity\models\entitymodel::getByEntityId(['entityId' => $value['entity_id']]);
-                    $oComment->value = $value['firstname'].' '.$value['lastname'].' - '.$date->format('d-m-Y H:i:s').' ('.$entityRoot['entity_label'].' - '.$userEntity['entity_label'].') : '.$value['note_text'];
+                    $additionalUserInfos = '';
+                    if (!empty($value['entity_id'])) {
+                        $entityRoot      = \Entity\models\EntityModel::getEntityRootById(['entityId' => $value['entity_id']]);
+                        $userEntity      = \Entity\models\entitymodel::getByEntityId(['entityId' => $value['entity_id']]);
+                        $additionalUserInfos = ' ('.$entityRoot['entity_label'].' - '.$userEntity['entity_label'].')';
+                    }
+                    $oComment->value = $value['firstname'].' '.$value['lastname'].' - '.$date->format('d-m-Y H:i:s'). $additionalUserInfos . ' : '.$value['note_text'];
                     array_push($aReturn, $oComment);
                 }
             }
@@ -451,7 +455,7 @@ class SendMessageExchangeController
         $aDefaultConfig = \Sendmail\Controllers\ReceiveMessageExchangeController::readXmlConfig();
 
         $traCommunicationObject->Channel = $aArgs['ChannelType'];
-        $traCommunicationObject->value   = $aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']];
+        $traCommunicationObject->value   = rtrim($aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']], "/");
 
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Communication = [$traCommunicationObject];
 

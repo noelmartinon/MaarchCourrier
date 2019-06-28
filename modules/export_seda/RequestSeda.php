@@ -33,7 +33,7 @@ class RequestSeda
     {
 
         //create session if NO SESSION
-        /*if (empty($_SESSION['user'])) {
+        if (empty($_SESSION['user'])) {
             require_once('core/class/class_functions.php');
             include_once('core/init.php');
             require_once('core/class/class_portal.php');
@@ -76,7 +76,7 @@ class RequestSeda
             $businessAppTools->build_business_app_config();
             $coreTools->load_modules_config($_SESSION['modules']);
             $coreTools->load_menu($_SESSION['modules']);
-        }*/
+        }
 
         $this->statement = [];
         if ($db) {
