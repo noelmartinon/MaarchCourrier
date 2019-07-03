@@ -128,6 +128,14 @@
                 <key>firstname</key>
                 <value>contact_firstname</value>
             </rawData>
+            <rawData>
+                <key>civility</key>
+                <value>contact_title</value>
+            </rawData>
+            <rawData>
+                <key>company</key>
+                <value>society</value>
+            </rawData>
             <data>
                 <key>cityId</key>
                 <value>73</value>

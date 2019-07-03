@@ -2285,6 +2285,7 @@ abstract class contacts_v2_Abstract extends Database
                             $select[] = 'ca_id';
                             $select[] = 'firstname';
                             $select[] = 'lastname';
+                            $select[] = 'title';
                             $document = \Contact\models\ContactModel::getOnView(['select' => $select, 'where' => ['contact_id = ?'], 'data' => [$_SESSION['contact']['current_contact_id']]]);
                             if (!empty($document[0])) {
                                 foreach ($object['rawData'] as $key => $value) {
@@ -2292,6 +2293,8 @@ abstract class contacts_v2_Abstract extends Database
                                         $value = 'firstname';
                                     } elseif ($value == 'contact_lastname' && empty($document[0][$value])) {
                                         $value = 'lastname';
+                                    } elseif ($value == 'contact_title' && empty($document[0][$value])) {
+                                        $value = 'title';
                                     }
                                     $tmpBodyData[$key] = $document[0][$value];
                                 }
