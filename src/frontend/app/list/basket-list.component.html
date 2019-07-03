@@ -121,6 +121,7 @@
                                             <mat-icon *ngIf="row.isLocked !== true" title="{{row.statusLabel}}" [ngStyle]="{'color': row.priorityColor}" color="primary"
                                                 class="{{row.statusImage.charAt(0)}}{{row.statusImage.charAt(1)}} {{row.statusImage}} {{row.statusImage.charAt(0)}}{{row.statusImage.charAt(1)}}-2x">
                                             </mat-icon>
+                                            <span *ngIf="row.confidentiality === 'Y'" class="watermark">{{lang.confidential}}</span>
                                             <mat-icon *ngIf="row.isLocked === true" title="{{lang.warnLockResInProgress}} : {{row.locker}}" style="color: red;" class="fa fa-lock fa-2x">
                                             </mat-icon>
                                         </span>

@@ -1021,4 +1021,5 @@ export const LANG_NL = {
     "workingDays"                           : "werkdag(en)",
     "yes"                                   : "Ja",
     "zipcode"                               : "Postcode",
+    "confidential" : "Confidential", //_TO_TRANSLATE
 };

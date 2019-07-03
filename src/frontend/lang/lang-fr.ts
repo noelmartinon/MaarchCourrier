@@ -1027,4 +1027,5 @@ export const LANG_FR = {
     "workingDays"                           : "jour(s) ouvré(s)",
     "yes"                                   : "Oui",
     "zipcode"                               : "Code postal",
+    "confidential" : "Confidentiel",
 };

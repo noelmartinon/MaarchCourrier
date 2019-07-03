@@ -850,8 +850,8 @@ export const LANG_EN = {
     "since"                                 : "Since",
     "siret"                                 : "SIRET number",
     "siretCode"                             : "SIRET code",
-    "phpmail"                               : "Function php 'mail'",
-    "qmail"                                 : "Local mail server 'Qmail'",
+    "phpmail"                               : "Function php (mail)",
+    "qmail"                                 : "Local mail server (Qmail)",
     "smtprelay"                             : "Smtp relay (sendmail)",
     "smtpclient"                            : "Smtp client (smtp)",
     "smtpAuth"                              : "Authentication methode",
@@ -994,4 +994,5 @@ export const LANG_EN = {
     "workingDays"                           : "Working days",
     "yes"                                   : "Yes",
     "zipcode"                               : "Zip code",
+    "confidential" : "Confidential",
 };
