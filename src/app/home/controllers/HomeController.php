@@ -102,6 +102,7 @@ class HomeController
                 'priorities.color as priority_color',
                 'mlb.process_limit_date',
                 'r.res_id',
+                'r.confidentiality',
                 'status.img_filename as status_icon',
                 'status.label_status as status_label',
                 'status.id as status_id',

@@ -395,3 +395,13 @@ h1.admin-app-name {
 .mat-tab-body-content {
     height: auto !important;
 }
+
+.watermark {
+    position: absolute;
+    transform: rotate(-20deg);
+    color: red;
+    font-weight: bold;
+    margin-left: -80px;
+    margin-top: 10px;
+    opacity: 0.6;
+}

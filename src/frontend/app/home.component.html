@@ -38,6 +38,7 @@
                             </div>
                             <div style="overflow: hidden;text-overflow: ellipsis;">
                                 <mat-icon [ngStyle]="{'color': row.priority_color}" color="primary" class="{{row.status_icon.charAt(0)}}{{row.status_icon.charAt(1)}} {{row.status_icon}} {{row.status_icon.charAt(0)}}{{row.status_icon.charAt(1)}}-2x" title="{{row.status_label}} ({{row.status_id}})"></mat-icon>
+                                <span *ngIf="row.confidentiality === 'Y'" class="watermark">{{lang.confidential}}</span>
                             </div>
                             <div style="padding-top: 5px;color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;" title="{{row.alt_identifier}} (n°{{row.res_id}})">
                                 {{row.alt_identifier}}
