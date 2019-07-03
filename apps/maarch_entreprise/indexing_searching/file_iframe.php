@@ -79,6 +79,7 @@ if (isset($_GET['num'])) {
         if (empty($return['errors'])) {
             $fileNameBasename = pathinfo($return['fullFilename'], PATHINFO_BASENAME);
             $_SESSION['upfile'][$num]['fileNamePdfOnTmp'] = $fileNameBasename;
+            $mimeType = $is->get_mime_type('pdf');
             header('Pragma: public');
             header('Expires: 0');
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
@@ -135,8 +136,9 @@ if (isset($_GET['num'])) {
             $core->load_html();
             $core->load_header();
             //time = $core->get_session_time_expire();?>
-            <body style="background: url(static.php?filename=logo_maarch_only.svg) center center no-repeat;background-size: 90%;">
-            <?php
+
+<body style="background: url(static.php?filename=logo_maarch_only.svg) center center no-repeat;background-size: 90%;">
+    <?php
             $ext = strtolower($_SESSION['upfile'][$num]['format']);
             if (file_exists($_SESSION['upfile'][$num]['local_path'])) {
                 echo '<br/><br/><div class="error" style="display:block">'
@@ -150,14 +152,14 @@ if (isset($_GET['num'])) {
                 echo '<br/><br/><div class="error" style="display:block">'
                 ._PROBLEM_LOADING_FILE_TMP_DIR.'.</div>';
             } ?>
-            &nbsp;
-            </body>
-            </html>
-            <?php
+    &nbsp;
+</body>
+
+</html>
+<?php
         }
     }
 } else {
-    
     $extension = explode('.', $_SESSION['upfile']['name']);
     $count_level = count($extension) - 1;
     $the_ext = $extension[$count_level];
@@ -271,8 +273,9 @@ if (isset($_GET['num'])) {
             $core->load_html();
             $core->load_header();
             //time = $core->get_session_time_expire();?>
-            <body style="background: url(static.php?filename=logo_maarch_only.svg) center center no-repeat;background-size: 90%;">
-            <?php
+
+<body style="background: url(static.php?filename=logo_maarch_only.svg) center center no-repeat;background-size: 90%;">
+    <?php
                 $ext = strtolower($_SESSION['upfile']['format']);
             if (file_exists($_SESSION['upfile']['local_path'])) {
                 echo '<br/><br/><div class="advertissement">'
@@ -283,16 +286,18 @@ if (isset($_GET['num'])) {
                 echo '<br/><br/><div class="error" style="display:block">'
                     ._PROBLEM_LOADING_FILE_TMP_DIR.'.</div>';
             } ?>
-            &nbsp;
-            </body>
-            </html>
-            <?php
+    &nbsp;
+</body>
+
+</html>
+<?php
         }
     } else {
         $core->load_html();
         $core->load_header(); ?>
-        <body style="background: url(static.php?filename=logo_maarch_only.svg) center center no-repeat;background-size: 90%;">
-        <?php
+
+<body style="background: url(static.php?filename=logo_maarch_only.svg) center center no-repeat;background-size: 90%;">
+    <?php
         if (isset($_SESSION['upfile']['error'])
             && $_SESSION['upfile']['error'] == 1
         ) {
@@ -315,9 +320,10 @@ if (isset($_GET['num'])) {
             echo '</ul></div>';
         }
         $_SESSION['error'] = ''; ?>
-        &nbsp;
-        </body>
-        </html>
-        <?php
+    &nbsp;
+</body>
+
+</html>
+<?php
     }
 }
