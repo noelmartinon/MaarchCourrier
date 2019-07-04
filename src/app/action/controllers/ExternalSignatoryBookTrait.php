@@ -13,13 +13,11 @@
 namespace Action\controllers;
 
 use Attachment\models\AttachmentModel;
-use Entity\models\ListInstanceModel;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
 use ExternalSignatoryBook\controllers\XParaphController;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
-use User\models\UserModel;
 
 trait ExternalSignatoryBookTrait
 {
@@ -59,13 +57,12 @@ trait ExternalSignatoryBookTrait
                     return ['errors' => ['No attachment for this mail : ' . $noAttachmentsResource['alt_identifier']]];
                 }
 
-                $processingUserInfo = MaarchParapheurController::getUserById(['config' => $config, 'id' => $args['data']['processingUser']]);
                 $sendedInfo = MaarchParapheurController::sendDatas([
-                    'config'           => $config,
-                    'resIdMaster'      => $args['resId'],
-                    'processingUser'   => $processingUserInfo['login'],
-                    'objectSent'       => $args['data']['objectSent'],
-                    'userId'           => $GLOBALS['userId']
+                    'config'      => $config,
+                    'resIdMaster' => $args['resId'],
+                    'objectSent'  => 'attachment',
+                    'userId'      => $GLOBALS['userId'],
+                    'steps'       => $args['data']['steps'],
                 ]);
                 if (!empty($sendedInfo['error'])) {
                     return ['errors' => [$sendedInfo['error']]];
@@ -73,7 +70,7 @@ trait ExternalSignatoryBookTrait
                     $attachmentToFreeze = $sendedInfo['sended'];
                 }
 
-                $historyInfo = ' (à ' . $processingUserInfo['firstname'] . ' ' . $processingUserInfo['lastname'] . ')';
+                $historyInfo = $sendedInfo['historyInfos'];
             } elseif ($config['id'] == 'xParaph') {
                 $attachments = AttachmentModel::getOnView([
                     'select'    => [
@@ -126,33 +123,6 @@ trait ExternalSignatoryBookTrait
                             'externalId' => $externalId
                         ]);
                     }
-                }
-            }
-
-            $document = ResModel::getById(['resId' => $args['resId'], 'select' => ['status']]);
-            
-            if ($document['status'] == 'EVIS' || $document['status'] == 'ESIG') {
-                $stepDetails = ListInstanceModel::getCurrentStepByResId(['resId' => $args['resId']]);
-
-                if (!empty($stepDetails) && $stepDetails['item_id'] != $GLOBALS['userId']) {
-                    ListInstanceModel::update([
-                        'set'   => ['process_date' => 'CURRENT_TIMESTAMP'],
-                        'where' => ['listinstance_id = ?', 'item_mode = ?', 'res_id = ?', 'item_id = ?', 'difflist_type = ?'],
-                        'data'  => [$stepDetails['listinstance_id'], $stepDetails['item_mode'], $args['resId'], $stepDetails['item_id'], 'VISA_CIRCUIT']
-                    ]);
-
-                    $currentUserInfo = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['firstname', 'lastname']]);
-                    $visaUserInfo = UserModel::getByLogin(['login' => $stepDetails['item_id'], 'select' => ['firstname', 'lastname']]);
-        
-                    $historyInfo = ' ' . _VISA_BY . ' ' . $currentUserInfo['firstname'] . ' ' . $currentUserInfo['lastname'] . ' ' . _INSTEAD_OF . ' ' . $visaUserInfo['firstname'] . ' ' . $visaUserInfo['lastname'];
-                } elseif (!empty($stepDetails)) {
-                    ListInstanceModel::update([
-                        'set'   => ['process_date' => 'CURRENT_TIMESTAMP'],
-                        'where' => ['listinstance_id = ?', 'item_mode = ?', 'res_id = ?', 'item_id = ?', 'difflist_type = ?'],
-                        'data'  => [$stepDetails['listinstance_id'], $stepDetails['item_mode'], $args['resId'], $GLOBALS['userId'], 'VISA_CIRCUIT']
-                    ]);
-
-                    $historyInfo = '';
                 }
             }
         }

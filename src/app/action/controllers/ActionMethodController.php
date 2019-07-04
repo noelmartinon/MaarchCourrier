@@ -12,18 +12,20 @@
 
 namespace Action\controllers;
 
+use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
+use Action\models\ActionModel;
+use Action\models\BasketPersistenceModel;
+use Action\models\ResMarkAsReadModel;
 use Entity\controllers\ListInstanceController;
 use Entity\models\ListInstanceModel;
+use ExternalSignatoryBook\controllers\MaarchParapheurController;
 use History\controllers\HistoryController;
+use MessageExchange\controllers\MessageExchangeReviewController;
 use Note\models\NoteModel;
 use Resource\models\ResModel;
-use Action\models\ResMarkAsReadModel;
-use Action\models\BasketPersistenceModel;
-use Action\models\ActionModel;
-use SrcCore\models\ValidatorModel;
+use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
-use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
-use MessageExchange\controllers\MessageExchangeReviewController;
+use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
 class ActionMethodController
@@ -42,6 +44,7 @@ class ActionMethodController
         'disabledBasketPersistenceAction'       => 'disabledBasketPersistenceAction',
         'resMarkAsReadAction'                   => 'resMarkAsReadAction',
         'sendExternalSignatoryBookAction'       => 'sendExternalSignatoryBookAction',
+        'sendExternalNoteBookAction'            => 'sendExternalNoteBookAction',
         'createAcknowledgementReceiptsAction'   => 'createAcknowledgementReceipts',
         'updateAcknowledgementSendDateAction'   => 'updateAcknowledgementSendDateAction',
         'sendShippingAction'                    => 'createMailevaShippings'
@@ -263,5 +266,50 @@ class ActionMethodController
         }
 
         return true;
+    }
+
+    public static function sendExternalNoteBookAction(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
+        $config = [];
+
+        if (!empty($loadedXml)) {
+            $config['id'] = 'maarchParapheur';
+            foreach ($loadedXml->signatoryBook as $value) {
+                if ($value->id == $config['id']) {
+                    $config['data'] = (array)$value;
+                    break;
+                }
+            }
+
+            $processingUserInfo = MaarchParapheurController::getUserById(['config' => $config, 'id' => $args['data']['processingUser']]);
+            $sendedInfo = MaarchParapheurController::sendDatas([
+                'config'           => $config,
+                'resIdMaster'      => $args['resId'],
+                'processingUser'   => $processingUserInfo['login'],
+                'objectSent'       => 'mail',
+                'userId'           => $GLOBALS['userId']
+            ]);
+            if (!empty($sendedInfo['error'])) {
+                return ['errors' => [$sendedInfo['error']]];
+            } else {
+                $attachmentToFreeze = $sendedInfo['sended'];
+            }
+
+            $historyInfo = ' (à ' . $processingUserInfo['firstname'] . ' ' . $processingUserInfo['lastname'] . ')';
+        }
+
+        if (!empty($attachmentToFreeze)) {
+            ResModel::update([
+                'set' => ['external_signatory_book_id' => $attachmentToFreeze['letterbox_coll'][$args['resId']]],
+                'where' => ['res_id = ?'],
+                'data' => [$args['resId']]
+            ]);
+        }
+
+        return ['history' => $historyInfo];
     }
 }

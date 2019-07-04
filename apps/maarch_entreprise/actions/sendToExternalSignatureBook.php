@@ -50,7 +50,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
     }
 
     $html = '<div id="frm_error_'.$id_action.'" class="error"></div>';
-    $html .= '<h2 class="title">' . $labelAction . '</h2>';
+    $html .= '<h2 class="title">'._ACTION_CONFIRM. '<br>' . $labelAction . '</h2>';
 
     $html .= '<form name="sendToExternalSB" id="sendToExternalSB" method="post" class="forms" action="#">';
     $html .= '<input type="hidden" name="chosen_action" id="chosen_action" value="end_action" />';
@@ -71,7 +71,31 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
         } elseif ($config['id'] == 'maarchParapheur') {
             include_once 'modules/visa/class/MaarchParapheurController.php';
 
-            $htmlModal = MaarchParapheurController::getModal($config);
+            $htmlModal = MaarchParapheurController::getInitializeDatas($config);
+
+            if (empty($htmlModal['error'])) {
+                $aUsersInMP = [];
+                foreach ($htmlModal['users'] as $value) {
+                    $aUsersInMP[] = $value['id'];
+                }
+                $documentIds = explode(", ", $values_str);
+                foreach ($documentIds as $resId) {
+                    $listinstances = \Entity\models\ListInstanceModel::getVisaCircuitByResId(['select' => ['external_id', 'firstname', 'lastname'], 'id' => $resId]);
+                    if (empty($listinstances)) {
+                        $htmlModal['error'] = _EMPTY_VISA_WORKFLOW;
+                        break;
+                    }
+    
+                    foreach ($listinstances as $user) {
+                        $externalId = json_decode($user['external_id'], true);
+                        if (!in_array($externalId['maarchParapheur'], $aUsersInMP)) {
+                            $htmlModal['error'] = _EMPTY_VISA_WORKFLOW;
+                            break 2;
+                        }
+                    }
+                }
+                $htmlModal = '';
+            }
         }
 
         if (!empty($htmlModal['error'])) {
@@ -122,8 +146,6 @@ function check_form($form_id, $values)
             }
         }
         if ($config['id'] == 'maarchParapheur') {
-            $objectSentSign = get_value_fields($values, 'objectSentSign');
-            $objectSentNote  = get_value_fields($values, 'objectSentNote');
             $hasAttachmentError = hasAttachmentError();
             if (!empty($_SESSION['stockCheckbox'])) {
                 $aResources = $_SESSION['stockCheckbox'];
@@ -131,14 +153,14 @@ function check_form($form_id, $values)
                 $aResources = [$_SESSION['doc_id']];
             }
 
-            if ($objectSentSign == 'attachment' && $hasAttachmentError['error']) {
+            if ($hasAttachmentError['error']) {
                 if (!empty($_SESSION['stockCheckbox'])) {
                     $_SESSION['action_error'] = _MAIL_HAS_NO_RESPONSE_PROJECT . ' : ' . implode(",", $hasAttachmentError['resList']);
                 } else {
                     $_SESSION['action_error'] = _NO_RESPONSE_PROJECT_VISA;
                 }
                 return false;
-            } elseif ($objectSentSign == 'attachment') {
+            } else {
                 foreach ($aResources as $resId) {
                     $attachments = \Attachment\models\AttachmentModel::getOnView([
                         'select'    => [
@@ -168,16 +190,6 @@ function check_form($form_id, $values)
                             $_SESSION['action_error'] = _FILE_MISSING . ' : ' . $filePath;
                             return false;
                         }
-                    }
-                }
-            } elseif ($objectSentNote == 'mail') {
-                foreach ($aResources as $resId) {
-                    $adrMainInfo = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => 'letterbox_coll']);
-                    $docserverMainInfo = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrMainInfo['docserver_id']]);
-                    $filePath = $docserverMainInfo['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
-                    if (!is_file($filePath)) {
-                        $_SESSION['action_error'] = _FILE_MISSING . ' : ' . $filePath;
-                        return false;
                     }
                 }
             }
@@ -226,23 +238,26 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 include_once 'modules/visa/class/FastParapheurController.php';
                 $attachmentToFreeze = FastParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
             } elseif ($config['id'] == 'maarchParapheur') {
-
-                $processingUser  = get_value_fields($values_form, 'processingUser');
-                $objectSentNote  = get_value_fields($values_form, 'objectSentNote');
-                $objectSentSign  = get_value_fields($values_form, 'objectSentSign');
-
-                if (!empty($objectSentNote)) {
-                    $objectSent = $objectSentNote;
-                } else {
-                    $objectSent = $objectSentSign;
+                $listinstances = \Entity\models\ListInstanceModel::getVisaCircuitByResId(['select' => ['external_id', 'users.user_id', 'requested_signature'], 'id' => $res_id]);
+                if (empty($listinstances)) {
+                    var_dump('No visa workflow');
                 }
-                $processingUserInfo = \ExternalSignatoryBook\controllers\MaarchParapheurController::getUserById(['config' => $config, 'id' => $processingUser]);
+    
+                $workflow = [];
+                foreach ($listinstances as $user) {
+                    $externalId = json_decode($user['external_id'], true);
+                    if (empty($externalId['maarchParapheur'])) {
+                        return ['error' => 'Some users do not exist in Maarch Parapheur'];
+                    }
+                    $workflow[] = ['userId' => $externalId['maarchParapheur'], 'mode' => ($user['requested_signature'] ? 'sign' : 'visa')];
+                }
+
                 $sendedInfo = \ExternalSignatoryBook\controllers\MaarchParapheurController::sendDatas([
-                    'config'             => $config,
-                    'resIdMaster'        => $res_id,
-                    'processingUser'     => $processingUserInfo['login'],
-                    'objectSent'         => $objectSent,
-                    'userId'             => $_SESSION['user']['UserId']
+                    'config'      => $config,
+                    'resIdMaster' => $res_id,
+                    'objectSent'  => 'attachment',
+                    'userId'      => $_SESSION['user']['UserId'],
+                    'steps'       => $workflow,
                 ]);
                 if (!empty($sendedInfo['error'])) {
                     var_dump($sendedInfo['error']);
@@ -251,47 +266,28 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                     $attachmentToFreeze = $sendedInfo['sended'];
                 }
 
-                $message = ' (à ' . $processingUserInfo['firstname'] . ' ' . $processingUserInfo['lastname'] . ')';
+                $message = $sendedInfo['historyInfos'];
             }
         }
 
         if (!empty($attachmentToFreeze)) {
-            if (!empty($attachmentToFreeze['letterbox_coll'])) {
-                \Resource\models\ResModel::update([
-                    'set' => ['external_signatory_book_id' => $attachmentToFreeze['letterbox_coll'][$res_id]],
-                    'where' => ['res_id = ?'],
-                    'data' => [$res_id]
-                ]);
-            } else {
-                if (!empty($attachmentToFreeze['attachments_coll'])) {
-                    foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
-                        \Attachment\models\AttachmentModel::freezeAttachment([
-                            'resId' => $resId,
-                            'table' => 'res_attachments',
-                            'externalId' => $externalId
-                        ]);
-                    }
-                }
-                if (!empty($attachmentToFreeze['attachments_version_coll'])) {
-                    foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
-                        \Attachment\models\AttachmentModel::freezeAttachment([
-                            'resId' => $resId,
-                            'table' => 'res_version_attachments',
-                            'externalId' => $externalId
-                        ]);
-                    }
+            if (!empty($attachmentToFreeze['attachments_coll'])) {
+                foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
+                    \Attachment\models\AttachmentModel::freezeAttachment([
+                        'resId' => $resId,
+                        'table' => 'res_attachments',
+                        'externalId' => $externalId
+                    ]);
                 }
             }
-
-            $stmt     = $db->query('SELECT status FROM res_letterbox WHERE res_id = ?', array($res_id));
-            $resource = $stmt->fetchObject();
-            
-            if ($resource->status == 'EVIS' || $resource->status == 'ESIG') {
-                $sequence    = $circuit_visa->getCurrentStep($res_id, $coll_id, 'VISA_CIRCUIT');
-                $stepDetails = array();
-                $stepDetails = $circuit_visa->getStepDetails($res_id, $coll_id, 'VISA_CIRCUIT', $sequence);
-
-                $message = $circuit_visa->processVisaWorkflow(['stepDetails' => $stepDetails, 'res_id' => $res_id]);
+            if (!empty($attachmentToFreeze['attachments_version_coll'])) {
+                foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
+                    \Attachment\models\AttachmentModel::freezeAttachment([
+                        'resId' => $resId,
+                        'table' => 'res_version_attachments',
+                        'externalId' => $externalId
+                    ]);
+                }
             }
         }
     }

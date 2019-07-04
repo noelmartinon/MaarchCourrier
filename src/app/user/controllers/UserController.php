@@ -42,7 +42,6 @@ use User\models\UserBasketPreferenceModel;
 use User\models\UserEntityModel;
 use User\models\UserModel;
 use User\models\UserSignatureModel;
-use SrcCore\models\CurlModel;
 
 class UserController
 {
@@ -1336,208 +1335,54 @@ class UserController
         ]);
     }
 
-    public function sendToMaarchParapheur(Request $request, Response $response, array $aArgs)
-    {
-        $error = $this->hasUsersRights(['id' => $aArgs['id']]);
-        if (!empty($error['error'])) {
-            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
-        }
-
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
-
-        if ($loadedXml->signatoryBookEnabled == 'maarchParapheur') {
-            $userInfo = UserModel::getById(['select' => ['firstname', 'lastname', 'mail', 'external_id', 'user_id'], 'id' => $aArgs['id']]);
-
-            $bodyData = [
-                "lastname"  => $userInfo['lastname'],
-                "firstname" => $userInfo['firstname'],
-                "login"     => $userInfo['user_id'],
-                "email"     => $userInfo['mail']
-            ];
-
-            foreach ($loadedXml->signatoryBook as $value) {
-                if ($value->id == "maarchParapheur") {
-                    $url      = $value->url;
-                    $userId   = $value->userId;
-                    $password = $value->password;
-                    break;
-                }
-            }
-
-            $curlResponse = CurlModel::execSimple([
-                'url'           => rtrim($url, '/') . '/rest/users',
-                'basicAuth'     => ['user' => $userId, 'password' => $password],
-                'headers'       => ['content-type:application/json'],
-                'method'        => 'POST',
-                'body'          => json_encode($bodyData)
-            ]);
-
-            if ($curlResponse['code'] != '200') {
-                if (!empty($curlResponse['response']['errors'])) {
-                    $errors =  $curlResponse['response']['errors'];
-                } else {
-                    $errors =  $curlResponse['errors'];
-                }
-                if (empty($errors)) {
-                    $errors = 'An error occured. Please check your configuration file.';
-                }
-                return $response->withStatus(400)->withJson(['errors' => $errors]);
-            }
-        } else {
-            return $response->withStatus(403)->withJson(['errors' => 'maarchParapheur is not enabled']);
-        }
-
-        $externalId = json_decode($userInfo['external_id'], true);
-        $externalId['maarchParapheur'] = $curlResponse['response']['id'];
-
-        UserModel::updateExternalId(['id' => $aArgs['id'], 'externalId' => json_encode($externalId)]);
-
-        HistoryController::add([
-            'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
-            'eventType'    => 'ADD',
-            'eventId'      => 'userCreation',
-            'info'         => _USER_CREATED_IN_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"
-        ]);
-
-        return $response->withJson(['externalId' => $curlResponse['response']['id']]);
-    }
-
-    public function sendSignaturesToMaarchParapheur(Request $request, Response $response, array $aArgs)
-    {
-        $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
-        if (!empty($error['error'])) {
-            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
-        }
-
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
-
-        if ($loadedXml->signatoryBookEnabled == 'maarchParapheur') {
-            $userInfo   = UserModel::getById(['select' => ['external_id', 'user_id'], 'id' => $aArgs['id']]);
-            $externalId = json_decode($userInfo['external_id'], true);
-
-            if (!empty($externalId['maarchParapheur'])) {
-                $userSignatures = UserSignatureModel::get([
-                    'select'    => ['signature_path', 'signature_file_name', 'id'],
-                    'where'     => ['user_serial_id = ?'],
-                    'data'      => [$aArgs['id']]
-                ]);
-                if (empty($userSignatures)) {
-                    return $response->withStatus(400)->withJson(['errors' => 'User has no signature']);
-                }
-        
-                $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
-                if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-                    return $response->withStatus(400)->withJson(['errors' => 'Path for signature docserver does not exists']);
-                }
-
-                $signatures = [];
-                $signaturesId = [];
-                foreach ($userSignatures as $value) {
-                    $pathToSignature = $docserver['path_template'] . str_replace('#', '/', $value['signature_path']) . $value['signature_file_name'];
-                    if (is_file($pathToSignature)) {
-                        $base64          = base64_encode(file_get_contents($pathToSignature));
-                        $format          = pathinfo($pathToSignature, PATHINFO_EXTENSION);
-                        $signatures[]    = ['encodedSignature' => $base64, 'format' => $format];
-                        $signaturesId[]   = $value['id'];
-                    } else {
-                        return $response->withStatus(403)->withJson(['errors' => 'File does not exists : ' . $pathToSignature]);
-                    }
-                }
-
-                $bodyData = [
-                    "signatures"          => $signatures,
-                    "externalApplication" => 'maarchCourrier'
-                ];
-    
-                foreach ($loadedXml->signatoryBook as $value) {
-                    if ($value->id == "maarchParapheur") {
-                        $url      = $value->url;
-                        $userId   = $value->userId;
-                        $password = $value->password;
-                        break;
-                    }
-                }
-
-                $curlResponse = CurlModel::execSimple([
-                    'url'           => rtrim($url, '/') . '/rest/users/' . $externalId['maarchParapheur'] . '/externalSignatures',
-                    'basicAuth'     => ['user' => $userId, 'password' => $password],
-                    'headers'       => ['content-type:application/json'],
-                    'method'        => 'PUT',
-                    'body'          => json_encode($bodyData)
-                ]);
-            } else {
-                return $response->withStatus(403)->withJson(['errors' => 'user does not exists in maarch Parapheur']);
-            }
-
-            if ($curlResponse['code'] != '204') {
-                if (!empty($curlResponse['response']['errors'])) {
-                    $errors =  $curlResponse['response']['errors'];
-                } else {
-                    $errors =  $curlResponse['errors'];
-                }
-                if (empty($errors)) {
-                    $errors = 'An error occured. Please check your configuration file.';
-                }
-                return $response->withStatus(400)->withJson(['errors' => $errors]);
-            }
-        } else {
-            return $response->withStatus(403)->withJson(['errors' => 'maarchParapheur is not enabled']);
-        }
-
-        HistoryController::add([
-            'tableName'    => 'users',
-            'recordId'     => $userInfo['user_id'],
-            'eventType'    => 'UP',
-            'eventId'      => 'signatureSync',
-            'info'         => _SIGNATURES_SEND_TO_MAARCHPARAPHEUR . " : " . implode(", ", $signaturesId)
-        ]);
-
-        return $response->withJson(['success' => 'success']);
-    }
-
-    private function hasUsersRights(array $aArgs)
+    public function hasUsersRights(array $aArgs)
     {
         $error = [
             'status'    => 200,
             'error'     => ''
         ];
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
-        if (empty($user['user_id'])) {
+        if (!is_numeric($aArgs['id'])) {
             $error['status'] = 400;
-            $error['error'] = 'User not found';
+            $error['error'] = 'id must be an integer';
         } else {
-            if (empty($aArgs['himself']) || $GLOBALS['userId'] != $user['user_id']) {
-                if (!ServiceModel::hasService(['id' => 'admin_users', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin'])) {
-                    $error['status'] = 403;
-                    $error['error'] = 'Service forbidden';
-                }
-                if ($GLOBALS['userId'] != 'superadmin') {
-                    $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
-                    $users = UserEntityModel::getWithUsers([
-                        'select'    => ['users.id'],
-                        'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
-                        'data'      => [$entities, 'DEL']
-                    ]);
-                    $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id']]);
-                    $users = array_merge($users, $usersNoEntities);
-                    $allowed = false;
-                    foreach ($users as $value) {
-                        if ($value['id'] == $aArgs['id']) {
-                            $allowed = true;
+            $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
+            if (empty($user['user_id'])) {
+                $error['status'] = 400;
+                $error['error'] = 'User not found';
+            } else {
+                if (empty($aArgs['himself']) || $GLOBALS['userId'] != $user['user_id']) {
+                    if (!ServiceModel::hasService(['id' => 'admin_users', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin'])) {
+                        $error['status'] = 403;
+                        $error['error'] = 'Service forbidden';
+                    }
+                    if ($GLOBALS['userId'] != 'superadmin') {
+                        $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+                        $users = UserEntityModel::getWithUsers([
+                            'select'    => ['users.id'],
+                            'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
+                            'data'      => [$entities, 'DEL']
+                        ]);
+                        $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id']]);
+                        $users = array_merge($users, $usersNoEntities);
+                        $allowed = false;
+                        foreach ($users as $value) {
+                            if ($value['id'] == $aArgs['id']) {
+                                $allowed = true;
+                            }
+                        }
+                        if (!$allowed) {
+                            $error['status'] = 403;
+                            $error['error'] = 'UserId out of perimeter';
                         }
                     }
-                    if (!$allowed) {
-                        $error['status'] = 403;
-                        $error['error'] = 'UserId out of perimeter';
-                    }
+                } elseif ($aArgs['delete'] && $GLOBALS['userId'] == $user['user_id']) {
+                    $error['status'] = 403;
+                    $error['error'] = 'Can not delete yourself';
                 }
-            } elseif ($aArgs['delete'] && $GLOBALS['userId'] == $user['user_id']) {
-                $error['status'] = 403;
-                $error['error'] = 'Can not delete yourself';
             }
         }
+
 
         return $error;
     }

@@ -162,6 +162,7 @@ try {
     }
 
     $configRemoteSignatoryBook = [];
+    $configRemoteNoteBook = ['id' => 'maarchParapheur'];
     if (file_exists($path)) {
         $loadedXml = simplexml_load_file($path);
         if ($loadedXml) {
@@ -169,6 +170,9 @@ try {
             foreach ($loadedXml->signatoryBook as $value) {
                 if ($value->id == $configRemoteSignatoryBook['id']) {
                     $configRemoteSignatoryBook['data'] = (array)$value;
+                }
+                if ($value->id == $configRemoteNoteBook['id']) {
+                    $configRemoteNoteBook['data'] = (array)$value;
                 }
             }
         }
@@ -244,15 +248,6 @@ while ($reqResult = $stmt->fetchObject()) {
     }
 }
 
-$GLOBALS['logger']->write('Retrieve mails sent to remote signatory book', 'INFO');
-$query = "SELECT res_id, external_signatory_book_id as external_id, subject, typist 
-        FROM res_letterbox WHERE external_signatory_book_id IS NOT NULL";
-$stmt = $GLOBALS['db']->query($query, []);
-
-while ($reqResult = $stmt->fetchObject()) {
-    $idsToRetrieve['resLetterbox'][$reqResult->res_id] = $reqResult;
-}
-
 // On récupère les pj signés dans le parapheur distant
 $GLOBALS['logger']->write('Retrieve signed/annotated documents from remote signatory book', 'INFO');
 if ($configRemoteSignatoryBook['id'] == 'ixbus') {
@@ -265,6 +260,19 @@ if ($configRemoteSignatoryBook['id'] == 'ixbus') {
     $retrievedMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
 } elseif ($configRemoteSignatoryBook['id'] == 'xParaph') {
     $retrievedMails = \ExternalSignatoryBook\controllers\XParaphController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+}
+
+$GLOBALS['logger']->write('Retrieve mails sent to remote signatory book', 'INFO');
+$query = "SELECT res_id, external_signatory_book_id as external_id, subject, typist 
+        FROM res_letterbox WHERE external_signatory_book_id IS NOT NULL";
+$stmt = $GLOBALS['db']->query($query, []);
+
+while ($reqResult = $stmt->fetchObject()) {
+    $idsToRetrieve['resLetterbox'][$reqResult->res_id] = $reqResult;
+}
+if (!empty($idsToRetrieve['resLetterbox'])) {
+    $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'];
 }
 
 if (!empty($retrievedMails['error'])) {
@@ -296,6 +304,10 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
             'table'             => 'res_attachments'
         ]);
     }
+    $additionalHistoryInfo = '';
+    if (!empty($value->workflowInfo)) {
+        $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+    }
 
     if ($value->status == 'validated') {
         if (!empty($value->encodedFile)) {
@@ -316,20 +328,22 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
                 'status'          => 'TRA',
                 'encodedFile'     => $value->encodedFile,
                 'table'           => 'res_version_attachments',
-                'noteContent'     => $value->noteContent
+                'noteContent'     => $value->noteContent,
+                'noteCreatorId'   => $value->noteCreatorId,
+                'noteCreatorName' => $value->noteCreatorName
             ]);
         }
     
         $GLOBALS['logger']->write('Document validated', 'INFO');
-        $GLOBALS['db']->query("UPDATE res_version_attachments set status = 'OBS' WHERE res_id = ?", [$resId]);
+        $GLOBALS['db']->query("UPDATE res_version_attachments set status = 'OBS', external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$resId]);
         if (!empty($value->onlyVisa) && $value->onlyVisa) {
             $status = $validatedStatusOnlyVisa;
         } else {
             $status = $validatedStatus;
         }
-        Bt_processVisaWorkflow(['res_id_master' => $value->res_id_master, 'validatedStatus' => $status]);
 
-        $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_version_attachments) a été validée dans le parapheur externe';
+        Bt_validatedMail(['status' => $status, 'resId' => $value->res_id_master]);
+        $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_version_attachments) a été validée dans le parapheur externe' . $additionalHistoryInfo;
         Bt_history([
             'table_name' => 'res_version_attachments',
             'record_id'  => $resId,
@@ -362,8 +376,11 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
                 'encodedFile'     => $value->encodedFile,
                 'in_signature_book' => 'false',
                 'table'           => 'res_attachments',
-                'noteContent'     => $value->noteContent
+                'noteContent'     => $value->noteContent,
+                'noteCreatorId'   => $value->noteCreatorId,
+                'noteCreatorName' => $value->noteCreatorName
             ]);
+            $value->noteContent = '';
         }
         $GLOBALS['logger']->write('Document refused', 'INFO');
         Bt_refusedSignedMail([
@@ -371,7 +388,10 @@ foreach ($retrievedMails['isVersion'] as $resId => $value) {
             'resIdAttachment' => $resId,
             'refusedStatus'   => $refusedStatus,
             'resIdMaster'     => $value->res_id_master,
-            'noteContent'     => $value->noteContent
+            'noteContent'     => $value->noteContent,
+            'noteCreatorId'   => $value->noteCreatorId,
+            'noteCreatorName' => $value->noteCreatorName,
+            'additionalHistoryInfo' => $additionalHistoryInfo
         ]);
     }
 }
@@ -399,6 +419,10 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             'table'             => 'res_attachments'
         ]);
     }
+    $additionalHistoryInfo = '';
+    if (!empty($value->workflowInfo)) {
+        $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+    }
 
     if ($value->status == 'validated') {
         if (!empty($value->encodedFile)) {
@@ -419,20 +443,22 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
                 'status'          => 'TRA',
                 'encodedFile'     => $value->encodedFile,
                 'table'           => 'res_version_attachments',
-                'noteContent'     => $value->noteContent
+                'noteContent'     => $value->noteContent,
+                'noteCreatorId'   => $value->noteCreatorId,
+                'noteCreatorName' => $value->noteCreatorName
             ]);
         }
 
         $GLOBALS['logger']->write('Document validated', 'INFO');
-        $GLOBALS['db']->query("UPDATE res_attachments SET status = 'OBS' WHERE res_id = ?", [$resId]);
+        $GLOBALS['db']->query("UPDATE res_attachments SET status = 'OBS', external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$resId]);
         if (!empty($value->onlyVisa) && $value->onlyVisa) {
             $status = $validatedStatusOnlyVisa;
         } else {
             $status = $validatedStatus;
         }
-        Bt_processVisaWorkflow(['res_id_master' => $value->res_id_master, 'validatedStatus' => $status]);
+        Bt_validatedMail(['status' => $status, 'resId' => $value->res_id_master]);
 
-        $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été validée dans le parapheur externe';
+        $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été validée dans le parapheur externe' . $additionalHistoryInfo;
         Bt_history([
             'table_name' => 'res_attachments',
             'record_id'  => $resId,
@@ -465,8 +491,11 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
                 'encodedFile'     => $value->encodedFile,
                 'in_signature_book' => 'false',
                 'table'           => 'res_attachments',
-                'noteContent'     => $value->noteContent
+                'noteContent'     => $value->noteContent,
+                'noteCreatorId'   => $value->noteCreatorId,
+                'noteCreatorName' => $value->noteCreatorName
             ]);
+            $value->noteContent = '';
         }
         $GLOBALS['logger']->write('Document refused', 'INFO');
         Bt_refusedSignedMail([
@@ -474,7 +503,10 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             'resIdAttachment' => $resId,
             'refusedStatus'   => $refusedStatus,
             'resIdMaster'     => $value->res_id_master,
-            'noteContent'     => $value->noteContent
+            'noteContent'     => $value->noteContent,
+            'noteCreatorId'   => $value->noteCreatorId,
+            'noteCreatorName' => $value->noteCreatorName,
+            'additionalHistoryInfo' => $additionalHistoryInfo
         ]);
     }
 }
@@ -491,19 +523,24 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
             'format'            => $value->format,
             'encodedFile'       => $value->encodedFile,
             'noteContent'       => $value->noteContent,
+            'noteCreatorId'     => $value->noteCreatorId,
+            'noteCreatorName'   => $value->noteCreatorName,
             'in_signature_book' => 'false',
-            'attachment_type'    => 'document_with_notes'
+            'attachment_type'   => 'document_with_notes'
         ]);
     }
-
+    $additionalHistoryInfo = '';
+    if (!empty($value->workflowInfo)) {
+        $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+    }
     if ($value->status == 'validatedNote') {
         $GLOBALS['logger']->write('Document validated', 'INFO');
-        Bt_processVisaWorkflow(['res_id_master' => $value->res_id, 'validatedStatus' => $validatedStatusAnnot]);
+        Bt_validatedMail(['status' => $validatedStatusAnnot, 'resId' => $value->res_id]);
 
         Bt_history([
             'table_name' => 'res_letterbox',
             'record_id'  => $value->res_id,
-            'info'       => 'Le document '.$resId.' (res_letterbox) a été validé dans le parapheur externe',
+            'info'       => 'Le document '.$resId.' (res_letterbox) a été validé dans le parapheur externe' . $additionalHistoryInfo,
             'event_type' => 'ACTION#1',
             'event_id'   => '1'
         ]);
@@ -514,7 +551,7 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
         Bt_history([
             'table_name' => 'res_letterbox',
             'record_id'  => $resId,
-            'info'       => 'Le document '.$resId.' (res_letterbox) a été refusé dans le parapheur externe',
+            'info'       => 'Le document '.$resId.' (res_letterbox) a été refusé dans le parapheur externe' . $additionalHistoryInfo,
             'event_type' => 'ACTION#1',
             'event_id'   => '1'
         ]);

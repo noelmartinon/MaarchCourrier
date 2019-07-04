@@ -501,3 +501,8 @@ define("_FILE_NOT_ALLOWED_INFO_2", "with MIME-type_TO_TRANSLATE");
 define("_FILE_NOT_ALLOWED_INFO_3", "is not allowed_TO_TRANSLATE");
 
 define('_SEND_TO_EXTERNAL_NOTEBOOK', 'Send data to external note book_TO_TRANSLATE');
+
+define("_SIGNATORY", "Signatory_TO_TRANSLATE");
+define("_VISA_USER_MIN", "Visa user_TO_TRANSLATE");
+define("_NOTE_USER", "Note user_TO_TRANSLATE");
+define("_WF_SEND_TO", "Send to : _TO_TRANSLATE");

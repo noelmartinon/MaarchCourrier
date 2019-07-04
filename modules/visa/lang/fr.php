@@ -485,3 +485,12 @@ if (!defined('_MAIL_NOTE')) {
 if (!defined('_ATTACHMENT_SIGNATURE')) {
     define('_ATTACHMENT_SIGNATURE', "Signature des documents intégrés au parapheur");
 }
+if (!defined('_NOTE_USER')) {
+    define('_NOTE_USER', "Annotateur");
+}
+if (!defined('_WF_SEND_TO')) {
+    define('_WF_SEND_TO', "Envoyé à :");
+}
+if (!defined('_VISA_USER_MIN')) {
+    define('_VISA_USER_MIN', "Viseur");
+}

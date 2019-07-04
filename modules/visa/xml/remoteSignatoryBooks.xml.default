@@ -6,10 +6,6 @@
         <userId>ccornillac@maarch.com</userId>
         <password>maarch</password>
         <url>https://demo.maarchparapheur.com</url>
-        <signature>SIGN</signature>
-        <annotation>NOTE</annotation>
-        <externalValidated>VAL</externalValidated>
-        <externalRefused>REF</externalRefused>
     </signatoryBook>
     <signatoryBook>
         <id>ixbus</id>

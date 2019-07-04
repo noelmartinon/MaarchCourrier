@@ -304,3 +304,12 @@ if (!defined('_MAIL_NOTE')) {
 if (!defined('_ATTACHMENT_SIGNATURE')) {
     define('_ATTACHMENT_SIGNATURE', "Signature of attachment in signature book");
 }
+if (!defined('_NOTE_USER')) {
+    define('_NOTE_USER', "Note user");
+}
+if (!defined('_WF_SEND_TO')) {
+    define('_WF_SEND_TO', "Send to :");
+}
+if (!defined('_VISA_USER_MIN')) {
+    define('_VISA_USER_MIN', "Visa user");
+}

@@ -157,9 +157,16 @@ function Bt_myInclude($file)
 function Bt_createAttachment($aArgs = [])
 {
     if (!empty($aArgs['noteContent'])) {
+        $creatorName = '';
+        if (!empty($aArgs['noteCreatorId'])) {
+            $creatorId = $aArgs['noteCreatorId'];
+        } else {
+            $creatorId = 'superadmin';
+            $creatorName = $aArgs['noteCreatorName'] . ' : ';
+        }
         $GLOBALS['db']->query(
-            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, 'superadmin', CURRENT_TIMESTAMP, ?)",
-            [$aArgs['res_id_master'], $aArgs['noteContent']]
+            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, ?, CURRENT_TIMESTAMP, ?)",
+            [$aArgs['res_id_master'], $creatorId, $creatorName . $aArgs['noteContent']]
         );
     }
 
@@ -247,17 +254,24 @@ function Bt_createAttachment($aArgs = [])
 function Bt_refusedSignedMail($aArgs = [])
 {
     if (!empty($aArgs['noteContent'])) {
+        $creatorName = '';
+        if (!empty($aArgs['noteCreatorId'])) {
+            $creatorId = $aArgs['noteCreatorId'];
+        } else {
+            $creatorId = 'superadmin';
+            $creatorName = $aArgs['noteCreatorName'] . ' : ';
+        }
         $GLOBALS['db']->query(
-            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, 'superadmin', CURRENT_TIMESTAMP, ?)",
-            [$aArgs['resIdMaster'], $aArgs['noteContent']]
+            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, $creatorId, CURRENT_TIMESTAMP, ?)",
+            [$aArgs['resIdMaster'], $creatorName . $aArgs['noteContent']]
         );
     }
-    $GLOBALS['db']->query("UPDATE ".$aArgs['tableAttachment']." SET status = 'A_TRA' WHERE res_id = ?", [$aArgs['resIdAttachment']]);
+    $GLOBALS['db']->query("UPDATE ".$aArgs['tableAttachment']." SET status = 'A_TRA', external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$aArgs['resIdAttachment']]);
     $GLOBALS['db']->query('UPDATE listinstance SET process_date = NULL WHERE res_id = ? AND difflist_type = ?', [$aArgs['resIdMaster'], 'VISA_CIRCUIT']);
     
     $GLOBALS['db']->query("UPDATE res_letterbox SET status = '" . $aArgs['refusedStatus'] . "' WHERE res_id = ?", [$aArgs['resIdMaster']]);
 
-    $historyInfo = 'La signature de la pièce jointe '.$aArgs['resIdAttachment'].' ('.$aArgs['tableAttachment'].') a été refusée dans le parapheur externe';
+    $historyInfo = 'La signature de la pièce jointe '.$aArgs['resIdAttachment'].' ('.$aArgs['tableAttachment'].') a été refusée dans le parapheur externe' . $aArgs['additionalHistoryInfo'];
     Bt_history([
         'table_name' => $aArgs['tableAttachment'],
         'record_id'  => $aArgs['resIdAttachment'],
@@ -273,47 +287,6 @@ function Bt_refusedSignedMail($aArgs = [])
         'event_type' => 'ACTION#1',
         'event_id'   => '1'
     ]);
-}
-
-function Bt_processVisaWorkflow($aArgs = [])
-{
-    $visaWorkflow = Bt_getVisaWorkflow(['resId' => $aArgs['res_id_master']]);
-
-    $nbVisaWorkflow = $visaWorkflow->rowCount();
-
-    if ($nbVisaWorkflow > 0) {
-        while ($listInstance = $visaWorkflow->fetchObject()) {
-            $GLOBALS['db']->query("UPDATE listinstance SET process_date = CURRENT_TIMESTAMP WHERE listinstance_id = ?", [$listInstance->listinstance_id]);
-            $nbUserProcess++;
-            // Stop to the first signatory user
-            if ($listInstance->requested_signature) {
-                $GLOBALS['db']->query("UPDATE listinstance SET signatory = 'true' WHERE listinstance_id = ?", [$listInstance->listinstance_id]);
-                break;
-            }
-        }
-        if ($nbUserProcess < $nbVisaWorkflow) {
-            // Get the next user in workflow
-            $listInstance = $visaWorkflow->fetchObject();
-            if ($listInstance->requested_signature) {
-                $mailStatus = 'ESIG';
-            } else {
-                $mailStatus = 'EVIS';
-            }
-            Bt_validatedMail(['status' => $mailStatus, 'resId' => $aArgs['res_id_master']]);
-        } else {
-            Bt_validatedMail(['status' => $aArgs['validatedStatus'], 'resId' => $aArgs['res_id_master']]);
-        }
-    } else {
-        Bt_validatedMail(['status' => $aArgs['validatedStatus'], 'resId' => $aArgs['res_id_master']]);
-    }
-}
-
-function Bt_getVisaWorkflow($aArgs = [])
-{
-    $req = "SELECT listinstance_id, item_id, requested_signature FROM listinstance WHERE res_id = ? AND difflist_type = 'VISA_CIRCUIT' AND process_date IS NULL ORDER BY listinstance_id ASC";
-    $stmt = $GLOBALS['db']->query($req, array($aArgs['resId']));
-
-    return $stmt;
 }
 
 function Bt_validatedMail($aArgs = [])

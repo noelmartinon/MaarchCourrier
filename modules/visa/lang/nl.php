@@ -391,3 +391,12 @@ if (!defined('_MAIL_NOTE')) {
 if (!defined('_ATTACHMENT_SIGNATURE')) {
     define('_ATTACHMENT_SIGNATURE', 'Handtekening van de documenten die in het vloeiboek geïntegreerd zijn');
 }
+if (!defined('_NOTE_USER')) {
+    define('_NOTE_USER', "Note user _TO_TRANSLATE");
+}
+if (!defined('_WF_SEND_TO')) {
+    define('_WF_SEND_TO', "Send to : _TO_TRANSLATE");
+}
+if (!defined('_VISA_USER_MIN')) {
+    define('_VISA_USER_MIN', "Visa user _TO_TRANSLATE");
+}
