@@ -1,31 +1,51 @@
 <mat-list *ngIf="!loading">
     <mat-form-field *ngIf="injectDatas.editable" appearance="outline" floatLabel="never" [style.fontSize.px]="10">
-        <input class="metaSearch" type="text" matInput placeholder="{{lang.addPerson}}">
+        <input id="availableUsers" type="text" matInput placeholder="{{lang.addPerson}}" [matAutocomplete]="auto"
+            [formControl]="userCtrl">
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addItem($event)" isOpen="true">
+            <mat-option *ngFor="let user of filteredUsers | async" [value]="user">
+                {{user.idToDisplay}}
+            </mat-option>
+        </mat-autocomplete>
     </mat-form-field>
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!injectDatas.editable">
-        <div *ngIf="visaWorkflow.items.length === 0" style="opacity: 0.5;text-align: center;font-size: 10px;padding: 10px;">
+        <div class="emptyContent" *ngIf="visaWorkflow.items.length === 0">
             {{lang.noPerson}}
         </div>
-        <mat-list-item *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag class="columns"
-            [cdkDragDisabled]="!injectDatas.editable" [class.notDraggable]="injectDatas.editable" [class.notEditable]="!injectDatas.editable" [ngStyle]="{'background': diffusion.process_date != null ? 'rgba(0, 128, 0, 0.11)' : ''}">
-            <mat-icon mat-list-icon class="fa fa-user fa-2x" color="primary"></mat-icon>
-                <mat-icon mat-list-icon class="fa fa-hourglass fa-2x" *ngIf="diffusion.process_date == null" style="opacity:0.5;"></mat-icon>
-                <mat-icon mat-list-icon class="fa fa-check fa-2x" *ngIf="diffusion.process_date != null" style="opacity:0.5;"
-                    color="accent"></mat-icon>
-                    <h4 mat-line style="display: flex;">
-                            <span style="flex: 1;">{{diffusion.item_firstname}} {{diffusion.item_lastname}}</span>
-                            <span *ngIf="!diffusion.requested_signature" style="flex: 1;text-align: right;font-size: 90%;" color="primary">{{lang.visaUser}}</span>
-                            <span *ngIf="diffusion.requested_signature" style="flex: 1;text-align: right;font-size: 90%;" color="warn">{{lang.signUser}}</span>
-                        </h4>
-                        <p mat-line style="display: flex;">
-                                <span style="opacity:0.5;flex: 1;">{{diffusion.item_entity}}</span>
-                                <span *ngIf="diffusion.process_date != null" title='{{diffusion.process_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'
-                                    style="flex: 1;text-align: right;font-size: 90%;" color="accent">{{diffusion.process_date
-                                    | timeAgo}}</span>
-                            </p>
+        <mat-list-item *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag class="columns workflow"
+            [cdkDragDisabled]="!injectDatas.editable" [class.notDraggable]="!injectDatas.editable"
+            [class.notEditable]="!injectDatas.editable" [class.processed]="diffusion.process_date != null">
+            <mat-icon *ngIf="!injectDatas.editable" mat-list-icon class="fa fa-user fa-2x" color="primary"></mat-icon>
+            <mat-icon *ngIf="injectDatas.editable" class="avatar" mat-list-icon color="primary"
+                    [style.background-image]="'url('+diffusion.picture+')'"></mat-icon>
+            <ng-container *ngIf="!injectDatas.editable">
+                <mat-icon mat-list-icon class="fa fa-hourglass fa-2x"
+                    [ngClass]="{'fa-hourglass': diffusion.process_date == null,'fa-check': diffusion.process_date != null}"
+                    style="opacity:0.5;"></mat-icon>
+            </ng-container>
+            <div mat-line class="workflowLine">
+                <div class="workflowLineContainer">
+                    <div class="workflowLineLabel">
+                        {{diffusion.labelToDisplay}}
+                    </div>
+                    <div class="workflowLineSubLabel">
+                        {{diffusion.item_entity}}
+                    </div>
+                    <div *ngIf="diffusion.process_date != null" class="workflowLineProcessDate"
+                        title='{{diffusion.process_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'
+                        color="accent">{{diffusion.process_date
+                                                | timeAgo}}</div>
+                </div>
+                <div>
+                    <button class="currentRoleButton" [color]="diffusion.requested_signature ? 'primary': '' " [disabled]="!injectDatas.editable" mat-raised-button
+                        title="{{lang[diffusion.currentRole+'User']}}" (click)="changeRole(i)">{{diffusion.requested_signature ? lang.signUser : lang.visaUser}}</button>
+                </div>
+
+            </div>
             <button mat-icon-button *ngIf="injectDatas.editable" (click)="deleteItem(i)">
                 <mat-icon class="fa fa-times" color="warn"></mat-icon>
             </button>
         </mat-list-item>
     </div>
+</mat-list>

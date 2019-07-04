@@ -78,6 +78,7 @@ $app->get('/res/{resIdMaster}/attachments/{resId}/thumbnail', \Attachment\contro
 //AutoComplete
 $app->get('/autocomplete/contacts', \SrcCore\controllers\AutoCompleteController::class . ':getContacts');
 $app->get('/autocomplete/users', \SrcCore\controllers\AutoCompleteController::class . ':getUsers');
+$app->get('/autocomplete/maarchParapheurUsers', \SrcCore\controllers\AutoCompleteController::class . ':getMaarchParapheurUsers');
 $app->get('/autocomplete/contactsUsers', \SrcCore\controllers\AutoCompleteController::class . ':getContactsAndUsers');
 $app->get('/autocomplete/contacts/groups', \SrcCore\controllers\AutoCompleteController::class . ':getContactsForGroups');
 $app->get('/autocomplete/users/administration', \SrcCore\controllers\AutoCompleteController::class . ':getUsersForAdministration');
@@ -190,6 +191,7 @@ $app->get('/header', \SrcCore\controllers\CoreController::class . ':getHeader');
 //Home
 $app->get('/home', \Home\controllers\HomeController::class . ':get');
 $app->get('/home/lastRessources', \Home\controllers\HomeController::class . ':getLastRessources');
+$app->get('/home/maarchParapheurDocuments', \Home\controllers\HomeController::class . ':getMaarchParapheurDocuments');
 
 //Jnlp
 $app->post('/jnlp', \ContentManagement\controllers\JnlpController::class . ':generateJnlp');
@@ -269,7 +271,6 @@ $app->get('/natures', \Resource\controllers\ResController::class . ':getNatures'
 $app->get('/resources/{resId}/isAllowed', \Resource\controllers\ResController::class . ':isAllowedForCurrentUser');
 $app->post('/resources/checkFileUpload', \Resource\controllers\StoreController::class . ':checkFileUpload');
 
-
 //ResourcesList
 $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}', \Resource\controllers\ResourceListController::class . ':get');
 $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions', \Resource\controllers\ResourceListController::class . ':getActions');
@@ -284,6 +285,7 @@ $app->post('/acknowledgementReceipt', \AcknowledgementReceipt\controllers\Acknow
 //PreProcess
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkAcknowledgementReceipt', \Action\controllers\PreProcessActionController::class . ':checkAcknowledgementReceipt');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkExternalSignatoryBook', \Action\controllers\PreProcessActionController::class . ':checkExternalSignatoryBook');
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkExternalNoteBook', \Action\controllers\PreProcessActionController::class . ':checkExternalNoteBook');
 $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/getRedirect', \Action\controllers\PreProcessActionController::class . ':getRedirectInformations');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkShippings', \Action\controllers\PreProcessActionController::class . ':checkShippings');
 $app->get('/resources/{resId}/users/{userId}/isDestinationChanging', \Action\controllers\PreProcessActionController::class . ':isDestinationChanging');
@@ -335,8 +337,11 @@ $app->post('/users/{id}/password', \User\controllers\UserController::class . ':r
 $app->put('/users/{id}/password', \User\controllers\UserController::class . ':updatePassword');
 $app->get('/users/{userId}/status', \User\controllers\UserController::class . ':getStatusByUserId');
 $app->put('/users/{id}/status', \User\controllers\UserController::class . ':updateStatus');
-$app->put('/users/{id}/maarchParapheur', \User\controllers\UserController::class . ':sendToMaarchParapheur');
-$app->put('/users/{id}/externalSignatures', \User\controllers\UserController::class . ':sendSignaturesToMaarchParapheur');
+$app->put('/users/{id}/createInMaarchParapheur', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':sendUserToMaarchParapheur');
+$app->put('/users/{id}/linkToMaarchParapheur', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':linkUserToMaarchParapheur');
+$app->put('/users/{id}/unlinkToMaarchParapheur', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':unlinkUserToMaarchParapheur');
+$app->get('/users/{id}/statusInMaarchParapheur', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':userStatusInMaarchParapheur');
+$app->put('/users/{id}/externalSignatures', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':sendSignaturesToMaarchParapheur');
 $app->post('/users/{id}/groups', \User\controllers\UserController::class . ':addGroup');
 $app->put('/users/{id}/groups/{groupId}', \User\controllers\UserController::class . ':updateGroup');
 $app->delete('/users/{id}/groups/{groupId}', \User\controllers\UserController::class . ':deleteGroup');
@@ -378,6 +383,8 @@ $app->post('/scriptNotification', \Notification\controllers\NotificationSchedule
 $app->post('/saveNumericPackage', \Sendmail\Controllers\ReceiveMessageExchangeController::class . ':saveMessageExchange');
 $app->post('/saveMessageExchangeReturn', \Sendmail\Controllers\ReceiveMessageExchangeController::class . ':saveMessageExchangeReturn');
 $app->post('/saveMessageExchangeReview', \Sendmail\Controllers\MessageExchangeReviewController::class . ':saveMessageExchangeReview');
+
+$app->get('/maarchParapheur/user/{id}/picture', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getUserPicture');
 
 $app->get('/xParaphWorkflow', \ExternalSignatoryBook\controllers\XParaphController::class . ':getWorkflow');
 $app->post('/xParaphAccount', \ExternalSignatoryBook\controllers\XParaphController::class . ':createXparaphAccount');

@@ -56,6 +56,38 @@ export class AutoCompletePlugin {
             });
         }
 
+        if (target.indexOf('signatureBookUsers') != -1) {
+            this.userCtrl = new FormControl();
+            this.userCtrl.valueChanges.pipe(
+                debounceTime(300),
+                filter(value => value ? value.length > 2 : false),
+                distinctUntilChanged(),
+                switchMap(data => this.http.get(this.coreUrl + 'rest/autocomplete/maarchParapheurUsers', { params: { "search": data } }))
+            ).subscribe((response: any) => {
+                this.filteredUsers = this.userCtrl.valueChanges
+                    .pipe(
+                        startWith(''),
+                        map(user => user ? this.autocompleteFilterUser(user) : response.slice())
+                    );
+            });
+        }
+
+        if (target.indexOf('signatureBookUsersNotLinked') != -1) {
+            this.userCtrl = new FormControl();
+            this.userCtrl.valueChanges.pipe(
+                debounceTime(300),
+                filter(value => value ? value.length > 2 : false),
+                distinctUntilChanged(),
+                switchMap(data => this.http.get(this.coreUrl + 'rest/autocomplete/maarchParapheurUsers', { params: { "search": data, "exludeAlreadyConnected": 'true' } }))
+            ).subscribe((response: any) => {
+                this.filteredUsers = this.userCtrl.valueChanges
+                    .pipe(
+                        startWith(''),
+                        map(user => user ? this.autocompleteFilterUser(user) : response.slice())
+                    );
+            });
+        }
+
         if (target.indexOf('statuses') != -1) {
             this.statusCtrl = new FormControl();
             this.http.get(this.coreUrl + 'rest/autocomplete/statuses')

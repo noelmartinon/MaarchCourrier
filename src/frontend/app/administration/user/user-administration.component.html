@@ -30,22 +30,32 @@
                         {{lang.changePassword}}
                     </p>
                 </a>
-                <a mat-list-item *ngIf="user.canCreateMaarchParapheurUser" (click)="sendToMaarchParapheur()"
+                <a mat-list-item *ngIf="user.canCreateMaarchParapheurUser || maarchParapheurLink.login === ''" (click)="linkMaarchParapheurAccount()"
                     title="{{lang.createUserInMaarchParapheur}}">
-                    <mat-icon color="primary" mat-list-icon class="fa fa-user"></mat-icon>
+                    <mat-icon color="primary" mat-list-icon class="fa fa-link"></mat-icon>
                     <p mat-line>
-                        {{lang.createUserInMaarchParapheur}}
+                        {{lang.linkAccount}}
                     </p>
-                </a>
-                <a style="opacity:0.7" mat-list-item *ngIf="user.external_id.maarchParapheur" disabled
-                    title="{{lang.userCreatedInMaarchParapheur}}">
-                    <mat-icon color="primary" mat-list-icon class="fa fa-user"></mat-icon>
-                    <p mat-line>
-                        {{lang.userCreatedInMaarchParapheur}}
+                    <p mat-line *ngIf="!maarchParapheurConnectionStatus" style="font-size:11px;color:red">
+                        {{lang.maarchParapheurLinkbroken}}
                     </p>
                 </a>
             </mat-nav-list>
             <mat-divider></mat-divider>
+            <mat-list *ngIf="maarchParapheurLink.login !== ''">
+                <h3 mat-subheader>Compte Maarch Parapheur</h3>
+                <mat-list-item>
+                    <mat-icon class="avatarAccount" color="primary" mat-list-icon [style.background-image]="'url('+maarchParapheurLink.picture+')'"></mat-icon>
+                    <p mat-line class="accountInfo">
+                        <span>
+                            {{maarchParapheurLink.login}}
+                        </span>
+                        <button mat-icon-button color="warn" (click)="unlinkMaarchParapheurAccount()" title="{{lang.unlinkAccount}}">
+                            <mat-icon class="fas fa-unlink"></mat-icon>
+                        </button>
+                    </p>
+                </mat-list-item>
+            </mat-list>
         </mat-sidenav>
         <mat-sidenav-content>
             <div *ngIf="loading" style="display:flex;height:100%;">

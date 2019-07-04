@@ -227,6 +227,18 @@ An action page is described in a ACTIONPAGE tag :
         </COLLECTIONS>
     </ACTIONPAGE>
     <ACTIONPAGE>
+        <ID>sendToExternalNoteBook</ID>
+        <LABEL>_SEND_TO_EXTERNAL_NOTEBOOK</LABEL>
+        <NAME>sendToExternalNoteBook</NAME>
+        <component>sendExternalNoteBookAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+        <COLLECTIONS>
+            <COLL_ID>letterbox_coll</COLL_ID>
+        </COLLECTIONS>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
         <ID>close_mail_and_index</ID>
         <LABEL>_CLOSE_MAIL_AND_INDEX</LABEL>
         <NAME>close_mail_and_index</NAME>

@@ -10,6 +10,7 @@ import { AdministrationRoutingModule }          from './administration-routing.m
 
 import { AdministrationComponent }                      from './administration.component';
 import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent }      from './user/users-administration.component';
+import { AccountLinkComponent }      from './user/account-link/account-link.component';
 import { GroupsAdministrationComponent, GroupsAdministrationRedirectModalComponent }    from './group/groups-administration.component';
 import { UserAdministrationComponent, UserAdministrationRedirectModalComponent }                  from './user/user-administration.component';
 import { GroupAdministrationComponent }                 from './group/group-administration.component';
@@ -103,7 +104,8 @@ import { ShippingAdministrationComponent }              from './shipping/shippin
         ListAdministrationComponent,
         TemplateAdministrationCheckEntitiesModalComponent,
         ShippingsAdministrationComponent,
-        ShippingAdministrationComponent
+        ShippingAdministrationComponent,
+        AccountLinkComponent
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,
@@ -116,7 +118,8 @@ import { ShippingAdministrationComponent }              from './shipping/shippin
         TechnicalAdministrationComponent,
         ListAdministrationComponent,
         ListAdministrationComponent,
-        TemplateAdministrationCheckEntitiesModalComponent
+        TemplateAdministrationCheckEntitiesModalComponent,
+        AccountLinkComponent
     ],
 })
 export class AdministrationModule {}

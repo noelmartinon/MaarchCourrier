@@ -14,6 +14,7 @@ import { CreateAcknowledgementReceiptActionComponent } from './create-acknowledg
 import { CloseAndIndexActionComponent } from './close-and-index-action/close-and-index-action.component';
 import { UpdateDepartureDateActionComponent } from './update-departure-date-action/update-departure-date-action.component';
 import { SendExternalSignatoryBookActionComponent } from './send-external-signatory-book-action/send-external-signatory-book-action.component';
+import { SendExternalNoteBookActionComponent } from './send-external-note-book-action/send-external-note-book-action.component';
 // import { ProcessActionComponent } from './process-action/process-action.component';
 import { Router } from '@angular/router';
 import { ViewDocActionComponent } from './view-doc-action/view-doc-action.component';
@@ -331,6 +332,28 @@ export class ActionsListComponent implements OnInit {
 
     sendExternalSignatoryBookAction() {
         const dialogRef = this.dialog.open(SendExternalSignatoryBookActionComponent, {
+            width: '500px',
+            data: {
+                contextMode: this.contextMode,
+                contextChrono: this.contextMenuTitle,
+                selectedRes: this.selectedRes,
+                action: this.currentAction,
+                currentBasketInfo: this.currentBasketInfo
+            }
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            this.unlock();
+
+            if (result == 'success') {
+                this.endAction();
+            } else {
+                this.unlockRest();
+            }
+        });
+    }
+
+    sendExternalNoteBookAction() {
+        const dialogRef = this.dialog.open(SendExternalNoteBookActionComponent, {
             width: '500px',
             data: {
                 contextMode: this.contextMode,

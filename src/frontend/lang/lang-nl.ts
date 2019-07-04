@@ -1021,5 +1021,22 @@ export const LANG_NL = {
     "workingDays"                           : "werkdag(en)",
     "yes"                                   : "Ja",
     "zipcode"                               : "Postcode",
+    "noVisaWorkflow" : "No visa workflow set up.", //_TO_TRANSLATE
+    "visaWorkflowWillBeSend" : "Visa workflow will be send to Maarch Parapheur", //_TO_TRANSLATE
+    "usersNotExistedInMaarchParapheur" : "Some users does not exist in Maarch Parapheur", //_TO_TRANSLATE
+    "usersMissingInSignatureBook" : "missing in Maarch Parapheur", //_TO_TRANSLATE
+    "unlinkAccount" : "Unlink account", //_TO_TRANSLATE
+    "accountLinked" : "Account linked", //_TO_TRANSLATE
+    "accountUnlinked" : "Account unlinked", //_TO_TRANSLATE
+    "maarchParapheurAccountMsg" : "A <b>new</b> account with login", //_TO_TRANSLATE
+    "maarchParapheurAccountMsg2" : " will be created in Maarch Parapheur.", //_TO_TRANSLATE
+    "searchUserInMaarchParapheur" : "Search unlinked an user in Maarch Parapheur", //_TO_TRANSLATE
+    "newLoginInMaarchParapheur" : "New Maarch Parapheur Login", //_TO_TRANSLATE
+    "loginAlreadyExistsInMaarchParapheur" : "Login already exists in Maarch Parapheur", //_TO_TRANSLATE
+    "maarchParapheurLinkbroken" : "Maarch Parapheur link is broken", //_TO_TRANSLATE
+    "maarchParapheurDocuments" : "Last Maarch Parapheur document(s)", //_TO_TRANSLATE
+    "to_visa" : "To approve", //_TO_TRANSLATE
+    "to_sign" : "To sign", //_TO_TRANSLATE
+    "to_note" : "To note", //_TO_TRANSLATE
     "confidential" : "Confidential", //_TO_TRANSLATE
 };

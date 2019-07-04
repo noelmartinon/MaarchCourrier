@@ -6,7 +6,7 @@
         0 3px 14px 2px rgba(0, 0, 0, 0.12);
     background: white;
     padding: 10px;
-    .mat-icon {
+    .mat-icon, .mat-icon-button {
         display: none;
     }
 }
@@ -37,4 +37,76 @@
 
 .notEditable {
     cursor: initial;
+}
+
+.currentContextButton{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    width: 150px;
+    text-align: left;
+}
+
+.currentRoleButton{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    width: 120px;
+    text-align: center;
+}
+
+.emptyContent {
+    opacity: 0.5;
+    text-align: center;
+    font-size: 10px;
+    padding: 10px;
+}
+
+.processed {
+    background: rgba(0, 128, 0, 0.11);
+}
+
+.workflow {
+    height: auto !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.workflowLine {
+    display: flex !important;
+    align-items: center;
+
+    &Container {
+        flex:1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &Label {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    &SubLabel {
+        font-size: 80%;
+        opacity:0.5;
+        flex: 1;
+        text-overflow: ellipsis;
+        overflow: hidden; 
+    }
+
+    &ProcessDate {
+        flex: 1;
+        text-align: left;
+        font-size: 90%;
+    }
+}
+
+.avatar {
+    border: solid 3px #F99830;
+    height: 45px !important;
+    width: 45px !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }

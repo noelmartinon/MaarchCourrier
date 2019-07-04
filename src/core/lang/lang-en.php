@@ -321,6 +321,7 @@ define('_MARK_AS_READ_DESC', 'Mark the mail as \'read\' in the basket. Insert th
 define('_SEND_FILE_WS', 'Send file via Web Service');
 define('_SEND_DATA_WS', 'Send data via Web Service');
 define('_SEND_TO_EXTERNAL_SB', 'Send data to external signature book');
+define('_SEND_TO_EXTERNAL_NOTEBOOK', 'Send data to external note book');
 define('_CLOSE_MAIL_AND_INDEX', 'Close a mail and launch the indexation');
 define('_CLOSE_MAIL_AND_INDEX_DESC', 'Allows you to update the closing date of a mail (\'closing_date\' of the mlb_coll_ext table) AND opens the indexing page to save a new mail.');
 define('_CLOSE_MAIL_WITH_ATTACHMENT', 'Closing with attachment');
@@ -455,6 +456,8 @@ define('_CLOSING_DATE', 'Closing date');
 define('_ACTION_DATE', 'Action date');
 
 define('_USER_CREATED_IN_MAARCHPARAPHEUR', 'User created in Maarch Parapheur');
+define('_USER_LINKED_TO_MAARCHPARAPHEUR', 'User link to Maarch Parapheur');
+define('_USER_UNLINKED_TO_MAARCHPARAPHEUR', 'User unlink to Maarch Parapheur');
 define('_SIGNATURES_SEND_TO_MAARCHPARAPHEUR', 'Signatures sent to Maarch Parapheur');
 
 define('_CREATE_ACKNOWLEDGEMENT_RECEIPT', 'Generate and send acknowledgement receipt');

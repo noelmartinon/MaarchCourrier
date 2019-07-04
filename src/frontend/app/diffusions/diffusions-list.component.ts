@@ -95,7 +95,7 @@ export class DiffusionsListComponent extends AutoCompletePlugin implements OnIni
                 data.listTemplate.forEach((element: any) => {
                     if (element.item_mode == 'cc') {
                         this.diffList['copy'].items.push(element);
-                    } else {
+                    } else if (element.object_type != 'VISA_CIRCUIT') {
                         this.diffList[element.item_mode].items.push(element);
                     }
                 });

@@ -6,10 +6,11 @@ import { LANG } from '../../translate.component';
 import { MatSidenav, MatPaginator, MatTableDataSource, MatSort, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormControl, FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 
 import { AutoCompletePlugin } from '../../../plugins/autocomplete.plugin';
 import { SelectionModel } from '@angular/cdk/collections';
+import { AccountLinkComponent } from './account-link/account-link.component';
 
 declare function $j(selector: any): any;
 declare const angularGlobals: any;
@@ -17,30 +18,30 @@ declare const angularGlobals: any;
 
 @Component({
     templateUrl: "user-administration.component.html",
-    styleUrls: ['user-administration.component.css'],
+    styleUrls: ['user-administration.component.scss'],
     providers: [NotificationService]
 })
 export class UserAdministrationComponent extends AutoCompletePlugin implements OnInit {
-    @ViewChild('snav') public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2') public sidenavRight  : MatSidenav;
+    @ViewChild('snav') public sidenavLeft: MatSidenav;
+    @ViewChild('snav2') public sidenavRight: MatSidenav;
 
 
-    private _mobileQueryListener    : () => void;
-    mobileQuery                     : MediaQueryList;
+    private _mobileQueryListener: () => void;
+    mobileQuery: MediaQueryList;
 
-    coreUrl                         : string;
-    lang                            : any       = LANG;
-    loading                         : boolean   = false;
-    dialogRef                       : MatDialogRef<any>;
-    config                          : any       = {};
-    serialId                        : number;
-    userId                          : string;
-    mode                            : string    = '';
-    user                            : any       = {};
-    _search                         : string    = '';
-    creationMode                    : boolean;
+    coreUrl: string;
+    lang: any = LANG;
+    loading: boolean = false;
+    dialogRef: MatDialogRef<any>;
+    config: any = {};
+    serialId: number;
+    userId: string;
+    mode: string = '';
+    user: any = {};
+    _search: string = '';
+    creationMode: boolean;
 
-    signatureModel                  : any       = {
+    signatureModel: any = {
         base64: "",
         base64ForJs: "",
         name: "",
@@ -48,38 +49,43 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         size: 0,
         label: "",
     };
-    userAbsenceModel                : any[]     = [];
-    userList                        : any[]     = [];
-    selectedSignature               : number    = -1;
-    selectedSignatureLabel          : string    = "";
-    loadingSign                     : boolean   = false;
-    data                            : any[]     = [];
-    CurrentYear                     : number    = new Date().getFullYear();
-    currentMonth                    : number    = new Date().getMonth() + 1;
-    minDate                         : Date      = new Date();
-    firstFormGroup                  : FormGroup;
-    ruleText                        : string = '';
-    otherRuleText                   : string;
-    validPassword                   : boolean = false;
-    showPassword                    : boolean = false;
-    hidePassword                    : boolean = true;
-    passwordModel                   : any = {
-        currentPassword : "",
-        newPassword     : "",
-        reNewPassword   : ""
+    userAbsenceModel: any[] = [];
+    userList: any[] = [];
+    maarchParapheurLink: any = {
+        login: '',
+        picture: ''
+    }
+    selectedSignature: number = -1;
+    selectedSignatureLabel: string = "";
+    loadingSign: boolean = false;
+    data: any[] = [];
+    CurrentYear: number = new Date().getFullYear();
+    currentMonth: number = new Date().getMonth() + 1;
+    minDate: Date = new Date();
+    firstFormGroup: FormGroup;
+    ruleText: string = '';
+    otherRuleText: string;
+    validPassword: boolean = false;
+    showPassword: boolean = false;
+    hidePassword: boolean = true;
+    passwordModel: any = {
+        currentPassword: "",
+        newPassword: "",
+        reNewPassword: ""
     };
-    passwordRules                   : any = {
-        minLength           : { enabled: false, value: 0 },
-        complexityUpper     : { enabled: false, value: 0 },
-        complexityNumber    : { enabled: false, value: 0 },
-        complexitySpecial   : { enabled: false, value: 0 },
-        renewal             : { enabled: false, value: 0 },
-        historyLastUse      : { enabled: false, value: 0 }
+    passwordRules: any = {
+        minLength: { enabled: false, value: 0 },
+        complexityUpper: { enabled: false, value: 0 },
+        complexityNumber: { enabled: false, value: 0 },
+        complexitySpecial: { enabled: false, value: 0 },
+        renewal: { enabled: false, value: 0 },
+        historyLastUse: { enabled: false, value: 0 }
     };
 
-    displayedColumns    = ['event_date', 'event_type', 'info', 'remote_ip'];
-    dataSource          = new MatTableDataSource(this.data);
-    selectedTabIndex : number = 0;
+    displayedColumns = ['event_date', 'event_type', 'info', 'remote_ip'];
+    dataSource = new MatTableDataSource(this.data);
+    selectedTabIndex: number = 0;
+    maarchParapheurConnectionStatus = true;
 
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
@@ -92,11 +98,11 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
     //Redirect Baskets
     selectionBaskets = new SelectionModel<Element>(true, []);
     masterToggleBaskets(event: any) {
-        if (event.checked) {  
+        if (event.checked) {
             this.user.baskets.forEach((basket: any) => {
                 if (!basket.userToDisplay) {
-                    this.selectionBaskets.select(basket); 
-                }      
+                    this.selectionBaskets.select(basket);
+                }
             });
         } else {
             this.selectionBaskets.clear();
@@ -142,11 +148,16 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                 this.http.get(this.coreUrl + "rest/users/" + this.serialId + "/details")
                     .subscribe((data: any) => {
                         this.user = data;
-                        
+
                         this.data = data.history;
                         this.userId = data.user_id;
                         this.minDate = new Date(this.CurrentYear + '-' + this.currentMonth + '-01');
                         this.headerService.setHeader(this.lang.userModification, data.firstname + " " + data.lastname);
+
+                        if (this.user.external_id.maarchParapheur !== undefined) {
+                            this.checkInfoMaarchParapheurAccount();
+                        }
+
                         this.loading = false;
                         setTimeout(() => {
                             this.dataSource = new MatTableDataSource(this.data);
@@ -158,6 +169,87 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                     });
             }
         });
+    }
+
+    checkInfoMaarchParapheurAccount() {
+        this.http.get("../../rest/users/" + this.serialId + "/statusInMaarchParapheur")
+            .subscribe((data: any) => {
+                this.maarchParapheurLink.login = data.link;
+                this.loading = false;
+                if (this.maarchParapheurLink.login !== '') {
+                    this.loadAvatarMaarchParapheur(this.user.external_id.maarchParapheur);
+                } else {
+                    this.maarchParapheurConnectionStatus = false;
+                }
+            });
+    }
+
+    linkMaarchParapheurAccount() {
+        const dialogRef = this.dialog.open(AccountLinkComponent, { autoFocus: false, data: { user: this.user } });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                if (result.inMaarchParapheur) {
+                    this.linkAccountToMaarchParahpeur(result.id);
+                } else {
+                    this.createAccountToMaarchParahpeur(result.id, result.login);
+                }
+
+            }
+        });
+    }
+
+    linkAccountToMaarchParahpeur(externalId: number) {
+        this.http.put(this.coreUrl + "rest/users/" + this.serialId + "/linkToMaarchParapheur", { maarchParapheurUserId: externalId })
+            .subscribe(() => {
+                this.user.canCreateMaarchParapheurUser = false;
+                this.user.external_id['maarchParapheur'] = externalId;
+                this.checkInfoMaarchParapheurAccount();
+                this.notify.success(this.lang.accountLinked);
+            }, (err) => {
+                this.notify.error(err.error.errors);
+            });
+    }
+
+    createAccountToMaarchParahpeur(id: number, login: string) {
+        this.http.put(this.coreUrl + "rest/users/" + id + "/createInMaarchParapheur", { login: login })
+            .subscribe((data: any) => {
+                this.user.canCreateMaarchParapheurUser = false;
+                this.user.external_id['maarchParapheur'] = data.externalId;
+                this.checkInfoMaarchParapheurAccount();
+                this.notify.success(this.lang.accountAdded);
+            }, (err) => {
+                if (err.error.errors == 'Login already exists') {
+                    err.error.errors = this.lang.loginAlreadyExistsInMaarchParapheur
+                }
+                this.notify.error(err.error.errors);
+            });
+    }
+
+    loadAvatarMaarchParapheur(externalId: number) {
+        this.http.get("../../rest/maarchParapheur/user/" + externalId + "/picture")
+            .subscribe((data: any) => {
+                this.maarchParapheurLink.picture = data.picture;
+
+            }, (err) => {
+                this.notify.handleErrors(err);
+            });
+    }
+
+    unlinkMaarchParapheurAccount() {
+        let r = confirm(this.lang.confirmAction + ' ' + this.lang.unlinkAccount);
+
+        if (r) {
+            this.http.put(this.coreUrl + "rest/users/" + this.serialId + "/unlinkToMaarchParapheur", {})
+                .subscribe(() => {
+                    this.user.canCreateMaarchParapheurUser = true;
+                    this.maarchParapheurLink.login = '';
+                    this.maarchParapheurLink.picture = '';
+                    this.notify.success(this.lang.accountUnlinked);
+                    this.maarchParapheurConnectionStatus = true;
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
+        }
     }
 
     toogleRedirect(basket: any) {
@@ -192,7 +284,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                 .on('select_node.jstree', (e: any, data: any) => {
                     if (this.mode == '') {
                         this.addEntity(data.node.id);
-                    }  
+                    }
                 }).on('deselect_node.jstree', (e: any, data: any) => {
                     this.deleteEntity(data.node.id);
                 })
@@ -309,8 +401,8 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
 
     addEntity(entiyId: any) {
         let entity = {
-            "entityId"  : entiyId,
-            "role"      : ''
+            "entityId": entiyId,
+            "role": ''
         };
 
         this.http.post(this.coreUrl + "rest/users/" + this.serialId + "/entities", entity)
@@ -357,28 +449,28 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                             this.notify.error(err.error.errors);
                         });
                 } else {
-                    this.config = { data: { hasConfidentialityInstances:data['hasConfidentialityInstances'], hasListTemplates:data['hasListTemplates'] } };
+                    this.config = { data: { hasConfidentialityInstances: data['hasConfidentialityInstances'], hasListTemplates: data['hasListTemplates'] } };
                     this.dialogRef = this.dialog.open(UserAdministrationRedirectModalComponent, this.config);
                     this.dialogRef.afterClosed().subscribe((result: any) => {
                         this.mode = 'delete';
                         if (result) {
                             this.mode = result.processMode;
-                            this.http.request('DELETE', this.coreUrl + "rest/users/" + this.serialId + "/entities/" + entityId, {body : {"mode":this.mode,"newUser":result.newUser}})
-                            .subscribe((data: any) => {
-                                this.user.entities = data.entities;
-                                this.user.allEntities = data.allEntities;
-                                this.notify.success(this.lang.entityDeleted);
-                            }, (err) => {
-                                this.notify.error(err.error.errors);
-                            });
+                            this.http.request('DELETE', this.coreUrl + "rest/users/" + this.serialId + "/entities/" + entityId, { body: { "mode": this.mode, "newUser": result.newUser } })
+                                .subscribe((data: any) => {
+                                    this.user.entities = data.entities;
+                                    this.user.allEntities = data.allEntities;
+                                    this.notify.success(this.lang.entityDeleted);
+                                }, (err) => {
+                                    this.notify.error(err.error.errors);
+                                });
                         } else {
                             $j('#jstree').jstree('select_node', entityId);
                             this.mode = '';
                         }
-                    this.dialogRef = null;
+                        this.dialogRef = null;
                     });
                 }
-               
+
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -429,7 +521,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         }
     }
 
-    test(event:any) {
+    test(event: any) {
         if (event.mouseEvent.dataTransfer.files && event.mouseEvent.dataTransfer.files[0]) {
             var reader = new FileReader();
 
@@ -449,15 +541,15 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         }
     }
 
-    addBasketRedirection(newUser:any) {
-        let basketsRedirect:any[] = [];
-        
+    addBasketRedirection(newUser: any) {
+        let basketsRedirect: any[] = [];
+
         this.selectionBaskets.selected.forEach((elem: any) => {
             basketsRedirect.push(
                 {
                     actual_user_id: newUser.serialId,
-                    basket_id:elem.basket_id,
-                    group_id:elem.groupSerialId,
+                    basket_id: elem.basket_id,
+                    group_id: elem.groupSerialId,
                     originalOwner: null
                 }
             )
@@ -479,16 +571,16 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         }
     }
 
-    reassignBasketRedirection(newUser:any, basket: any, i: number) {
+    reassignBasketRedirection(newUser: any, basket: any, i: number) {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
             this.http.post(this.coreUrl + "rest/users/" + this.serialId + "/redirectedBaskets", [
                 {
-                    "actual_user_id": newUser.serialId, 
-                    "basket_id": basket.basket_id, 
+                    "actual_user_id": newUser.serialId,
+                    "basket_id": basket.basket_id,
                     "group_id": basket.group_id,
-                    "originalOwner": basket.owner_user_id, 
+                    "originalOwner": basket.owner_user_id,
                 }
             ])
                 .subscribe((data: any) => {
@@ -534,24 +626,24 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         }
     }
 
-    toggleBasket(state:boolean) {
-        let basketsDisable:any = [];
+    toggleBasket(state: boolean) {
+        let basketsDisable: any = [];
         this.user.baskets.forEach((elem: any) => {
             this.selectionBaskets.selected.forEach((selected: any) => {
                 if (elem.basket_id == selected.basket_id && elem.group_id == selected.group_id && elem.allowed != state) {
                     elem.allowed = state;
-                    basketsDisable.push({"basketId" : elem.basket_id, "groupSerialId":elem.groupSerialId, "allowed":state});
+                    basketsDisable.push({ "basketId": elem.basket_id, "groupSerialId": elem.groupSerialId, "allowed": state });
                 }
             });
         });
         if (basketsDisable.length > 0) {
-            this.http.put(this.coreUrl + "rest/users/" + this.serialId + "/baskets", {"baskets" :basketsDisable})
-            .subscribe((data: any) => {
-                this.selectionBaskets.clear();
-                this.notify.success(this.lang.basketsUpdated);
-            }, (err: any) => {
-                this.notify.error(err.error.errors);
-            });
+            this.http.put(this.coreUrl + "rest/users/" + this.serialId + "/baskets", { "baskets": basketsDisable })
+                .subscribe((data: any) => {
+                    this.selectionBaskets.clear();
+                    this.notify.success(this.lang.basketsUpdated);
+                }, (err: any) => {
+                    this.notify.error(err.error.errors);
+                });
         }
     }
 
@@ -578,7 +670,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
 
     getErrorMessage() {
         if (this.firstFormGroup.controls['newPasswordCtrl'].value != this.firstFormGroup.controls['retypePasswordCtrl'].value) {
-            this.firstFormGroup.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
+            this.firstFormGroup.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
         } else {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         }
@@ -608,8 +700,8 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         if (group.controls['newPasswordCtrl'].value == group.controls['retypePasswordCtrl'].value) {
             return false;
         } else {
-            group.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
-            return {'mismatch': true};
+            group.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
+            return { 'mismatch': true };
         }
     }
 
@@ -626,7 +718,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
     changePasswd() {
         this.http.get(this.coreUrl + 'rest/passwordRules')
             .subscribe((data: any) => {
-                let valArr : ValidatorFn[] = [];
+                let valArr: ValidatorFn[] = [];
                 let ruleTextArr: String[] = [];
                 let otherRuleTextArr: String[] = [];
 
@@ -671,13 +763,13 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label]+'.');
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
                         }
                     } else if (rule.label == 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
                         this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2']+'.');
+                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2'] + '.');
                         }
                     }
 
@@ -702,8 +794,8 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                 Validators.compose([Validators.required])
             ]
         }, {
-            validator: this.matchValidator
-        });
+                validator: this.matchValidator
+            });
 
         this.validPassword = false;
         this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null);
@@ -767,7 +859,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         }
     }
 
-    setUserModeLogin(event:any) {
+    setUserModeLogin(event: any) {
         if (event.checked) {
             this.user.loginmode = "restMode";
         } else {
@@ -775,7 +867,7 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         }
     }
 
-    sendToMaarchParapheur(){
+    sendToMaarchParapheur() {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.createUserInMaarchParapheur);
 
         if (r) {
