@@ -658,7 +658,7 @@ if ($stmt->rowCount() == 0) {
                     $inputAddressValue = $data[$key]['address_value'];
 
                     $iconShow = "<a href=\"#\" onclick=\"window.open('index.php?display=true&dir=my_contacts&page=info_contact_iframe&mode=editDetail&editDetail&popup&contactid='+document.getElementById('contactid').value+'&addressid='+document.getElementById('addressid').value+'', 'contact_info', 'height=800, width=1000,scrollbars=yes,resizable=yes');\">".$iconShow.'</a>';
-                } elseif($key == 'resourceContact') {
+                } elseif ($key == 'resourceContact') {
                     $iconShow = "<a href=\"#\" onclick=\"openSenderInfoContact(document.getElementById('sender_recipient_id').value, document.getElementById('sender_recipient_type').value)\">".$iconShow.'</a>';
                 } elseif (in_array($key, ['dest_user_id', 'exp_user_id'])) {
                     $inputValue = $data[$key]['value'];
@@ -684,7 +684,7 @@ if ($stmt->rowCount() == 0) {
             //END DATA LABEL
 
             //GET DATA INPUT
-            echo '<td>';
+            echo '<td style="position:relative">';
             if (!isset($data[$key]['readonly']) || $data[$key]['readonly'] == true) {
                 $disabledAttr = 'disabled="disabled"';
                 $disabledClass = 'readonly';
@@ -702,7 +702,7 @@ if ($stmt->rowCount() == 0) {
                     if ($key == 'exp_contact_id') {
                         if (!empty($data[$key]['address_value'])) {
                             $contactData = \Contact\models\ContactModel::getOnView(['select' => ['*'], 'where' => ['ca_id = ?'], 'data' => [$data[$key]['address_value']]]);
-                            if(!empty($contactData[0])){
+                            if (!empty($contactData[0])) {
                                 $rate = \Contact\controllers\ContactController::getFillingRate(['contact' => (array)$contactData[0]]);
                             } else {
                                 $rate['color'] = 'LightYellow';
@@ -757,11 +757,11 @@ if ($stmt->rowCount() == 0) {
                             $_SESSION['adresses']['contactid'][] = $data[$key]['multi']['contact_id'][$icontacts];
 
                             $contactData = \Contact\models\ContactModel::getOnView(['select' => ['*'], 'where' => ['ca_id = ?'], 'data' => [$data[$key]['multi']['address_id'][$icontacts]]]);
-                            if(!empty($contactData[0])){
+                            if (!empty($contactData[0])) {
                                 $rate = \Contact\controllers\ContactController::getFillingRate(['contact' => (array)$contactData[0]]);
                             } else {
                                 $rate['color'] = 'LightYellow';
-                            }        
+                            }
                             echo '<div class="multicontact_element" style="display:table;width:200px;background-color:'.$rate['color'].';" id="'.$icontacts.'_'.$data[$key]['multi']['contact_id'][$icontacts].'"><div style="display:table-cell;width:100%;vertical-align:middle;">'.$data[$key]['multi']['arr_values'][$icontacts].'</div>';
 
                             if (empty($disabledAttr)) {
@@ -794,7 +794,7 @@ if ($stmt->rowCount() == 0) {
                     $rate = [];
                     if (!empty($sr['type']) && $sr['type'] == 'contact') {
                         $contactData = \Contact\models\ContactModel::getOnView(['select' => ['*'], 'where' => ['ca_id = ?'], 'data' => [$sr['item_id']]]);
-                        if(!empty($contactData[0])) {
+                        if (!empty($contactData[0])) {
                             $rate = \Contact\controllers\ContactController::getFillingRate(['contact' => (array)$contactData[0]]);
                         }
                     }
@@ -836,7 +836,6 @@ if ($stmt->rowCount() == 0) {
                     } else {
                         echo '<script>initSenderRecipientAutocomplete(\'sender_recipient\',\'contactsUsers\', false);</script>';
                     }
-
                 } else {
                     echo "<input type='text' name='{$key}' id='{$key}' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' class='{$disabledClass}' {$disabledAttr}/>";
                 }
@@ -939,7 +938,7 @@ if ($stmt->rowCount() == 0) {
                 }
             } elseif ($data[$key]['display'] == 'textinput') {
                 $inputValue = $data[$key]['show_value'];
-                echo "<input type='text' name='{$key}' id='{$key}' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' class='{$disabledClass}' {$disabledAttr}/>";             
+                echo "<input type='text' name='{$key}' id='{$key}' value='{$inputValue}' title='{$inputValue}' alt='{$inputValue}' size='40' class='{$disabledClass}' {$disabledAttr}/>";
 
                 if ($key == 'type_id') {
                     $inputValue = $data[$key]['value'];
@@ -1050,9 +1049,9 @@ if ($stmt->rowCount() == 0) {
                         <td align="left" width="200px">
                             <?php
                             echo $indexes[$key]['label']; ?>:
-                        </td>
-                        <td>
-                        <?php
+                                </td>
+                                <td style="position:relative">
+                                    <?php
                         if ($indexes[$key]['type_field'] == 'input') {
                             ?>
                                     <!--<input type="text" name="<?php functions::xecho($key); ?>" id="

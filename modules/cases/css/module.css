@@ -1,16 +1,6 @@
 
 
 /* menu */
-.whole-panel {
-    background: #135F7F;
-    border: 1px solid #000;
-    height: 650px;
-    min-width: 995px;
-    margin: 0 auto 1em;
-    padding: 5px 0 0 5px;
-    display: block;
-}
-
 .detailsCasesButton {
     background: #F2F2F2;
     border: 1px solid #666;
