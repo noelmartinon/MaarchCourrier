@@ -20,6 +20,8 @@ use Group\models\GroupModel;
 use Resource\models\ResModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\CoreConfigModel;
+use SrcCore\models\CurlModel;
 use User\models\UserModel;
 use Parameter\models\ParameterModel;
 
@@ -29,7 +31,7 @@ class HomeController
     {
         $regroupedBaskets = [];
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'external_id']]);
         $homeMessage = ParameterModel::getById(['select' => ['param_value_string'], 'id'=> 'homepage_message']);
         $homeMessage = trim($homeMessage['param_value_string']);
 
@@ -84,10 +86,13 @@ class HomeController
             $assignedBaskets[$key]['ownerLogin'] = UserModel::getById(['id' => $assignedBasket['owner_user_id'], 'select' => ['user_id']])['user_id'];
         }
 
+        $externalId = json_decode($user['external_id'], true);
+
         return $response->withJson([
-            'regroupedBaskets'  => $regroupedBaskets,
-            'assignedBaskets'   => $assignedBaskets,
-            'homeMessage'       => $homeMessage,
+            'regroupedBaskets'              => $regroupedBaskets,
+            'assignedBaskets'               => $assignedBaskets,
+            'homeMessage'                   => $homeMessage,
+            'isLinkedToMaarchParapheur'     => !empty($externalId['maarchParapheur'])
         ]);
     }
 
@@ -114,5 +119,59 @@ class HomeController
         return $response->withJson([
             'lastResources'     => $lastResources,
         ]);
+    }
+
+    public function getMaarchParapheurDocuments(Request $request, Response $response)
+    {
+        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['external_id']]);
+
+        $externalId = json_decode($user['external_id'], true);
+        if (empty($externalId['maarchParapheur'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'User is not linked to Maarch Parapheur']);
+        }
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
+        if (empty($loadedXml)) {
+            return $response->withStatus(400)->withJson(['errors' => 'SignatoryBooks configuration file missing']);
+        }
+
+        $url      = '';
+        $userId   = '';
+        $password = '';
+        foreach ($loadedXml->signatoryBook as $value) {
+            if ($value->id == "maarchParapheur") {
+                $url      = rtrim($value->url, '/');
+                $userId   = $value->userId;
+                $password = $value->password;
+                break;
+            }
+        }
+
+        if (empty($url)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maarch Parapheur configuration missing']);
+        }
+
+        $curlResponse = CurlModel::execSimple([
+            'url'           => rtrim($url, '/') . '/rest/documents',
+            'basicAuth'     => ['user' => $userId, 'password' => $password],
+            'headers'       => ['content-type:application/json'],
+            'method'        => 'GET',
+            'queryParams'   => ['userId' => $externalId['maarchParapheur'], 'limit' => 10]
+        ]);
+
+        if ($curlResponse['code'] != '200') {
+            if (!empty($curlResponse['response']['errors'])) {
+                $errors =  $curlResponse['response']['errors'];
+            } else {
+                $errors =  $curlResponse['errors'];
+            }
+            if (empty($errors)) {
+                $errors = 'An error occured. Please check your configuration file.';
+            }
+            return $response->withStatus(400)->withJson(['errors' => $errors]);
+        }
+
+        $curlResponse['response']['url'] = $url;
+        return $response->withJson($curlResponse['response']);
     }
 }
