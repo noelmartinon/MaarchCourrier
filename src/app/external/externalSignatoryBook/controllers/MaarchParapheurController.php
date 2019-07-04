@@ -322,6 +322,16 @@ class MaarchParapheurController
                 'externalId'        => $value['userId'],
                 'externalName'      => 'maarchParapheur'
             ]);
+            if (empty($userInfos)) {
+                $curlResponse = CurlModel::execSimple([
+                    'url'           => rtrim($aArgs['config']['data']['url'], '/') . '/rest/users/'.$value['userId'],
+                    'basicAuth'     => ['user' => $aArgs['config']['data']['userId'], 'password' => $aArgs['config']['data']['password']],
+                    'headers'       => ['content-type:application/json'],
+                    'method'        => 'GET'
+                ]);
+                $userInfos['firstname'] = $curlResponse['response']['user']['firstname'];
+                $userInfos['lastname'] = $curlResponse['response']['user']['lastname'];
+            }
             if ($value['mode'] == 'note') {
                 $mode = _NOTE_USER;
             } elseif ($value['mode'] == 'visa') {
