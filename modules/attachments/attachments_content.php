@@ -544,10 +544,23 @@ if (isset($_POST['add']) && $_POST['add']) {
                                     $error = $resAttach->get_error();
                                 } else {
                                     // Delete temporary backup
-                                    $db->query(
-                                        "DELETE FROM res_attachments WHERE res_id = ? and status = 'TMP' and typist = ?",
-                                        array($_SESSION['attachmentInfo'][$attachNum]['inProgressResId'], $_SESSION['user']['UserId'])
+                                    $stmt = $db->query(
+                                        "SELECT docserver_id, path, filename FROM res_attachments WHERE res_id = ? AND status = 'TMP' AND typist = ?",
+                                        [$_SESSION['attachmentInfo'][$numAttach]['inProgressResId'], $_SESSION['user']['UserId']]
                                     );
+                                    if ($stmt->rowCount() !== 0) {
+                                        $line           = $stmt->fetchObject();
+                                        $stmt = $db->query("SELECT path_template FROM docservers WHERE docserver_id = ?", array($line->docserver_id));
+                                        $lineDoc   = $stmt->fetchObject();
+                                        $file      = $lineDoc->path_template . $line->path . $line->filename;
+                                        $file      = str_replace("#", DIRECTORY_SEPARATOR, $file);
+                                        unlink($file);
+
+                                        $db->query(
+                                            "DELETE FROM res_attachments WHERE res_id = ? and status = 'TMP' and typist = ?",
+                                            array($_SESSION['attachmentInfo'][$numAttach]['inProgressResId'], $_SESSION['user']['UserId'])
+                                        );
+                                    }
 
                                     if ($_SESSION['history']['attachadd'] == 'true') {
                                         $hist = new history();

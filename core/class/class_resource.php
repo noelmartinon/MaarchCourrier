@@ -148,7 +148,7 @@
             $docserver = (object)$value;
         }
         $docserverTypeObject = $docserverTypeControler->get($docserver->docserver_type_id);
-        $arrayTmp = (array)$docserver;
+        $arrayTmp = (array)$docserverTypeObject;
         foreach ($arrayTmp as $key => $value) {
             $docserverTypeObject = (object)$value;
         }
