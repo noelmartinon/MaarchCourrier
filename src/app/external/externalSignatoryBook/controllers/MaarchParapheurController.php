@@ -293,7 +293,7 @@ class MaarchParapheurController
                 $metadata[_RECIPIENTS] = $contact;
             }
 
-            $workflow = [['processingUser' => $processingUser, 'mode' => 'note']];
+            $workflow = [['userId' => $processingUser, 'mode' => 'note']];
             $bodyData = [
                 'title'            => $mainResource[0]['subject'],
                 'reference'        => $mainResource[0]['alt_identifier'],

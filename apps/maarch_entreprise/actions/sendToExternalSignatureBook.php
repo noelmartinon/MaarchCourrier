@@ -249,7 +249,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                     if (empty($externalId['maarchParapheur'])) {
                         return ['error' => 'Some users do not exist in Maarch Parapheur'];
                     }
-                    $workflow[] = ['userId' => $externalId['maarchParapheur'], 'mode' => ($user['requested_signature'] ? 'sign' : 'visa')];
+                    $workflow[] = ['externalId' => $externalId['maarchParapheur'], 'action' => ($user['requested_signature'] ? 'sign' : 'visa')];
                 }
 
                 $sendedInfo = \ExternalSignatoryBook\controllers\MaarchParapheurController::sendDatas([

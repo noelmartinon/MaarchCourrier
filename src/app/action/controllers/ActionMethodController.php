@@ -289,7 +289,7 @@ class ActionMethodController
             $sendedInfo = MaarchParapheurController::sendDatas([
                 'config'           => $config,
                 'resIdMaster'      => $args['resId'],
-                'processingUser'   => $processingUserInfo['login'],
+                'processingUser'   => $args['data']['processingUser'],
                 'objectSent'       => 'mail',
                 'userId'           => $GLOBALS['userId']
             ]);
