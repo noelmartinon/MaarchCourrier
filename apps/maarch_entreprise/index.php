@@ -378,6 +378,14 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
     } elseif ($cookie['userId'] == 'superadmin' && !empty($_REQUEST['administration'])) {
         ?><script>triggerAngular('#/administration')</script><?php
     } elseif (empty($_REQUEST['page'])) {
-        ?><script>triggerAngular('#/home')</script><?php
+        ?>
+            <script>
+                var route = '#/home';
+                if(localStorage.getItem('PreviousV2Route') != null) {
+                    route = '#' + localStorage.getItem('PreviousV2Route');
+                }
+                triggerAngular(route);
+            </script>
+        <?php
     }
 }

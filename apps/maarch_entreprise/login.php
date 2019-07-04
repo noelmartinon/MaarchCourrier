@@ -21,6 +21,10 @@ if (isset($_GET['target_page']) && trim($_GET['target_page']) != '') {
 
 $serverPath = '';
 
+echo '<script>';
+echo "localStorage.removeItem('PreviousV2Route');";
+echo '</script>';
+
 if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN'
     && strtoupper(substr(PHP_OS, 0, 3)) != 'WINNT'
 ) {

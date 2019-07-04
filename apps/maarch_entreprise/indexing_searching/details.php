@@ -382,7 +382,7 @@ if ($stmt->rowCount() == 0) {
             <?php
             if (!isset($_POST['up_res_id']) || !$_POST['up_res_id']) {
                 if ($_SESSION['indexation'] == false) {
-                    echo '<a href="#" onclick="$j(\'#ariane a:nth-last-child(3)\')[0].click();"><i class="fa fa-arrow-circle-left fa-2x" title="'._BACK.'"></i></a>';
+                    echo '<a href="javascript:history.go(-1)"><i class="fa fa-arrow-circle-left fa-2x" title="'._BACK.'"></i></a>';
                 }
             } ?>
         </p>
