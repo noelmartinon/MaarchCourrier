@@ -13,7 +13,8 @@ import { AdministrationModule }                 from './administration/administr
 
 import { ProfileComponent }                     from './profile.component';
 import { AboutUsComponent }                     from './about-us.component';
-import { HomeComponent }                        from './home.component';
+import { HomeComponent }                        from './home/home.component';
+import { MaarchParapheurListComponent }         from './home/maarch-parapheur/maarch-parapheur-list.component';
 import { BasketListComponent }                  from './list/basket-list.component';
 import { PasswordModificationComponent, InfoChangePasswordModalComponent, }        from './password-modification.component';
 import { SignatureBookComponent, SafeUrlPipe }  from './signature-book.component';
@@ -67,6 +68,7 @@ import { AvisWorkflowComponent }             from './avis/avis-workflow.componen
         ProfileComponent,
         AboutUsComponent,
         HomeComponent,
+        MaarchParapheurListComponent,
         BasketListComponent,
         PasswordModificationComponent,
         SignatureBookComponent,

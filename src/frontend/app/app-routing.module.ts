@@ -5,7 +5,7 @@ import { ActivateUserComponent }            from './activate-user.component';
 import { PasswordModificationComponent }    from './password-modification.component';
 import { ProfileComponent }                 from './profile.component';
 import { AboutUsComponent }                 from './about-us.component';
-import { HomeComponent }                    from './home.component';
+import { HomeComponent }                    from './home/home.component';
 import { BasketListComponent }              from './list/basket-list.component';
 import { SignatureBookComponent }           from './signature-book.component';
 import { SaveNumericPackageComponent }      from './save-numeric-package.component';
