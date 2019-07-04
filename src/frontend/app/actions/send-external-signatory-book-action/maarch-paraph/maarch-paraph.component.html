@@ -1,31 +1,23 @@
-<div class="col-md-12" style="padding-top: 10px;" *ngIf="additionalsInfos.users.length != 0">
-    <mat-form-field>
-        <mat-label>{{lang.userMaarchParapheur}}</mat-label>
-        <mat-select name="processingUser" [(ngModel)]="externalSignatoryBookDatas.processingUser" required>
-            <mat-option *ngFor="let user of additionalsInfos.users" [value]="user.id">
-                {{user.firstname}} {{user.lastname}} ({{user.email}})
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+<div class="col-md-12">
+    <div class="fieldsetdContainer" style="flex:2">
+        <h2>{{lang.visaWorkflow}} :</h2>
+        <div class="fieldsetdContent">
+            <app-visa-workflow #appVisaWorkflow [injectDatas]="injectDatasParam"></app-visa-workflow>
+            <div *ngIf="appVisaWorkflow.checkExternalSignatoryBook().length > 0" class="alert-message alert-message-danger" role="alert">
+                <b>{{appVisaWorkflow.checkExternalSignatoryBook().join(', ')}}</b> {{lang.usersMissingInSignatureBook}} !       
+            </div>
+        </div>
+    </div>
 </div>
-<div class="col-md-12" *ngIf="additionalsInfos.users.length == 0">
-    {{lang.noUserDefinedInMaarchParapheur}}
-</div>
-<div class="col-sm-12" *ngIf="additionalsInfos.users.length != 0">
-    <mat-radio-group required name="objectSent" [(ngModel)]="externalSignatoryBookDatas.objectSent">
-        <mat-radio-button color="primary" name="objectSent" checked value="mail">{{lang.mailNote}}</mat-radio-button>
-        <mat-radio-button color="primary" name="objectSent" value="attachment">{{lang.attachmentSignature}}</mat-radio-button><br><br>
-    </mat-radio-group>
-</div>
-<div class="col-md-12" *ngIf="additionalsInfos.noMail.length != 0 && externalSignatoryBookDatas.objectSent == 'mail'">
+<div class="col-md-12" *ngIf="additionalsInfos.visaWorkflowError">
     <div>
         <div class="alert-message alert-message-danger mailList" role="alert">
             <p>
                 {{lang.canNotMakeAction}} :
             </p>
             <ul>
-                <li *ngFor="let mail of additionalsInfos.noMail">
-                    <b>{{mail.alt_identifier}}</b> : {{lang[mail.reason]}}
+                <li *ngFor="let visaError of additionalsInfos.visaWorkflowError">
+                    <b>{{visaError.alt_identifier}}</b> : {{lang[visaError.reason]}}
                 </li>
             </ul>
         </div>
