@@ -40,6 +40,20 @@ if ($_REQUEST['mode'] == 'add') {
     $tableName = "res_version_attachments";
 }
 
+$stmt = $db->query(
+    "SELECT docserver_id, path, filename FROM ".$tableName." WHERE res_id_master = ? AND status = 'TMP' AND typist = ?",
+    [$_SESSION['doc_id'], $_SESSION['user']['UserId']]
+);
+if ($stmt->rowCount() !== 0) {
+    while ($line = $stmt->fetchObject()) {
+        $stmt = $db->query("SELECT path_template FROM docservers WHERE docserver_id = ?", array($line->docserver_id));
+        $lineDoc   = $stmt->fetchObject();
+        $file      = $lineDoc->path_template . $line->path . $line->filename;
+        $file      = str_replace("#", DIRECTORY_SEPARATOR, $file);
+        unlink($file);
+    }
+}
+
 $db->query("DELETE FROM ".$tableName." WHERE res_id_master = ? and status = 'TMP' and typist = ?", [$_SESSION['doc_id'], $_SESSION['user']['UserId']]);
 unset($_SESSION['attachmentInfo']);
 

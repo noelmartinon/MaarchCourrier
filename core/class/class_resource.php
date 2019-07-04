@@ -143,15 +143,7 @@
         $docserverControler = new docservers_controler();
         $docserverTypeControler = new docserver_types_controler();
         $docserver = $docserverControler->get($docserver_id);
-        $arrayTmp = (array)$docserver;
-        foreach ($arrayTmp as $key => $value) {
-            $docserver = (object)$value;
-        }
         $docserverTypeObject = $docserverTypeControler->get($docserver->docserver_type_id);
-        $arrayTmp = (array)$docserverTypeObject;
-        foreach ($arrayTmp as $key => $value) {
-            $docserverTypeObject = (object)$value;
-        }
         $fingerprint = Ds_doFingerprint($filetmp, $docserverTypeObject->fingerprint_mode);
         $filesize = filesize($filetmp);
         array_push($data, array('column' => "fingerprint", 'value' => $fingerprint, 'type' => "string"));
