@@ -61,6 +61,6 @@ export class MaarchParapheurListComponent implements OnInit {
     }
 
     goTo(row: any) {
-        window.location.href = this.maarchParapheurUrl + '/dist/index.html#/documents/' + row.id;
+        window.open(this.maarchParapheurUrl + '/dist/index.html#/documents/' + row.id, '_blank');
     }
 }
