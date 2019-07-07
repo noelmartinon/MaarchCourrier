@@ -1706,7 +1706,7 @@ class Install extends functions
         $db->query($query, array($sec->getPasswordHash($newPass)));
     }
 
-    public function copy_dir($dir2copy, $dir_paste, $excludeExt = false, $excludeSymlink = false)
+    public function copy_dir($dir2copy, $dir_paste, $excludeExt = false, $excludeSymlink = false, $excludeDirectories = [])
     {
         // On vérifie si $dir2copy est un dossier
         if (is_dir($dir2copy)) {
@@ -1722,11 +1722,11 @@ class Install extends functions
                     }
                     // S'il s'agit d'un dossier, on relance la fonction recursive
                     if ($excludeSymlink) {
-                        if (is_dir($dir2copy.$file) && $file != '..' && $file != '.' && !is_link($dir2copy.$file)) {
-                            if (!$this->copy_dir($dir2copy.$file.'/', $dir_paste.$file.'/', $excludeExt, $excludeSymlink)) {
+                        if (is_dir($dir2copy.$file) && $file != '..' && $file != '.' && !is_link($dir2copy.$file) && !in_array($file, $excludeDirectories)) {
+                            if (!$this->copy_dir($dir2copy.$file.'/', $dir_paste.$file.'/', $excludeExt, $excludeSymlink, $excludeDirectories)) {
                                 return false;
                             }
-                        } elseif ($file != '..' && $file != '.' && !is_link($dir2copy.$file)) {
+                        } elseif ($file != '..' && $file != '.' && !is_link($dir2copy.$file) && !in_array($file, $excludeDirectories)) {
                             if (is_array($excludeExt) && count($excludeExt)>0) {
                                 $copyIt = true;
                                 foreach ($excludeExt as $key => $value) {
@@ -1742,11 +1742,11 @@ class Install extends functions
                             }
                         }
                     } else {
-                        if (is_dir($dir2copy.$file) && $file != '..' && $file != '.') {
-                            if (!$this->copy_dir($dir2copy.$file.'/', $dir_paste.$file.'/', $excludeExt, $excludeSymlink)) {
+                        if (is_dir($dir2copy.$file) && $file != '..' && $file != '.' && !in_array($file, $excludeDirectories)) {
+                            if (!$this->copy_dir($dir2copy.$file.'/', $dir_paste.$file.'/', $excludeExt, $excludeSymlink, $excludeDirectories)) {
                                 return false;
                             }
-                        } elseif ($file != '..' && $file != '.') {
+                        } elseif ($file != '..' && $file != '.' && !in_array($file, $excludeDirectories)) {
                             if (is_array($excludeExt) && count($excludeExt) > 0) {
                                 $copyIt = true;
                                 foreach ($excludeExt as $key => $value) {

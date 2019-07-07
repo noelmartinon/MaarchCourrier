@@ -24,8 +24,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
 <script>
     function launchProcess(
         myVar
-    )
-    {
+    ) {
         $(document).ready(function() {
             var oneIsEmpty = false;
             if (myVar.length < 1) {
@@ -41,7 +40,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
 
             ajax(
                 'backupVersion',
-                'myVar|'+myVar,
+                'myVar|' + myVar,
                 'ajaxReturn',
                 'false'
             );
@@ -71,7 +70,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                                 :
                             </td>
                             <td>
-                                <input type="text" id="actualPath" size="60" disabled name="actualPath" value="<?php echo $_SESSION['config']['corepath'];?>"/>
+                                <input type="text" id="actualPath" size="60" disabled name="actualPath" value="<?php echo $_SESSION['config']['corepath'];?>" />
                             </td>
                         </tr>
                         <tr>
@@ -82,7 +81,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                                 :
                             </td>
                             <td>
-                                <input type="text" id="path" size="60" name="backupPath" value=""/>
+                                <input type="text" id="path" size="60" name="backupPath" value="" />
                             </td>
                         </tr>
                         <tr>
@@ -94,11 +93,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                             <td></td>
                             <td></td>
                             <td>
-                                <input
-                                  type="button"
-                                  name="Submit" id="ajaxReturn_button"  value="<?php echo _BACKUP_ACTUAL_VERSION;?>"
-                                  onClick="$(this).css('display', 'none');launchProcess($('#path').val());"
-                                />
+                                <input type="button" name="Submit" id="ajaxReturn_button" value="<?php echo _BACKUP_ACTUAL_VERSION;?>" onClick="$(this).css('display', 'none');launchProcess($('#path').val());" />
                             </td>
                         </tr>
                     </table>
@@ -106,7 +101,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                 <br />
                 <div id="ajaxReturn_ko"></div>
                 <div align="center">
-                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);"/>
+                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);" />
                 </div>
             </p>
         </div>
@@ -123,7 +118,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                     </a>
                 </div>
                 <div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=update_download');" class="ajaxReturn" id="ajaxReturn_ok" style="display: none;">
+                    <a href="#" onClick="goTo('index.php?step=update_download');" id="ajaxReturn" style="display: none;">
                         <?php echo _NEXT_INSTALL;?>
                     </a>
                 </div>

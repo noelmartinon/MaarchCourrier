@@ -50,7 +50,7 @@ if (!$Class_Install->createPath($path)) {
     exit;
 }
 
-if (!$Class_Install->copy_dir($_SESSION['config']['corepath'] , $path . DIRECTORY_SEPARATOR, false, true)) {
+if (!$Class_Install->copy_dir($_SESSION['config']['corepath'], $path . DIRECTORY_SEPARATOR, false, true, ['logs', 'log', 'tmp'])) {
     $return['status'] = 0;
     $return['text'] = _CAN_NOT_COPY_TO . ' : ' . $path . '<br>' . _CHECK_RIGHT_SOURCE_FOLDER;
 
@@ -59,5 +59,11 @@ if (!$Class_Install->copy_dir($_SESSION['config']['corepath'] , $path . DIRECTOR
     echo $jsonReturn;
     exit;
 }
-echo '{"status":1}';
+
+$return['status'] = 1;
+$return['text'] = '';
+
+$jsonReturn = json_encode($return);
+
+echo $jsonReturn;
 exit;
