@@ -187,7 +187,7 @@ class SendMessageExchangeController
         return true;
     }
 
-    protected function control($aArgs = [])
+    protected static function control($aArgs = [])
     {
         $errors = [];
 
@@ -218,7 +218,7 @@ class SendMessageExchangeController
         return $errors;
     }
 
-    protected function generateComments($aArgs = [])
+    protected static function generateComments($aArgs = [])
     {
         $aReturn    = [];
 
