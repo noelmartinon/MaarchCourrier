@@ -1727,7 +1727,7 @@ class Install extends functions
                                 return false;
                             }
                         } elseif ($file != '..' && $file != '.' && !is_link($dir2copy.$file) && !in_array($file, $excludeDirectories)) {
-                            if (is_array($excludeExt) && count($excludeExt)>0) {
+                            if (is_array($excludeExt) && count($excludeExt)>0 && $file != 'applicationVersion.xml') {
                                 $copyIt = true;
                                 foreach ($excludeExt as $key => $value) {
                                     if (strtolower($value) == strtolower(pathinfo($dir2copy.$file, PATHINFO_EXTENSION))) {
@@ -1747,7 +1747,7 @@ class Install extends functions
                                 return false;
                             }
                         } elseif ($file != '..' && $file != '.' && !in_array($file, $excludeDirectories)) {
-                            if (is_array($excludeExt) && count($excludeExt) > 0) {
+                            if (is_array($excludeExt) && count($excludeExt) > 0 && $file != 'applicationVersion.xml') {
                                 $copyIt = true;
                                 foreach ($excludeExt as $key => $value) {
                                     if (strtolower($value) == strtolower(pathinfo($dir2copy.$file, PATHINFO_EXTENSION))) {
