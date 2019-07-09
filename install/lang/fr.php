@@ -476,3 +476,7 @@ if (!defined('_LOGIN_PICTURE_FROM_DATA')) {
 if (!defined('_CUSTOM_LIST')) {
     define('_CUSTOM_LIST', "Liste des instances MaarchCourrier déjà installées sur ce serveur");
 }
+
+if (!defined('_MUST_CHOOSE_VERSION')) {
+    define('_MUST_CHOOSE_VERSION', "Vous devez choisir une version");
+}

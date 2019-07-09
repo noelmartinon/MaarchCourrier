@@ -87,7 +87,7 @@ foreach ($tags as $value) {
 
             ajax(
                 'downloadVersion',
-                'myVar|'+myVar,
+                'myVar|' + myVar,
                 'ajaxReturn',
                 'false'
             );
@@ -111,7 +111,8 @@ foreach ($tags as $value) {
                 <form>
                     <table align="center" style="margin-top:50px">
                         <tr>
-                            <td><?php echo _YOUR_VERSION;?></td>
+                            <td><?php echo _YOUR_VERSION;?>
+                            </td>
                             <td>:</td>
                             <td>
                                 <?php echo '<b>' . $currentVersion->param_value_string . '</b>';?>
@@ -121,14 +122,15 @@ foreach ($tags as $value) {
                             <td colspan="3">&nbsp;</td>
                         </tr>
                         <tr>
-                            <td><?php echo _CHOOSE_VERSION_TO_UPDATE;?></td>
+                            <td><?php echo _CHOOSE_VERSION_TO_UPDATE;?>
+                            </td>
                             <td>:</td>
                             <td>
                                 <?php
                                 if (count($tags)>0) {
                                     ?>
-                                    <select id="version" id="name">
-                                        <?php
+                                <select id="version" id="name">
+                                    <?php
                                         for ($i=0;$i<count($allCurrentTags);$i++) {
                                             if ($allCurrentTags[$i]['enabled']) {
                                                 echo '<option value="' . $allCurrentTags[$i]['name'] . '">';
@@ -140,39 +142,47 @@ foreach ($tags as $value) {
                                                 echo '</option>';
                                             }
                                         } ?>
-                                    </select>
-                                    <?php
+                                </select>
+                                <?php
                                 } else {
                                     echo _NO_AVAILABLE_TAG_TO_UPDATE . '<br />';
                                 }
                                 ?>
                             </td>
                         </tr>
-                        <tr><td colspan="3">&nbsp;</td></tr>
+                        <tr>
+                            <td colspan="3">&nbsp;</td>
+                        </tr>
 
-                        <?php if(!$Class_Install->isPhpRequirements('zip')){ ?>
-                        <tr><td colspan="3">&nbsp;</td></tr>
-                        <tr><td><?php echo _MISSING_PREREQUISITE_UPDATE ;?></td><td colspan="2"></td></tr>
+                        <?php if (!$Class_Install->isPhpRequirements('zip')) {
+                                    ?>
+                        <tr>
+                            <td colspan="3">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td><?php echo _MISSING_PREREQUISITE_UPDATE ; ?>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>
                         <tr>
                             <td>
-                                <?php echo $Class_Install->checkPrerequisites(false);?>
+                                <?php echo $Class_Install->checkPrerequisites(false); ?>
                             </td>
                             <td></td>
                             <td>
-                                <?php echo _ZIP_LIB;?>
+                                <?php echo _ZIP_LIB; ?>
                             </td>
                         </tr>
-                        <?php } else { ?>
+                        <?php
+                                } else {
+                                    ?>
                         <tr>
                             <td colspan="3">
-                                <input
-                                  type="button"
-                                  name="Submit" id="ajaxReturn_button"  value="<?php echo _DOWNLOAD_VERSION;?>"
-                                  onClick="$(this).css('display', 'none');launchProcess($('#version').val());"
-                                />
+                                <input type="button" name="Submit" id="ajaxReturn_button" value="<?php echo _DOWNLOAD_VERSION; ?>" onClick="$(this).css('display', 'none');launchProcess($('#version').val());" />
                             </td>
                         </tr>
-                        <?php } ?>
+                        <?php
+                                } ?>
                     </table>
                     <div align="center" style="margin-bottom:50px">
                         <?php
@@ -188,7 +198,7 @@ foreach ($tags as $value) {
                 <br />
                 <div id="ajaxReturn_ko"></div>
                 <div align="center">
-                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);"/>
+                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);" />
                 </div>
             </p>
         </div>
@@ -205,7 +215,7 @@ foreach ($tags as $value) {
                     </a>
                 </div>
                 <div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=update_deploy');" class="ajaxReturn" id="ajaxReturn_ok" style="display: none;">
+                    <a href="#" onClick="goTo('index.php?step=update_deploy');" id="ajaxReturn" style="display: none;">
                         <?php echo _NEXT_INSTALL;?>
                     </a>
                 </div>
