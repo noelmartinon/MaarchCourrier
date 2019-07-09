@@ -40,9 +40,9 @@
 
 .watermark {
   position: absolute;
-  transform: rotate(-20deg);
+  left: 50%;
+  transform: translateX(-50%) rotate(-20deg);
   color: red;
   font-weight: bold;
-  margin-left: -60px;
   opacity: 0.6;
 }
