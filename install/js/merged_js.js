@@ -387,7 +387,9 @@ function ajax(
     top
 )
 {
-    var ajaxUrl  = url;
+  $('.wait').css("display","block");
+
+  var ajaxUrl  = url;
 
     var parametersTemp = parameters.split('|');
 
@@ -423,6 +425,7 @@ function ajax(
 
     $(document).ready( function() {
         $.getJSON('ajax.php?script='+ajaxUrl, ajaxParameters, function(data){
+            $('.wait').css("display","none");
             if (data.status == 1) {
                 retour_ok.html(data.text);
                 retour_ko.html('');
