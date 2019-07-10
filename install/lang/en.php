@@ -467,3 +467,7 @@ if (!defined('_LOGIN_PICTURE_FROM_DATA')) {
 if (!defined('_CUSTOM_LIST')) {
     define('_CUSTOM_LIST', "Custom list already installed on this server");
 }
+
+if (!defined('_MUST_CHOOSE_VERSION')) {
+    define('_MUST_CHOOSE_VERSION', "You must choose a version");
+}

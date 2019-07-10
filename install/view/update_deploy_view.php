@@ -24,14 +24,13 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
 <script>
     function launchProcess(
         myVar
-    )
-    {
+    ) {
         $(document).ready(function() {
             $('#ajaxReturn_ko').html('');
 
             ajax(
                 'deployVersion',
-                'myVar|'+myVar,
+                'myVar|' + myVar,
                 'ajaxReturn',
                 'false'
             );
@@ -62,11 +61,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                             <td></td>
                             <td></td>
                             <td>
-                                <input
-                                  type="button"
-                                  name="Submit" id="ajaxReturn_button"  value="<?php echo _DEPLOY_VERSION;?>"
-                                  onClick="$(this).css('display', 'none');launchProcess($('#version').val());"
-                                />
+                                <input type="button" name="Submit" id="ajaxReturn_button" value="<?php echo _DEPLOY_VERSION;?>" onClick="$(this).css('display', 'none');launchProcess($('#version').val());" />
                             </td>
                         </tr>
                     </table>
@@ -74,7 +69,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                 <br />
                 <div id="ajaxReturn_ko"></div>
                 <div align="center">
-                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);"/>
+                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);" />
                 </div>
             </p>
         </div>
@@ -91,7 +86,7 @@ if ($_SESSION['user']['UserId'] <> 'superadmin') {
                     </a>
                 </div>
                 <div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=update_end');" class="ajaxReturn" id="ajaxReturn_ok" style="display: none;">
+                    <a href="#" onClick="goTo('index.php?step=update_end');" id="ajaxReturn" style="display: none;">
                         <?php echo _NEXT_INSTALL;?>
                     </a>
                 </div>
