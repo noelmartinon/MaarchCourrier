@@ -203,7 +203,7 @@ class DocserverController
 
         $docserver = DocserverModel::getCurrentDocserver(['collId' => $aArgs['collId'], 'typeId' => $aArgs['docserverTypeId']]);
         if (empty($docserver)) {
-            return ['errors' => '[storeRessourceOnDocserver] No available Docserver'];
+            return ['errors' => '[storeRessourceOnDocserver] No available Docserver with type ' . $aArgs['docserverTypeId']];
         }
 
         $pathOnDocserver = DocserverController::createPathOnDocServer(['path' => $docserver['path_template']]);

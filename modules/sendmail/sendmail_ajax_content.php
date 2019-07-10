@@ -190,7 +190,11 @@ switch ($mode) {
         if ($formContent == 'messageExchange') {
             $return = SendMessageExchangeController::createMessageExchange($_REQUEST);
             if (!empty($return['errors'])) {
-                $error = implode(", ", $return['errors']);
+                if (is_array($return['errors'])) {
+                    $error = implode(", ", $return['errors']);
+                } else {
+                    $error = $return['errors'];
+                }
                 $status = 1;
             }
             //Reload and show message
