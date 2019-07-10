@@ -20,10 +20,9 @@ class ReadMessageExchangeController
 {
     public static function getMessageExchange($aArgs = [])
     {
-        $errors = self::control($aArgs);
 
-        if (!empty($errors)) {
-            return ['errors' => $errors];
+        if (empty($aArgs['id'])) {
+            return ['errors' => 'id is empty'];
         }
 
         $aDataForm = [];
@@ -97,16 +96,5 @@ class ReadMessageExchangeController
         }
 
         return $aDataForm;
-    }
-
-    protected function control($aArgs = [])
-    {
-        $errors = [];
-
-        if (empty($aArgs['id'])) {
-            array_push($errors, 'wrong format for id');
-        }
-
-        return $errors;
     }
 }
