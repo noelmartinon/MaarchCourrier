@@ -256,10 +256,10 @@ class ArchiveTransfer
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->StartDate = $startDate->format('Y-m-d');
         $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->EndDate = $endDate->format('Y-m-d');
 
-        $messageId = $this->saveMessage($messageObject);
+        $messageSaved = $this->saveMessage($messageObject);
 
         foreach ($listResId as $resId) {
-            $this->db->insertUnitIdentifier($messageId, "res_letterbox", $resId);
+            $this->db->insertUnitIdentifier($messageSaved['messageId'], "res_letterbox", $resId);
         }
 
         return $result;

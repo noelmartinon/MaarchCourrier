@@ -142,7 +142,7 @@ abstract class MessageExchangeModelAbstract
             ]);
 
             if (!empty($storeResult['errors'])) {
-                var_dump($storeResult['errors']);
+                return ['error' => $storeResult['errors']];
             }
             $docserverId = $storeResult['docserver_id'];
             $filepath    = $storeResult['destination_dir'];
@@ -189,9 +189,9 @@ abstract class MessageExchangeModelAbstract
                 ]
                 ]);
         } catch (Exception $e) {
-            return false;
+            return ['error' => $e];
         }
 
-        return $messageObject->messageId;
+        return ['messageId' => $messageObject->messageId];
     }
 }

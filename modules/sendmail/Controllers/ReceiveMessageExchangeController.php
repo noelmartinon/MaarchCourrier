@@ -69,7 +69,10 @@ class ReceiveMessageExchangeController
         $sDataObject = $res['content'];
         $sDataObject = json_decode($sDataObject);
         
-        self::sendAcknowledgement(["dataObject" => $sDataObject]);
+        $acknowledgementReturn = self::sendAcknowledgement(["dataObject" => $sDataObject]);
+        if (!empty($acknowledgementReturn['error'])) {
+            return $response->withStatus(400)->withJson(["errors" => $acknowledgementReturn['error']]);
+        }
 
         $aDefaultConfig = self::readXmlConfig();
 
@@ -459,7 +462,7 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $GLOBALS['userId'];
 
         $acknowledgementObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_AckSent';
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'Acknowledgement', 'file_path' => $filePath]);
+        $messageExchangeSaved = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'Acknowledgement', 'file_path' => $filePath]);
 
         $acknowledgementObject->DataObjectPackage = new \stdClass();
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata = new \stdClass();
@@ -468,7 +471,9 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content = new \stdClass();
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_ACK]'.date("Ymd_his");
 
-        $sendMessage->send($acknowledgementObject, $messageId, 'Acknowledgement');
+        $sendMessage->send($acknowledgementObject, $messageExchangeSaved['messageId'], 'Acknowledgement');
+
+        return $messageExchangeSaved['messageId'];
     }
 
     protected function sendReply($aArgs = [])
@@ -499,7 +504,7 @@ class ReceiveMessageExchangeController
         $filePath = $sendMessage->generateMessageFile($replyObject, "ArchiveTransferReply", $tmpPath);
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_ReplySent';
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReply', 'file_path' => $filePath]);
+        $messageExchangeSaved = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $replyObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveTransferReply', 'file_path' => $filePath]);
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
 
@@ -512,7 +517,7 @@ class ReceiveMessageExchangeController
 
         $replyObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->Title[0] = '[CAPTUREM2M_REPLY]'.date("Ymd_his");
 
-        $sendMessage->send($replyObject, $messageId, 'ArchiveTransferReply');
+        $sendMessage->send($replyObject, $messageExchangeSaved['messageId'], 'ArchiveTransferReply');
     }
 
     public function saveMessageExchangeReturn(Request $request, Response $response)
@@ -547,10 +552,13 @@ class ReceiveMessageExchangeController
             $messageExchange = $RequestSeda->getMessageByReference($dataObject->MessageRequestIdentifier->value);
         }
 
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => $data['type']]);
+        $messageExchangeSaved = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => $data['type']]);
+        if (!empty($messageExchangeSaved['error'])) {
+            return $response->withStatus(400)->withJson(['errors' => $messageExchangeSaved['error']]);
+        }
 
         return $response->withJson([
-            "messageId" => $messageId
+            "messageId" => $messageExchangeSaved['messageId']
         ]);
     }
 

@@ -527,7 +527,7 @@ class RequestSeda
             ]);
 
             if (!empty($storeResult['errors'])) {
-                var_dump($storeResult['errors']);
+                return ['error' => $storeResult['errors']];
             }
             $docserver_id = $storeResult['docserver_id'];
             $filepath     = $storeResult['destination_dir'];
@@ -595,17 +595,16 @@ class RequestSeda
             $queryParams[] = $fingerprint;
             $queryParams[] = $filesize;
 
-            $res = $this->db->query($query, $queryParams);
+            $this->db->query($query, $queryParams);
         } catch (Exception $e) {
-            return false;
+            return ['error' => $e];
         }
 
-        return $messageObject->messageId;
+        return ['messageId' => $messageObject->messageId];
     }
 
     public function insertAttachment($data, $type)
     {
-        $docserverControler = new docservers_controler();
 
         $fileInfos = array(
             "tmpDir"      => $data->tmpDir,

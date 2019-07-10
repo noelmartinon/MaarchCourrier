@@ -92,7 +92,7 @@ class MessageExchangeReviewController
 
             $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'].'_NotificationSent';
             $reviewObject->TransferringAgency = $reviewObject->OriginatingAgency;
-            $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $reviewObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveModificationNotification', 'file_path' => $filePath]);
+            $messageExchangeSaved = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $reviewObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveModificationNotification', 'file_path' => $filePath]);
 
             $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'].'_Notification';
 
@@ -106,7 +106,7 @@ class MessageExchangeReviewController
 
             $reviewObject->TransferringAgency->OrganizationDescriptiveMetadata = new \stdClass();
             $reviewObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $_SESSION['user']['UserId'];
-            $sendMessage->send($reviewObject, $messageId, 'ArchiveModificationNotification');
+            $sendMessage->send($reviewObject, $messageExchangeSaved['messageId'], 'ArchiveModificationNotification');
         }
     }
 
@@ -143,10 +143,10 @@ class MessageExchangeReviewController
             $RequestSeda->updateOperationDateMessage(['operation_date' => $dataObject->Date, 'message_id' => $messageExchange->message_id]);
         }
 
-        $messageId = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveModificationNotification']);
+        $messageExchangeSaved = \SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange->res_id_master, 'type' => 'ArchiveModificationNotification']);
 
         return $response->withJson([
-            'messageId' => $messageId,
+            'messageId' => $messageExchangeSaved['messageId'],
         ]);
     }
 }

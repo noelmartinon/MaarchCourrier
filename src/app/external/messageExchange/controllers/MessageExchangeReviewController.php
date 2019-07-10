@@ -81,7 +81,7 @@ class MessageExchangeReviewController
 
             $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'].'_NotificationSent';
             $reviewObject->TransferringAgency = $reviewObject->OriginatingAgency;
-            $messageId = SendMessageExchangeController::saveMessageExchange(['dataObject' => $reviewObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveModificationNotification', 'file_path' => $filePath, 'userId' => $aArgs['userId']]);
+            $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $reviewObject, 'res_id_master' => $aArgs['res_id_master'], 'type' => 'ArchiveModificationNotification', 'file_path' => $filePath, 'userId' => $aArgs['userId']]);
 
             $reviewObject->MessageIdentifier->value = $messageExchangeData['reference_number'].'_Notification';
 
@@ -96,7 +96,7 @@ class MessageExchangeReviewController
             $reviewObject->TransferringAgency->OrganizationDescriptiveMetadata = new \stdClass();
             $reviewObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $aArgs['userId'];
 
-            SendMessageController::send($reviewObject, $messageId, 'ArchiveModificationNotification');
+            SendMessageController::send($reviewObject, $messageExchangeSaved['messageId'], 'ArchiveModificationNotification');
         }
     }
 }
