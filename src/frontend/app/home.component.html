@@ -31,12 +31,12 @@
                         <table *ngIf="!loading" mat-table [dataSource]="dataSource" matSort matSortActive="res_id" matSortDisableClear matSortDirection="asc" style="width:100%;table-layout: fixed;">
                     <!-- Number Column -->
                     <ng-container matColumnDef="res_id">
-                        <td mat-cell *matCellDef="let row" [ngStyle]="{'width': mobileMode ? '30%' : '15%'}" style="text-align:center;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;padding: 5px;vertical-align: middle;">
+                        <td mat-cell *matCellDef="let row" [ngStyle]="{'width': mobileMode ? '30%' : '15%'}" style="position:relative;text-align:center;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;padding: 5px;vertical-align: middle;">
                             <div *ngIf="row.closing_date == null && mobileMode" id="{{row.res_id}}_creation_date" style="color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;"
                                 title='{{row.creation_date | date : "le dd/MM/y à HH:mm"}}'>
                                 <i class="fa fa-calendar" title="{{lang.creationDate}}"></i> {{row.creation_date | timeAgo}}
                             </div>
-                            <div style="overflow: hidden;text-overflow: ellipsis;">
+                            <div style="text-overflow: ellipsis;position:relative;">
                                 <mat-icon [ngStyle]="{'color': row.priority_color}" color="primary" class="{{row.status_icon.charAt(0)}}{{row.status_icon.charAt(1)}} {{row.status_icon}} {{row.status_icon.charAt(0)}}{{row.status_icon.charAt(1)}}-2x" title="{{row.status_label}} ({{row.status_id}})"></mat-icon>
                                 <span *ngIf="row.confidentiality === 'Y'" class="watermark">{{lang.confidential}}</span>
                             </div>

@@ -398,10 +398,9 @@ h1.admin-app-name {
 
 .watermark {
     position: absolute;
-    transform: rotate(-20deg);
+    left: 50%;
+    transform: translateX(-50%) rotate(-20deg);
     color: red;
     font-weight: bold;
-    margin-left: -80px;
-    margin-top: 10px;
     opacity: 0.6;
 }
