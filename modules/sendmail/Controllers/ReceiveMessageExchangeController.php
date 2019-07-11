@@ -473,7 +473,7 @@ class ReceiveMessageExchangeController
 
         $sendMessage->send($acknowledgementObject, $messageExchangeSaved['messageId'], 'Acknowledgement');
 
-        return $messageExchangeSaved['messageId'];
+        return $messageExchangeSaved;
     }
 
     protected function sendReply($aArgs = [])
