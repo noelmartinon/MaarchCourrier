@@ -3856,7 +3856,7 @@ function checkMultiIndexingGroup(url) {
 
 function writeLocationBar(path,label,level) {
     if ($j('#ariane a:last').length == 0) {
-        var home = $j('<a href="'+path+'">'+label+'</a>');
+        var home = $j('<a href="'+path+'" onclick="localStorage.setItem(\'PreviousV2Route\', \'/home\');">'+label+'</a>');
         home.appendTo('#ariane');
     } else {
         var elem = $j('<a href="'+path+'&level='+level+'">'+label+'</a>');
