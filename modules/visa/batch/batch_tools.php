@@ -235,6 +235,7 @@ function Bt_createAttachment($aArgs = [])
             'Authorization: Basic ' . base64_encode($GLOBALS['userWS']. ':' .$GLOBALS['passwordWS']),
         ],
         CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_POSTFIELDS => json_encode($allDatas),
         CURLOPT_POST => true
     ];
