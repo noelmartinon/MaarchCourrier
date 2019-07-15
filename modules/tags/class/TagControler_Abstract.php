@@ -20,7 +20,7 @@
 
 /**
 * Module : Tags
-* 
+*
 * This module is used to store ressources with any keywords
 * V: 1.0
 *
@@ -47,8 +47,7 @@ try {
     require_once("core/class/users_controler.php");
     require_once("modules/entities/class/class_users_entities_Abstract.php");
     require_once("core/class/users_controler.php");
-
-} catch (Exception $e){
+} catch (Exception $e) {
     functions::xecho($e->getMessage()).' // ';
 }
 
@@ -77,9 +76,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         $return     = array();
         $where_what = array();
   
-        $db = new Database(); 
+        $db = new Database();
         
-        if($core->test_service('private_tag', 'tags',false) == 1){
+        if ($core->test_service('private_tag', 'tags', false) == 1) {
             $entitiesRestriction = array();
             $uc = new users_controler();
             $userEntities = $uc->getEntities($_SESSION['user']['UserId']);
@@ -90,57 +89,61 @@ abstract class tag_controler_Abstract extends ObjectControler
             }
 
             //CHECK TAG IS ALLOW FOR THESE ENTITIES
-            if(!empty($entitiesRestriction)){
+            if (!empty($entitiesRestriction)) {
                 $entitiesRestriction = "'".implode("','", $entitiesRestriction)."'";
                 $where = ' WHERE entity_id IN ('.$entitiesRestriction.')';
-            }else{
+            } else {
                 $where = '';
             }
             $stmt = $db->query(
-            'SELECT distinct(tag_id)' 
+            'SELECT distinct(tag_id)'
             . ' FROM tags_entities'
-            . $where
-            ,array());
+            . $where,
+                array()
+            );
             
             $restrictedTagIdList = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
             
             //CHECK TAG WHO IS NOT RESTRICTED
             $stmt = $db->query(
-            'SELECT tag_id' 
+            'SELECT tag_id'
             . ' FROM tags'
-            . ' WHERE tag_id NOT IN (select distinct(tag_id) from tags_entities)'
-            ,array());
+            . ' WHERE tag_id NOT IN (select distinct(tag_id) from tags_entities)',
+                array()
+            );
             $freeTagIdList = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
             
             //MERGE ALLOWED TAGS AND FREE TAGS
-            $tagIdList = array_merge($restrictedTagIdList,$freeTagIdList);
+            $tagIdList = array_merge($restrictedTagIdList, $freeTagIdList);
             
-            if(!empty($tagIdList)){
+            if (!empty($tagIdList)) {
                 $tagIdList = "'".implode("','", $tagIdList)."'";
                 $where = ' WHERE tag_id IN ('.$tagIdList.')';
-            }else{
+            } else {
                 // NO TAG ALLOWED
                 $where = ' WHERE tag_id = 0';
             }
             
             $stmt = $db->query(
-            'SELECT tag_id, tag_label FROM ' 
-            . _TAG_TABLE_NAME 
+            'SELECT tag_id, tag_label FROM '
+            . _TAG_TABLE_NAME
             . $where
-            . ' ORDER BY tag_label ASC '
-            ,$where_what);
+            . ' ORDER BY tag_label ASC ',
+                $where_what
+            );
         } else {
             $stmt = $db->query(
-            'SELECT tag_id, tag_label FROM ' 
-            . _TAG_TABLE_NAME 
-            . ' ORDER BY tag_label ASC '
-            ,$where_what);
+            'SELECT tag_id, tag_label FROM '
+            . _TAG_TABLE_NAME
+            . ' ORDER BY tag_label ASC ',
+                $where_what
+            );
         }
   
         self::set_specific_id('tag_id');
       
-        if($stmt->rowCount() > 0){
-            while($tag=$stmt->fetchObject()){
+        if ($stmt->rowCount() > 0) {
+            while ($tag=$stmt->fetchObject()) {
                 $tougue['tag_id']    = $tag->tag_id;
                 $tougue['tag_label'] = $tag->tag_label;
                 $tougue['coll_id']   = $tag->coll_id;
@@ -151,13 +154,13 @@ abstract class tag_controler_Abstract extends ObjectControler
         return false;
     }
     
-    public function get_by_id($tag_id, $coll_id = 'letterbox_coll') {
+    public function get_by_id($tag_id, $coll_id = 'letterbox_coll')
+    {
         /*
          * Searching a tag by label
          * @If tag exists, return this value, else, return false
          */
         if (empty($tag_id) || empty($coll_id)) {
-
             return null;
         }
 
@@ -167,8 +170,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
                 'SELECT tag_id, tag_label, coll_id FROM ' . _TAG_TABLE_NAME
                 . ' WHERE tag_id = ? AND'
-                . ' coll_id = ?'
-                , array($tag_id, $coll_id));
+                . ' coll_id = ?',
+            array($tag_id, $coll_id)
+        );
 
         self::set_specific_id('tag_id');
 
@@ -177,8 +181,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         //Retrieve entities restriction
         $stmt = $db->query(
                 'SELECT entity_id FROM tags_entities'
-                . ' WHERE tag_id = ?'
-                , array($tag_id));
+                . ' WHERE tag_id = ?',
+            array($tag_id)
+        );
         $entities = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
         $tag->entities = $entities;
@@ -197,8 +202,7 @@ abstract class tag_controler_Abstract extends ObjectControler
          * @If tag exists, return this value, else, return false
          */
         $tag_label = str_replace("''", "'", $tag_label);
-        if (empty($tag_label) || empty($coll_id) ) {
-           
+        if (empty($tag_label) || empty($coll_id)) {
             return null;
         }
 
@@ -206,8 +210,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
             'SELECT tag_id, tag_label FROM '._TAG_TABLE_NAME
             . ' WHERE tag_label = ? AND'
-            . ' coll_id = ?'
-            ,array($tag_label,$coll_id));
+            . ' coll_id = ?',
+            array($tag_label,$coll_id)
+        );
         
         $tag=$stmt->fetchObject();
 
@@ -238,7 +243,7 @@ abstract class tag_controler_Abstract extends ObjectControler
         }
     }
   
-    public function get_by_res($res_id,$coll_id)
+    public function get_by_res($res_id, $coll_id)
     {
         /*
          * Searching tags by a ressources
@@ -249,20 +254,24 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
             "SELECT tag_res.tag_id FROM tag_res"
             . " INNER JOIN tags ON tag_res.tag_id = tags.tag_id"
-            . " WHERE tag_res.res_id = ? AND tags.coll_id = ?"
-        ,array($res_id,$coll_id));
+            . " WHERE tag_res.res_id = ? AND tags.coll_id = ?",
+            array($res_id,$coll_id)
+        );
         //$db->show();
         
         
         $return = array();
-        while ($res = $stmt->fetchObject()){
+        while ($res = $stmt->fetchObject()) {
             array_push($return, $res->tag_id);
         }
-        if ($return) return $return;
-        else return false;
+        if ($return) {
+            return $return;
+        } else {
+            return false;
+        }
     }
   
-    public function delete_this_tag($res_id,$coll_id,$tag_label)
+    public function delete_this_tag($res_id, $coll_id, $tag_label)
     {
         /*
          * Deleting a tag for a ressource
@@ -270,30 +279,39 @@ abstract class tag_controler_Abstract extends ObjectControler
         $db = new Database();
         $stmt = $db->query(
             "SELECT tag_label FROM " ._TAG_TABLE_NAME
-            . " WHERE res_id = ? AND coll_id = ? AND tag_label = ?"
-        ,array($res_id,$coll_id,$tag_label));
+            . " WHERE res_id = ? AND coll_id = ? AND tag_label = ?",
+            array($res_id,$coll_id,$tag_label)
+        );
 
-        if ($stmt->rowCount()>0){
+        if ($stmt->rowCount()>0) {
             //Lancement de la suppression de l'occurence
             $stmt = $db->query(
                 "DELETE FROM " ._TAG_TABLE_NAME
-                . " WHERE res_id = ? AND coll_id = ? AND tag_label = ? "
-            ,array($res_id,$coll_id,$tag_label));
-            if ($stmt){ 
+                . " WHERE res_id = ? AND coll_id = ? AND tag_label = ? ",
+                array($res_id,$coll_id,$tag_label)
+            );
+            if ($stmt) {
                 $hist = new history();
                 $hist->add(
-                    _TAG_TABLE_NAME, $tag_label, "DEL", 'tagdel', _TAG_DELETED.' : "'.
+                    _TAG_TABLE_NAME,
+                    $tag_label,
+                    "DEL",
+                    'tagdel',
+                    _TAG_DELETED.' : "'.
                     substr(functions::protect_string_db($tag_label), 0, 254) .'"',
-                    $_SESSION['config']['databasetype'], 'tags'
+                    $_SESSION['config']['databasetype'],
+                    'tags'
                 );
-                return true; }
+                return true;
+            }
         }
         return fasle;
         
         //$db->show();
     }
     
-    public function countdocs($tag_id){
+    public function countdocs($tag_id)
+    {
         /*
          * Count ressources for one tag : used by tags administration
          */
@@ -302,15 +320,15 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
                 "SELECT count(res_id) AS bump FROM tag_res"
                 . " WHERE tag_id = ?"
-                . " AND res_id <> 0"
-        ,array($tag_id));
+                . " AND res_id <> 0",
+            array($tag_id)
+        );
         
         $result = $stmt->fetchObject();
-        $return = 0; 
+        $return = 0;
         
-        if ($result)
-        {
-            $return = $result->bump; 
+        if ($result) {
+            $return = $result->bump;
         }
         
         return $return;
@@ -321,13 +339,15 @@ abstract class tag_controler_Abstract extends ObjectControler
      * Searching a list of ressources by label
      * @Return : an Array with label's ressources or 0
      */
-    public function getresarray_byId($tag_id){
+    public function getresarray_byId($tag_id)
+    {
         $result = array();
         $db = new Database();
         $stmt = $db->query(
                 "SELECT res_id FROM tag_res"
-                . " WHERE tag_id = ?"
-        ,array($tag_id));
+                . " WHERE tag_id = ?",
+            array($tag_id)
+        );
 
         $result = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
         return $result;
@@ -341,50 +361,51 @@ abstract class tag_controler_Abstract extends ObjectControler
          * @If tag exists, return this value, else, return false
          */
         $db = new Database();
-        $core = new core_tools(); 
+        $core = new core_tools();
         
         $where = '';
-        if($core->test_service('private_tag', 'tags',false) == 1){
+        if ($core->test_service('private_tag', 'tags', false) == 1) {
             $entitiesRestriction = array();
-            $userEntities = users_controler::getEntities($_SESSION['user']['UserId']);
-            //var_dump($entitiesDirection);
+            $uc = new users_controler();
+            $userEntities = $uc->getEntities($_SESSION['user']['UserId']);
             foreach ($userEntities as $entity) {
                 $entity_id = $entity['ENTITY_ID'];
                 $entitiesRestriction[] = $entity_id;
             }
-            //var_dump($entitiesRestriction);
             //CHECK TAG IS ALLOW FOR THESE ENTITIES
-            if(!empty($entitiesRestriction)){
+            if (!empty($entitiesRestriction)) {
                 $entitiesRestriction = "'".implode("','", $entitiesRestriction)."'";
                 $where = ' WHERE entity_id IN ('.$entitiesRestriction.')';
-            }else{
+            } else {
                 $where = '';
             }
             $stmt = $db->query(
-            'SELECT distinct(tag_id)' 
+            'SELECT distinct(tag_id)'
             . ' FROM tags_entities'
-            . $where
-            ,array());
+            . $where,
+                array()
+            );
 
             $restrictedTagIdList = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
             //var_dump($restrictedTagIdList);
             //CHECK TAG WHO IS NOT RESTRICTED
             $stmt = $db->query(
-            'SELECT tag_id' 
+            'SELECT tag_id'
             . ' FROM tags'
-            . ' WHERE tag_id NOT IN (select distinct(tag_id) from tags_entities)'
-            ,array());
+            . ' WHERE tag_id NOT IN (select distinct(tag_id) from tags_entities)',
+                array()
+            );
             $freeTagIdList = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
             //var_dump($freeTagIdList);
             //MERGE ALLOWED TAGS AND FREE TAGS
-            $tagIdList = array_merge($restrictedTagIdList,$freeTagIdList);
+            $tagIdList = array_merge($restrictedTagIdList, $freeTagIdList);
 
-            if(!empty($tagIdList)){
+            if (!empty($tagIdList)) {
                 $tagIdList = "'".implode("','", $tagIdList)."'";
                 $where = ' AND tag_id IN ('.$tagIdList.')';
-            }else{
+            } else {
                 $where = '';
             }
         }
@@ -392,8 +413,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
                 "DELETE FROM tag_res"
                 . " WHERE res_id = ?"
-                . $where
-        ,array($res_id));
+                . $where,
+            array($res_id)
+        );
         /*$hist = new history();
         $hist->add(
             'res_view_letterbox', $res_id, "DEL", 'tagdel', _ALL_TAG_DELETED_FOR_RES_ID.' : "'.
@@ -404,7 +426,7 @@ abstract class tag_controler_Abstract extends ObjectControler
     }
     
     
-    public function delete($tag_id,$coll_id='letterbox_coll')
+    public function delete($tag_id, $coll_id='letterbox_coll')
     {
         /*
          * Deleting  [REALLY] a tag for a ressource
@@ -412,40 +434,49 @@ abstract class tag_controler_Abstract extends ObjectControler
         $db = new Database();
         $stmt = $db->query(
                 "DELETE FROM " ._TAG_TABLE_NAME
-                . " WHERE tag_id = ?"
-        ,array($tag_id));
+                . " WHERE tag_id = ?",
+            array($tag_id)
+        );
         $stmt = $db->query(
                 "DELETE FROM tag_res"
-                . " WHERE tag_id = ?"
-        ,array($tag_id));
+                . " WHERE tag_id = ?",
+            array($tag_id)
+        );
         $stmt = $db->query(
                 "DELETE FROM tags_entities"
-                . " WHERE tag_id = ?"
-        ,array($tag_id));
+                . " WHERE tag_id = ?",
+            array($tag_id)
+        );
         
-        if ($stmt){
+        if ($stmt) {
             $hist = new history();
             $hist->add(
-                _TAG_TABLE_NAME, $tag_label, "DEL", 'tagdel', _TAG_DELETED.' : "'.
+                _TAG_TABLE_NAME,
+                $tag_label,
+                "DEL",
+                'tagdel',
+                _TAG_DELETED.' : "'.
                 substr(functions::protect_string_db($tag_label), 0, 254) .'"',
-                $_SESSION['config']['databasetype'], 'tags'
+                $_SESSION['config']['databasetype'],
+                'tags'
             );
-            return true; 
+            return true;
         }
         return false;
         //$db->show();
     }
     
     
-    public function store($tag_id, $mode='up', $params){
+    public function store($tag_id, $mode='up', $params)
+    {
         /*
          * Store into the database a tag for a ressource
          */
         
-        if ($mode=='add'){
+        if ($mode=='add') {
             $new_tag_label = $params[0];
             $coll_id = $params[1];
-            $this->insert_tag_label($new_tag_label, $coll_id);  
+            $this->insert_tag_label($new_tag_label, $coll_id);
             
             /*$hist = new history();
             $hist->add(
@@ -454,12 +485,10 @@ abstract class tag_controler_Abstract extends ObjectControler
                 $_SESSION['config']['databasetype'], 'tags'
             );*/
             return true;
-        }
-        elseif($mode=='up'){
-            
+        } elseif ($mode=='up') {
             $new_tag_label = $params[0];
             $coll_id = $params[1];
-            $this->update_tag($tag_id, $coll_id);  
+            $this->update_tag($tag_id, $coll_id);
             /*$hist = new history();
             $hist->add(
                 _TAG_TABLE_NAME, $new_tag_label, "ADD", 'tagup', _TAG_ADDED.' : "'.
@@ -467,10 +496,8 @@ abstract class tag_controler_Abstract extends ObjectControler
                 $_SESSION['config']['databasetype'], 'tags'
             );*/
             return true;
-        }
-        else
-        {
-            return false;   
+        } else {
+            return false;
         }
     }
     
@@ -486,26 +513,29 @@ abstract class tag_controler_Abstract extends ObjectControler
         $db = new Database();
         $stmt = $db->query(
             "SELECT tag_label FROM " ._TAG_TABLE_NAME
-            . " WHERE  coll_id = ? and tag_label = ?  "
-        ,array($coll_id,$new_tag_label));
-        if ($stmt->rowCount() == 0)
-        {
+            . " WHERE  coll_id = ? and tag_label = ?  ",
+            array($coll_id,$new_tag_label)
+        );
+        if ($stmt->rowCount() == 0) {
             $stmt = $db->query(
                 "UPDATE " ._TAG_TABLE_NAME
                 . " SET tag_label = ?"
-                . " WHERE coll_id = ? AND tag_label = ?"
-            ,array($new_tag_label,$coll_id,$old_taglabel));
+                . " WHERE coll_id = ? AND tag_label = ?",
+                array($new_tag_label,$coll_id,$old_taglabel)
+            );
             $hist = new history();
             $hist->add(
-                _TAG_TABLE_NAME, $new_tag_label, "UP", 'tagup', _TAG_UPDATED.' : "'.
+                _TAG_TABLE_NAME,
+                $new_tag_label,
+                "UP",
+                'tagup',
+                _TAG_UPDATED.' : "'.
                 substr(functions::protect_string_db($new_tag_label), 0, 254) .'"',
-                $_SESSION['config']['databasetype'], 'tags'
+                $_SESSION['config']['databasetype'],
+                'tags'
             );
-        }
-        else
-        {
+        } else {
             $_SESSION['error'] = _TAG_ALREADY_EXISTS;
-            
         }
     }
     
@@ -524,25 +554,26 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
             "UPDATE " ._TAG_TABLE_NAME
             . " SET  tag_label = ?"
-            . " WHERE  tag_id = ?"
-        ,array($new_tag_label,$tag_id));
+            . " WHERE  tag_id = ?",
+            array($new_tag_label,$tag_id)
+        );
         
-        //reset entities restrictions    
+        //reset entities restrictions
         $stmt = $db->query(
                 "DELETE FROM tags_entities"
-                . " WHERE tag_id = ?"
-        ,array($tag_id));
+                . " WHERE tag_id = ?",
+            array($tag_id)
+        );
         
-        if(!empty($_SESSION['m_admin']['tag']['entities'])){
+        if (!empty($_SESSION['m_admin']['tag']['entities'])) {
             foreach ($_SESSION['m_admin']['tag']['entities'] as $entity_id) {
                 $stmt = $db->query(
                     "INSERT INTO tags_entities"
-                    . "(tag_id, entity_id) VALUES (?, ?)"
-                  ,array($tag_id,$entity_id));
+                    . "(tag_id, entity_id) VALUES (?, ?)",
+                    array($tag_id,$entity_id)
+                );
             }
         }
-
-        
     }
     
     public function insert_tag_label($new_tag_label, $coll_id)
@@ -564,31 +595,33 @@ abstract class tag_controler_Abstract extends ObjectControler
         //$db->show();exit();
         if ($stmt->rowCount() == 0)
         {*/
-             $stmt = $db->query(
+        $stmt = $db->query(
                 "INSERT INTO " ._TAG_TABLE_NAME
-                . "(tag_label, coll_id, entity_id_owner) VALUES (?, ?, ?)"
-              ,array($new_tag_label,$coll_id,$_SESSION['user']['primaryentity']['id']));
+                . "(tag_label, coll_id, entity_id_owner) VALUES (?, ?, ?)",
+                 array($new_tag_label,$coll_id,$_SESSION['user']['primaryentity']['id'])
+             );
              
-            $tag_id = $db->lastInsertId('tag_id_seq');
+        $tag_id = $db->lastInsertId('tag_id_seq');
             
-            if(!empty($_SESSION['m_admin']['tag']['entities'])){
-                foreach ($_SESSION['m_admin']['tag']['entities'] as $entity_id) {
-                    $stmt = $db->query(
+        if (!empty($_SESSION['m_admin']['tag']['entities'])) {
+            foreach ($_SESSION['m_admin']['tag']['entities'] as $entity_id) {
+                $stmt = $db->query(
                         "INSERT INTO tags_entities"
-                        . "(tag_id, entity_id) VALUES (?, ?)"
-                      ,array($tag_id,$entity_id));
-                }
+                        . "(tag_id, entity_id) VALUES (?, ?)",
+                        array($tag_id,$entity_id)
+                    );
             }
+        }
             
         /*}else{
             $_SESSION['error'] = _TAG_DEFAULT.' '.': '.$new_tag_label.' '._ALREADY_EXISTS;
             return false;
         }*/
-        
     }
     
     
-    public function add_this_tag($res_id, $tag_id) {
+    public function add_this_tag($res_id, $tag_id)
+    {
         /*
          * Adding  [REALLY] a tag for a ressource
          */
@@ -597,8 +630,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         $stmt = $db->query(
                 "INSERT INTO tag_res"
                 . " (tag_id, res_id)"
-                . " VALUES (?,?)  "
-                , array($tag_id, $res_id));
+                . " VALUES (?,?)  ",
+            array($tag_id, $res_id)
+        );
         if ($stmt) {
 
             /* $hist = new history();
@@ -615,14 +649,15 @@ abstract class tag_controler_Abstract extends ObjectControler
         //$db->show();
     }
 
-    public function load_sessiontag($res_id,$coll_id)
+    public function load_sessiontag($res_id, $coll_id)
     {
-            $_SESSION['tagsuser'] = array();    
-            $_SESSION['tagsuser'] = $this->get_by_res($res_id, $coll_id); 
+        $_SESSION['tagsuser'] = array();
+        $_SESSION['tagsuser'] = $this->get_by_res($res_id, $coll_id);
     }
     
     
-    public function add_this_tags_in_session($tag_label, $coll_id) {
+    public function add_this_tags_in_session($tag_label, $coll_id)
+    {
         $_SESSION['m_admin']['tag'] = array();
         $_SESSION['m_admin']['tag']['tag_label'] = $tag_label;
         $_SESSION['m_admin']['tag']['entities'] = array();
@@ -647,45 +682,40 @@ abstract class tag_controler_Abstract extends ObjectControler
     public function remove_this_tags_in_session($tag_label)
     { //remplir le formulaire de session
     
-        if ($_SESSION['tagsuser'])
-        {
+        if ($_SESSION['tagsuser']) {
             $ready = false;
-            foreach($_SESSION['tagsuser'] as $this_tag){
-                if ($this_tag == $tag_label){
+            foreach ($_SESSION['tagsuser'] as $this_tag) {
+                if ($this_tag == $tag_label) {
                     $ready = true;
-                }   
+                }
             }
             
-            if ($ready == true){
-                
+            if ($ready == true) {
                 unset($_SESSION['tagsuser'][array_search($tag_label, $_SESSION['tagsuser'])]);
                 return true;
             }
             return false;
-        }
-        else
-        {
+        } else {
             return false;
-        }    
+        }
     }
     
-    public function associateTagToRes($res_id,$coll_id,$tag_array)
+    public function associateTagToRes($res_id, $coll_id, $tag_array)
     {
-        $core_tools = new core_tools(); 
-        if ($core_tools->test_service('add_tag_to_res', 'tags',false) == 1)
-        {
+        $core_tools = new core_tools();
+        if ($core_tools->test_service('add_tag_to_res', 'tags', false) == 1) {
             $this->deleteTagsRes($res_id);
             if (!empty($tag_array[0])) {
-                foreach($tag_array as $this_tagId)
-                {
-                    $this->add_this_tag($res_id,$this_tagId);
+                foreach ($tag_array as $this_tagId) {
+                    $this->add_this_tag($res_id, $this_tagId);
                 }
             }
         }
     }
     
     
-    protected function control_label($label){
+    protected function control_label($label)
+    {
         $label  = str_replace('\r', '', $label);
         $label  = str_replace('\n', '', $label);
         // $label  = str_replace('\'', ' ', $label);
@@ -695,12 +725,9 @@ abstract class tag_controler_Abstract extends ObjectControler
         
         
         //On découpe la chaine composée de virgules
-        $tabrr = array( CHR(13) => ",", CHR(10) => "," ); 
-        $label = strtr($label,$tabrr); 
+        $tabrr = array( CHR(13) => ",", CHR(10) => "," );
+        $label = strtr($label, $tabrr);
         
         return $label;
     }
-  
 }
-
-?>

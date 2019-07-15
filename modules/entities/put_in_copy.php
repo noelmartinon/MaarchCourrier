@@ -13,8 +13,7 @@ function get_form_txt(
     $module,
     $coll_id,
     $mode
-)
-{
+) {
     $frm_str = '<div id="frm_error_' . $id_action . '" class="error"></div>';
     $frm_str .= '<h2 class="title">' . _ADD_COPY_FOR_DOC . ' ' . _NUM;
     $values_str = '';
@@ -28,40 +27,43 @@ function get_form_txt(
     $diff_list = new diffusion_list();
     $_SESSION['process']['diff_list'] = $diff_list->get_listinstance($values_str);
     $frm_str .= '<div id="diff_list_div">';
-        $frm_str .= '<div>';
-            if (count($_SESSION['process']['diff_list']['copy']['users']) == 0 && count($_SESSION['process']['diff_list']['copy']['entities']) == 0) {
-                $frm_str .= _NO_COPY;
-            } else {
-                $frm_str .= '<table cellpadding="0" cellspacing="0" border="0" class="listing3">';
-                $color = ' class="col"';
-                for ($i=0;$i<count($_SESSION['process']['diff_list']['copy']['entities']);$i++) {
-                    if ($color == ' class="col"') {
-                        $color = '';
-                    } else {
-                        $color = ' class="col"';
-                    }
-                    $frm_str .= '<tr '.$color.' >';
-                    $frm_str .= '<td><i class="fa fa-sitemap fa-2x" title="'._ENTITY.'"></i></td>';
-                    $frm_str .= '<td >'.$_SESSION['process']['diff_list']['copy']['entities'][$i]['entity_id'].'</td>';
-                    $frm_str .= '<td colspan="2">'.$_SESSION['process']['diff_list']['copy']['entities'][$i]['entity_label'].'</td>';
-                    $frm_str .= '</tr>';
+    $frm_str .= '<div>';
+    if (empty($_SESSION['process']['diff_list']['copy']['users']) && empty($_SESSION['process']['diff_list']['copy']['entities'])) {
+        $frm_str .= _NO_COPY;
+    } else {
+        $frm_str .= '<table cellpadding="0" cellspacing="0" border="0" class="listing3">';
+        $color = ' class="col"';
+        if (!empty($_SESSION['process']['diff_list']['copy']['entities'])) {
+            for ($i=0;$i<count($_SESSION['process']['diff_list']['copy']['entities']);$i++) {
+                if ($color == ' class="col"') {
+                    $color = '';
+                } else {
+                    $color = ' class="col"';
                 }
-                for ($i=0;$i<count($_SESSION['process']['diff_list']['copy']['users']);$i++) {
-                    if ($color == ' class="col"') {
-                        $color = '';
-                    } else {
-                        $color = ' class="col"';
-                    }
-                    $frm_str .= '<tr '.$color.' >';
-                        $frm_str .= '<td><i class="fa fa-user fa-2x" title="'._USER.'"></i></td>';
-                        $frm_str .= '<td >'.$_SESSION['process']['diff_list']['copy']['users'][$i]['firstname'].'</td>';
-                        $frm_str .= '<td >'.$_SESSION['process']['diff_list']['copy']['users'][$i]['lastname'].'</td>';
-                        $frm_str .= '<td>'.$_SESSION['process']['diff_list']['copy']['users'][$i]['entity_label'].'</td>';
-                    $frm_str .= '</tr>';
-                }
-                $frm_str .= '</table>';
+                $frm_str .= '<tr '.$color.' >';
+                $frm_str .= '<td><i class="fa fa-sitemap fa-2x" title="'._ENTITY.'"></i></td>';
+                $frm_str .= '<td >'.$_SESSION['process']['diff_list']['copy']['entities'][$i]['entity_id'].'</td>';
+                $frm_str .= '<td colspan="2">'.$_SESSION['process']['diff_list']['copy']['entities'][$i]['entity_label'].'</td>';
+                $frm_str .= '</tr>';
             }
-        $frm_str .= '</div>';
+        } elseif (!empty($_SESSION['process']['diff_list']['copy']['users'])) {
+            for ($i=0;$i<count($_SESSION['process']['diff_list']['copy']['users']);$i++) {
+                if ($color == ' class="col"') {
+                    $color = '';
+                } else {
+                    $color = ' class="col"';
+                }
+                $frm_str .= '<tr '.$color.' >';
+                $frm_str .= '<td><i class="fa fa-user fa-2x" title="'._USER.'"></i></td>';
+                $frm_str .= '<td >'.$_SESSION['process']['diff_list']['copy']['users'][$i]['firstname'].'</td>';
+                $frm_str .= '<td >'.$_SESSION['process']['diff_list']['copy']['users'][$i]['lastname'].'</td>';
+                $frm_str .= '<td>'.$_SESSION['process']['diff_list']['copy']['users'][$i]['entity_label'].'</td>';
+                $frm_str .= '</tr>';
+            }
+        }
+        $frm_str .= '</table>';
+    }
+    $frm_str .= '</div>';
     $frm_str .= '</div>';
         
     $frm_str .= '<a href="#" onclick="window.open(\''.$_SESSION['config']['businessappurl']
@@ -72,17 +74,17 @@ function get_form_txt(
               . _ADD_COPIES . '</a>';
     $frm_str .='<hr />';
     $frm_str .='<div align="center">';
-        $frm_str .= '<form name="frm_put_in_copy" id="frm_put_in_copy" method="post" class="forms" action="#">';
-            $frm_str .= '<input type="hidden" name="chosen_action" id="chosen_action" value="end_action" />';
-            $frm_str .=' <input type="button" name="put_in_copy" id="put_in_copy" value="'
+    $frm_str .= '<form name="frm_put_in_copy" id="frm_put_in_copy" method="post" class="forms" action="#">';
+    $frm_str .= '<input type="hidden" name="chosen_action" id="chosen_action" value="end_action" />';
+    $frm_str .=' <input type="button" name="put_in_copy" id="put_in_copy" value="'
                      . _VALIDATE_PUT_IN_COPY . '" class="button" '
                      . 'onclick="valid_action_form( \'frm_put_in_copy\', \''
-                     . $path_manage_action . '\', \''. $id_action . '\', \'' 
-                     . $values_str . '\', \'' . $table . '\', \''. $module . '\', \'' 
+                     . $path_manage_action . '\', \''. $id_action . '\', \''
+                     . $values_str . '\', \'' . $table . '\', \''. $module . '\', \''
                      . $coll_id . '\', \'' . $mode . '\');"  />&nbsp;';
-            $frm_str .='<input type="button" name="cancel" id="cancel" class="button"  value="'
+    $frm_str .='<input type="button" name="cancel" id="cancel" class="button"  value="'
                       . _CANCEL . '" onclick="destroyModal(\'modal_' . $id_action . '\');"/>';
-        $frm_str .='</form>';
+    $frm_str .='</form>';
     $frm_str .='</div>';
     return addslashes($frm_str);
 }
@@ -101,17 +103,16 @@ function manage_form(
     $coll_id,
     $table,
     $values_form
-)
-{
+) {
     //var_dump($_SESSION['process']);
     $list = new diffusion_list();
     $params = array(
-        'mode'=> 'listinstance', 
-        'table' => $_SESSION['tablename']['ent_listinstance'], 
-        'coll_id' => $coll_id, 
-        'res_id' => $arr_id[0], 
-        'user_id' => $_SESSION['user']['UserId'], 
-        'concat_list' => true, 
+        'mode'=> 'listinstance',
+        'table' => $_SESSION['tablename']['ent_listinstance'],
+        'coll_id' => $coll_id,
+        'res_id' => $arr_id[0],
+        'user_id' => $_SESSION['user']['UserId'],
+        'concat_list' => true,
         'only_cc' => true
     );
     $msg = _ADD_COPY_FOR_DOC . ' ' . $arr_id[0];
