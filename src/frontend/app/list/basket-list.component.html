@@ -105,7 +105,7 @@
                                             <ng-container
                                                 *ngIf="data.value != 'getCategory' && data.value != 'getCreationAndProcessLimitDates'">
                                                 <span *ngIf="!data.value.includes('Date')" title="{{data.displayTitle}}"
-                                                    [innerHTML]="data.displayValue | shorten: 30: '...'"></span>
+                                                    [innerHTML]="data.displayValue"></span>
                                                 <span *ngIf="data.value.includes('Date')"
                                                     [innerHTML]="data.displayValue | timeAgo"></span>
                                             </ng-container>
