@@ -110,7 +110,7 @@
       <pattern value="/^[0-9\-\+\.\(\) ]{2,20}$/" />
     </dataType>
     <dataType name="filename" base="graph">
-      <pattern value="/^[\w-.]+$/" />
+      <pattern value="/^[\w\-.]+$/" />
     </dataType>
     <dataType name="keyword_id" base="string">
       <pattern value="/^[\w ]+$/" />
