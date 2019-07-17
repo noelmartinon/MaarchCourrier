@@ -113,8 +113,8 @@ Mods
                         </span>
                         <span style="flex:1;text-align: right;">
                             <span title="##defineLang|_DEST_USER## - ##defineLang|_SHIPPER##">##loadValue|exp_user_id####loadValue|is_multicontacts## ##func_bool_see_multi_contacts##</span><br/>
-                            ##ifStatement|'#loadValue|real_dest#'!=null|#loadValue|real_dest#|##<br/><br/>
-                            ##ifStatement|'#loadValue|case_label#'!=null|<b>#defineLang|_CASE# : </b>#loadValue|case_label#|##
+                            ##ifStatement|'#loadEscapeValue|real_dest#'!=null|#loadValue|real_dest#|##<br/><br/>
+                            ##ifStatement|'#loadEscapeValue|case_label#'!=null|<b>#defineLang|_CASE# : </b>#loadValue|case_label#|##
                         </span>
                     </span>
                     <span style="display: flex;width: 100%;">

@@ -110,8 +110,8 @@ Mods
                         </span>
                         <span style="flex:1;text-align: right;">
                             <span title="##defineLang|_VISA_USER## - ##defineLang|_SIGN_USER##">##loadValue|signatory_user##</span><br/>
-                            ##ifStatement|'#loadValue|real_dest#'!=null|#loadValue|real_dest#|##<br/><br/>
-                            ##ifStatement|'#loadValue|case_label#'!=null|<b>#defineLang|_CASE# : </b>#loadValue|case_label#|##
+                            ##ifStatement|'#loadEscapeValue|real_dest#'!=null|#loadValue|real_dest#|##<br/><br/>
+                            ##ifStatement|'#loadEscapeValue|case_label#'!=null|<b>#defineLang|_CASE# : </b>#loadValue|case_label#|##
                         </span>
                     </span>
                     <span style="display: flex;width: 100%;">
