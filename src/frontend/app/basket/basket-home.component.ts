@@ -49,9 +49,13 @@ export class BasketHomeComponent implements OnInit {
         }
     }
 
-    refreshDatas() {
-        this.refreshBasketHome()
-        this.refreshEvent.emit();
+    refreshDatas(basket: any) {
+        this.refreshBasketHome();
+
+        // AVOID DOUBLE REQUEST IF ANOTHER BASKET IS SELECTED
+        if (this.currentBasketInfo.basketId == basket.id) {
+            this.refreshEvent.emit();
+        }
     }
 
     refreshBasketHome(){

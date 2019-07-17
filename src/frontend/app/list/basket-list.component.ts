@@ -2,12 +2,12 @@ import { ChangeDetectorRef, Component, OnInit, ViewChild, EventEmitter, ViewCont
 import { MediaMatcher } from '@angular/cdk/layout';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { merge, Observable, of as observableOf  } from 'rxjs';
+import { merge, Observable, of as observableOf, Subject  } from 'rxjs';
 import { NotificationService } from '../notification.service';
 import { MatDialog, MatSidenav, MatPaginator, MatSort, MatBottomSheet } from '@angular/material';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { startWith, switchMap, map, catchError } from 'rxjs/operators';
+import { startWith, switchMap, map, catchError, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../service/header.service';
 import { FiltersListService } from '../../service/filtersList.service';
@@ -87,6 +87,8 @@ export class BasketListComponent implements OnInit {
     allResInBasket: number[] = [];
     selectedDiffusionTab: number = 0;
 
+    private destroy$ = new Subject<boolean>();
+
     @ViewChild('actionsListContext') actionsList: ActionsListComponent;
     @ViewChild('filtersTool') filtersTool: FiltersToolComponent;
     @ViewChild('appPanelList') appPanelList: PanelListComponent;
@@ -117,9 +119,9 @@ export class BasketListComponent implements OnInit {
 
         this.isLoadingResults = false;
 
-        this.initResultList();
-
         this.route.params.subscribe(params => {
+            this.destroy$.next(true);
+
             this.basketUrl = '../../rest/resourcesList/users/' + params['userSerialId'] + '/groups/' + params['groupSerialId'] + '/baskets/' + params['basketId'];
 
             this.currentBasketInfo = {
@@ -135,12 +137,16 @@ export class BasketListComponent implements OnInit {
 
             this.listProperties = this.filtersListService.initListsProperties(this.currentBasketInfo.ownerId, this.currentBasketInfo.groupId, this.currentBasketInfo.basketId);
 
-            this.refreshDao();
+            this.initResultList();
 
         },
             (err: any) => {
                 this.notify.handleErrors(err);
             });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next(true);
     }
 
     initResultList() {
@@ -152,6 +158,7 @@ export class BasketListComponent implements OnInit {
         // When list is refresh (sort, page, filters)
         merge(this.sort.sortChange, this.paginator.page, this.filtersChange)
             .pipe(
+                takeUntil(this.destroy$),
                 startWith({}),
                 switchMap(() => {
                     this.isLoadingResults = true;

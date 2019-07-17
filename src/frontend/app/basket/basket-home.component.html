@@ -22,7 +22,7 @@
                         {{basket.basket_name}}<br/><small color="primary">({{lang.redirectedTo}} {{basket.redirectedUser}})</small>
                     </p>
                 </a>
-                <a mat-list-item [ngClass]="{'selectedBasket': currentBasketInfo.basketId == basket.id && currentBasketInfo.ownerId == basket.owner_user_id && currentBasketInfo.groupId == regroupedBasket.groupSerialId}" *ngIf="!basket.redirected" (click)="refreshDatas();closePanelLeft();" routerLink="/basketList/users/{{basket.owner_user_id}}/groups/{{regroupedBasket.groupSerialId}}/baskets/{{basket.id}}" style="cursor:pointer;" [ngStyle]="{'opacity': basket.resourceNumber==0 ? '0.5' : '1', 'height': mobileMode ? '50px' : '38px'}">
+                <a mat-list-item [ngClass]="{'selectedBasket': currentBasketInfo.basketId == basket.id && currentBasketInfo.ownerId == basket.owner_user_id && currentBasketInfo.groupId == regroupedBasket.groupSerialId}" *ngIf="!basket.redirected" (click)="refreshDatas(basket);closePanelLeft();" routerLink="/basketList/users/{{basket.owner_user_id}}/groups/{{regroupedBasket.groupSerialId}}/baskets/{{basket.id}}" style="cursor:pointer;" [ngStyle]="{'opacity': basket.resourceNumber==0 ? '0.5' : '1', 'height': mobileMode ? '50px' : '38px'}">
                     <span *ngIf="basket.resourceNumber==0" class="nbResZero">{{basket.resourceNumber}}</span>
                     <span *ngIf="basket.resourceNumber!=0" class="nbRes">{{basket.resourceNumber}}</span>
                     <p mat-line title="{{basket.basket_name}}" [ngStyle]="{'color': basket.color}">
