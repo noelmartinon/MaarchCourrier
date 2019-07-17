@@ -1049,6 +1049,37 @@ abstract class lists_Abstract extends Database
         }
     }
 
+    protected function _tmplt_loadEscapeValue($parameter, $resultTheLine)
+    {
+        $my_explode = explode('|', $parameter);
+
+        if (!$my_explode[1]) {
+            return _WRONG_PARAM_FOR_LOAD_VALUE;
+        } else {
+            $column = $my_explode[1];
+            if (is_array($resultTheLine)) {
+                for ($i = 0; $i <= count($resultTheLine); ++$i) {
+                    if ($resultTheLine[$i]['column'] == $column) {
+                        if (is_bool($resultTheLine[$i]['value'])) {
+                            //If boolean (convert to string)
+                            if ($resultTheLine[$i]['value']) {
+                                return 'true';
+                            } else {
+                                return 'false';
+                            }
+                        } else {
+                            if ($resultTheLine[$i]['column'] == 'subject') {
+                                return preg_replace('/\s+/', ' ', $resultTheLine[$i]['value']);
+                            } else {
+                                return addslashes($resultTheLine[$i]['value']);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     protected function _tmplt_loadValue($parameter, $resultTheLine)
     {
         $my_explode = explode('|', $parameter);
@@ -1754,7 +1785,10 @@ abstract class lists_Abstract extends Database
         //#loadValue|arg1##: load value in the db; arg1= column's value identifier
         if (preg_match("/^loadValue\|/", $parameter)) {
             $var = $this->_tmplt_loadValue($parameter, $resultTheLine);
-            //#sortColumn|arg1## : cretate sort in header; arg1 = name of the column
+            //#loadValue|arg1##: load value in the db; arg1= column's value identifier
+        } elseif (preg_match("/^loadEscapeValue\|/", $parameter)) {
+            $var = $this->_tmplt_loadEscapeValue($parameter, $resultTheLine);
+            //#defineLang|arg1## : define constant by the lang file; arg1 = constant of lang.php
         } elseif (preg_match("/^sortColumn\|/", $parameter)) {
             $var = $this->_tmplt_sortColumn($parameter);
             //#defineLang|arg1## : define constant by the lang file; arg1 = constant of lang.php
