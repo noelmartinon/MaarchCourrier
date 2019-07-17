@@ -26,7 +26,7 @@ switch ($request) {
 
         switch ($event->table_name) {
             case 'notes':
-                $from .= ' JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id';
+                $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id'
                     .' AND ('
                         .' notes.id not in (SELECT DISTINCT note_id FROM note_entities) '
@@ -71,7 +71,7 @@ switch ($request) {
 
         switch ($event->table_name) {
             case 'notes':
-                $from .= ' JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id';
+                $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id'
                     .' AND ('
                         .' notes.id not in (SELECT DISTINCT note_id FROM note_entities) '
@@ -116,7 +116,7 @@ switch ($request) {
 
         switch ($event->table_name) {
             case 'notes':
-                $from .= ' JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id';
+                $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id';
                 break;
 

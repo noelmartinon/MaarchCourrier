@@ -23,7 +23,7 @@ switch ($request) {
         $arrayPDO = array(':recordid' => $event->record_id);
         switch ($event->table_name) {
             case 'notes':
-                $from .= ' JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id';
+                $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $from .= ' JOIN res_letterbox lb ON lb.res_id = notes.identifier';
                 $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id'
                     .' AND ('
@@ -88,7 +88,7 @@ switch ($request) {
         $arrayPDO = array(':recordid' => $event->record_id);
         switch ($event->table_name) {
             case 'notes':
-                $from .= ' JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id';
+                $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $from .= ' JOIN res_letterbox lb ON lb.res_id = notes.identifier';
                 $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id';
                 if ($notification->diffusion_properties != '') {

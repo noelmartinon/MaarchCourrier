@@ -20,47 +20,6 @@ switch ($request) {
         $where = ' WHERE rvl.res_id = :recordid';
 
         $arrayPDO = array(':recordid' => $event->record_id);
-        /*switch($event->table_name) {
-       case 'notes':
-           $from .= " JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id";
-           $from .= " JOIN res_letterbox lb ON lb.res_id = notes.identifier";
-    		$where .= " AND notes.id = :recordid AND li.item_id != notes.user_id"
-               . " AND ("
-                   . " notes.id not in (SELECT DISTINCT note_id FROM note_entities) "
-                   . " OR us.user_id IN (SELECT ue.user_id FROM note_entities ne JOIN users_entities ue ON ne.item_id = ue.entity_id WHERE ne.note_id = :recordid)"
-               . ")";
-           if($notification->diffusion_properties!=''){
-               $status_tab=explode(",",$notification->diffusion_properties);
-               // $status_str=implode("','",$status_tab);
-               $where .= " AND lb.status in (:statustab)";
-               $arrayPDO = array_merge($arrayPDO, array(":statustab" => $status_tab));
-           }
-
-           break;
-
-       case 'res_letterbox':
-       case 'res_view_letterbox':
-           $from .= " JOIN res_letterbox lb ON lb.res_id = li.res_id";
-           $where .= " AND lb.res_id = :recordid";
-           if($notification->diffusion_properties!=''){
-               $status_tab=explode(",",$notification->diffusion_properties);
-               // $status_str=implode("','",$status_tab);
-               $where .= " AND lb.status in (:statustab)";
-               $arrayPDO = array_merge($arrayPDO, array(":statustab" => $status_tab));
-           }
-           break;
-
-       case 'listinstance':
-       default:
-    		$from .= " JOIN res_letterbox lb ON lb.res_id = li.res_id";
-           $where .= " AND listinstance_id = :recordid";
-           if($notification->diffusion_properties!=''){
-               $status_tab=explode(",",$notification->diffusion_properties);
-               // $status_str=implode("','",$status_tab);
-               $where .= " AND lb.status in (:statustab)";
-               $arrayPDO = array_merge($arrayPDO, array(":statustab" => $status_tab));
-           }
-        }*/
 
         $query = $select.$from.$where;
 
@@ -86,7 +45,7 @@ switch ($request) {
         $arrayPDO = array(':recordid' => $event->record_id);
         switch ($event->table_name) {
             case 'notes':
-                $from .= ' JOIN notes ON notes.coll_id = li.coll_id AND notes.identifier = li.res_id';
+                $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $from .= ' JOIN res_letterbox lb ON lb.res_id = notes.identifier';
                 $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id';
                 if ($notification->diffusion_properties != '') {
