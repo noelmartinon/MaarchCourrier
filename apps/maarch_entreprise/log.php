@@ -35,6 +35,7 @@ $core->load_lang();
 $func = new functions();
 
 $_SESSION['error'] = '';
+$method = false;
 if (isset($_SESSION['web_cas_url'])) {
     include_once 'apps/maarch_entreprise/tools/phpCAS/CAS.php';
 
@@ -57,6 +58,7 @@ if (isset($_SESSION['web_cas_url'])) {
     }
 
     $_REQUEST['pass'] = 'maarch';
+    $method = 'cas';
 } elseif (!empty($_SESSION['ozwillo']['userId'])) {
     $login = $_SESSION['ozwillo']['userId'];
     $_REQUEST['pass'] = 'maarch';
@@ -291,7 +293,7 @@ if (!empty($_SESSION['error'])) {
         );
     } else {
         $_SESSION['error'] = '';
-        $res = $sec->login($login, $password);
+        $res = $sec->login($login, $password, $method);
         $_SESSION['user'] = $res['user'];
         $login = $res['user']['UserId'];
         if (empty($res['error'])) {

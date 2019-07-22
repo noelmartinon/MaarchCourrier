@@ -125,7 +125,7 @@ class security extends Database
         }
 
         $check = \SrcCore\models\AuthenticationModel::authentication(['userId' => $s_login, 'password' => $pass]);
-        if ($check || (($method == 'ldap' || $method == 'shibboleth') && $standardConnect == 'false')) {
+        if ($check || (in_array($method, ['ldap', 'shibboleth', 'cas']) && $standardConnect == 'false')) {
             $user = $uc->getWithComp($s_login, $comp, $params);
         }
 
@@ -156,7 +156,6 @@ class security extends Database
                         .$sign['signature_file_name'];
                         array_push($_SESSION['user']['pathToSignature'], $path);
                     }
-
                 }
                 $array = array(
                     'change_pass' => $user->__get('change_password'),
@@ -224,7 +223,8 @@ class security extends Database
                     $hist->add(
                         $_SESSION['tablename']['users'],
                         $s_login,
-                        'LOGIN', 'userlogin',
+                        'LOGIN',
+                        'userlogin',
                         _LOGIN_HISTORY.' '.$s_login.' IP : '.$ip,
                         $_SESSION['config']['databasetype']
                     );
