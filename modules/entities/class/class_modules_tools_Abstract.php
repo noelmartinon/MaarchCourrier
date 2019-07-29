@@ -848,16 +848,7 @@ abstract class entities_Abstract extends functions
         }
         for ($i = 0; $i < count($baskAbs); $i ++) {
             if ($baskAbs[$i]['abs_basket']) {
-                $stmt = $db->query(
-                    "select uc.group_id from " . USERGROUP_CONTENT_TABLE
-                    . " uc , " . USERGROUPS_TABLE . " u where uc.user_id = ? and u.group_id = "
-                    . "uc.group_id and u.enabled= 'Y' and "
-                    . "uc.primary_group = 'Y'",
-                    array($baskAbs[$i]['basket_owner'])
-                );
-                //$db->show();
-                $res = $stmt->fetchObject();
-                $primaryGroup = $res->group_id;
+                $primaryGroup = $baskAbs[$i]['group_id'];
                 $tmpBasketId = preg_replace(
                     '/_' . $baskAbs[$i]['basket_owner'] . '$/',
                     '',
@@ -904,16 +895,7 @@ abstract class entities_Abstract extends functions
         }
         for ($i = 0; $i < count($baskAbs); $i ++) {
             if ($baskAbs[$i]['abs_basket']) {
-                $stmt = $db->query(
-                    "select uc.group_id from " . USERGROUP_CONTENT_TABLE
-                    . " uc , " . USERGROUPS_TABLE . " u where uc.user_id = ? and u.group_id = "
-                    . "uc.group_id and u.enabled= 'Y' and "
-                    . "uc.primary_group = 'Y'",
-                    array($baskAbs[$i]['basket_owner'])
-                );
-                //$db->show();
-                $res = $stmt->fetchObject();
-                $primaryGroup = $res->group_id;
+                $primaryGroup = $baskAbs[$i]['group_id'];
                 $tmpBasketId = preg_replace(
                     '/_' . $baskAbs[$i]['basket_owner'] . '$/',
                     '',
