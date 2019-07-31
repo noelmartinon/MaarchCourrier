@@ -339,7 +339,7 @@ class TemplateController
             if (!empty($copyResult['errors'])) {
                 return $response->withStatus(500)->withJson(['errors' => 'Template duplication failed : ' . $copyResult['errors']]);
             }
-            $template['template_path'] = str_replace(str_replace(DIRECTORY_SEPARATOR, '#', $docserver['path_template']), '', $docinfo['destinationDir']);
+            $template['template_path'] = str_replace($docserver['path_template'], '', $docinfo['destinationDir']);
             $template['template_file_name'] = $docinfo['fileDestinationName'];
         }
 
