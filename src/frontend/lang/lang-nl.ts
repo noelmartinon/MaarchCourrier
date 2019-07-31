@@ -1034,7 +1034,7 @@ export const LANG_NL = {
     "newLoginInMaarchParapheur" : "New Maarch Parapheur Login", //_TO_TRANSLATE
     "loginAlreadyExistsInMaarchParapheur" : "Login already exists in Maarch Parapheur", //_TO_TRANSLATE
     "maarchParapheurLinkbroken" : "Maarch Parapheur link is broken", //_TO_TRANSLATE
-    "maarchParapheurDocuments" : "Last Maarch Parapheur document(s)", //_TO_TRANSLATE
+    "maarchParapheurDocuments" : "Maarch Parapheur document(s)", //_TO_TRANSLATE
     "to_visa" : "To approve", //_TO_TRANSLATE
     "to_sign" : "To sign", //_TO_TRANSLATE
     "to_note" : "To note", //_TO_TRANSLATE
