@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
 
-declare function $j(selector: any): any;
+declare var $j: any;
 
 declare var angularGlobals: any;
 
@@ -112,5 +112,7 @@ export class NotificationAdministrationComponent implements OnInit {
             });
     }
 
-    isNumber(val:any) { return typeof val === 'number'; }
+    isNumber(val:any) {
+        return $j.isNumeric(val);
+    }
 }
