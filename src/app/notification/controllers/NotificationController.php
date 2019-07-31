@@ -42,9 +42,7 @@ class NotificationController
         }
 
         if (!Validator::intVal()->validate($aArgs['id'])) {
-            return $response
-                ->withStatus(500)
-                ->withJson(['errors' => 'Id is not a numeric']);
+            return $response->withStatus(400)->withJson(['errors' => 'Id is not a numeric']);
         }
 
         $notification = NotificationModel::getById(['notification_sid' => $aArgs['id']]);
@@ -63,7 +61,7 @@ class NotificationController
 
         $data = [];
 
-        $data['event'] = NotificationModel::getEvent();
+        $data['event'] = NotificationModel::getEvents();
         $data['template'] = NotificationModel::getTemplate();
         $data['diffusionType'] = NotificationModel::getDiffusionType();
         $data['groups'] = NotificationModel::getDiffusionTypeGroups();
@@ -71,6 +69,7 @@ class NotificationController
         $data['entities'] = NotificationModel::getDiffusionTypeEntities();
         $data['status'] = NotificationModel::getDiffusionTypeStatus();
 
+        $notification['event_id'] = (string)$notification['event_id'];
         $notification['data'] = $data;
 
         $filename = 'notification';
@@ -304,7 +303,7 @@ class NotificationController
         $notification['attachfor_properties'] = [];
         $data = [];
 
-        $data['event'] = NotificationModel::getEvent();
+        $data['event'] = NotificationModel::getEvents();
         $data['template'] = NotificationModel::getTemplate();
         $data['diffusionType'] = NotificationModel::getDiffusionType();
         $data['groups'] = NotificationModel::getDiffusionTypeGroups();

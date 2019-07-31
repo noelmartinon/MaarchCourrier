@@ -129,24 +129,27 @@ abstract class NotificationModelAbstract
         return $aReturn;
     }
 
-    public static function getEvent()
+    public static function getEvents()
     {
-        $tabEvent_Type = DatabaseModel::select([
+        $events = DatabaseModel::select([
             'select' => ['id, label_action'],
             'table'  => ['actions'],
         ]);
+        foreach ($events as $key => $event) {
+            $events[$key]['id'] = (string)$event['id'];
+        }
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/notifications/xml/event_type.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->event_type as $eventType) {
-                $tabEvent_Type[] = [
-                    'id'           => (string) $eventType->id,
-                    'label_action' => (string) $eventType->label
+                $events[] = [
+                    'id'           => (string)$eventType->id,
+                    'label_action' => (string)$eventType->label
                 ];
             }
         }
 
-        return $tabEvent_Type;
+        return $events;
     }
 
     public static function getTemplate()
