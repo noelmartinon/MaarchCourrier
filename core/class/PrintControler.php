@@ -245,9 +245,9 @@ class PrintControler extends PrintFunctions
 				//INITIATOR
                 if (!empty($resId)) {
                     $filename_QR = $_SESSION['config']['tmppath'].DIRECTORY_SEPARATOR.$_SESSION['user']['UserId'] . time() . rand() ."_QRCODE.png";
-                    QRcode::png($resId, $filename_QR);
+                    QRcode::png($resId, $filename_QR, 0, 10);
 
-                    $pdf->Image($filename_QR, 7, 3);
+                    $pdf->Image($filename_QR, 5, 5, 40, 40);
                 }
                 $pdf->Cell(20, 5, "", 0, 0, 'L', false);
                 if ($this->array_print[$cpt]['initiator'] <> '') {
@@ -256,6 +256,7 @@ class PrintControler extends PrintFunctions
                     	array($this->array_print[$cpt]['initiator'])
                     );
                     $resultEntity = $stmt->fetchObject();
+                    $pdf->Cell(15,5, '', 0, 0, 'C', false);
                     $pdf->MultiCell(100, 5, utf8_decode(_INITIATOR . ' : '
                         . $resultEntity->entity_label . " (" . $this->array_print[$cpt]['initiator'] . ")"), 0, 'C', false);
 				} elseif($this->array_print[$cpt]['typist'] <> '') {
@@ -283,8 +284,9 @@ class PrintControler extends PrintFunctions
                 } else {
                     $fileNumber = $this->array_print[$cpt]['res_id'];
                 }
-				$pdf->Cell(182,5,utf8_decode(_PRINTED_FILE_NUMBER . ' : ') . $fileNumber, 1, 1, 'C', false);
-				
+				$pdf->Cell(35,5, '', 0, 0, 'C', false);
+				$pdf->Cell(147,5,utf8_decode(_PRINTED_FILE_NUMBER . ' : ') . $fileNumber, 1, 1, 'C', false);
+
 				//BREAK A LINE
 				$pdf->SetY($pdf->GetY()+4);
 				//BREAK A LINE
