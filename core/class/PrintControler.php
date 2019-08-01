@@ -284,8 +284,15 @@ class PrintControler extends PrintFunctions
                 } else {
                     $fileNumber = $this->array_print[$cpt]['res_id'];
                 }
-				$pdf->Cell(35,5, '', 0, 0, 'C', false);
-				$pdf->Cell(147,5,utf8_decode(_PRINTED_FILE_NUMBER . ' : ') . $fileNumber, 1, 1, 'C', false);
+
+                if (!empty($resId)) {
+                    $pdf->Cell(35,5, '', 0, 0, 'C', false);
+                    $titleCell = 147;
+                } else {
+                    $titleCell = 182;
+                }
+
+				$pdf->Cell($titleCell,5,utf8_decode(_PRINTED_FILE_NUMBER . ' : ') . $fileNumber, 1, 1, 'C', false);
 
 				//BREAK A LINE
 				$pdf->SetY($pdf->GetY()+4);
