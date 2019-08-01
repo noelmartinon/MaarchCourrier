@@ -216,24 +216,17 @@ abstract class entities_Abstract extends functions
                 }
             }
             //to delete duplicates entries due to array_merge_recursive fonction when digital key in an array
-            foreach ($_SESSION['user']['redirect_groupbasket_by_group'] as $aBasketKey => $aBasketContent) {
-                foreach ($aBasketContent as $aGroupKey => $aGroupContent) {
-                    $cptCtrl = 1;
-                    foreach ($aGroupContent as $aActionKey => $aActionContent) {
-                        if ($cptCtrl % 2 == 0) {
-                            unset($_SESSION['user']['redirect_groupbasket_by_group'][$aBasketKey][$aGroupKey][$aActionKey]);
-                        }
-                        $cptCtrl++;
-                    }
-                }
-            }
-            // echo '<pre>';
-            // print_r($_SESSION['user']['redirect_groupbasket']);
-            // echo '</pre>';
-            // echo '<pre>';
-            // print_r($_SESSION['user']['redirect_groupbasket_by_group']);
-            // echo '</pre>';
-            // exit;
+            // foreach ($_SESSION['user']['redirect_groupbasket_by_group'] as $aBasketKey => $aBasketContent) {
+            //     foreach ($aBasketContent as $aGroupKey => $aGroupContent) {
+            //         $cptCtrl = 1;
+            //         foreach ($aGroupContent as $aActionKey => $aActionContent) {
+            //             if ($cptCtrl % 2 == 0) {
+            //                 unset($_SESSION['user']['redirect_groupbasket_by_group'][$aBasketKey][$aGroupKey][$aActionKey]);
+            //             }
+            //             $cptCtrl++;
+            //         }
+            //     }
+            // }
         }
     }
 
