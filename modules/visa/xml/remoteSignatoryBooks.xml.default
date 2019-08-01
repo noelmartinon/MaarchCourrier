@@ -5,7 +5,7 @@
         <id>maarchParapheur</id>
         <userId>ccornillac@maarch.com</userId>
         <password>maarch</password>
-        <url>https://demo.maarchparapheur.com</url>
+        <url>http://demo.maarchparapheur.com</url>
     </signatoryBook>
     <signatoryBook>
         <id>ixbus</id>
