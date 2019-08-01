@@ -316,7 +316,16 @@ DO $$ BEGIN
     UPDATE res_letterbox SET external_reference = NULL WHERE external_link is not NULL;
   END IF;
 END$$;
-
+DO $$ BEGIN
+  IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'res_letterbox') AND attname = 'scan_date') = 0 THEN
+    ALTER TABLE res_letterbox ADD COLUMN scan_date timestamp without time zone;
+    ALTER TABLE res_letterbox ADD COLUMN scan_user CHARACTER VARYING (50) DEFAULT NULL::character varying;
+    ALTER TABLE res_letterbox ADD COLUMN scan_location CHARACTER VARYING (255) DEFAULT NULL::character varying;
+    ALTER TABLE res_letterbox ADD COLUMN scan_wkstation CHARACTER VARYING (255) DEFAULT NULL::character varying;
+    ALTER TABLE res_letterbox ADD COLUMN scan_batch CHARACTER VARYING (50) DEFAULT NULL::character varying;
+    ALTER TABLE res_letterbox ADD COLUMN scan_postmark CHARACTER VARYING (50) DEFAULT NULL::character varying;
+  END IF;
+END$$;
 
 /* RE-CREATE VIEW*/
 CREATE OR REPLACE VIEW res_view_letterbox AS
@@ -398,6 +407,12 @@ CREATE OR REPLACE VIEW res_view_letterbox AS
     r.custom_f3 AS doc_custom_f3,
     r.custom_f4 AS doc_custom_f4,
     r.custom_f5 AS doc_custom_f5,
+    r.scan_date,
+    r.scan_user,
+    r.scan_location,
+    r.scan_wkstation,
+    r.scan_batch,
+    r.scan_postmark,
     f.foldertype_id,
     ft.foldertype_label,
     f.custom_t1 AS fold_custom_t1,
