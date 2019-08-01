@@ -212,9 +212,9 @@ class SummarySheetController
                     $prefix = 'MAARCH_';
                 }
                 $qrCode = new QrCode($prefix . $resource['res_id']);
-                $qrCode->setSize(110);
+                $qrCode->setSize(400);
                 $qrCode->setMargin(25);
-                $pdf->Image('@'.$qrCode->writeString(), 21, 10, 50, 50);
+                $pdf->Image('@'.$qrCode->writeString(), 21, 10, 90, 90);
             }
         }
         foreach ($units as $key => $unit) {
