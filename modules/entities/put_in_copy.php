@@ -46,8 +46,9 @@ function get_form_txt(
                 $frm_str .= '<td colspan="2">'.$_SESSION['process']['diff_list']['copy']['entities'][$i]['entity_label'].'</td>';
                 $frm_str .= '</tr>';
             }
-        } elseif (!empty($_SESSION['process']['diff_list']['copy']['users'])) {
-            for ($i=0;$i<count($_SESSION['process']['diff_list']['copy']['users']);$i++) {
+        }
+        if (!empty($_SESSION['process']['diff_list']['copy']['users'])) {
+            for ($i=0; $i<count($_SESSION['process']['diff_list']['copy']['users']); $i++) {
                 if ($color == ' class="col"') {
                     $color = '';
                 } else {
