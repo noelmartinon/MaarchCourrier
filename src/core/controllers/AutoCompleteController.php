@@ -129,10 +129,8 @@ class AutoCompleteController
                 'select' => ['external_id->>\'maarchParapheur\' as external_id'],
                 'where' => ['external_id->>\'maarchParapheur\' is not null']
             ]);
-            $externalId = ['excludeId' => array_column($usersAlreadyConnected, 'external_id')];
-            $exclude = '&'.http_build_query($externalId);
+            $excludedUsers = array_column($usersAlreadyConnected, 'external_id');
         }
-
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
 
@@ -147,7 +145,7 @@ class AutoCompleteController
             }
 
             $curlResponse = CurlModel::execSimple([
-                'url'           => rtrim($url, '/') . '/rest/autocomplete/users?search='.urlencode($data['search']).$exclude,
+                'url'           => rtrim($url, '/') . '/rest/autocomplete/users?search='.urlencode($data['search']),
                 'basicAuth'     => ['user' => $userId, 'password' => $password],
                 'headers'       => ['content-type:application/json'],
                 'method'        => 'GET'
@@ -166,6 +164,10 @@ class AutoCompleteController
             }
 
             foreach ($curlResponse['response'] as $key => $value) {
+                if (!empty($data['exludeAlreadyConnected']) && in_array($value['id'], $excludedUsers)) {
+                    unset($curlResponse['response'][$key]);
+                    continue;
+                }
                 $curlResponse['response'][$key]['idToDisplay'] = $value['firstname'] . ' ' . $value['lastname'];
                 $curlResponse['response'][$key]['externalId']['maarchParapheur'] = $value['id'];
             }
