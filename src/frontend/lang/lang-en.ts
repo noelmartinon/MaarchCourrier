@@ -259,7 +259,7 @@ export const LANG_EN = {
     "decemberShort"                         : "Dec.",
     "default"                               : "default",
     "defaultAction"                         : "Default action",
-    "defaultOrder"                          : "Default order(s)",
+    "defaultOrder"                          : "Default order",
     "defaultPriority"                       : "Default priority",
     "defaultSort"                           : "Default sort",
     "defaultTemplate"                       : "Template nature",
