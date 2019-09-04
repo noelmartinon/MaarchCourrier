@@ -424,7 +424,11 @@ class ListTemplateController
         ValidatorModel::notEmpty($aArgs, ['items']);
         ValidatorModel::arrayType($aArgs, ['items']);
 
+        $destFound = false;
         foreach ($aArgs['items'] as $item) {
+            if ($destFound && $item['item_mode'] == 'dest') {
+                return ['errors' => 'More than one dest not allowed'];
+            }
             if (empty($item['item_id'])) {
                 return ['errors' => 'Item_id is empty'];
             }
@@ -433,6 +437,9 @@ class ListTemplateController
             }
             if (empty($item['item_mode'])) {
                 return ['errors' => 'Item_mode is empty'];
+            }
+            if ($item['item_mode'] == 'dest') {
+                $destFound = true;
             }
         }
 
