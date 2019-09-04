@@ -71,15 +71,28 @@ abstract class NotificationScheduleModelAbstract
         $corePath = str_replace('custom/'.$customId.'/src/app/notification/models', '', __DIR__);
         $corePath = str_replace('src/app/notification/models', '', $corePath);
 
+        $emptyLine = [
+            'm'           => 1,
+            'h'           => 1,
+            'dom'         => 1,
+            'mon'         => 1,
+            'dow'         => 1,
+            'cmd'         => 'empty',
+            'description' => 'empty',
+            'state'       => 'hidden',
+        ];
         foreach ($lines as $cronLine) {
-            $cronLine = trim($cronLine);
-            if (strpos($cronLine, '#') !== false) {
-                $cronLine = substr($cronLine, 0, strpos($cronLine, '#'));
+            $cronLine = preg_replace('![ \t]+!', ' ', trim($cronLine));
+            if ($aArgs['setHiddenValue'] && (strpos($cronLine, '#') !== false || strpos($cronLine, 'MAILTO=') !== false)) {
+                $data[] = $emptyLine;
+                continue;
+            } elseif (!$aArgs['setHiddenValue'] && (strpos($cronLine, '#') === 0 || strpos($cronLine, 'MAILTO=') === 0)) {
+                $data[] = [ 'm' => $cronLine];
+                continue;
             }
             if (empty($cronLine)) {
                 continue;
             }
-            $cronLine = preg_replace('![ \t]+!', ' ', $cronLine);
             if ($cronLine[0] == '@') {
                 $explodeCronLine = explode(' ', $cronLine, 2);
                 $cmd = $explodeCronLine[1];
