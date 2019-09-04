@@ -218,7 +218,6 @@ class ListTemplateController
 
     public function delete(Request $request, Response $response, array $aArgs)
     {
-
         $listTemplates = ListTemplateModel::getById(['id' => $aArgs['id'], 'select' => ['object_id', 'object_type']]);
         
         if (!ServiceModel::hasService(['id' => 'manage_entities', 'userId' => $GLOBALS['userId'], 'location' => 'entities', 'type' => 'admin']) && !strstr($listTemplates[0]['object_id'], 'VISA_CIRCUIT_') && !strstr($listTemplates[0]['object_id'], 'AVIS_CIRCUIT_')) {
@@ -375,7 +374,11 @@ class ListTemplateController
         ValidatorModel::notEmpty($aArgs, ['items']);
         ValidatorModel::arrayType($aArgs, ['items']);
 
+        $destFound = false;
         foreach ($aArgs['items'] as $item) {
+            if ($destFound && $item['item_mode'] == 'dest') {
+                return ['errors' => 'More than one dest not allowed'];
+            }
             if (empty($item['item_id'])) {
                 return ['errors' => 'Item_id is empty'];
             }
@@ -384,6 +387,9 @@ class ListTemplateController
             }
             if (empty($item['item_mode'])) {
                 return ['errors' => 'Item_mode is empty'];
+            }
+            if ($item['item_mode'] == 'dest') {
+                $destFound = true;
             }
         }
 
