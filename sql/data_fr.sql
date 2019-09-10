@@ -1333,7 +1333,7 @@ INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, 
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (507, '', 'AGENT', 'EenvBasket', 'Y', 'N', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (529, '', 'AGENT', 'EenvBasket', 'Y', 'N', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'AGENT', 'SuiviParafBasket', 'Y', 'Y', 'Y');
-INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (527, '', 'AGENT', 'MyBasket', 'N', 'Y', 'N');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (527, '', 'AGENT', 'MyBasket', 'Y', 'Y', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'AGENT', 'AR_Create', 'Y', 'Y', 'Y');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (528, '', 'AGENT', 'AR_Create', 'Y', 'N', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'AGENT', 'AR_AlreadySend', 'Y', 'Y', 'Y');
@@ -1348,7 +1348,7 @@ INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, 
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (505, 'closing_date IS NULL', 'RESPONSABLE', 'MyBasket', 'N', 'Y', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (506, 'closing_date IS NOT NULL', 'RESPONSABLE', 'MyBasket', 'N', 'Y', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (400, '', 'RESPONSABLE', 'MyBasket', 'N', 'Y', 'N');
-INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (527, '', 'RESPONSABLE', 'MyBasket', 'N', 'Y', 'N');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (527, '', 'RESPONSABLE', 'MyBasket', 'Y', 'Y', 'N');
 
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (100, '', 'RESPONSABLE', 'AR_Create', 'Y', 'Y', 'Y');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (528, '', 'RESPONSABLE', 'AR_Create', 'Y', 'N', 'N');
