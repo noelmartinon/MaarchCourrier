@@ -69,6 +69,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                             "three_state": false //no cascade selection
                         },
                         'core': {
+                            force_text : true,
                             'themes': {
                                 'name': 'proton',
                                 'responsive': true
