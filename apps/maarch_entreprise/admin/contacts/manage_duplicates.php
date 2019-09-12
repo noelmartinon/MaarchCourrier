@@ -19,17 +19,18 @@
 */
 
 /**
-* @brief  manage contacts duplicates
-*
-*
-* @file
-* @author Laurent Giovannoni <dev@maarch.org>
-* @date $date$
-* @version $Revision$
-* @ingroup admin
-*/
+ * @brief  manage contacts duplicates
+ *
+ *
+ * @file
+ * @author Laurent Giovannoni <dev@maarch.org>
+ * @date $date$
+ * @version $Revision$
+ * @ingroup admin
+ */
+error_log('begining of file ' . round(microtime(true) * 1000));
 require_once 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-    . DIRECTORY_SEPARATOR  . 'class' . DIRECTORY_SEPARATOR 
+    . DIRECTORY_SEPARATOR  . 'class' . DIRECTORY_SEPARATOR
     . 'class_business_app_tools.php';
 $admin = new core_tools();
 $admin->test_admin('admin_contacts', 'apps');
@@ -39,6 +40,30 @@ $db = new Database();
 $business = new business_app_tools();
 
 $_SESSION['m_admin'] = array();
+
+// ----------------------------------------------------
+
+$limit = 13;
+$offsetSoc = 0;
+if (isset($_POST["offsetSoc"])) {
+    $offsetSoc = $_POST["offsetSoc"];
+
+    if ($offsetSoc < 0) {
+        $offsetSoc = 0;
+    }
+}
+
+$offsetName = 0;
+if (isset($_POST["offsetName"])) {
+    $offsetName = $_POST["offsetName"];
+
+    if ($offsetName < 0) {
+        $offsetName = 0;
+    }
+}
+
+// ----------------------------------------------------
+
 /****************Management of the location bar  ************/
 $init = false;
 if (isset($_REQUEST['reinit']) && $_REQUEST['reinit'] == "true") {
@@ -73,8 +98,8 @@ function randomColor($lastColor)
     return $val;
 }
 
-echo '<h1><i class="fa fa-magic fa-2x"></i>&nbsp;' 
-        . _MANAGE_DUPLICATES 
+echo '<h1><i class="fa fa-magic fa-2x"></i>&nbsp;'
+    . _MANAGE_DUPLICATES
     . '</h1>';
 
 echo '<div id="inner_content">';
@@ -110,11 +135,25 @@ $tabSoc = array();
 $socCompare = '';
 $colorToUse = '';
 $colorNumber = '2';
+
 $stmt = $db->query($selectDuplicatesBySociety);
 
+// -------------------------------------
+$nbSoc = $stmt->rowCount();
+
+$lineDoublSocTab = [];
+while ($lineDoublSocTmp = $stmt->fetchObject()) {
+    $lineDoublSocTab[] = $lineDoublSocTmp;
+}
+
+
+// -------------------------------------
 $cptSoc = 0;
 $i = 0;
-while($lineDoublSoc = $stmt->fetchObject()) {
+
+for($cptLineDoublSoc = $offsetSoc; $cptLineDoublSoc < ($limit + $offsetSoc); $cptLineDoublSoc++) {
+    $lineDoublSoc = $lineDoublSocTab[$cptLineDoublSoc];
+
     $stmt2 = $db->query("SELECT id,firstname,lastname,address_num,address_street,address_postal_code,address_town,email FROM contact_addresses WHERE contact_id = ?", array($lineDoublSoc->contact_id));
     $res = $stmt2->fetchObject();
 
@@ -178,26 +217,111 @@ while($lineDoublSoc = $stmt->fetchObject()) {
     }
     $comp_society = $lineDoublSoc->contact_id;
 }
+
 $htmlTabSoc .= '</tbody>';
 //$func->show_array($tabSoc);
 $htmlTabSoc .= '</table>';
 $htmlTabSoc .= '<style>#duplicates_society tbody tr:hover{opacity:0.5 !important;}</style>';
 $htmlTabSoc .= '<input type="submit" value="fusionner!" class="button"/>';
 $htmlTabSoc .= '</form>';
+
+
+// -----------------------------------------------------------
+
+$htmlNavigationButtonsSoc = '<div style="display: inline; float: right; margin-top: -15px">';
+if ($offsetSoc >= $limit) {
+    $htmlNavigationButtonsSoc .= '<form style="display: inline" method="post" action="#">';
+
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetName" value="' . $offsetName . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetSoc" value="0"/>';
+    $htmlNavigationButtonsSoc .= '<input type="submit" value="Première page" class="button"/>';
+
+    $htmlNavigationButtonsSoc .= '</form>';
+
+    $htmlNavigationButtonsSoc .= '<form style="display: inline; margin-left: 10px" method="post" action="#">';
+
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetName" value="' . $offsetName . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetSoc" value="' . ($offsetSoc - $limit) . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="submit" value="Précédent" class="button"/>';
+
+    $htmlNavigationButtonsSoc .= '</form>';
+}
+
+$htmlNavigationButtonsSoc .= '<p style="display: inline; margin-right: 20px; margin-left: 20px">Résultat(s) ' . ($offsetSoc + 1). ' à ' . ($offsetSoc + $limit) . ' / ' . $nbSoc . '</p>';
+
+if ($offsetSoc + $limit < $nbSoc) {
+    $htmlNavigationButtonsSoc .= '<form style="display: inline; margin-right: 10px" method="post" action="#">';
+
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetName" value="' . $offsetName . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetSoc" value="' . ($offsetSoc + $limit) . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="submit" value="Suivant" class="button"/>';
+
+    $htmlNavigationButtonsSoc .= '</form>';
+
+    $htmlNavigationButtonsSoc .= '<form style="display: inline" method="post" action="#">';
+
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetName" value="' . $offsetName . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="hidden" name="offsetSoc" value="' . ($nbSoc - $limit) . '"/>';
+    $htmlNavigationButtonsSoc .= '<input type="submit" value="Dernière page" class="button"/>';
+
+    $htmlNavigationButtonsSoc .= '</form>';
+}
+$htmlNavigationButtonsSoc .= '</div>';
+
+// -----------------------------------------------------------
+
 if ($cptSoc == 0) {
     echo _NO_SOCIETY_DUPLICATES . '<br>';
 } else {
     echo $htmlTabSoc;
+
+    echo $htmlNavigationButtonsSoc;
 }
 ?><br><?php
 /***********************************************************************/
 //duplicates by name
-$selectDuplicatesByName = "SELECT contact_id, lower(translate(lastname||' '||firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) as lastname_firstname, society, society_short,is_corporate_person, lastname, firstname, title 
-from contacts_v2 
-WHERE lower(translate(lastname||' '||firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) in (
-SELECT lower(translate(lastname||' '||firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) as lastname_firstname FROM contacts_v2 GROUP BY lastname_firstname 
-HAVING Count(lower(translate(lastname||' '||firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))) > 1 and lower(translate(lastname||' '||firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) <> ' ') 
-order by lower(translate(lastname||' '||firstname,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')),contact_id";
+
+$selectDuplicatesByName = "SELECT distinct contacts_v2.contact_id,
+                      lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                                      'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                                      'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))         as lastname_firstname,
+                      society,
+                      society_short,
+                      is_corporate_person,
+                      contacts_v2.lastname,
+                      contacts_v2.firstname,
+                      contacts_v2.title,
+                      (select count(*)
+                       from contact_addresses as ca2
+                       where ca2.contact_id = contacts_v2.contact_id)                                               as nb_addresses,
+                      (select id from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
+                      (select address_num from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
+                      (select address_street from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
+                      (select address_postal_code from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
+                      (select address_town from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
+                      (select email from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1)
+      from contacts_v2
+      WHERE lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                            'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                            'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) in (
+                SELECT lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                                       'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) as lastname_firstname
+                FROM contacts_v2
+                GROUP BY lastname_firstname
+                HAVING Count(lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                                             'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                                             'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))) >
+                       1
+                   and lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                                       'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) <>
+                       ' ')
+      order by lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                               'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                               'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')),
+               contacts_v2.contact_id";
+
 $htmlTabName = '<form name="manage_duplicate_person" action="#" onsubmit="return linkDuplicate(\'manage_duplicate_person\')" method="post">';
 $htmlTabName .= '<table style="width:100%;">';
 $htmlTabName .= '<CAPTION>' . _DUPLICATES_BY_NAME . '</CAPTION>';
@@ -218,21 +342,31 @@ $tabName = array();
 $nameCompare = '';
 $colorToUse = '';
 $colorNumber = '2';
+
 $stmt = $db->query($selectDuplicatesByName);
+
+// -------------------------------------
+$nbName = $stmt->rowCount();
+
+$lineDoublNameTab = [];
+while ($lineDoublNameTmp = $stmt->fetchObject()) {
+    $lineDoublNameTab[] = $lineDoublNameTmp;
+}
+
+// -------------------------------------
+
 $cptName = 0;
 $i++;
-while($lineDoublName = $stmt->fetchObject()) {
-    $stmt2 = $db->query("SELECT id,address_num,address_street,address_postal_code,address_town,email FROM contact_addresses WHERE contact_id = ?", array($lineDoublName->contact_id));
-    $res = $stmt2->fetchObject();
 
-    $nb_addresses = $stmt2->rowCount();
-    $arr_address = array($res->address_num,$res->address_street,$res->address_postal_code,$res->address_town);
-    $tmp_address = implode(' ', $arr_address);
+for ($cptLineDoublName = $offsetName; $cptLineDoublName < ($limit + $offsetName); $cptLineDoublName++) {
+    $lineDoublName = $lineDoublNameTab[$cptLineDoublName];
 
-    $address = $tmp_address;
+    $nb_addresses = $lineDoublName->nb_addresses;
 
-    if(!empty($res->email)){
-        $address .= ' ('.$res->email.')';
+    $address = $lineDoublName->address_num . ' ' . $lineDoublName->address_street . ' ' . $lineDoublName->address_postal_code . ' ' . $lineDoublName->address_town;
+
+    if(!empty($lineDoublName->email)){
+        $address .= ' ('.$lineDoublName->email.')';
     }
 
     if (empty(trim($address))) {
@@ -241,9 +375,10 @@ while($lineDoublName = $stmt->fetchObject()) {
     if ($lineDoublName->contact_id <> '') {
         $cptName++;
 
-        if ($nameCompare == $lineDoublName->lastname_firstname) {
-            //echo 'doublon<br>';
-        } else {
+//        if ($nameCompare == $lineDoublName->lastname_firstname) {
+//            echo 'doublon<br>';
+//        } else {
+        if ($nameCompare != $lineDoublName->lastname_firstname) {
             //echo 'new doublon<br>';
             $i++;
             $class = 'duplicate_person_'.$i;
@@ -258,7 +393,7 @@ while($lineDoublName = $stmt->fetchObject()) {
 
         $nameCompare = $lineDoublName->lastname_firstname;
         $htmlTabName .= '<tr style="background-color: '.$colorToUse.';display:table;width:100%;color:#666;" id="tr_' . $lineDoublName->contact_id . '">';
-        $htmlTabName .= '<td style="width:10%;"><input type="checkbox" class="'.$class.'" id="fusion_id_'.$lineDoublName->contact_id.'" name="slave_'.$class.'" title="contact à fusionner" value="'.$lineDoublName->contact_id.'" onclick="checkOthersDuplicate(\'manage_duplicate_person\',\'slave_'.$class.'\',\'master_'.$class.'\');"/> <input type="radio" id="master_fusion_id_'.$lineDoublName->contact_id.'" name="master_'.$class.'" title="contact maître servant de fusion" value="'.$lineDoublName->contact_id.'"/> <input type="hidden" id="master_address_fusion_id_'.$lineDoublName->contact_id.'" name="master_address_'.$class.'" value="'.$res->id.'"/> <input type="checkbox" class="'.$class.'" id="delete_contact_id_'.$res->id.'" name="delete_address" title="supprimer l\'adresse" value="'.$res->id.'"/></td>';
+        $htmlTabName .= '<td style="width:10%;"><input type="checkbox" class="'.$class.'" id="fusion_id_'.$lineDoublName->contact_id.'" name="slave_'.$class.'" title="contact à fusionner" value="'.$lineDoublName->contact_id.'" onclick="checkOthersDuplicate(\'manage_duplicate_person\',\'slave_'.$class.'\',\'master_'.$class.'\');"/> <input type="radio" id="master_fusion_id_'.$lineDoublName->contact_id.'" name="master_'.$class.'" title="contact maître servant de fusion" value="'.$lineDoublName->contact_id.'"/> <input type="hidden" id="master_address_fusion_id_'.$lineDoublName->contact_id.'" name="master_address_'.$class.'" value="'.$lineDoublName->id.'"/> <input type="checkbox" class="'.$class.'" id="delete_contact_id_'.$lineDoublName->id.'" name="delete_address" title="supprimer l\'adresse" value="'.$lineDoublName->id.'"/></td>';
         $htmlTabName .= '<td style="width:5%;">' . $lineDoublName->contact_id . '</td>';
         $htmlTabName .= '<td style="width:10%;">' . $business->get_label_title($lineDoublName->title) . '</td>';
         $htmlTabName .= '<td style="width:15%;">' . $lineDoublName->lastname . '</td>';
@@ -295,16 +430,65 @@ while($lineDoublName = $stmt->fetchObject()) {
         $htmlTabName .= '</tr>';
     }
 }
+
 $htmlTabName .= '</tbody>';
 //$func->show_array($tabName);
 $htmlTabName .= '</table>';
 $htmlTabName .= '<input type="submit" value="fusionner!" class="button"/>';
 $htmlTabName .= '</form>';
+
+// -----------------------------------------------------------
+
+$htmlNavigationButtonsName = '<div style="display: inline; float: right; margin-top: -15px">';
+if ($offsetName >= $limit) {
+    $htmlNavigationButtonsName .= '<form style="display: inline" method="post" action="#">';
+
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetSoc" value="' . $offsetSoc . '"/>';
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetName" value="0"/>';
+    $htmlNavigationButtonsName .= '<input type="submit" value="Première page" class="button"/>';
+
+    $htmlNavigationButtonsName .= '</form>';
+
+    $htmlNavigationButtonsName .= '<form style="display: inline; margin-left: 10px" method="post" action="#">';
+
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetSoc" value="' . $offsetSoc . '"/>';
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetName" value="' . ($offsetName - $limit) . '"/>';
+    $htmlNavigationButtonsName .= '<input type="submit" value="Précédent" class="button"/>';
+
+    $htmlNavigationButtonsName .= '</form>';
+}
+
+$htmlNavigationButtonsName .= '<p style="display: inline; margin-right: 20px; margin-left: 20px">Résultat(s) ' . ($offsetName + 1). ' à ' . ($offsetName + $limit) . ' / ' . $nbName . '</p>';
+
+
+if ($offsetName + $limit < $nbName) {
+    $htmlNavigationButtonsName .= '<form style="display: inline; margin-right: 10px" method="post" action="#">';
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetSoc" value="' . $offsetSoc . '"/>';
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetName" value="' . ($offsetName + $limit) . '"/>';
+    $htmlNavigationButtonsName .= '<input type="submit" value="Suivant" class="button"/>';
+
+    $htmlNavigationButtonsName .= '</form>';
+
+    $htmlNavigationButtonsName .= '<form style="display: inline" method="post" action="#">';
+
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetSoc" value="' . $offsetSoc . '"/>';
+    $htmlNavigationButtonsName .= '<input type="hidden" name="offsetName" value="' . ($nbName - $limit) . '"/>';
+    $htmlNavigationButtonsName .= '<input type="submit" value="Dernière page" class="button"/>';
+
+    $htmlNavigationButtonsName .= '</form>';
+}
+$htmlNavigationButtonsName .= '</div>';
+
+// -----------------------------------------------------------
 if ($cptName == 0) {
-    echo '<hr/>'; 
+    echo '<hr/>';
     echo _NO_NAME_DUPLICATES . '<br>';
 } else {
     echo $htmlTabName;
+
+    echo $htmlNavigationButtonsName;
 }
 echo '</div>';
 echo '</div>';
+
+
