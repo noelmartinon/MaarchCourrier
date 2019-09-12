@@ -263,7 +263,7 @@ function Bt_refusedSignedMail($aArgs = [])
             $creatorName = $aArgs['noteCreatorName'] . ' : ';
         }
         $GLOBALS['db']->query(
-            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, $creatorId, CURRENT_TIMESTAMP, ?)",
+            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, '".$creatorId."', CURRENT_TIMESTAMP, ?)",
             [$aArgs['resIdMaster'], $creatorName . $aArgs['noteContent']]
         );
     }
