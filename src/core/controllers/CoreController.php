@@ -34,6 +34,7 @@ class CoreController
         $aInit['applicationMinorVersion'] = CoreConfigModel::getApplicationVersion()['applicationMinorVersion'];
         $aInit['lang'] = CoreConfigModel::getLanguage();
         $aInit['user'] = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
+        $aInit['customLanguage'] = CoreConfigModel::getCustomLanguage(['lang' => $aInit['lang']]);
 
         $aInit['scriptsToinject'] = [];
         $aInit['scriptsInjected'] = [];

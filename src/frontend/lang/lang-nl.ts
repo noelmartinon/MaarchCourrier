@@ -1,7 +1,7 @@
 export const LANG_NL = {
-    'ARsimple'                              : 'AR simple', //_TO_TRANSLATE
-    'ARsva'                                 : 'AR SVA', //_TO_TRANSLATE
-    'ARsvr'                                 : 'AR SVR', //_TO_TRANSLATE
+    "ARsimple"                              : "AR simple", //_TO_TRANSLATE
+    "ARsva"                                 : "AR SVA", //_TO_TRANSLATE
+    "ARsvr"                                 : "AR SVR", //_TO_TRANSLATE
     "aboutUs"                               : "Over Maarch Courrier",
     "abs"                                   : "Afwezig",
     "absOff"                                : "Afwezigheid uitgeschakeld",

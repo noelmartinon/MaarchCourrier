@@ -13,4 +13,8 @@ if (angularGlobals.lang == "en") {
     dictionary = LANG_NL;
 }
 
+if (angularGlobals.customLanguage != null) {
+    dictionary = {...dictionary, ...angularGlobals.customLanguage};
+}
+
 export const LANG = dictionary;

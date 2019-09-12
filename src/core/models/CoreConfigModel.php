@@ -109,6 +109,21 @@ class CoreConfigModel
         return 'en';
     }
 
+    public static function getCustomLanguage($aArgs = [])
+    {
+        $customId = CoreConfigModel::getCustomId();
+        if (file_exists('custom/' . $customId . '/lang/lang-'.$aArgs['lang'].'.ts')) {
+            $fileContent = file_get_contents('custom/' . $customId . '/lang/lang-'.$aArgs['lang'].'.ts');
+            $fileContent = str_replace("\n", "", $fileContent);
+
+            $strpos = strpos($fileContent, "=");
+            $substr = substr(trim($fileContent), $strpos + 2, -1);
+            return json_decode($substr);
+        }
+
+        return '';
+    }
+
     /**
      * Get the timezone
      *
