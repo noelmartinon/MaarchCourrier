@@ -38,7 +38,7 @@ class ConvertPdfController
         $tmpPath = CoreConfigModel::getTmpPath();
 
         self::addBom($aArgs['fullFilename']);
-        $command = "unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
+        $command = "timeout 10 unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
 
         exec('export HOME=' . $tmpPath . ' && '.$command.' 2>&1', $output, $return);
 
@@ -94,7 +94,7 @@ class ConvertPdfController
 
         if (strtolower($docInfo["extension"]) != 'pdf') {
             self::addBom($tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
-            $command = "unoconv -f pdf " . escapeshellarg($tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
+            $command = "timeout 10 unoconv -f pdf " . escapeshellarg($tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
             exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
 
             if (!file_exists($tmpPath.$fileNameOnTmp.'.pdf')) {
@@ -149,7 +149,7 @@ class ConvertPdfController
         file_put_contents($tmpPath . $tmpFilename, base64_decode($aArgs['encodedResource']));
 
         self::addBom($tmpPath.$tmpFilename);
-        $command = "unoconv -f pdf {$tmpPath}{$tmpFilename}";
+        $command = "timeout 10 unoconv -f pdf {$tmpPath}{$tmpFilename}";
         exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
 
         if (!file_exists($tmpPath.$tmpFilename.'.pdf')) {
