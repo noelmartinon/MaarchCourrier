@@ -129,13 +129,13 @@ class Install extends functions
         if (!$this->isPhpRequirements('gd')) {
             return false;
         }
-        // if (!$this->isPhpRequirements('imagick')) {
-        //     return false;
-        // }
         /*if (!$this->isPhpRequirements('ghostscript')) {
             return false;
         }*/
         if (!$this->isPearRequirements('System.php')) {
+            return false;
+        }
+        if (!$this->isPhpRequirements('imagick')) {
             return false;
         }
         // if (!$this->isPearRequirements('MIME/Type.php')) {
