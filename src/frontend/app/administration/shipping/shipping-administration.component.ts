@@ -138,6 +138,7 @@ export class ShippingAdministrationComponent implements OnInit {
             .jstree({
                 "checkbox": { three_state: false },
                 'core': {
+                    force_text : true,
                     'themes': {
                         'name': 'proton',
                         'responsive': true
