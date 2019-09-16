@@ -337,17 +337,19 @@ $param['department_number_mu'] = array('label' => _DEPARTMENT_NUMBER, 'type' => 
 $arr_tmp2 = array('label' => _N_GED, 'type' => 'input_text', 'param' => array('field_label' => _N_GED, 'other' => $size));
 $param['numged'] = $arr_tmp2;
 
-// Num Case
-$arr_tmp2 = array('label' => _CASE_NUMBER, 'type' => 'input_text', 'param' => array('field_label' => _CASE_NUMBER, 'other' => $size));
-$param['numcase'] = $arr_tmp2;
+if ($core_tools->is_module_loaded('cases') == true) {
+    // Num Case
+    $arr_tmp2 = array('label' => _CASE_NUMBER, 'type' => 'input_text', 'param' => array('field_label' => _CASE_NUMBER, 'other' => $size));
+    $param['numcase'] = $arr_tmp2;
 
-// Label Case
-$arr_tmp2 = array('label' => _CASE_LABEL, 'type' => 'input_text', 'param' => array('field_label' => _CASE_LABEL, 'other' => $size));
-$param['labelcase'] = $arr_tmp2;
+    // Label Case
+    $arr_tmp2 = array('label' => _CASE_LABEL, 'type' => 'input_text', 'param' => array('field_label' => _CASE_LABEL, 'other' => $size));
+    $param['labelcase'] = $arr_tmp2;
 
-// Description Case
-$arr_tmp2 = array('label' => _CASE_DESCRIPTION, 'type' => 'input_text', 'param' => array('field_label' => _CASE_DESCRIPTION, 'other' => $size));
-$param['descriptioncase'] = $arr_tmp2;
+    // Description Case
+    $arr_tmp2 = array('label' => _CASE_DESCRIPTION, 'type' => 'input_text', 'param' => array('field_label' => _CASE_DESCRIPTION, 'other' => $size));
+    $param['descriptioncase'] = $arr_tmp2;
+}
 
 //status
 $status = $status_obj->get_searchable_status();
