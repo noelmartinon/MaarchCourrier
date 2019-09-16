@@ -3255,6 +3255,18 @@ function fill_field_date_range(values) {
 }
 
 /**
+ * Fills num range in the search form whith value
+ *
+ * @param values Array Values of the search criteria which must be displayed
+ **/
+function fill_field_num_range(values) {
+    for (var key in values) {
+        var tmp_elem = $(key);
+        tmp_elem.value = values[key][0];
+    }
+}
+
+/**
  * Selects items in a mutiple list (html select object with multiple) in the search form
  *
  * @param values Array Values of the search criteria which must be displayed
