@@ -359,6 +359,26 @@
       <parameter name="doc_custom_t13" type="string" />
       <parameter name="doc_custom_t14" type="string" />
       <parameter name="doc_custom_t15" type="string" />
+      <parameter name="doc_custom_f1_min" type="string" />
+      <parameter name="doc_custom_f1_max" type="string" />
+      <parameter name="doc_custom_f2_min" type="string" />
+      <parameter name="doc_custom_f2_max" type="string" />
+      <parameter name="doc_custom_f3_min" type="string" />
+      <parameter name="doc_custom_f3_max" type="string" />
+      <parameter name="doc_custom_f4_min" type="string" />
+      <parameter name="doc_custom_f4_max" type="string" />
+      <parameter name="doc_custom_f5_min" type="string" />
+      <parameter name="doc_custom_f5_max" type="string" />
+      <parameter name="doc_custom_n1_min" type="integer" />
+      <parameter name="doc_custom_n1_max" type="integer" />
+      <parameter name="doc_custom_n2_min" type="integer" />
+      <parameter name="doc_custom_n2_max" type="integer" />
+      <parameter name="doc_custom_n3_min" type="integer" />
+      <parameter name="doc_custom_n3_max" type="integer" />
+      <parameter name="doc_custom_n4_min" type="integer" />
+      <parameter name="doc_custom_n4_max" type="integer" />
+      <parameter name="doc_custom_n5_min" type="integer" />
+      <parameter name="doc_custom_n5_max" type="integer" />
       <parameter name="signatory_group" type="identifier" />
       <parameter name="signatory_name_id" type="identifier" />
       <parameter name="tags_chosen" type="string" />
