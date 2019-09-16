@@ -112,6 +112,26 @@ $core_tools->load_header('', true, false);
 
 <body><?php
 $core_tools->load_js();
+
+$aUserEntities = \User\models\UserModel::getEntitiesById(['userId' => $_SESSION['user']['UserId']]);
+$userEntities = [];
+foreach ($aUserEntities as $value) {
+    $userEntities[] = $value['entity_id'];
+}
+
+if (empty($userEntities)) {
+    $userEntities = [''];
+}
+
+$userTemplates = \SrcCore\models\DatabaseModel::select([
+    'select'    => ['distinct t.template_id', 't.template_label', 't.template_content'],
+    'table'     => ['templates t', 'templates_association ta'],
+    'left_join' => ['t.template_id = ta.template_id'],
+    'where'     => ['t.template_target = \'sendmail\'', 'value_field in (?)'],
+    'data'      => [$userEntities],
+    'order_by'  => ['t.template_label asc']
+]);
+
 //ADD
 if ($mode == 'add') {
     $content .= '<div class="block">';
@@ -438,9 +458,8 @@ if ($mode == 'add') {
 
     $content .= '<option value="">'._ADD_TEMPLATE_MAIL.'</option>';
 
-    $stmt = $db->query("select template_id, template_label, template_content from templates where template_target = 'sendmail' order by template_label asc");
-    while ($result = $stmt->fetchObject()) {
-        $content .= "<option value='".$result->template_id."'>".$result->template_label.'</option>';
+    foreach ($userTemplates as $result) {
+        $content .= "<option value='".$result['template_id']."'>".$result['template_label'].'</option>';
     }
     $content .= '</select>';
     $content .= '<label style="margin-left: 15%;padding-right:10px">'.'Signature de mail'.'</label>';
