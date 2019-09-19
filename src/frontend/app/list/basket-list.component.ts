@@ -436,7 +436,7 @@ export class ResultListHttpDao {
     getRepoIssues(sort: string, order: string, page: number, href: string, filters: string): Observable<BasketList> {
         this.filtersListService.updateListsPropertiesPage(page);
         let offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}${filters}`;
+        const requestUrl = `${href}?limit=25&offset=${offset}${filters}`;
 
         return this.http.get<BasketList>(requestUrl);
     }
