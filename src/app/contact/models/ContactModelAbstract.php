@@ -465,7 +465,7 @@ abstract class ContactModelAbstract
             $aArgs['data'][$key]['column'] = strtolower($value['column']);
 
             if ($value['column'] == 'external_id') {
-                $formatedDataContact[$value['column']] = json_encode(['m2m' => $value['value']]);
+                $formatedDataAddress[$value['column']] = json_encode(['m2m' => $value['value']]);
             } elseif ($value['table'] == "contacts_v2") {
                 $formatedDataContact[$value['column']] = $value['value'];
             } elseif ($value['table'] == "contact_addresses") {
