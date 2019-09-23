@@ -141,17 +141,15 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     # save note
     if ($formValues['note_content_to_users'] != '') {
         //Add notes
-        $msgResult = "";
+        $content_note = $formValues['note_content_to_users'];
+        $content_note = str_replace(";", ".", $content_note);
+        $content_note = str_replace("--", "-", $content_note);
         foreach ($arr_id as $res_id) {
-            $content_note = $formValues['note_content_to_users'];
-            $content_note = str_replace(";", ".", $content_note);
-            $content_note = str_replace("--", "-", $content_note);
-            $msgResult .= $res_id.'#';
             $note->addNote($res_id, $coll_id, $content_note);
         }
     }
 
-    return array('result' => $res_id.'#', 'history_msg' => '');
+    return array('result' => implode("#", $arr_id), 'history_msg' => '');
 }
 
  /**
