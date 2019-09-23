@@ -118,7 +118,12 @@ class CoreConfigModel
 
             $strpos = strpos($fileContent, "=");
             $substr = substr(trim($fileContent), $strpos + 2, -1);
-            return json_decode($substr);
+
+            $trimmed = rtrim($substr, ',}');
+            $trimmed .= '}';
+            $decode = json_decode($trimmed);
+
+            return $decode;
         }
 
         return '';
