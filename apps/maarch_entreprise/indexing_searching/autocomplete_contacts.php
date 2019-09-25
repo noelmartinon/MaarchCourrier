@@ -25,6 +25,10 @@ $multi_sessions_address_id    = $_SESSION['adresses']['addressid'];
 $user_ids                     = array();
 $address_ids                  = array();
 
+$arrContact                   = array();
+$arrContactCorporate          = array();
+$arrContactNonCorporate       = array();
+
 if ($_SESSION['is_multi_contact'] == 'OK') {
     if (is_array($multi_sessions_address_id) && count($multi_sessions_address_id) > 0) {
         for ($imulti = 0; $imulti <= count($multi_sessions_address_id); ++$imulti) {
@@ -131,9 +135,9 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
         $nb_total      = $nb_total + $stmt->rowCount();
         $aAlreadyCatch = [];
         while ($res = $stmt->fetchObject()) {
-            if ($itRes > $maxResult) {
-                break;
-            }
+//            if ($itRes > $maxResult) {
+//                break;
+//            }
             $containResult = true;
 
             if ($res->is_corporate_person == 'N') {
@@ -200,14 +204,67 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
                 $color = $rate['color'];
             }
 
-            $arrContact[] = "<li id='".$res->contact_id.','.$res->ca_id."' style='font-size:12px;background-color:$color;'>".$contact_icon.' '
-            .'<span style="display:table-cell;vertical-align:middle;">'.$contact_info.'</span>'
-            .'<div style="font-size:9px;font-style:italic;"> - '.$address.'</div>'
-        .'</li>';
-            $aAlreadyCatch[$res->contact_id.','.$res->ca_id] = 'added';
-            ++$itRes;
+                $arrContactTmp = "<li id='" . $res->contact_id . ',' . $res->ca_id . "' style='font-size:12px;background-color:$color;'>" . $contact_icon . ' '
+                    . '<span style="display:table-cell;vertical-align:middle;">' . $contact_info . '</span>'
+                    . '<div style="font-size:9px;font-style:italic;"> - ' . $address . '</div>'
+                    . '</li>';
+
+                if ($res->is_corporate_person == 'Y') {
+                    $arrContactCorporate[] = [$res, $arrContactTmp];
+                } else {
+                    $arrContactNonCorporate[] = [$res, $arrContactTmp];
+                }
+
+                $aAlreadyCatch[$res->contact_id . ',' . $res->ca_id] = 'added';
+//                ++$itRes;
         }
     }
+
+
+    // ----------------------------------------------------------
+    // Sort on corporate person
+    uasort($arrContactCorporate, function ($a, $b) {
+        $diff =  strcmp($a[0]->society, $b[0]->society);
+
+        if ($diff != 0) {
+            return $diff;
+        }
+        $diff = strcmp($a[0]->lastname, $b[0]->lastname);
+        return $diff;
+    });
+
+    // Sort on non corporate person
+    uasort($arrContactCorporate, function ($a, $b) {
+        $diff =  strcmp($a[0]->lastname, $b[0]->lastname);
+
+        if ($diff != 0) {
+            return $diff;
+        }
+        $diff = strcmp($a[0]->society, $b[0]->society);
+        return $diff;
+    });
+
+//    $itRes = 0;
+//    $arrContact = array();
+    foreach ($arrContactCorporate as $contactCorporate) {
+        if ($itRes > $maxResult) {
+            break;
+        }
+        $arrContact[] = $contactCorporate[1];
+        $itRes++;
+    }
+
+    if ($itRes < $maxResult) {
+        foreach ($arrContactNonCorporate as $contactNonCorporate) {
+            if ($itRes > $maxResult) {
+                break;
+            }
+            $arrContact[] = $contactNonCorporate[1];
+            $itRes++;
+        }
+    }
+
+    // ----------------------------------------------------------
 
     //Third, contacts groups
     if ($_REQUEST['multiContact'] == "true") {
