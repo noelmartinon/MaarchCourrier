@@ -4,6 +4,10 @@ import { NotificationService } from '../../notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
+import { Observable, of } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { startWith, map, catchError, finalize, tap } from 'rxjs/operators';
+import { LatinisePipe } from 'ngx-pipes';
 
 @Component({
     templateUrl: "send-external-note-book-action.component.html",
@@ -25,22 +29,43 @@ export class SendExternalNoteBookActionComponent implements OnInit {
     };
     errors: any;
 
+    filteredOptions: Observable<string[]>;
+    autocompleteControl = new FormControl();
+
     @ViewChild('noteEditor') noteEditor: NoteEditorComponent;
 
-    constructor(public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<SendExternalNoteBookActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(
+        public http: HttpClient, 
+        private notify: NotificationService, 
+        public dialogRef: MatDialogRef<SendExternalNoteBookActionComponent>, 
+        @Inject(MAT_DIALOG_DATA) public data: any,
+        private latinisePipe: LatinisePipe) { }
 
     ngOnInit(): void {
         this.loading = true;
 
-        this.http.post('../../rest/resourcesList/users/' + this.data.currentBasketInfo.ownerId + '/groups/' + this.data.currentBasketInfo.groupId + '/baskets/' + this.data.currentBasketInfo.basketId + '/checkExternalNoteBook', { resources: this.data.selectedRes })
-            .subscribe((data: any) => {
+        this.http.post('../../rest/resourcesList/users/' + this.data.currentBasketInfo.ownerId + '/groups/' + this.data.currentBasketInfo.groupId + '/baskets/' + this.data.currentBasketInfo.basketId + '/checkExternalNoteBook', { resources: this.data.selectedRes }).pipe(
+            map((data: any) => {
+                data.additionalsInfos.users.forEach((element: any) => {
+                    element.displayName = element.firstname + ' ' + element.lastname;
+                });
+                return data;
+            }),
+            tap((data) => {
                 this.additionalsInfos = data.additionalsInfos;
+                this.filteredOptions = this.autocompleteControl.valueChanges
+                    .pipe(
+                        startWith(''),
+                        map(value => this._filter(value))
+                    );
                 this.errors = data.errors;
-                this.loading = false;
-            }, (err: any) => {
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
                 this.notify.handleErrors(err);
-                this.loading = false;
-            });
+                return of(false);
+            })
+        ).subscribe();
     }
 
     onSubmit(): void {
@@ -73,5 +98,20 @@ export class SendExternalNoteBookActionComponent implements OnInit {
         } else {
             return false;
         }
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.additionalsInfos.users.filter((option: any) => this.latinisePipe.transform(option.displayName.toLowerCase()).includes(filterValue));
+        } else {
+            return this.additionalsInfos.users;
+        }
+    }
+
+    setVal(ev: any) {
+        const user = ev.option.value;
+        this.autocompleteControl.setValue(user.displayName);
+        this.externalSignatoryBookDatas.processingUser = user.id;
     }
 }

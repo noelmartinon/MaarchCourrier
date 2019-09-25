@@ -16,12 +16,14 @@
                 <div>
                     <div class="col-md-12" style="padding-top: 10px;" *ngIf="additionalsInfos.users.length != 0">
                         <mat-form-field>
-                            <mat-label>{{lang.userMaarchParapheur}}</mat-label>
-                            <mat-select name="processingUser" [(ngModel)]="externalSignatoryBookDatas.processingUser" required>
-                                <mat-option *ngFor="let user of additionalsInfos.users" [value]="user.id">
-                                    {{user.firstname}} {{user.lastname}} ({{user.email}})
+                            <input type="text"
+                                [placeholder]="lang.userMaarchParapheur" aria-label="Number" matInput
+                                [formControl]="autocompleteControl" [matAutocomplete]="auto" required>
+                            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="setVal($event)">
+                                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                                    <b color="primary">{{option.displayName}}</b>&nbsp;<small>{{option.email}}</small>
                                 </mat-option>
-                            </mat-select>
+                            </mat-autocomplete>
                         </mat-form-field>
                     </div>
                     <div class="col-md-12" *ngIf="additionalsInfos.users.length == 0">
@@ -50,6 +52,7 @@
     </mat-sidenav-container>
 </div>
 <div mat-dialog-actions class="actions">
-    <button mat-raised-button mat-button color="primary" [disabled]="loading || checkValidAction()" (click)="onSubmit()">{{lang.validate}}</button>
+    <button mat-raised-button mat-button color="primary" [disabled]="loading || checkValidAction()"
+        (click)="onSubmit()">{{lang.validate}}</button>
     <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
 </div>
