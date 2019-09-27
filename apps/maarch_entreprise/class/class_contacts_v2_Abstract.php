@@ -167,7 +167,7 @@ abstract class contacts_v2_Abstract extends Database
                 $path_contacts_confirm = $_SESSION['config']['businessappurl'].'index.php?page=contacts_v2_confirm';
             }
             header(
-                'location: '.$path_contacts_confirm.'&mode='.$mode.'&mycontact='.$mycontact
+                'location: '.$path_contacts_confirm.'&body_loaded&mode='.$mode.'&mycontact='.$mycontact
             );
             exit;
         }
