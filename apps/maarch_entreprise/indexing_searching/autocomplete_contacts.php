@@ -234,7 +234,7 @@ if ($_SESSION['is_multi_contact'] == 'OK') {
     });
 
     // Sort on non corporate person
-    uasort($arrContactCorporate, function ($a, $b) {
+    uasort($arrContactNonCorporate, function ($a, $b) {
         $diff =  strcmp($a[0]->lastname, $b[0]->lastname);
 
         if ($diff != 0) {
