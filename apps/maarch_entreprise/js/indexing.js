@@ -2046,7 +2046,7 @@ function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId
     }
 
     $j("#" + inputId).typeahead({
-        order: "asc",
+        // order: "asc",
         display: "idToDisplay",
         templateValue: "{{otherInfo}}",
         emptyTemplate: "Aucune donnée pour <b>{{query}}</b>",
@@ -2081,7 +2081,7 @@ function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId
                     } else {
                         $j("#" + inputId).css('background-color', li[0].getStyle('background-color'));
                     }
-                    
+
                 }
                 if(typeof cardId != 'undefined'){
                     $j("#" + cardId).css('visibility', 'visible');
