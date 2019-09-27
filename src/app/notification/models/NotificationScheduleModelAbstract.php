@@ -83,10 +83,10 @@ abstract class NotificationScheduleModelAbstract
         ];
         foreach ($lines as $cronLine) {
             $cronLine = preg_replace('![ \t]+!', ' ', trim($cronLine));
-            if ($aArgs['setHiddenValue'] && (strpos($cronLine, '#') !== false || strpos($cronLine, 'MAILTO=') !== false)) {
+            if ($aArgs['setHiddenValue'] && ($cronLine[0] == '#' || ctype_alpha($cronLine[0]))) {
                 $data[] = $emptyLine;
                 continue;
-            } elseif (!$aArgs['setHiddenValue'] && (strpos($cronLine, '#') === 0 || strpos($cronLine, 'MAILTO=') === 0)) {
+            } elseif (!$aArgs['setHiddenValue'] && ($cronLine[0] == '#' || ctype_alpha($cronLine[0]))) {
                 $data[] = [ 'm' => $cronLine];
                 continue;
             }
