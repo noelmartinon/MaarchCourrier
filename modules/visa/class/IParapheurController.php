@@ -193,12 +193,6 @@ class IParapheurController
 
         $curlReturn = $curlReturn = self::returnCurl($xmlPostString, $aArgs['config']);
 
-        if (!$curlReturn['response']) {
-            // TODO gestin d'une erreur
-            echo $curlReturn['error'];
-            return false;
-        }
-
         $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetDossierResponse[0];
         if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
             // TODO gestion d'une potentielle erreur
