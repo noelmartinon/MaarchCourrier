@@ -266,6 +266,8 @@ function Bt_processVisaWorkflow($aArgs = [])
             }
 
             Bt_validatedMail(['status' => $mailStatus, 'resId' => $aArgs['res_id_master']]);
+        } elseif ($nbUserProcess == $nbVisaWorkflow) {
+            Bt_validatedMail(['status' => $aArgs['validatedStatus'], 'resId' => $aArgs['res_id_master']]);
         }
     } else {
         Bt_validatedMail(['status' => $aArgs['validatedStatus'], 'resId' => $aArgs['res_id_master']]);
