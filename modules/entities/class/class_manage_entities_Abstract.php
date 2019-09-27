@@ -467,8 +467,8 @@ abstract class entity_Abstract extends functions
                         $entities, 
                         array(
                             'ID' =>$line->entity_id, 
-                            'LABEL' =>  $espace . functions::show_string($line->entity_label),
-                             'SHORT_LABEL' =>$espace . functions::show_string($line->short_label), 
+                            'LABEL' =>  $espace . functions::xssafe($line->entity_label),
+                             'SHORT_LABEL' =>$espace . functions::xssafe($line->short_label), 
                              'KEYWORD' => false,
                              'DISABLED' => false,
                         )
@@ -478,8 +478,8 @@ abstract class entity_Abstract extends functions
                         $entities, 
                         array(
                             'ID' =>$line->entity_id, 
-                            'LABEL' =>  $espace . functions::show_string($line->entity_label),
-                             'SHORT_LABEL' =>$espace . functions::show_string($line->short_label), 
+                            'LABEL' =>  $espace . functions::xssafe($line->entity_label),
+                             'SHORT_LABEL' =>$espace . functions::xssafe($line->short_label), 
                              'KEYWORD' => false,
                              'DISABLED' => true,
                         )
@@ -603,9 +603,9 @@ abstract class entity_Abstract extends functions
                         array_push(
                             $entities, 
                             array(
-                                'ID' =>$parent[$i]['ENTITY_ID'], 'LABEL' => 
-                                $this->show_string($parent[$i]['ENTITY_LABEL']), 
-                                'SHORT_LABEL' => $this->show_string($parent[$i]['SHORT_LABEL']), 
+                                'ID' =>$parent[$i]['ENTITY_ID'], 
+                                'LABEL' => functions::xssafe($parent[$i]['ENTITY_LABEL']), 
+                                'SHORT_LABEL' => functions::xssafe($parent[$i]['SHORT_LABEL']), 
                                 'KEYWORD' => false,
                                 'DISABLED' => false,
                             )

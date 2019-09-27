@@ -876,7 +876,7 @@ if ($stmt->rowCount() == 0) {
                                     } else {
                                         $inputAttr = '';
                                     }
-                                    echo "<option value='{$inputId}' {$inputAttr}>&nbsp;&nbsp;&nbsp;&nbsp;{$inputValue}</option>";
+                                    echo "<option value='{$inputId}' {$inputAttr}>&nbsp;&nbsp;&nbsp;&nbsp;".functions::xssafe($inputValue)."</option>";
                                 }
                                 echo '</optgroup>';
                             }
