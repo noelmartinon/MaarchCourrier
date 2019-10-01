@@ -405,4 +405,26 @@ abstract class EntityModelAbstract
 
         return $roles;
     }
+
+    public static function getEntityPathByEntityId(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['entityId']);
+        ValidatorModel::stringType($args, ['entityId', 'path']);
+
+        $entity = EntityModel::getByEntityId([
+            'select'   => ['entity_id', 'parent_entity_id'],
+            'entityId' => $args['entityId']
+        ]);
+
+        if (!empty($args['path'])) {
+            $args['path'] = "/{$args['path']}";
+        }
+        $args['path'] = $entity['entity_id'] . $args['path'];
+
+        if (empty($entity['parent_entity_id'])) {
+            return $args['path'];
+        }
+
+        return EntityModel::getEntityPathByEntityId(['entityId' => $entity['parent_entity_id'], 'path' => $args['path']]);
+    }
 }
