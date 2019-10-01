@@ -124,16 +124,22 @@ if (isset($_REQUEST['load'])) {
         
     //Where clause
         $where_tab = array();
-        //
+        
+        $rawUserEntities = \Entity\models\EntityModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['entity_id']]);
+        $userEntities = array_column($rawUserEntities, 'entity_id');
+        $userEntities = !empty($userEntities) ? $userEntities : [''];
+
         $where_tab[] = "identifier = ?";
         $where_tab[] = "type = ?";
-        $where_tab[] = "notes.id in (select notes.id from notes left join note_entities on notes.id = note_entities.note_id where item_id IS NULL OR item_id = '".$_SESSION['user']['primaryentity']['id']."' or notes.user_id = '".$_SESSION['user']['UserId']."')";
+        $where_tab[] = "notes.id in (select notes.id from notes left join note_entities on notes.id = note_entities.note_id where item_id IS NULL OR item_id in (?) or notes.user_id = '".$_SESSION['user']['UserId']."')";
         $arrayPDO = array($identifier);
         if (empty($origin) || $origin != 'folder') {
             $arrayPDO[] = 'resource';
         } else {
             $arrayPDO[] = 'folder';
         }
+
+        $arrayPDO[] = $userEntities;
 
         //Build where
         $where = implode(' and ', $where_tab);

@@ -192,9 +192,9 @@ switch ($mode) {
                 if ($state_entity == false) {
                     $content .= '<option value="'
                         .$entitiesList[$i]->entity_id.'" alt="'
-                        .$entitiesList[$i]->short_label.'" title="'
-                        .$entitiesList[$i]->short_label.'">'
-                        .$entitiesList[$i]->short_label.'</option>';
+                        .functions::xssafe($entitiesList[$i]->short_label).'" title="'
+                        .functions::xssafe($entitiesList[$i]->short_label).'">'
+                        .functions::xssafe($entitiesList[$i]->short_label).'</option>';
                 }
             }
             $content .= '</select><br/> </td>';
@@ -211,10 +211,10 @@ switch ($mode) {
                if ($state_entity == true || ($entitiesForRestriction && in_array($entitiesList[$i]->entity_id, $entitiesForRestriction))) {
                     $content .= '<option value="'
                         .$entitiesList[$i]->entity_id.'" alt="'
-                        .$entitiesList[$i]->short_label.'" title="'
-                        .$entitiesList[$i]->short_label.'" selected="selected">'
-                        .$entitiesList[$i]->short_label.'</option>';
-               }
+                        .functions::xssafe($entitiesList[$i]->short_label).'" title="'
+                        .functions::xssafe($entitiesList[$i]->short_label).'" selected="selected">'
+                        .functions::xssafe($entitiesList[$i]->short_label).'</option>';
+                }
             }
             $content .= '</select></td>';
             $content .= '</tr></table>';
@@ -388,9 +388,9 @@ switch ($mode) {
                     if (!in_array($entitiesList[$i], $notesEntities)) {
                         $content .= '<option value="'
                             .$entitiesList[$i]->entity_id.'" alt="'
-                            .$entitiesList[$i]->short_label.'" title="'
-                            .$entitiesList[$i]->short_label.'">'
-                            .$entitiesList[$i]->short_label.'</option>';
+                            .functions::xssafe($entitiesList[$i]->short_label).'" title="'
+                            .functions::xssafe($entitiesList[$i]->short_label).'">'
+                            .functions::xssafe($entitiesList[$i]->short_label).'</option>';
                     }
                 }
                 $content .= '</select><br/> </td>';
@@ -405,9 +405,9 @@ switch ($mode) {
                 for ($i=0;$i<count($notesEntities);$i++) {
                     $content .= '<option value="'
                         .$notesEntities[$i]->entity_id.'" alt="'
-                        .$notesEntities[$i]->short_label.'" title="'
-                        .$notesEntities[$i]->short_label.'" selected="selected">'
-                        .$notesEntities[$i]->short_label.'</option>';
+                        .functions::xssafe($notesEntities[$i]->short_label).'" title="'
+                        .functions::xssafe($notesEntities[$i]->short_label).'" selected="selected">'
+                        .functions::xssafe($notesEntities[$i]->short_label).'</option>';
                 }
                 $content .= '</select></td>';
                 $content .= '</tr></table>';
@@ -553,4 +553,3 @@ switch ($mode) {
 echo "{status : " . $status . ", msg_result : '" . $msgResult . "', content : '" . addslashes(_parse($content)) . "', error : '" . addslashes($error) . "', exec_js : '".addslashes($js)."'}";
 exit ();
 ?>
-
