@@ -105,6 +105,10 @@ $path_to_script = $_SESSION['config']['businessappurl']
     .'index.php?display=true&module=sendmail&page=sendmail_ajax_content&identifier='
     .$identifier.'&origin='.$origin.$parameters;
 
+$path_to_script_ajax = $_SESSION['config']['businessappurl']
+    .'index.php?display=true&module=sendmail&page=sendmail_to_contact_ajax&identifier='
+    .$identifier.'&origin='.$origin.$parameters;
+
 $core_tools->load_lang();
 $core_tools->load_html();
 $core_tools->load_header('', true, false);
@@ -504,7 +508,7 @@ if ($mode == 'add') {
     //Send
     $id_action = 500;
     $content .= ' <input style="display:none;" type="button" name="valid" value="&nbsp;'._SEND_EMAIL
-                .'&nbsp;" id="valid" class="button" onclick="validEmailFormForSendToContact(\''.$path_to_script.'&mode=added&for=send&action='.$_GET['action'].'\', \'formEmail\');" />&nbsp;';
+                .'&nbsp;" id="valid" class="button" onclick="validEmailFormForSendToContact(\''.$path_to_script.'&mode=added&for=send&action='.$_GET['action'].'\', \'formEmail\',\''.$path_to_script_ajax.'&mode=added&for=send\', \''.$_SESSION['status'].'\');" />&nbsp;';
     $content .= '</div>';
     $content .= '</form>';
     $content .= '</div>';

@@ -40,13 +40,13 @@ if (!defined('_ADD_ATTACHMENT_TO_SEND_TO_CONTACT')) {
     define('_ADD_ATTACHMENT_TO_SEND_TO_CONTACT', "Veuillez ajouter une pièce jointe avant d'envoyer ce courrier au contact");
 }
 if (!defined('_SEND_TO_CONTACT_WITH_MANDATORY_ATTACHMENT')) {
-    define('_SEND_TO_CONTACT_WITH_MANDATORY_ATTACHMENT', 'Envoyer au contact avec une pièce jointe obligatoire');
+    define('_SEND_TO_CONTACT_WITH_MANDATORY_ATTACHMENT', 'Envoyer au contact avec une pièce jointe obligatoire et accusé de réception');
 }
 if (!defined('_SEND_TO_CONTACT_WITH_MANDATORY_ATTACHMENT_DESC')) {
     define('_SEND_TO_CONTACT_WITH_MANDATORY_ATTACHMENT_DESC', "Ouvre une modal d'envoi de mail avec l'email du contact associé au document en tant que destinataire, présence OBLIGATOIRE de pièce(s) jointe(s) à l'envoi.");
 }
 if (!defined('_SEND_ATTACHMENTS_TO_CONTACT')) {
-    define('_SEND_ATTACHMENTS_TO_CONTACT', 'Envoyer au contact');
+    define('_SEND_ATTACHMENTS_TO_CONTACT', 'Envoyer au contact avec accusé de réception');
 }
 if (!defined('_SEND_ATTACHMENTS_TO_CONTACT_DESC')) {
     define('_SEND_ATTACHMENTS_TO_CONTACT_DESC', "Ouvre une modal d'envoi de mail avec l'email du contact associé au document en tant que destinataire.");
