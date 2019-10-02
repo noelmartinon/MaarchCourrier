@@ -437,7 +437,7 @@ class MaarchParapheurController
 
     public static function retrieveSignedMails(array $aArgs)
     {
-        foreach (['noVersion', 'isVersion', 'resLetterbox'] as $version) {
+        foreach (['noVersion', 'isVersion', 'noVersionOutgoing', 'isVersionOutgoing', 'resLetterbox'] as $version) {
             foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
                 $documentWorkflow = MaarchParapheurController::getDocumentWorkflow(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
                 $state = MaarchParapheurController::getState(['workflow' => $documentWorkflow]);

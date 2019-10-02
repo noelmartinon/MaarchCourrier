@@ -238,10 +238,14 @@ $query = "SELECT res_id, res_id_version, external_id->>'signatureBookId' as exte
         FROM res_view_attachments WHERE status = 'FRZ' AND external_id->>'signatureBookId' IS NOT NULL AND external_id->>'signatureBookId' <> ''";
 $stmt = $GLOBALS['db']->query($query, []);
     
-$idsToRetrieve = ['noVersion' => [], 'isVersion' => [], 'resLetterbox' => []];
+$idsToRetrieve = ['noVersion' => [], 'isVersion' => [], 'noVersionOutgoing' => [], 'isVersionOutgoing' => [], 'resLetterbox' => []];
 
 while ($reqResult = $stmt->fetchObject()) {
-    if (!empty($reqResult->res_id)) {
+    if (!empty($reqResult->res_id) && $reqResult->attachment_type == 'outgoing_mail') {
+        $idsToRetrieve['noVersionOutgoing'][$reqResult->res_id] = $reqResult;
+    } elseif (!empty($reqResult->res_id_version) && $reqResult->attachment_type == 'outgoing_mail') {
+        $idsToRetrieve['isVersionOutgoing'][$reqResult->res_id_version] = $reqResult;
+    } elseif (!empty($reqResult->res_id)) {
         $idsToRetrieve['noVersion'][$reqResult->res_id] = $reqResult;
     } else {
         $idsToRetrieve['isVersion'][$reqResult->res_id_version] = $reqResult;
@@ -271,6 +275,10 @@ while ($reqResult = $stmt->fetchObject()) {
     $idsToRetrieve['resLetterbox'][$reqResult->res_id] = $reqResult;
 }
 if (!empty($idsToRetrieve['resLetterbox'])) {
+    $idsToRetrieve['noVersion'] = [];
+    $idsToRetrieve['isVersion'] = [];
+    $idsToRetrieve['noVersionOutgoing'] = [];
+    $idsToRetrieve['isVersionOutgoing'] = [];
     $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve]);
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'];
 }
@@ -559,8 +567,122 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
     $GLOBALS['db']->query("UPDATE res_letterbox SET external_signatory_book_id = null WHERE res_id = ?", [$resId]);
 }
 
+foreach ($retrievedMails['noVersionOutgoing'] as $resId => $value) {
+    $GLOBALS['logger']->write('Update res_attachment outgoing : ' . $resId . '. ExternalSignatoryBookId : ' . $value->external_id, 'INFO');
+
+    if (!empty($value->encodedFile)) {
+        $GLOBALS['logger']->write('Create Attachment', 'INFO');
+        Bt_createAttachment([
+            'res_id_master'   => $value->res_id_master,
+            'title'           => $value->title,
+            'identifier'      => $value->identifier,
+            'type_id'         => $value->type_id,
+            'dest_contact_id' => $value->dest_contact_id,
+            'dest_address_id' => $value->dest_address_id,
+            'dest_user'       => $value->dest_user,
+            'typist'          => $value->typist,
+            'format'          => $value->format,
+            'attachment_type' => 'outgoing_mail',
+            'status'          => 'A_TRA',
+            'encodedFile'     => $value->encodedFile,
+            'in_signature_book' => 'false',
+            'table'           => 'res_attachments',
+            'noteContent'     => $value->noteContent,
+            'noteCreatorId'   => $value->noteCreatorId,
+            'noteCreatorName' => $value->noteCreatorName
+        ]);
+    }
+    $GLOBALS['db']->query("UPDATE res_attachments SET status = 'TRA', external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$resId]);
+    $additionalHistoryInfo = '';
+    if (!empty($value->workflowInfo)) {
+        $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+    }
+    $attachmentResIdMaster = \Attachment\models\AttachmentModel::getById(['select' => ['res_id_master'], 'id' => $resId, 'isVersion' => false]);
+    if ($value->status == 'validatedNote') {
+        $GLOBALS['logger']->write('Document validated', 'INFO');
+        Bt_validatedMail(['status' => $validatedStatusAnnot, 'resId' => $attachmentResIdMaster['res_id_master']]);
+
+        Bt_history([
+            'table_name' => 'res_letterbox',
+            'record_id'  => $attachmentResIdMaster['res_id_master'],
+            'info'       => 'Le document '.$attachmentResIdMaster['res_id_master'].' (res_letterbox outgoing) a été validé dans l\'annotateur externe' . $additionalHistoryInfo,
+            'event_type' => 'ACTION#1',
+            'event_id'   => '1'
+        ]);
+    } elseif ($value->status == 'refusedNote') {
+        $GLOBALS['logger']->write('Document refused', 'INFO');
+        $GLOBALS['db']->query("UPDATE res_letterbox SET status = '" . $refusedStatusAnnot . "' WHERE res_id = ?", [$attachmentResIdMaster['res_id_master']]);
+    
+        Bt_history([
+            'table_name' => 'res_letterbox',
+            'record_id'  => $attachmentResIdMaster['res_id_master'],
+            'info'       => 'Le document '.$attachmentResIdMaster['res_id_master'].' (res_letterbox outgoing) a été refusé dans l\'annotateur externe' . $additionalHistoryInfo,
+            'event_type' => 'ACTION#1',
+            'event_id'   => '1'
+        ]);
+    }
+    $GLOBALS['db']->query("UPDATE res_letterbox SET external_signatory_book_id = null WHERE res_id = ?", [$attachmentResIdMaster['res_id_master']]);
+}
+
+foreach ($retrievedMails['isVersionOutgoing'] as $resId => $value) {
+    $GLOBALS['logger']->write('Update res_version_attachment outgoing : ' . $resId . '. ExternalSignatoryBookId : ' . $value->external_id, 'INFO');
+
+    if (!empty($value->encodedFile)) {
+        $GLOBALS['logger']->write('Create Attachment', 'INFO');
+        Bt_createAttachment([
+            'res_id_master'   => $value->res_id_master,
+            'title'           => $value->title,
+            'identifier'      => $value->identifier,
+            'type_id'         => $value->type_id,
+            'dest_contact_id' => $value->dest_contact_id,
+            'dest_address_id' => $value->dest_address_id,
+            'dest_user'       => $value->dest_user,
+            'typist'          => $value->typist,
+            'format'          => $value->format,
+            'attachment_type' => 'outgoing_mail',
+            'status'          => 'A_TRA',
+            'encodedFile'     => $value->encodedFile,
+            'in_signature_book' => 'false',
+            'table'           => 'res_attachments',
+            'noteContent'     => $value->noteContent,
+            'noteCreatorId'   => $value->noteCreatorId,
+            'noteCreatorName' => $value->noteCreatorName
+        ]);
+    }
+    $GLOBALS['db']->query("UPDATE res_version_attachments SET status = 'TRA', external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$resId]);
+    $additionalHistoryInfo = '';
+    if (!empty($value->workflowInfo)) {
+        $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+    }
+    $attachmentResIdMaster = \Attachment\models\AttachmentModel::getById(['select' => ['res_id_master'], 'id' => $resId, 'isVersion' => true]);
+    if ($value->status == 'validatedNote') {
+        $GLOBALS['logger']->write('Document validated', 'INFO');
+        Bt_validatedMail(['status' => $validatedStatusAnnot, 'resId' => $attachmentResIdMaster['res_id_master']]);
+
+        Bt_history([
+            'table_name' => 'res_letterbox',
+            'record_id'  => $attachmentResIdMaster['res_id_master'],
+            'info'       => 'Le document '.$attachmentResIdMaster['res_id_master'].' (res_letterbox outgoing) a été validé dans l\'annotateur externe' . $additionalHistoryInfo,
+            'event_type' => 'ACTION#1',
+            'event_id'   => '1'
+        ]);
+    } elseif ($value->status == 'refusedNote') {
+        $GLOBALS['logger']->write('Document refused', 'INFO');
+        $GLOBALS['db']->query("UPDATE res_letterbox SET status = '" . $refusedStatusAnnot . "' WHERE res_id = ?", [$attachmentResIdMaster['res_id_master']]);
+    
+        Bt_history([
+            'table_name' => 'res_letterbox',
+            'record_id'  => $attachmentResIdMaster['res_id_master'],
+            'info'       => 'Le document '.$attachmentResIdMaster['res_id_master'].' (res_letterbox outgoing) a été refusé dans l\'annotateur externe' . $additionalHistoryInfo,
+            'event_type' => 'ACTION#1',
+            'event_id'   => '1'
+        ]);
+    }
+    $GLOBALS['db']->query("UPDATE res_letterbox SET external_signatory_book_id = null WHERE res_id = ?", [$attachmentResIdMaster['res_id_master']]);
+}
+
 $GLOBALS['logger']->write('End of process', 'INFO');
-$nbMailsRetrieved = count($retrievedMails['noVersion']) + count($retrievedMails['isVersion']) + count($retrievedMails['resLetterbox']);
+$nbMailsRetrieved = count($retrievedMails['noVersion']) + count($retrievedMails['isVersion']) + count($retrievedMails['resLetterbox']) + count($retrievedMails['noVersionOutgoing']) + count($retrievedMails['isVersionOutgoing']);
 $GLOBALS['logger']->write($nbMailsRetrieved.' document(s) retrieved', 'INFO');
 
 Bt_logInDataBase(
