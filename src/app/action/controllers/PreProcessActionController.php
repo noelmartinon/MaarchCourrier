@@ -619,7 +619,45 @@ class PreProcessActionController
             }
 
             foreach ($data['resources'] as $resId) {
-                $noAttachmentsResource = ResModel::getExtById(['resId' => $resId, 'select' => ['alt_identifier']]);
+                $noAttachmentsResource = ResModel::getExtById(['resId' => $resId, 'select' => ['alt_identifier', 'category_id']]);
+
+                if ($noAttachmentsResource['category_id'] == 'outgoing') {
+                    $attachment = \Attachment\models\AttachmentModel::getOnView([
+                        'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename', 'title', 'identifier'],
+                        'where'     => ['res_id_master = ?', 'attachment_type = ?', 'status not in (?)'],
+                        'data'      => [$resId, 'outgoing_mail', ['DEL', 'OBS', 'FRZ']],
+                        'limit'     => 1
+                    ]);
+                    if (!empty($attachment[0])) {
+                        $attachmentTodisplay = $attachment[0];
+                        $id                  = (empty($attachmentTodisplay['res_id']) ? $attachmentTodisplay['res_id_version'] : $attachmentTodisplay['res_id']);
+                        $isVersion           = empty($attachmentTodisplay['res_id']);
+                        if ($isVersion) {
+                            $collId = "attachments_version_coll";
+                        } else {
+                            $collId = "attachments_coll";
+                        }
+                        $convertedDocument = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $id, 'collId' => $collId, 'isVersion' => $isVersion]);
+                        if (empty($convertedDocument['errors'])) {
+                            $attachmentTodisplay = $convertedDocument;
+                        }
+                        $document['docserver_id'] = $attachmentTodisplay['docserver_id'];
+                        $document['path']         = $attachmentTodisplay['path'];
+                        $document['filename']     = $attachmentTodisplay['filename'];
+    
+                        $mainResource[0]['alt_identifier'] = $attachment[0]['identifier'];
+                        $mainResource[0]['subject']        = $attachment[0]['title'];
+    
+                        $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template']]);
+    
+                        $arrivedMailMainfilePath = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+                        if (!is_file($arrivedMailMainfilePath)) {
+                            $additionalsInfos['noMail'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'fileDoesNotExists'];
+                            continue;
+                        }
+                    }
+                }
+
                 if (empty($noAttachmentsResource['alt_identifier'])) {
                     $noAttachmentsResource['alt_identifier'] = _UNDEFINED;
                 }

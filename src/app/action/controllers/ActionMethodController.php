@@ -302,12 +302,30 @@ class ActionMethodController
             $historyInfo = ' (à ' . $processingUserInfo['firstname'] . ' ' . $processingUserInfo['lastname'] . ')';
         }
 
-        if (!empty($attachmentToFreeze)) {
+        if (!empty($attachmentToFreeze['letterbox_coll'])) {
             ResModel::update([
                 'set' => ['external_signatory_book_id' => $attachmentToFreeze['letterbox_coll'][$args['resId']]],
                 'where' => ['res_id = ?'],
                 'data' => [$args['resId']]
             ]);
+        }
+        if (!empty($attachmentToFreeze['attachments_coll'])) {
+            foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
+                \Attachment\models\AttachmentModel::freezeAttachment([
+                    'resId'      => $resId,
+                    'table'      => 'res_attachments',
+                    'externalId' => $externalId
+                ]);
+            }
+        }
+        if (!empty($attachmentToFreeze['attachments_version_coll'])) {
+            foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
+                \Attachment\models\AttachmentModel::freezeAttachment([
+                    'resId'      => $resId,
+                    'table'      => 'res_version_attachments',
+                    'externalId' => $externalId
+                ]);
+            }
         }
 
         return ['history' => $historyInfo];

@@ -100,11 +100,57 @@ function check_form($form_id, $values)
     }
 
     foreach ($aResources as $resId) {
-        $adrMainInfo = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => 'letterbox_coll']);
-        $docserverMainInfo = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrMainInfo['docserver_id']]);
-        $filePath = $docserverMainInfo['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
-        if (!is_file($filePath)) {
-            $_SESSION['action_error'] = _FILE_MISSING . ' : ' . $filePath;
+        $document = \Resource\models\ResModel::getById(['select' => ['docserver_id', 'path', 'filename'], 'resId' => $resId]);
+        $extDocument = \Resource\models\ResModel::getExtById(['select' => ['category_id', 'alt_identifier'], 'resId' => $resId]);
+        if (empty($document) || empty($extDocument)) {
+            $_SESSION['action_error'] = 'Document does not exists : ' . $resId;
+            return false;
+        }
+
+        $convertedDocument = Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => 'letterbox_coll', 'isVersion' => false]);
+
+        if (empty($convertedDocument['errors'])) {
+            $documentTodisplay        = $convertedDocument;
+            $document['docserver_id'] = $documentTodisplay['docserver_id'];
+            $document['path']         = $documentTodisplay['path'];
+            $document['filename']     = $documentTodisplay['filename'];
+        }
+
+        if ($extDocument['category_id'] == 'outgoing') {
+            $attachment = \Attachment\models\AttachmentModel::getOnView([
+                'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename'],
+                'where'     => ['res_id_master = ?', 'attachment_type = ?', 'status not in (?)'],
+                'data'      => [$resId, 'outgoing_mail', ['DEL', 'OBS', 'FRZ']],
+                'limit'     => 1
+            ]);
+            if (!empty($attachment[0])) {
+                $attachmentTodisplay = $attachment[0];
+                $id                  = (empty($attachmentTodisplay['res_id']) ? $attachmentTodisplay['res_id_version'] : $attachmentTodisplay['res_id']);
+                $isVersion           = empty($attachmentTodisplay['res_id']);
+                if ($isVersion) {
+                    $collId = "attachments_version_coll";
+                } else {
+                    $collId = "attachments_coll";
+                }
+                $convertedDocument = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $id, 'collId' => $collId, 'isVersion' => $isVersion]);
+                if (empty($convertedDocument['errors'])) {
+                    $attachmentTodisplay = $convertedDocument;
+                }
+                $document['docserver_id'] = $attachmentTodisplay['docserver_id'];
+                $document['path']         = $attachmentTodisplay['path'];
+                $document['filename']     = $attachmentTodisplay['filename'];
+            }
+        }
+
+        $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            $_SESSION['action_error'] = 'Problem with docserver : ' . $document['docserver_id'];
+            return false;
+        }
+
+        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+        if (!is_file($pathToDocument)) {
+            $_SESSION['action_error'] = _FILE_MISSING . ' : ' . $pathToDocument;
             return false;
         }
     }
@@ -151,6 +197,24 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                     'where' => ['res_id = ?'],
                     'data' => [$res_id]
                 ]);
+            }
+            if (!empty($attachmentToFreeze['attachments_coll'])) {
+                foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
+                    \Attachment\models\AttachmentModel::freezeAttachment([
+                        'resId' => (int)$resId,
+                        'table' => 'res_attachments',
+                        'externalId' => $externalId
+                    ]);
+                }
+            }
+            if (!empty($attachmentToFreeze['attachments_version_coll'])) {
+                foreach ($attachmentToFreeze['attachments_version_coll'] as $resId => $externalId) {
+                    \Attachment\models\AttachmentModel::freezeAttachment([
+                        'resId' => (int)$resId,
+                        'table' => 'res_version_attachments',
+                        'externalId' => $externalId
+                    ]);
+                }
             }
         }
     }

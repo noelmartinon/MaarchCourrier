@@ -152,6 +152,37 @@ class MaarchParapheurController
         $concatPdf->setPrintHeader(false);
 
         if ($aArgs['objectSent'] == 'mail') {
+            $attachment = \Attachment\models\AttachmentModel::getOnView([
+                'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename', 'title', 'identifier'],
+                'where'     => ['res_id_master = ?', 'attachment_type = ?', 'status not in (?)'],
+                'data'      => [$aArgs['resIdMaster'], 'outgoing_mail', ['DEL', 'OBS', 'FRZ']],
+                'limit'     => 1
+            ]);
+            if (!empty($attachment[0])) {
+                $attachmentTodisplay = $attachment[0];
+                $id                  = (empty($attachmentTodisplay['res_id']) ? $attachmentTodisplay['res_id_version'] : $attachmentTodisplay['res_id']);
+                $isVersion           = empty($attachmentTodisplay['res_id']);
+                if ($isVersion) {
+                    $collId = "attachments_version_coll";
+                } else {
+                    $collId = "attachments_coll";
+                }
+                $convertedDocument = \Convert\controllers\ConvertPdfController::getConvertedPdfById(['resId' => $id, 'collId' => $collId, 'isVersion' => $isVersion]);
+                if (empty($convertedDocument['errors'])) {
+                    $attachmentTodisplay = $convertedDocument;
+                }
+                $document['docserver_id'] = $attachmentTodisplay['docserver_id'];
+                $document['path']         = $attachmentTodisplay['path'];
+                $document['filename']     = $attachmentTodisplay['filename'];
+
+                $mainResource[0]['alt_identifier'] = $attachment[0]['identifier'];
+                $mainResource[0]['subject']        = $attachment[0]['title'];
+
+                $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template']]);
+
+                $arrivedMailMainfilePath = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+            }
+
             foreach ([$filename, $arrivedMailMainfilePath] as $file) {
                 $pageCount = $concatPdf->setSourceFile($file);
                 for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
@@ -281,6 +312,28 @@ class MaarchParapheurController
                 }
             }
         } elseif ($aArgs['objectSent'] == 'mail') {
+            $extDocument = \Resource\models\ResModel::getExtById(['select' => ['category_id'], 'resId' => $aArgs['resIdMaster']]);
+            $category    = 'letterbox_coll';
+            $elementId   = $aArgs['resIdMaster'];
+            if ($extDocument['category_id'] == 'outgoing') {
+                $attachment = \Attachment\models\AttachmentModel::getOnView([
+                    'select'  => ['res_id','res_id_version'],
+                    'where'   => ['res_id_master = ?', 'attachment_type = ?', 'status not in (?)'],
+                    'data'    => [$aArgs['resIdMaster'], 'outgoing_mail', ['DEL', 'OBS', 'FRZ']],
+                    'limit'   => 1
+                ]);
+                if (!empty($attachment[0])) {
+                    $id        = (empty($attachment[0]['res_id']) ? $attachment[0]['res_id_version'] : $attachment[0]['res_id']);
+                    $isVersion = empty($attachment[0]['res_id']);
+                    if ($isVersion) {
+                        $collId = "attachments_version_coll";
+                    } else {
+                        $collId = "attachments_coll";
+                    }
+                    $category = $collId;
+                    $elementId = $id;
+                }
+            }
             $metadata = [];
             if (!empty($priority['label'])) {
                 $metadata[_PRIORITY] = $priority['label'];
@@ -312,7 +365,7 @@ class MaarchParapheurController
                 'bodyData' => $bodyData
             ]);
 
-            $attachmentToFreeze['letterbox_coll'][$aArgs['resIdMaster']] = $response['id'];
+            $attachmentToFreeze[$category][$elementId] = $response['id'];
         }
 
         $workflowInfos = [];
