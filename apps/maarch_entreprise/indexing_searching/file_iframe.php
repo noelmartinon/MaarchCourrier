@@ -94,6 +94,7 @@ if (isset($_GET['num'])) {
             readfile($loc);
             exit();
         } else {
+            echo '<script language="javascript">document.location.reload(true);</script>';
             echo '<br/><br/><div class="error">'._PROBLEM_LOADING_FILE_TMP_DIR.'.</div>';
             exit();
         }
