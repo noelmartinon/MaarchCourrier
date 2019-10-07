@@ -230,68 +230,69 @@ while ($state != 'END') {
                     $sender = (string) $mailerParams->mailfrom;
                     $recipient_mail = $tmpNotif['recipient']->mail;
 
-                    //$subject = $notification->description;
-                    $html = $func->protect_string_db($html, '', 'no');
-                    $html = str_replace('&amp;', '&', $html);
-                    $html = str_replace('&', '#and#', $html);
+                    if (!empty($recipient_mail)) {
+                        $html = $func->protect_string_db($html, '', 'no');
+                        $html = str_replace('&amp;', '&', $html);
+                        $html = str_replace('&', '#and#', $html);
 
-                    // Attachments
-                    $attachments = array();
-                    if ($attachMode) {
-                        $logger->write('Adding attachments', 'INFO');
-                        foreach ($basket_list['events'] as $event) {
-                            // Check if event is related to document in collection
-                            if ($event->res_id != '') {
-                                $query = 'SELECT '
-                                    .'ds.path_template ,'
-                                    .'mlb.path, '
-                                    .'mlb.filename '
-                                    .'FROM '.$coll_view.' mlb LEFT JOIN docservers ds ON mlb.docserver_id = ds.docserver_id '
-                                    .'WHERE mlb.res_id = ?';
-                                $stmt = Bt_doQuery($db, $query, array($event->res_id));
-                                $path_parts = $stmt->fetchObject();
-                                $path = $path_parts->path_template.str_replace('#', '/', $path_parts->path).$path_parts->filename;
-                                $path = str_replace('//', '/', $path);
-                                $path = str_replace('\\', '/', $path);
-                                $attachments[] = $path;
+                        // Attachments
+                        $attachments = array();
+                        if ($attachMode) {
+                            $logger->write('Adding attachments', 'INFO');
+                            foreach ($basket_list['events'] as $event) {
+                                // Check if event is related to document in collection
+                                if ($event->res_id != '') {
+                                    $query = 'SELECT '
+                                        .'ds.path_template ,'
+                                        .'mlb.path, '
+                                        .'mlb.filename '
+                                        .'FROM '.$coll_view.' mlb LEFT JOIN docservers ds ON mlb.docserver_id = ds.docserver_id '
+                                        .'WHERE mlb.res_id = ?';
+                                    $stmt = Bt_doQuery($db, $query, array($event->res_id));
+                                    $path_parts = $stmt->fetchObject();
+                                    $path = $path_parts->path_template.str_replace('#', '/', $path_parts->path).$path_parts->filename;
+                                    $path = str_replace('//', '/', $path);
+                                    $path = str_replace('\\', '/', $path);
+                                    $attachments[] = $path;
+                                }
                             }
+                            $logger->write(count($attachments).' attachment(s) added', 'INFO');
                         }
-                        $logger->write(count($attachments).' attachment(s) added', 'INFO');
-                    }
-                    if (in_array($user_id, $exceptUsers[$basketId])) {
-                        $logger->write('Notification disabled for '.$user_id, 'WARNING');
-                    } else {
-                        $logger->write('... adding e-mail to email stack', 'INFO');
-                        if ($_SESSION['config']['databasetype'] == 'ORACLE') {
-                            $query = "DECLARE
-                                    vString notif_email_stack.html_body%type;
-                                    BEGIN
-                                    vString := '".$html."';
-                                    INSERT INTO "._NOTIF_EMAIL_STACK_TABLE_NAME."
-                                    (sender, recipient, subject, html_body, charset, attachments, module) 
-                                    VALUES (?, ?, ?, vString, ?, '".implode(',', $attachments)."', 'notifications');
-                                    END;";
-                            $arrayPDO = array($sender, $recipient_mail, $subject, $mailerParams->charset);
+                        if (in_array($user_id, $exceptUsers[$basketId])) {
+                            $logger->write('Notification disabled for '.$user_id, 'WARNING');
                         } else {
-                            if (count($attachments) > 0) {
-                                $query = 'INSERT INTO '._NOTIF_EMAIL_STACK_TABLE_NAME
-                                .' (sender, recipient, subject, html_body, charset, attachments, module) '
-                                ."VALUES (?, ?, ?, ?, ?, '".implode(',', $attachments)."', 'notifications')";
+                            $logger->write('... adding e-mail to email stack', 'INFO');
+                            if ($_SESSION['config']['databasetype'] == 'ORACLE') {
+                                $query = "DECLARE
+                                        vString notif_email_stack.html_body%type;
+                                        BEGIN
+                                        vString := '".$html."';
+                                        INSERT INTO "._NOTIF_EMAIL_STACK_TABLE_NAME."
+                                        (sender, recipient, subject, html_body, charset, attachments, module) 
+                                        VALUES (?, ?, ?, vString, ?, '".implode(',', $attachments)."', 'notifications');
+                                        END;";
+                                $arrayPDO = array($sender, $recipient_mail, $subject, $mailerParams->charset);
                             } else {
-                                $query = 'INSERT INTO '._NOTIF_EMAIL_STACK_TABLE_NAME
-                                .' (sender, recipient, subject, html_body, charset, module) '
-                                ."VALUES (?, ?, ?, ?, ?, 'notifications')";
+                                if (count($attachments) > 0) {
+                                    $query = 'INSERT INTO '._NOTIF_EMAIL_STACK_TABLE_NAME
+                                    .' (sender, recipient, subject, html_body, charset, attachments, module) '
+                                    ."VALUES (?, ?, ?, ?, ?, '".implode(',', $attachments)."', 'notifications')";
+                                } else {
+                                    $query = 'INSERT INTO '._NOTIF_EMAIL_STACK_TABLE_NAME
+                                    .' (sender, recipient, subject, html_body, charset, module) '
+                                    ."VALUES (?, ?, ?, ?, ?, 'notifications')";
+                                }
+                                $arrayPDO = array($sender, $recipient_mail, $subject, $html, $mailerParams->charset);
                             }
-                            $arrayPDO = array($sender, $recipient_mail, $subject, $html, $mailerParams->charset);
-                        }
 
-                        $db->query($query, $arrayPDO);
-                    }
-                    foreach ($basket_list['events'] as $event) {
-                        if (in_array($event->user_id, $exceptUsers[$basketId])) {
-                            $events_controler->commitEvent($event->event_stack_sid, 'WARNING : Notification disabled for '.$event->user_id);
-                        } else {
-                            $events_controler->commitEvent($event->event_stack_sid, 'SUCCESS');
+                            $db->query($query, $arrayPDO);
+                        }
+                        foreach ($basket_list['events'] as $event) {
+                            if (in_array($event->user_id, $exceptUsers[$basketId])) {
+                                $events_controler->commitEvent($event->event_stack_sid, 'WARNING : Notification disabled for '.$event->user_id);
+                            } else {
+                                $events_controler->commitEvent($event->event_stack_sid, 'SUCCESS');
+                            }
                         }
                     }
                 }
