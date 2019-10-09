@@ -121,12 +121,15 @@ class IParapheurController
             $b64Attachment          = base64_encode(file_get_contents($attachmentFilePath));
             $b64AnnexesLetterbox    = base64_encode(file_get_contents($annexes['letterbox']['filePath']));
 
-            $annexesXmlPostString   = '<ns:DocAnnexe> 
-                                    <ns:nom>Fichier original</ns:nom> 
-                                    <ns:fichier xm:contentType="application/pdf">' . $b64AnnexesLetterbox . '</ns:fichier> 
-                                    <ns:mimetype>application/pdf</ns:mimetype> 
+            $annexLetterboxMimeType = mime_content_type($annexes['letterbox']['filePath']);
+            if ($annexLetterboxMimeType) {
+                $annexesXmlPostString = '<ns:DocAnnexe>
+                                    <ns:nom>Fichier original</ns:nom>
+                                    <ns:fichier xm:contentType="' . $annexLetterboxMimeType . '">' . $b64AnnexesLetterbox . '</ns:fichier>
+                                    <ns:mimetype>' . $annexLetterboxMimeType . '</ns:mimetype>
                                     <ns:encoding>utf-8</ns:encoding>
                                 </ns:DocAnnexe>';
+            }
             if (!empty($annexes['attachments'])) {
                 for ($j = 0; $j < count($annexes['attachments']); $j++) {
                     $b64AnnexesAttachment = base64_encode(file_get_contents($annexes['attachments'][$j]['filePath']));
