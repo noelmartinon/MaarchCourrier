@@ -226,35 +226,7 @@ abstract class BasketModelAbstract
 
         return !empty(GroupBasketModel::get(['where' => ['basket_id = ?', 'group_id = ?'], 'data' => [$aArgs['id'], $aArgs['groupId']]]));
     }
-
-    public static function getResListById(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['basketId', 'userId']);
-        ValidatorModel::stringType($aArgs, ['basketId', 'userId']);
-        ValidatorModel::arrayType($aArgs, ['select']);
-
-        $aBasket = DatabaseModel::select([
-            'select'    => ['basket_clause', 'basket_res_order'],
-            'table'     => ['baskets'],
-            'where'     => ['basket_id = ?'],
-            'data'      => [$aArgs['basketId']]
-        ]);
-
-        if (empty($aBasket[0]) || empty($aBasket[0]['basket_clause'])) {
-            return [];
-        }
-
-        $where = PreparedClauseController::getPreparedClause(['clause' => $aBasket[0]['basket_clause'], 'login' => $aArgs['userId']]);
-
-        $aResList = ResModel::getOnView([
-            'select'    => $aArgs['select'],
-            'where'     => [$where],
-            'orderBy'   => empty($aBasket[0]['basket_res_order']) ? ['creation_date DESC'] : [$aBasket[0]['basket_res_order']],
-        ]);
-
-        return $aResList;
-    }
-
+    
     public static function getBasketsByLogin(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['login']);

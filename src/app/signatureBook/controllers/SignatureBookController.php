@@ -390,13 +390,14 @@ class SignatureBookController
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
 
-        $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause', 'basket_id', 'basket_name']]);
+        $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause', 'basket_id', 'basket_name', 'basket_res_order']]);
 
         $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
         $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id', 'alt_identifier', 'subject', 'creation_date', 'process_limit_date', 'priority', 'contact_id', 'address_id', 'user_lastname', 'user_firstname'],
-            'where'     => [$whereClause]
+            'where'     => [$whereClause],
+            'orderBy'   => empty($basket['basket_res_order']) ? ['creation_date DESC'] : [$basket['basket_res_order']]
         ]);
 
         $resListForAttachments = [];
