@@ -106,6 +106,16 @@ class ListInstanceController
         $currentUser = UserModel::getById(['select' => ['user_id'], 'id' => $args['userId']]);
         $primaryEntity = UserModel::getPrimaryEntityById(['id' => $args['userId']]);
 
+        // if user is superadmin, get a root entity as primary entity
+        if ($currentUser['user_id'] == 'superadmin') {
+            $primaryEntity = EntityModel::get([
+                'select'    => ['entity_id'],
+                'where'     => ['parent_entity_id is null or parent_entity_id = ?'],
+                'data'      => ['']
+            ]);
+            $primaryEntity = $primaryEntity[0];
+        }
+
         DatabaseModel::beginTransaction();
 
         foreach ($args['data'] as $ListInstanceByRes) {
