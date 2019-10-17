@@ -380,7 +380,9 @@ CREATE VIEW res_view_attachments AS
 
 UPDATE res_attachments SET in_signature_book = TRUE;
 UPDATE res_version_attachments SET in_signature_book = TRUE;
-UPDATE listinstance SET signatory = TRUE WHERE item_mode = 'sign';
+UPDATE listinstance SET requested_signature = TRUE WHERE item_mode = 'sign';
+UPDATE listinstance SET signatory = TRUE WHERE item_mode = 'sign' AND process_date is not null;
+UPDATE listinstance SET signatory = FALSE WHERE item_mode = 'sign' AND process_date is null;
 
 ALTER TABLE notif_event_stack ALTER COLUMN record_id TYPE character varying(128);
 
