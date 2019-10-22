@@ -120,7 +120,7 @@ export class UsersAdministrationComponent extends AutoCompletePlugin implements 
 
         this.http.get(this.coreUrl + 'rest/users/' + user.id + '/isDeletable')
             .subscribe((response: any) => {
-                if (response.errors) {
+                if (response && response.hasOwnProperty('errors')) {
                     this.notify.error(response.errors);
                 } else {
                     user.isDeletable = response.isDeletable
@@ -299,7 +299,7 @@ export class UsersAdministrationComponent extends AutoCompletePlugin implements 
                                 //update listInstances
                                 this.http.put(this.coreUrl + 'rest/listinstances', user.redirectListInstances)
                                     .subscribe((data: any) => {
-                                        if (data.errors) {
+                                        if (data && data.hasOwnProperty('errors')) {
                                             this.notify.error(data.errors);
                                         } else {
 

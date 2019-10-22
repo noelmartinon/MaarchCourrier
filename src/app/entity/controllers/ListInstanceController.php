@@ -111,7 +111,7 @@ class ListInstanceController
                 'select'    => ['entity_id'],
                 'where'     => ['parent_entity_id is null or parent_entity_id = ?'],
                 'data'      => [''],
-                'limit'     => [1]
+                'limit'     => 1
             ]);
             $primaryEntity = $primaryEntity[0];
         } else {
