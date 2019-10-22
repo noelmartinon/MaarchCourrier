@@ -104,16 +104,18 @@ class ListInstanceController
         ValidatorModel::intVal($args, ['userId']);
 
         $currentUser = UserModel::getById(['select' => ['user_id'], 'id' => $args['userId']]);
-        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $args['userId']]);
 
         // if user is superadmin, get a root entity as primary entity
         if ($currentUser['user_id'] == 'superadmin') {
             $primaryEntity = EntityModel::get([
                 'select'    => ['entity_id'],
                 'where'     => ['parent_entity_id is null or parent_entity_id = ?'],
-                'data'      => ['']
+                'data'      => [''],
+                'limit'     => [1]
             ]);
             $primaryEntity = $primaryEntity[0];
+        } else {
+            $primaryEntity = UserModel::getPrimaryEntityById(['id' => $args['userId']]);
         }
 
         DatabaseModel::beginTransaction();
