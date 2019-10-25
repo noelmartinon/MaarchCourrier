@@ -273,34 +273,11 @@ class ExportController
                         $tags = ExportController::getTags(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $csvContent[] = empty($tags[$resource['res_id']]) ? '' : $tags[$resource['res_id']];
                     } elseif ($value['value'] == 'getSignatories') {
-                        $signatories[] = ExportController::getSignatories(['chunkedResIds' => $aArgs['chunkedResIds']]);
-
-                        $sign = $signatories[$resource['res_id']];
-                        if (empty($sign)) {
-                            $sign = '';
-                        } else if (is_array($sign)) {
-                            $sign = implode(',', $sign);
-
-                            if ($sign == 'empty') {
-                                $sign = '';
-                            }
-                        }
-                        $csvContent[] = $sign;
+                        $signatories = ExportController::getSignatories(['chunkedResIds' => $aArgs['chunkedResIds']]);
+                        $csvContent[] = empty($signatories[$resource['res_id']]) ? '' : $signatories[$resource['res_id']];
                     } elseif ($value['value'] == 'getSignatureDates') {
-                        $signatureDates[] = ExportController::getSignatureDates(['chunkedResIds' => $aArgs['chunkedResIds']]);
-
-                        $sign = $signatureDates[$resource['res_id']];
-                        if (empty($sign)) {
-                            $sign = '';
-                        } else if (is_array($sign)) {
-                            $sign = implode(',', $sign);
-
-                            if ($sign == 'empty') {
-                                $sign = '';
-                            }
-                        }
-
-                        $csvContent[] = $sign;
+                        $signatureDates = ExportController::getSignatureDates(['chunkedResIds' => $aArgs['chunkedResIds']]);
+                        $csvContent[] = empty($signatureDates[$resource['res_id']]) ? '' : $signatureDates[$resource['res_id']];
                     } elseif ($value['value'] == 'getDepartment') {
                         if (!empty($resource['department_number_id'])) {
                             $csvContent[] = $resource['department_number_id'] . ' - ' . DepartmentController::getById(['id' => $resource['department_number_id']]);
@@ -318,17 +295,9 @@ class ExportController
                 }
             }
 
-            // Decode UTF-8 strings to ISO-8859-1
-            for ($i = 0; $i < count($csvContent); $i++) {
-                if (is_array($csvContent[$i])) {
-                    for ($j = 0; $j < count($csvContent[$i]); $j++) {
-                        $csvContent[$i][$j] = utf8_decode($csvContent[$i][$j]);
-                    }
-                } else {
-                    $csvContent[$i] = utf8_decode($csvContent[$i]);
-                }
+            foreach($csvContent as $key => $value) {
+                $csvContent[$key] = utf8_decode($value);
             }
-
             fputcsv($file, $csvContent, $delimiter);
         }
 
@@ -424,11 +393,11 @@ class ExportController
                         $tags = ExportController::getTags(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($tags[$resource['res_id']]) ? '' : $tags[$resource['res_id']];
                     } elseif ($value['value'] == 'getSignatories') {
-                        $signatories[] = ExportController::getSignatories(['chunkedResIds' => $aArgs['chunkedResIds']]);
+                        $signatories = ExportController::getSignatories(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($signatories[$resource['res_id']]) ? '' : $signatories[$resource['res_id']];
                     } elseif ($value['value'] == 'getSignatureDates') {
-                        $signatureDates[] = ExportController::getSignatureDates(['chunkedResIds' => $aArgs['chunkedResIds']]);
-                        $content[]        = empty($signatureDates[$resource['res_id']]) ? '' : $signatureDates[$resource['res_id']];
+                        $signatureDates = ExportController::getSignatureDates(['chunkedResIds' => $aArgs['chunkedResIds']]);
+                        $csvContent[] = empty($signatureDates[$resource['res_id']]) ? '' : $signatureDates[$resource['res_id']];
                     } elseif ($value['value'] == 'getDepartment') {
                         if (!empty($resource['department_number_id'])) {
                             $content[] = $resource['department_number_id'] . ' - ' . DepartmentController::getById(['id' => $resource['department_number_id']]);
@@ -513,9 +482,9 @@ class ExportController
         ValidatorModel::notEmpty($args, ['chunkedResIds']);
         ValidatorModel::arrayType($args, ['chunkedResIds']);
 
-        static $aTags = [];
-        if (!empty($aTags)) {
-            return $aTags;
+        static $tags = [];
+        if (!empty($tags)) {
+            return $tags;
         }
 
         foreach ($args['chunkedResIds'] as $resIds) {
@@ -526,29 +495,18 @@ class ExportController
                 'order_by'  => ['res_id']
             ]);
 
-            if (!empty($tagsRes)) {
-                $resId = '';
-                foreach ($tagsRes as $key => $value) {
-                    if ($key != 0 && $resId == $value['res_id']) {
-                        $tags .= "\n";
-                    } elseif ($key != 0 && $resId != $value['res_id']) {
-                        $aTags[$resId] = $tags;
-                        $tags = '';
-                    } else {
-                        $tags = '';
-                    }
-                    $tag = TagModel::getById(['id' => $value['tag_id'], 'select' => ['tag_label']]);
-                    $tags .= $tag['tag_label'];
-                    $resId = $value['res_id'];
+            foreach ($tagsRes as $key => $value) {
+                $tag = TagModel::getById(['id' => $value['tag_id'], 'select' => ['tag_label']]);
+                if (!empty($tags[$value['res_id']])) {
+                    $tags[$value['res_id']] .= "\n";
+                } else {
+                    $tags[$value['res_id']] = '';
                 }
-                $aTags[$value['res_id']] = $tags;
+                $tags[$value['res_id']] .= $tag['tag_label'];
             }
         }
 
-        if (empty($aTags)) {
-            $aTags = ['empty'];
-        }
-        return $aTags;
+        return $tags;
     }
 
     private static function getSignatories(array $args)
@@ -569,28 +527,17 @@ class ExportController
                 'order_by'   => ['res_id']
             ]);
 
-            if (!empty($listInstances)) {
-                $resId = '';
-                foreach ($listInstances as $key => $listInstance) {
-                    if ($key != 0 && $resId == $listInstance['res_id']) {
-                        $signatories .= "\n";
-                    } elseif ($key != 0 && $resId != $listInstance['res_id']) {
-                        $aSignatories[$resId] = $signatories;
-                        $signatories = '';
-                    } else {
-                        $signatories = '';
-                    }
-                    $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
-                    $signatories .= "{$user['firstname']} {$user['lastname']}";
-                    $resId = $listInstance['res_id'];
+            foreach ($listInstances as $key => $listInstance) {
+                $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+                if (!empty($aSignatories[$listInstance['res_id']])) {
+                    $aSignatories[$listInstance['res_id']] .= "\n";
+                } else {
+                    $aSignatories[$listInstance['res_id']] = '';
                 }
-                $aSignatories[$listInstance['res_id']] = $signatories;
+                $aSignatories[$listInstance['res_id']] .= "{$user['firstname']} {$user['lastname']}";
             }
         }
 
-        if (empty($aSignatories)) {
-            $aSignatories = ['empty'];
-        }
         return $aSignatories;
     }
 
@@ -612,28 +559,17 @@ class ExportController
                 'order_by'  => ['res_id']
             ]);
 
-            if (!empty($attachments)) {
-                $resId = '';
-                foreach ($attachments as $key => $attachment) {
-                    if ($key != 0 && $resId == $attachment['res_id']) {
-                        $dates .= "\n";
-                    } elseif ($key != 0 && $resId != $attachment['res_id']) {
-                        $aSignatureDates[$resId] = $dates;
-                        $dates = '';
-                    } else {
-                        $dates = '';
-                    }
-                    $date  = new \DateTime($attachment['creation_date']);
-                    $dates .= $date->format('d-m-Y H:i');
-                    $resId = $attachment['res_id'];
+            foreach ($attachments as $key => $attachment) {
+                $date  = new \DateTime($attachment['creation_date']);
+                if (!empty($aSignatureDates[$attachment['res_id']])) {
+                    $aSignatureDates[$attachment['res_id']] .= "\n";
+                } else {
+                    $aSignatureDates[$attachment['res_id']] = '';
                 }
-                $aSignatureDates[$attachment['res_id']] = $dates;
+                $aSignatureDates[$attachment['res_id']] .= $date->format('d-m-Y H:i');
             }
         }
 
-        if (empty($aSignatureDates)) {
-            $aSignatureDates = ['empty'];
-        }
         return $aSignatureDates;
     }
 
