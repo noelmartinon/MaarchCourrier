@@ -129,6 +129,9 @@ abstract class UserModelAbstract
             'set'       => [
                 'status'    => 'DEL',
             ],
+            'postSet'   => [
+                'external_id' => 'external_id - \'maarchParapheur\''
+            ],
             'where'     => ['id = ?'],
             'data'      => [$aArgs['id']]
         ]);
