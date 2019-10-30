@@ -712,7 +712,7 @@ TRUNCATE TABLE listmodels;
 DELETE FROM entities WHERE entity_id = 'VILLE';
 INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('VILLE', 'Ville de Maarch-les-bains', 'Ville de Maarch-les-bains', 'Y', '', '', '', '', '', '', 'info@maarch.org', '', '', 'Direction');
 DELETE FROM listmodels WHERE object_id = 'VILLE' AND object_type = 'entity_id';
-INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, item_mode, title, description, process_comment, visible) VALUES ('VILLE', 'entity_id', 0, '', 'user_id', 'dest', 'Ville de Maarch-les-bains','Ville de Maarch-les-bains', '', 'Y');
+INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, item_mode, title, description, process_comment, visible) VALUES ('VILLE', 'entity_id', 0, 'ppetit', 'user_id', 'dest', 'Ville de Maarch-les-bains','Ville de Maarch-les-bains', '', 'Y');
 DELETE FROM entities WHERE entity_id = 'CAB';
 INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('CAB', 'Cabinet du Maire', 'Cabinet du Maire', 'Y', '', '', '', '', '', '', 'info@maarch.org', '', 'VILLE', 'Direction');
 DELETE FROM listmodels WHERE object_id = 'CAB' AND object_type = 'entity_id';
@@ -806,11 +806,11 @@ INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, 
 DELETE FROM entities WHERE entity_id = 'ELUS';
 INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('ELUS', 'Ensemble des élus', 'ELUS:Ensemble des élus', 'Y', '', '', '', '', '', '', 'info@maarch.org', '', 'VILLE', 'Direction');
 DELETE FROM listmodels WHERE object_id = 'ELUS' AND object_type = 'entity_id';
-INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, item_mode, title, description, process_comment, visible) VALUES ('ELUS', 'entity_id', 0, '', 'user_id', 'dest', 'ELUS:Ensemble des élus','ELUS:Ensemble des élus', '', 'Y');
+INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, item_mode, title, description, process_comment, visible) VALUES ('ELUS', 'entity_id', 0, 'ddur', 'user_id', 'dest', 'ELUS:Ensemble des élus','ELUS:Ensemble des élus', '', 'Y');
 DELETE FROM entities WHERE entity_id = 'CCAS';
 INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('CCAS', 'Centre Communal d''Action Sociale', 'Centre Communal d''Action Sociale', 'Y', '', '', '', '', '', '', 'info@maarch.org', '', '', 'Direction');
 DELETE FROM listmodels WHERE object_id = 'CCAS' AND object_type = 'entity_id';
-INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, item_mode, title, description, process_comment, visible) VALUES ('CCAS', 'entity_id', 0, '', 'user_id', 'dest', 'Centre Communal d''Action Sociale','Centre Communal d''Action Sociale', '', 'Y');
+INSERT INTO listmodels (object_id, object_type, "sequence", item_id, item_type, item_mode, title, description, process_comment, visible) VALUES ('CCAS', 'entity_id', 0, 'jjane', 'user_id', 'dest', 'Centre Communal d''Action Sociale','Centre Communal d''Action Sociale', '', 'Y');
 
 -- Create BASKETS
 TRUNCATE TABLE baskets;
