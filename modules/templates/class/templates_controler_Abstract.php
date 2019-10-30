@@ -24,19 +24,18 @@ try {
 }
 
 /**
-* @brief  Controler of the templates object 
+* @brief  Controler of the templates object
 *
 *<ul>
 *  <li>Get an templates object from an id</li>
 *  <li>Save in the database a templates</li>
-*  <li>Manage the operation on the templates related tables in the database 
+*  <li>Manage the operation on the templates related tables in the database
 *  (insert, select, update, delete)</li>
 *</ul>
 * @ingroup templates
 */
 abstract class templates_controler_Abstract extends ObjectControler implements ObjectControlerIF
 {
-    
     protected $stylesArray = array();
     
     /**
@@ -47,13 +46,13 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param string mode up or add
     * @return array
     */
-    public function save($template, $mode='') 
+    public function save($template, $mode='')
     {
         $control = array();
         if (!isset($template) || empty($template)) {
             $control = array(
-                'status' => 'ko', 
-                'value' => '', 
+                'status' => 'ko',
+                'value' => '',
                 'error' => _TEMPLATE_ID_EMPTY,
             );
             return $control;
@@ -74,7 +73,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 //Update existing template
                 if ($this->update($template)) {
                     $control = array(
-                        'status' => 'ok', 
+                        'status' => 'ok',
                         'value' => $template->template_id,
                     );
                     $this->updateTemplateEntityAssociation($template->template_id);
@@ -82,17 +81,18 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     if ($_SESSION['history']['templateadd'] == 'true') {
                         $history = new history();
                         $history->add(
-                            _TEMPLATES_TABLE_NAME, 
-                            $template->template_id, 
-                            'UP', 'templateadd',
+                            _TEMPLATES_TABLE_NAME,
+                            $template->template_id,
+                            'UP',
+                            'templateadd',
                             _TEMPLATE_UPDATED.' : '.$template->template_id,
                             $_SESSION['config']['databasetype']
                         );
                     }
                 } else {
                     $control = array(
-                        'status' => 'ko', 
-                        'value' => '', 
+                        'status' => 'ko',
+                        'value' => '',
                         'error' => _PB_WITH_TEMPLATE,
                     );
                 }
@@ -109,7 +109,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 if ($this->insert($template)) {
                     $templateId = $this->getLastTemplateId($template->template_label);
                     $control = array(
-                        'status' => 'ok', 
+                        'status' => 'ok',
                         'value' => $templateId,
                     );
                     $this->updateTemplateEntityAssociation($templateId);
@@ -117,17 +117,18 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     if ($_SESSION['history']['templateadd'] == 'true') {
                         $history = new history();
                         $history->add(
-                            _TEMPLATES_TABLE_NAME, 
-                            $templateId, 
-                            'ADD', 'templateadd',
+                            _TEMPLATES_TABLE_NAME,
+                            $templateId,
+                            'ADD',
+                            'templateadd',
                             _TEMPLATE_ADDED . ' : ' . $templateId,
                             $_SESSION['config']['databasetype']
                         );
                     }
                 } else {
                     $control = array(
-                        'status' => 'ko', 
-                        'value' => '', 
+                        'status' => 'ko',
+                        'value' => '',
                         'error' => _PB_WITH_TEMPLATE,
                     );
                 }
@@ -143,7 +144,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param  string $mode up or add
     * @return array ok if the object is well formated, ko otherwise
     */
-    protected function control($template, $mode) 
+    protected function control($template, $mode)
     {
         $f = new functions();
         $sec = new SecurityControler();
@@ -182,22 +183,21 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         $return = array();
         if (!empty($error)) {
             $return = array(
-                'status' => 'ko', 
-                'value' => $template, 
+                'status' => 'ko',
+                'value' => $template,
                 'error' => $error,
             );
-        } else {            
+        } else {
             if ($template->template_type == 'OFFICE') {
-                if (($mode == 'up' && $_SESSION['m_admin']['templates']['applet']) 
-                    || ($mode == 'up' && !empty($_SESSION['m_admin']['templates']['current_style'])) 
-                    || $mode == 'add') 
-                {
+                if (($mode == 'up' && $_SESSION['m_admin']['templates']['applet'])
+                    || ($mode == 'up' && !empty($_SESSION['m_admin']['templates']['current_style']))
+                    || $mode == 'add') {
                     $storeInfos = array();
                     $storeInfos = $this->storeTemplateFile();
                     if (!$storeInfos) {
                         $return = array(
-                            'status' => 'ko', 
-                            'value' => $template, 
+                            'status' => 'ko',
+                            'value' => $template,
                             'error' => $_SESSION['error'],
                         );
                     } else {
@@ -205,7 +205,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                         $template->template_file_name = $storeInfos['file_destination_name'];
                         $template->template_style = $storeInfos['template_style'];
                         $return = array(
-                            'status' => 'ok', 
+                            'status' => 'ok',
                             'value' => $template,
                         );
                     }
@@ -217,7 +217,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 }
             } else {
                 $return = array(
-                    'status' => 'ok', 
+                    'status' => 'ok',
                     'value' => $template,
                 );
             }
@@ -231,7 +231,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param  $template templates object
     * @return bool true if the insertion is complete, false otherwise
     */
-    protected function insert($template) 
+    protected function insert($template)
     {
         return $this->advanced_insert($template);
     }
@@ -242,7 +242,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param  $template templates object
     * @return bool true if the update is complete, false otherwise
     */
-    protected function update($template) 
+    protected function update($template)
     {
         return $this->advanced_update($template);
     }
@@ -251,13 +251,13 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * Returns an templates object based on a templates identifier
     *
     * @param  $template_id string  templates identifier
-    * @param  $comp_where string  where clause arguments 
+    * @param  $comp_where string  where clause arguments
     * (must begin with and or or)
-    * @param  $can_be_disabled bool  if true gets the template even if it is 
+    * @param  $can_be_disabled bool  if true gets the template even if it is
     * disabled in the database (false by default)
     * @return templates object with properties from the database or null
     */
-    public function get($template_id, $comp_where='', $can_be_disabled=false) 
+    public function get($template_id, $comp_where='', $can_be_disabled=false)
     {
         $this->set_foolish_ids(array('template_id'));
         $this->set_specific_id('template_id');
@@ -274,7 +274,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         } else {
             return null;
         }
-        
     }
 
     /**
@@ -283,7 +282,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param $template_id of template to send
     * @return template
     */
-    public function getWs($template_id) 
+    public function getWs($template_id)
     {
         $this->set_foolish_ids(array('template_id'));
         $this->set_specific_id('template_id');
@@ -297,19 +296,19 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     }
 
     /**
-    * Deletes in the database (templates related tables) a given 
+    * Deletes in the database (templates related tables) a given
     * templates (template_id)
     *
     * @param  $template string  templates identifier
     * @return bool true if the deletion is complete, false otherwise
     */
-    public function delete($template) 
+    public function delete($template)
     {
         $control = array();
         if (!isset($template) || empty($template)) {
             $control = array(
-                'status' => 'ko', 
-                'value' => '', 
+                'status' => 'ko',
+                'value' => '',
                 'error' => _TEMPLATES_EMPTY,
             );
             return $control;
@@ -317,16 +316,16 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         $template = $this->isATemplate($template);
         if (!$this->templateExists($template->template_id)) {
             $control = array(
-                'status' => 'ko', 
-                'value' => '', 
+                'status' => 'ko',
+                'value' => '',
                 'error' => _TEMPLATES_NOT_EXISTS,
             );
             return $control;
         }
         if ($this->linkExists($template->template_id)) {
             $control = array(
-                'status' => 'ko', 
-                'value' => '', 
+                'status' => 'ko',
+                'value' => '',
                 'error' => _LINK_EXISTS,
             );
             return $control;
@@ -340,21 +339,24 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             $ok = true;
         } catch (Exception $e) {
             $control = array(
-                'status' => 'ko', 
-                'value' => '', 
+                'status' => 'ko',
+                'value' => '',
                 'error' => _CANNOT_DELETE_TEMPLATE_ID.' '.$template->template_id,
             );
             $ok = false;
         }
         $control = array(
-            'status' => 'ok', 
+            'status' => 'ok',
             'value' => $template->template_id,
         );
         if ($_SESSION['history']['templatedel'] == 'true') {
             include_once 'core/class/class_history.php';
             $history = new history();
             $history->add(
-                _TEMPLATES_TABLE_NAME, $template->template_id, 'DEL', 'templatedel',
+                _TEMPLATES_TABLE_NAME,
+                $template->template_id,
+                'DEL',
+                'templatedel',
                 _TEMPLATE_DELETED.' : '.$template->template_id,
                 $_SESSION['config']['databasetype']
             );
@@ -364,22 +366,22 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
 
     /**
     * Disables a given templates
-    * 
-    * @param  $template templates object 
-    * @return bool true if the disabling is complete, false otherwise 
+    *
+    * @param  $template templates object
+    * @return bool true if the disabling is complete, false otherwise
     */
-    public function disable($template) 
+    public function disable($template)
     {
         //
     }
 
     /**
     * Enables a given templates
-    * 
-    * @param  $template templates object  
-    * @return bool true if the enabling is complete, false otherwise 
+    *
+    * @param  $template templates object
+    * @return bool true if the enabling is complete, false otherwise
     */
-    public function enable($template) 
+    public function enable($template)
     {
         //
     }
@@ -390,7 +392,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     * @param  $object ws template object
     * @return object template
     */
-    protected function isATemplate($object) 
+    protected function isATemplate($object)
     {
         if (get_class($object) <> 'templates') {
             $func = new functions();
@@ -408,18 +410,18 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
 
     /**
     * Checks if the template exists
-    * 
+    *
     * @param $template_id templates identifier
     * @return bool true if the template exists
     */
-    public function templateExists($template_id) 
+    public function templateExists($template_id)
     {
         if (!isset($template_id) || empty($template_id)) {
             return false;
         }
         $db = new Database();
         
-        $query = "select template_id from " . _TEMPLATES_TABLE_NAME 
+        $query = "select template_id from " . _TEMPLATES_TABLE_NAME
             . " where template_id = ? ";
         try {
             $stmt = $db->query($query, array($template_id));
@@ -433,12 +435,12 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     }
 
     /**
-    * Checks if the template is linked 
-    * 
+    * Checks if the template is linked
+    *
     * @param $template_id templates identifier
     * @return bool true if the template is linked
     */
-    public function linkExists($template_id) 
+    public function linkExists($template_id)
     {
         if (!isset($template_id) || empty($template_id)) {
             return false;
@@ -455,7 +457,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     
     /**
     * Return the last templateId
-    * 
+    *
     * @return bigint templateId
     */
     public function getLastTemplateId($templateLabel)
@@ -471,10 +473,10 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
 
     /**
     * Return all templates ID
-    * 
+    *
     * @return array of templates
     */
-    public function getAllId($can_be_disabled = false) 
+    public function getAllId($can_be_disabled = false)
     {
         $db = new Database();
         $query = "select template_id from " . _TEMPLATES_TABLE_NAME . " ";
@@ -502,10 +504,11 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     
     /**
     * Return all templates in an array
-    * 
+    *
     * @return array of templates
     */
-    public function getAllTemplatesForSelect() {
+    public function getAllTemplatesForSelect()
+    {
         $return = array();
         
         $db = new Database();
@@ -526,11 +529,11 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     
     /**
     * Return all templates in an array for an entity
-    * 
+    *
     * @param $entityId entity identifier
     * @return array of templates
     */
-    public function getAllTemplatesForProcess($entityId) 
+    public function getAllTemplatesForProcess($entityId)
     {
         include_once 'core/class/docservers_controler.php';
 
@@ -545,13 +548,14 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         $templates = [];
         while ($res = $stmt->fetchObject()) {
             array_push(
-                $templates, array(
-                    'ID' => $res->template_id, 
+                $templates,
+                array(
+                    'ID' => $res->template_id,
                     'LABEL' => $res->template_label,
                     'TYPE' => $res->template_type,
                     'TARGET' => $res->template_target,
                     'ATTACHMENT_TYPE' => $res->template_attachment_type,
-                    'FILE' => $docserverTemplate->path_template.str_replace('#','/',$res->template_path).$res->template_file_name
+                    'FILE' => $docserverTemplate->path_template.str_replace('#', '/', $res->template_path).$res->template_file_name
                 )
             );
         }
@@ -562,16 +566,17 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     {
         $db = new Database();
         $db->query(
-            "delete from " . _TEMPLATES_ASSOCIATION_TABLE_NAME 
-            . " where template_id = ?", array($templateId)
+            "delete from " . _TEMPLATES_ASSOCIATION_TABLE_NAME
+            . " where template_id = ?",
+            array($templateId)
         );
        
         for ($i=0;$i<count($_SESSION['m_admin']['templatesEntitiesSelected']);$i++) {
             $db->query(
-                "insert into " . _TEMPLATES_ASSOCIATION_TABLE_NAME 
+                "insert into " . _TEMPLATES_ASSOCIATION_TABLE_NAME
                 . " (template_id, value_field) VALUES (?, ?)",
                 array($templateId, $_SESSION['m_admin']['templatesEntitiesSelected'][$i])
-            ); 
+            );
         }
     }
     
@@ -587,7 +592,8 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             $stmt = $db->query(
                 "select value_field from "
                 . _TEMPLATES_ASSOCIATION_TABLE_NAME
-                . " where template_id = ?", array($templateId)
+                . " where template_id = ?",
+                array($templateId)
             );
             while ($res = $stmt->fetchObject()) {
                 array_push($items['destination'], $res->value_field);
@@ -595,9 +601,10 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         } else {
             $items[$field] = [];
             $stmt = $db->query(
-                "select value_field from " 
-                . _TEMPLATES_ASSOCIATION_TABLE_NAME 
-                . " where template_id = ?", array($templateId)
+                "select value_field from "
+                . _TEMPLATES_ASSOCIATION_TABLE_NAME
+                . " where template_id = ?",
+                array($templateId)
             );
             while ($res = $stmt->fetchObject()) {
                 array_push($items[$field], $res->value_field);
@@ -620,7 +627,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 $filePath = $dir . $folder . '/' . $filescan;
                 $info = pathinfo($filePath);
                 array_push(
-                    $this->stylesArray, 
+                    $this->stylesArray,
                     array(
                         'fileName' => basename($filePath, '.' . $info['extension']),
                         'fileExt'  => strtoupper($info['extension']),
@@ -632,20 +639,20 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         return $this->stylesArray;
     }
     
-    public function getTemplatesDatasources($configXml) 
+    public function getTemplatesDatasources($configXml)
     {
         $datasources = array();
         //Browse all files of the style template dir
         $xmlcontent = simplexml_load_file($configXml);
         foreach ($xmlcontent->datasource as $datasource) {
-            //<id> <label> <script>    
+            //<id> <label> <script>
             if (@constant((string) $datasource->label)) {
                 $label = constant((string)$datasource->label);
             } else {
                 $label = (string) $datasource->label;
             }
             array_push(
-                $datasources, 
+                $datasources,
                 array(
                     'id' => (string)$datasource->id,
                     'label'  => $label,
@@ -656,12 +663,12 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         return $datasources;
     }
     
-    public function getTemplatesTargets() 
+    public function getTemplatesTargets()
     {
         $targets = array();
         //attachments
         array_push(
-            $targets, 
+            $targets,
             array(
                 'id' => 'attachments',
                 'label'  => _ATTACHMENTS,
@@ -669,7 +676,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         );
         //notifications
         array_push(
-            $targets, 
+            $targets,
             array(
                 'id' => 'notifications',
                 'label'  => _NOTIFICATIONS,
@@ -677,7 +684,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         );
         //doctypes
         array_push(
-            $targets, 
+            $targets,
             array(
                 'id' => 'doctypes',
                 'label'  => _DOCTYPES,
@@ -685,15 +692,15 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         );
         //notes
         array_push(
-            $targets, 
+            $targets,
             array(
                 'id' => 'notes',
                 'label'  => _NOTES,
             )
         );
         //sendmail
-         array_push(
-             $targets, 
+        array_push(
+             $targets,
              array(
                  'id' => 'sendmail',
                  'label'  => _SENDMAIL,
@@ -703,7 +710,7 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
     }
     
     //returns file ext
-    function extractFileExt($sFullPath)
+    public function extractFileExt($sFullPath)
     {
         $sName = $sFullPath;
         if (strpos($sName, '.')==0) {
@@ -714,12 +721,11 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         return end($ExtractFileExt);
     }
     
-    function storeTemplateFile()
+    public function storeTemplateFile()
     {
-        
         if (!$_SESSION['m_admin']['templates']['applet']) {
             $tmpFileName = 'cm_tmp_file_' . $_SESSION['user']['UserId']
-                . '_' . rand() . '.' 
+                . '_' . rand() . '.'
                 . strtolower(
                     $this->extractFileExt(
                         $_SESSION['m_admin']['templates']['current_style']
@@ -727,7 +733,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 );
             $tmpFilePath = $_SESSION['config']['tmppath'] . $tmpFileName;
             if (!copy($_SESSION['m_admin']['templates']['current_style'], $tmpFilePath)) {
-
                 $_SESSION['error'] = _PB_TO_COPY_STYLE_ON_TMP . ' ' . $tmpFilePath;
                 return false;
             } else {
@@ -763,27 +768,26 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 );
                 $storeInfos['template_style'] = $_SESSION['m_admin']['templates']['template_style'];
                 if (!file_exists($storeInfos['path_template'] . str_replace("#", DIRECTORY_SEPARATOR, $storeInfos['destination_dir']) . $storeInfos['file_destination_name'])) {
-
                     $_SESSION['error'] = $storeInfos['error'];
                     return false;
                 }
                 return $storeInfos;
             } else {
-                $_SESSION['error'] = 'ERROR : file not exists ' 
+                $_SESSION['error'] = 'ERROR : file not exists '
                     . $_SESSION['m_admin']['templates']['current_style'];
                 return false;
             }
         }
     }
     
-     /**
+    /**
     * Make a copy of template to temp directory for merge process
     *
     * @param object $templateObj : template object
     * @return string $templateCopyPath : path to working copy
     */
-    protected function getWorkingCopy($templateObj) {
-        
+    protected function getWorkingCopy($templateObj)
+    {
         if ($templateObj->template_type == 'HTML') {
             $fileExtension = 'html';
             $fileNameOnTmp = $_SESSION['config']['tmppath'] . 'tmp_template_' . $_SESSION['user']['UserId']
@@ -806,15 +810,15 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             return $fileNameOnTmp;
         } else {
             $dbTemplate = new Database();
-            $query = "select path_template from " . _DOCSERVERS_TABLE_NAME 
+            $query = "select path_template from " . _DOCSERVERS_TABLE_NAME
                 . " where docserver_id = 'TEMPLATES'";
             $stmt = $dbTemplate->query($query);
             $resDs = $stmt->fetchObject();
             $pathToDs = $resDs->path_template;
             $pathToTemplateOnDs = $pathToDs
                 . str_replace(
-                    "#", 
-                    DIRECTORY_SEPARATOR, 
+                    "#",
+                    DIRECTORY_SEPARATOR,
                     $templateObj->template_path
                 )
                 . $templateObj->template_file_name;
@@ -823,11 +827,11 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         }
     }
     
-    protected function getDatasourceScript($datasourceId) 
+    protected function getDatasourceScript($datasourceId)
     {
         if ($datasourceId <> '') {
             $xmlfile = 'modules/templates/xml/datasources.xml';
-            $xmlfileCustom = $_SESSION['config']['corepath'] 
+            $xmlfileCustom = $_SESSION['config']['corepath']
             . 'custom/' . $_SESSION['custom_override_id'] . '/' . $xmlfile;
             
             if (file_exists($xmlfileCustom)) {
@@ -885,14 +889,13 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     }
                 }
             }
-            
         }
         return $datasources;
     }
     
     
-    /** Merge template with data from a datasource to the requested output 
-    * 
+    /** Merge template with data from a datasource to the requested output
+    *
     * @param string $templateId : templates identifier
     * @param array $params : array of parameters for datasource retrieval
     * @param string $outputType : save to 'file', retrieve 'content'
@@ -931,6 +934,11 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             $TBS->LoadTemplate($pathToTemplate);
         }
         
+        $ext = strrchr($pathToTemplate, '.');
+        if (!empty($datasources['contact'][0]['postal_address']) && $ext === '.docx') {
+            $datasources['contact'][0]['postal_address'] = nl2br($datasources['contact'][0]['postal_address']);
+            $datasources['contact'][0]['postal_address'] = str_replace('<br />', '</w:t><w:br/><w:t>', $datasources['contact'][0]['postal_address']);
+        }
         foreach ($datasources as $name => $datasource) {
             // Scalar values or arrays ?
             if (!is_array($datasource)) {
@@ -940,11 +948,12 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             }
         }
 
-        if ($ext = strrchr($pathToTemplate, '.')) {
-            if ($ext === '.odt')
+        if ($ext) {
+            if ($ext === '.odt') {
                 $TBS->LoadTemplate('#styles.xml');
-            else if ($ext === '.docx')
+            } elseif ($ext === '.docx') {
                 $TBS->LoadTemplate('#word/header1.xml');
+            }
 
             foreach ($datasources as $name => $datasource) {
                 // Scalar values or arrays ?
@@ -966,11 +975,10 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                     }
                 }
             }
-
         }
 
 
-        switch($outputType) {
+        switch ($outputType) {
         case 'content':
             if ($templateObj->template_type == 'OFFICE') {
                 $TBS->Show(OPENTBS_STRING);
@@ -999,12 +1007,12 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         }
     }
     
-    /** Copy a template master on tmp dir 
-    * 
+    /** Copy a template master on tmp dir
+    *
     * @param string $templateId : templates identifier
     * @return string path of the template in tmp dir
     */
-    public function copyTemplateOnTmp($templateId) 
+    public function copyTemplateOnTmp($templateId)
     {
         $templateObj = $this->get($templateId);
         // Get template path from docserver
