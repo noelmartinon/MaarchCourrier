@@ -91,7 +91,7 @@ if (in_array($loginRequestArray['CAS_VERSION'], ['CAS_VERSION_2_0', 'CAS_VERSION
 }
 
 $db    = new Database();
-$query = "SELECT user_id FROM users WHERE user_id = ?";
+$query = "SELECT user_id FROM users WHERE lower(user_id) = lower(?)";
 $stmt  = $db->query($query, array($userId));
 
 if ($stmt->rowCount() == 0) {
