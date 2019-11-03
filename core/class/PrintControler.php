@@ -228,21 +228,17 @@ class PrintControler extends PrintFunctions
 				$pdf->useTemplate($tplIdx);
 			
 				/**********************************************************************/
-				
-				//THE FONT
-				$pdf->SetFont('Arial','B',11);
-				
+                //PRINT DATE
+                $pdf->SetFont('Arial','',10);
+                $pdf->Cell(40,5,utf8_decode(_PRINT_DATE . ' : ') . date('d-m-Y'),0,0, 'L', false);
+                
 				//APPLICATION NAME
-				$pdf->Cell(140,5, utf8_decode($_SESSION['config']['applicationname']),0,0, 'C', false);
-				
-				$pdf->SetFont('Arial','',10);
-				
-				//PRINT DATE
-				$pdf->Cell(40,5,utf8_decode(_PRINT_DATE . ' : ') . date('d-m-Y'),0,1, 'L', false);
+				$pdf->SetFont('Arial','B',11);
+				$pdf->Cell(110,5, utf8_decode($_SESSION['config']['applicationname']),0,1, 'C', false);
 				
 				$pdf->SetFont('Arial','B',10);
 				
-				//INITIATOR
+                //INITIATOR
                 if (!empty($resId)) {
                     $filename_QR = $_SESSION['config']['tmppath'].DIRECTORY_SEPARATOR.$_SESSION['user']['UserId'] . time() . rand() ."_QRCODE.png";
                     $parameter = \Parameter\models\ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
@@ -252,17 +248,16 @@ class PrintControler extends PrintFunctions
                     }
                     QRcode::png($prefix . $resId, $filename_QR, 0, 10);
 
-                    $pdf->Image($filename_QR, 5, 5, 40, 40);
+                    $pdf->Image($filename_QR, 158, 5, 40, 40);
                 }
-                $pdf->Cell(20, 5, "", 0, 0, 'L', false);
+                $pdf->Cell(50, 5, "", 0, 0, 'L', false);
                 if ($this->array_print[$cpt]['initiator'] <> '') {
                     $stmt = $db->query(
                     	"select entity_label from entities where entity_id = ?", 
                     	array($this->array_print[$cpt]['initiator'])
                     );
                     $resultEntity = $stmt->fetchObject();
-                    $pdf->Cell(15,5, '', 0, 0, 'C', false);
-                    $pdf->MultiCell(100, 5, utf8_decode(_INITIATOR . ' : '
+                    $pdf->MultiCell(90, 5, utf8_decode(_INITIATOR . ' : '
                         . $resultEntity->entity_label . " (" . $this->array_print[$cpt]['initiator'] . ")"), 0, 'C', false);
 				} elseif($this->array_print[$cpt]['typist'] <> '') {
                     require_once "modules/entities/class/class_manage_entities.php";
@@ -273,8 +268,8 @@ class PrintControler extends PrintFunctions
                     	array($initiator['ID'])
                     );
                     $resultEntity = $stmt->fetchObject();
-                    $pdf->MultiCell(36,5,utf8_decode(_INITIATOR . ' : ' 
-                        . $resultEntity->entity_label . " (" . $initiator['ID'] . ")"), 0, 1, 'L', false);
+                    $pdf->MultiCell(90, 5, utf8_decode(_INITIATOR . ' : ' 
+                        . $resultEntity->entity_label . " (" . $initiator['ID'] . ")"), 0, 'C', false);
                 }
 				$pdf->SetFont('Arial', 'B', 14);
 				
@@ -289,9 +284,8 @@ class PrintControler extends PrintFunctions
                 } else {
                     $fileNumber = $this->array_print[$cpt]['res_id'];
                 }
-				$pdf->Cell(35,5, '', 0, 0, 'C', false);
-				$pdf->Cell(147,5,utf8_decode(_PRINTED_FILE_NUMBER . ' : ') . $fileNumber, 1, 1, 'C', false);
-
+				$pdf->Cell(150,5,utf8_decode(_PRINTED_FILE_NUMBER . ' : ') . $fileNumber, 1, 1, 'C', false);
+				
 				//BREAK A LINE
 				$pdf->SetY($pdf->GetY()+4);
 				//BREAK A LINE

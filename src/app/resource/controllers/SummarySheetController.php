@@ -191,11 +191,14 @@ class SummarySheetController
         $widthAssignee  = $widthNoMargins / 6;
 
         $appName = CoreConfigModel::getApplicationName();
+        $pdf->SetFont('', '', 8);
+        $pdf->Cell(0, 20, "$appName / " . date('d-m-Y'), 0, 2, 'L', false);
+        $pdf->SetY($pdf->GetY() - 20);
+
         $pdf->SetFont('', 'B', 12);
         $pdf->Cell(0, 20, _SUMMARY_SHEET, 0, 2, 'C', false);
-        $pdf->SetY($pdf->GetY() - 20);
+        
         $pdf->SetFont('', '', 8);
-        $pdf->Cell(0, 20, "$appName / " . date('d-m-Y'), 0, 2, 'R', false);
         $pdf->Cell(0, 1, $resource['alt_identifier'], 0, 2, 'C', false);
 
         $pdf->SetY($pdf->GetY() + 15);
@@ -214,7 +217,7 @@ class SummarySheetController
                 $qrCode = new QrCode($prefix . $resource['res_id']);
                 $qrCode->setSize(400);
                 $qrCode->setMargin(25);
-                $pdf->Image('@'.$qrCode->writeString(), 21, 10, 90, 90);
+                $pdf->Image('@'.$qrCode->writeString(), 485, 10, 90, 90);
             }
         }
         foreach ($units as $key => $unit) {
