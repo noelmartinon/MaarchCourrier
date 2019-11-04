@@ -83,7 +83,7 @@ class ActionMethodController
                 HistoryController::add([
                     'tableName' => 'res_view_letterbox',
                     'recordId'  => $resource,
-                    'eventType' => 'ACTION#' . $resource,
+                    'eventType' => 'ACTION#' . $aArgs['id'],
                     'eventId'   => $aArgs['id'],
                     'info'      => "{$aArgs['basketName']} : {$action['label_action']}{$aArgs['history']}"
                 ]);
@@ -112,7 +112,6 @@ class ActionMethodController
 
             if (!empty($externalId['localeoId'])) {
                 if (!empty($config['inObject'])) {
-
                     foreach ($config['objects'] as $object) {
                         $select = [];
                         $tmpBodyData = [];
