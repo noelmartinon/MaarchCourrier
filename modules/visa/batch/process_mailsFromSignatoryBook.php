@@ -288,6 +288,18 @@ if (!empty($retrievedMails['error'])) {
     exit;
 }
 
+// Move outgoing attachment to visa workflow
+$outgoingToVisa = ['noVersionOutgoing' => [], 'isVersionOutgoing' => []];
+foreach (['noVersionOutgoing', 'isVersionOutgoing'] as $version) {
+    foreach ($retrievedMails[$version] as $resId => $value) {
+        if (in_array($value->status, ['validated', 'refused'])) {
+            $moveToVersion = str_replace("Outgoing", "", $version);
+            $retrievedMails[$moveToVersion][$resId] = $value;
+            unset($retrievedMails[$version][$resId]);
+        }
+    }
+}
+
 // On dégele les pj et on créé une nouvelle ligne si le document a été signé
 foreach ($retrievedMails['isVersion'] as $resId => $value) {
     $GLOBALS['logger']->write('Update res_version_attachments : ' . $resId . '. ExternalId : ' . $value->external_id, 'INFO');
