@@ -21,6 +21,7 @@ export class FiltersListComponent implements OnInit {
     categories: any[] = [];
     entitiesList: any[] = [];
     statuses: any[] = [];
+    doctypes: any[] = [];
 
     loading: boolean = false;
 
@@ -68,9 +69,22 @@ export class FiltersListComponent implements OnInit {
                                         }
                                     });
                                 });
+                                this.http.get("../../rest/doctypes/types")
+                                    .subscribe((data: any) => {
+                                        this.doctypes = data.doctypes;
+                                        this.doctypes.forEach(element => {
+                                            element.selected = false;
+                                            this.listProperties.doctypes.forEach((listPropertyDoctype: any) => {
+                                                if (element.type_id === listPropertyDoctype.id) {
+                                                    element.selected = true;
+                                                }
+                                            });
+                                        });
 
-                                this.loading = false;
-                                
+                                        this.loading = false;
+
+                                    });
+
                             });
                     });
             });

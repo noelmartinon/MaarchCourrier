@@ -94,4 +94,8 @@
         *ngFor="let subEntity of this.listProperties.subEntities; let i=index"
         (click)="removeFilter('subEntities', i)">{{subEntity.label}}
         <i class="fa fa-times-circle"></i></span>
+    <span class="label badge-doctypes" title="{{lang.doctypes}}"
+        *ngFor="let doctype of this.listProperties.doctypes; let i=index"
+        (click)="removeFilter('doctypes', i)">{{doctype.label}}
+        <i class="fa fa-times-circle"></i></span>
 </div>

@@ -267,10 +267,12 @@ class ResourceListController
         $whereCategories = $where;
         $whereStatuses   = $where;
         $whereEntities   = $where;
+        $whereDocTypes   = $where;
         $dataPriorities  = $queryData;
         $dataCategories  = $queryData;
         $dataStatuses    = $queryData;
         $dataEntities    = $queryData;
+        $dataDocTypes     = $queryData;
 
         if (isset($data['priorities'])) {
             if (empty($data['priorities'])) {
@@ -286,11 +288,13 @@ class ResourceListController
                 $dataCategories[] = explode(',', $replace);
                 $dataStatuses[]   = explode(',', $replace);
                 $dataEntities[]   = explode(',', $replace);
+                $dataDocTypes[]   = explode(',', $replace);
             }
 
             $whereCategories[] = $tmpWhere;
             $whereStatuses[]   = $tmpWhere;
             $whereEntities[]   = $tmpWhere;
+            $whereDocTypes[]   = $tmpWhere;
         }
         if (isset($data['categories'])) {
             if (empty($data['categories'])) {
@@ -306,11 +310,13 @@ class ResourceListController
                 $dataPriorities[] = explode(',', $replace);
                 $dataStatuses[]   = explode(',', $replace);
                 $dataEntities[]   = explode(',', $replace);
+                $dataDocTypes[]   = explode(',', $replace);
             }
 
             $wherePriorities[] = $tmpWhere;
             $whereStatuses[]   = $tmpWhere;
             $whereEntities[]   = $tmpWhere;
+            $whereDocTypes[]   = $tmpWhere;
         }
         if (!empty($data['statuses'])) {
             $wherePriorities[] = 'status in (?)';
@@ -319,6 +325,18 @@ class ResourceListController
             $dataCategories[]  = explode(',', $data['statuses']);
             $whereEntities[]   = 'status in (?)';
             $dataEntities[]    = explode(',', $data['statuses']);
+            $whereDocTypes[]   = 'status in (?)';
+            $dataDocTypes[]    = explode(',', $data['statuses']);
+        }
+        if (!empty($data['doctypes'])) {
+            $wherePriorities[] = 'type_id in (?)';
+            $dataPriorities[]  = explode(',', $data['doctypes']);
+            $whereCategories[] = 'type_id in (?)';
+            $dataCategories[]  = explode(',', $data['doctypes']);
+            $whereEntities[]   = 'type_id in (?)';
+            $dataEntities[]    = explode(',', $data['doctypes']);
+            $whereStatuses[]   = 'type_id in (?)';
+            $dataStatuses[]    = explode(',', $data['doctypes']);
         }
         if (isset($data['entities'])) {
             if (empty($data['entities'])) {
@@ -334,11 +352,13 @@ class ResourceListController
                 $dataPriorities[] = explode(',', $replace);
                 $dataCategories[] = explode(',', $replace);
                 $dataStatuses[] = explode(',', $replace);
+                $dataDocTypes[] = explode(',', $replace);
             }
 
             $wherePriorities[] = $tmpWhere;
             $whereCategories[] = $tmpWhere;
             $whereStatuses[]   = $tmpWhere;
+            $whereDocTypes[]   = $tmpWhere;
         }
         if (!empty($data['entitiesChildren'])) {
             $entities = explode(',', $data['entitiesChildren']);
@@ -354,6 +374,8 @@ class ResourceListController
                 $dataCategories[]  = $entitiesChildren;
                 $whereStatuses[]   = 'destination in (?)';
                 $dataStatuses[]    = $entitiesChildren;
+                $whereDocTypes[]   = 'destination in (?)';
+                $dataDocTypes[]    = $entitiesChildren;
             }
         }
 
@@ -436,10 +458,26 @@ class ResourceListController
             ];
         }
 
+        $docTypes = [];
+        $rawDocType = ResModel::getOnView([
+            'select'    => ['count(res_id)', 'type_id', 'type_label'],
+            'where'     => $whereDocTypes,
+            'data'      => $dataDocTypes,
+            'groupBy'   => ['type_id', 'type_label']
+        ]);
+        foreach ($rawDocType as $key => $value) {
+            $docTypes[] = [
+                'id'        => empty($value['type_id']) ? null : $value['type_id'],
+                'label'     => empty($value['type_label']) ? '_UNDEFINED' : $value['type_label'],
+                'count'     => $value['count']
+            ];
+        }
+
         $priorities = (count($priorities) >= 2) ? $priorities : [];
         $categories = (count($categories) >= 2) ? $categories : [];
         $statuses   = (count($statuses) >= 2) ? $statuses : [];
         $entities   = (count($entities) >= 2) ? $entities : [];
+        $docTypes   = (count($docTypes) >= 2) ? $docTypes : [];
 
         $entitiesChildren = [];
         foreach ($entities as $entity) {
@@ -461,7 +499,21 @@ class ResourceListController
             ];
         }
 
-        return $response->withJson(['entities' => $entities, 'priorities' => $priorities, 'categories' => $categories, 'statuses' => $statuses, 'entitiesChildren' => $entitiesChildren]);
+        usort($entities, ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
+        usort($priorities, ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
+        usort($categories, ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
+        usort($statuses, ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
+        usort($entitiesChildren, ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
+        usort($docTypes, ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
+
+        return $response->withJson([
+            'entities' => $entities,
+            'priorities' => $priorities,
+            'categories' => $categories,
+            'statuses' => $statuses,
+            'entitiesChildren' => $entitiesChildren,
+            'doctypes' => $docTypes
+        ]);
     }
 
     public static function getResourcesListQueryData(array $args)
@@ -543,14 +595,20 @@ class ResourceListController
                 $queryData[] = $entitiesChildren;
             }
         }
+        if (!empty($args['data']['doctypes'])) {
+            $table[] = 'doctypes';
+            $leftJoin[] = 'doctypes.description=res_view_letterbox.type_label';
+            $where[] = 'doctypes.type_id in (?)';
+            $queryData[] = explode(',', $args['data']['doctypes']);
+        }
 
         if (!empty($args['data']['order']) && strpos($args['data']['order'], 'alt_identifier') !== false) {
             $order = 'order_alphanum(alt_identifier) ' . explode(' ', $args['data']['order'])[1];
         }
         if (!empty($args['data']['order']) && strpos($args['data']['order'], 'priority') !== false) {
             $order = 'priorities.order ' . explode(' ', $args['data']['order'])[1];
-            $table = ['priorities'];
-            $leftJoin = ['res_view_letterbox.priority = priorities.id'];
+            $table[] = 'priorities';
+            $leftJoin[] = 'res_view_letterbox.priority = priorities.id';
         }
 
         return ['table' => $table, 'leftJoin' => $leftJoin, 'where' => $where, 'queryData' => $queryData, 'order' => $order];
@@ -1057,5 +1115,15 @@ class ResourceListController
         $notes = NoteModel::get(['select' => ['count(1)'], 'where' => ['identifier = ?', 'note_text like ?'], 'data' => [$args['resId'], '[avis%']]);
 
         return $notes[0]['count'];
+    }
+
+    private function compareSortOnLabel($a, $b)
+    {
+        if (strtolower($a['label']) < strtolower($b['label'])) {
+            return -1;
+        } elseif (strtolower($a['label']) > strtolower($b['label'])) {
+            return 1;
+        }
+        return 0;
     }
 }
