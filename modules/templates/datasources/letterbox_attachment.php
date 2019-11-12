@@ -42,6 +42,9 @@ if (!empty($res_id)) {
     AND a.parent_entity_id = b.entity_id', array($doc['initiator']));
     $initiator = $stmt2->fetch(PDO::FETCH_ASSOC);
 
+    \SrcCore\models\DatabasePDO::reset();
+    new \SrcCore\models\DatabasePDO(['customId' => $_SESSION['custom_override_id']]);
+
     if (!empty($initiator)) {
         foreach ($initiator as $column => $value) {
             $doc['initiator_'.$column] = $value;
