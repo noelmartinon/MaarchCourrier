@@ -30,7 +30,7 @@ $app = new \Slim\App(['settings' => ['displayErrorDetails' => true, 'determineRo
 
 //Authentication
 $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, callable $next) {
-    $routesWithoutAuthentication = ['GET/jnlp/{jnlpUniqueId}'];
+    $routesWithoutAuthentication = ['GET/jnlp/{jnlpUniqueId}', 'POST/password', 'PUT/password', 'GET/passwordRules'];
     $route = $request->getAttribute('route');
     $currentMethod = empty($route) ? '' : $route->getMethods()[0];
     $currentRoute = empty($route) ? '' : $route->getPattern();
@@ -45,7 +45,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
                     return $response->withStatus(405)->withJson(['errors' => $r['errors']]);
                 }
             }
-        } else {
+        } elseif ($currentMethod.$currentRoute != 'GET/initialize') {
             return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
         }
     }
@@ -333,7 +333,6 @@ $app->delete('/users/{id}', \User\controllers\UserController::class . ':delete')
 $app->put('/users/{id}/suspend', \User\controllers\UserController::class . ':suspend');
 $app->get('/users/{id}/isDeletable', \User\controllers\UserController::class . ':isDeletable');
 $app->get('/users/{id}/details', \User\controllers\UserController::class . ':getDetailledById');
-$app->post('/users/{id}/password', \User\controllers\UserController::class . ':resetPassword');
 $app->put('/users/{id}/password', \User\controllers\UserController::class . ':updatePassword');
 $app->get('/users/{userId}/status', \User\controllers\UserController::class . ':getStatusByUserId');
 $app->put('/users/{id}/status', \User\controllers\UserController::class . ':updateStatus');
@@ -357,6 +356,8 @@ $app->delete('/users/{id}/signatures/{signatureId}', \User\controllers\UserContr
 $app->post('/users/{id}/redirectedBaskets', \User\controllers\UserController::class . ':setRedirectedBaskets');
 $app->delete('/users/{id}/redirectedBaskets', \User\controllers\UserController::class . ':deleteRedirectedBasket');
 $app->put('/users/{id}/baskets', \User\controllers\UserController::class . ':updateBasketsDisplay');
+$app->post('/password', \User\controllers\UserController::class . ':forgotPassword');
+$app->put('/password', \User\controllers\UserController::class . ':passwordInitialization');
 
 //VersionsUpdate
 $app->get('/versionsUpdate', \VersionUpdate\controllers\VersionUpdateController::class . ':get');

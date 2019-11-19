@@ -57,6 +57,7 @@ return array(
     'Group\\' => array($baseDir . '/src/app/group'),
     'Gitlab\\' => array($vendorDir . '/m4tthumphrey/php-gitlab-api/lib/Gitlab'),
     'Folder\\' => array($baseDir . '/src/app/folder'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'FastRoute\\' => array($vendorDir . '/nikic/fast-route/src'),
     'ExternalSignatoryBook\\' => array($baseDir . '/src/app/external/externalSignatoryBook'),
     'ExportSeda\\' => array($baseDir . '/src/app/external/exportSeda'),

@@ -839,21 +839,6 @@ class users_controler extends ObjectControler implements ObjectControlerIF
 
         return $ok;
     }
-    
-    public function changePassword($userId, $newPassword)
-    {
-        if (! isset($userId) || empty($userId) || ! isset($newPassword)
-            || empty($newPassword)
-        ) {
-            return false;
-        }
-        self::$db = new Database();
-        $func = new functions();
-        $query = 'update ' . USERS_TABLE
-            . " set password = ?, change_password = 'Y' where user_id = ?";
-        $stmt = self::$db->query($query, array($newPassword, $userId));
-        return $stmt;
-    }
 
     /**
     * Asserts if a given user (user_id) is deleted in the database

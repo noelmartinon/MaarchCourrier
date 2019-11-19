@@ -10,6 +10,7 @@ function triggerAngular(locationToGo) {
     $j('body').removeAttr("id");
     $j('body').removeAttr("style");
     $j('body').removeAttr("onload");
+    $j('#bodyloginCustom').remove();
     $j.ajax({
         url: '../../rest/initialize',
         type: 'GET',

@@ -10,6 +10,8 @@ import { BasketListComponent }              from './list/basket-list.component';
 import { SignatureBookComponent }           from './signature-book.component';
 import { SaveNumericPackageComponent }      from './save-numeric-package.component';
 import { AppGuard }                         from '../service/app.guard';
+import { ForgotPasswordComponent }          from './login/forgotPassword/forgotPassword.component';
+import { UpdatePasswordComponent }          from './login/updatePassword/updatePassword.component';
 
 @NgModule({
     imports: [
@@ -22,6 +24,8 @@ import { AppGuard }                         from '../service/app.guard';
             { path: 'basketList/users/:userSerialId/groups/:groupSerialId/baskets/:basketId', canActivate: [AppGuard], component: BasketListComponent },
             { path: 'saveNumericPackage', canActivate: [AppGuard], component: SaveNumericPackageComponent },
             { path: 'signatureBook/users/:userId/groups/:groupId/baskets/:basketId/resources/:resId', canActivate: [AppGuard],component: SignatureBookComponent },
+            { path: 'forgot-password', component: ForgotPasswordComponent },
+            { path: 'update-password', component: UpdatePasswordComponent },
             { path: '**',  redirectTo: 'home', pathMatch: 'full' },
         ], { useHash: true }),
     ],

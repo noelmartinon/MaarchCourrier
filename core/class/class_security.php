@@ -131,6 +131,11 @@ class security extends Database
 
         if (isset($user)) {
             if ($user->__get('enabled') == 'Y') {
+                \User\models\UserModel::update([
+                    'set'   => ['reset_token' => null],
+                    'where' => ['user_id = ?'],
+                    'data'  => [$s_login]
+                ]);
                 $ugc = new usergroups_controler();
                 $sec_controler = new SecurityControler();
                 $serv_controler = new ServiceControler();

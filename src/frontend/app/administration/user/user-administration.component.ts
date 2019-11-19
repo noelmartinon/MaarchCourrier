@@ -351,19 +351,6 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
         this.selectedSignatureLabel = this.user.signatures[index].signature_label;
     }
 
-    resetPassword(user: any) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.resetPsw);
-
-        if (r) {
-            this.http.post(this.coreUrl + "rest/users/" + this.serialId + "/password", {})
-                .subscribe((data: any) => {
-                    this.notify.success(this.lang.pswReseted);
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
-    }
-
     toggleGroup(group: any) {
         if ($j('#' + group.group_id + '-input').is(':checked') == true) {
             var groupReq = {

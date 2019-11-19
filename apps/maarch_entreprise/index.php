@@ -339,7 +339,7 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
         header('location: index.php?display=true&page=logout&logout=true');
         exit();
     }
-    $user = \User\models\UserModel::getByLogin(['login' => $cookie['userId'], 'select' => ['password_modification_date', 'change_password', 'status']]);
+    $user = \User\models\UserModel::getByLogin(['login' => $cookie['userId'], 'select' => ['password_modification_date', 'status']]);
 
     //HTML CONTENT OF ANGULAR
     echo \SrcCore\models\CoreConfigModel::initAngularStructure();
@@ -350,9 +350,7 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
     $loggingMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
     if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'ozwillo', 'shibboleth'])) {
         $passwordRules = \SrcCore\models\PasswordModel::getEnabledRules();
-        if ($user['change_password'] == 'Y') {
-            $_REQUEST['triggerAngular'] = 'changePass';
-        } elseif (!empty($passwordRules['renewal'])) {
+        if (!empty($passwordRules['renewal'])) {
             $currentDate = new \DateTime();
             $lastModificationDate = new \DateTime($user['password_modification_date']);
             $lastModificationDate->add(new DateInterval("P{$passwordRules['renewal']}D"));

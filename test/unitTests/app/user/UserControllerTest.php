@@ -676,26 +676,11 @@ class UserControllerTest extends TestCase
 
         $this->assertSame(true, $checkPassword);
 
-        //  RESET PASSWORD
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $aArgs = [];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
-
-        $response     = $userController->resetPassword($fullRequest, new \Slim\Http\Response(), ['id' => $user['id']]);
-        $responseBody = json_decode((string)$response->getBody());
-
-        $this->assertSame('success', $responseBody->success);
-
-        $checkPassword = \SrcCore\models\AuthenticationModel::authentication(['userId' => $GLOBALS['userId'], 'password' => 'maarch']);
-
-        $this->assertSame(true, $checkPassword);
-
         //  UPDATE PASSWORD
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $aArgs = [
-            'currentPassword'   => 'maarch',
+            'currentPassword'   => 'hcraam',
             'newPassword'       => 'superadmin',
             'reNewPassword'     => 'superadmin'
         ];

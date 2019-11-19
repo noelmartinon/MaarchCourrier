@@ -81,7 +81,15 @@ abstract class UserModelAbstract
     {
         ValidatorModel::notEmpty($aArgs, ['user']);
         ValidatorModel::notEmpty($aArgs['user'], ['userId', 'firstname', 'lastname']);
-        ValidatorModel::stringType($aArgs['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'phone', 'changePassword', 'loginmode']);
+        ValidatorModel::stringType($aArgs['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'phone', 'loginmode']);
+
+        $length = rand(50, 70);
+        $chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrstuvwxyz!@$%^*_=+,.?';
+        $count = mb_strlen($chars);
+        for ($i = 0, $password = ''; $i < $length; $i++) {
+            $index = rand(0, $count - 1);
+            $password .= mb_substr($chars, $index, 1);
+        }
 
         DatabaseModel::insert([
             'table'         => 'users',
@@ -94,9 +102,9 @@ abstract class UserModelAbstract
                 'initials'                      => $aArgs['user']['initials'],
                 'enabled'                       => 'Y',
                 'status'                        => 'OK',
-                'change_password'               => empty($aArgs['user']['changePassword']) ? 'Y' : $aArgs['user']['changePassword'],
+                'change_password'               => 'N',
                 'loginmode'                     => empty($aArgs['user']['loginmode']) ? 'standard' : $aArgs['user']['loginmode'],
-                'password'                      => AuthenticationModel::getPasswordHash('maarch'),
+                'password'                      => AuthenticationModel::getPasswordHash($password),
                 'password_modification_date'    => 'CURRENT_TIMESTAMP'
             ]
         ]);
@@ -243,15 +251,16 @@ abstract class UserModelAbstract
 
     public static function resetPassword(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['id']);
+        ValidatorModel::notEmpty($aArgs, ['id', 'password']);
         ValidatorModel::intVal($aArgs, ['id']);
 
         DatabaseModel::update([
             'table'     => 'users',
             'set'       => [
-                'password'                      => AuthenticationModel::getPasswordHash('maarch'),
-                'change_password'               => 'Y',
-                'password_modification_date'    => 'CURRENT_TIMESTAMP'
+                'password'                      => AuthenticationModel::getPasswordHash($aArgs['password']),
+                'change_password'               => 'N',
+                'password_modification_date'    => 'CURRENT_TIMESTAMP',
+                'reset_token'                   => null
             ],
             'where'     => ['id = ?'],
             'data'      => [$aArgs['id']]

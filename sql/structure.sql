@@ -224,6 +224,7 @@ CREATE TABLE users
   loginmode character varying(50) DEFAULT NULL::character varying,
   cookie_key character varying(255) DEFAULT NULL::character varying,
   cookie_date timestamp without time zone,
+  reset_token text,
   failed_authentication INTEGER DEFAULT 0,
   locked_until TIMESTAMP without time zone,
   external_id jsonb DEFAULT '{}',

@@ -14,6 +14,7 @@
 
 namespace SrcCore\controllers;
 
+use Firebase\JWT\JWT;
 use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
@@ -37,6 +38,14 @@ class AuthenticationController
             }
         }
 
+        if (!empty($userId)) {
+            UserModel::update([
+                'set'   => ['reset_token' => null],
+                'where' => ['user_id = ?'],
+                'data'  => [$userId]
+            ]);
+        }
+
         return $userId;
     }
 
@@ -46,7 +55,7 @@ class AuthenticationController
         ValidatorModel::stringType($aArgs, ['userId', 'currentRoute']);
 
         if ($aArgs['currentRoute'] != '/initialize') {
-            $user = UserModel::getByLogin(['select' => ['status', 'change_password'], 'login' => $aArgs['userId']]);
+            $user = UserModel::getByLogin(['select' => ['status'], 'login' => $aArgs['userId']]);
 
             if ($user['status'] == 'ABS' && !in_array($aArgs['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
                 return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
@@ -58,9 +67,7 @@ class AuthenticationController
                 if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'ozwillo', 'shibboleth'])) {
 
                     $passwordRules = PasswordModel::getEnabledRules();
-                    if ($user['change_password'] == 'Y') {
-                        return ['isRouteAvailable' => false, 'errors' => 'User must change his password'];
-                    } elseif (!empty($passwordRules['renewal'])) {
+                    if (!empty($passwordRules['renewal'])) {
                         $currentDate = new \DateTime();
                         $lastModificationDate = new \DateTime($user['password_modification_date']);
                         $lastModificationDate->add(new \DateInterval("P{$passwordRules['renewal']}D"));
@@ -109,5 +116,19 @@ class AuthenticationController
         }
 
         return _BAD_LOGIN_OR_PSW;
+    }
+
+    public static function getResetJWT($args = [])
+    {
+        $token = [
+            'exp'   => time() + $args['expirationTime'],
+            'user'  => [
+                'id' => $args['id']
+            ]
+        ];
+
+        $jwt = JWT::encode($token, CoreConfigModel::getEncryptKey());
+
+        return $jwt;
     }
 }

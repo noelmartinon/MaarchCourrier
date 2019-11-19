@@ -1046,4 +1046,12 @@ export const LANG_FR = {
     "to_sign" : "À signer",
     "to_note" : "À annoter",
     "confidential" : "Confidentiel",
+    "afterClickingSendLinkChangePassword": "Après avoir cliqué sur <b>Envoyer</b>, vous recevrez un courriel contenant un lien pour modifier votre mot de passe. Ce lien sera actif <b>1 heure</b>.",
+    "enterLogin": "Saisissez votre identifiant",
+    "send" : "Envoyer",
+    "generation" : "Génération...",
+    "requestSentByEmail" : "La demande vous a été envoyé par courriel.",
+    "logInOncePasswordChanged": "Vous serez amené à vous connecter une fois la modification du mot de passe effectuée.",
+    "samePassword" : "Les mots de passe sont identiques",
+    "sending" : "Envoi...",
 };

@@ -18,12 +18,6 @@
                         {{lang.desactivateAbsence}}
                     </p>
                 </a>
-                <a mat-list-item *ngIf="user.canResetPassword" (click)="resetPassword()">
-                    <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
-                    <p mat-line>
-                        {{lang.reinitPassword}}
-                    </p>
-                </a>
                 <a *ngIf="user.canModifyPassword" mat-list-item (click)="changePasswd();">
                     <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
                     <p mat-line>

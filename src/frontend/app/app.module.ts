@@ -56,6 +56,8 @@ import { DiffusionsListComponent }             from './diffusions/diffusions-lis
 import { VisaWorkflowComponent }             from './visa/visa-workflow.component';
 import { AvisWorkflowComponent }             from './avis/avis-workflow.component';
 
+import { ForgotPasswordComponent }          from './login/forgotPassword/forgotPassword.component';
+import { UpdatePasswordComponent }          from './login/updatePassword/updatePassword.component';
 
 
 @NgModule({
@@ -109,6 +111,8 @@ import { AvisWorkflowComponent }             from './avis/avis-workflow.componen
         RedirectActionComponent,
         SendShippingActionComponent,
         ActionsListComponent,
+        ForgotPasswordComponent,
+        UpdatePasswordComponent,
     ],
     entryComponents: [
         CustomSnackbarComponent,

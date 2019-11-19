@@ -19,11 +19,13 @@ use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
-use Entity\models\ListInstanceModel;
-use Group\models\ServiceModel;
+use Email\controllers\EmailController;
 use Entity\models\EntityModel;
+use Entity\models\ListInstanceModel;
 use Entity\models\ListTemplateModel;
+use Firebase\JWT\JWT;
 use Group\models\GroupModel;
+use Group\models\ServiceModel;
 use History\controllers\HistoryController;
 use History\models\HistoryModel;
 use Notification\controllers\NotificationsEventsController;
@@ -33,6 +35,7 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\AuthenticationController;
 use SrcCore\controllers\PasswordController;
 use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
@@ -40,8 +43,11 @@ use SrcCore\models\DatabaseModel;
 use SrcCore\models\PasswordModel;
 use User\models\UserBasketPreferenceModel;
 use User\models\UserEntityModel;
+use User\models\UserGroupModel;
 use User\models\UserModel;
 use User\models\UserSignatureModel;
+
+require_once 'core/class/Url.php';
 
 class UserController
 {
@@ -183,6 +189,26 @@ class UserController
             if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
                 NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => 'superadmin', 'info' => _QUOTA_EXCEEDED]);
             }
+        }
+
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        if ($loggingMethod['id'] == 'standard') {
+            $resetToken = AuthenticationController::getResetJWT(['id' => $newUser['id'], 'expirationTime' => 1209600]); // 14 days
+            UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$newUser['id']]]);
+
+            $url = str_replace('rest/', '', \Url::coreurl());
+            $url .= 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+            EmailController::createEmail([
+                'userId'    => $newUser['id'],
+                'data'      => [
+                    'sender'        => ['email' => 'Notification'],
+                    'recipients'    => [$newUser['mail']],
+                    'object'        => _NOTIFICATIONS_USER_CREATION_SUBJECT,
+                    'body'          => _NOTIFICATIONS_USER_CREATION_BODY . $url . _NOTIFICATIONS_USER_CREATION_FOOTER,
+                    'isHtml'        => true,
+                    'status'        => 'WAITING'
+                ]
+            ]);
         }
 
         HistoryController::add([
@@ -425,6 +451,23 @@ class UserController
             'data'  => [$aArgs['id'], $aArgs['id']]
         ]);
 
+        // Delete from groups
+        UserGroupModel::delete(['where' => ['user_id = ?'], 'data' => [$user['user_id']]]);
+        UserBasketPreferenceModel::delete([
+            'where' => ['user_serial_id = ?'],
+            'data'  => [$aArgs['id']]
+        ]);
+        RedirectBasketModel::delete([
+            'where' => ['owner_user_id = ?'],
+            'data'  => [$aArgs['id']]
+        ]);
+
+        // Delete from entities
+        UserEntityModel::delete([
+            'where' => ['user_id = ?'],
+            'data'  => [$user['user_id']]
+        ]);
+
         UserModel::delete(['id' => $aArgs['id']]);
 
         HistoryController::add([
@@ -486,18 +529,6 @@ class UserController
             'where' => ['id = ?'],
             'data'  => [$user['id']]
         ]);
-
-        return $response->withJson(['success' => 'success']);
-    }
-
-    public function resetPassword(Request $request, Response $response, array $aArgs)
-    {
-        $error = $this->hasUsersRights(['id' => $aArgs['id']]);
-        if (!empty($error['error'])) {
-            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
-        }
-
-        UserModel::resetPassword(['id' => $aArgs['id']]);
 
         return $response->withJson(['success' => 'success']);
     }
@@ -1396,5 +1427,94 @@ class UserController
         }
 
         return true;
+    }
+
+    public function forgotPassword(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty']);
+        }
+
+        $user = UserModel::getByLogin(['select' => ['id', 'mail'], 'login' => strtolower($body['login'])]);
+        if (empty($user)) {
+            return $response->withStatus(204);
+        }
+
+        $GLOBALS['id'] = $user['id'];
+        $GLOBALS['userId'] = $body['login'];
+
+        $resetToken = AuthenticationController::getResetJWT(['id' => $user['id'], 'expirationTime' => 3600]); // 1 hour
+        UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$user['id']]]);
+
+        $url = str_replace('rest/', '', \Url::coreurl());
+        $url .= 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+        EmailController::createEmail([
+            'userId'    => $user['id'],
+            'data'      => [
+                'sender'        => ['email' => 'Notification'],
+                'recipients'    => [$user['mail']],
+                'object'        => _NOTIFICATIONS_FORGOT_PASSWORD_SUBJECT,
+                'body'          => _NOTIFICATIONS_FORGOT_PASSWORD_BODY . $url . _NOTIFICATIONS_FORGOT_PASSWORD_FOOTER,
+                'isHtml'        => true,
+                'status'        => 'WAITING'
+            ]
+        ]);
+
+        HistoryController::add([
+            'tableName'    => 'users',
+            'recordId'     => $body['login'],
+            'eventType'    => 'UP',
+            'eventId'      => 'userModification',
+            'info'         => _PASSWORD_REINIT_SENT
+        ]);
+
+        return $response->withStatus(204);
+    }
+
+    public static function passwordInitialization(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        $check = Validator::stringType()->notEmpty()->validate($body['token']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['password']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body token or body password is empty']);
+        }
+
+        try {
+            $jwt = JWT::decode($body['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
+        } catch (\Exception $e) {
+            return $response->withStatus(403)->withJson(['errors' => 'Invalid token', 'lang' => 'invalidToken']);
+        }
+
+        $user = UserModel::getById(['id' => $jwt->user->id, 'select' => ['user_id', 'id', 'reset_token']]);
+        if (empty($user)) {
+            return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
+        }
+
+        if ($body['token'] != $user['reset_token']) {
+            return $response->withStatus(403)->withJson(['errors' => 'Invalid token', 'lang' => 'invalidToken']);
+        }
+
+        if (!PasswordController::isPasswordValid(['password' => $body['password']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Password does not match security criteria']);
+        }
+
+        UserModel::resetPassword(['password' => $body['password'], 'id'  => $user['id']]);
+
+        $GLOBALS['id'] = $user['id'];
+        $GLOBALS['userId'] = $user['user_id'];
+
+        HistoryController::add([
+            'tableName'    => 'users',
+            'recordId'     => $user['user_id'],
+            'eventType'    => 'UP',
+            'eventId'      => 'userModification',
+            'info'         => _PASSWORD_REINIT . " {$body['login']}"
+        ]);
+
+        return $response->withStatus(204);
     }
 }
