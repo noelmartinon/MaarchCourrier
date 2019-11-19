@@ -1013,4 +1013,10 @@ export const LANG_EN = {
     "to_sign" : "To sign",
     "to_note" : "To note",
     "confidential" : "Confidential",
+    "othersInfos" : "Other(s) information(s)",
+    "contactDetails" : "Details",
+    "contactsFillingRate" : "Filling rate",
+    "contact_physical" : "Physical contact",
+    "contact_corporate" : "Corporate contact",
+    "contact_internal" : "Internal user",
 };

@@ -55,6 +55,8 @@ import { AttachmentsListComponent }             from './attachments/attachments-
 import { DiffusionsListComponent }             from './diffusions/diffusions-list.component';
 import { VisaWorkflowComponent }             from './visa/visa-workflow.component';
 import { AvisWorkflowComponent }             from './avis/avis-workflow.component';
+import { ContactsListComponent } from './contact/list/contacts-list.component';
+import { ContactsListModalComponent } from './contact/list/modal/contacts-list-modal.component';
 
 
 
@@ -109,6 +111,8 @@ import { AvisWorkflowComponent }             from './avis/avis-workflow.componen
         RedirectActionComponent,
         SendShippingActionComponent,
         ActionsListComponent,
+        ContactsListComponent,
+        ContactsListModalComponent
     ],
     entryComponents: [
         CustomSnackbarComponent,
@@ -131,7 +135,8 @@ import { AvisWorkflowComponent }             from './avis/avis-workflow.componen
         ProcessActionComponent,
         RedirectActionComponent,
         SendShippingActionComponent,
-        ViewDocActionComponent
+        ViewDocActionComponent,
+        ContactsListModalComponent
     ],
     providers: [ HeaderService, FiltersListService ],
     bootstrap: [ AppComponent ]

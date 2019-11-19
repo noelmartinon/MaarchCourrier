@@ -1039,4 +1039,10 @@ export const LANG_NL = {
     "to_sign" : "To sign", //_TO_TRANSLATE
     "to_note" : "To note", //_TO_TRANSLATE
     "confidential" : "Confidential", //_TO_TRANSLATE
+    "othersInfos" : "Other(s) information(s)", //_TO_TRANSLATE
+    "contactDetails" : "Details", //_TO_TRANSLATE
+    "contactsFillingRate" : "Filling rate", //_TO_TRANSLATE
+    "contact_physical" : "Physical contact", //_TO_TRANSLATE
+    "contact_corporate" : "Corporate contact", //_TO_TRANSLATE
+    "contact_internal" : "Internal user", //_TO_TRANSLATE
 };

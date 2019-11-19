@@ -1,3 +1,5 @@
+@import '../../css/vars.scss';
+
 .align_leftData {
   text-align: left;
 }
@@ -45,4 +47,12 @@
   color: red;
   font-weight: bold;
   opacity: 0.6;
+}
+
+.hasEvent {
+  cursor: pointer;
+
+  &:hover {
+      color: $primary;
+  }
 }

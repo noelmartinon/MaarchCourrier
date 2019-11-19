@@ -1046,4 +1046,10 @@ export const LANG_FR = {
     "to_sign" : "À signer",
     "to_note" : "À annoter",
     "confidential" : "Confidentiel",
+    "othersInfos" : "Autre(s) information(s)",
+    "contactDetails" : "Coordonnées",
+    "contactsFillingRate" : "Taux de complétude",
+    "contact_physical" : "Contact physique",
+    "contact_corporate" : "Contact moral",
+    "contact_internal" : "Utilisateur interne",
 };

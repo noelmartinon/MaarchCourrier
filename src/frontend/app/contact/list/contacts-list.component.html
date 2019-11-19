@@ -1,0 +1,74 @@
+<div class="contact-list-container contact-list-container-{{contacts.length}}">
+    <ng-container *ngIf="loading; else elseTemplate">
+        <div class="loading">
+            <mat-spinner></mat-spinner>
+        </div>
+    </ng-container>
+    <ng-template #elseTemplate>
+        <mat-card class="contact-card" *ngFor="let contact of contacts">
+            <mat-card-header>
+                <div mat-card-avatar class="contact-header-image fa" [class.fa-building]="contact.mode === 'corporate'"
+                    [class.fa-users]="contact.mode === 'internal'" [class.fa-user]="contact.mode ==='physical'"
+                    [title]="lang['contact_'+contact.mode]">
+                </div>
+                <mat-card-title>{{contact.firstname}} {{contact.lastname}}</mat-card-title>
+                <mat-card-subtitle [title]="lang.contactsFilling_function">{{contact.function}}&nbsp;
+                </mat-card-subtitle>
+                <i class="contact-filling fa fa-circle" *ngIf="contact.mode !== 'internal'" [style.color]="contact.filling"
+                    [title]="lang.contactsFillingRate"></i>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-list>
+                    <h3 mat-subheader>{{lang.contactDetails}}</h3>
+                    <mat-list-item class="contact-item" *ngIf="contact.society !== ''">
+                        <mat-icon mat-list-icon class="contact-group far fa-building"
+                            [title]="lang.contactsFilling_society"></mat-icon>
+                        <p mat-line class="contact-content"> {{contact.society}} </p>
+                    </mat-list-item>
+                    <mat-list-item class="contact-item" *ngIf="contact.department !== ''">
+                        <mat-icon mat-list-icon class="contact-group fa fa-sitemap"
+                            [title]="lang.contactsFilling_departement"></mat-icon>
+                        <p mat-line class="contact-content"> {{contact.department}} </p>
+                        <p mat-line class="contact-content" *ngIf="contact.occupancy !== ''"> ({{contact.occupancy}}) </p>
+                    </mat-list-item>
+                    <mat-list-item class="contact-item" *ngIf="contact.email !== ''">
+                        <mat-icon mat-list-icon class="contact-group far fa-envelope" [title]="lang.email"></mat-icon>
+                        <a matLine href="mailto:{{contact.email}}" class="contact-content"> {{contact.email}} </a>
+                    </mat-list-item>
+                    <mat-list-item class="contact-item" *ngIf="contact.phone !== ''">
+                        <mat-icon mat-list-icon class="contact-group fas fa-phone" [title]="lang.phoneNumber">
+                        </mat-icon>
+                        <p mat-line class="contact-content"> {{contact.phone}} </p>
+                    </mat-list-item>
+                    <mat-list-item class="contact-address" (click)="goTo(contact)" [title]="lang.address" *ngIf="contact.mode !== 'internal'">
+                        <mat-icon mat-list-icon class="contact-group fas fa-map-marker-alt"></mat-icon>
+                        <p mat-line class="contact-content" *ngIf="contact.num !== '' || contact.street !== ''"> {{contact.num}} {{contact.street}} </p>
+                        <p mat-line class="contact-content" *ngIf="contact.complement !== ''"> ({{contact.complement}}) </p>
+                        <p mat-line class="contact-content" *ngIf="contact.postalCode !== '' || contact.town !== ''"> {{contact.postalCode}} {{contact.town}} </p>
+                        <p mat-line class="contact-content" *ngIf="contact.country !== ''"> {{contact.country}} </p>
+                    </mat-list-item>
+                </mat-list>
+                <mat-expansion-panel *ngIf="contact.website !== '' || contact.otherData !== ''">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            {{lang.othersInfos}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-list>
+                        <mat-list-item class="contact-item" *ngIf="contact.website !== ''">
+                            <mat-icon mat-list-icon class="contact-group fas fa-globe"
+                                [title]="lang.contactsFilling_website">
+                            </mat-icon>
+                            <a matLine href="http://{{contact.website}}" target="_blank" class="contact-content">
+                                {{contact.website}} </a>
+                        </mat-list-item>
+                        <mat-list-item class="contact-item" *ngIf="contact.otherData !== ''" [title]="lang.others">
+                            <mat-icon mat-list-icon class="contact-group far fa-question-circle"></mat-icon>
+                            <p mat-line class="contact-content"> {{contact.otherData}} </p>
+                        </mat-list-item>
+                    </mat-list>
+                </mat-expansion-panel>
+            </mat-card-content>
+        </mat-card>
+    </ng-template>
+</div>

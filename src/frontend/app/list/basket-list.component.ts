@@ -17,6 +17,7 @@ import { ActionsListComponent } from '../actions/actions-list.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { BasketHomeComponent } from '../basket/basket-home.component';
 import { PanelListComponent } from './panel/panel-list.component';
+import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
 
 
 declare function $j(selector: any): any;
@@ -270,11 +271,13 @@ export class BasketListComponent implements OnInit {
 
             // Process secondary datas
             element.display.forEach((key: any) => {
+                key.event = false;
                 key.displayTitle = key.displayValue;
                 if ((key.displayValue == null || key.displayValue == '') && ['getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
                     key.displayValue = this.lang.undefined;
                     key.displayTitle = '';
                 } else if (["getSenders", "getRecipients"].indexOf(key.value) > -1) {
+                    key.event = true;
                     if (key.displayValue.length > 1) {
                         key.displayTitle = key.displayValue.join(' - ');
                         key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.lang.contacts;
@@ -419,6 +422,20 @@ export class BasketListComponent implements OnInit {
         }, 200);
         
     }
+
+    launchEventSubData(data: any, row: any) {
+        if (data.event) {
+            if (["getSenders", "getRecipients"].indexOf(data.value) > -1) {
+                const mode = data.value === 'getSenders' ? 'sender' : 'recipient';
+                this.openContact(row, mode);
+            }
+        }
+    }
+
+    openContact(row: any, mode: string) {
+        this.dialog.open(ContactsListModalComponent, { data: { title: `${row.alt_identifier} - ${row.subject}`, mode: mode, resId: row.res_id } });
+    }
+
 }
 export interface BasketList {
     resources: any[];
