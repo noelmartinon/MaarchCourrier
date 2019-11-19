@@ -18,6 +18,8 @@ use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
 use Basket\models\BasketModel;
 use Basket\models\RedirectBasketModel;
+use Contact\controllers\ContactController;
+use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\controllers\ConvertThumbnailController;
 use Convert\models\AdrModel;
@@ -36,6 +38,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use Status\models\StatusModel;
 use User\models\UserModel;
@@ -573,6 +576,100 @@ class ResController
     public function getNotesCountForCurrentUserById(Request $request, Response $response, array $aArgs)
     {
         return $response->withJson(NoteModel::countByResId(['resId' => $aArgs['resId'], 'login' => $GLOBALS['userId']]));
+    }
+
+    public function getContacts(Request $request, Response $response, array $args)
+    {
+        $ext = ResModel::getExtById(['resId' => $args['resId']]);
+
+        if (empty($ext)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document does not exist']);
+        }
+
+        $rawContacts = [];
+        if ($ext['is_multicontacts'] == 'Y') {
+            $multiContacts = DatabaseModel::select([
+                'select'    => ['contact_id', 'address_id'],
+                'table'     => ['contacts_res'],
+                'where'     => ['res_id = ?', 'mode = ?'],
+                'data'      => [$ext['res_id'], 'multi']
+            ]);
+
+            foreach ($multiContacts as $multiContact) {
+                $rawContacts[] = [
+                    'login'         => $multiContact['contact_id'],
+                    'address_id'    => $multiContact['address_id'],
+                ];
+            }
+        } else {
+            $rawContacts[] = [
+                'login'         => $ext['exp_user_id'],
+                'address_id'    => $ext['address_id'],
+            ];
+        }
+
+        $contacts = [];
+
+        foreach ($rawContacts as $rawContact) {
+            if (!empty($rawContact['address_id'])) {
+                $contactView = ContactModel::getOnView([
+                    'select' => [
+                        'is_corporate_person', 'lastname', 'firstname', 'address_num', 'address_street', 'address_town',
+                        'address_postal_code', 'address_country', 'ca_id', 'society', 'website', 'phone',
+                        'contact_firstname', 'contact_lastname', 'address_country', 'email', 'function', 'contact_other_data'
+                    ],
+                    'where'     => ['ca_id = ?'],
+                    'data'      => [$rawContact['address_id']]
+                ]);
+
+                $contactView = $contactView[0];
+
+                $contact = [
+                    'mode'      => $contactView['is_corporate_person'] == 'Y',
+                    'firstName' => $contactView['firstname'],
+                    'lastName'  => $contactView['lastname'],
+                    'email'     => $contactView['email'],
+                    'phone'     => $contactView['phone'],
+                    'company'   => $contactView['society'],
+                    'function'  => $contactView['function'],
+                    'address_num'   => $contactView['address_num'],
+                    'addressStreet'   => $contactView['address_street'],
+                    'addressTown'   => $contactView['address_town'],
+                    'addressPostalCode'   => $contactView['address_postal_code'],
+                    'addressCountry'   => $contactView['address_country'],
+                    'otherData' => $contactView['contact_other_data'],
+                    'website'   => $contactView['website']
+                ];
+
+                $filling = ContactController::getFillingRate(['contact' => $contact]);
+
+                $contact['filling'] = $filling['color'];
+
+                $contacts[] = $contact;
+            } else {
+                $user = UserModel::getByLowerLogin(['login' => $rawContact['login']]);
+
+                $contact = [
+                    'mode'      => null,
+                    'firstName' => $user['firstname'],
+                    'lastName'  => $user['lastname'],
+                    'email'     => $user['mail'],
+                    'phone'     => $user['phone'],
+                    'company'   => null,
+                    'function'  => null,
+                    'address_num'   => null,
+                    'addressStreet'   => null,
+                    'addressTown'   => null,
+                    'addressPostalCode'   => null,
+                    'addressCountry'   => null,
+                    'otherData' => null,
+                    'website'   => null
+                ];
+                $contacts[] = $contact;
+            }
+        }
+
+        return $response->withJson(['contacts' => $contacts]);
     }
 
     public static function getEncodedDocument(array $aArgs)
