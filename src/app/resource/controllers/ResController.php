@@ -625,18 +625,18 @@ class ResController
                 $contactView = $contactView[0];
 
                 $contact = [
-                    'mode'      => $contactView['is_corporate_person'] == 'Y',
+                    'mode'      => $contactView['is_corporate_person'] == 'Y' ? 'corporate' : 'physical',
                     'firstName' => $contactView['firstname'],
                     'lastName'  => $contactView['lastname'],
                     'email'     => $contactView['email'],
                     'phone'     => $contactView['phone'],
-                    'company'   => $contactView['society'],
+                    'society'   => $contactView['society'],
                     'function'  => $contactView['function'],
-                    'address_num'   => $contactView['address_num'],
-                    'addressStreet'   => $contactView['address_street'],
-                    'addressTown'   => $contactView['address_town'],
-                    'addressPostalCode'   => $contactView['address_postal_code'],
-                    'addressCountry'   => $contactView['address_country'],
+                    'num'   => $contactView['address_num'],
+                    'street'   => $contactView['address_street'],
+                    'town'   => $contactView['address_town'],
+                    'postalCode'   => $contactView['address_postal_code'],
+                    'country'   => $contactView['address_country'],
                     'otherData' => $contactView['contact_other_data'],
                     'website'   => $contactView['website']
                 ];
@@ -650,21 +650,26 @@ class ResController
                 $user = UserModel::getByLowerLogin(['login' => $rawContact['login']]);
 
                 $contact = [
-                    'mode'      => null,
+                    'mode'      => 'internal',
                     'firstName' => $user['firstname'],
                     'lastName'  => $user['lastname'],
                     'email'     => $user['mail'],
                     'phone'     => $user['phone'],
-                    'company'   => null,
+                    'society'   => null,
                     'function'  => null,
-                    'address_num'   => null,
-                    'addressStreet'   => null,
-                    'addressTown'   => null,
-                    'addressPostalCode'   => null,
-                    'addressCountry'   => null,
+                    'num'   => null,
+                    'street'   => null,
+                    'town'   => null,
+                    'postalCode'   => null,
+                    'country'   => null,
                     'otherData' => null,
                     'website'   => null
                 ];
+
+                $filling = ContactController::getFillingRate(['contact' => $contact]);
+
+                $contact['filling'] = $filling['color'];
+
                 $contacts[] = $contact;
             }
         }
