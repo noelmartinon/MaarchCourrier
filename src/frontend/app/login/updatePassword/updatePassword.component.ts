@@ -64,7 +64,7 @@ export class UpdatePasswordComponent implements OnInit {
     }
 
     updatePassword() {
-        this.labelButton = this.lang.sending;
+        this.labelButton = this.lang.emailSendInProgress;
         this.loading = true;
 
         this.http.put('../../rest/password', { 'token': this.token, 'password': this.password.newPassword })
@@ -79,7 +79,7 @@ export class UpdatePasswordComponent implements OnInit {
                 this.notificationService.success(this.lang.passwordChanged);
                 location.href = 'index.php?display=true&page=login';
             }, (err: any) => {
-                this.notificationService.handleErrors(err);
+                this.notificationService.error(this.lang[err.error.lang]);
             });
     }
 
