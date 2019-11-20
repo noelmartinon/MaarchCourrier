@@ -1045,4 +1045,6 @@ export const LANG_NL = {
     "contact_physical" : "Physical contact", //_TO_TRANSLATE
     "contact_corporate" : "Corporate contact", //_TO_TRANSLATE
     "contact_internal" : "Internal user", //_TO_TRANSLATE
+    "contact_entity"   : "Entity", //_TO_TRANSLATE
+    "contact_third"   : "Contact third", //_TO_TRANSLATE
 };

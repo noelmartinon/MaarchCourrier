@@ -8,13 +8,13 @@
         <mat-card class="contact-card" *ngFor="let contact of contacts">
             <mat-card-header>
                 <div mat-card-avatar class="contact-header-image fa" [class.fa-building]="contact.mode === 'corporate'"
-                    [class.fa-users]="contact.mode === 'internal'" [class.fa-user]="contact.mode ==='physical'"
+                    [class.fa-users]="contact.mode === 'internal'" [class.fa-user]="contact.mode ==='physical'" [class.fa-sitemap]="contact.mode ==='entity'" [class.fa-user-friends]="contact.mode ==='third'"
                     [title]="lang['contact_'+contact.mode]">
                 </div>
                 <mat-card-title>{{contact.firstname}} {{contact.lastname}}</mat-card-title>
                 <mat-card-subtitle [title]="lang.contactsFilling_function">{{contact.function}}&nbsp;
                 </mat-card-subtitle>
-                <i class="contact-filling fa fa-circle" *ngIf="contact.mode !== 'internal'" [style.color]="contact.filling"
+                <i class="contact-filling fa fa-circle" *ngIf="contact.mode === 'physical' && contact.mode === 'corporate'" [style.color]="contact.filling"
                     [title]="lang.contactsFillingRate"></i>
             </mat-card-header>
             <mat-card-content>

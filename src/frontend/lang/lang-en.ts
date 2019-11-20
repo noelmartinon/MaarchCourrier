@@ -1019,4 +1019,6 @@ export const LANG_EN = {
     "contact_physical" : "Physical contact",
     "contact_corporate" : "Corporate contact",
     "contact_internal" : "Internal user",
+    "contact_entity"   : "Entity",
+    "contact_third"   : "Contact third",
 };
