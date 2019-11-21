@@ -593,7 +593,7 @@ class ResController
         $contacts = [];
         if ($queryParams['type'] == 'senders') {
             if ($ext['category_id'] == 'outgoing') {
-                $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => 'dest_user_id']);
+                $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
             } else {
                 $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contacts_res', 'columnRes' => 'exp_user_id']);
             }
