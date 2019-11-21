@@ -26,5 +26,12 @@
             <password>ThePassword</password>
             <ssl>false</ssl>
         </annuary>
+        <annuary>
+            <uri>2.2.2.2</uri>
+            <baseDN>base</baseDN>
+            <login>Administrateur</login>
+            <password>ThePassword</password>
+            <ssl>false</ssl>
+        </annuary>
     </annuaries>
 </ROOT>

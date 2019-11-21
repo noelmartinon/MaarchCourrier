@@ -195,6 +195,7 @@ class EntityController
             'eventId'   => 'entityCreation',
         ]);
 
+
         if (empty($data['parent_entity_id']) && $GLOBALS['userId'] != 'superadmin') {
             $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
             $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $GLOBALS['userId']]);
