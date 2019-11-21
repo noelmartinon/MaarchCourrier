@@ -2761,7 +2761,7 @@ if (!defined('_COMMUNICATION_TYPE')) {
     define('_COMMUNICATION_TYPE', 'Moyen de communication');
 }
 if (!defined('_COMMUNICATION_VALUE')) {
-    define('_COMMUNICATION_VALUE', 'Valeur');
+    define('_COMMUNICATION_VALUE', 'Moyen de communication M2M');
 }
 if (!defined('_COMMUNICATION_ADDED')) {
     define('_COMMUNICATION_ADDED', 'Communication ajoutée');

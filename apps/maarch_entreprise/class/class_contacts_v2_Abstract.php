@@ -763,7 +763,7 @@ abstract class contacts_v2_Abstract extends Database
                         <?php echo _STRUCTURE_ORGANISM; ?>:</label>
                 </td>
                 <td class="indexing_field">
-                    <input name="society" type="text" id="society" value="<?php if ($mode != 'add' && isset($_SESSION['m_admin']['contact']['SOCIETY'])) {
+                    <input onchange="getOuM2MAnnuary()" name="society" type="text" id="society" value="<?php if ($mode != 'add' && isset($_SESSION['m_admin']['contact']['SOCIETY'])) {
                         functions::xecho($func->show_str($_SESSION['m_admin']['contact']['SOCIETY']));
                     } ?>" />
                 </td>
@@ -890,7 +890,7 @@ abstract class contacts_v2_Abstract extends Database
                 </td>
                 <td>&nbsp;</td>
             </tr>
-            <tr id="communication_type_tr">
+            <!-- <tr id="communication_type_tr">
                 <td>
                     <?php echo _COMMUNICATION_TYPE; ?>:</td>
                 <td class="indexing_field">
@@ -930,14 +930,18 @@ abstract class contacts_v2_Abstract extends Database
                 } ?>
                     </select>
                 </td>
-            </tr>
+            </tr> -->
             <tr>
                 <td>
                     <?php echo _COMMUNICATION_VALUE; ?>:</td>
                 <td class="indexing_field">
-                    <input name="communication_value" type="text" id="communication_value" value="<?php if (isset($_SESSION['m_admin']['communication']['VALUE'])) {
-                    functions::xecho($func->show_str($_SESSION['m_admin']['communication']['VALUE']));
-                } ?>" />
+                    <div class="typeahead__container" style="width: 208px;display:inline-block;">
+                        <div class="typeahead__field">
+                            <span class="typeahead__query">
+                                <input class="<?php echo $fieldAddressClass; ?>" name="communication_value" autocomplete="off" type="text" id="communication_value" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['VALUE'])); ?>"/>
+                            </span>
+                        </div>
+                    </div>
                 </td>
             </tr>
         </table>

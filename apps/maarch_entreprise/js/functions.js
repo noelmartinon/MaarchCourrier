@@ -4021,3 +4021,31 @@ function uploadFiles () {
         }
     });
 }
+
+function getOuM2MAnnuary() {
+    $j("#communication_value").typeahead({
+        delay: '300',
+        minLength: 0,
+        searchOnFocus: true,
+        filter: false,
+        dynamic: true,
+        display: "unitOrganization",
+        templateValue: "{{unitOrganization}}",
+        emptyTemplate: "L'entreprise <b>"+$j('#society').val()+"</b> n'existe pas dans l'annuaire",
+        source: {
+            ajax: {
+                type: "GET",
+                dataType: "json",
+                url: "../../rest/autocomplete/ouM2MAnnuary",
+                data: {
+                    society: $j('#society').val()
+                }
+            }
+        },
+        callback: {
+            onClickAfter: function(node, a, item, event) {
+                $j('#communication_value').val(item.communicationValue);
+            }
+        }
+    });
+}

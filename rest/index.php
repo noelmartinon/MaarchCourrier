@@ -86,6 +86,7 @@ $app->get('/autocomplete/users/visa', \SrcCore\controllers\AutoCompleteControlle
 $app->get('/autocomplete/entities', \SrcCore\controllers\AutoCompleteController::class . ':getEntities');
 $app->get('/autocomplete/statuses', \SrcCore\controllers\AutoCompleteController::class . ':getStatuses');
 $app->get('/autocomplete/banAddresses', \SrcCore\controllers\AutoCompleteController::class . ':getBanAddresses');
+$app->get('/autocomplete/ouM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getOuM2MAnnuary');
 
 //Baskets
 $app->get('/baskets', \Basket\controllers\BasketController::class . ':get');

@@ -555,6 +555,82 @@ class AutoCompleteController
         return $response->withJson($addresses);
     }
 
+    public static function getOuM2MAnnuary(Request $request, Response $response)
+    {
+        $data = $request->getQueryParams();
+
+        $check = Validator::stringType()->notEmpty()->validate($data['society']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query society is empty']);
+        }
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
+
+        if (!$loadedXml) {
+            return ['success' => 'M2M is disabled'];
+        }
+        if ($loadedXml->annuaries->enabled == 'false') {
+            return ['success' => 'Annuary is disabled'];
+        }
+        $organization = (string)$loadedXml->annuaries->organization;
+        if (empty($organization)) {
+            return ['errors' => 'Tag organization is empty'];
+        }
+        $annuaries = [];
+        foreach ($loadedXml->annuaries as $annuary) {
+            $annuaries[] = [
+                'uri'       => (string)$annuary->uri,
+                'baseDN'    => (string)$annuary->baseDN,
+                'login'     => (string)$annuary->login,
+                'password'  => (string)$annuary->password,
+                'ssl'       => (string)$annuary->ssl,
+            ];
+        }
+
+        foreach ($annuaries as $annuary) {
+            $ldap = @ldap_connect($annuary);
+            if ($ldap === false) {
+                $error = 'Ldap connect failed : uri is maybe wrong';
+                continue;
+            }
+            ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+
+            $search = @ldap_search($ldap, $annuary['baseDN'], "(ou={$data['society']}*)", ['cn', 'mail', 'destinationIndicator', 'labeledURI']);
+            if ($search === false) {
+                $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
+                continue;
+            }
+            $entries = ldap_get_entries($ldap, $search);
+
+            foreach ($entries as $value) {
+                if (!empty($value['mail'])) {
+                    $unitOrganizations[] = [
+                        'communicationValue' => $value['mail'],
+                        'siret'              => $value['destinationIndicator'],
+                        'unitOrganization'   => "{$value['cn']} - {$value['destinationIndicator']} ({$value['mail']})"
+                    ];
+                }
+                if (!empty($value['labeledURI'])) {
+                    $unitOrganizations[] = [
+                        'communicationValue' => $value['labeledURI'],
+                        'siret'              => $value['destinationIndicator'],
+                        'unitOrganization'   => "{$value['cn']} - {$value['destinationIndicator']} ({$value['labeledURI']})"
+                    ];
+                }
+            }
+
+            return $response->withJson($unitOrganizations);
+        }
+        // $unitOrganizations[] = [
+        //     'communicationValue'     => "localhost.com/res",
+        //     'siret'   => "1234567",
+        //     'unitOrganization' => "SPM - 1234567 (localhost.com/res)"
+        // ];
+        // return $response->withJson($unitOrganizations);
+    }
+
     private static function getDataForRequest(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['search', 'fields', 'where', 'data', 'fieldsNumber']);
