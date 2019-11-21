@@ -426,7 +426,7 @@ export class BasketListComponent implements OnInit {
     launchEventSubData(data: any, row: any) {
         if (data.event) {
             if (["getSenders", "getRecipients"].indexOf(data.value) > -1) {
-                const mode = data.value === 'getSenders' ? 'sender' : 'recipient';
+                const mode = data.value === 'getSenders' ? 'senders' : 'recipients';
                 this.openContact(row, mode);
             }
         }
