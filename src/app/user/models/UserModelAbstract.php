@@ -420,6 +420,25 @@ abstract class UserModelAbstract
         return $aEntity[0];
     }
 
+    public static function getNonPrimaryEntitiesById(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['id']);
+        ValidatorModel::intVal($args, ['id']);
+
+        $entities = DatabaseModel::select([
+            'select'    => ['users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'],
+            'table'     => ['users, users_entities, entities'],
+            'where'     => ['users.user_id = users_entities.user_id', 'users_entities.entity_id = entities.entity_id', 'users.id = ?', 'users_entities.primary_entity = ?'],
+            'data'      => [$args['id'], 'N']
+        ]);
+
+        if (empty($entities)) {
+            return [];
+        }
+
+        return $entities;
+    }
+
     public static function getGroupsByUserId(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['userId']);

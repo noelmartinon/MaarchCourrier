@@ -588,20 +588,22 @@ class ResController
             return $response->withStatus(404)->withJson(['errors' => 'Document does not exist']);
         }
 
-        if ($ext['category_id'] == 'outgoing') {
-            $senders = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => 'dest_user_id']);
-        } else {
-            $senders = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contacts_res', 'columnRes' => 'exp_user_id']);
-        }
-
-        if ($ext['category_id'] == 'outgoing') {
-            $recipients = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contact_res', 'columnRes' => 'exp_user_id']);
-        } else {
-            $recipients = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
-        }
+        $queryParams = $request->getQueryParams();
 
         $contacts = [];
-        $contacts = array_merge($senders, $contacts, $recipients);
+        if ($queryParams['type'] == 'senders') {
+            if ($ext['category_id'] == 'outgoing') {
+                $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => 'dest_user_id']);
+            } else {
+                $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contacts_res', 'columnRes' => 'exp_user_id']);
+            }
+        } elseif ($queryParams['type'] == 'recipients') {
+            if ($ext['category_id'] == 'outgoing') {
+                $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contact_res', 'columnRes' => 'exp_user_id']);
+            } else {
+                $contacts = ResController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
+            }
+        }
 
         return $response->withJson(['contacts' => $contacts]);
     }
@@ -938,21 +940,22 @@ class ResController
 
                 $contact = [
                     'mode'      => $mode,
-                    'firstname' => $contactView['firstname'],
-                    'lastname'  => $contactView['lastname'],
-                    'email'     => $contactView['email'],
-                    'phone'     => $contactView['phone'],
-                    'society'   => $contactView['society'],
-                    'function'  => $contactView['function'],
-                    'num'       => $contactView['address_num'],
-                    'street'    => $contactView['address_street'],
-                    'complement'=> $contactView['address_complement'],
-                    'town'      => $contactView['address_town'],
-                    'postalCode'=> $contactView['address_postal_code'],
-                    'country'   => $contactView['address_country'],
-                    'otherData' => $contactView['contact_other_data'],
-                    'website'   => $contactView['website'],
-                    'occupancy' => $contactView['occupancy']
+                    'firstname' => $contactView['firstname'] ?? '',
+                    'lastname'  => $contactView['lastname'] ?? '',
+                    'email'     => $contactView['email'] ?? '',
+                    'phone'     => $contactView['phone'] ?? '',
+                    'society'   => $contactView['society'] ?? '',
+                    'function'  => $contactView['function'] ?? '',
+                    'num'       => $contactView['address_num'] ?? '',
+                    'street'    => $contactView['address_street'] ?? '',
+                    'complement'=> $contactView['address_complement'] ?? '',
+                    'town'      => $contactView['address_town'] ?? '',
+                    'postalCode'=> $contactView['address_postal_code'] ?? '',
+                    'country'   => $contactView['address_country'] ?? '',
+                    'otherData' => $contactView['contact_other_data'] ?? '',
+                    'website'   => $contactView['website'] ?? '',
+                    'occupancy' => $contactView['occupancy'] ?? '',
+                    'department' => $contactView['departement'] ?? ''
                 ];
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
@@ -967,23 +970,36 @@ class ResController
                     $user = UserModel::getById(['id' => $rawContact['user_id']]);
                 }
 
+                $phone = '';
+                if (!empty($phone)) {
+                    $phone = $user['phone'];
+                }
+
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $user['id']]);
+
+                $userEntities = UserModel::getNonPrimaryEntitiesById(['id' => $user['id']]);
+                $userEntities = array_column($userEntities, 'entity_label');
+
+                $nonPrimaryEntities = implode(', ', $userEntities);
+
                 $contact = [
                     'mode'      => 'internal',
                     'firstname' => $user['firstname'],
                     'lastname'  => $user['lastname'],
                     'email'     => $user['mail'],
-                    'phone'     => $user['phone'],
-                    'society'   => null,
-                    'function'  => null,
-                    'num'       => null,
-                    'street'    => null,
-                    'complement'=> null,
-                    'town'      => null,
-                    'postalCode'=> null,
-                    'country'   => null,
-                    'otherData' => null,
-                    'website'   => null,
-                    'occupancy' => null
+                    'phone'     => $phone,
+                    'society'   => '',
+                    'function'  => '',
+                    'num'       => '',
+                    'street'    => '',
+                    'complement'=> '',
+                    'town'      => '',
+                    'postalCode'=> '',
+                    'country'   => '',
+                    'otherData' => '',
+                    'website'   => '',
+                    'occupancy' => $nonPrimaryEntities,
+                    'department' => $primaryEntity['entity_label']
                 ];
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
@@ -996,21 +1012,22 @@ class ResController
 
                 $contact = [
                     'mode'      => 'entity',
-                    'firstname' => null,
+                    'firstname' => '',
                     'lastname'  => $entity['entity_label'],
                     'email'     => $entity['email'],
-                    'phone'     => null,
-                    'society'   => null,
-                    'function'  => null,
-                    'num'       => null,
-                    'street'    => null,
-                    'complement'=> null,
-                    'town'      => null,
-                    'postalCode'=> null,
-                    'country'   => null,
-                    'otherData' => null,
-                    'website'   => null,
-                    'occupancy' => null
+                    'phone'     => '',
+                    'society'   => '',
+                    'function'  => '',
+                    'num'       => '',
+                    'street'    => '',
+                    'complement'=> '',
+                    'town'      => '',
+                    'postalCode'=> '',
+                    'country'   => '',
+                    'otherData' => '',
+                    'website'   => '',
+                    'occupancy' => '',
+                    'department' => ''
                 ];
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
