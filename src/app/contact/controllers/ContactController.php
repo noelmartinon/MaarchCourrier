@@ -580,7 +580,7 @@ class ContactController
 
                 $phone = '';
                 if (!empty($phone) && ($user['id'] == $GLOBALS['id']
-                        || ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId']]))) {
+                        || ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use']))) {
                     $phone = $user['phone'];
                 }
 

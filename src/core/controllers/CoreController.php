@@ -88,6 +88,8 @@ class CoreController
         $user['entities'] = UserModel::getEntitiesById(['userId' => $GLOBALS['userId']]);
         $user['indexingGroups'] = [];
 
+        $user['privileges'] = [];
+
         if ($GLOBALS['userId'] == 'superadmin') {
             $menu = ServiceModel::getApplicationServicesByXML(['type' => 'menu']);
             foreach ($menu as $key => $value) {
@@ -97,6 +99,8 @@ class CoreController
             }
             $menuModules = ServiceModel::getModulesServicesByXML(['type' => 'menu']);
             $menu = array_merge($menu, $menuModules);
+            $user['privileges'][] = 'view_personal_data';
+            $user['privileges'][] = 'manage_personal_data';
         } else {
             $menu = ServiceController::getMenuServicesByUserId(['userId' => $GLOBALS['userId']]);
             foreach ($menu as $value) {
@@ -107,6 +111,13 @@ class CoreController
                         }
                     }
                 }
+            }
+
+            if (ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use'])) {
+                $user['privileges'][] = 'view_personal_data';
+            }
+            if (ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use'])) {
+                $user['privileges'][] = 'manage_personal_data';
             }
         }
 
