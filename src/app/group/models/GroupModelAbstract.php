@@ -15,6 +15,7 @@
 namespace Group\models;
 
 use Group\controllers\GroupController;
+use Group\controllers\ServiceController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -197,19 +198,28 @@ abstract class GroupModelAbstract
         ValidatorModel::stringType($aArgs, ['userId']);
 
         $rawUserGroups = UserModel::getGroupsByUserId(['userId' => $aArgs['userId']]);
-
-        $userGroups = [];
-        foreach ($rawUserGroups as $value) {
-            $userGroups[] = $value['group_id'];
-        }
+        $userGroups = array_column($rawUserGroups, 'group_id');
 
         $allGroups = GroupModel::get(['select' => ['group_id', 'group_desc']]);
 
+        if ($GLOBALS['userId'] == 'superadmin') {
+            $assignableGroups = GroupModel::get(['select' => ['group_id']]);
+        } else {
+            $assignableGroups = ServiceController::getAssignableGroups(['userId' => $GLOBALS['userId']]);
+        }
+        $assignableGroups = array_column($assignableGroups, 'group_id');
+
         foreach ($allGroups as $key => $value) {
-            if (in_array($value['group_id'], $userGroups)) {
-                $allGroups[$key]['disabled'] = true;
+            if (in_array($value['group_id'], $assignableGroups)) {
+                $allGroups[$key]['enabled'] = true;
             } else {
-                $allGroups[$key]['disabled'] = false;
+                $allGroups[$key]['enabled'] = false;
+            }
+
+            if (in_array($value['group_id'], $userGroups)) {
+                $allGroups[$key]['checked'] = true;
+            } else {
+                $allGroups[$key]['checked'] = false;
             }
         }
 

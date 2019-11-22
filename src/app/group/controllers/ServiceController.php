@@ -8,6 +8,7 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\ValidatorModel;
+use User\models\UserModel;
 
 class ServiceController
 {
@@ -76,5 +77,62 @@ class ServiceController
         }
 
         return $response->withJson($parameters);
+    }
+
+    public static function getAssignableGroups(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['userId']);
+        ValidatorModel::stringType($args, ['userId']);
+
+        $rawUserGroups = UserModel::getGroupsByUserId(['userId' => $args['userId']]);
+        $userGroups = array_column($rawUserGroups, 'group_id');
+
+        $assignable = [];
+        foreach ($userGroups as $userGroup) {
+            $groups = ServiceModel::getParametersFromGroupPrivilege(['groupId' => $userGroup, 'privilegeId' => 'admin_users']);
+            if (!empty($groups)) {
+                $groups = $groups['groups'];
+                $assignable = array_merge($assignable, $groups);
+            }
+        }
+
+        foreach ($assignable as $key => $group) {
+            $assignable[$key] = GroupModel::getById(['id' => $group, 'select' => ['group_id', 'group_desc']]);
+        }
+
+        return $assignable;
+    }
+
+    public static function canAssignGroup(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['userId', 'groupId']);
+        ValidatorModel::stringType($args, ['userId']);
+        ValidatorModel::intVal($args, ['groupId']);
+
+        if ($args['userId'] == 'superadmin') {
+            return true;
+        }
+
+        $privileges = ServiceModel::getByUserAndPrivilege(['userId' => $args['userId'], 'privilegeId' => 'admin_users']);
+        $privileges = array_column($privileges, 'parameters');
+
+        if (empty($privileges)) {
+            return false;
+        }
+        $assignable = [];
+
+        foreach ($privileges as $groups) {
+            $groups = json_decode($groups);
+            $groups = $groups->groups;
+            if ($groups != null) {
+                $assignable = array_merge($assignable, $groups);
+            }
+        }
+
+        if (count($assignable) == 0) {
+            return false;
+        }
+
+        return in_array($args['groupId'], $assignable);
     }
 }

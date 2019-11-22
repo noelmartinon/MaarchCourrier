@@ -377,14 +377,13 @@ abstract class ServiceModelAbstract
     public static function getByUserAndPrivilege(array $args)
     {
         ValidatorModel::notEmpty($args, ['userId', 'privilegeId']);
-        ValidatorModel::intVal($args, ['userId']);
-        ValidatorModel::stringType($args, ['privilegeId']);
+        ValidatorModel::stringType($args, ['userId', 'privilegeId']);
 
         $aServices = DatabaseModel::select([
             'select'    => ['usergroups_services.service_id, usergroups_services.parameters'],
             'table'     => ['usergroup_content, usergroups_services, usergroups'],
             'where'     => [
-                'usergroup_content.group_id = usergroups.id',
+                'usergroup_content.group_id = usergroups.group_id',
                 'usergroups.group_id = usergroups_services.group_id',
                 'usergroup_content.user_id = ?',
                 'usergroups_services.service_id = ?'

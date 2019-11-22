@@ -24,6 +24,7 @@ use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Entity\models\ListTemplateModel;
 use Firebase\JWT\JWT;
+use Group\controllers\ServiceController;
 use Group\models\GroupModel;
 use Group\models\ServiceModel;
 use History\controllers\HistoryController;
@@ -992,6 +993,9 @@ class UserController
         } elseif (UserModel::hasGroup(['id' => $aArgs['id'], 'groupId' => $data['groupId']])) {
             return $response->withStatus(400)->withJson(['errors' => _USER_ALREADY_LINK_GROUP]);
         }
+        if (!ServiceController::canAssignGroup(['userId' => $GLOBALS['userId'], 'groupId' => $group['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
         if (empty($data['role'])) {
             $data['role'] = '';
         }
@@ -1030,8 +1034,12 @@ class UserController
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
-        if (empty(GroupModel::getByGroupId(['groupId' => $aArgs['groupId']]))) {
+        $group = GroupModel::getByGroupId(['groupId' => $aArgs['groupId']]);
+        if (empty($group)) {
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
+        }
+        if (!ServiceController::canAssignGroup(['userId' => $GLOBALS['userId'], 'groupId' => $group['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
         $data = $request->getParams();
@@ -1063,6 +1071,10 @@ class UserController
         $group = GroupModel::getByGroupId(['select' => ['id'], 'groupId' => $aArgs['groupId']]);
         if (empty($group)) {
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
+        }
+
+        if (!ServiceController::canAssignGroup(['userId' => $GLOBALS['userId'], 'groupId' => $group['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
         UserModel::deleteGroup(['id' => $aArgs['id'], 'groupId' => $aArgs['groupId']]);
