@@ -579,8 +579,8 @@ class ContactController
                 }
 
                 $phone = '';
-                if (!empty($phone) /*&& ($user['id'] == $GLOBALS['id']
-                        || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']]))*/) {
+                if (!empty($phone) && ($user['id'] == $GLOBALS['id']
+                        || ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId']]))) {
                     $phone = $user['phone'];
                 }
 

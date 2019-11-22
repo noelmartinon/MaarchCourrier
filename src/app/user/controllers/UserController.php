@@ -104,8 +104,16 @@ class UserController
 
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'enabled', 'phone', 'mail', 'initials', 'loginmode', 'external_id']]);
         $user['external_id']        = json_decode($user['external_id'], true);
-        $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $aArgs['id']]);
-        $user['emailSignatures']    = UserModel::getEmailSignaturesById(['userId' => $user['user_id']]);
+
+        if (ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId']])) {
+            $user['signatures'] = UserSignatureModel::getByUserSerialId(['userSerialid' => $aArgs['id']]);
+            $user['emailSignatures'] = UserModel::getEmailSignaturesById(['userId' => $user['user_id']]);
+        } else {
+            $user['signatures'] = [];
+            $user['emailSignatures'] = [];
+            unset($user['phone']);
+        }
+
         $user['groups']             = UserModel::getGroupsByUserId(['userId' => $user['user_id']]);
         $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['user_id']]);
         $user['entities']           = UserModel::getEntitiesById(['userId' => $user['user_id']]);
@@ -176,6 +184,10 @@ class UserController
             $data['changePassword']= 'N';
         }
 
+        if (!ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId']])) {
+            $data['phone'] = null;
+        }
+
         UserModel::create(['user' => $data]);
 
         $newUser = UserModel::getByLogin(['login' => $data['userId']]);
@@ -243,10 +255,14 @@ class UserController
             'firstname' => $data['firstname'],
             'lastname'  => $data['lastname'],
             'mail'      => $data['mail'],
-            'phone'     => $data['phone'],
             'initials'  => $data['initials'],
             'loginmode' => empty($data['loginmode']) ? 'standard' : $data['loginmode'],
         ];
+
+        if (ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId']])) {
+            $set['phone'] = $data['phone'];
+        }
+
         if (!empty($data['enabled']) && $data['enabled'] == 'Y') {
             $set['enabled'] = 'Y';
         }
@@ -753,6 +769,12 @@ class UserController
         if (!Validator::intVal()->validate($aArgs['id']) || !Validator::intVal()->validate($aArgs['signatureId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
+
+        if (!ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId']])
+            && $aArgs['id'] != $GLOBALS['id']) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
@@ -788,6 +810,11 @@ class UserController
 
     public function addSignature(Request $request, Response $response, array $aArgs)
     {
+        if (!ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId']])
+            && $aArgs['id'] != $GLOBALS['id']) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
@@ -853,6 +880,11 @@ class UserController
 
     public function updateSignature(Request $request, Response $response, array $aArgs)
     {
+        if (!ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId']])
+            && $aArgs['id'] != $GLOBALS['id']) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
@@ -877,6 +909,11 @@ class UserController
 
     public function deleteSignature(Request $request, Response $response, array $aArgs)
     {
+        if (!ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId']])
+            && $aArgs['id'] != $GLOBALS['id']) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
