@@ -22,6 +22,9 @@ import { SaveNumericPackageComponent }          from './save-numeric-package.com
 import { ActivateUserComponent }                from './activate-user.component';
 
 import { ActionsListComponent }                 from './actions/actions-list.component';
+import { ContactsListComponent } from './contact/list/contacts-list.component';
+import { ContactsListModalComponent } from './contact/list/modal/contacts-list-modal.component';
+
 
 /*ACTIONS PAGES */
 import { ConfirmActionComponent }               from './actions/confirm-action/confirm-action.component';
@@ -113,6 +116,8 @@ import { UpdatePasswordComponent }          from './login/updatePassword/updateP
         ActionsListComponent,
         ForgotPasswordComponent,
         UpdatePasswordComponent,
+        ContactsListComponent,
+        ContactsListModalComponent
     ],
     entryComponents: [
         CustomSnackbarComponent,
@@ -135,7 +140,8 @@ import { UpdatePasswordComponent }          from './login/updatePassword/updateP
         ProcessActionComponent,
         RedirectActionComponent,
         SendShippingActionComponent,
-        ViewDocActionComponent
+        ViewDocActionComponent,
+        ContactsListModalComponent
     ],
     providers: [ HeaderService, FiltersListService ],
     bootstrap: [ AppComponent ]

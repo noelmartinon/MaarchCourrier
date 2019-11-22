@@ -1053,4 +1053,12 @@ export const LANG_FR = {
     "requestSentByEmail" : "La demande vous a été envoyé par courriel.",
     "logInOncePasswordChanged": "Vous serez amené à vous connecter une fois la modification du mot de passe effectuée.",
     "invalidToken" : "Le jeton est expiré ou n'existe plus",
+    "othersInfos" : "Autre(s) information(s)",
+    "contactDetails" : "Coordonnées",
+    "contactsFillingRate" : "Taux de complétude",
+    "contact_physical" : "Contact physique",
+    "contact_corporate" : "Contact moral",
+    "contact_internal" : "Utilisateur interne",
+    "contact_entity"   : "Entité",
+    "contact_third"   : "Tier bénéficiaire",
 };
