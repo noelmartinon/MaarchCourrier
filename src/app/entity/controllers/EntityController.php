@@ -20,6 +20,8 @@ use Entity\models\ListInstanceModel;
 use Entity\models\ListTemplateModel;
 use Group\models\ServiceModel;
 use History\controllers\HistoryController;
+use MessageExchange\controllers\AnnuaryController;
+use Parameter\models\ParameterModel;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -157,6 +159,8 @@ class EntityController
         $entity['redirects'] = count($redirects);
         $entity['canAdminUsers'] = ServiceModel::hasService(['id' => 'admin_users', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin']);
         $entity['canAdminTemplates'] = ServiceModel::hasService(['id' => 'admin_templates', 'userId' => $GLOBALS['userId'], 'location' => 'templates', 'type' => 'admin']);
+        $siret = ParameterModel::getById(['id' => 'siret', 'select' => ['param_value_string']]);
+        $entity['canSynchronizeSiret'] = !empty($siret['param_value_string']);
 
         return $response->withJson(['entity' => $entity]);
     }
@@ -301,7 +305,7 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => [1]]);
+        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => ['id', 'business_id']]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
@@ -325,6 +329,13 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity is still used']);
         }
 
+        if (!empty($entity['business_id'])) {
+            $control = AnnuaryController::deleteEntityToOrganization(['id' => $entity['id']]);
+            if (!empty($control['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+            }
+        }
+
         ListTemplateModel::delete(['where' => ['object_id = ?'], 'data' => [$aArgs['id']]]);
         EntityModel::delete(['where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
 
@@ -346,7 +357,7 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $dyingEntity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => ['parent_entity_id']]);
+        $dyingEntity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => ['id', 'parent_entity_id', 'business_id']]);
         $successorEntity = EntityModel::getByEntityId(['entityId' => $aArgs['newEntityId'], 'select' => [1]]);
         if (empty($dyingEntity) || empty($successorEntity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity does not exist']);
@@ -355,6 +366,13 @@ class EntityController
         foreach ($entities as $entity) {
             if (($entity['entity_id'] == $aArgs['id'] && $entity['allowed'] == false) || ($entity['entity_id'] == $aArgs['newEntityId'] && $entity['allowed'] == false)) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
+            }
+        }
+
+        if (!empty($dyingEntity['business_id'])) {
+            $control = AnnuaryController::deleteEntityToOrganization(['id' => $dyingEntity['id']]);
+            if (!empty($control['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
             }
         }
 

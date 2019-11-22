@@ -720,7 +720,7 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
                     user_id : newUser.otherInfo,
                     firstname : displayName[0],
                     lastname : displayName[1]
-                }
+                };
                 this.currentEntity.users.push(user);
                 this.dataSourceUsers = new MatTableDataSource(this.currentEntity.users);
                 this.dataSourceUsers.paginator = this.paginatorUsers;
@@ -735,6 +735,16 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
         if(this.currentEntity.canAdminTemplates) {
             this.router.navigate(['/administration/templates/' + templateId]);
         }
+    }
+
+    addEntityToAnnuary() {
+        this.http.put(this.coreUrl + "rest/entities/" + this.currentEntity.id + "/annuaries", this.currentEntity)
+            .subscribe((data) => {
+                this.currentEntity.business_id = data['entitySiret'];
+                this.notify.success("Synchronisation effectuée");
+            }, (err) => {
+                this.notify.error(err.error.errors);
+            });
     }
 }
 @Component({

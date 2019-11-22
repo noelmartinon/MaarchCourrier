@@ -18,7 +18,7 @@
     <m2m_communication>https://cchaplin:maarch@demo.maarchcourrier.com</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
     <annuaries>
         <enabled>false</enabled>
-        <organization>Services du Premier Ministre</organization>
+        <organization>organization</organization>
         <annuary>
             <uri>1.1.1.1</uri>
             <baseDN>base</baseDN>

@@ -170,6 +170,7 @@ $app->get('/entities/{id}/details', \Entity\controllers\EntityController::class 
 $app->get('/entities/{id}/users', \Entity\controllers\EntityController::class . ':getUsersById');
 $app->put('/entities/{id}/reassign/{newEntityId}', \Entity\controllers\EntityController::class . ':reassignEntity');
 $app->put('/entities/{id}/status', \Entity\controllers\EntityController::class . ':updateStatus');
+$app->put('/entities/{id}/annuaries', \MessageExchange\controllers\AnnuaryController::class . ':updateEntityToOrganization');
 $app->get('/entityTypes', \Entity\controllers\EntityController::class . ':getTypes');
 
 //Groups

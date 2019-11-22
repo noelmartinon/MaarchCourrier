@@ -168,7 +168,10 @@
                                         <div class="col-sm-12">
                                             <mat-form-field>
                                                 <input matInput [(ngModel)]="currentEntity.business_id" name="business_id" id="business_id" title="{{lang.siretCode}}" type="text"
-                                                    placeholder="{{lang.siretCode}}" maxlength="255">
+                                                    placeholder="{{lang.siretCode}}" maxlength="255" disabled>
+                                                <button *ngIf="!creationMode && currentEntity.canSynchronizeSiret" color="primary" mat-icon-button matSuffix title="Synchroniser" (click)="addEntityToAnnuary()">
+                                                    <mat-icon class="fas fa-compress-arrows-alt"></mat-icon>
+                                                </button>
                                             </mat-form-field>
                                         </div>
                                     </div>

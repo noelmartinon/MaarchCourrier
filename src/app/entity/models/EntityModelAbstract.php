@@ -82,7 +82,7 @@ abstract class EntityModelAbstract
         ValidatorModel::notEmpty($aArgs, ['entity_id', 'entity_label', 'short_label', 'entity_type']);
         ValidatorModel::stringType($aArgs, [
             'entity_id', 'entity_label', 'short_label', 'entity_type', 'adrs_1', 'adrs_2', 'adrs_3',
-            'zipcode', 'city', 'country', 'email', 'business_id', 'parent_entity_id',
+            'zipcode', 'city', 'country', 'email', 'parent_entity_id',
             'ldap_id', 'transferring_agency', 'archival_agreement', 'archival_agency', 'entity_full_name'
         ]);
 
@@ -99,7 +99,6 @@ abstract class EntityModelAbstract
                 'city'                  => $aArgs['city'],
                 'country'               => $aArgs['country'],
                 'email'                 => $aArgs['email'],
-                'business_id'           => $aArgs['business_id'],
                 'parent_entity_id'      => $aArgs['parent_entity_id'],
                 'entity_type'           => $aArgs['entity_type'],
                 'ldap_id'               => $aArgs['ldap_id'],
