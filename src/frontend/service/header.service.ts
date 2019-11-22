@@ -28,7 +28,7 @@ export class HeaderService {
                 });
                 this.menu = data.menu;
 
-            }, (err) => {
+            }, (err: any) => {
                 console.log(err.error.errors);
             });
     }
@@ -36,5 +36,9 @@ export class HeaderService {
     setHeader(maintTitle: string, subTitle: any = '') {
         this.headerMessage = maintTitle;
         this.subHeaderMessage = subTitle;
+    }
+
+    hasCurrentUserPrivilege(privilegeId: string) {
+        return this.user.privileges.indexOf(privilegeId) > -1;
     }
 }

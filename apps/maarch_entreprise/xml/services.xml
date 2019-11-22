@@ -445,4 +445,20 @@
     <enabled>true</enabled>
     <angular>true</angular>
   </SERVICE>
+  <SERVICE>
+    <id>view_personal_data</id>
+    <name>_VIEW_PERSONAL_DATA</name>
+    <comment>_VIEW_PERSONAL_DATA</comment>
+    <servicetype>use</servicetype>
+    <system_service>false</system_service>
+    <enabled>true</enabled>
+  </SERVICE>
+  <SERVICE>
+    <id>manage_personal_data</id>
+    <name>_MANAGE_PERSONAL_DATA</name>
+    <comment>_MANAGE_PERSONAL_DATA</comment>
+    <servicetype>use</servicetype>
+    <system_service>false</system_service>
+    <enabled>true</enabled>
+  </SERVICE>
 </root>

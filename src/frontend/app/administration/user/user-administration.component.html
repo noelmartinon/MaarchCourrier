@@ -174,7 +174,7 @@
                                     <mat-form-field>
                                         <input matInput type="tel" id="phone" name="phone" title="{{lang.phoneNumber}}"
                                             placeholder="{{lang.phoneNumber}}" [(ngModel)]="user.phone"
-                                            pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$">
+                                            pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$"  [disabled]="!canManagePersonalDatas || !canViewPersonalDatas">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -398,8 +398,8 @@
                             </mat-tab-group>
                         </div>
                     </mat-tab>
-                    <mat-tab *ngIf="!creationMode" label="{{lang.signatures}}">
-                        <div dnd-droppable matTooltip="{{lang.uploadSignFileInfo}}"
+                    <mat-tab *ngIf="!creationMode" label="{{lang.signatures}}" [disabled]="!canViewPersonalDatas">
+                        <div *ngIf="canManagePersonalDatas" dnd-droppable matTooltip="{{lang.uploadSignFileInfo}}"
                             (click)="clickOnUploader('uploadSignFile')" [class.dndFileHighlighted]="highlightMe"
                             (dragover)="highlightMe=true" (dragleave)="highlightMe=false"
                             (onDropSuccess)="test($event);highlightMe=false;" class="dndFile">
@@ -414,10 +414,10 @@
                                             <mat-form-field floatLabel="never">
                                                 <input matInput type="text" [(ngModel)]="signature.signature_label"
                                                     name="selectedSignatureLabel" placeholder="{{lang.label}}"
-                                                    (change)="updateSignature(i)">
+                                                    (change)="updateSignature(i)" [disabled]="!canManagePersonalDatas">
                                                 <button mat-button matSuffix mat-icon-button
                                                     (click)="deleteSignature(signature)" color="warn"
-                                                    matTooltip="{{lang.delete}}">
+                                                    matTooltip="{{lang.delete}}" [disabled]="!canManagePersonalDatas">
                                                     <mat-icon class="fa fa-times"></mat-icon>
                                                 </button>
                                             </mat-form-field>
@@ -428,7 +428,7 @@
                                 </div>
                             </div>
                             <div>
-                                <button *ngIf="user.signatures.length > 0" mat-icon-button color="primary" (click)="syncMP()"
+                                <button *ngIf="user.signatures.length > 0  && canManagePersonalDatas" mat-icon-button color="primary" (click)="syncMP()"
                                     matTooltip="{{lang.syncSignsToMaarchParapheur}}"
                                     [disabled]="!user.external_id.maarchParapheur || loadingSign">
                                     <mat-icon class="fa fa-sync-alt fa-2x" [class.fa-spin]="loadingSign"></mat-icon>

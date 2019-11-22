@@ -512,3 +512,6 @@ define("_PASSWORD_REINIT", "Mot de passe réinitialisé");
 define("_NOTIFICATIONS_USER_CREATION_SUBJECT", "[Maarch Courrier] Création de votre compte");
 define("_NOTIFICATIONS_USER_CREATION_BODY", "Bonjour,<br/>Un administrateur a créé votre compte dans l'application Maarch Courrier.<br/>Pour vous connecter et définir votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
 define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>Ce message est envoyé automatiquement. Merci de ne pas y répondre.<br/>Pour toutes questions, merci de contacter l'administrateur technique de la solution.");
+
+define("_VIEW_PERSONAL_DATA", "Voir les données personnelles de l'utilisateur");
+define("_MANAGE_PERSONAL_DATA", "Modifier ou supprimer les données personnelles de l'utilisateur");

@@ -87,6 +87,9 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
     selectedTabIndex: number = 0;
     maarchParapheurConnectionStatus = true;
 
+    canViewPersonalDatas: boolean = false;
+    canManagePersonalDatas: boolean = false;
+
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
     applyFilter(filterValue: string) {
@@ -138,6 +141,8 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
 
                 this.headerService.setHeader(this.lang.userCreation);
                 this.creationMode = true;
+                this.canViewPersonalDatas = true;
+                this.canManagePersonalDatas = true;
                 this.loading = false;
             } else {
                 window['MainHeaderComponent'].setSnav(this.sidenavLeft);
@@ -148,6 +153,20 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
                 this.http.get(this.coreUrl + "rest/users/" + this.serialId + "/details")
                     .subscribe((data: any) => {
                         this.user = data;
+
+                        if (this.headerService.user.id === this.user.id) {
+                            this.canViewPersonalDatas = true;
+                            this.canManagePersonalDatas = true;
+                        } else {
+                            this.canViewPersonalDatas = this.headerService.hasCurrentUserPrivilege('view_personal_data');
+                            this.canManagePersonalDatas = this.headerService.hasCurrentUserPrivilege('manage_personal_data');
+                        }
+                        
+                        
+                        if (!this.canViewPersonalDatas) {
+                            this.user.phone = '****';
+
+                        }
 
                         this.data = data.history;
                         this.userId = data.user_id;
