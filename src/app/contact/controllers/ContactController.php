@@ -16,13 +16,17 @@ namespace Contact\controllers;
 
 use Contact\models\ContactFillingModel;
 use Contact\models\ContactModel;
+use Entity\models\EntityModel;
 use Group\models\ServiceModel;
+use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
+use User\models\UserModel;
 
 class ContactController
 {
@@ -227,6 +231,34 @@ class ContactController
         ContactFillingModel::update($data);
 
         return $response->withJson(['success' => 'success']);
+    }
+
+    public function getContacts(Request $request, Response $response, array $args)
+    {
+        $ext = ResModel::getExtById(['resId' => $args['resId']]);
+
+        if (empty($ext)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document does not exist']);
+        }
+
+        $queryParams = $request->getQueryParams();
+
+        $contacts = [];
+        if ($queryParams['type'] == 'senders') {
+            if ($ext['category_id'] == 'outgoing') {
+                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
+            } else {
+                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'contacts_res', 'columnRes' => 'exp_user_id']);
+            }
+        } elseif ($queryParams['type'] == 'recipients') {
+            if ($ext['category_id'] == 'outgoing') {
+                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'contact_res', 'columnRes' => 'exp_user_id']);
+            } else {
+                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
+            }
+        }
+
+        return $response->withJson(['contacts' => $contacts]);
     }
 
     public static function getFillingRate(array $aArgs)
@@ -441,5 +473,180 @@ class ContactController
         } else {
             return false;
         }
+    }
+
+    public static function getFormattedContacts(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resource', 'tableMulti']);
+        ValidatorModel::arrayType($args, ['resource']);
+        ValidatorModel::stringType($args, ['tableMulti', 'columnRes']);
+
+        $resource = $args['resource'];
+
+        $rawContacts = [];
+        if ($resource['is_multicontacts'] == 'Y' || !isset($args['columnRes'])) {
+            if ($args['tableMulti'] == 'contacts_res') {
+                $multiContacts = DatabaseModel::select([
+                    'select' => ['contact_id', 'address_id', 'mode'],
+                    'table' => ['contacts_res'],
+                    'where' => ['res_id = ?'],
+                    'data' => [$resource['res_id']]
+                ]);
+
+                foreach ($multiContacts as $multiContact) {
+                    $rawContacts[] = [
+                        'login'         => $multiContact['contact_id'],
+                        'address_id'    => $multiContact['address_id'],
+                        'mode'          => $multiContact['mode']
+                    ];
+                }
+            } elseif ($args['tableMulti'] == 'resource_contacts') {
+                $multiContacts = DatabaseModel::select([
+                    'select' => ['item_id', 'type', 'mode'],
+                    'table' => ['resource_contacts'],
+                    'where' => ['res_id = ?'],
+                    'data' => [$resource['res_id']]
+                ]);
+
+                foreach ($multiContacts as $multiContact) {
+                    $rawContacts[] = [
+                        'user_id' => $multiContact['type'] == 'user' ? $multiContact['item_id'] : null,
+                        'address_id' => $multiContact['type'] == 'contact' ? $multiContact['item_id'] : null,
+                        'entity_id' => $multiContact['type'] == 'entity' ? $multiContact['item_id'] : null,
+                    ];
+                }
+            }
+        } else {
+            $rawContacts[] = [
+                'login'         => $resource[$args['columnRes']],
+                'address_id'    => $resource['address_id'],
+            ];
+        }
+
+        $contacts = [];
+
+        foreach ($rawContacts as $rawContact) {
+            if (!empty($rawContact['address_id'])) {
+                $contactView = ContactModel::getOnView([
+                    'select' => [
+                        'is_corporate_person', 'lastname', 'firstname', 'address_num', 'address_street', 'address_complement',
+                        'address_town', 'address_postal_code', 'address_country', 'ca_id', 'society', 'website', 'phone',
+                        'contact_firstname', 'contact_lastname', 'address_country', 'email', 'function', 'contact_other_data',
+                        'occupancy'
+                    ],
+                    'where'     => ['ca_id = ?'],
+                    'data'      => [$rawContact['address_id']]
+                ]);
+
+                $contactView = $contactView[0];
+
+                if (!empty($rawContact['mode']) && $rawContact['mode'] == 'third') {
+                    $mode = 'third';
+                } else {
+                    $mode = $contactView['is_corporate_person'] == 'Y' ? 'corporate' : 'physical';
+                }
+
+                $contact = [
+                    'mode'      => $mode,
+                    'firstname' => $contactView['firstname'] ?? '',
+                    'lastname'  => $contactView['lastname'] ?? '',
+                    'email'     => $contactView['email'] ?? '',
+                    'phone'     => $contactView['phone'] ?? '',
+                    'society'   => $contactView['society'] ?? '',
+                    'function'  => $contactView['function'] ?? '',
+                    'num'       => $contactView['address_num'] ?? '',
+                    'street'    => $contactView['address_street'] ?? '',
+                    'complement'=> $contactView['address_complement'] ?? '',
+                    'town'      => $contactView['address_town'] ?? '',
+                    'postalCode'=> $contactView['address_postal_code'] ?? '',
+                    'country'   => $contactView['address_country'] ?? '',
+                    'otherData' => $contactView['contact_other_data'] ?? '',
+                    'website'   => $contactView['website'] ?? '',
+                    'occupancy' => $contactView['occupancy'] ?? '',
+                    'department' => $contactView['departement'] ?? ''
+                ];
+
+                $filling = ContactController::getFillingRate(['contact' => $contact]);
+
+                $contact['filling'] = $filling['color'];
+
+                $contacts[] = $contact;
+            } elseif (!empty($rawContact['login'] || !empty($rawContact['user_id']))) {
+                if (!empty($rawContact['login'])) {
+                    $user = UserModel::getByLowerLogin(['login' => $rawContact['login']]);
+                } else {
+                    $user = UserModel::getById(['id' => $rawContact['user_id']]);
+                }
+
+                $phone = '';
+                if (!empty($phone) /*&& ($user['id'] == $GLOBALS['id']
+                        || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']]))*/) {
+                    $phone = $user['phone'];
+                }
+
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $user['id']]);
+
+                $userEntities = UserModel::getNonPrimaryEntitiesById(['id' => $user['id']]);
+                $userEntities = array_column($userEntities, 'entity_label');
+
+                $nonPrimaryEntities = implode(', ', $userEntities);
+
+                $contact = [
+                    'mode'      => 'internal',
+                    'firstname' => $user['firstname'],
+                    'lastname'  => $user['lastname'],
+                    'email'     => $user['mail'],
+                    'phone'     => $phone,
+                    'society'   => '',
+                    'function'  => '',
+                    'num'       => '',
+                    'street'    => '',
+                    'complement'=> '',
+                    'town'      => '',
+                    'postalCode'=> '',
+                    'country'   => '',
+                    'otherData' => '',
+                    'website'   => '',
+                    'occupancy' => $nonPrimaryEntities,
+                    'department' => $primaryEntity['entity_label']
+                ];
+
+                $filling = ContactController::getFillingRate(['contact' => $contact]);
+
+                $contact['filling'] = $filling['color'];
+
+                $contacts[] = $contact;
+            } elseif (!empty($rawContact['entity_id'])) {
+                $entity = EntityModel::getById(['id' => $rawContact['entity_id']]);
+
+                $contact = [
+                    'mode'      => 'entity',
+                    'firstname' => '',
+                    'lastname'  => $entity['entity_label'],
+                    'email'     => $entity['email'],
+                    'phone'     => '',
+                    'society'   => '',
+                    'function'  => '',
+                    'num'       => '',
+                    'street'    => '',
+                    'complement'=> '',
+                    'town'      => '',
+                    'postalCode'=> '',
+                    'country'   => '',
+                    'otherData' => '',
+                    'website'   => '',
+                    'occupancy' => '',
+                    'department' => ''
+                ];
+
+                $filling = ContactController::getFillingRate(['contact' => $contact]);
+
+                $contact['filling'] = $filling['color'];
+
+                $contacts[] = $contact;
+            }
+        }
+
+        return $contacts;
     }
 }

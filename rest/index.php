@@ -271,6 +271,7 @@ $app->get('/categories', \Resource\controllers\ResController::class . ':getCateg
 $app->get('/natures', \Resource\controllers\ResController::class . ':getNatures');
 $app->get('/resources/{resId}/isAllowed', \Resource\controllers\ResController::class . ':isAllowedForCurrentUser');
 $app->post('/resources/checkFileUpload', \Resource\controllers\StoreController::class . ':checkFileUpload');
+$app->get('/resources/{resId}/contacts', \Contact\controllers\ContactController::class . ':getContacts');
 
 //ResourcesList
 $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}', \Resource\controllers\ResourceListController::class . ':get');
