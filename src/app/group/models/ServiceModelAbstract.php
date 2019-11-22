@@ -350,4 +350,64 @@ abstract class ServiceModelAbstract
 
         return $loadedXml;
     }
+
+    public static function getParametersFromGroupPrivilege(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['groupId', 'privilegeId']);
+        ValidatorModel::stringType($args, ['groupId', 'privilegeId']);
+
+        $extra = DatabaseModel::select([
+            'select'    => ['parameters'],
+            'table'     => ['usergroups_services'],
+            'where'     => ['usergroups_services.group_id = ?', 'usergroups_services.service_id = ?'],
+            'data'      => [$args['groupId'], $args['privilegeId']]
+        ]);
+
+        $extra = array_column($extra, 'parameters');
+
+        if (count($extra) == 0) {
+            return null;
+        }
+
+        $extra = json_decode($extra[0], true);
+
+        return $extra;
+    }
+
+    public static function getByUserAndPrivilege(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['userId', 'privilegeId']);
+        ValidatorModel::intVal($args, ['userId']);
+        ValidatorModel::stringType($args, ['privilegeId']);
+
+        $aServices = DatabaseModel::select([
+            'select'    => ['usergroups_services.service_id, usergroups_services.parameters'],
+            'table'     => ['usergroup_content, usergroups_services, usergroups'],
+            'where'     => [
+                'usergroup_content.group_id = usergroups.id',
+                'usergroups.group_id = usergroups_services.group_id',
+                'usergroup_content.user_id = ?',
+                'usergroups_services.service_id = ?'
+            ],
+            'data'      => [$args['userId'], $args['privilegeId']]
+        ]);
+
+        return $aServices;
+    }
+
+    public static function updateParameters(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['groupId', 'privilegeId']);
+        ValidatorModel::stringType($args, ['groupId', 'privilegeId']);
+
+        DatabaseModel::update([
+            'table'     => 'usergroups_services',
+            'set'       => ['parameters ' => $args['parameters']],
+            'where'     => ['usergroups_services.group_id = ?', 'usergroups_services.service_id = ?'],
+            'data'      => [$args['groupId'], $args['privilegeId']]
+        ]);
+
+        return true;
+
+    }
 }

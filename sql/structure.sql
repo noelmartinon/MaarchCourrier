@@ -200,6 +200,7 @@ CREATE TABLE usergroups_services
 (
   group_id character varying NOT NULL,
   service_id character varying NOT NULL,
+  parameters jsonb,
   CONSTRAINT usergroups_services_pkey PRIMARY KEY (group_id, service_id)
 )
 WITH (OIDS=FALSE);

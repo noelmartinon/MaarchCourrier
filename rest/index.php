@@ -181,6 +181,8 @@ $app->delete('/groups/{id}', \Group\controllers\GroupController::class . ':delet
 $app->get('/groups/{id}/details', \Group\controllers\GroupController::class . ':getDetailledById');
 $app->put('/groups/{id}/services/{serviceId}', \Group\controllers\GroupController::class . ':updateService');
 $app->put('/groups/{id}/reassign/{newGroupId}', \Group\controllers\GroupController::class . ':reassignUsers');
+$app->put('/groups/{id}/privileges/{privilegeId}/parameters', \Group\controllers\ServiceController::class . ':updateParameters');
+$app->get('/groups/{id}/privileges/{privilegeId}/parameters', \Group\controllers\ServiceController::class . ':getParameters');
 
 //Histories
 $app->get('/histories', \History\controllers\HistoryController::class . ':get');
