@@ -1061,4 +1061,7 @@ export const LANG_FR = {
     "contact_internal" : "Utilisateur interne",
     "contact_entity"   : "Entité",
     "contact_third"   : "Tier bénéficiaire",
+    "goToAdminParams" : "Accéder aux paramètres de l'administration",
+    "adminParamsUsers" : "Options administration utilisateurs",
+    "chooseAllowedGroups" : "Choisissez les groupes d'affectations autorisés",
 };

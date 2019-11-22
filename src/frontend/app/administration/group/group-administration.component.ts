@@ -8,6 +8,8 @@ import { HeaderService }        from '../../../service/header.service';
 import { MatPaginator, MatTableDataSource, MatSort, MatSidenav} from '@angular/material';
 
 import { AutoCompletePlugin } from '../../../plugins/autocomplete.plugin';
+import { map, tap, exhaustMap, finalize, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 declare function $j(selector: any) : any;
 declare const angularGlobals : any;
@@ -15,6 +17,7 @@ declare const angularGlobals : any;
 
 @Component({
     templateUrl: "group-administration.component.html",
+    styleUrls: ['group-administration.component.scss'],
     providers   : [NotificationService]
 })
 export class GroupAdministrationComponent  extends AutoCompletePlugin implements OnInit {
@@ -28,6 +31,7 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
     coreUrl                         : string;
     lang                            : any       = LANG;
     loading                         : boolean   = false;
+    paramsLoading: boolean = false;
 
     group                           : any       = {
         security                    : {}
@@ -39,6 +43,8 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
     usersDataSource                 : any;
     basketsDataSource               : any;
 
+    authorizedGroupsUserParams: any[] = [];
+    panelMode = 'keywordInfos';
 
     @ViewChild('paginatorBaskets') paginatorBaskets: MatPaginator;
     @ViewChild('sortBaskets') sortBaskets: MatSort;
@@ -127,6 +133,9 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
     }
 
     updateService(service: any) {
+        if (service.checked) {
+            this.sidenavRight.close();
+        }
         this.http.put(this.coreUrl + "rest/groups/" + this.group['id'] + "/services/" + service['id'], service)
             .subscribe(() => {
                 this.notify.success(this.lang.groupServicesUpdated);
@@ -160,5 +169,63 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
+    }
+
+    openUserParams(id: string) {
+        this.sidenavRight.toggle();
+        if (!this.sidenavRight.opened) {
+            this.panelMode = '';
+        } else {
+            this.panelMode = id;
+            this.paramsLoading = true;
+            this.http.get(`../../rest/groups`).pipe(
+                map((data: any) => {
+                    data.groups = data.groups.map((group: any) => {
+                        return {
+                            id: group.id,
+                            label: group.group_desc
+                        }
+                    });
+                    return data;
+                }),
+                tap((data: any) => {
+                    this.authorizedGroupsUserParams = data.groups;
+                }),
+                exhaustMap(() => this.http.get(`../../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters?parameter=groups`)),
+                tap((data: any) => {
+                    const allowedGroups: any[] = data;
+                    this.authorizedGroupsUserParams.forEach(group => {
+                        if (allowedGroups.indexOf(group.id) > -1) {
+                            group.checked = true;
+                        } else {
+                            group.checked = false;
+                        }
+                    });
+                }),
+                finalize(() => this.paramsLoading = false),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
+    }
+
+    updatePrivilegeParams(paramList: any) {
+        let obj = {};
+        if (this.panelMode === 'admin_users') {
+            obj = {
+                groups: paramList.map((param: any) => param.value)
+            }
+        }
+        this.http.put(`../../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters`, { parameters: obj }).pipe(
+            tap(() => {
+                this.notify.success('parametres modifiés');
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

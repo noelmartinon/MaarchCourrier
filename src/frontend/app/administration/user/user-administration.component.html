@@ -219,7 +219,7 @@
                         <mat-nav-list>
                             <mat-list-item *ngFor="let group of user.allGroups" disableRipple="true">
                                 <mat-slide-toggle id="{{group.group_id}}" color="primary"
-                                    [checked]="group.disabled == true" (change)="toggleGroup(group)">
+                                    [checked]="group.checked == true" [disabled]="!group.enabled" (change)="toggleGroup(group)">
                                     {{group.group_desc}}</mat-slide-toggle>
                             </mat-list-item>
                         </mat-nav-list>
