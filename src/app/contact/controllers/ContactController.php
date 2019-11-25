@@ -18,6 +18,7 @@ use Contact\models\ContactFillingModel;
 use Contact\models\ContactModel;
 use Entity\models\EntityModel;
 use Group\models\ServiceModel;
+use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use Respect\Validation\Validator;
@@ -235,6 +236,11 @@ class ContactController
 
     public function getContacts(Request $request, Response $response, array $args)
     {
+        if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['userId']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+
         $ext = ResModel::getExtById(['resId' => $args['resId']]);
 
         if (empty($ext)) {
