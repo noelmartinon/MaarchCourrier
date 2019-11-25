@@ -14,7 +14,6 @@
 
 namespace MessageExchange\controllers;
 
-
 use Entity\models\EntityModel;
 use Group\models\ServiceModel;
 use Parameter\models\ParameterModel;
@@ -144,7 +143,7 @@ class AnnuaryController
         return ['success' => 'success'];
     }
 
-    private static function getAnnuaries()
+    public static function getAnnuaries()
     {
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
 

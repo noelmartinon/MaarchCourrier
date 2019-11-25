@@ -107,6 +107,12 @@ abstract class contacts_v2_Abstract extends Database
         } else {
             $_SESSION['m_admin']['communication']['TYPE'] = '';
         }
+        if ($_REQUEST['business_id_value'] != '') {
+            $_SESSION['m_admin']['communication']['business_id'] = $_REQUEST['business_id_value'];
+            $_SESSION['m_admin']['address']['M2M_ID'] = $_REQUEST['business_id_value'];
+        } else {
+            $_SESSION['m_admin']['communication']['TYPE'] = '';
+        }
         if (!empty($_SESSION['m_admin']['communication']['TYPE'])) {
             $_SESSION['m_admin']['communication']['VALUE'] = trim(trim($func->wash(
                 $_REQUEST['communication_value'], 'no', _COMMUNICATION_VALUE.' ', 'yes', 0, 255
@@ -942,6 +948,8 @@ abstract class contacts_v2_Abstract extends Database
                             </span>
                         </div>
                     </div>
+                    <input name="communication_type" type="hidden" id="communication_type" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['TYPE'])); ?>"/>
+                    <input name="business_id_value" type="hidden" id="business_id_value" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['business_id'])); ?>"/>
                 </td>
             </tr>
         </table>
@@ -1034,6 +1042,32 @@ abstract class contacts_v2_Abstract extends Database
         } else if ($j('[name=is_corporate]:checked').val() == 'Y' && isChecked == false) {
             setContactType('corporate', '<?php echo $can_add_contact; ?>');
         }
+
+        $j("#communication_value").typeahead({
+            delay: '300',
+            minLength: 0,
+            searchOnFocus: true,
+            filter: false,
+            dynamic: true,
+            display: "unitOrganization",
+            templateValue: "{{unitOrganization}}",
+            emptyTemplate: "L'entreprise <b>"+$j('#society').val()+"</b> n'existe pas dans l'annuaire",
+            source: {
+                ajax: {
+                    type: "GET",
+                    dataType: "json",
+                    url: "../../rest/autocomplete/ouM2MAnnuary",
+                    data: {
+                        society: $j('#society').val()
+                    }
+                }
+            },
+            callback: {
+                onClickAfter: function(node, a, item, event) {
+                    setM2MAnnuary(item);
+                }
+            }
+        });
     </script>
 
 
@@ -2005,9 +2039,13 @@ abstract class contacts_v2_Abstract extends Database
                         <?php echo _M2M_ID; ?>:</label>
                 </td>
                 <td align="right">
-                    <input style="margin-left:0px;" class="<?php echo $fieldAddressClass; ?>" name="m2m_id"
-                        id="m2m_id" type="text" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_ID'])); ?>"
-                    />
+                    <div class="typeahead__container" style="width: 208px;display:inline-block;">
+                        <div class="typeahead__field">
+                            <span class="typeahead__query">
+                                <input class="<?php echo $fieldAddressClass; ?>" name="m2m_id" id="m2m_id" autocomplete="off" type="text" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_ID'])); ?>"/>
+                            </span>
+                        </div>
+                    </div>
                     <span class="blue_asterisk" style="visibility:hidden;">*</span>
                 </td>
             </tr>
@@ -2175,6 +2213,35 @@ abstract class contacts_v2_Abstract extends Database
     <?php
 
                 }
+                ?>
+                <script type="text/javascript">
+                    $j("#m2m_id").typeahead({
+                        delay: '300',
+                        minLength: 0,
+                        searchOnFocus: true,
+                        filter: false,
+                        dynamic: true,
+                        display: "unitOrganization",
+                        templateValue: "{{unitOrganization}}",
+                        emptyTemplate: "L'entreprise <b>"+$j('#society').val()+"</b> n'existe pas dans l'annuaire",
+                        source: {
+                            ajax: {
+                                type: "GET",
+                                dataType: "json",
+                                url: "../../rest/autocomplete/businessIdM2MAnnuary",
+                                data: {
+                                    communicationValue: $j('#is_external_contact_id').val()
+                                }
+                            }
+                        },
+                        callback: {
+                            onClickAfter: function(node, a, item, event) {
+                                $j('#m2m_id').val(item.businessIdValue);
+                            }
+                        }
+                    });
+                </script>
+                <?php
         } ?>
 </div>
 <?php

@@ -4044,8 +4044,14 @@ function getOuM2MAnnuary() {
         },
         callback: {
             onClickAfter: function(node, a, item, event) {
-                $j('#communication_value').val(item.communicationValue);
+                setM2MAnnuary(item);
             }
         }
     });
+}
+
+function setM2MAnnuary(item) {
+    $j('#communication_value').val(item.communicationValue);
+    $j('#communication_type').val(item.communicationType);
+    $j('#business_id_value').val(item.businessIdValue);
 }

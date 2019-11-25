@@ -251,6 +251,7 @@
       <parameter name="dir" type="identifier" />
       <parameter name="mycontact" type="identifier" />
       <parameter name="communication_type" type="string" />
+      <parameter name="business_id_value" type="string" />
       <parameter name="communication_value" type="string" />
     </validationRule>
 
