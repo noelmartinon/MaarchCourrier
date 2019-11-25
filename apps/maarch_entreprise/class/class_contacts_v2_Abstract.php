@@ -1457,6 +1457,7 @@ abstract class contacts_v2_Abstract extends Database
                     $_SESSION['m_admin']['address']['SALUTATION_FOOTER'] = functions::show_string($line->salutation_footer);
                     $externalId = (array)json_decode($line->external_id);
                     $_SESSION['m_admin']['address']['M2M_ID'] = $externalId['m2m'];
+                    $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = $externalId['m2m_ldap_id'];
                     $_SESSION['m_admin']['address']['BAN_ID'] = functions::show_string($line->ban_id);
                 } else {
                     unset($_SESSION['address_up_error']);
@@ -2047,6 +2048,7 @@ abstract class contacts_v2_Abstract extends Database
                         </div>
                     </div>
                     <span class="blue_asterisk" style="visibility:hidden;">*</span>
+                    <input name="m2m_ldap_id" type="hidden" id="m2m_ldap_id" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_LDAP_ID'])); ?>"/>
                 </td>
             </tr>
             <tr>
@@ -2237,6 +2239,7 @@ abstract class contacts_v2_Abstract extends Database
                         callback: {
                             onClickAfter: function(node, a, item, event) {
                                 $j('#m2m_id').val(item.businessIdValue);
+                                $j('#m2m_ldap_id').val(item.entryuuid);
                             }
                         }
                     });
@@ -2374,7 +2377,7 @@ abstract class contacts_v2_Abstract extends Database
                     $_SESSION['m_admin']['address']['MAIL'], $_SESSION['m_admin']['address']['ADD_NUM'], $_SESSION['m_admin']['address']['ADD_STREET'], $_SESSION['m_admin']['address']['ADD_COMP'],
                     $_SESSION['m_admin']['address']['ADD_TOWN'], $_SESSION['m_admin']['address']['ADD_CP'], $_SESSION['m_admin']['address']['ADD_COUNTRY'], $_SESSION['m_admin']['address']['OTHER_DATA'],
                     $_SESSION['m_admin']['address']['TITLE'], $_SESSION['m_admin']['address']['IS_PRIVATE'], $_SESSION['m_admin']['address']['WEBSITE'], $_SESSION['m_admin']['address']['OCCUPANCY'],
-                    $_SESSION['user']['UserId'], $entity_id, $_SESSION['m_admin']['address']['SALUTATION_HEADER'], $_SESSION['m_admin']['address']['SALUTATION_FOOTER'], json_encode(['m2m' => $_SESSION['m_admin']['address']['M2M_ID']]), $_SESSION['m_admin']['address']['BAN_ID'], );
+                    $_SESSION['user']['UserId'], $entity_id, $_SESSION['m_admin']['address']['SALUTATION_HEADER'], $_SESSION['m_admin']['address']['SALUTATION_FOOTER'], json_encode(['m2m' => $_SESSION['m_admin']['address']['M2M_ID']'m2m_ldap_id' => $_SESSION['m_admin']['address']['M2M_LDAP_ID']]), $_SESSION['m_admin']['address']['BAN_ID'], );
 
                 $db->query($query, $arrayPDO);
                 if ($_SESSION['history']['addressadd']) {
@@ -2475,6 +2478,7 @@ abstract class contacts_v2_Abstract extends Database
                 $contactToUpdate = \Contact\models\ContactModel::getByAddressId(['addressId' => $_SESSION['m_admin']['address']['ID'], 'select' => ['external_id']]);
                 $externalId = json_decode($contactToUpdate['external_id'], true);
                 $externalId['m2m'] = empty($_SESSION['m_admin']['address']['M2M_ID']) ? null : $_SESSION['m_admin']['address']['M2M_ID'];
+                $externalId['m2m_ldap_id'] = empty($_SESSION['m_admin']['address']['M2M_LDAP_ID']) ? null : $_SESSION['m_admin']['address']['M2M_LDAP_ID'];
 
                 $query = 'UPDATE '.$_SESSION['tablename']['contact_addresses'].' 
                       SET contact_purpose_id = ?
@@ -2612,6 +2616,7 @@ abstract class contacts_v2_Abstract extends Database
         } else {
             $_SESSION['m_admin']['address']['M2M_ID'] = '';
         }
+        $_SESSION['m_admin']['address']['M2M_ID'] = $_REQUEST['m2m_ldap_id'];
 
         if ($_REQUEST['departement'] != '') {
             $_SESSION['m_admin']['address']['DEPARTEMENT'] = $func->wash(

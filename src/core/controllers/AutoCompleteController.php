@@ -663,7 +663,7 @@ class AutoCompleteController
             }
             $entries = ldap_get_entries($ldap, $search);
             $siret = $entries[0]['destinationindicator'][0];
-            $search  = @ldap_search($ldap, $entries[0]['dn'], "(cn=*)", ['cn', 'destinationindicator']);
+            $search  = @ldap_search($ldap, $entries[0]['dn'], "(cn=*)", ['cn', 'destinationindicator', 'entryUUID']);
             $entries = ldap_get_entries($ldap, $search);
 
             foreach ($entries as $key => $value) {
@@ -671,6 +671,7 @@ class AutoCompleteController
                     continue;
                 }
                 $unitOrganizations[] = [
+                    'entryuuid'        => $value['entryuuid'][0],
                     'businessIdValue'  => $siret . '/' . $value['destinationindicator'][0],
                     'unitOrganization' => "{$value['cn'][0]} - {$siret}/{$value['destinationindicator'][0]}"
                 ];
