@@ -15,10 +15,10 @@
         <contact_purpose_id>1</contact_purpose_id>
     </contact_addresses>
     <basketRedirection_afterUpload>NumericBasket</basketRedirection_afterUpload><!--basketId-->
-    <m2m_communication>https://cchaplin:maarch@demo.maarchcourrier.com</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
+    <m2m_communication>https://cchaplin:maarch@demo.maarchcourrier.com,cchaplin@maarch.com</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
     <annuaries>
         <enabled>false</enabled>
-        <organization>Services du Premier Ministre</organization>
+        <organization>Service</organization>
         <annuary>
             <uri>1.1.1.1</uri>
             <baseDN>base</baseDN>

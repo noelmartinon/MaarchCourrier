@@ -52,6 +52,7 @@ class AnnuaryController
             }
         }
         $organization = $control['organization'];
+        $communicationMeans = $control['communicationMeans'];
         $annuaries = $control['annuaries'];
 
         foreach ($annuaries as $annuary) {
@@ -63,16 +64,37 @@ class AnnuaryController
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
             ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
 
-            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['id']})", ['dn']);
+            $search = @ldap_search($ldap, "{$annuary['baseDN']}", "(ou={$organization})", ['dn']);
             if ($search === false) {
-                return $response->withStatus(400)->withJson(['errors' => 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap)]);
+                continue;
             }
-            $entries = ldap_get_entries($ldap, $search);
 
             $authenticated = @ldap_bind($ldap, $annuary['login'], $annuary['password']);
             if (!$authenticated) {
                 return $response->withStatus(400)->withJson(['errors' => 'Ldap authentication failed : ' . ldap_error($ldap)]);
             }
+
+            $entries = ldap_get_entries($ldap, $search);
+            if ($entries['count'] == 0) {
+                $info = [];
+                $info['ou'] = $organization;
+                $info['destinationIndicator'] = $siret['param_value_string'];
+                $info['labeledURI'] = $communicationMeans['url'] ?? null;
+                $info['postOfficeBox'] = $communicationMeans['email'] ?? null;
+                $info['objectclass'] = ['organizationalUnit', 'top', 'labeledURIObject'];
+
+                $added = @ldap_add($ldap, "ou={$organization},{$annuary['baseDN']}", $info);
+                if (!$added) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Ldap add failed : ' . ldap_error($ldap)]);
+                }
+            }
+
+            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['id']})", ['dn']);
+            if ($search === false) {
+                return $response->withStatus(400)->withJson(['errors' => 'Ldap search failed : ' . ldap_error($ldap)]);
+            }
+            $entries = ldap_get_entries($ldap, $search);
+
             if ($entries['count'] > 0) {
                 $renamed = @ldap_rename($ldap, $entries[0]['dn'], "cn={$entity['entity_label']}", "ou={$organization},{$annuary['baseDN']}", true);
                 if (!$renamed) {
@@ -84,6 +106,7 @@ class AnnuaryController
                     return $response->withStatus(400)->withJson(['errors' => 'Ldap replace failed : ' . ldap_error($ldap)]);
                 }
             } else {
+                $info = [];
                 $info['cn'] = $entity['entity_label'];
                 $info['sn'] = $entity['entity_label'];
                 $info['destinationIndicator'] = $args['id'];
@@ -170,6 +193,23 @@ class AnnuaryController
             ];
         }
 
-        return ['annuaries' => $annuaries, 'organization' => $organization];
+        $rawCommunicationMeans = (string)$loadedXml->m2m_communication;
+        if (empty($rawCommunicationMeans)) {
+            return ['errors' => 'Tag m2m_communication is empty'];
+        }
+        $communicationMeans = [];
+        $rawCommunicationMeans = explode(',', $rawCommunicationMeans);
+        foreach ($rawCommunicationMeans as $value) {
+            if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                $communicationMeans['email'] = $value;
+            } elseif (filter_var($value, FILTER_VALIDATE_URL)) {
+                $communicationMeans['url'] = $value;
+            }
+        }
+        if (empty($communicationMeans)) {
+            return ['errors' => 'No communication means found'];
+        }
+
+        return ['annuaries' => $annuaries, 'organization' => $organization, 'communicationMeans' => $communicationMeans];
     }
 }
