@@ -154,11 +154,7 @@ class UserController
         $check = $check && Validator::stringType()->notEmpty()->validate($data['firstname']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['lastname']);
         $check = $check && (empty($data['mail']) || filter_var($data['mail'], FILTER_VALIDATE_EMAIL));
-
-        if (!ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use'])) {
-            $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone']));
-        }
-
+        $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone']));
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
@@ -187,10 +183,6 @@ class UserController
 
         if ($data['loginmode'] == 'restMode') {
             $data['changePassword']= 'N';
-        }
-
-        if (!ServiceModel::hasService(['id' => 'manage_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use'])) {
-            $data['phone'] = null;
         }
 
         UserModel::create(['user' => $data]);
