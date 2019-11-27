@@ -329,11 +329,13 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity is still used']);
         }
 
+        $entities = [];
         if (!empty($entity['business_id'])) {
-            $control = AnnuaryController::deleteEntityToOrganization(['id' => $entity['id']]);
+            $control = AnnuaryController::deleteEntityToOrganization(['entityId' => $aArgs['id']]);
             if (!empty($control['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
             }
+            $entities['deleted'] = $control['deleted'];
         }
 
         ListTemplateModel::delete(['where' => ['object_id = ?'], 'data' => [$aArgs['id']]]);
@@ -348,7 +350,8 @@ class EntityController
             'eventId'   => 'entitySuppression',
         ]);
 
-        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']])]);
+        $entities['entities'] = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        return $response->withJson($entities);
     }
 
     public function reassignEntity(Request $request, Response $response, array $aArgs)
@@ -369,11 +372,13 @@ class EntityController
             }
         }
 
+        $entities = [];
         if (!empty($dyingEntity['business_id'])) {
-            $control = AnnuaryController::deleteEntityToOrganization(['id' => $dyingEntity['id']]);
+            $control = AnnuaryController::deleteEntityToOrganization(['entityId' => $aArgs['id']]);
             if (!empty($control['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
             }
+            $entities['deleted'] = $control['deleted'];
         }
 
         //Documents
@@ -430,7 +435,8 @@ class EntityController
             'eventId'   => 'entitySuppression',
         ]);
 
-        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']])]);
+        $entities['entities'] = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        return $response->withJson($entities);
     }
 
     public function updateStatus(Request $request, Response $response, array $aArgs)

@@ -400,8 +400,12 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
                             $j('#jstree').jstree(true).settings.core.data = this.entities;
                             $j('#jstree').jstree("refresh");
                             this.sidenavRight.close();
-                            this.notify.success(this.lang.entityDeleted);
 
+                            if (typeof data['deleted'] !== "undefined" && !data['deleted']) {
+                                this.notify.success("Entité supprimée mais l'annuaire est injoignable, l'entité est possiblement toujours présente dedans");
+                            } else {
+                                this.notify.success(this.lang.entityDeleted);
+                            }
                         }, (err) => {
                             this.notify.error(err.error.errors);
                         });
@@ -442,8 +446,12 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
                         $j('#jstree').jstree(true).settings.core.data = this.entities;
                         $j('#jstree').jstree("refresh");
                         this.sidenavRight.close();
-                        this.notify.success(this.lang.entityDeleted);
-                    }, (err) => {
+                        if (typeof data['deleted'] !== "undefined" && !data['deleted']) {
+                            this.notify.success("Entité supprimée mais l'annuaire est injoignable, l'entité est possiblement toujours présente dedans");
+                        } else {
+                            this.notify.success(this.lang.entityDeleted);
+                        }
+                    }, (err: any) => {
                         this.notify.error(err.error.errors);
                     });
             }
@@ -739,11 +747,19 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
 
     addEntityToAnnuary() {
         this.http.put(this.coreUrl + "rest/entities/" + this.currentEntity.id + "/annuaries", this.currentEntity)
-            .subscribe((data) => {
+            .subscribe((data: any) => {
                 this.currentEntity.business_id = data['entitySiret'];
-                this.notify.success("Synchronisation effectuée");
-            }, (err) => {
-                this.notify.error(err.error.errors);
+                if (typeof data['synchronized'] === "undefined") {
+                    this.notify.success("Numéro SIRET généré");
+                } else {
+                    if (data['synchronized']) {
+                        this.notify.success("Numéro SIRET généré et synchronisation annuaire effectuée");
+                    } else {
+                        this.notify.success("Numéro SIRET généré mais l'annuaire est injoignable");
+                    }
+                }
+            }, (err: any) => {
+                this.notify.handleErrors(err);
             });
     }
 }

@@ -42,7 +42,11 @@ export class NotificationService {
         } else {
             if (err.error !== undefined) {
                 if (err.error.errors !== undefined) {
-                    this.error(err.error.errors);
+                    if (err.error.lang !== undefined) {
+                        this.error('lang.' + err.error.lang);
+                    } else {
+                        this.error(err.error.errors);
+                    }
                     if (err.status === 403 || err.status === 404) {
                         this.router.navigate(['/home']);
                     }

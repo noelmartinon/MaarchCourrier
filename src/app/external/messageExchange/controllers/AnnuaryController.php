@@ -29,22 +29,22 @@ class AnnuaryController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $entity = EntityModel::getById(['id' => $args['id'], 'select' => ['entity_label']]);
+        $entity = EntityModel::getById(['id' => $args['id'], 'select' => ['entity_id', 'entity_label']]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity does not exist']);
         }
 
         $siret = ParameterModel::getById(['id' => 'siret', 'select' => ['param_value_string']]);
         if (empty($siret['param_value_string'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Parameter siret does not exist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Parameter siret does not exist', 'lang' => 'invalidToken']);
         }
 
-        $entitySiret = "{$siret['param_value_string']}/{$args['id']}";
+        $entitySiret = "{$siret['param_value_string']}/{$entity['entity_id']}";
 
         EntityModel::update(['set' => ['business_id' => $entitySiret], 'where' => ['id = ?'], 'data' => [$args['id']]]);
 
         $control = AnnuaryController::getAnnuaries();
-        if (!isset($control['annuaries'])) {
+        if (empty($control['annuaries'])) {
             if (isset($control['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
             } else {
@@ -89,7 +89,7 @@ class AnnuaryController
                 }
             }
 
-            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['id']})", ['dn']);
+            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$entity['entity_id']})", ['dn']);
             if ($search === false) {
                 return $response->withStatus(400)->withJson(['errors' => 'Ldap search failed : ' . ldap_error($ldap)]);
             }
@@ -109,7 +109,7 @@ class AnnuaryController
                 $info = [];
                 $info['cn'] = $entity['entity_label'];
                 $info['sn'] = $entity['entity_label'];
-                $info['destinationIndicator'] = $args['id'];
+                $info['destinationIndicator'] = $entity['entity_id'];
                 $info['objectclass'] = ['top', 'inetOrgPerson'];
 
                 $added = @ldap_add($ldap, "cn={$entity['entity_label']},ou={$organization},{$annuary['baseDN']}", $info);
@@ -121,7 +121,7 @@ class AnnuaryController
             break;
         }
 
-        return $response->withJson(['entitySiret' => $entitySiret]);
+        return $response->withJson(['entitySiret' => $entitySiret, 'synchronized' => !empty($authenticated)]);
     }
 
     public static function deleteEntityToOrganization(array $args)
@@ -142,9 +142,9 @@ class AnnuaryController
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
             ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
 
-            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['id']})", ['dn']);
+            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['entityId']})", ['dn']);
             if ($search === false) {
-                return ['errors' => 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap)];
+                continue;
             }
             $entries = ldap_get_entries($ldap, $search);
             if ($entries['count'] == 0) {
@@ -163,7 +163,7 @@ class AnnuaryController
             break;
         }
 
-        return ['success' => 'success'];
+        return ['deleted' => !empty($deleted)];
     }
 
     public static function getAnnuaries()

@@ -164,12 +164,14 @@
                                             </mat-form-field>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" *ngIf="!creationMode">
                                         <div class="col-sm-12">
                                             <mat-form-field>
-                                                <input matInput [(ngModel)]="currentEntity.business_id" name="business_id" id="business_id" title="{{lang.siretCode}}" type="text"
+                                                <input *ngIf="!currentEntity.canSynchronizeSiret" matInput value="Paramètre SIRET manquant" title="{{lang.siretCode}}" type="text"
                                                     placeholder="{{lang.siretCode}}" maxlength="255" disabled>
-                                                <button *ngIf="!creationMode && currentEntity.canSynchronizeSiret" color="primary" mat-icon-button matSuffix title="Synchroniser" (click)="addEntityToAnnuary()">
+                                                <input *ngIf="currentEntity.canSynchronizeSiret" matInput [(ngModel)]="currentEntity.business_id" name="business_id" id="business_id" title="{{lang.siretCode}}" type="text"
+                                                    placeholder="{{lang.siretCode}}" maxlength="255" disabled>
+                                                <button *ngIf="currentEntity.canSynchronizeSiret" color="primary" mat-icon-button matSuffix title="Générer un numéro SIRET" (click)="addEntityToAnnuary()">
                                                     <mat-icon class="fas fa-compress-arrows-alt"></mat-icon>
                                                 </button>
                                             </mat-form-field>
