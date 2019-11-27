@@ -806,7 +806,13 @@ $linkwithwhat =
                 $role_label = _ASSIGNEE;
             }
             if (!empty($_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'])) {
-                $entity_id_dest = $_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'];
+                $recipientEntities = \User\models\UserModel::getEntitiesById(['userId' => $_SESSION[$origin]['diff_list']['dest']['users'][0]['user_id']]);
+                $recipientEntities = array_column($recipientEntities, 'entity_id');
+                if (in_array($entities[0]['ID'], $recipientEntities)) {
+                    $entity_id_dest = $entities[0]['ID'];
+                } else {
+                    $entity_id_dest = $_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'];
+                }
             }
             if ((!empty($_SESSION[$origin]['diff_list'][$role_id]['users']) && count($_SESSION[$origin]['diff_list'][$role_id]['users']) > 0) || (!empty($_SESSION[$origin]['diff_list'][$role_id]['entities']) && count($_SESSION[$origin]['diff_list'][$role_id]['entities']) > 0)) {
                 if (($specific_role == $role_id || $specific_role.'_copy' == $role_id || $specific_role.'_info' == $role_id) || !isset($_REQUEST['specific_role'])) {
