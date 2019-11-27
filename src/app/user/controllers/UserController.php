@@ -213,7 +213,7 @@ class UserController
                     'sender'        => ['email' => 'Notification'],
                     'recipients'    => [$newUser['mail']],
                     'object'        => _NOTIFICATIONS_USER_CREATION_SUBJECT,
-                    'body'          => _NOTIFICATIONS_USER_CREATION_BODY . $url . _NOTIFICATIONS_USER_CREATION_FOOTER,
+                    'body'          => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_USER_CREATION_FOOTER,
                     'isHtml'        => true,
                     'status'        => 'WAITING'
                 ]
@@ -1505,7 +1505,7 @@ class UserController
                 'sender'        => ['email' => 'Notification'],
                 'recipients'    => [$user['mail']],
                 'object'        => _NOTIFICATIONS_FORGOT_PASSWORD_SUBJECT,
-                'body'          => _NOTIFICATIONS_FORGOT_PASSWORD_BODY . $url . _NOTIFICATIONS_FORGOT_PASSWORD_FOOTER,
+                'body'          => _NOTIFICATIONS_FORGOT_PASSWORD_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_FORGOT_PASSWORD_FOOTER,
                 'isHtml'        => true,
                 'status'        => 'WAITING'
             ]

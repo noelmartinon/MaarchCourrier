@@ -504,14 +504,15 @@ define("_NOTE_USER", "Annotateur");
 define("_WF_SEND_TO", "Envoyé à : ");
 
 define("_NOTIFICATIONS_FORGOT_PASSWORD_SUBJECT", "[Maarch Courrier] Demande de réinitialisation de mot de passe");
-define("_NOTIFICATIONS_FORGOT_PASSWORD_BODY", "Bonjour,<br/>Vous avez demandé à retrouver le mot de passe d'accès à votre compte Maarch Courrier.<br/>Pour modifier votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
-define("_NOTIFICATIONS_FORGOT_PASSWORD_FOOTER", "<br/><br/>Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer ce courriel.<br/>Pour toutes questions, merci de contacter l'administrateur technique de la solution.");
+define("_NOTIFICATIONS_FORGOT_PASSWORD_BODY", "Bonjour,<br/><br/>Vous avez demandé à retrouver le mot de passe d'accès à votre compte Maarch Courrier.<br/><br/>Pour modifier votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
+define("_NOTIFICATIONS_FORGOT_PASSWORD_FOOTER", "<br/><br/>Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer ce courriel.<br/><br/>Pour toutes questions, merci de contacter l'administrateur de la solution.");
 define("_PASSWORD_REINIT_SENT", "Réinitialisation du mot de passe envoyé");
 define("_PASSWORD_REINIT", "Mot de passe réinitialisé");
 
-define("_NOTIFICATIONS_USER_CREATION_SUBJECT", "[Maarch Courrier] Création de votre compte");
-define("_NOTIFICATIONS_USER_CREATION_BODY", "Bonjour,<br/>Un administrateur a créé votre compte dans l'application Maarch Courrier.<br/>Pour vous connecter et définir votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
-define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>Ce message est envoyé automatiquement. Merci de ne pas y répondre.<br/>Pour toutes questions, merci de contacter l'administrateur technique de la solution.");
+define("_NOTIFICATIONS_USER_CREATION_SUBJECT", "[Maarch Courrier] Activer votre compte utilisateur");
+define("_NOTIFICATIONS_USER_CREATION_BODY", "Bienvenue,<br/><br/>Vous disposez maintenant d'un compte dans l'application de gestion électronique de courrier Maarch Courrier.<br/><br/>Pour vous connecter et définir votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
+define("_CLICK_HERE", "Cliquez-ici pour définir votre mot de passe");
+define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>Ce message est envoyé automatiquement à la suite d'une action de l'administrateur.<br/>Merci de ne pas y répondre.<br/><br/>Pour toutes questions, merci de contacter l'administrateur technique de la solution.");
 
 define("_VIEW_PERSONAL_DATA", "Voir les données personnelles de l'utilisateur");
 define("_MANAGE_PERSONAL_DATA", "Modifier ou supprimer les données personnelles de l'utilisateur");
