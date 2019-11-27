@@ -732,6 +732,7 @@ export const LANG_NL = {
     "userIsNotDeletable"                        : "You do not have <b>full access rights</b> to diffusion list or mails for the user ", //_TO_TRANSLATE
     "userIsDeletableBy"                         : "Only a user with the <b>totality of access rights</b> can delete or suspend this user.", //_TO_TRANSLATE
     "mailEntitiesList"                          : "List of entities attached to mails", //_TO_TRANSLATE,
+    "undefined"                                 : "Undefined", //_TO_TRANSLATE
     "unableToSuspend"                           : "Schorsing onmogelijk", //_TO_TRANSLATE
     "unableToDelete"                            : "Niet te onderdrukken", //_TO_TRANSLATE
     "confidential"                                      : "Confidentiel"//_TO_TRANSLATE

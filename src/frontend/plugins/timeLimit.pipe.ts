@@ -12,12 +12,13 @@ export class TimeLimitPipe implements PipeTransform, OnDestroy {
 	transform(value:string) {
 		this.removeTimer();
 		let d = new Date(value);
-		let dayNumber = ('0' + d.getDate()).slice(-2)
-		let monthNumber = ('0' + d.getMonth()).slice(-2)
-		let hourNumber = ('0' + d.getHours()).slice(-2)
-		let minuteNumber = ('0' + d.getMinutes()).slice(-2)
+		let dayNumber = ('0' + d.getDate()).slice(-2);
+		const realMonth = d.getMonth()+1;
+		let monthNumber = ('0' + realMonth).slice(-2);
+		let hourNumber = ('0' + d.getHours()).slice(-2);
+		let minuteNumber = ('0' + d.getMinutes()).slice(-2);
 		let now = new Date();
-		let month = new Array();
+		let month = [];
 		month[0] = this.lang.januaryShort;
 		month[1] = this.lang.februaryShort;
 		month[2] = this.lang.marchShort;
@@ -45,13 +46,15 @@ export class TimeLimitPipe implements PipeTransform, OnDestroy {
 		let days = Math.round(Math.abs(hours / 24));
 		let months = Math.round(Math.abs(days/30.416));
 		let years = Math.round(Math.abs(days/365));
-		if(now > d) {
-			return '<span class="timeDanger" color="warn">' + this.lang.outdated + ' !</span>';
+		if(value == null) {
+			return '<span>' + this.lang.undefined + '</span>';
+		} else if(now > d) {
+			return '<span class="timeDanger" color="warn"><b>' + this.lang.outdated + ' !</b></span>';
 		} else {
 			if (Number.isNaN(seconds)){
 				return '';
 			} else if (days <= 3) {
-				return '<span color="warn">'+ days + ' ' + this.lang.dayS +'</span>';
+				return '<span color="warn"><b>'+ days + ' ' + this.lang.dayS +'</b></span>';
 			} else if (days <= 7) {
 				return '<span class="timeWarn">'+ days + ' ' + this.lang.dayS +'</span>';
 			} else if (days <= 345) {

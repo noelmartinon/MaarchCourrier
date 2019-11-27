@@ -479,6 +479,7 @@ export const LANG_FR = {
     "string"                            : "Chaine de caractère",
     "sunday"                            : "Dimanche",
     "suspend"                           : "Suspendre",
+    "undefined"                         : "Non défini",
     "unableToSuspend"                   : "Impossible de suspendre",
     "suspended"                         : "Suspendu",
     "suspendNotification"               : "Susprendre la notification",

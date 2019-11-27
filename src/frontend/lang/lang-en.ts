@@ -384,6 +384,7 @@ export const LANG_EN = {
     "string"                            : "String",
     "sunday"                            : "Sunday",
     "suspend"                           : "Suspend",
+    "undefined"                         : "Undefined",
     "unableToSuspend"                   : "Unable to suspend",
     "suspended"                         : "Suspended",
     "suspendNotification"               : "Suspend notification",
