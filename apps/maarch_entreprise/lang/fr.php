@@ -5077,3 +5077,7 @@ if (!defined('_ACTION_DATE')) {
 if (!defined('_STATUS_NOT_EXISTS')) {
     define('_STATUS_NOT_EXISTS', 'Statut non défini');
 }
+
+if (!defined('_DATE_LOCALE')) {
+    define("_DATE_LOCALE", "fr_FR.utf8");
+}

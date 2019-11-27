@@ -502,3 +502,5 @@ define("_SIGNATORY", "Signataire");
 define("_VISA_USER_MIN", "Viseur");
 define("_NOTE_USER", "Annotateur");
 define("_WF_SEND_TO", "Envoyé à : ");
+
+define("_DATE_LOCALE", "fr_FR.utf8");

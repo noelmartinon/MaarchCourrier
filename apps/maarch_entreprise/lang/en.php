@@ -4940,3 +4940,7 @@ if (!defined('_ACTION_DATE')) {
 if (!defined('_STATUS_NOT_EXISTS')) {
     define('_STATUS_NOT_EXISTS', 'Status undefined');
 }
+
+if (!defined('_DATE_LOCALE')) {
+    define("_DATE_LOCALE", "en_US.utf8");
+}
