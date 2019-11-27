@@ -212,4 +212,116 @@ class AnnuaryController
 
         return ['annuaries' => $annuaries, 'organization' => $organization, 'communicationMeans' => $communicationMeans];
     }
+
+    public static function addContact(array $args)
+    {
+        $control = AnnuaryController::getAnnuaries();
+        if (empty($control['annuaries'])) {
+            return ['errors' => _M2M_ANNUARY_IS_NOT_SET];
+        }
+
+        $annuaries          = $control['annuaries'];
+        $organization       = $args['ouName'];
+        $communicationMeans = $args['communicationValue'];
+        $serviceName        = $args['serviceName'];
+
+        $m2mId              = $args['m2mId'];
+        $businessId         = explode("/", $m2mId);
+        $siret              = $businessId[0];
+        $entityId           = $businessId[1];
+
+        foreach ($annuaries as $annuary) {
+            $ldap = @ldap_connect($annuary['uri']);
+            if ($ldap === false) {
+                continue;
+            }
+            ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
+
+            $authenticated = @ldap_bind($ldap, $annuary['login'], $annuary['password']);
+            if (!$authenticated) {
+                return ['errors' => _M2M_LDAP_AUTHENTICATION_FAILED . ' : ' . ldap_error($ldap)];
+            }
+            
+            $search  = @ldap_search($ldap, "{$annuary['baseDN']}", "(destinationIndicator={$siret})", ['ou']);
+            $entries = ldap_get_entries($ldap, $search);
+
+            if ($entries['count'] > 0) {
+                $search = @ldap_search($ldap, "ou={$entries[0]['ou'][0]},{$annuary['baseDN']}", "(destinationIndicator={$entityId})", ['ou', 'entryUUID']);
+                $entries = ldap_get_entries($ldap, $search);
+                if ($entries['count'] > 0) {
+                    return ['entryUUID' => $entries[0]['entryuuid'][0]];
+                }
+            } else {
+                $info = [];
+                $info['ou'] = $organization;
+                $info['destinationIndicator'] = $siret;
+                if (filter_var($communicationMeans, FILTER_VALIDATE_EMAIL)) {
+                    $info['postOfficeBox'] = $communicationMeans;
+                } else {
+                    $info['labeledURI'] = $communicationMeans;
+                }
+                
+                $info['objectclass'] = ['organizationalUnit', 'top', 'labeledURIObject'];
+
+                $added = @ldap_add($ldap, "ou={$organization},{$annuary['baseDN']}", $info);
+                if (!$added) {
+                    return ['errors' => _M2M_LDAP_ADD_FAILED . ' : ' . ldap_error($ldap)];
+                }
+            }
+            $info = [];
+            $info['cn'] = $serviceName;
+            $info['sn'] = $serviceName;
+            $info['destinationIndicator'] = $entityId;
+            $info['objectclass'] = ['top', 'inetOrgPerson'];
+
+            $added = @ldap_add($ldap, "cn={$serviceName},ou={$organization},{$annuary['baseDN']}", $info);
+            if (!$added) {
+                return ['errors' => _M2M_LDAP_ADD_FAILED . ' : ' . ldap_error($ldap)];
+            }
+
+            $search  = @ldap_search($ldap, "{$annuary['baseDN']}", "(destinationIndicator={$siret})", ['ou']);
+            $entries = ldap_get_entries($ldap, $search);
+            $search  = @ldap_search($ldap, "ou={$entries[0]['ou'][0]},{$annuary['baseDN']}", "(destinationIndicator={$entityId})", ['entryUUID']);
+            $entries = ldap_get_entries($ldap, $search);
+            return ['entryUUID' => $entries[0]['entryuuid'][0]];
+
+            break;
+        }
+
+        return ['errors' => _NO_M2M_ANNUARY_AVAILABLE];
+    }
+
+    public static function isSiretNumber(array $args) 
+    {
+        if (strlen($args['siret']) != 14) {
+            return false;
+        }
+        if (!is_numeric($args['siret'])) {
+            return false;
+        }
+
+        // on prend chaque chiffre un par un
+        // si son index (position dans la chaîne en commence à 0 au premier caractère) est pair
+        // on double sa valeur et si cette dernière est supérieure à 9, on lui retranche 9
+        // on ajoute cette valeur à la somme totale
+
+        for ($index = 0; $index < 14; $index ++) {
+            $number = (int) $args['siret'][$index];
+            if (($index % 2) == 0) {
+                if (($number *= 2) > 9) {
+                    $number -= 9;
+                }
+            }
+            $sum += $number;
+        }
+
+        // le numéro est valide si la somme des chiffres est multiple de 10
+        if (($sum % 10) != 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

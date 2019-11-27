@@ -3751,6 +3751,11 @@ width:auto;
     font-size: 12px;
 }
 
+.typeahead__custom_width_contact .typeahead__list {
+    width: 208px;
+    word-wrap: break-word;
+}
+
 .typeahead__cancel-button {
     padding: 0px !important;
     padding-right: 10px !important;

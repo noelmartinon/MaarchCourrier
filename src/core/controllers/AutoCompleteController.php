@@ -582,9 +582,9 @@ class AutoCompleteController
             }
             ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
-            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
-            $search = @ldap_search($ldap, $annuary['baseDN'], "(ou={$data['society']}*)", ['ou', 'postOfficeBox', 'destinationIndicator', 'labeledURI']);
+            $search = @ldap_search($ldap, $annuary['baseDN'], "(ou=*{$data['society']}*)", ['ou', 'postOfficeBox', 'destinationIndicator', 'labeledURI']);
             if ($search === false) {
                 $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
                 continue;
@@ -650,12 +650,12 @@ class AutoCompleteController
             }
             ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
-            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
             if (filter_var($data['communicationValue'], FILTER_VALIDATE_EMAIL)) {
-                $search = @ldap_search($ldap, $annuary['baseDN'], "(postOfficeBox={$data['communicationValue']}*)", ['destinationIndicator']);
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(postofficebox={$data['communicationValue']})", ['destinationIndicator']);
             } else {
-                $search = @ldap_search($ldap, $annuary['baseDN'], "(labeledURI={$data['communicationValue']}*)", ['destinationIndicator']);
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(labeleduri={$data['communicationValue']})", ['destinationIndicator']);
             }
             if ($search === false) {
                 $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);

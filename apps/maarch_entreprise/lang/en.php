@@ -4940,3 +4940,16 @@ if (!defined('_ACTION_DATE')) {
 if (!defined('_STATUS_NOT_EXISTS')) {
     define('_STATUS_NOT_EXISTS', 'Status undefined');
 }
+
+if (!defined('_M2M_ANNUARY_IS_NOT_SET')) {
+    define("_M2M_ANNUARY_IS_NOT_SET", "M2M annuary is not set");
+}
+if (!defined('_M2M_LDAP_AUTHENTICATION_FAILED')) {
+    define("_M2M_LDAP_AUTHENTICATION_FAILED", "M2M annuary authentication failed");
+}
+if (!defined('_M2M_LDAP_ADD_FAILED')) {
+    define("_M2M_LDAP_ADD_FAILED", "Problem while adding contact in M2M annuary");
+}
+if (!defined('_NO_M2M_ANNUARY_AVAILABLE')) {
+    define("_NO_M2M_ANNUARY_AVAILABLE", "No M2M annuary available");
+}

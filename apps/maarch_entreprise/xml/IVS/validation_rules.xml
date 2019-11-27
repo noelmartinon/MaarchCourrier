@@ -143,6 +143,7 @@
       <parameter name="mycontact" type="string" />
       <parameter name="dir" type="identifier" />
       <parameter name="m2m_id" type="string" />
+      <parameter name="m2m_ldap_id" type="string" />
       <parameter name="refMaarch" type="YN" />
       <parameter name="searchAddress" type="string" />
       <parameter name="ban_id" type="string" />
@@ -244,6 +245,7 @@
       <parameter name="is_corporate" type="YN" />
       <parameter name="is_external" type="YN" />
       <parameter name="m2m_id" type="string" />
+      <parameter name="m2m_ldap_id" type="string" />
       <parameter name="lastname" type="personname" />
       <parameter name="society" type="string" />
       <parameter name="society_short" type="string" />

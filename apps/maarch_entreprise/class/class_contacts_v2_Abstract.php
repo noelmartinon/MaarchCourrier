@@ -941,7 +941,7 @@ abstract class contacts_v2_Abstract extends Database
                 <td>
                     <?php echo _COMMUNICATION_VALUE; ?>:</td>
                 <td class="indexing_field">
-                    <div class="typeahead__container" style="width: 208px;display:inline-block;">
+                    <div class="typeahead__container typeahead__custom_width_contact" style="width: 208px;display:inline-block;">
                         <div class="typeahead__field">
                             <span class="typeahead__query">
                                 <input class="<?php echo $fieldAddressClass; ?>" name="communication_value" autocomplete="off" type="text" id="communication_value" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['VALUE'])); ?>"/>
@@ -2358,6 +2358,23 @@ abstract class contacts_v2_Abstract extends Database
                     $_SESSION['m_admin']['address']['CONTACT_PURPOSE_ID'] = $res_purpose->id;
                 }
             }
+
+            if (!empty($_SESSION['m_admin']['address']['M2M_ID']) && empty($_SESSION['m_admin']['address']['M2M_LDAP_ID'])) {
+                $annuaryInfo = \MessageExchange\controllers\AnnuaryController::addContact([
+                    'ouName'             => $_SESSION['m_admin']['contact']['SOCIETY'],
+                    'communicationValue' => $_SESSION['m_admin']['communication']['VALUE'],
+                    'serviceName'        => $_SESSION['m_admin']['address']['DEPARTEMENT'],
+                    'm2mId'              => $_SESSION['m_admin']['address']['M2M_ID']
+                ]);
+                if (!empty($annuaryInfo['errors'])) {
+                    $_SESSION['error'] = $annuaryInfo['errors'];
+                } else {
+                    $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = $annuaryInfo['entryUUID'];
+                }
+            } else {
+                $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = null;
+            }
+
             if ($mode == 'add') {
                 if ($_SESSION['user']['UserId'] == 'superadmin') {
                     $entity_id = 'SUPERADMIN';
@@ -2377,7 +2394,7 @@ abstract class contacts_v2_Abstract extends Database
                     $_SESSION['m_admin']['address']['MAIL'], $_SESSION['m_admin']['address']['ADD_NUM'], $_SESSION['m_admin']['address']['ADD_STREET'], $_SESSION['m_admin']['address']['ADD_COMP'],
                     $_SESSION['m_admin']['address']['ADD_TOWN'], $_SESSION['m_admin']['address']['ADD_CP'], $_SESSION['m_admin']['address']['ADD_COUNTRY'], $_SESSION['m_admin']['address']['OTHER_DATA'],
                     $_SESSION['m_admin']['address']['TITLE'], $_SESSION['m_admin']['address']['IS_PRIVATE'], $_SESSION['m_admin']['address']['WEBSITE'], $_SESSION['m_admin']['address']['OCCUPANCY'],
-                    $_SESSION['user']['UserId'], $entity_id, $_SESSION['m_admin']['address']['SALUTATION_HEADER'], $_SESSION['m_admin']['address']['SALUTATION_FOOTER'], json_encode(['m2m' => $_SESSION['m_admin']['address']['M2M_ID']'m2m_ldap_id' => $_SESSION['m_admin']['address']['M2M_LDAP_ID']]), $_SESSION['m_admin']['address']['BAN_ID'], );
+                    $_SESSION['user']['UserId'], $entity_id, $_SESSION['m_admin']['address']['SALUTATION_HEADER'], $_SESSION['m_admin']['address']['SALUTATION_FOOTER'], json_encode(['m2m' => $_SESSION['m_admin']['address']['M2M_ID'], 'm2m_ldap_id' => $_SESSION['m_admin']['address']['M2M_LDAP_ID']]), $_SESSION['m_admin']['address']['BAN_ID'], );
 
                 $db->query($query, $arrayPDO);
                 if ($_SESSION['history']['addressadd']) {
@@ -2610,13 +2627,19 @@ abstract class contacts_v2_Abstract extends Database
         );
 
         if ($_REQUEST['m2m_id'] != '') {
+            $_REQUEST['m2m_id'] = str_replace(" ", "", $_REQUEST['m2m_id']);
+            $businessId = explode("/", $_REQUEST['m2m_id']);
+            $validSiret = \MessageExchange\controllers\AnnuaryController::isSiretNumber(['siret' => $businessId[0]]);
+            if (!$validSiret) {
+                $_SESSION['error'] = _M2M_ID_FORMAT_NOT_ALLOWED . ' : SIRET/ID_ENTITE';
+            }
             $_SESSION['m_admin']['address']['M2M_ID'] = $func->wash(
                 $_REQUEST['m2m_id'], 'no', _M2M_ID.' ', 'yes', 0, 255
             );
         } else {
             $_SESSION['m_admin']['address']['M2M_ID'] = '';
         }
-        $_SESSION['m_admin']['address']['M2M_ID'] = $_REQUEST['m2m_ldap_id'];
+        $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = $_REQUEST['m2m_ldap_id'];
 
         if ($_REQUEST['departement'] != '') {
             $_SESSION['m_admin']['address']['DEPARTEMENT'] = $func->wash(

@@ -5081,3 +5081,20 @@ if (!defined('_STATUS_NOT_EXISTS')) {
 if (!defined('_FORGOT_PASSWORD')) {
     define('_FORGOT_PASSWORD', 'Mot de passe oublié ?');
 }
+
+if (!defined('_M2M_ID_FORMAT_NOT_ALLOWED')) {
+    define('_M2M_ID_FORMAT_NOT_ALLOWED', 'Le champ Identifiant GEC doit être formé comme ceci');
+}
+
+if (!defined('_M2M_ANNUARY_IS_NOT_SET')) {
+    define("_M2M_ANNUARY_IS_NOT_SET", "Aucun annuaire M2M paramétré");
+}
+if (!defined('_M2M_LDAP_AUTHENTICATION_FAILED')) {
+    define("_M2M_LDAP_AUTHENTICATION_FAILED", "Connexion impossible à l'annuaire M2M");
+}
+if (!defined('_M2M_LDAP_ADD_FAILED')) {
+    define("_M2M_LDAP_ADD_FAILED", "Problème lors de l'ajout du contact dans l'annuaire M2M");
+}
+if (!defined('_NO_M2M_ANNUARY_AVAILABLE')) {
+    define("_NO_M2M_ANNUARY_AVAILABLE", "Aucun annuaire M2M disponible");
+}
