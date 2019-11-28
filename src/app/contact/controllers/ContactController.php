@@ -538,7 +538,7 @@ class ContactController
                         'is_corporate_person', 'lastname', 'firstname', 'address_num', 'address_street', 'address_complement',
                         'address_town', 'address_postal_code', 'address_country', 'ca_id', 'society', 'website', 'phone',
                         'contact_firstname', 'contact_lastname', 'address_country', 'email', 'function', 'contact_other_data',
-                        'occupancy'
+                        'occupancy', 'contact_function'
                     ],
                     'where'     => ['ca_id = ?'],
                     'data'      => [$rawContact['address_id']]
@@ -554,12 +554,12 @@ class ContactController
 
                 $contact = [
                     'mode'      => $mode,
-                    'firstname' => $contactView['firstname'] ?? '',
-                    'lastname'  => $contactView['lastname'] ?? '',
+                    'firstname' => $contactView['is_corporate_person'] == 'Y' ? $contactView['firstname'] : $contactView['contact_firstname'],
+                    'lastname'  => $contactView['is_corporate_person'] == 'Y' ? $contactView['lastname'] : $contactView['contact_lastname'],
                     'email'     => $contactView['email'] ?? '',
                     'phone'     => $contactView['phone'] ?? '',
                     'society'   => $contactView['society'] ?? '',
-                    'function'  => $contactView['function'] ?? '',
+                    'function'  => $contactView['is_corporate_person'] == 'Y' ? $contactView['function'] : $contactView['contact_function'],
                     'num'       => $contactView['address_num'] ?? '',
                     'street'    => $contactView['address_street'] ?? '',
                     'complement'=> $contactView['address_complement'] ?? '',
