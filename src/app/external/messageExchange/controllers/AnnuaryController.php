@@ -62,7 +62,7 @@ class AnnuaryController
             }
             ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
-            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
             $search = @ldap_search($ldap, "{$annuary['baseDN']}", "(ou={$organization})", ['dn']);
             if ($search === false) {
@@ -144,7 +144,7 @@ class AnnuaryController
             }
             ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
-            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
             $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['entityId']})", ['dn']);
             if ($search === false) {
