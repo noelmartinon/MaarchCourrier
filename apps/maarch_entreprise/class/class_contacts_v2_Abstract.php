@@ -100,30 +100,25 @@ abstract class contacts_v2_Abstract extends Database
         } else {
             $_SESSION['m_admin']['contact']['SOCIETY_SHORT'] = '';
         }
-        if ($_REQUEST['communication_type'] != '') {
-            $_SESSION['m_admin']['communication']['TYPE'] = $func->wash(
-                $_REQUEST['communication_type'], 'no', _COMMUNICATION_TYPE.' ', 'yes', 0, 32
-            );
-        } else {
-            $_SESSION['m_admin']['communication']['TYPE'] = '';
-        }
-        if ($_REQUEST['business_id_value'] != '') {
-            $_SESSION['m_admin']['communication']['business_id'] = $_REQUEST['business_id_value'];
-            $_SESSION['m_admin']['address']['M2M_ID'] = $_REQUEST['business_id_value'];
-        } else {
-            $_SESSION['m_admin']['communication']['TYPE'] = '';
-        }
-        if (!empty($_SESSION['m_admin']['communication']['TYPE'])) {
+        if (!empty($_REQUEST['communication_value'])) {
+            if ($_REQUEST['business_id_value'] != '') {
+                $_SESSION['m_admin']['communication']['business_id'] = $_REQUEST['business_id_value'];
+                $_SESSION['m_admin']['address']['M2M_ID'] = $_REQUEST['business_id_value'];
+            }
+            if (filter_var($_REQUEST['communication_value'], FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['m_admin']['communication']['TYPE'] = 'mail';
+            } else {
+                $_SESSION['m_admin']['communication']['TYPE'] = 'url';
+            }
             $_SESSION['m_admin']['communication']['VALUE'] = trim(trim($func->wash(
                 $_REQUEST['communication_value'], 'no', _COMMUNICATION_VALUE.' ', 'yes', 0, 255
             )), '/');
         } else {
             $_SESSION['m_admin']['communication']['VALUE'] = '';
+            $_SESSION['m_admin']['communication']['business_id'] = '';
+            $_SESSION['m_admin']['address']['M2M_ID'] = '';
+            $_SESSION['m_admin']['communication']['TYPE'] = '';
         }
-
-        $_SESSION['m_admin']['contact']['CONTACT_TYPE'] = $func->wash(
-            $_REQUEST['contact_type'], 'no', _CONTACT_TYPE.' ', 'yes', 0, 255
-        );
 
         if ($_REQUEST['comp_data'] != '') {
             $_SESSION['m_admin']['contact']['OTHER_DATA'] = $func->wash(
@@ -896,47 +891,6 @@ abstract class contacts_v2_Abstract extends Database
                 </td>
                 <td>&nbsp;</td>
             </tr>
-            <!-- <tr id="communication_type_tr">
-                <td>
-                    <?php echo _COMMUNICATION_TYPE; ?>:</td>
-                <td class="indexing_field">
-                    <select name="communication_type" id="communication_type">
-                        <option value="">
-                            <?php echo _CHOOSE_COMMUNICATION_TYPES; ?>
-                        </option>
-                        <?php if ($_SESSION['m_admin']['communication']['TYPE'] == 'email') {
-                                ?>
-                        <option value="email" selected="selected">
-                            <?php echo _EMAIL; ?>
-                        </option>
-                        <?php
-
-                            } else {
-                                ?>
-                        <option value="email">
-                            <?php echo _EMAIL; ?>
-                        </option>
-                        <?php
-
-                            }
-                if ($_SESSION['m_admin']['communication']['TYPE'] == 'url') {
-                    ?>
-                        <option value="url" selected="selected">
-                            <?php echo _URL; ?>
-                        </option>
-                        <?php
-
-                } else {
-                    ?>
-                        <option value="url">
-                            <?php echo _URL; ?>
-                        </option>
-                        <?php
-
-                } ?>
-                    </select>
-                </td>
-            </tr> -->
             <tr>
                 <td>
                     <?php echo _COMMUNICATION_VALUE; ?>:</td>
@@ -948,7 +902,6 @@ abstract class contacts_v2_Abstract extends Database
                             </span>
                         </div>
                     </div>
-                    <input name="communication_type" type="hidden" id="communication_type" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['TYPE'])); ?>"/>
                     <input name="business_id_value" type="hidden" id="business_id_value" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['business_id'])); ?>"/>
                 </td>
             </tr>
@@ -1457,7 +1410,7 @@ abstract class contacts_v2_Abstract extends Database
                     $_SESSION['m_admin']['address']['SALUTATION_FOOTER'] = functions::show_string($line->salutation_footer);
                     $externalId = (array)json_decode($line->external_id);
                     $_SESSION['m_admin']['address']['M2M_ID'] = $externalId['m2m'];
-                    $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = $externalId['m2m_ldap_id'];
+                    $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = $externalId['m2m_annuary_id'];
                     $_SESSION['m_admin']['address']['BAN_ID'] = functions::show_string($line->ban_id);
                 } else {
                     unset($_SESSION['address_up_error']);
@@ -2048,7 +2001,7 @@ abstract class contacts_v2_Abstract extends Database
                         </div>
                     </div>
                     <span class="blue_asterisk" style="visibility:hidden;">*</span>
-                    <input name="m2m_ldap_id" type="hidden" id="m2m_ldap_id" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_LDAP_ID'])); ?>"/>
+                    <input name="m2m_annuary_id" type="hidden" id="m2m_annuary_id" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_ANNUARY_ID'])); ?>"/>
                 </td>
             </tr>
             <tr>
@@ -2239,7 +2192,7 @@ abstract class contacts_v2_Abstract extends Database
                         callback: {
                             onClickAfter: function(node, a, item, event) {
                                 $j('#m2m_id').val(item.businessIdValue);
-                                $j('#m2m_ldap_id').val(item.entryuuid);
+                                $j('#m2m_annuary_id').val(item.entryuuid);
                             }
                         }
                     });
@@ -2359,7 +2312,7 @@ abstract class contacts_v2_Abstract extends Database
                 }
             }
 
-            if (!empty($_SESSION['m_admin']['address']['M2M_ID']) && empty($_SESSION['m_admin']['address']['M2M_LDAP_ID'])) {
+            if (!empty($_SESSION['m_admin']['address']['M2M_ID']) && empty($_SESSION['m_admin']['address']['M2M_ANNUARY_ID'])) {
                 $annuaryInfo = \MessageExchange\controllers\AnnuaryController::addContact([
                     'ouName'             => $_SESSION['m_admin']['contact']['SOCIETY'],
                     'communicationValue' => $_SESSION['m_admin']['communication']['VALUE'],
@@ -2369,10 +2322,10 @@ abstract class contacts_v2_Abstract extends Database
                 if (!empty($annuaryInfo['errors'])) {
                     $_SESSION['error'] = $annuaryInfo['errors'];
                 } else {
-                    $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = $annuaryInfo['entryUUID'];
+                    $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = $annuaryInfo['entryUUID'];
                 }
             } else {
-                $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = null;
+                $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = null;
             }
 
             if ($mode == 'add') {
@@ -2394,7 +2347,7 @@ abstract class contacts_v2_Abstract extends Database
                     $_SESSION['m_admin']['address']['MAIL'], $_SESSION['m_admin']['address']['ADD_NUM'], $_SESSION['m_admin']['address']['ADD_STREET'], $_SESSION['m_admin']['address']['ADD_COMP'],
                     $_SESSION['m_admin']['address']['ADD_TOWN'], $_SESSION['m_admin']['address']['ADD_CP'], $_SESSION['m_admin']['address']['ADD_COUNTRY'], $_SESSION['m_admin']['address']['OTHER_DATA'],
                     $_SESSION['m_admin']['address']['TITLE'], $_SESSION['m_admin']['address']['IS_PRIVATE'], $_SESSION['m_admin']['address']['WEBSITE'], $_SESSION['m_admin']['address']['OCCUPANCY'],
-                    $_SESSION['user']['UserId'], $entity_id, $_SESSION['m_admin']['address']['SALUTATION_HEADER'], $_SESSION['m_admin']['address']['SALUTATION_FOOTER'], json_encode(['m2m' => $_SESSION['m_admin']['address']['M2M_ID'], 'm2m_ldap_id' => $_SESSION['m_admin']['address']['M2M_LDAP_ID']]), $_SESSION['m_admin']['address']['BAN_ID'], );
+                    $_SESSION['user']['UserId'], $entity_id, $_SESSION['m_admin']['address']['SALUTATION_HEADER'], $_SESSION['m_admin']['address']['SALUTATION_FOOTER'], json_encode(['m2m' => $_SESSION['m_admin']['address']['M2M_ID'], 'm2m_annuary_id' => $_SESSION['m_admin']['address']['M2M_ANNUARY_ID']]), $_SESSION['m_admin']['address']['BAN_ID'], );
 
                 $db->query($query, $arrayPDO);
                 if ($_SESSION['history']['addressadd']) {
@@ -2495,7 +2448,7 @@ abstract class contacts_v2_Abstract extends Database
                 $contactToUpdate = \Contact\models\ContactModel::getByAddressId(['addressId' => $_SESSION['m_admin']['address']['ID'], 'select' => ['external_id']]);
                 $externalId = json_decode($contactToUpdate['external_id'], true);
                 $externalId['m2m'] = empty($_SESSION['m_admin']['address']['M2M_ID']) ? null : $_SESSION['m_admin']['address']['M2M_ID'];
-                $externalId['m2m_ldap_id'] = empty($_SESSION['m_admin']['address']['M2M_LDAP_ID']) ? null : $_SESSION['m_admin']['address']['M2M_LDAP_ID'];
+                $externalId['m2m_annuary_id'] = empty($_SESSION['m_admin']['address']['M2M_ANNUARY_ID']) ? null : $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'];
 
                 $query = 'UPDATE '.$_SESSION['tablename']['contact_addresses'].' 
                       SET contact_purpose_id = ?
@@ -2639,7 +2592,7 @@ abstract class contacts_v2_Abstract extends Database
         } else {
             $_SESSION['m_admin']['address']['M2M_ID'] = '';
         }
-        $_SESSION['m_admin']['address']['M2M_LDAP_ID'] = $_REQUEST['m2m_ldap_id'];
+        $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = $_REQUEST['m2m_annuary_id'];
 
         if ($_REQUEST['departement'] != '') {
             $_SESSION['m_admin']['address']['DEPARTEMENT'] = $func->wash(

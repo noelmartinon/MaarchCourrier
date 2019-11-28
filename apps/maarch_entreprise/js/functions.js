@@ -4052,6 +4052,5 @@ function getOuM2MAnnuary() {
 
 function setM2MAnnuary(item) {
     $j('#communication_value').val(item.communicationValue);
-    $j('#communication_type').val(item.communicationType);
     $j('#business_id_value').val(item.businessIdValue);
 }

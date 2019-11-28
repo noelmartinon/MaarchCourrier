@@ -157,12 +157,13 @@ abstract class ContactModelAbstract
 
     public static function updateAddress(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['set', 'where', 'data']);
-        ValidatorModel::arrayType($aArgs, ['set', 'where', 'data']);
+        ValidatorModel::notEmpty($aArgs, ['where', 'data']);
+        ValidatorModel::arrayType($aArgs, ['set', 'postSet', 'where', 'data']);
 
         DatabaseModel::update([
             'table' => 'contact_addresses',
             'set'   => $aArgs['set'],
+            'postSet' => $aArgs['postSet'],
             'where' => $aArgs['where'],
             'data'  => $aArgs['data']
         ]);
@@ -273,6 +274,26 @@ abstract class ContactModelAbstract
                 'type'       => $aArgs['type'],
                 'value'      => trim(trim($aArgs['value']), '/')
             ]
+        ]);
+
+        return true;
+    }
+
+    public static function updateContactCommunication(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['contactId', 'type', 'value']);
+        ValidatorModel::intVal($aArgs, ['contactId']);
+
+        DatabaseModel::update([
+            'table' => 'contact_communication',
+            'set'   => [
+                'type' => $aArgs['type'],
+                'value' => $aArgs['value']
+            ],
+            'where' => [
+                'contact_id = ?'
+            ],
+            'data'  => [$aArgs['contactId']]
         ]);
 
         return true;

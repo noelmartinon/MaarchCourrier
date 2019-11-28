@@ -293,7 +293,7 @@ class AnnuaryController
         return ['errors' => _NO_M2M_ANNUARY_AVAILABLE];
     }
 
-    public static function isSiretNumber(array $args) 
+    public static function isSiretNumber(array $args)
     {
         if (strlen($args['siret']) != 14) {
             return false;
@@ -322,6 +322,43 @@ class AnnuaryController
             return false;
         } else {
             return true;
+        }
+    }
+
+    public static function getByUui(array $args)
+    {
+        $control = AnnuaryController::getAnnuaries();
+        if (!isset($control['annuaries'])) {
+            return $control;
+        }
+        $annuaries = $control['annuaries'];
+
+        foreach ($annuaries as $annuary) {
+            $ldap = @ldap_connect($annuary['uri']);
+            if ($ldap === false) {
+                continue;
+            }
+            ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+
+            $search = @ldap_search($ldap, "{$annuary['baseDN']}", "(entryUUID={$args['contactUuid']})", ['dn', 'destinationIndicator', 'entryDN']);
+            if ($search === false) {
+                continue;
+            }
+            $entries = ldap_get_entries($ldap, $search);
+            if ($entries['count'] > 0) {
+                $departmentDestinationIndicator = $entries[0]['destinationindicator'][0];
+                $entryDn  = $entries[0]['entrydn'][0];
+                $pathDn   = explode(',', $entryDn);
+                $parentOu = $pathDn[1];
+                $search   = @ldap_search($ldap, "{$annuary['baseDN']}", "({$parentOu})", ['dn', 'destinationIndicator', 'postOfficeBox', 'labeledURIObject']);
+                $entries  = ldap_get_entries($ldap, $search);
+
+                return ['mail' => $entries[0]['postofficebox'][0], 'url' => $entries[0]['labeleduriobject'][0], 'businessId' => $entries[0]['destinationindicator'][0] . '/' . $departmentDestinationIndicator];
+            }
+
+            break;
         }
     }
 }

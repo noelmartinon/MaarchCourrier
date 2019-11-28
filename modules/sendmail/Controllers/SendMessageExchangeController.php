@@ -127,11 +127,30 @@ class SendMessageExchangeController
 
         $sendMessage = new SendMessage();
 
-        foreach ($_SESSION['adresses']['to'] as $key => $value) {
+        foreach ($_SESSION['adresses']['to'] as $addressId => $value) {
             /******** GET ARCHIVAl INFORMATIONs **************/
-            $contactInfo                       = \Contact\models\ContactModel::getFullAddressById(['addressId' => $key]);
+            $contactInfo                       = \Contact\models\ContactModel::getFullAddressById(['addressId' => $addressId, 'select' => ['contact_id', 'external_id']]);
             $ArchivalAgencyCommunicationType   = \Contact\models\ContactModel::getContactCommunication(['contactId' => $contactInfo[0]['contact_id']]);
-            $ArchivalAgencyContactInformations = \Contact\models\ContactModel::getFullAddressById(['addressId' => $key]);
+            $externalInfo = json_decode($contactInfo[0]['external_id'], true);
+            if (!empty($externalInfo['m2m_annuary_id'])) {
+                $m2mAnnuaryInfo = \MessageExchange\controllers\AnnuaryController::getByUui(['contactUuid' => $externalInfo['m2m_annuary_id']]);
+                if (empty($m2mAnnuaryInfo['error']) && !empty($m2mAnnuaryInfo[$ArchivalAgencyCommunicationType['type']])) {
+                    $ArchivalAgencyCommunicationType['value'] = $m2mAnnuaryInfo[$ArchivalAgencyCommunicationType['type']];
+                    \Contact\models\ContactModel::updateContactCommunication([
+                        'contactId' => $contactInfo[0]['contact_id'],
+                        'type'      => $ArchivalAgencyCommunicationType['type'],
+                        'value'     => $ArchivalAgencyCommunicationType['value']
+                    ]);
+                    \Contact\models\ContactModel::updateAddress([
+                        'postSet' => [
+                            'external_id' => 'external_id - \'m2m\' || \'{"m2m":"'.$m2mAnnuaryInfo['businessId'].'"}\''
+                        ],
+                        'where' => ['id = ?'],
+                        'data' => [$addressId]
+                    ]);
+                }
+            }
+            $ArchivalAgencyContactInformations = \Contact\models\ContactModel::getFullAddressById(['addressId' => $addressId]);
 
             /******** GENERATE MESSAGE EXCHANGE OBJECT *********/
             $dataObject = self::generateMessageObject([

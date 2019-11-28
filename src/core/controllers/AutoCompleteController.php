@@ -569,8 +569,6 @@ class AutoCompleteController
         if (!isset($control['annuaries'])) {
             if (isset($control['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
-            } else {
-                return $response->withJson(['entitySiret' => $entitySiret]);
             }
         }
 
@@ -598,7 +596,6 @@ class AutoCompleteController
                 if (!empty($value['postofficebox'])) {
                     $unitOrganizations[] = [
                         'communicationValue' => $value['postofficebox'][0],
-                        'communicationType'  => 'mail',
                         'businessIdValue'    => $value['destinationindicator'][0],
                         'unitOrganization'   => "{$value['ou'][0]} ({$value['postofficebox'][0]})"
                     ];
@@ -606,7 +603,6 @@ class AutoCompleteController
                 if (!empty($value['labeleduri'])) {
                     $unitOrganizations[] = [
                         'communicationValue' => $value['labeleduri'][0],
-                        'communicationType'  => 'url',
                         'businessIdValue'    => $value['destinationindicator'][0],
                         'unitOrganization'   => "{$value['ou'][0]} ({$value['labeleduri'][0]})"
                     ];
@@ -615,13 +611,6 @@ class AutoCompleteController
 
             return $response->withJson($unitOrganizations);
         }
-        // $unitOrganizations[] = [
-        //     'communicationValue' => "localhost.com/res",
-        //     'communicationType'  => 'url',
-        //     'businessIdValue'    => "1234567",
-        //     'unitOrganization'   => "SPM - 1234567 (localhost.com/res)"
-        // ];
-        // return $response->withJson($unitOrganizations);
     }
 
     public static function getBusinessIdM2MAnnuary(Request $request, Response $response)
@@ -637,8 +626,6 @@ class AutoCompleteController
         if (!isset($control['annuaries'])) {
             if (isset($control['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
-            } else {
-                return $response->withJson(['entitySiret' => $entitySiret]);
             }
         }
 
@@ -661,29 +648,29 @@ class AutoCompleteController
                 $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
                 continue;
             }
-            $entries = ldap_get_entries($ldap, $search);
-            $siret = $entries[0]['destinationindicator'][0];
-            $search  = @ldap_search($ldap, $entries[0]['dn'], "(cn=*)", ['cn', 'destinationindicator', 'entryUUID']);
-            $entries = ldap_get_entries($ldap, $search);
-
-            foreach ($entries as $key => $value) {
-                if (!is_numeric($key)) {
+            $entriesOu = ldap_get_entries($ldap, $search);
+            foreach ($entriesOu as $keyOu => $valueOu) {
+                if (!is_numeric($keyOu)) {
                     continue;
                 }
-                $unitOrganizations[] = [
-                    'entryuuid'        => $value['entryuuid'][0],
-                    'businessIdValue'  => $siret . '/' . $value['destinationindicator'][0],
-                    'unitOrganization' => "{$value['cn'][0]} - {$siret}/{$value['destinationindicator'][0]}"
-                ];
+                $siret   = $valueOu['destinationindicator'][0];
+                $search  = @ldap_search($ldap, $valueOu['dn'], "(cn=*)", ['cn', 'destinationindicator', 'entryUUID']);
+                $entries = ldap_get_entries($ldap, $search);
+
+                foreach ($entries as $key => $value) {
+                    if (!is_numeric($key)) {
+                        continue;
+                    }
+                    $unitOrganizations[] = [
+                        'entryuuid'        => $value['entryuuid'][0],
+                        'businessIdValue'  => $siret . '/' . $value['destinationindicator'][0],
+                        'unitOrganization' => "{$value['cn'][0]} - {$siret}/{$value['destinationindicator'][0]}"
+                    ];
+                }
             }
 
             return $response->withJson($unitOrganizations);
         }
-        // $unitOrganizations[] = [
-        //     'businessIdValue'    => "1234567",
-        //     'unitOrganization'   => "SPM - 1234567"
-        // ];
-        // return $response->withJson($unitOrganizations);
     }
 
     private static function getDataForRequest(array $aArgs)
