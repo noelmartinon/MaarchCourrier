@@ -14,7 +14,7 @@
                 <mat-card-title>{{contact.firstname}} {{contact.lastname}}</mat-card-title>
                 <mat-card-subtitle [title]="lang.contactsFilling_function">{{contact.function}}&nbsp;
                 </mat-card-subtitle>
-                <i class="contact-filling fa fa-circle" *ngIf="contact.mode === 'physical' || contact.mode === 'corporate'" [style.color]="contact.filling"
+                <i class="contact-filling fa fa-circle" *ngIf="(contact.mode === 'physical' || contact.mode === 'corporate') && contact.filling !== ''" [style.color]="contact.filling"
                     [title]="lang.contactsFillingRate"></i>
             </mat-card-header>
             <mat-card-content>
