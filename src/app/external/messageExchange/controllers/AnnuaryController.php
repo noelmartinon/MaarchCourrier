@@ -81,7 +81,7 @@ class AnnuaryController
                 $info['destinationIndicator'] = $siret['param_value_string'];
                 $info['objectclass'] = ['organizationalUnit', 'top', 'labeledURIObject'];
                 if (!empty($communicationMeans['url'])) {
-                    $info['labeledURI'] = $communicationMeans['url'];
+                    $info['labeledURI'] = rtrim($communicationMeans['url'], '/');
                 }
                 if (!empty($communicationMeans['email'])) {
                     $info['postOfficeBox'] = $communicationMeans['email'];
