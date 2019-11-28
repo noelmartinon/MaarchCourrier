@@ -614,13 +614,7 @@ class ContactController
                     'department' => $primaryEntity['entity_label']
                 ];
 
-<<<<<<< HEAD
-                $filling = ContactController::getFillingRate(['contact' => $contact]);
-
-                $contact['filling'] = $filling['color'] ?? '';
-=======
                 $contact['filling'] = '';
->>>>>>> contact filling
 
                 $contacts[] = $contact;
             } elseif (!empty($rawContact['entity_id'])) {
@@ -646,13 +640,7 @@ class ContactController
                     'department' => ''
                 ];
 
-<<<<<<< HEAD
-                $filling = ContactController::getFillingRate(['contact' => $contact]);
-
-                $contact['filling'] = $filling['color'] ?? '';
-=======
                 $contact['filling'] = '';
->>>>>>> contact filling
 
                 $contacts[] = $contact;
             }
