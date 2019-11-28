@@ -279,7 +279,6 @@ class ContactController
             if ($aArgs['contact']['is_corporate_person'] == 'N') {
                 foreach ($contactsFilling['rating_columns'] as $key => $value) {
                     if (in_array($value, ['firstname', 'lastname', 'title', 'function'])) {
-
                         $contactsFilling['rating_columns'][$key] = 'contact_' . $value;
                     }
                 }
@@ -401,7 +400,6 @@ class ContactController
                     'strMaxLength'  => 38
                 ]);
             }
-
         }
         // Ligne 3
         if (!empty($aArgs['address_complement'])) {
@@ -616,9 +614,13 @@ class ContactController
                     'department' => $primaryEntity['entity_label']
                 ];
 
+<<<<<<< HEAD
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
 
                 $contact['filling'] = $filling['color'] ?? '';
+=======
+                $contact['filling'] = '';
+>>>>>>> contact filling
 
                 $contacts[] = $contact;
             } elseif (!empty($rawContact['entity_id'])) {
@@ -644,9 +646,13 @@ class ContactController
                     'department' => ''
                 ];
 
+<<<<<<< HEAD
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
 
                 $contact['filling'] = $filling['color'] ?? '';
+=======
+                $contact['filling'] = '';
+>>>>>>> contact filling
 
                 $contacts[] = $contact;
             }
