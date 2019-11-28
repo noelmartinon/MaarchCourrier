@@ -574,7 +574,7 @@ class ContactController
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
 
-                $contact['filling'] = $filling['color'];
+                $contact['filling'] = $filling['color'] ?? '';
 
                 $contacts[] = $contact;
             } elseif (!empty($rawContact['login'] || !empty($rawContact['user_id']))) {
@@ -618,7 +618,7 @@ class ContactController
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
 
-                $contact['filling'] = $filling['color'];
+                $contact['filling'] = $filling['color'] ?? '';
 
                 $contacts[] = $contact;
             } elseif (!empty($rawContact['entity_id'])) {
@@ -646,7 +646,7 @@ class ContactController
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
 
-                $contact['filling'] = $filling['color'];
+                $contact['filling'] = $filling['color'] ?? '';
 
                 $contacts[] = $contact;
             }
