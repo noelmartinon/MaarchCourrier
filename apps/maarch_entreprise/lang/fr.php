@@ -5098,3 +5098,7 @@ if (!defined('_M2M_LDAP_ADD_FAILED')) {
 if (!defined('_NO_M2M_ANNUARY_AVAILABLE')) {
     define("_NO_M2M_ANNUARY_AVAILABLE", "Aucun annuaire M2M disponible");
 }
+
+if (!defined('_CANNOT_SYNCHRONIZE_M2M_ANNUARY')) {
+    define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Le contact ne peut pas être ajouté dans l'annuaire car un des champs suivants est manquant : Société, moyen de communication, service");
+}

@@ -4953,3 +4953,7 @@ if (!defined('_M2M_LDAP_ADD_FAILED')) {
 if (!defined('_NO_M2M_ANNUARY_AVAILABLE')) {
     define("_NO_M2M_ANNUARY_AVAILABLE", "No M2M annuary available");
 }
+
+if (!defined('_CANNOT_SYNCHRONIZE_M2M_ANNUARY')) {
+    define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Contact can not be added in M2M annuary because one of these field is empty : Society, communication means, department");
+}

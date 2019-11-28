@@ -641,47 +641,6 @@ abstract class contacts_v2_Abstract extends Database
                     functions::xecho($_REQUEST['start']);
                 } ?>" />
         <table id="frmcontact_table">
-            <!--                     <tr>
-                        <td>&nbsp;</td>
-                        <td class="indexing_field">
-                            <input type="radio"  class="check" name="is_external" value="N" <?php if ($_SESSION['m_admin']['contact']['IS_EXTERNAL_CONTACT'] == 'N') {
-                    ?>checked="checked"
-            <?php
-
-                } ?>onclick="javascript:show_admin_external_contact( false, '
-            <?php functions::xecho($display_value); ?>')" id="external_no">
-            <span onclick="$('external_no').click();" onmouseover="this.style.cursor='pointer';">
-                <?php echo _IS_INTERNAL_CONTACT; ?>
-            </span>
-            <input type="radio" class="check" name="is_external" value="Y" <?php if ($_SESSION[ 'm_admin'][
-                'contact'][ 'IS_EXTERNAL_CONTACT']=='Y') {
-                    ?> checked="checked"
-            <?php
-
-                } ?>onclick="javascript:show_admin_external_contact( true, '
-            <?php functions::xecho($display_value); ?>')" id="external_yes">
-            <span onclick="$('external_yes').click();" onmouseover="this.style.cursor='pointer';">
-                <?php echo _IS_EXTERNAL_CONTACT; ?>
-            </span>
-            </td>
-            <td>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            </td>
-            <td>&nbsp;</td>
-            </tr>
-            <tr id="search_directory" style="display:<?php if ($_SESSION['m_admin']['contact']['IS_EXTERNAL_CONTACT'] == 'N') {
-                    echo 'none';
-                } else {
-                    functions::xecho($display_value);
-                } ?>">
-                <td>
-                    <label for="searchDirectory">
-                        <?php echo _SEARCH_DIRECTORY; ?>: </label>
-                </td>
-                <td class="indexing_field">
-                    <input name="searchDirectory" type="text" onkeyup="this.value=this.value.toUpperCase()" id="lastname" value="" />
-                </td>
-                <td>&nbsp;</td>
-            </tr> -->
             <tr>
                 <td>&nbsp;</td>
                 <td class="indexing_field">
@@ -902,7 +861,7 @@ abstract class contacts_v2_Abstract extends Database
                     <div class="typeahead__container typeahead__custom_width_contact" style="width: 208px;display:inline-block;">
                         <div class="typeahead__field">
                             <span class="typeahead__query">
-                                <input class="<?php echo $fieldAddressClass; ?>" name="communication_value" autocomplete="off" type="text" id="communication_value" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['VALUE'])); ?>"/>
+                                <input onkeyup="$j('#business_id_value').val('');" class="<?php echo $fieldAddressClass; ?>" name="communication_value" autocomplete="off" type="text" id="communication_value" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['communication']['VALUE'])); ?>"/>
                             </span>
                         </div>
                     </div>
@@ -2000,7 +1959,7 @@ abstract class contacts_v2_Abstract extends Database
                     <div class="typeahead__container" style="width: 208px;display:inline-block;">
                         <div class="typeahead__field">
                             <span class="typeahead__query">
-                                <input class="<?php echo $fieldAddressClass; ?>" name="m2m_id" id="m2m_id" autocomplete="off" type="text" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_ID'])); ?>"/>
+                                <input onkeyup="$j('#m2m_annuary_id').val('');" class="<?php echo $fieldAddressClass; ?>" name="m2m_id" id="m2m_id" autocomplete="off" type="text" value="<?php functions::xecho($func->show_str($_SESSION['m_admin']['address']['M2M_ID'])); ?>"/>
                             </span>
                         </div>
                     </div>
@@ -2317,16 +2276,20 @@ abstract class contacts_v2_Abstract extends Database
             }
 
             if (!empty($_SESSION['m_admin']['address']['M2M_ID']) && empty($_SESSION['m_admin']['address']['M2M_ANNUARY_ID'])) {
-                $annuaryInfo = \MessageExchange\controllers\AnnuaryController::addContact([
-                    'ouName'             => $_SESSION['m_admin']['contact']['SOCIETY'],
-                    'communicationValue' => $_SESSION['m_admin']['communication']['VALUE'],
-                    'serviceName'        => $_SESSION['m_admin']['address']['DEPARTEMENT'],
-                    'm2mId'              => $_SESSION['m_admin']['address']['M2M_ID']
-                ]);
-                if (!empty($annuaryInfo['errors'])) {
-                    $_SESSION['error'] = $annuaryInfo['errors'];
+                if (empty($_SESSION['m_admin']['contact']['SOCIETY']) || empty($_SESSION['m_admin']['communication']['VALUE']) || empty($_SESSION['m_admin']['address']['DEPARTEMENT'])) {
+                    $_SESSION['error'] = _CANNOT_SYNCHRONIZE_M2M_ANNUARY;
                 } else {
-                    $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = $annuaryInfo['entryUUID'];
+                    $annuaryInfo = \MessageExchange\controllers\AnnuaryController::addContact([
+                        'ouName'             => $_SESSION['m_admin']['contact']['SOCIETY'],
+                        'communicationValue' => $_SESSION['m_admin']['communication']['VALUE'],
+                        'serviceName'        => $_SESSION['m_admin']['address']['DEPARTEMENT'],
+                        'm2mId'              => $_SESSION['m_admin']['address']['M2M_ID']
+                    ]);
+                    if (!empty($annuaryInfo['errors'])) {
+                        $_SESSION['error'] = $annuaryInfo['errors'];
+                    } else {
+                        $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = $annuaryInfo['entryUUID'];
+                    }
                 }
             } else {
                 $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = null;
