@@ -120,6 +120,10 @@ abstract class contacts_v2_Abstract extends Database
             $_SESSION['m_admin']['communication']['TYPE'] = '';
         }
 
+        $_SESSION['m_admin']['contact']['CONTACT_TYPE'] = $func->wash(
+            $_REQUEST['contact_type'], 'no', _CONTACT_TYPE.' ', 'yes', 0, 255
+        );
+
         if ($_REQUEST['comp_data'] != '') {
             $_SESSION['m_admin']['contact']['OTHER_DATA'] = $func->wash(
                 $_REQUEST['comp_data'], 'no', _COMP_DATA.' ', 'yes', 0, 255
