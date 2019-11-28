@@ -79,9 +79,13 @@ class AnnuaryController
                 $info = [];
                 $info['ou'] = $organization;
                 $info['destinationIndicator'] = $siret['param_value_string'];
-                $info['labeledURI'] = $communicationMeans['url'] ?? null;
-                $info['postOfficeBox'] = $communicationMeans['email'] ?? null;
                 $info['objectclass'] = ['organizationalUnit', 'top', 'labeledURIObject'];
+                if (!empty($communicationMeans['url'])) {
+                    $info['labeledURI'] = $communicationMeans['url'];
+                }
+                if (!empty($communicationMeans['email'])) {
+                    $info['postOfficeBox'] = $communicationMeans['email'];
+                }
 
                 $added = @ldap_add($ldap, "ou={$organization},{$annuary['baseDN']}", $info);
                 if (!$added) {
