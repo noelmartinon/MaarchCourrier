@@ -572,45 +572,48 @@ class AutoCompleteController
             }
         }
 
-        foreach ($control['annuaries'] as $annuary) {
-            $ldap = @ldap_connect($annuary['uri']);
-            if ($ldap === false) {
-                $error = 'Ldap connect failed : uri is maybe wrong';
-                continue;
-            }
-            ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
-            ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
-            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
-
-            $search = @ldap_search($ldap, $annuary['baseDN'], "(ou=*{$data['society']}*)", ['ou', 'postOfficeBox', 'destinationIndicator', 'labeledURI']);
-            if ($search === false) {
-                $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
-                continue;
-            }
-            $entries = ldap_get_entries($ldap, $search);
-
-            foreach ($entries as $key => $value) {
-                if (!is_numeric($key)) {
+        $unitOrganizations = [];
+        if (!empty($control['annuaries'])) {
+            foreach ($control['annuaries'] as $annuary) {
+                $ldap = @ldap_connect($annuary['uri']);
+                if ($ldap === false) {
                     continue;
                 }
-                if (!empty($value['postofficebox'])) {
-                    $unitOrganizations[] = [
-                        'communicationValue' => $value['postofficebox'][0],
-                        'businessIdValue'    => $value['destinationindicator'][0],
-                        'unitOrganization'   => "{$value['ou'][0]} ({$value['postofficebox'][0]})"
-                    ];
+                ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+                ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
+    
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(ou=*{$data['society']}*)", ['ou', 'postOfficeBox', 'destinationIndicator', 'labeledURI']);
+                if ($search === false) {
+                    continue;
                 }
-                if (!empty($value['labeleduri'])) {
-                    $unitOrganizations[] = [
-                        'communicationValue' => $value['labeleduri'][0],
-                        'businessIdValue'    => $value['destinationindicator'][0],
-                        'unitOrganization'   => "{$value['ou'][0]} ({$value['labeleduri'][0]})"
-                    ];
+                $entries = ldap_get_entries($ldap, $search);
+    
+                foreach ($entries as $key => $value) {
+                    if (!is_numeric($key)) {
+                        continue;
+                    }
+                    if (!empty($value['postofficebox'])) {
+                        $unitOrganizations[] = [
+                            'communicationValue' => $value['postofficebox'][0],
+                            'businessIdValue'    => $value['destinationindicator'][0],
+                            'unitOrganization'   => "{$value['ou'][0]} ({$value['postofficebox'][0]})"
+                        ];
+                    }
+                    if (!empty($value['labeleduri'])) {
+                        $unitOrganizations[] = [
+                            'communicationValue' => $value['labeleduri'][0],
+                            'businessIdValue'    => $value['destinationindicator'][0],
+                            'unitOrganization'   => "{$value['ou'][0]} ({$value['labeleduri'][0]})"
+                        ];
+                    }
                 }
+    
+                break;
             }
-
-            return $response->withJson($unitOrganizations);
         }
+        
+        return $response->withJson($unitOrganizations);
     }
 
     public static function getBusinessIdM2MAnnuary(Request $request, Response $response)
