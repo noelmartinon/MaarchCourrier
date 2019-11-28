@@ -307,6 +307,7 @@ class AnnuaryController
         // on double sa valeur et si cette dernière est supérieure à 9, on lui retranche 9
         // on ajoute cette valeur à la somme totale
 
+        $sum = 0;
         for ($index = 0; $index < 14; $index ++) {
             $number = (int) $args['siret'][$index];
             if (($index % 2) == 0) {
@@ -360,5 +361,7 @@ class AnnuaryController
 
             break;
         }
+
+        return ['errors' => 'No annuary found or UUID does not exist'];
     }
 }
