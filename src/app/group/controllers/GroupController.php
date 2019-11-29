@@ -158,10 +158,6 @@ class GroupController
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
         }
 
-        if ($data['checked'] === true && !empty(GroupModel::getServiceById(['groupId' => $group['group_id'], 'serviceId' => $aArgs['serviceId']]))) {
-            return $response->withStatus(400)->withJson(['errors' => 'Service is already linked to this group']);
-        }
-
         GroupModel::updateServiceById(['groupId' => $group['group_id'], 'serviceId' => $aArgs['serviceId'], 'checked' => $data['checked']]);
 
         return $response->withJson(['success' => 'success']);
