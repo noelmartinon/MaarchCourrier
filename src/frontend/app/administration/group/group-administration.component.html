@@ -62,16 +62,16 @@
                                 </mat-expansion-panel>
                             </mat-tab>
                             <mat-tab label="{{lang.administrationServices}}">
-                                <div class="col-md-3" *ngFor="let service of group['services'].administration"
+                                <div class="col-md-3" *ngFor="let administration of group['services'].administration"
                                     style="padding:10px;">
-                                    <mat-slide-toggle color="primary" name="{{service.name}}"
-                                        [checked]="service.checked" [(ngModel)]="service.checked"
-                                        (change)="updateService(service)" matTooltip="{{service.comment}}">
-                                        {{service.name}}</mat-slide-toggle>
-                                    <button mat-icon-button [class.active]="panelMode === service.id"
-                                        *ngIf="service.id === 'admin_users'"
-                                        (click)="$event.stopPropagation();openUserParams(service.id)" color="primary"
-                                        [title]="lang.goToAdminParams" [disabled]="!service.checked">
+                                    <mat-slide-toggle color="primary" name="{{administration.name}}"
+                                        [(ngModel)]="administration.checked" [checked]="administration.checked"
+                                        (change)="updateService(administration)" matTooltip="{{administration.comment}}">
+                                        {{administration.name}}</mat-slide-toggle>
+                                    <button mat-icon-button [class.active]="panelMode === administration.id"
+                                        *ngIf="administration.id === 'admin_users'"
+                                        (click)="$event.stopPropagation();openUserParams(administration.id)" color="primary"
+                                        [title]="lang.goToAdminParams" [disabled]="!administration.checked">
                                         <mat-icon class="fa fa-cogs"></mat-icon>
                                     </button>
                                 </div>

@@ -5,11 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-import { MatPaginator, MatTableDataSource, MatSort, MatSidenav } from '@angular/material';
+import { MatPaginator, MatTableDataSource, MatSort, MatSidenav, MatDialog } from '@angular/material';
 
 import { AutoCompletePlugin } from '../../../plugins/autocomplete.plugin';
-import { map, tap, exhaustMap, finalize, catchError } from 'rxjs/operators';
+import { map, tap, exhaustMap, finalize, catchError, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ConfirmModalComponent } from '../../confirmModal.component';
 
 declare function $j(selector: any): any;
 declare const angularGlobals: any;
@@ -62,7 +63,7 @@ export class GroupAdministrationComponent extends AutoCompletePlugin implements 
         this.basketsDataSource.filter = filterValue;
     }
 
-    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, private route: ActivatedRoute, private router: Router, private notify: NotificationService, private headerService: HeaderService) {
+    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, private route: ActivatedRoute, private router: Router, private notify: NotificationService, private headerService: HeaderService, private dialog: MatDialog) {
         super(http, ['adminUsers']);
         $j("link[href='merged_css.php']").remove();
         this.mobileQuery = media.matchMedia('(max-width: 768px)');
@@ -105,7 +106,6 @@ export class GroupAdministrationComponent extends AutoCompletePlugin implements 
                         }
 
                         this.group.services.use[0] = this.group.services.use[0].filter((priv: any) => ['manage_personal_data', 'view_personal_data'].indexOf(priv.id) === -1)
-                        console.log(priv);
                         const service = {
                             "id": "confidentialityAndSecurity_personal_data",
                             "name": this.lang.personalDataMsg,
@@ -162,16 +162,16 @@ export class GroupAdministrationComponent extends AutoCompletePlugin implements 
     changePersonalDataPrivilege(ev: any) {
 
         if (ev.value === 'view_personal_data') {
-            this.updateService({id: 'view_personal_data', 'checked': true});
-            this.updateService({id: 'manage_personal_data', 'checked': false});
+            this.updateService({ id: 'view_personal_data', 'checked': true });
+            this.updateService({ id: 'manage_personal_data', 'checked': false });
 
         } else if (ev.value === 'manage_personal_data') {
-            this.updateService({id: 'view_personal_data', 'checked': true});
-            this.updateService({id: 'manage_personal_data', 'checked': true});
+            this.updateService({ id: 'view_personal_data', 'checked': true });
+            this.updateService({ id: 'manage_personal_data', 'checked': true });
 
         } else {
-            this.updateService({id: 'view_personal_data', 'checked': false});
-            this.updateService({id: 'manage_personal_data', 'checked': false});
+            this.updateService({ id: 'view_personal_data', 'checked': false });
+            this.updateService({ id: 'manage_personal_data', 'checked': false });
         }
 
     }
@@ -180,13 +180,41 @@ export class GroupAdministrationComponent extends AutoCompletePlugin implements 
         if (service.checked) {
             this.sidenavRight.close();
         }
-        this.http.put(this.coreUrl + "rest/groups/" + this.group['id'] + "/services/" + service['id'], service)
-            .subscribe(() => {
-                this.notify.success(this.lang.groupServicesUpdated);
-            }, (err) => {
-                service.checked = !service.checked;
-                this.notify.error(err.error.errors);
-            });
+
+        if (service.checked && service.id === 'admin_groups') {
+            const config = { data: { msg: this.lang.enableGroupMsg } };
+            let dialogRef = this.dialog.open(ConfirmModalComponent, config);
+            dialogRef.afterClosed().pipe(
+                tap((data: string) => {
+                    if (data !== 'ok') {
+                        service.checked = false;
+                    }
+                }),
+                filter((data: string) => data === 'ok'),
+                tap(() => {
+                    this.http.put(this.coreUrl + "rest/groups/" + this.group['id'] + "/services/" + service['id'], service)
+                    .subscribe(() => {
+                        this.notify.success(this.lang.groupServicesUpdated);
+                    }, (err) => {
+                        service.checked = !service.checked;
+                        this.notify.error(err.error.errors);
+                    });
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+
+        } else {
+            this.http.put(this.coreUrl + "rest/groups/" + this.group['id'] + "/services/" + service['id'], service)
+                .subscribe(() => {
+                    this.notify.success(this.lang.groupServicesUpdated);
+                }, (err) => {
+                    service.checked = !service.checked;
+                    this.notify.error(err.error.errors);
+                });
+        }
     }
 
     linkUser(newUser: any) {
