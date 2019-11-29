@@ -164,6 +164,15 @@ class GroupController
 
         GroupModel::updateServiceById(['groupId' => $group['group_id'], 'serviceId' => $aArgs['serviceId'], 'checked' => $data['checked']]);
 
+        if ($aArgs['serviceId'] == 'admin_users' && $data['checked'] === true) {
+            $groups = GroupModel::get(['select' => ['id']]);
+            $groups = array_column($groups, 'id');
+
+            $parameters = json_encode(['groups' => $groups]);
+
+            ServiceModel::updateParameters(['groupId' => $group['group_id'], 'privilegeId' => 'admin_users', 'parameters' => $parameters]);
+        }
+
         return $response->withJson(['success' => 'success']);
     }
 
