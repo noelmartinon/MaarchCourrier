@@ -124,16 +124,17 @@ class UserController
         $user['redirectedBaskets']  = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
         $user['history']            = HistoryModel::getByUserId(['userId' => $user['user_id'], 'select' => ['event_type', 'event_date', 'info', 'remote_ip']]);
         $user['canModifyPassword']  = false;
-        $user['canResetPassword']   = true;
+        $user['canSendActivationNotification']  = false;
         $user['canCreateMaarchParapheurUser'] = false;
 
-        $loggingMethod = CoreConfigModel::getLoggingMethod();
-        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS) && $user['loginmode'] != 'restMode') {
-            $user['canResetPassword'] = false;
-        }
         if ($user['loginmode'] == 'restMode') {
             $user['canModifyPassword'] = true;
         }
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        if ($user['loginmode'] != 'restMode' && $loggingMethod['id'] == 'standard') {
+            $user['canSendActivationNotification'] = true;
+        }
+
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
         if ((string)$loadedXml->signatoryBookEnabled == 'maarchParapheur' && $user['loginmode'] != 'restMode' && empty($user['external_id']['maarchParapheur'])) {
             $user['canCreateMaarchParapheurUser'] = true;
@@ -1437,6 +1438,40 @@ class UserController
         return $response->withJson([
             'userBaskets' => BasketModel::getRegroupedBasketsByUserId(['userId' => $GLOBALS['userId']])
         ]);
+    }
+
+    public function sendAccountActivationNotification(Request $request, Response $response, array $args)
+    {
+        $control = $this->hasUsersRights(['id' => $args['id']]);
+        if (!empty($control['error'])) {
+            return $response->withStatus($control['status'])->withJson(['errors' => $control['error']]);
+        }
+
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        if ($loggingMethod['id'] != 'standard') {
+            return $response->withStatus($control['status'])->withJson(['errors' => $control['error']]);
+        }
+
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['mail']]);
+
+        $resetToken = AuthenticationController::getResetJWT(['id' => $args['id'], 'expirationTime' => 1209600]); // 14 days
+        UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$args['id']]]);
+
+        $url = str_replace('rest/', '', \Url::coreurl());
+        $url .= 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+        EmailController::createEmail([
+            'userId'    => $args['id'],
+            'data'      => [
+                'sender'        => ['email' => 'Notification'],
+                'recipients'    => [$user['mail']],
+                'object'        => _NOTIFICATIONS_USER_CREATION_SUBJECT,
+                'body'          => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_USER_CREATION_FOOTER,
+                'isHtml'        => true,
+                'status'        => 'WAITING'
+            ]
+        ]);
+
+        return $response->withStatus(204);
     }
 
     public function hasUsersRights(array $aArgs)
