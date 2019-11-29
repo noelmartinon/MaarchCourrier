@@ -77,39 +77,35 @@ abstract class UserModelAbstract
         return $aUser[0];
     }
 
-    public static function create(array $aArgs)
+    public static function create(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['user']);
-        ValidatorModel::notEmpty($aArgs['user'], ['userId', 'firstname', 'lastname']);
-        ValidatorModel::stringType($aArgs['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'phone', 'loginmode']);
+        ValidatorModel::notEmpty($args, ['user']);
+        ValidatorModel::notEmpty($args['user'], ['userId', 'firstname', 'lastname']);
+        ValidatorModel::stringType($args['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'phone', 'loginmode']);
 
-        $length = rand(50, 70);
-        $chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrstuvwxyz!@$%^*_=+,.?';
-        $count = mb_strlen($chars);
-        for ($i = 0, $password = ''; $i < $length; $i++) {
-            $index = rand(0, $count - 1);
-            $password .= mb_substr($chars, $index, 1);
-        }
+        $password = AuthenticationModel::generatePassword();
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'users_id_seq']);
 
         DatabaseModel::insert([
             'table'         => 'users',
             'columnsValues' => [
-                'user_id'                       => strtolower($aArgs['user']['userId']),
-                'firstname'                     => $aArgs['user']['firstname'],
-                'lastname'                      => $aArgs['user']['lastname'],
-                'mail'                          => $aArgs['user']['mail'],
-                'phone'                         => $aArgs['user']['phone'],
-                'initials'                      => $aArgs['user']['initials'],
+                'id'                            => $nextSequenceId,
+                'user_id'                       => strtolower($args['user']['userId']),
+                'firstname'                     => $args['user']['firstname'],
+                'lastname'                      => $args['user']['lastname'],
+                'mail'                          => $args['user']['mail'],
+                'phone'                         => $args['user']['phone'],
+                'initials'                      => $args['user']['initials'],
                 'enabled'                       => 'Y',
                 'status'                        => 'OK',
                 'change_password'               => 'N',
-                'loginmode'                     => empty($aArgs['user']['loginmode']) ? 'standard' : $aArgs['user']['loginmode'],
+                'loginmode'                     => empty($args['user']['loginmode']) ? 'standard' : $args['user']['loginmode'],
                 'password'                      => AuthenticationModel::getPasswordHash($password),
                 'password_modification_date'    => 'CURRENT_TIMESTAMP'
             ]
         ]);
 
-        return true;
+        return $nextSequenceId;
     }
 
     public static function update(array $aArgs)

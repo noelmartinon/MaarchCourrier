@@ -161,17 +161,38 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $existingUser = UserModel::getByLowerLogin(['login' => $data['userId'], 'select' => ['id', 'status']]);
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        $existingUser = UserModel::getByLowerLogin(['login' => $data['userId'], 'select' => ['id', 'status', 'mail']]);
 
         if (!empty($existingUser) && $existingUser['status'] == 'DEL') {
             UserModel::updateStatus(['id' => $existingUser['id'], 'status' => 'OK']);
             UserModel::update([
                 'set'   => [
-                    'enabled'   => 'Y'
+                    'enabled'   => 'Y',
+                    'password'  => AuthenticationModel::getPasswordHash(AuthenticationModel::generatePassword())
                 ],
                 'where' => ['id = ?'],
                 'data'  => [$existingUser['id']]
             ]);
+
+            if ($loggingMethod['id'] == 'standard') {
+                $resetToken = AuthenticationController::getResetJWT(['id' => $existingUser['id'], 'expirationTime' => 1209600]); // 14 days
+                UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$existingUser['id']]]);
+
+                $url = str_replace('rest/', '', \Url::coreurl());
+                $url .= 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+                EmailController::createEmail([
+                    'userId'    => $existingUser['id'],
+                    'data'      => [
+                        'sender'        => ['email' => 'Notification'],
+                        'recipients'    => [$existingUser['mail']],
+                        'object'        => _NOTIFICATIONS_USER_CREATION_SUBJECT,
+                        'body'          => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_USER_CREATION_FOOTER,
+                        'isHtml'        => true,
+                        'status'        => 'WAITING'
+                    ]
+                ]);
+            }
 
             return $response->withJson(['user' => $existingUser]);
         } elseif (!empty($existingUser)) {
@@ -206,7 +227,6 @@ class UserController
             }
         }
 
-        $loggingMethod = CoreConfigModel::getLoggingMethod();
         if ($loggingMethod['id'] == 'standard') {
             $resetToken = AuthenticationController::getResetJWT(['id' => $newUser['id'], 'expirationTime' => 1209600]); // 14 days
             UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$newUser['id']]]);

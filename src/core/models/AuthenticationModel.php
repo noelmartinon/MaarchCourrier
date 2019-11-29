@@ -179,4 +179,17 @@ class AuthenticationModel
 
         return true;
     }
+
+    public static function generatePassword()
+    {
+        $length = rand(50, 70);
+        $chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrstuvwxyz!@$%^*_=+,.?';
+        $count = mb_strlen($chars);
+        for ($i = 0, $password = ''; $i < $length; $i++) {
+            $index = rand(0, $count - 1);
+            $password .= mb_substr($chars, $index, 1);
+        }
+
+        return $password;
+    }
 }
