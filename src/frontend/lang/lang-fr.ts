@@ -1068,4 +1068,6 @@ export const LANG_FR = {
     "notVisible": "Non visibles",
     "viewPersonalData": "Consultables",
     "managePersonalData": "Consultables et modifiables",
+    "sendActivationNotification": "Envoyer à nouveau le courriel d'activation",
+    "activationNotificationSend": "Le courriel d'activation a été envoyé",
 };

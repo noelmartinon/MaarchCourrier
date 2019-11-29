@@ -18,6 +18,12 @@
                         {{lang.desactivateAbsence}}
                     </p>
                 </a>
+                <a mat-list-item *ngIf="user.canSendActivationNotification" (click)="resendActivationNotification()">
+                    <mat-icon color="primary" mat-list-icon class="fa fa-paper-plane"></mat-icon>
+                    <p mat-line>
+                        {{lang.sendActivationNotification}}
+                    </p>
+                </a>
                 <a *ngIf="user.canModifyPassword" mat-list-item (click)="changePasswd();">
                     <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
                     <p mat-line>
