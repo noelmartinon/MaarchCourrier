@@ -141,8 +141,8 @@ export class UserAdministrationComponent extends AutoCompletePlugin implements O
 
                 this.headerService.setHeader(this.lang.userCreation);
                 this.creationMode = true;
-                this.canViewPersonalDatas = true;
-                this.canManagePersonalDatas = true;
+                this.canViewPersonalDatas = false;
+                this.canManagePersonalDatas = this.headerService.hasCurrentUserPrivilege('manage_personal_data');
                 this.loading = false;
             } else {
                 window['MainHeaderComponent'].setSnav(this.sidenavLeft);

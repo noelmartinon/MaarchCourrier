@@ -71,8 +71,7 @@
                                     <button mat-icon-button [class.active]="panelMode === service.id"
                                         *ngIf="service.id === 'admin_users'"
                                         (click)="$event.stopPropagation();openUserParams(service.id)" color="primary"
-                                        [title]="lang.goToAdminParams"
-                                        [disabled]="!service.checked">
+                                        [title]="lang.goToAdminParams" [disabled]="!service.checked">
                                         <mat-icon class="fa fa-cogs"></mat-icon>
                                     </button>
                                 </div>
@@ -84,12 +83,26 @@
                                             {{lang[upperService[0]['location']]}}
                                         </mat-panel-title>
                                     </mat-expansion-panel-header>
-                                    <mat-list>
-                                        <mat-list-item *ngFor="let service of upperService">
+                                    <mat-list *ngFor="let service of upperService">
+                                        <mat-list-item
+                                            *ngIf="service.id !== 'confidentialityAndSecurity_personal_data'">
                                             <mat-slide-toggle color="primary" name="{{service.name}}"
                                                 [checked]="service.checked" [(ngModel)]="service.checked"
                                                 (change)="updateService(service)" matTooltip="{{service.comment}}">
                                                 {{service.name}}</mat-slide-toggle>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="service.id === 'confidentialityAndSecurity_personal_data'"
+                                            color="primary" style="font-size: 16px;">
+                                            <span [innerHTML]="service.name"></span>
+                                            <mat-form-field
+                                                style="width: 300px !important;padding-left: 10px;padding-right: 10px;">
+                                                <mat-select [(ngModel)]="service.current"
+                                                    (selectionChange)="changePersonalDataPrivilege($event)">
+                                                    <mat-option value="">{{lang.notVisible}}</mat-option>
+                                                    <mat-option *ngFor="let subservice of service.services"
+                                                        [value]="subservice.id">{{subservice.label}}</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>.
                                         </mat-list-item>
                                     </mat-list>
                                 </mat-expansion-panel>

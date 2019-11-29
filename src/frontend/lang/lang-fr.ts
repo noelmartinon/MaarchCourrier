@@ -1064,4 +1064,8 @@ export const LANG_FR = {
     "goToAdminParams" : "Accéder aux paramètres de l'administration",
     "adminParamsUsers" : "Options administration utilisateurs",
     "chooseAllowedGroups" : "Choisissez les groupes d'affectations autorisés",
+    "personalDataMsg": "Les données personnelles de l'utilisateur sont : ",
+    "notVisible": "Non visibles",
+    "viewPersonalData": "Consultables",
+    "managePersonalData": "Consultables et modifiables",
 };

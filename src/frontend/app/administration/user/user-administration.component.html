@@ -174,7 +174,7 @@
                                     <mat-form-field>
                                         <input matInput type="tel" id="phone" name="phone" title="{{lang.phoneNumber}}"
                                             placeholder="{{lang.phoneNumber}}" [(ngModel)]="user.phone"
-                                            pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$"  [disabled]="!canManagePersonalDatas || !canViewPersonalDatas">
+                                            pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$"  [disabled]="(creationMode && !canManagePersonalDatas) || (!creationMode && (!canManagePersonalDatas || !canViewPersonalDatas))">
                                     </mat-form-field>
                                 </div>
                             </div>

@@ -4,44 +4,44 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
-import { MatPaginator, MatTableDataSource, MatSort, MatSidenav} from '@angular/material';
+import { HeaderService } from '../../../service/header.service';
+import { MatPaginator, MatTableDataSource, MatSort, MatSidenav } from '@angular/material';
 
 import { AutoCompletePlugin } from '../../../plugins/autocomplete.plugin';
 import { map, tap, exhaustMap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-declare function $j(selector: any) : any;
-declare const angularGlobals : any;
+declare function $j(selector: any): any;
+declare const angularGlobals: any;
 
 
 @Component({
     templateUrl: "group-administration.component.html",
     styleUrls: ['group-administration.component.scss'],
-    providers   : [NotificationService]
+    providers: [NotificationService]
 })
-export class GroupAdministrationComponent  extends AutoCompletePlugin implements OnInit {
+export class GroupAdministrationComponent extends AutoCompletePlugin implements OnInit {
     /*HEADER*/
-    @ViewChild('snav') public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2') public sidenavRight  : MatSidenav;
+    @ViewChild('snav') public sidenavLeft: MatSidenav;
+    @ViewChild('snav2') public sidenavRight: MatSidenav;
 
-    private _mobileQueryListener    : () => void;
-    mobileQuery                     : MediaQueryList;
+    private _mobileQueryListener: () => void;
+    mobileQuery: MediaQueryList;
 
-    coreUrl                         : string;
-    lang                            : any       = LANG;
-    loading                         : boolean   = false;
+    coreUrl: string;
+    lang: any = LANG;
+    loading: boolean = false;
     paramsLoading: boolean = false;
 
-    group                           : any       = {
-        security                    : {}
+    group: any = {
+        security: {}
     };
-    creationMode                    : boolean;
+    creationMode: boolean;
 
-    usersDisplayedColumns           = ['firstname', 'lastname'];
-    basketsDisplayedColumns         = ['basket_name', 'basket_desc'];
-    usersDataSource                 : any;
-    basketsDataSource               : any;
+    usersDisplayedColumns = ['firstname', 'lastname'];
+    basketsDisplayedColumns = ['basket_name', 'basket_desc'];
+    usersDataSource: any;
+    basketsDataSource: any;
 
     authorizedGroupsUserParams: any[] = [];
     panelMode = 'keywordInfos';
@@ -62,7 +62,7 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
         this.basketsDataSource.filter = filterValue;
     }
 
-    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,public http: HttpClient, private route: ActivatedRoute, private router: Router, private notify: NotificationService, private headerService: HeaderService) {
+    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, private route: ActivatedRoute, private router: Router, private notify: NotificationService, private headerService: HeaderService) {
         super(http, ['adminUsers']);
         $j("link[href='merged_css.php']").remove();
         this.mobileQuery = media.matchMedia('(max-width: 768px)');
@@ -87,14 +87,41 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
 
                 this.creationMode = true;
                 this.loading = false;
-            } else {                
+            } else {
                 window['MainHeaderComponent'].setSnav(this.sidenavLeft);
                 window['MainHeaderComponent'].setSnavRight(null);
 
                 this.creationMode = false;
                 this.http.get(this.coreUrl + "rest/groups/" + params['id'] + "/details")
-                    .subscribe((data : any) => {
+                    .subscribe((data: any) => {
                         this.group = data['group'];
+
+                        // DEV SGAMI
+                        let priv = '';
+                        if (this.group.services.use[0].filter((priv: any) => priv.id === 'manage_personal_data' && priv.checked)[0]) {
+                            priv = 'manage_personal_data';
+                        } else if (this.group.services.use[0].filter((priv: any) => priv.id === 'view_personal_data' && priv.checked)[0]) {
+                            priv = 'view_personal_data';
+                        }
+
+                        this.group.services.use[0] = this.group.services.use[0].filter((priv: any) => ['manage_personal_data', 'view_personal_data'].indexOf(priv.id) === -1)
+                        console.log(priv);
+                        const service = {
+                            "id": "confidentialityAndSecurity_personal_data",
+                            "name": this.lang.personalDataMsg,
+                            "current": priv,
+                            "services": [{
+                                'id': 'view_personal_data',
+                                'label': this.lang.viewPersonalData
+                            },
+                            {
+                                'id': 'manage_personal_data',
+                                'label': this.lang.managePersonalData
+                            }]
+                        };
+
+                        this.group.services.use[0].push(service);
+
                         this.headerService.setHeader(this.lang.groupModification, this.group['group_desc']);
                         this.loading = false;
                         setTimeout(() => {
@@ -116,20 +143,37 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
     onSubmit() {
         if (this.creationMode) {
             this.http.post(this.coreUrl + "rest/groups", this.group)
-                .subscribe((data : any) => {
+                .subscribe((data: any) => {
                     this.notify.success(this.lang.groupAdded);
                     this.router.navigate(["/administration/groups/" + data.group]);
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put(this.coreUrl + "rest/groups/" + this.group['id'] , {"description" : this.group['group_desc'], "security" : this.group['security']})
+            this.http.put(this.coreUrl + "rest/groups/" + this.group['id'], { "description": this.group['group_desc'], "security": this.group['security'] })
                 .subscribe(() => {
                     this.notify.success(this.lang.groupUpdated);
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
         }
+    }
+
+    changePersonalDataPrivilege(ev: any) {
+
+        if (ev.value === 'view_personal_data') {
+            this.updateService({id: 'view_personal_data', 'checked': true});
+            this.updateService({id: 'manage_personal_data', 'checked': false});
+
+        } else if (ev.value === 'manage_personal_data') {
+            this.updateService({id: 'view_personal_data', 'checked': true});
+            this.updateService({id: 'manage_personal_data', 'checked': true});
+
+        } else {
+            this.updateService({id: 'view_personal_data', 'checked': false});
+            this.updateService({id: 'manage_personal_data', 'checked': false});
+        }
+
     }
 
     updateService(service: any) {
@@ -145,21 +189,21 @@ export class GroupAdministrationComponent  extends AutoCompletePlugin implements
             });
     }
 
-    linkUser(newUser:any) {
+    linkUser(newUser: any) {
         this.userCtrl.setValue('');
         $j('.autocompleteSearch').blur();
         var groupReq = {
-            "groupId"   : this.group.group_id,
-            "role"      : this.group.role
+            "groupId": this.group.group_id,
+            "role": this.group.role
         };
         this.http.post(this.coreUrl + "rest/users/" + newUser.id + "/groups", groupReq)
             .subscribe(() => {
                 var displayName = newUser.idToDisplay.split(" ");
                 var user = {
-                    id : newUser.id,
-                    user_id : newUser.otherInfo,
-                    firstname : displayName[0],
-                    lastname : displayName[1]
+                    id: newUser.id,
+                    user_id: newUser.otherInfo,
+                    firstname: displayName[0],
+                    lastname: displayName[1]
                 };
                 this.group.users.push(user);
                 this.usersDataSource = new MatTableDataSource(this.group.users);
