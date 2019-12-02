@@ -211,6 +211,8 @@ class XParaphController
             $docserverInfo = DocserverModel::getByDocserverId(['docserverId' => $aArgs['attachmentInfo']['docserver_id']]);
             $filePath      = $docserverInfo['path_template'] . str_replace('#', '/', $aArgs['attachmentInfo']['path']) . $aArgs['attachmentInfo']['filename'];
 
+            setlocale(LC_TIME, _DATE_LOCALE);
+
             $tbs = new \clsTinyButStrong();
             $tbs->NoErr = true;
             $tbs->PlugIn(TBS_INSTALL, OPENTBS_PLUGIN);

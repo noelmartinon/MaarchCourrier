@@ -923,7 +923,9 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         if ($datasourceObj->script) {
             include $datasourceObj->script;
         }
-        
+
+        setlocale(LC_TIME, _DATE_LOCALE);
+
         // Merge with TBS
         $TBS = new clsTinyButStrong;
         $TBS->NoErr = true;

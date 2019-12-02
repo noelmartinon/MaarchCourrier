@@ -251,15 +251,15 @@ class ContactController
         $contacts = [];
         if ($queryParams['type'] == 'senders') {
             if ($ext['category_id'] == 'outgoing') {
-                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
+                $contacts = ContactController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
             } else {
-                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'contacts_res', 'columnRes' => 'exp_user_id']);
+                $contacts = ContactController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contacts_res', 'columnRes' => 'exp_user_id']);
             }
         } elseif ($queryParams['type'] == 'recipients') {
             if ($ext['category_id'] == 'outgoing') {
-                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'contact_res', 'columnRes' => 'exp_user_id']);
+                $contacts = ContactController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'contact_res', 'columnRes' => 'exp_user_id']);
             } else {
-                $contacts = ContactController::getFormattedContacts(['resource' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
+                $contacts = ContactController::getFormattedContacts(['ext' => $ext, 'tableMulti' => 'resource_contacts', 'columnRes' => null]);
             }
         }
 
@@ -278,7 +278,6 @@ class ContactController
             if ($aArgs['contact']['is_corporate_person'] == 'N') {
                 foreach ($contactsFilling['rating_columns'] as $key => $value) {
                     if (in_array($value, ['firstname', 'lastname', 'title', 'function'])) {
-
                         $contactsFilling['rating_columns'][$key] = 'contact_' . $value;
                     }
                 }
@@ -400,7 +399,6 @@ class ContactController
                     'strMaxLength'  => 38
                 ]);
             }
-
         }
         // Ligne 3
         if (!empty($aArgs['address_complement'])) {
@@ -482,20 +480,20 @@ class ContactController
 
     public static function getFormattedContacts(array $args)
     {
-        ValidatorModel::notEmpty($args, ['resource', 'tableMulti']);
-        ValidatorModel::arrayType($args, ['resource']);
+        ValidatorModel::notEmpty($args, ['ext', 'tableMulti']);
+        ValidatorModel::arrayType($args, ['ext']);
         ValidatorModel::stringType($args, ['tableMulti', 'columnRes']);
 
-        $resource = $args['resource'];
+        $ext = $args['ext'];
 
         $rawContacts = [];
-        if ($resource['is_multicontacts'] == 'Y' || !isset($args['columnRes'])) {
+        if ($ext['is_multicontacts'] == 'Y' || !isset($args['columnRes'])) {
             if ($args['tableMulti'] == 'contacts_res') {
                 $multiContacts = DatabaseModel::select([
                     'select' => ['contact_id', 'address_id', 'mode'],
                     'table' => ['contacts_res'],
                     'where' => ['res_id = ?'],
-                    'data' => [$resource['res_id']]
+                    'data' => [$ext['res_id']]
                 ]);
 
                 foreach ($multiContacts as $multiContact) {
@@ -510,7 +508,7 @@ class ContactController
                     'select' => ['item_id', 'type', 'mode'],
                     'table' => ['resource_contacts'],
                     'where' => ['res_id = ?'],
-                    'data' => [$resource['res_id']]
+                    'data' => [$ext['res_id']]
                 ]);
 
                 foreach ($multiContacts as $multiContact) {
@@ -523,8 +521,8 @@ class ContactController
             }
         } else {
             $rawContacts[] = [
-                'login'         => $resource[$args['columnRes']],
-                'address_id'    => $resource['address_id'],
+                'login'         => $ext[$args['columnRes']],
+                'address_id'    => $ext['address_id'],
             ];
         }
 
@@ -537,7 +535,7 @@ class ContactController
                         'is_corporate_person', 'lastname', 'firstname', 'address_num', 'address_street', 'address_complement',
                         'address_town', 'address_postal_code', 'address_country', 'ca_id', 'society', 'website', 'phone',
                         'contact_firstname', 'contact_lastname', 'address_country', 'email', 'function', 'contact_other_data',
-                        'occupancy'
+                        'occupancy', 'contact_function'
                     ],
                     'where'     => ['ca_id = ?'],
                     'data'      => [$rawContact['address_id']]
@@ -553,12 +551,12 @@ class ContactController
 
                 $contact = [
                     'mode'      => $mode,
-                    'firstname' => $contactView['firstname'] ?? '',
-                    'lastname'  => $contactView['lastname'] ?? '',
+                    'firstname' => $contactView['is_corporate_person'] == 'Y' ? $contactView['firstname'] : $contactView['contact_firstname'],
+                    'lastname'  => $contactView['is_corporate_person'] == 'Y' ? $contactView['lastname'] : $contactView['contact_lastname'],
                     'email'     => $contactView['email'] ?? '',
                     'phone'     => $contactView['phone'] ?? '',
                     'society'   => $contactView['society'] ?? '',
-                    'function'  => $contactView['function'] ?? '',
+                    'function'  => $contactView['is_corporate_person'] == 'Y' ? $contactView['function'] : $contactView['contact_function'],
                     'num'       => $contactView['address_num'] ?? '',
                     'street'    => $contactView['address_street'] ?? '',
                     'complement'=> $contactView['address_complement'] ?? '',
@@ -573,7 +571,7 @@ class ContactController
 
                 $filling = ContactController::getFillingRate(['contact' => $contact]);
 
-                $contact['filling'] = $filling['color'];
+                $contact['filling'] = $filling['color'] ?? '';
 
                 $contacts[] = $contact;
             } elseif (!empty($rawContact['login'] || !empty($rawContact['user_id']))) {
@@ -584,6 +582,7 @@ class ContactController
                 }
 
                 $phone = '';
+
                 if (!empty($phone) && ($user['user_id'] == $GLOBALS['userIdd']
                         || ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use']))) {
                     $phone = $user['phone'];
@@ -615,10 +614,7 @@ class ContactController
                     'occupancy' => $nonPrimaryEntities,
                     'department' => $primaryEntity['entity_label']
                 ];
-
-                $filling = ContactController::getFillingRate(['contact' => $contact]);
-
-                $contact['filling'] = $filling['color'];
+                $contact['filling'] = '';
 
                 $contacts[] = $contact;
             } elseif (!empty($rawContact['entity_id'])) {
@@ -643,10 +639,7 @@ class ContactController
                     'occupancy' => '',
                     'department' => ''
                 ];
-
-                $filling = ContactController::getFillingRate(['contact' => $contact]);
-
-                $contact['filling'] = $filling['color'];
+                $contact['filling'] = '';
 
                 $contacts[] = $contact;
             }

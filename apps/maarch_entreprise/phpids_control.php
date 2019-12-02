@@ -33,6 +33,7 @@ if ($processIDS) {
             'COOKIE' => $_COOKIE
         );
         unset($request['COOKIE']['maarchCourrierAuth']);
+        unset($request['COOKIE']['CTSESSIONEN']); // cookie  ClearTrust
 
         $init = IDS_Init::init(
             dirname(__FILE__)

@@ -1619,11 +1619,12 @@ vertical-align: middle;
 #bodyloginCustom0 {
     background: url(static.php?filename=bodylogin.jpg) fixed 0 0 no-repeat;
     background-size: 100% 100%;
+    display: flex;
 }
 
 #bodyloginCustom {
     width: 600px;
-    height: 320px;
+    /*height: 320px;*/
     /*color: #b5b5b5;*/
     /*margin: auto;*/
     /*margin-top: 50px;*/
@@ -1634,8 +1635,10 @@ vertical-align: middle;
     margin: auto;
     
     border: 2px #24b0ed solid;
-    position: absolute;
-    /*margin: auto;*/
+    /*position: absolute;
+    margin: auto;*/
+    position: relative;
+    padding: 10px;
 }
 
 #bodyloginCustom:before {
