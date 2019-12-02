@@ -4944,16 +4944,23 @@ if (!defined('_STATUS_NOT_EXISTS')) {
 if (!defined('_M2M_ANNUARY_IS_NOT_SET')) {
     define("_M2M_ANNUARY_IS_NOT_SET", "M2M annuary is not set");
 }
+
 if (!defined('_M2M_LDAP_AUTHENTICATION_FAILED')) {
     define("_M2M_LDAP_AUTHENTICATION_FAILED", "M2M annuary authentication failed");
 }
+
 if (!defined('_M2M_LDAP_ADD_FAILED')) {
     define("_M2M_LDAP_ADD_FAILED", "Problem while adding contact in M2M annuary");
 }
+
 if (!defined('_NO_M2M_ANNUARY_AVAILABLE')) {
     define("_NO_M2M_ANNUARY_AVAILABLE", "No M2M annuary available");
 }
 
 if (!defined('_CANNOT_SYNCHRONIZE_M2M_ANNUARY')) {
     define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Contact can not be added in M2M annuary because one of these field is empty : Society, communication means, department");
+}
+
+if (!defined('_DATE_LOCALE')) {
+    define("_DATE_LOCALE", "en_US.utf8");
 }

@@ -503,3 +503,5 @@ define("_SIGNATORY", "Signatory");
 define("_VISA_USER_MIN", "Visa user");
 define("_NOTE_USER", "Note user");
 define("_WF_SEND_TO", "Send to : ");
+
+define("_DATE_LOCALE", "en_US.utf8");

@@ -5078,6 +5078,7 @@ if (!defined('_STATUS_NOT_EXISTS')) {
     define('_STATUS_NOT_EXISTS', 'Statut non défini');
 }
 
+
 if (!defined('_FORGOT_PASSWORD')) {
     define('_FORGOT_PASSWORD', 'Mot de passe oublié ?');
 }
@@ -5101,4 +5102,7 @@ if (!defined('_NO_M2M_ANNUARY_AVAILABLE')) {
 
 if (!defined('_CANNOT_SYNCHRONIZE_M2M_ANNUARY')) {
     define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Le contact ne peut pas être ajouté dans l'annuaire car un des champs suivants est manquant : Société, moyen de communication, service");
+}
+if (!defined('_DATE_LOCALE')) {
+    define("_DATE_LOCALE", "fr_FR.utf8");
 }

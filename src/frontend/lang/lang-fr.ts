@@ -1046,6 +1046,7 @@ export const LANG_FR = {
     "to_sign" : "À signer",
     "to_note" : "À annoter",
     "confidential" : "Confidentiel",
+<<<<<<< HEAD
     "afterClickingSendLinkChangePassword": "Après avoir cliqué sur <b>Envoyer</b>, vous recevrez un courriel contenant un lien pour modifier votre mot de passe. Ce lien sera actif <b>1 heure</b>.",
     "enterLogin": "Saisissez votre identifiant",
     "send" : "Envoyer",
@@ -1053,6 +1054,8 @@ export const LANG_FR = {
     "requestSentByEmail" : "La demande vous a été envoyé par courriel.",
     "logInOncePasswordChanged": "Vous serez amené à vous connecter une fois la modification du mot de passe effectuée.",
     "invalidToken" : "Le jeton est expiré ou n'existe plus",
+=======
+>>>>>>> tags/19.04.10
     "othersInfos" : "Autre(s) information(s)",
     "contactDetails" : "Coordonnées",
     "contactsFillingRate" : "Taux de complétude",
@@ -1061,6 +1064,7 @@ export const LANG_FR = {
     "contact_internal" : "Utilisateur interne",
     "contact_entity"   : "Entité",
     "contact_third"   : "Tier bénéficiaire",
+<<<<<<< HEAD
     "goToAdminParams" : "Accéder aux paramètres de l'administration",
     "adminParamsUsers" : "Options administration utilisateurs",
     "chooseAllowedGroups" : "Choisissez les groupes d'affectations autorisés",
@@ -1071,4 +1075,6 @@ export const LANG_FR = {
     "sendActivationNotification": "Envoyer à nouveau le courriel d'activation",
     "activationNotificationSend": "Le courriel d'activation a été envoyé",
     "enableGroupMsg": "Ce groupe pourra potentiellement avoir accès à l'ensemble des fonctionnalités de l'application.",
+=======
+>>>>>>> tags/19.04.10
 };

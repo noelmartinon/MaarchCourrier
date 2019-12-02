@@ -37,6 +37,8 @@ class MergeController
         ValidatorModel::notEmpty($args['data'], ['resId', 'contactAddressId', 'userId']);
         ValidatorModel::intVal($args['data'], ['resId', 'contactAddressId', 'userId']);
 
+        setlocale(LC_TIME, _DATE_LOCALE);
+
         $tbs = new \clsTinyButStrong();
         $tbs->NoErr = true;
         $tbs->PlugIn(TBS_INSTALL, OPENTBS_PLUGIN);
