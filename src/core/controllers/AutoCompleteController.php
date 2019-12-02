@@ -643,9 +643,9 @@ class AutoCompleteController
             ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
             if (filter_var($data['communicationValue'], FILTER_VALIDATE_EMAIL)) {
-                $search = @ldap_search($ldap, $annuary['baseDN'], "(postofficebox={$data['communicationValue']})", ['initials']);
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(postofficebox={$data['communicationValue']})", ['destinationIndicator']);
             } else {
-                $search = @ldap_search($ldap, $annuary['baseDN'], "(labeleduri={$data['communicationValue']})", ['initials']);
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(labeleduri={$data['communicationValue']})", ['destinationIndicator']);
             }
             if ($search === false) {
                 $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
@@ -656,7 +656,7 @@ class AutoCompleteController
                 if (!is_numeric($keyOu)) {
                     continue;
                 }
-                $siret   = $valueOu['initials'][0];
+                $siret   = $valueOu['destinationindicator'][0];
                 $search  = @ldap_search($ldap, $valueOu['dn'], "(cn=*)", ['cn', 'initials', 'entryUUID']);
                 $entries = ldap_get_entries($ldap, $search);
 
