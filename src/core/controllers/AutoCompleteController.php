@@ -643,9 +643,9 @@ class AutoCompleteController
             ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
             if (filter_var($data['communicationValue'], FILTER_VALIDATE_EMAIL)) {
-                $search = @ldap_search($ldap, $annuary['baseDN'], "(postofficebox={$data['communicationValue']})", ['destinationIndicator']);
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(postofficebox={$data['communicationValue']})", ['initials']);
             } else {
-                $search = @ldap_search($ldap, $annuary['baseDN'], "(labeleduri={$data['communicationValue']})", ['destinationIndicator']);
+                $search = @ldap_search($ldap, $annuary['baseDN'], "(labeleduri={$data['communicationValue']})", ['initials']);
             }
             if ($search === false) {
                 $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
@@ -656,8 +656,8 @@ class AutoCompleteController
                 if (!is_numeric($keyOu)) {
                     continue;
                 }
-                $siret   = $valueOu['destinationindicator'][0];
-                $search  = @ldap_search($ldap, $valueOu['dn'], "(cn=*)", ['cn', 'destinationindicator', 'entryUUID']);
+                $siret   = $valueOu['initials'][0];
+                $search  = @ldap_search($ldap, $valueOu['dn'], "(cn=*)", ['cn', 'initials', 'entryUUID']);
                 $entries = ldap_get_entries($ldap, $search);
 
                 foreach ($entries as $key => $value) {
@@ -666,8 +666,8 @@ class AutoCompleteController
                     }
                     $unitOrganizations[] = [
                         'entryuuid'        => $value['entryuuid'][0],
-                        'businessIdValue'  => $siret . '/' . $value['destinationindicator'][0],
-                        'unitOrganization' => "{$value['cn'][0]} - {$siret}/{$value['destinationindicator'][0]}"
+                        'businessIdValue'  => $siret . '/' . $value['initials'][0],
+                        'unitOrganization' => "{$value['cn'][0]} - {$siret}/{$value['initials'][0]}"
                     ];
                 }
             }
