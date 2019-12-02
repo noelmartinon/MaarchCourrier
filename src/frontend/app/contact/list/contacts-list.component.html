@@ -14,8 +14,7 @@
                 <mat-card-title>{{contact.firstname}} {{contact.lastname}}</mat-card-title>
                 <mat-card-subtitle [title]="lang.contactsFilling_function">{{contact.function}}&nbsp;
                 </mat-card-subtitle>
-                <i class="contact-filling fa fa-circle" *ngIf="(contact.mode === 'physical' || contact.mode === 'corporate') && contact.filling !== ''" [style.color]="contact.filling"
-                    [title]="lang.contactsFillingRate"></i>
+                <i class="contact-filling fa fa-circle" *ngIf="(contact.mode === 'physical' || contact.mode === 'corporate') && contact.filling !== ''" [style.color]="contact.filling" [title]="lang.contactsFillingRate"></i>
             </mat-card-header>
             <mat-card-content>
                 <mat-list>
@@ -41,6 +40,7 @@
                         <p mat-line class="contact-content"> {{contact.phone}} </p>
                     </mat-list-item>
                     <mat-list-item class="contact-address" (click)="goTo(contact)" [title]="lang.address" *ngIf="contact.num !== '' || contact.street !== '' || contact.complement !== '' || contact.postalCode !== '' || contact.town !== '' || contact.country !== ''">
+
                         <mat-icon mat-list-icon class="contact-group fas fa-map-marker-alt"></mat-icon>
                         <p mat-line class="contact-content" *ngIf="contact.num !== '' || contact.street !== ''"> {{contact.num}} {{contact.street}} </p>
                         <p mat-line class="contact-content" *ngIf="contact.complement !== ''"> ({{contact.complement}}) </p>
