@@ -355,10 +355,10 @@ class AnnuaryController
                 $entryDn  = $entries[0]['entrydn'][0];
                 $pathDn   = explode(',', $entryDn);
                 $parentOu = $pathDn[1];
-                $search   = @ldap_search($ldap, "{$annuary['baseDN']}", "({$parentOu})", ['dn', 'destinationIndicator', 'postOfficeBox', 'labeledURIObject']);
+                $search   = @ldap_search($ldap, "{$annuary['baseDN']}", "({$parentOu})", ['dn', 'destinationIndicator', 'postOfficeBox', 'labeledURI']);
                 $entries  = ldap_get_entries($ldap, $search);
 
-                return ['mail' => $entries[0]['postofficebox'][0], 'url' => $entries[0]['labeleduriobject'][0], 'businessId' => $entries[0]['destinationindicator'][0] . '/' . $departmentDestinationIndicator];
+                return ['mail' => $entries[0]['postofficebox'][0], 'url' => $entries[0]['labeleduri'][0], 'businessId' => $entries[0]['destinationindicator'][0] . '/' . $departmentDestinationIndicator];
             }
 
             break;
