@@ -15,6 +15,7 @@
 define('_ACTION_ADDED', 'Action ajoutée');
 define('_ACTION_DELETED', 'Action supprimée');
 define('_ACTION_UPDATED', 'Action modifiée');
+define('_ADD_NOTIFICATIONS', 'Notification créée');
 define('_ALREADY_EXISTS', 'existe déjà');
 define('_AVIS_USER', 'Pour avis');
 define('_AVIS_USER_COPY', 'En copie (avis)');
