@@ -421,6 +421,8 @@ class TemplateController
             $tmpPath = CoreConfigModel::getTmpPath();
             $myFile = $tmpPath . $fileNameOnTmp;
 
+            setlocale(LC_TIME, _DATE_LOCALE);
+
             // Merge with TBS
             $TBS = new \clsTinyButStrong;
             $TBS->NoErr = true;

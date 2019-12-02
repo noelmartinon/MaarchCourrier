@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '19.04.9' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '19.04.10' WHERE id = 'database_version';
 
 DELETE FROM parameters WHERE id = 'QrCodePrefix';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('QrCodePrefix', 'Si activé (1), ajoute "Maarch_" dans le contenu des QrCode générés. (Utilisable avec MaarchCapture >= 1.4)', 0);
@@ -326,6 +326,38 @@ DO $$ BEGIN
     ALTER TABLE res_letterbox ADD COLUMN scan_postmark CHARACTER VARYING (50) DEFAULT NULL::character varying;
   END IF;
 END$$;
+
+/* USERS */
+ALTER TABLE users DROP COLUMN IF EXISTS reset_token;
+ALTER TABLE users ADD COLUMN reset_token text;
+
+/* usergroups_services */
+ALTER TABLE usergroups_services DROP COLUMN IF EXISTS parameters;
+ALTER TABLE usergroups_services ADD parameters jsonb;
+UPDATE usergroups_services SET parameters = (
+    cast('{"groups": [' || (
+        SELECT string_agg(cast(id AS VARCHAR), ', ' ORDER BY id) FROM usergroups
+    ) || ']}' AS jsonb)
+    )
+WHERE service_id = 'admin_users';
+
+DELETE FROM usergroups_services WHERE service_id = 'view_personal_data' or service_id = 'manage_personal_data';
+INSERT INTO usergroups_services (group_id, service_id)
+SELECT distinct(group_id), 'view_personal_data'
+FROM usergroups_services WHERE group_id IN (
+    SELECT group_id FROM usergroups_services
+    WHERE service_id = 'admin_users'
+);
+INSERT INTO usergroups_services (group_id, service_id)
+SELECT distinct(group_id), 'manage_personal_data'
+FROM usergroups_services WHERE group_id IN (
+    SELECT group_id FROM usergroups_services
+    WHERE service_id = 'admin_users'
+);
+
+/* SIRET */
+DELETE FROM parameters WHERE id = 'siret';
+INSERT INTO parameters (id, description, param_value_string) VALUES ('siret', 'Numéro SIRET de l''entreprise', '12345678901234');
 
 /* RE-CREATE VIEW*/
 CREATE OR REPLACE VIEW res_view_letterbox AS

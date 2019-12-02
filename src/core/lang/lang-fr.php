@@ -15,7 +15,6 @@
 define('_ACTION_ADDED', 'Action ajoutée');
 define('_ACTION_DELETED', 'Action supprimée');
 define('_ACTION_UPDATED', 'Action modifiée');
-define('_ADD_NOTIFICATIONS', 'Notification créée');
 define('_ALREADY_EXISTS', 'existe déjà');
 define('_AVIS_USER', 'Pour avis');
 define('_AVIS_USER_COPY', 'En copie (avis)');
@@ -503,6 +502,7 @@ define("_VISA_USER_MIN", "Viseur");
 define("_NOTE_USER", "Annotateur");
 define("_WF_SEND_TO", "Envoyé à : ");
 
+
 define("_NOTIFICATIONS_FORGOT_PASSWORD_SUBJECT", "[Maarch Courrier] Demande de réinitialisation de mot de passe");
 define("_NOTIFICATIONS_FORGOT_PASSWORD_BODY", "Bonjour,<br/><br/>Vous avez demandé à retrouver le mot de passe d'accès à votre compte Maarch Courrier.<br/><br/>Pour modifier votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
 define("_NOTIFICATIONS_FORGOT_PASSWORD_FOOTER", "<br/><br/>Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer ce courriel.<br/><br/>Pour toutes questions, merci de contacter l'administrateur de la solution.");
@@ -516,3 +516,4 @@ define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>Ce message est envoyé 
 
 define("_VIEW_PERSONAL_DATA", "Voir les données personnelles de l'utilisateur");
 define("_MANAGE_PERSONAL_DATA", "Modifier ou supprimer les données personnelles de l'utilisateur");
+define("_DATE_LOCALE", "fr_FR.utf8");

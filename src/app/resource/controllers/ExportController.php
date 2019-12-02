@@ -553,20 +553,20 @@ class ExportController
 
         foreach ($args['chunkedResIds'] as $resIds) {
             $attachments = AttachmentModel::getOnView([
-                'select'    => ['creation_date', 'res_id'],
-                'where'     => ['res_id in (?)', 'attachment_type = ?', 'status = ?'],
+                'select'    => ['creation_date', 'res_id_master'],
+                'where'     => ['res_id_master in (?)', 'attachment_type = ?', 'status = ?'],
                 'data'      => [$resIds, 'signed_response', 'TRA'],
                 'order_by'  => ['res_id']
             ]);
 
             foreach ($attachments as $key => $attachment) {
                 $date  = new \DateTime($attachment['creation_date']);
-                if (!empty($aSignatureDates[$attachment['res_id']])) {
-                    $aSignatureDates[$attachment['res_id']] .= "\n";
+                if (!empty($aSignatureDates[$attachment['res_id_master']])) {
+                    $aSignatureDates[$attachment['res_id_master']] .= "\n";
                 } else {
-                    $aSignatureDates[$attachment['res_id']] = '';
+                    $aSignatureDates[$attachment['res_id_master']] = '';
                 }
-                $aSignatureDates[$attachment['res_id']] .= $date->format('d-m-Y H:i');
+                $aSignatureDates[$attachment['res_id_master']] .= $date->format('d-m-Y H:i');
             }
         }
 

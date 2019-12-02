@@ -506,3 +506,5 @@ define("_SIGNATORY", "Signatory_TO_TRANSLATE");
 define("_VISA_USER_MIN", "Visa user_TO_TRANSLATE");
 define("_NOTE_USER", "Note user_TO_TRANSLATE");
 define("_WF_SEND_TO", "Send to : _TO_TRANSLATE");
+
+define("_DATE_LOCALE", "en_US.utf8");
