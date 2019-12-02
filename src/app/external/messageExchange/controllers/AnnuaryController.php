@@ -93,7 +93,7 @@ class AnnuaryController
                 }
             }
 
-            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$entity['entity_id']})", ['dn']);
+            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(initials={$entity['entity_id']})", ['dn']);
             if ($search === false) {
                 return $response->withStatus(400)->withJson(['errors' => 'Ldap search failed : ' . ldap_error($ldap)]);
             }
@@ -113,7 +113,7 @@ class AnnuaryController
                 $info = [];
                 $info['cn'] = $entity['entity_label'];
                 $info['sn'] = $entity['entity_label'];
-                $info['destinationIndicator'] = $entity['entity_id'];
+                $info['initials'] = $entity['entity_id'];
                 $info['objectclass'] = ['top', 'inetOrgPerson'];
 
                 $added = @ldap_add($ldap, "cn={$entity['entity_label']},ou={$organization},{$annuary['baseDN']}", $info);
@@ -146,7 +146,7 @@ class AnnuaryController
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
             ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
 
-            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(destinationIndicator={$args['entityId']})", ['dn']);
+            $search = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(initials={$args['entityId']})", ['dn']);
             if ($search === false) {
                 continue;
             }
@@ -252,7 +252,7 @@ class AnnuaryController
             $entries = ldap_get_entries($ldap, $search);
 
             if ($entries['count'] > 0) {
-                $search = @ldap_search($ldap, "ou={$entries[0]['ou'][0]},{$annuary['baseDN']}", "(destinationIndicator={$entityId})", ['ou', 'entryUUID']);
+                $search = @ldap_search($ldap, "ou={$entries[0]['ou'][0]},{$annuary['baseDN']}", "(initials={$entityId})", ['ou', 'entryUUID']);
                 $entries = ldap_get_entries($ldap, $search);
                 if ($entries['count'] > 0) {
                     return ['entryUUID' => $entries[0]['entryuuid'][0]];
@@ -277,7 +277,7 @@ class AnnuaryController
             $info = [];
             $info['cn'] = $serviceName;
             $info['sn'] = $serviceName;
-            $info['destinationIndicator'] = $entityId;
+            $info['initials'] = $entityId;
             $info['objectclass'] = ['top', 'inetOrgPerson'];
 
             $added = @ldap_add($ldap, "cn={$serviceName},ou={$organization},{$annuary['baseDN']}", $info);
@@ -285,9 +285,7 @@ class AnnuaryController
                 return ['errors' => _M2M_LDAP_ADD_FAILED . ' : ' . ldap_error($ldap)];
             }
 
-            $search  = @ldap_search($ldap, "{$annuary['baseDN']}", "(destinationIndicator={$siret})", ['ou']);
-            $entries = ldap_get_entries($ldap, $search);
-            $search  = @ldap_search($ldap, "ou={$entries[0]['ou'][0]},{$annuary['baseDN']}", "(destinationIndicator={$entityId})", ['entryUUID']);
+            $search  = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(initials={$entityId})", ['entryUUID']);
             $entries = ldap_get_entries($ldap, $search);
             return ['entryUUID' => $entries[0]['entryuuid'][0]];
 
@@ -347,13 +345,13 @@ class AnnuaryController
             ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
             ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
 
-            $search = @ldap_search($ldap, "{$annuary['baseDN']}", "(entryUUID={$args['contactUuid']})", ['dn', 'destinationIndicator', 'entryDN']);
+            $search = @ldap_search($ldap, "{$annuary['baseDN']}", "(entryUUID={$args['contactUuid']})", ['dn', 'initials', 'entryDN']);
             if ($search === false) {
                 continue;
             }
             $entries = ldap_get_entries($ldap, $search);
             if ($entries['count'] > 0) {
-                $departmentDestinationIndicator = $entries[0]['destinationindicator'][0];
+                $departmentDestinationIndicator = $entries[0]['initials'][0];
                 $entryDn  = $entries[0]['entrydn'][0];
                 $pathDn   = explode(',', $entryDn);
                 $parentOu = $pathDn[1];
