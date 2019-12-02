@@ -2291,8 +2291,6 @@ abstract class contacts_v2_Abstract extends Database
                         $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = $annuaryInfo['entryUUID'];
                     }
                 }
-            } else {
-                $_SESSION['m_admin']['address']['M2M_ANNUARY_ID'] = null;
             }
 
             if ($mode == 'add') {
