@@ -6,3 +6,4 @@ php ./migrateFeature.php
 php ./migrateNewNature.php
 php ./refactorPriorities.php
 php ./refactorRemoteSignatoryBooks.php
+php ./migrateM2M.php
