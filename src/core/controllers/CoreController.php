@@ -20,6 +20,7 @@ use Group\models\ServiceModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
 require_once 'core/class/Url.php';
@@ -143,5 +144,15 @@ class CoreController
         }
 
         return $response->withJson($administration);
+    }
+
+    public static function setGlobals(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['login']);
+        ValidatorModel::stringType($args, ['login']);
+
+        $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['id']]);
+        $GLOBALS['userId'] = $args['login'];
+        $GLOBALS['id'] = $user['id'];
     }
 }

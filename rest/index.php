@@ -38,7 +38,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
     if (!in_array($currentMethod.$currentRoute, $routesWithoutAuthentication)) {
         $userId = \SrcCore\controllers\AuthenticationController::authentication();
         if (!empty($userId)) {
-            $GLOBALS['userId'] = $userId;
+            \SrcCore\controllers\CoreController::setGlobals(['login' => $userId]);
             if (!empty($currentRoute)) {
                 $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute]);
                 if (!$r['isRouteAvailable']) {
