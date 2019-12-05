@@ -127,7 +127,7 @@ class CurlModel
 
         $cookies = [];
         if (!empty($aArgs['options'][CURLOPT_HEADER])) {
-            preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $rawResponse, $matches);
+            preg_match_all('/Set-Cookie:\s*([;]*)/mi', $rawResponse, $matches);
             foreach ($matches[1] as $item) {
                 $cookie = explode("=", $item);
                 $cookies = array_merge($cookies, [$cookie[0] => $cookie[1]]);
@@ -136,7 +136,14 @@ class CurlModel
         } elseif (!empty($aArgs['delete_header'])) { // Delete header for iparapheur
             $body = explode(PHP_EOL . PHP_EOL, $rawResponse)[1]; // put the header ahead
             if (empty($body)) {
-                $body = explode(PHP_EOL, $rawResponse)[5];
+                $body = explode(PHP_EOL, $rawResponse);
+                // we remove the 4 starting item of the array (header)
+                for ($i=0; $i < 5; $i++) {
+                    array_shift($body);
+                }
+                // and the last item (footer)
+                array_pop($body);
+                $body = join('', $body);
             }
             $pattern = '/--uuid:[0-9a-f-]+--/';                  // And also the footer
             $rawResponse = preg_replace($pattern, '', $body);
