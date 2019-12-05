@@ -7,7 +7,7 @@
 -- *************************************************************************--
 
 DELETE FROM parameters where id = 'database_version';
-INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '18.10.12', NULL, NULL);
+INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '18.10.13', NULL, NULL);
 
 DROP VIEW IF EXISTS res_view_letterbox;
 DROP VIEW IF EXISTS res_view_attachments;
