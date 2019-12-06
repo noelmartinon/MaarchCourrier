@@ -808,8 +808,8 @@ $linkwithwhat =
             if (!empty($_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'])) {
                 $recipientEntities = \User\models\UserModel::getEntitiesById(['userId' => $_SESSION[$origin]['diff_list']['dest']['users'][0]['user_id']]);
                 $recipientEntities = array_column($recipientEntities, 'entity_id');
-                if (in_array($entities[0]['ID'], $recipientEntities)) {
-                    $entity_id_dest = $entities[0]['ID'];
+                if (in_array($_SESSION[$origin]['difflist_object']['object_id'], $recipientEntities)) {
+                    $entity_id_dest = $_SESSION[$origin]['difflist_object']['object_id'];
                 } else {
                     $entity_id_dest = $_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'];
                 }
