@@ -91,9 +91,12 @@ else
 //Try to create a new ldap instance
 try
 {
-	if($prefix_login != ''){
+	if(!empty($prefix_login)){
         $login_admin =$prefix_login."\\".$login_admin;
-    }
+	}
+	if (!empty($suffix_login)) {
+		$login_admin = $login_admin . $suffix_login;
+	}
 	$ad = new LDAP($domain,$login_admin,$pass,false);
 	//echo "connection Ldap ok\n";
 }
