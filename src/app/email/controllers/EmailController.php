@@ -96,6 +96,14 @@ class EmailController
             'info'         => _EMAIL_ADDED
         ]);
 
+        HistoryController::add([
+            'tableName'    => 'res_letterbox',
+            'recordId'     => $args['data']['document']['id'],
+            'eventType'    => 'ADD',
+            'eventId'      => 'emailCreation',
+            'info'         => _EMAIL_ADDED
+        ]);
+
         $isSent = ['success' => 'success'];
         if ($args['data']['status'] != 'DRAFT') {
             if ($args['data']['status'] == 'EXPRESS') {
@@ -208,6 +216,14 @@ class EmailController
         HistoryController::add([
             'tableName'    => 'emails',
             'recordId'     => $args['emailId'],
+            'eventType'    => 'UP',
+            'eventId'      => 'emailModification',
+            'info'         => _EMAIL_UPDATED
+        ]);
+
+        HistoryController::add([
+            'tableName'    => 'res_letterbox',
+            'recordId'     => $args['data']['document']['id'],
             'eventType'    => 'UP',
             'eventId'      => 'emailModification',
             'info'         => _EMAIL_UPDATED
@@ -495,7 +511,7 @@ class EmailController
     {
         $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
 
-        $email = EmailModel::getById(['select' => ['user_id'], 'id' => $args['id']]);
+        $email = EmailModel::getById(['select' => ['user_id', 'document'], 'id' => $args['id']]);
         if (empty($email)) {
             return $response->withStatus(400)->withJson(['errors' => 'Email does not exist']);
         }
@@ -511,6 +527,16 @@ class EmailController
         HistoryController::add([
             'tableName'    => 'emails',
             'recordId'     => $args['id'],
+            'eventType'    => 'DEL',
+            'eventId'      => 'emailDeletion',
+            'info'         => _EMAIL_REMOVED
+        ]);
+
+        $document = (array)json_decode($email['document']);
+
+        HistoryController::add([
+            'tableName'    => 'res_letterbox',
+            'recordId'     => $document['id'],
             'eventType'    => 'DEL',
             'eventId'      => 'emailDeletion',
             'info'         => _EMAIL_REMOVED
