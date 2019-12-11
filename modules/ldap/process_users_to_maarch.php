@@ -136,23 +136,23 @@ function infoBalise($description, $balise)
 		/*Fonction qui change le status d'un user s'il n'est plus dans le ldap*/
 		function changeStatusUsers($idUsersTab,$db)
 		{
-			$query = "select user_id from users where status not in ('DEL') and ";
-			$query .= "user_id not in ('".implode("','",$idUsersTab)."')";	
-			$qry = $db->prepare($query);	
+			$query = "select user_id from users where status not in ('DEL') and loginmode not in ('restMode') and ";
+			$query .= "user_id not in ('".implode("','", $idUsersTab)."')";
+			$qry = $db->prepare($query);
 			$qry->execute(array());
 			$result = $qry->fetchAll();
-			if($result == null){
+			if ($result == null) {
 				echo "Aucun utilisateur n'a besoin d'être passé en DEL\n";
 				return true;
-			}else{
+			} else {
 				echo "Des utilisateurs doivent changer de status !\n";
 
-				$qry = $db->prepare("UPDATE users set status = 'DEL' where user_id in (select user_id from users where status not in ('DEL') and user_id not in ('".implode("','",$idUsersTab)."')) ");	
+				$qry = $db->prepare("UPDATE users set status = 'DEL' where user_id in (select user_id from users where status not in ('DEL') and loginmode not in ('restMode') and user_id not in ('".implode("','", $idUsersTab)."')) ");
 				$qry->execute();
 				$result = $qry->fetchAll();
-				if(!$result){
+				if (!$result) {
 					echo "/!\ Aucun utilisateur n'a pu etre passé en DEL !\n";
-				}else{
+				} else {
 					echo "... des utilisateur ont été passé en DEL ...\n";
 				}
 			}
