@@ -443,6 +443,13 @@ class UserController
             $user['canModifyPassword'] = false;
         }
 
+        foreach ($user['baskets'] as $key => $basket) {
+            if (!$basket['allowed']) {
+                unset($user['baskets'][$key]);
+            }
+        }
+        $user['baskets'] = array_values($user['baskets']);
+
         return $response->withJson($user);
     }
 
@@ -569,6 +576,17 @@ class UserController
             if (empty($value['newUser']) || empty($value['basketId']) || empty($value['basketOwner']) || empty($value['virtual'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
             }
+
+            $userBasketPreference = UserBasketPreferenceModel::get([
+                'select' => [1], 
+                'where'  => ['basket_id =?', 'user_serial_id = ?'],
+                'data'   => [$value['basketId'], $aArgs['id']]
+            ]);
+
+            if (empty($userBasketPreference)) {
+                unset($data[$key]);
+                continue;
+            }
             $check = UserModel::getByUserId(['userId' => $value['newUser'], 'select' => ['1']]);
             if (empty($check)) {
                 return $response->withStatus(400)->withJson(['errors' => 'User not found']);
@@ -613,8 +631,19 @@ class UserController
             }
         }
 
+        $userBaskets = BasketModel::getBasketsByUserId(['userId' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']]);
+
+        if ($GLOBALS['userId'] == $user['user_id']) {
+            foreach ($userBaskets as $key => $basket) {
+                if (!$basket['allowed']) {
+                    unset($userBaskets[$key]);
+                }
+            }
+            $userBaskets = array_values($userBaskets);
+        }
+
         return $response->withJson([
-            'baskets'   => BasketModel::getBasketsByUserId(['userId' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']])
+            'baskets'    => $userBaskets
         ]);
     }
 
@@ -654,8 +683,19 @@ class UserController
             'info'         => _BASKET_REDIRECTION_SUPPRESSION . " {$aArgs['basketId']} {$user['user_id']}"
         ]);
 
+        $userBaskets = BasketModel::getBasketsByUserId(['userId' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']]);
+
+        if ($GLOBALS['userId'] == $user['user_id']) {
+            foreach ($userBaskets as $key => $basket) {
+                if (!$basket['allowed']) {
+                    unset($userBaskets[$key]);
+                }
+            }
+            $userBaskets = array_values($userBaskets);
+        }
+
         return $response->withJson([
-            'baskets'   => BasketModel::getBasketsByUserId(['userId' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']])
+            'baskets'   => $userBaskets
         ]);
     }
 
