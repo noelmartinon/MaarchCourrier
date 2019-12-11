@@ -96,13 +96,15 @@ class EmailController
             'info'         => _EMAIL_ADDED
         ]);
 
-        HistoryController::add([
-            'tableName'    => 'res_letterbox',
-            'recordId'     => $args['data']['document']['id'],
-            'eventType'    => 'ADD',
-            'eventId'      => 'emailCreation',
-            'info'         => _EMAIL_ADDED
-        ]);
+        if (!empty($args['data']['document']['id'])) {
+            HistoryController::add([
+                'tableName' => 'res_letterbox',
+                'recordId'  => $args['data']['document']['id'],
+                'eventType' => 'ADD',
+                'eventId'   => 'emailCreation',
+                'info'      => _EMAIL_ADDED
+            ]);
+        }
 
         $isSent = ['success' => 'success'];
         if ($args['data']['status'] != 'DRAFT') {
@@ -221,13 +223,15 @@ class EmailController
             'info'         => _EMAIL_UPDATED
         ]);
 
-        HistoryController::add([
-            'tableName'    => 'res_letterbox',
-            'recordId'     => $args['data']['document']['id'],
-            'eventType'    => 'UP',
-            'eventId'      => 'emailModification',
-            'info'         => _EMAIL_UPDATED
-        ]);
+        if (!empty($args['data']['document']['id'])) {
+            HistoryController::add([
+                'tableName' => 'res_letterbox',
+                'recordId'  => $args['data']['document']['id'],
+                'eventType' => 'UP',
+                'eventId'   => 'emailModification',
+                'info'      => _EMAIL_UPDATED
+            ]);
+        }
 
         if ($args['data']['status'] != 'DRAFT') {
             $customId = CoreConfigModel::getCustomId();
@@ -532,15 +536,17 @@ class EmailController
             'info'         => _EMAIL_REMOVED
         ]);
 
-        $document = (array)json_decode($email['document']);
+        if (!empty($args['data']['document'])) {
+            $document = (array)json_decode($email['document']);
 
-        HistoryController::add([
-            'tableName'    => 'res_letterbox',
-            'recordId'     => $document['id'],
-            'eventType'    => 'DEL',
-            'eventId'      => 'emailDeletion',
-            'info'         => _EMAIL_REMOVED
-        ]);
+            HistoryController::add([
+                'tableName' => 'res_letterbox',
+                'recordId'  => $document['id'],
+                'eventType' => 'DEL',
+                'eventId'   => 'emailDeletion',
+                'info'      => _EMAIL_REMOVED
+            ]);
+        }
 
         return $response->withStatus(204);
     }
