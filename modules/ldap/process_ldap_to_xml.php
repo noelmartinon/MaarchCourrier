@@ -89,17 +89,17 @@ else
 //**********************************//
 
 //Try to create a new ldap instance
-try
-{
-	if($prefix_login != ''){
+try {
+    if (!empty($prefix_login)) {
         $login_admin =$prefix_login."\\".$login_admin;
     }
-	$ad = new LDAP($domain,$login_admin,$pass,false);
-	//echo "connection Ldap ok\n";
-}
-catch(Exception $con_failure)
-{
-	exit("Impossible de se connecter à l'annuaire\n
+    if (!empty($suffix_login)) {
+        $login_admin = $login_admin . $suffix_login;
+    }
+    $ad = new LDAP($domain, $login_admin, $pass, false);
+    //echo "connection Ldap ok\n";
+} catch (Exception $con_failure) {
+    exit("Impossible de se connecter à l'annuaire\n
 		Erreur : ".$con_failure->getMessage()."\n");
 }
 
