@@ -458,6 +458,13 @@ class UserController
             $user['canModifyPassword'] = false;
         }
 
+        foreach ($user['baskets'] as $key => $basket) {
+            if (!$basket['allowed']) {
+                unset($user['baskets'][$key]);
+            }
+        }
+        $user['baskets'] = array_values($user['baskets']);
+
         return $response->withJson($user);
     }
 
@@ -563,6 +570,17 @@ class UserController
                 return $response->withStatus(400)->withJson(['errors' => 'Some data are empty']);
             }
 
+            $userBasketPreference = UserBasketPreferenceModel::get([
+                'select' => ['display'], 
+                'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
+                'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
+            ]);
+
+            if (empty($userBasketPreference)) {
+                unset($data[$key]);
+                continue;
+            }
+
             $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
             if (empty($check)) {
                 DatabaseModel::rollbackTransaction();
@@ -619,9 +637,20 @@ class UserController
 
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
 
+        $userBaskets = BasketModel::getBasketsByLogin(['login' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']]);
+
+        if ($GLOBALS['userId'] == $user['user_id']) {
+            foreach ($userBaskets as $key => $basket) {
+                if (!$basket['allowed']) {
+                    unset($userBaskets[$key]);
+                }
+            }
+            $userBaskets = array_values($userBaskets);
+        }
+
         return $response->withJson([
             'redirectedBaskets' => RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $aArgs['id']]),
-            'baskets'           => BasketModel::getBasketsByLogin(['login' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']])
+            'baskets'           => $userBaskets
         ]);
     }
 
@@ -668,8 +697,19 @@ class UserController
 
         DatabaseModel::commitTransaction();
 
+        $userBaskets = BasketModel::getBasketsByLogin(['login' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']]);
+
+        if ($GLOBALS['userId'] == $user['user_id']) {
+            foreach ($userBaskets as $key => $basket) {
+                if (!$basket['allowed']) {
+                    unset($userBaskets[$key]);
+                }
+            }
+            $userBaskets = array_values($userBaskets);
+        }
+
         return $response->withJson([
-            'baskets'   => BasketModel::getBasketsByLogin(['login' => $user['user_id'], 'unneededBasketId' => ['IndexingBasket']])
+            'baskets'   => $userBaskets
         ]);
     }
 
