@@ -214,6 +214,7 @@ CREATE TABLE users
   phone character varying(32) DEFAULT NULL::character varying,
   mail character varying(255) DEFAULT NULL::character varying,
   initials character varying(32) DEFAULT NULL::character varying,
+  preferences jsonb NOT NULL DEFAULT '{"documentEdition" : "java"}',
   custom_t1 character varying(50) DEFAULT '0'::character varying,
   custom_t2 character varying(50) DEFAULT NULL::character varying,
   custom_t3 character varying(50) DEFAULT NULL::character varying,

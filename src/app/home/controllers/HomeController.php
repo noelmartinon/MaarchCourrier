@@ -31,12 +31,29 @@ class HomeController
     {
         $regroupedBaskets = [];
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'external_id']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'preferences', 'external_id']]);
         $homeMessage = ParameterModel::getById(['select' => ['param_value_string'], 'id'=> 'homepage_message']);
         $homeMessage = trim($homeMessage['param_value_string']);
 
         $redirectedBaskets = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
         $groups = UserModel::getGroupsByUserId(['userId' => $GLOBALS['userId']]);
+
+        $preferences = json_decode($user['preferences'], true);
+        if (!empty($preferences['homeGroups'])) {
+            $orderGroups   = [];
+            $noOrderGroups = [];
+            foreach ($groups as $group) {
+                $key = array_search($group['id'], $preferences['homeGroups']);
+                if ($key === false) {
+                    $noOrderGroups[] = $group;
+                } else {
+                    $orderGroups[$key] = $group;
+                }
+            }
+            ksort($orderGroups);
+            $groups = array_merge($orderGroups, $noOrderGroups);
+        }
+
         foreach ($groups as $group) {
             $baskets = BasketModel::getAvailableBasketsByGroupUser([
                 'select'        => ['baskets.id', 'baskets.basket_id', 'baskets.basket_name', 'baskets.basket_desc', 'baskets.basket_clause', 'baskets.color', 'users_baskets_preferences.color as pcolor'],

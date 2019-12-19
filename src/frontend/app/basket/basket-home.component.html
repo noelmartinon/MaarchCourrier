@@ -5,14 +5,30 @@
         <mat-panel-title>
             {{lang.myBaskets}}
         </mat-panel-title>
+        <div title="{{lang.listConfiguration}}" (click)="$event.stopPropagation();editGroupOrder()">
+            <mat-icon [ngStyle]="{'color': editOrderGroups ? 'orange' : '#135F7F'}" mat-list-icon class="fa fa-cog" style="height:auto;"></mat-icon>
+        </div>
     </mat-expansion-panel-header>
-    <mat-form-field floatLabel="never" style="padding-left:20px;padding-right:20px;">
+    <mat-form-field floatLabel="never" style="padding-left:20px;padding-right:20px;" [style.display]="!editOrderGroups ? 'inline-block' : 'none'">
         <input matInput placeholder="{{lang.filterBy}}" #listFilter>
     </mat-form-field>
+
+    <div *ngIf="editOrderGroups" style="color: rgba(0,0,0,0.25);text-align:center">
+        {{lang.noticeGroupeOrder}}
+    </div>
+    <mat-list *ngIf="editOrderGroups">
+        <span dnd-sortable-container [dropZones]="['boxers-zone']" [sortableData]="homeData.regroupedBaskets">
+            <mat-list-item disableRipple="true" *ngFor="let regroupedBasket of homeData.regroupedBaskets;let i = index" title="{{lang.move}}" dnd-sortable
+                            [sortableIndex]="i" (onDropSuccess)="updateGroupsOrder()">
+                <mat-icon color="primary" mat-list-icon class="fa fa-arrows-alt" style="font-size:19px"></mat-icon>
+                <span class="basketGroupTitle">{{regroupedBasket.groupDesc}}</span>
+            </mat-list-item>
+        </span>
+    </mat-list>
     <ng-container *ngFor="let regroupedBasket of homeData.regroupedBaskets">
-        <mat-icon *ngIf="regroupedBasket.baskets[0]" color="primary" mat-list-icon class="fa fa-users" style="margin-left:10px;"></mat-icon> <span *ngIf="regroupedBasket.baskets[0]" color="primary" style="font-weight:bold;">{{regroupedBasket.groupDesc}}</span>
-        <mat-divider *ngIf="regroupedBasket.baskets[0]"></mat-divider>
-        <mat-nav-list>
+        <mat-icon *ngIf="regroupedBasket.baskets[0] && !editOrderGroups" color="primary" mat-list-icon class="fa fa-users" style="margin-left:10px;"></mat-icon> <span *ngIf="regroupedBasket.baskets[0] && !editOrderGroups" color="primary" style="font-weight:bold;">{{regroupedBasket.groupDesc}}</span>
+        <mat-divider *ngIf="regroupedBasket.baskets[0] && !editOrderGroups"></mat-divider>
+        <mat-nav-list *ngIf="!editOrderGroups">
             <ng-container *ngFor="let basket of regroupedBasket.baskets | filterList:listFilter.value:'basket_name'">
                 <a mat-list-item *ngIf="basket.redirected" disableRipple="true" style="cursor:not-allowed;">
                     <mat-icon [ngStyle]="{'color': basket.color}" *ngIf="basket.redirected && !mobileMode" mat-list-icon class="fa fa-share"></mat-icon>
@@ -32,7 +48,7 @@
             </ng-container>
         </mat-nav-list>
     </ng-container>
-    <ng-container *ngIf="homeData.assignedBaskets.length>0">
+    <ng-container *ngIf="homeData.assignedBaskets.length>0 && !editOrderGroups">
         <span color="primary" style="font-weight:bold;" title="{{lang.basketsAssigned}}">{{lang.basketsAssignedShort}}</span>
         <mat-divider></mat-divider>
         <mat-nav-list>

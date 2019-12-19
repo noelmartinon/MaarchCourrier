@@ -1047,4 +1047,6 @@ export const LANG_NL = {
     "contact_internal" : "Internal user", //_TO_TRANSLATE
     "contact_entity"   : "Entity", //_TO_TRANSLATE
     "contact_third"   : "Contact third", //_TO_TRANSLATE
+    "listConfiguration": "Manage list display", //_TO_TRANSLATE
+    "noticeGroupeOrder": "Drag and drop group to set order", //_TO_TRANSLATE
 };

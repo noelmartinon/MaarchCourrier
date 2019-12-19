@@ -1021,4 +1021,6 @@ export const LANG_EN = {
     "contact_internal" : "Internal user",
     "contact_entity"   : "Entity",
     "contact_third"   : "Contact third",
+    "listConfiguration": "Manage list display",
+    "noticeGroupeOrder": "Drag and drop group to set order",
 };

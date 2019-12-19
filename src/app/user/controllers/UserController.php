@@ -442,6 +442,7 @@ class UserController
     {
         $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'external_id']]);
         $user['external_id']        = json_decode($user['external_id'], true);
+        $user['preferences']        = json_decode($user['preferences'], true);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
         $user['emailSignatures']    = UserModel::getEmailSignaturesById(['userId' => $user['user_id']]);
         $user['groups']             = UserModel::getGroupsByUserId(['userId' => $user['user_id']]);
@@ -487,7 +488,45 @@ class UserController
             'data'  => [$user['id']]
         ]);
 
+        HistoryController::add([
+            'tableName'    => 'users',
+            'recordId'     => $GLOBALS['userId'],
+            'eventType'    => 'UP',
+            'eventId'      => 'userModification',
+            'info'         => _USER_UPDATED . " {$body['firstname']} {$body['lastname']}"
+        ]);
+
         return $response->withJson(['success' => 'success']);
+    }
+
+    public function updateCurrentUserPreferences(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'preferences', 'firstname', 'lastname']]);
+        $preferences = json_decode($user['preferences'], true);
+
+        if (!empty($body['homeGroups'])) {
+            $preferences['homeGroups'] = $body['homeGroups'];
+        }
+
+        UserModel::update([
+            'set'   => [
+                'preferences'   => json_encode($preferences)
+            ],
+            'where' => ['id = ?'],
+            'data'  => [$user['id']]
+        ]);
+
+        HistoryController::add([
+            'tableName'    => 'users',
+            'recordId'     => $GLOBALS['userId'],
+            'eventType'    => 'UP',
+            'eventId'      => 'userModification',
+            'info'         => _USER_PREFERENCE_UPDATED . " {$user['firstname']} {$user['lastname']}"
+        ]);
+
+        return $response->withStatus(204);
     }
 
     public function resetPassword(Request $request, Response $response, array $aArgs)

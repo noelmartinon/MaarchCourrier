@@ -1054,4 +1054,6 @@ export const LANG_FR = {
     "contact_internal" : "Utilisateur interne",
     "contact_entity"   : "Entité",
     "contact_third"   : "Tier bénéficiaire",
+    "listConfiguration": "Paramétrer l'affichage de la liste",
+    "noticeGroupeOrder": "Glisser-déposer les groupes pour définir l'ordre",
 };

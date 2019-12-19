@@ -505,3 +505,5 @@ define("_NOTE_USER", "Note user");
 define("_WF_SEND_TO", "Send to : ");
 
 define("_DATE_LOCALE", "en_US.utf8");
+
+define("_USER_PREFERENCE_UPDATED", "User preferences updated");

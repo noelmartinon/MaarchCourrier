@@ -504,3 +504,5 @@ define("_NOTE_USER", "Annotateur");
 define("_WF_SEND_TO", "Envoyé à : ");
 
 define("_DATE_LOCALE", "fr_FR.utf8");
+
+define("_USER_PREFERENCE_UPDATED", "Préférences utilisateur modifiées");

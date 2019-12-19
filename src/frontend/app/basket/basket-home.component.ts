@@ -2,6 +2,10 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { MatSidenav } from '@angular/material';
+import { tap, catchError } from 'rxjs/operators';
+import { MatExpansionPanel } from '@angular/material';
+import { of } from 'rxjs';
+import { NotificationService } from '../notification.service';
 
 declare function $j(selector: any) : any;
 declare var angularGlobals : any;
@@ -26,8 +30,9 @@ export class BasketHomeComponent implements OnInit {
     };
     @Input() snavL: MatSidenav;
     @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
+    editOrderGroups: boolean = false;
 
-    constructor(public http: HttpClient) {
+    constructor(public http: HttpClient, public notify:NotificationService) {
         this.mobileMode = angularGlobals.mobileMode;
     }
 
@@ -63,5 +68,20 @@ export class BasketHomeComponent implements OnInit {
             .subscribe((data: any) => {
                 this.homeData = data;
             });
+    }
+
+    editGroupOrder() {
+        this.editOrderGroups = !this.editOrderGroups;
+    }
+
+    updateGroupsOrder() {
+        var groupsOrder = this.homeData.regroupedBaskets.map((element: any) => element.groupSerialId);
+        this.http.put(this.coreUrl + "rest/currentUser/profile/preferences", { homeGroups: groupsOrder }).pipe(
+            tap(() => this.notify.success(this.lang.parameterUpdated)),
+            catchError((err) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }
