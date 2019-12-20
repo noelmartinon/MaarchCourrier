@@ -6,7 +6,7 @@
             {{lang.myBaskets}}
         </mat-panel-title>
         <div title="{{lang.listConfiguration}}" (click)="$event.stopPropagation();editGroupOrder()">
-            <mat-icon [ngStyle]="{'color': editOrderGroups ? 'orange' : '#135F7F'}" mat-list-icon class="fa fa-cog" style="height:auto;"></mat-icon>
+            <mat-icon [ngStyle]="{'color': editOrderGroups ? 'orange' : '#135F7F', 'opacity': editOrderGroups ? '1' : '0.4'}" mat-list-icon class="fa fa-cog" style="height:auto;"></mat-icon>
         </div>
     </mat-expansion-panel-header>
     <mat-form-field floatLabel="never" style="padding-left:20px;padding-right:20px;" [style.display]="!editOrderGroups ? 'inline-block' : 'none'">
