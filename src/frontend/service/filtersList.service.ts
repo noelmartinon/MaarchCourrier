@@ -5,6 +5,7 @@ interface listProperties {
     'groupId': number,
     'basketId': number,
     'page': string,
+    'pageSize': number,
     'order': string,
     'orderDir': string,
     'search': string,
@@ -50,6 +51,7 @@ export class FiltersListService {
                 'groupId': groupId,
                 'basketId': basketId,
                 'page': '0',
+                'pageSize': 10,
                 'order': '',
                 'orderDir': 'DESC',
                 'search': '',
@@ -71,6 +73,13 @@ export class FiltersListService {
     updateListsPropertiesPage(page: number) {
         if (this.listsProperties) {
             this.listsProperties[this.listsPropertiesIndex].page = page;
+            this.saveListsProperties();
+        }
+    }
+
+    updateListsPropertiesPageSize(pageSize: number) {
+        if (this.listsProperties) {
+            this.listsProperties[this.listsPropertiesIndex].pageSize = pageSize;
             this.saveListsProperties();
         }
     }

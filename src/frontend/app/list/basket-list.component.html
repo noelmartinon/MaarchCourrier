@@ -45,18 +45,18 @@
                                 {{lang.selected}})</small>
                         </div>
                         <div class="table-head-tool">
-                            <span>
-                                <app-actions-list #actionsList (triggerEvent)="refreshDaoAfterAction()"
-                                    [contextMode]="false" [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
-                                    [currentBasketInfo]="currentBasketInfo"></app-actions-list>
+                            <span style="float:right;height: 56px;margin-top: 5px;">
+                                <mat-paginator #paginatorResultList [length]="resultsLength" [pageSizeOptions]="[10, 25, 50, 100, 150]"
+                                    class="paginatorResultList"></mat-paginator>
                             </span>
-                            <span>
+                            <span style="float:right;height: 56px;margin-top: 11px;">
                                 <app-tools-list #actionsList [selectedRes]="selectedRes"
                                     [currentBasketInfo]="currentBasketInfo"></app-tools-list>
                             </span>
-                            <span>
-                                <mat-paginator #paginatorResultList [length]="resultsLength" [pageSize]="25"
-                                    class="paginatorResultList"></mat-paginator>
+                            <span style="float:right;height: 56px;margin-top: 11px;">
+                                <app-actions-list #actionsList (triggerEvent)="refreshDaoAfterAction()"
+                                    [contextMode]="false" [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
+                                    [currentBasketInfo]="currentBasketInfo"></app-actions-list>
                             </span>
                         </div>
                     </div>
