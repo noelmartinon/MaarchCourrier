@@ -65,8 +65,8 @@ if ($processIDS) {
                 $_SESSION['config']['databasetype'],
                 'admin',
                 false,
-                _OK,
-                _LEVEL_ERROR
+                'ok',
+                'ERROR'
             );
             if ($_SESSION['config']['debug'] == 'true') {
                 echo $result;
