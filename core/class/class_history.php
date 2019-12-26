@@ -367,25 +367,25 @@ class history
                 );
                 break;
 
-             case _LEVEL_INFO:
+             case 'INFO':
                 $logger->info(
                     $logLine
                 );
                 break;
 
-            case _LEVEL_WARN:
+            case 'WARNING':
                 $logger->warn(
                     $logLine
                 );
                 break;
 
-            case _LEVEL_ERROR:
+            case 'ERROR':
                 $logger->error(
                     $logLine
                 );
                 break;
 
-            case _LEVEL_FATAL:
+            case 'FATAL':
                 $logger->fatal(
                     $logLine
                 );

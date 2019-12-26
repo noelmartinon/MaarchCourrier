@@ -715,7 +715,7 @@ class dbquery extends functions
             if ($_SESSION['config']['debug'] == 'true') {
                 echo ' -<br /><br />' . _DATABASE . ' : ' . $this->_database;
             }
-            $trace->add("", 0, "SELECTDB", "DBERROR", _SELECT_DB_FAILED." : ".$this->_database, $_SESSION['config']['databasetype'], "database", true, _KO, _LEVEL_FATAL);
+            $trace->add("", 0, "SELECTDB", "DBERROR", _SELECT_DB_FAILED." : ".$this->_database, $_SESSION['config']['databasetype'], "database", true, _KO, 'FATAL');
             exit();
         }
 
