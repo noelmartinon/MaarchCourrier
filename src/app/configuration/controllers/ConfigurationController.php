@@ -82,6 +82,9 @@ class ConfigurationController
         if (!Validator::stringType()->notEmpty()->validate($aArgs['type'])) {
             return ['errors' => 'Configuration type is missing', 'code' => 400];
         }
+        if (!Validator::stringType()->notEmpty()->validate($aArgs['from'])) {
+            return ['errors' => 'Configuration from is missing or not well formatted', 'code' => 400];
+        }
         
         if (in_array($aArgs['type'], ['smtp', 'mail'])) {
             $check = Validator::stringType()->notEmpty()->validate($aArgs['host']);
@@ -92,7 +95,6 @@ class ConfigurationController
                 $check = $check && Validator::stringType()->notEmpty()->validate($aArgs['password']);
             }
             $check = $check && Validator::stringType()->validate($aArgs['secure']);
-            $check = $check && Validator::stringType()->validate($aArgs['from']);
             if (!$check) {
                 return ['errors' => "Configuration data is missing or not well formatted", 'code' => 400];
             }

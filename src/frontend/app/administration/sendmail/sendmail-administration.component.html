@@ -80,10 +80,10 @@
                                     </mat-form-field>
                                 </div>
                             </div>
-                            <div class="form-group" [style.opacity]="['smtp', 'mail'].indexOf(sendmail.type) > -1 ? '1' : '0.5'">
+                            <div class="form-group">
                                 <div class="col-md-12">
                                     <mat-form-field>
-                                        <input name="mailFrom" [(ngModel)]="sendmail.from" [disabled]="['smtp', 'mail'].indexOf(sendmail.type) == -1"
+                                        <input name="mailFrom" [(ngModel)]="sendmail.from" required
                                             matInput placeholder="{{lang.mailFrom}}" pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)">
                                     </mat-form-field>
                                 </div>
