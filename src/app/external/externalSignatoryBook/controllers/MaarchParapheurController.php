@@ -289,7 +289,12 @@ class MaarchParapheurController
                     if (!empty($contact)) {
                         $metadata[_RECIPIENTS] = $contact;
                     }
-        
+                    if (!empty($aArgs['note'])) {
+                        $noteCreationDate = new \DateTime();
+                        $noteCreationDate = $noteCreationDate->format('Y-m-d');
+                        $metadata[_NOTES_COMMENT] = trim($sender['firstname'] . ' ' .$sender['lastname']) . " ({$noteCreationDate}) : {$aArgs['note']}";
+                    }
+
                     $bodyData = [
                         'title'           => $value['title'],
                         'reference'       => $value['identifier'],
@@ -300,7 +305,7 @@ class MaarchParapheurController
                         'workflow'        => $workflow,
                         'metadata'        => $metadata
                     ];
-        
+
                     $response = CurlModel::exec([
                         'url'      => rtrim($aArgs['config']['data']['url'], '/') . '/rest/documents',
                         'user'     => $aArgs['config']['data']['userId'],
@@ -345,6 +350,11 @@ class MaarchParapheurController
             $contact = trim($mainResource[0]['contact_firstname'] . ' ' . $mainResource[0]['contact_lastname'] . ' ' . $mainResource[0]['contact_society']);
             if (!empty($contact)) {
                 $metadata[_RECIPIENTS] = $contact;
+            }
+            if (!empty($aArgs['note'])) {
+                $noteCreationDate = new \DateTime();
+                $noteCreationDate = $noteCreationDate->format('Y-m-d');
+                $metadata[_NOTES_COMMENT] = trim($sender['firstname'] . ' ' .$sender['lastname']) . " ({$noteCreationDate}) : {$aArgs['note']}";
             }
 
             $workflow = [['userId' => $processingUser, 'mode' => 'note']];
