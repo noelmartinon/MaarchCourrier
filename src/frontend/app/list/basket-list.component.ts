@@ -437,6 +437,10 @@ export class BasketListComponent implements OnInit {
         this.dialog.open(ContactsListModalComponent, { data: { title: `${row.alt_identifier} - ${row.subject}`, mode: mode, resId: row.res_id } });
     }
 
+    viewDocument(row: any) {
+        window.open(this.coreUrl + "rest/res/" + row.res_id + "/content", "_blank");
+    }
+
 }
 export interface BasketList {
     resources: any[];

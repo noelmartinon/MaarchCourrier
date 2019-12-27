@@ -1054,4 +1054,5 @@ export const LANG_FR = {
     "contact_internal" : "Utilisateur interne",
     "contact_entity"   : "Entité",
     "contact_third"   : "Tier bénéficiaire",
+    "viewResource" : "Voir le document",
 };
