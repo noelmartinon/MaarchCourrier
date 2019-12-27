@@ -140,6 +140,7 @@ export class RedirectActionComponent implements OnInit {
                 map(user => user ? this._filterUserRedirect(user) : this.userListRedirect.slice())
             );
 
+        this.loading = false;
         if (this.data.selectedRes.length == 1) {
             this.http.get("../../rest/resources/" + this.data.selectedRes[0] + "/listInstance").subscribe((data: any) => {
                 this.diffusionListDestRedirect = data.listInstance;
@@ -185,7 +186,7 @@ export class RedirectActionComponent implements OnInit {
                     this.notify.handleErrors(err);
                 });
 
-            if (this.keepDestForRedirection) {
+            if (this.keepDestForRedirection && this.currentDiffusionListDestRedirect.length > 0) {
                 let isInCopy = false;
                 let newCopy = null;
                 this.currentDiffusionListDestRedirect.forEach((element: any) => {
