@@ -82,7 +82,7 @@ class ConfigurationController
         if (!Validator::stringType()->notEmpty()->validate($aArgs['type'])) {
             return ['errors' => 'Configuration type is missing', 'code' => 400];
         }
-        if (!Validator::stringType()->notEmpty()->validate($aArgs['from'])) {
+        if (!Validator::email()->notEmpty()->validate($aArgs['from'])) {
             return ['errors' => 'Configuration from is missing or not well formatted', 'code' => 400];
         }
         
