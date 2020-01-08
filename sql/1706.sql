@@ -6,6 +6,8 @@
 --                                                                          --
 -- *************************************************************************--
 
+DROP VIEW IF EXISTS view_postindexing;
+
 --perfs on res_view_letterbox
 DROP VIEW IF EXISTS res_view_letterbox;
 CREATE OR REPLACE VIEW res_view_letterbox AS 
