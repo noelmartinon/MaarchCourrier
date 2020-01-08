@@ -1816,31 +1816,31 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         if ($values_form[$i]['ID'] == 'destination' && $_SESSION['ListDiffFromRedirect'] == true) {
             //fix redirect action in validate_page
         } else {
-            if($values_form[$i]['ID'] != 'departure_date' && $cat_id != 'outgoing'){
-            if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['type_field'] == 'integer' && $_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] != 'none') {
-                if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'res') {
-                    $query_res .= ', '.$values_form[$i]['ID'].' = ? ';
-                    $arrayPDOres = array_merge($arrayPDOres, array($values_form[$i]['VALUE']));
-                } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'coll_ext') {
-                    $query_ext .= ', '.$values_form[$i]['ID'].' = ? ';
-                    $arrayPDOext = array_merge($arrayPDOext, array($values_form[$i]['VALUE']));
-                }
-            } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['type_field'] == 'string' && $_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] != 'none') {
-                if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'res') {
-                    $query_res .= ', '.$values_form[$i]['ID'].' = ?';
-                    $arrayPDOres = array_merge($arrayPDOres, array($values_form[$i]['VALUE']));
-                } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'coll_ext') {
-                    $query_ext .= ', '.$values_form[$i]['ID'].' = ?';
-                    $arrayPDOext = array_merge($arrayPDOext, array($values_form[$i]['VALUE']));
-                }
-            } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['type_field'] == 'date' && $_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] != 'none') {
-                if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'res') {
-                    $query_res .= ', '.$values_form[$i]['ID'].' = ?';
-                    $arrayPDOres = array_merge($arrayPDOres, array($values_form[$i]['VALUE']));
-                } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'coll_ext') {
-                    $query_ext .= ', '.$values_form[$i]['ID'].' = ?';
-                    $arrayPDOext = array_merge($arrayPDOext, array($values_form[$i]['VALUE']));
-                }
+            if ($values_form[$i]['ID'] != 'departure_date') {
+                if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['type_field'] == 'integer' && $_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] != 'none') {
+                    if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'res') {
+                        $query_res .= ', '.$values_form[$i]['ID'].' = ? ';
+                        $arrayPDOres = array_merge($arrayPDOres, array($values_form[$i]['VALUE']));
+                    } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'coll_ext') {
+                        $query_ext .= ', '.$values_form[$i]['ID'].' = ? ';
+                        $arrayPDOext = array_merge($arrayPDOext, array($values_form[$i]['VALUE']));
+                    }
+                } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['type_field'] == 'string' && $_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] != 'none') {
+                    if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'res') {
+                        $query_res .= ', '.$values_form[$i]['ID'].' = ?';
+                        $arrayPDOres = array_merge($arrayPDOres, array($values_form[$i]['VALUE']));
+                    } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'coll_ext') {
+                        $query_ext .= ', '.$values_form[$i]['ID'].' = ?';
+                        $arrayPDOext = array_merge($arrayPDOext, array($values_form[$i]['VALUE']));
+                    }
+                } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['type_field'] == 'date' && $_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] != 'none') {
+                    if ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'res') {
+                        $query_res .= ', '.$values_form[$i]['ID'].' = ?';
+                        $arrayPDOres = array_merge($arrayPDOres, array($values_form[$i]['VALUE']));
+                    } elseif ($_ENV['categories'][$cat_id][$values_form[$i]['ID']]['table'] == 'coll_ext') {
+                        $query_ext .= ', '.$values_form[$i]['ID'].' = ?';
+                        $arrayPDOext = array_merge($arrayPDOext, array($values_form[$i]['VALUE']));
+                    }
                 }
             }
         }
