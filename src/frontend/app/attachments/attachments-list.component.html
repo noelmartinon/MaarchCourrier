@@ -34,6 +34,12 @@
                     <mat-checkbox color="primary" [(ngModel)]="attachment.in_send_attach" [disabled]="!mailevaEnabled"></mat-checkbox>
                     {{lang.putInSendAttach}}
                 </button>
+                <ng-container *ngIf="maarchParapheurEnabled && attachment.statusId === 'FRZ'">
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item (click)="openMaarchParapheurWorkflow(attachment)">
+                        {{lang.externalVisaWorkflow}}
+                    </button>
+                </ng-container>
             </mat-menu>
         </div>
 

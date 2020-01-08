@@ -78,6 +78,45 @@ export class VisaWorkflowComponent extends AutoCompletePlugin implements OnInit 
             });
     }
 
+    loadWorkflowMaarchParapheur(attachmentId: number) {
+        this.loading = true;
+        this.visaWorkflow.items = [];
+        this.http.get(`../../rest/attachments/${attachmentId}/maarchParapheurWorkflow`)
+            .subscribe((data: any) => {
+                data.workflow.forEach((element: any) => {
+                    if (element.processDate !== null) {
+                        let arrDate = element.processDate.split('-');
+                        arrDate = arrDate.concat(arrDate[arrDate.length-1].split(' '));
+                        arrDate.splice(2,1);
+
+                        const formatDate = `${arrDate[2]}-${arrDate[1]}-${arrDate[0]} ${arrDate[3]}`;
+
+                        element.processDate = formatDate;
+
+                    }
+                    
+                    
+                    const user = {
+                        'id': element.userId,
+                        'labelToDisplay': element.userDisplay,
+                        'requested_signature': element.mode === 'visa' ? false : true,
+                        'process_date': element.processDate,
+                        'picture': ''
+                    }                    
+                    this.visaWorkflow.items.push(user);
+                    this.http.get("../../rest/maarchParapheur/user/" + element.userId + "/picture")
+                        .subscribe((data: any) => {
+                            this.visaWorkflow.items.filter((item: any) => item.id === element.userId)[0].picture = data.picture;
+                        }, (err: any) => {
+                            this.notify.handleErrors(err);
+                        });
+                });
+                this.loading = false;
+            }, (err: any) => {
+                this.notify.handleErrors(err);
+            });
+    }
+
     deleteItem(index: number) {
         this.visaWorkflow.items.splice(index, 1);
     }

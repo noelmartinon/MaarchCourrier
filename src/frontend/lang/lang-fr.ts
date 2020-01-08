@@ -1055,4 +1055,5 @@ export const LANG_FR = {
     "contact_entity"   : "Entité",
     "contact_third"   : "Tier bénéficiaire",
     "viewResource" : "Voir le document",
+    "externalVisaWorkflow" : "Circuit de visa Maarch parapheur",    
 };
