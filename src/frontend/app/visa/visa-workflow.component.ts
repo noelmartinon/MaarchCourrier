@@ -81,8 +81,11 @@ export class VisaWorkflowComponent extends AutoCompletePlugin implements OnInit 
     loadWorkflowMaarchParapheur(attachment: any) {
         this.loading = true;
         this.visaWorkflow.items = [];
+        
+        const resId = attachment.relation > 1 ? attachment.res_id_version : attachment.res_id;
         const isVersion = attachment.relation > 1 ? '?isVersion=true':'';
-        this.http.get(`../../rest/attachments/${attachment.res_id}/maarchParapheurWorkflow${isVersion}`)
+        
+        this.http.get(`../../rest/attachments/${resId}/maarchParapheurWorkflow${isVersion}`)
             .subscribe((data: any) => {
                 data.workflow.forEach((element: any) => {
                     if (element.processDate !== null) {
