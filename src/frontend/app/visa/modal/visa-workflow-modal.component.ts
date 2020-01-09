@@ -22,7 +22,7 @@ export class VisaWorkflowModalComponent {
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<VisaWorkflowModalComponent>) { }
 
     ngOnInit(): void {
-        this.appVisaWorkflow.loadWorkflowMaarchParapheur(this.data.attachment.res_id);
+        this.appVisaWorkflow.loadWorkflowMaarchParapheur(this.data.attachment);
     }
 
 }

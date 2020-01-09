@@ -78,10 +78,11 @@ export class VisaWorkflowComponent extends AutoCompletePlugin implements OnInit 
             });
     }
 
-    loadWorkflowMaarchParapheur(attachmentId: number) {
+    loadWorkflowMaarchParapheur(attachment: any) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get(`../../rest/attachments/${attachmentId}/maarchParapheurWorkflow`)
+        const isVersion = attachment.relation > 1 ? '?isVersion=true':'';
+        this.http.get(`../../rest/attachments/${attachment.res_id}/maarchParapheurWorkflow${isVersion}`)
             .subscribe((data: any) => {
                 data.workflow.forEach((element: any) => {
                     if (element.processDate !== null) {
