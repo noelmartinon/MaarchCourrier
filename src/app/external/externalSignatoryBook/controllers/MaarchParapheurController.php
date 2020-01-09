@@ -291,7 +291,7 @@ class MaarchParapheurController
                     }
                     if (!empty($aArgs['note'])) {
                         $noteCreationDate = new \DateTime();
-                        $noteCreationDate = $noteCreationDate->format('Y-m-d');
+                        $noteCreationDate = $noteCreationDate->format('d-m-Y');
                         $metadata[_NOTES_COMMENT] = trim($sender['firstname'] . ' ' .$sender['lastname']) . " ({$noteCreationDate}) : {$aArgs['note']}";
                     }
 
@@ -353,7 +353,7 @@ class MaarchParapheurController
             }
             if (!empty($aArgs['note'])) {
                 $noteCreationDate = new \DateTime();
-                $noteCreationDate = $noteCreationDate->format('Y-m-d');
+                $noteCreationDate = $noteCreationDate->format('d-m-Y');
                 $metadata[_NOTES_COMMENT] = trim($sender['firstname'] . ' ' .$sender['lastname']) . " ({$noteCreationDate}) : {$aArgs['note']}";
             }
 
