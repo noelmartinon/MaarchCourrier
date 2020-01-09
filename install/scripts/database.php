@@ -28,7 +28,7 @@
 * @ingroup install
 */
 
-$pattern = '/^[a-zA-Z0-9_\-\s]*$/';
+$pattern = '/^[a-zA-Z0-9_\-]*$/';
 if (preg_match($pattern, $_REQUEST['databasename']) == false) {
     $return['status'] = 0;
     $return['text'] = "Wrong database name";
