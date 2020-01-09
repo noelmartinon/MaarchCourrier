@@ -573,7 +573,7 @@ class EmailController
             'info'         => _EMAIL_REMOVED
         ]);
 
-        if (!empty($args['data']['document'])) {
+        if (!empty($email['document'])) {
             $document = (array)json_decode($email['document']);
 
             HistoryController::add([
