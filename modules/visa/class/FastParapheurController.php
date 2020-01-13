@@ -164,7 +164,7 @@ class FastParapheurController
 
         $attachments         = \Attachment\models\AttachmentModel::getOnView([
             'select'         => ['res_id', 'res_id_version', 'title', 'attachment_type','path', 'res_id_master', 'format'],
-            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE'],
+            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS', 'FRZ')", 'in_signature_book = TRUE'],
             'data'           => [$aArgs['resIdMaster'], ['converted_pdf', 'incoming_mail_attachment', 'print_folder', 'signed_response']]
         ]);
 
@@ -239,17 +239,18 @@ class FastParapheurController
                 ]
             ]);
 
-            $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-            if (!empty($isError ->Fault[0])) {
-                // TODO gestion des erreurs
-                //echo (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
-                return false;
+            if (!empty($curlReturn['error'])) {
+                return ['error' => $curlReturn['error']];
+            } elseif (!empty($curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0])) {
+                $error = (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                return ['error' => $error];
             } else {
                 $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
                 $attachmentToFreeze[$collId][$resId] = (string) $documentId;
             }
         }
-        return $attachmentToFreeze;
+
+        return ['sended' => $attachmentToFreeze];
     }
 
     public static function download($aArgs)
