@@ -57,6 +57,7 @@ import { VisaWorkflowComponent }             from './visa/visa-workflow.componen
 import { AvisWorkflowComponent }             from './avis/avis-workflow.component';
 import { ContactsListComponent } from './contact/list/contacts-list.component';
 import { ContactsListModalComponent } from './contact/list/modal/contacts-list-modal.component';
+import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
 
 
 
@@ -112,7 +113,8 @@ import { ContactsListModalComponent } from './contact/list/modal/contacts-list-m
         SendShippingActionComponent,
         ActionsListComponent,
         ContactsListComponent,
-        ContactsListModalComponent
+        ContactsListModalComponent,
+        VisaWorkflowModalComponent
     ],
     entryComponents: [
         CustomSnackbarComponent,
@@ -136,7 +138,8 @@ import { ContactsListModalComponent } from './contact/list/modal/contacts-list-m
         RedirectActionComponent,
         SendShippingActionComponent,
         ViewDocActionComponent,
-        ContactsListModalComponent
+        ContactsListModalComponent,
+        VisaWorkflowModalComponent
     ],
     providers: [ HeaderService, FiltersListService ],
     bootstrap: [ AppComponent ]

@@ -3765,7 +3765,7 @@ width:auto;
 
 #sender_recipient_tr .typeahead__list {
     width: 225px;
-    margin-left: 17px;
+    /*margin-left: 17px;*/
 }
 
 .typeahead__container {

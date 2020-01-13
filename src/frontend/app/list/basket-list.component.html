@@ -45,18 +45,18 @@
                                 {{lang.selected}})</small>
                         </div>
                         <div class="table-head-tool">
-                            <span>
-                                <app-actions-list #actionsList (triggerEvent)="refreshDaoAfterAction()"
-                                    [contextMode]="false" [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
-                                    [currentBasketInfo]="currentBasketInfo"></app-actions-list>
+                            <span style="float:right;height: 56px;margin-top: 5px;">
+                                <mat-paginator #paginatorResultList [length]="resultsLength" [pageSizeOptions]="[10, 25, 50, 100, 150]"
+                                    class="paginatorResultList"></mat-paginator>
                             </span>
-                            <span>
+                            <span style="float:right;height: 56px;margin-top: 11px;">
                                 <app-tools-list #actionsList [selectedRes]="selectedRes"
                                     [currentBasketInfo]="currentBasketInfo"></app-tools-list>
                             </span>
-                            <span>
-                                <mat-paginator #paginatorResultList [length]="resultsLength" [pageSize]="25"
-                                    class="paginatorResultList"></mat-paginator>
+                            <span style="float:right;height: 56px;margin-top: 11px;">
+                                <app-actions-list #actionsList (triggerEvent)="refreshDaoAfterAction()"
+                                    [contextMode]="false" [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
+                                    [currentBasketInfo]="currentBasketInfo"></app-actions-list>
                             </span>
                         </div>
                     </div>
@@ -158,9 +158,12 @@
                                                 (click)="$event.stopPropagation();togglePanel('diffusion',row)">
                                                 <mat-icon fontSet="fas" fontIcon="fa-sitemap fa-2x" [color]="snav2.opened && row.checked && currentMode == 'diffusion' ? 'primary' : ''"></mat-icon>
                                             </button>
-                                            <button mat-icon-button title="{{lang.linkDetails}}"
-                                                (click)="$event.stopPropagation();goToDetail(row);"
+                                            <button mat-icon-button title="{{lang.viewResource}}" (click)="$event.stopPropagation();viewDocument(row)"
                                                 (mouseenter)="viewThumbnail(row);" (mouseleave)="closeThumbnail();">
+                                                <mat-icon  fontSet="fas" fontIcon="fa-eye fa-2x"></mat-icon>
+                                            </button>
+                                            <button mat-icon-button title="{{lang.linkDetails}}"
+                                                (click)="$event.stopPropagation();goToDetail(row);">
                                                 <mat-icon fontSet="fas" fontIcon="fa-info-circle fa-2x"></mat-icon>
                                             </button>
                                         </span>

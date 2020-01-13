@@ -1049,4 +1049,6 @@ export const LANG_NL = {
     "contact_third"   : "Contact third", //_TO_TRANSLATE
     "listConfiguration": "Manage list display", //_TO_TRANSLATE
     "noticeGroupeOrder": "Drag and drop group to set order", //_TO_TRANSLATE
+    "viewResource" : "View document", //_TO_TRANSLATE,
+    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE,
 };

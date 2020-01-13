@@ -715,7 +715,7 @@ class dbquery extends functions
             if ($_SESSION['config']['debug'] == 'true') {
                 echo ' -<br /><br />' . _DATABASE . ' : ' . $this->_database;
             }
-            $trace->add("", 0, "SELECTDB", "DBERROR", _SELECT_DB_FAILED." : ".$this->_database, $_SESSION['config']['databasetype'], "database", true, _KO, _LEVEL_FATAL);
+            $trace->add("", 0, "SELECTDB", "DBERROR", _SELECT_DB_FAILED." : ".$this->_database, $_SESSION['config']['databasetype'], "database", true, _KO, 'FATALA');
             exit();
         }
 
@@ -735,7 +735,7 @@ class dbquery extends functions
                 "database", 
                 true, 
                 _KO, 
-                _LEVEL_ERROR
+                'ERROR'
             );
             
             throw new Exception (_QUERY_DB_FAILED.": '".$sqlError."' "._QUERY.": [".$this->protect_string_db($this->_debugQuery)."]");
@@ -745,26 +745,26 @@ class dbquery extends functions
         // Closing connexion error
         if ($this->_sqlError == 4) {
             echo '- <b>' . _CLOSE_CONNEXION_ERROR . '</b> -<br /><br />';
-            $trace->add("", 0, "CLOSE", "DBERROR", _CLOSE_DB_FAILED, $_SESSION['config']['databasetype'], "database", true, _KO, _LEVEL_ERROR);
+            $trace->add("", 0, "CLOSE", "DBERROR", _CLOSE_DB_FAILED, $_SESSION['config']['databasetype'], "database", true, _KO, 'ERROR');
             exit();
         }
 
         // Constructor error
         if ($this->_sqlError == 5) {
             echo '- <b>' . _DB_INIT_ERROR . '</b> <br />';
-            $trace->add("", 0, "INIT", "DBERROR", _INIT_DB_FAILED, $_SESSION['config']['databasetype'], "database", true, _KO, _LEVEL_ERROR);
+            $trace->add("", 0, "INIT", "DBERROR", _INIT_DB_FAILED, $_SESSION['config']['databasetype'], "database", true, _KO, 'ERROR');
             exit();
         }
         // Query Preparation error (ORACLE & DB2)
         if ($this->_sqlError == 6) {
             echo '- <b>' . _QUERY_PREP_ERROR . '</b> <br />';
-            $trace->add("", 0, "QUERY", "DBERROR", _PREPARE_QUERY_DB_FAILED, $_SESSION['config']['databasetype'], "database", true, _KO, _LEVEL_ERROR);
+            $trace->add("", 0, "QUERY", "DBERROR", _PREPARE_QUERY_DB_FAILED, $_SESSION['config']['databasetype'], "database", true, _KO, 'ERROR');
             exit();
         }
         // Query Preparation error (ORACLE & DB2)
         if ($this->_sqlError == 7) {
             $_SESSION['error'] .= _SQL_QUERY_NOT_SECURE;
-            $trace->add("", 0, "QUERY", "DBERROR", _SQL_QUERY_NOT_SECURE, $_SESSION['config']['databasetype'], "database", true, _KO, _LEVEL_ERROR);
+            $trace->add("", 0, "QUERY", "DBERROR", _SQL_QUERY_NOT_SECURE, $_SESSION['config']['databasetype'], "database", true, _KO, 'ERROR');
             //exit();
         }
     }

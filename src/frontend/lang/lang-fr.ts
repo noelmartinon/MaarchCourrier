@@ -1056,4 +1056,6 @@ export const LANG_FR = {
     "contact_third"   : "Tier bénéficiaire",
     "listConfiguration": "Paramétrer l'affichage de la liste",
     "noticeGroupeOrder": "Glisser-déposer les groupes pour définir l'ordre",
+    "viewResource" : "Voir le document",
+    "externalVisaWorkflow" : "Circuit de visa Maarch parapheur",    
 };

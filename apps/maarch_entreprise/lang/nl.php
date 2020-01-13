@@ -1296,6 +1296,7 @@ if (!defined('_EMAIL_CC_ADDRESS')) { define('_EMAIL_CC_ADDRESS', 'E-mail kopie')
 if (!defined('_EMAIL_ID')) { define('_EMAIL_ID', 'E-mail ID');}
 if (!defined('_EMAIL_ACCOUNT')) { define('_EMAIL_ACCOUNT', 'E-mail account');}
 if (!defined('_HELP_KEYWORD_EMAIL')) { define('_HELP_KEYWORD_EMAIL', 'E-mail van de verbonden gebruiker');}
+if (!defined('_EMAIL_DRAFT_SAVED')) { define("_EMAIL_DRAFT_SAVED", "Draft saved_TO_TRANSLATE");}
 if (!defined('_INITIATOR')) { define('_INITIATOR', 'Aanvangende dienst');}
 if (!defined('_INITIATORS')) { define('_INITIATORS', 'Aanvangende dienst(en)');}
 if (!defined('_QUALIF_BUSINESS')) { define('_QUALIF_BUSINESS', 'Kwalificatie van de documenten van de businessverzameling');}

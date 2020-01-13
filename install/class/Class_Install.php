@@ -727,6 +727,11 @@ class Install extends functions
             exit;
         }
 
+        if (!$this->setScriptNotificationBasketsSh()) {
+            return false;
+            exit;
+        }
+
         if (!$this->setConfig_LDAP()) {
             return false;
             exit;
@@ -825,6 +830,11 @@ class Install extends functions
         }
 
         if (!$this->setScriptNotificationNctNccAndAncSh()) {
+            return false;
+            exit;
+        }
+
+        if (!$this->setScriptNotificationBasketsSh()) {
             return false;
             exit;
         }
@@ -1413,6 +1423,51 @@ class Install extends functions
             $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n RED';
 
             $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/nct-ncc-and-anc.sh', 'w+');
+            if (!$fp) {
+                return false;
+                exit;
+            }
+            $write = fwrite($fp, $res);
+            if (!$write) {
+                return false;
+                exit;
+            }
+
+            return true;
+        }
+    }
+
+    private function setScriptNotificationBasketsSh()
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $res = 'cd '.realpath('.')."\modules\\notifications\\";
+            $res .= "\n";
+            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\basket_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n BASKETS';
+            $res .= "\n";
+
+            $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.bat', 'w+');
+            if (!$fp) {
+                return false;
+                exit;
+            }
+            $write = fwrite($fp, $res);
+            if (!$write) {
+                return false;
+                exit;
+            }
+
+            return true;
+        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'LIN') {
+            $res = '#!/bin/bash';
+            $res .= "\n";
+            $res .= "eventStackPath='".realpath('.')."/modules/notifications/batch/basket_event_stack.php'";
+            $res .= "\n";
+            $res .= 'cd '.realpath('.').'/modules/notifications/batch/';
+            $res .= "\n";
+            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n BASKETS';
+            $res .= "\n";
+
+            $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.sh', 'w+');
             if (!$fp) {
                 return false;
                 exit;

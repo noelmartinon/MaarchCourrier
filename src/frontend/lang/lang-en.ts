@@ -1023,4 +1023,6 @@ export const LANG_EN = {
     "contact_third"   : "Contact third",
     "listConfiguration": "Manage list display",
     "noticeGroupeOrder": "Drag and drop group to set order",
+    "viewResource" : "View document",
+    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur",
 };

@@ -306,20 +306,20 @@ class IParapheurController
                                 'config' => $aArgs['config'],
                                 'documentId' => $isVersion->external_id
                             ]);
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'validated';
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->format = 'pdf';
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->encodedFile = $response['b64FileContent'];
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $noteContent;
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'validated';
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->format = 'pdf';
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->encodedFile = $response['b64FileContent'];
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->noteContent = $noteContent;
                             if ($status == $aArgs['config']['data']['signState']) {
                                 break;
                             }
                         } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
                             $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'refused';
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $noteContent;
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'refused';
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->noteContent = $noteContent;
                             break;
                         } else {
-                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'waiting';
+                            $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'waiting';
                         }
                     }
                 }

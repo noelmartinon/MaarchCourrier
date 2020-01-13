@@ -22,6 +22,7 @@ use Entity\models\ListInstanceModel;
 use History\controllers\HistoryController;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
+use Resource\controllers\ResController;
 use Resource\controllers\SummarySheetController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -288,7 +289,12 @@ class MaarchParapheurController
                     if (!empty($contact)) {
                         $metadata[_RECIPIENTS] = $contact;
                     }
-        
+                    if (!empty($aArgs['note'])) {
+                        $noteCreationDate = new \DateTime();
+                        $noteCreationDate = $noteCreationDate->format('d-m-Y');
+                        $metadata[_NOTES_COMMENT] = trim($sender['firstname'] . ' ' .$sender['lastname']) . " ({$noteCreationDate}) : {$aArgs['note']}";
+                    }
+
                     $bodyData = [
                         'title'           => $value['title'],
                         'reference'       => $value['identifier'],
@@ -299,7 +305,7 @@ class MaarchParapheurController
                         'workflow'        => $workflow,
                         'metadata'        => $metadata
                     ];
-        
+
                     $response = CurlModel::exec([
                         'url'      => rtrim($aArgs['config']['data']['url'], '/') . '/rest/documents',
                         'user'     => $aArgs['config']['data']['userId'],
@@ -344,6 +350,11 @@ class MaarchParapheurController
             $contact = trim($mainResource[0]['contact_firstname'] . ' ' . $mainResource[0]['contact_lastname'] . ' ' . $mainResource[0]['contact_society']);
             if (!empty($contact)) {
                 $metadata[_RECIPIENTS] = $contact;
+            }
+            if (!empty($aArgs['note'])) {
+                $noteCreationDate = new \DateTime();
+                $noteCreationDate = $noteCreationDate->format('d-m-Y');
+                $metadata[_NOTES_COMMENT] = trim($sender['firstname'] . ' ' .$sender['lastname']) . " ({$noteCreationDate}) : {$aArgs['note']}";
             }
 
             $workflow = [['userId' => $processingUser, 'mode' => 'note']];
@@ -901,5 +912,65 @@ class MaarchParapheurController
         ]);
 
         return $response->withJson(['success' => 'success']);
+    }
+
+    public function getWorkflow(Request $request, Response $response, array $args)
+    {
+        $data = $request->getQueryParams();
+        $isVersion = empty($data['isVersion']) ? false : true;
+        $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['res_id_master', 'status', 'external_id'], 'isVersion' => $isVersion]);
+        if (empty($attachment)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment does not exist']);
+        }
+        if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['userId']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment out of perimeter']);
+        }
+
+        $externalId = json_decode($attachment['external_id'], true);
+        if (empty($externalId['signatureBookId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment is not linked to Maarch Parapheur']);
+        }
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
+        if (empty($loadedXml)) {
+            return $response->withStatus(400)->withJson(['errors' => 'SignatoryBooks configuration file missing']);
+        }
+
+        $url      = '';
+        $userId   = '';
+        $password = '';
+        foreach ($loadedXml->signatoryBook as $value) {
+            if ($value->id == "maarchParapheur") {
+                $url      = rtrim($value->url, '/');
+                $userId   = $value->userId;
+                $password = $value->password;
+                break;
+            }
+        }
+
+        if (empty($url)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maarch Parapheur configuration missing']);
+        }
+
+        $curlResponse = CurlModel::execSimple([
+            'url'           => rtrim($url, '/') . "/rest/documents/{$externalId['signatureBookId']}/workflow",
+            'basicAuth'     => ['user' => $userId, 'password' => $password],
+            'headers'       => ['content-type:application/json'],
+            'method'        => 'GET'
+        ]);
+
+        if ($curlResponse['code'] != '200') {
+            if (!empty($curlResponse['response']['errors'])) {
+                $errors =  $curlResponse['response']['errors'];
+            } else {
+                $errors =  $curlResponse['errors'];
+            }
+            if (empty($errors)) {
+                $errors = 'An error occured. Please check your configuration file.';
+            }
+            return $response->withStatus(400)->withJson(['errors' => $errors]);
+        }
+
+        return $response->withJson($curlResponse['response']);
     }
 }

@@ -97,9 +97,12 @@ html,body {
     white-space: pre;
 
     div {
-        display: flex;
         flex: 1;
         align-items: center;
+    }
+
+    &-flex div {
+        display: flex;
     }
 
     &-result {
@@ -127,4 +130,3 @@ html,body {
 .mat-icon {
     height: auto;
 }
-

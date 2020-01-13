@@ -28,6 +28,17 @@
 * @ingroup install
 */
 
+$pattern = '/^[a-zA-Z0-9_\-]*$/';
+if (preg_match($pattern, $_REQUEST['databasename']) == false) {
+    $return['status'] = 0;
+    $return['text'] = "Wrong database name";
+
+    $jsonReturn = json_encode($return);
+
+    echo $jsonReturn;
+    exit;
+}
+
 if ($_REQUEST['action'] == 'testConnect') {
     $_SESSION['config']['databaseserver']     = $_REQUEST['databaseserver'];
     $_SESSION['config']['databaseserverport'] = $_REQUEST['databaseserverport'];
@@ -53,18 +64,11 @@ if ($_REQUEST['action'] == 'testConnect') {
         exit;
     }
 
-       
-        $filename = realpath('.').'/custom/';
-        if (!file_exists($filename)) {
-            $cheminCustom = realpath('.')."/custom";
-            mkdir($cheminCustom, 0755);                
-        }
-
-
-
-
-
-
+    $filename = realpath('.').'/custom/';
+    if (!file_exists($filename)) {
+        $cheminCustom = realpath('.')."/custom";
+        mkdir($cheminCustom, 0755);
+    }
 
     $return['status'] = 1;
     $return['text'] = '';
@@ -74,24 +78,10 @@ if ($_REQUEST['action'] == 'testConnect') {
     echo $jsonReturn;
     exit;
 } elseif ($_REQUEST['action'] == 'createdatabase') {
-
-
     $verifDatabase = $Class_Install->verificationDatabase($_REQUEST['databasename']);
-    //var_dump($verifDatabase);
-    if($verifDatabase == false){
-        //var_dump('test coucou');
-        // $_SESSION['config']['databasename'] = $_REQUEST['databasename'];
-        // //var_dump($_SESSION['config']);
-        // $return['status'] = 3;
-        // $return['text'] = "base de données existe déjà";
-        // $jsonReturn = json_encode($return);
-        // echo $jsonReturn;   
-        //exit;
+    if ($verifDatabase == false) {
         $createCustom = $Class_Install->createCustom($_REQUEST['databasename']);
-        //var_dump($createCustom);
-        //var_dump($createCustom);
-        if(!$createCustom){ 
-            //var_dump($createDatabase);
+        if (!$createCustom) {
             $return['status'] = 0;
             $return['text'] = _UNABLE_TO_CREATE_CUSTOM;
 
@@ -102,7 +92,6 @@ if ($_REQUEST['action'] == 'testConnect') {
         }
 
         $fillConfigs = $Class_Install->fillConfigOfAppAndModule($_REQUEST['databasename']);
-        //var_dump($fillConfigs);
         if (!$fillConfigs) {
             $return['status'] = 0;
             $return['text'] = _UNABLE_TO_CREATE_CUSTOM;
@@ -113,7 +102,6 @@ if ($_REQUEST['action'] == 'testConnect') {
             exit;
         }
 
-
         $return['status'] = 1;
         $return['text'] = 'redirect';
 
@@ -121,17 +109,9 @@ if ($_REQUEST['action'] == 'testConnect') {
 
         echo $jsonReturn;
         exit;
-
-
-    }elseif($verifDatabase == true){
-
-        //var_dump($verifDatabase);
-
-
+    } elseif ($verifDatabase == true) {
         $createCustom = $Class_Install->createCustom($_REQUEST['databasename']);
-            //var_dump($createCustom);
-        if($createCustom === false){ 
-            //var_dump($createDatabase);
+        if ($createCustom === false) {
             $return['status'] = 0;
             $return['text'] = _UNABLE_TO_CREATE_CUSTOM;
 
@@ -163,11 +143,8 @@ if ($_REQUEST['action'] == 'testConnect') {
 
         echo $jsonReturn;
         exit;
-
     }
-
 } elseif ($_REQUEST['action'] == 'loadDatas') {
-
     $loadDatas = $Class_Install->createData(
         'sql/'.$_REQUEST['dataFilename'].'.sql'
     );

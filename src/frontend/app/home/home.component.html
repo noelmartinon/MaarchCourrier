@@ -110,7 +110,7 @@
                                             title='{{row.closing_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'>{{row.closing_date | timeAgo}}</span>
                                     </div>
                                     <div>
-                                        <button mat-icon-button (click)="$event.stopPropagation();goTo(row);"
+                                        <button mat-icon-button (click)="$event.stopPropagation();viewDocument(row);"
                                             (mouseenter)="viewThumbnail(row);" (mouseleave)="closeThumbnail();">
                                             <mat-icon color="primary" class="fa fa-eye"></mat-icon>
                                         </button>

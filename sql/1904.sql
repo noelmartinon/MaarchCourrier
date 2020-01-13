@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '19.04.10' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '19.04.11' WHERE id = 'database_version';
 
 DELETE FROM parameters WHERE id = 'QrCodePrefix';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('QrCodePrefix', 'Si activé (1), ajoute "Maarch_" dans le contenu des QrCode générés. (Utilisable avec MaarchCapture >= 1.4)', 0);

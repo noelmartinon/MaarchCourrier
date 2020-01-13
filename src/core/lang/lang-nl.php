@@ -473,6 +473,7 @@ define("_EMAIL_DRAFT", "Draft_TO_TRANSLATE");
 define("_EMAIL_WAIT", "Waiting to be send_TO_TRANSLATE");
 define("_EMAIL_SENT", "Sent_TO_TRANSLATE");
 define("_EMAIL_ERROR", "Error when sending_TO_TRANSLATE");
+define("_EMAIL_DRAFT_SAVED", "Draft saved_TO_TRANSLATE");
 
 define("_MAILEVA_ADDED", "Shipping Maileva added_TO_TRANSLATE");
 define("_MAILEVA_UPDATED", "Shipping Maileva updated_TO_TRANSLATE");

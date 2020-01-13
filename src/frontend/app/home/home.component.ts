@@ -86,17 +86,8 @@ export class HomeComponent extends AutoCompletePlugin implements OnInit {
         });
     }
 
-    goTo(row:any) {
-        if (this.docUrl == this.coreUrl+'rest/res/'+row.res_id+'/content' && this.sidenavRight.opened) {
-            this.sidenavRight.close();
-        } else {
-            this.docUrl = this.coreUrl+'rest/res/'+row.res_id+'/content';
-
-            this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
-                "<iframe style='height:100%;width:100%;' src='" + this.docUrl + "' class='embed-responsive-item'>" +
-                "</iframe>");  
-            this.sidenavRight.open();
-        }
+    viewDocument(row: any) {
+        window.open(this.coreUrl+"rest/res/" + row.res_id + "/content", "_blank");
     }
 
     viewThumbnail(row:any) {

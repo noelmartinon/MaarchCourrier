@@ -439,22 +439,9 @@ class TemplateController
                     $TBS->MergeBlock($name, 'array', $datasource);
                 }
             }
-    
+
             if ($pathToTemplateInfo['extension'] == 'odt') {
                 $TBS->LoadTemplate('#styles.xml');
-            } elseif ($pathToTemplateInfo['extension'] == 'docx') {
-                $TBS->LoadTemplate('#word/header1.xml');
-            }
-            foreach ($datasources as $name => $datasource) {
-                if (!is_array($datasource)) {
-                    $TBS->MergeField($name, $datasource);
-                } else {
-                    $TBS->MergeBlock($name, 'array', $datasource);
-                }
-            }
-    
-            if ($pathToTemplateInfo['extension'] == 'docx') {
-                $TBS->LoadTemplate('#word/footer1.xml');
                 foreach ($datasources as $name => $datasource) {
                     if (!is_array($datasource)) {
                         $TBS->MergeField($name, $datasource);
@@ -462,8 +449,22 @@ class TemplateController
                         $TBS->MergeBlock($name, 'array', $datasource);
                     }
                 }
+            } elseif ($pathToTemplateInfo['extension'] == 'docx') {
+                $templates = ['word/header1.xml', 'word/header2.xml', 'word/header3.xml', 'word/footer1.xml', 'word/footer2.xml', 'word/footer3.xml'];
+                foreach ($templates as $template) {
+                    if ($TBS->Plugin(OPENTBS_FILEEXISTS, $template)) {
+                        $TBS->LoadTemplate("#{$template}", OPENTBS_ALREADY_UTF8);
+                        foreach ($datasources as $name => $datasource) {
+                            if (!is_array($datasource)) {
+                                $TBS->MergeField($name, $datasource);
+                            } else {
+                                $TBS->MergeBlock($name, 'array', $datasource);
+                            }
+                        }
+                    }
+                }
             }
-    
+
             $TBS->Show(OPENTBS_FILE, $myFile);
         } else {
             $myFile = $pathToTemplate;
