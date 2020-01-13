@@ -45,7 +45,7 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ? 
+        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ?
                     OR address_num ilike ? OR address_street ilike ? OR address_town ilike ? OR address_postal_code ilike ?)';
         $where = [];
         $requestData = [];
@@ -188,7 +188,8 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society']; //, 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+        $cptF = count($fields);
         foreach ($fields as $key => $field) {
             $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
             $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
@@ -201,7 +202,7 @@ class AutoCompleteController
         foreach ($searchItems as $item) {
             if (strlen($item) >= 2) {
                 $where[] = $fields;
-                for ($i = 0; $i < 9; $i++) {
+                for ($i = 0; $i < $cptF; $i++) {
                     $requestData[] = "%{$item}%";
                 }
             }
@@ -461,7 +462,7 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ? 
+        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ?
                     OR address_num ilike ? OR address_street ilike ? OR address_town ilike ? OR address_postal_code ilike ?)';
         $where = [];
         $requestData = [];
