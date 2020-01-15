@@ -42,7 +42,7 @@ export class BasketListComponent implements OnInit {
     public innerHtml: SafeHtml;
     basketUrl: string;
     homeData: any;
-    
+
     injectDatasParam = {
         resId: 0,
         editable: false
@@ -154,6 +154,7 @@ export class BasketListComponent implements OnInit {
         this.resultListDatabase = new ResultListHttpDao(this.http, this.filtersListService);
         // If the user changes the sort order, reset back to the first page.
         this.paginator.pageIndex = this.listProperties.page;
+        this.paginator.pageSize = this.listProperties.pageSize;
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
         // When list is refresh (sort, page, filters)
@@ -164,7 +165,7 @@ export class BasketListComponent implements OnInit {
                 switchMap(() => {
                     this.isLoadingResults = true;
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters());
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters(), this.paginator.pageSize);
                 }),
                 map(data => {
                     // Flip flag to show that loading has finished.
@@ -223,7 +224,7 @@ export class BasketListComponent implements OnInit {
 
     refreshBadgeNotes(nb: number) {
         this.currentResource.countNotes = nb;
-    }                                     
+    }
 
     refreshBadgeAttachments(nb: number) {
         this.currentResource.countAttachments = nb;
@@ -239,7 +240,7 @@ export class BasketListComponent implements OnInit {
         this.refreshDao();
         this.basketHome.refreshBasketHome();
         const e:any = {checked : false};
-        this.toggleAllRes(e); 
+        this.toggleAllRes(e);
     }
 
     filterThis(value: string) {
@@ -396,7 +397,7 @@ export class BasketListComponent implements OnInit {
     }
 
     open({ x, y }: MouseEvent, row: any) {
-        
+
         let thisSelect = { checked : true };
         let thisDeselect = { checked : false };
         if ( row.checked === false) {
@@ -416,11 +417,11 @@ export class BasketListComponent implements OnInit {
         row.checked = true;
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
-        
+
         setTimeout(() => {
             this.actionsList.launchEvent(action);
         }, 200);
-        
+
     }
 
     launchEventSubData(data: any, row: any) {
@@ -434,6 +435,10 @@ export class BasketListComponent implements OnInit {
 
     openContact(row: any, mode: string) {
         this.dialog.open(ContactsListModalComponent, { data: { title: `${row.alt_identifier} - ${row.subject}`, mode: mode, resId: row.res_id } });
+    }
+
+    viewDocument(row: any) {
+        window.open(this.coreUrl + "rest/res/" + row.res_id + "/content", "_blank");
     }
 
 }
@@ -450,10 +455,11 @@ export class ResultListHttpDao {
 
     constructor(private http: HttpClient, private filtersListService: FiltersListService) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, filters: string): Observable<BasketList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number): Observable<BasketList> {
         this.filtersListService.updateListsPropertiesPage(page);
-        let offset = page * 25;
-        const requestUrl = `${href}?limit=25&offset=${offset}${filters}`;
+        this.filtersListService.updateListsPropertiesPageSize(pageSize);
+        let offset = page * pageSize;
+        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}${filters}`;
 
         return this.http.get<BasketList>(requestUrl);
     }

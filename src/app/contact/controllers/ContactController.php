@@ -639,6 +639,7 @@ class ContactController
                     'occupancy' => '',
                     'department' => ''
                 ];
+
                 $contact['filling'] = '';
 
                 $contacts[] = $contact;

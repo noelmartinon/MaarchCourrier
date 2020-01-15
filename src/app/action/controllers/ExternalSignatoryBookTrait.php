@@ -63,6 +63,7 @@ trait ExternalSignatoryBookTrait
                     'objectSent'  => 'attachment',
                     'userId'      => $GLOBALS['userId'],
                     'steps'       => $args['data']['steps'],
+                    'note'        => $args['note'] ?? null
                 ]);
                 if (!empty($sendedInfo['error'])) {
                     return ['errors' => [$sendedInfo['error']]];

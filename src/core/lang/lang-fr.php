@@ -472,6 +472,7 @@ define("_EMAIL_DRAFT", "Brouillon");
 define("_EMAIL_WAIT", "En attente d'envoi");
 define("_EMAIL_SENT", "Envoyé");
 define("_EMAIL_ERROR", "Erreur lors de l'envoi");
+define("_EMAIL_DRAFT_SAVED", "Brouillon enregistré");
 
 define("_MAILEVA_ADDED", "Envoi postal Maileva ajouté");
 define("_MAILEVA_UPDATED", "Envoi postal Maileva mis à jour");

@@ -953,27 +953,26 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         if ($ext) {
             if ($ext === '.odt') {
                 $TBS->LoadTemplate('#styles.xml');
-            } elseif ($ext === '.docx') {
-                $TBS->LoadTemplate('#word/header1.xml');
-            }
-
-            foreach ($datasources as $name => $datasource) {
-                // Scalar values or arrays ?
-                if (!is_array($datasource)) {
-                    $TBS->MergeField($name, $datasource);
-                } else {
-                    $TBS->MergeBlock($name, 'array', $datasource);
-                }
-            }
-
-            if ($ext === '.docx') {
-                $TBS->LoadTemplate('#word/footer1.xml');
                 foreach ($datasources as $name => $datasource) {
                     // Scalar values or arrays ?
                     if (!is_array($datasource)) {
                         $TBS->MergeField($name, $datasource);
                     } else {
                         $TBS->MergeBlock($name, 'array', $datasource);
+                    }
+                }
+            } elseif ($ext === '.docx') {
+                $templates = ['word/header1.xml', 'word/header2.xml', 'word/header3.xml', 'word/footer1.xml', 'word/footer2.xml', 'word/footer3.xml'];
+                foreach ($templates as $template) {
+                    if ($TBS->Plugin(OPENTBS_FILEEXISTS, $template)) {
+                        $TBS->LoadTemplate("#{$template}", OPENTBS_ALREADY_UTF8);
+                        foreach ($datasources as $name => $datasource) {
+                            if (!is_array($datasource)) {
+                                $TBS->MergeField($name, $datasource);
+                            } else {
+                                $TBS->MergeBlock($name, 'array', $datasource);
+                            }
+                        }
                     }
                 }
             }

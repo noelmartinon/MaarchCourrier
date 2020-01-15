@@ -46,7 +46,7 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ? 
+        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ?
                     OR address_num ilike ? OR address_street ilike ? OR address_town ilike ? OR address_postal_code ilike ?)';
         $where = [];
         $requestData = [];
@@ -462,7 +462,7 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ? 
+        $fields = '(contact_firstname ilike ? OR contact_lastname ilike ? OR firstname ilike ? OR lastname ilike ? OR society ilike ?
                     OR address_num ilike ? OR address_street ilike ? OR address_town ilike ? OR address_postal_code ilike ?)';
         $where = [];
         $requestData = [];
@@ -582,13 +582,13 @@ class AutoCompleteController
                 ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
                 ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 5);
-    
+
                 $search = @ldap_search($ldap, $annuary['baseDN'], "(ou=*{$data['society']}*)", ['ou', 'postOfficeBox', 'destinationIndicator', 'labeledURI']);
                 if ($search === false) {
                     continue;
                 }
                 $entries = ldap_get_entries($ldap, $search);
-    
+
                 foreach ($entries as $key => $value) {
                     if (!is_numeric($key)) {
                         continue;
@@ -608,11 +608,11 @@ class AutoCompleteController
                         ];
                     }
                 }
-    
+
                 break;
             }
         }
-        
+
         return $response->withJson($unitOrganizations);
     }
 

@@ -472,6 +472,7 @@ define("_EMAIL_DRAFT", "Draft");
 define("_EMAIL_WAIT", "Waiting to be send");
 define("_EMAIL_SENT", "Sent");
 define("_EMAIL_ERROR", "Error when sending");
+define("_EMAIL_DRAFT_SAVED", "Draft saved");
 
 define("_MAILEVA_ADDED", "Shipping Maileva added");
 define("_MAILEVA_UPDATED", "Shipping Maileva updated");

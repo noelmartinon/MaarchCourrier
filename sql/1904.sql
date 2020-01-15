@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '19.04.10' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '19.04.11' WHERE id = 'database_version';
 
 DELETE FROM parameters WHERE id = 'QrCodePrefix';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('QrCodePrefix', 'Si activé (1), ajoute "Maarch_" dans le contenu des QrCode générés. (Utilisable avec MaarchCapture >= 1.4)', 0);
@@ -117,7 +117,7 @@ WITH (OIDS=FALSE);
 /* SERVICES */
 DO $$ BEGIN
   IF (SELECT count(group_id) FROM usergroups_services WHERE service_id IN ('edit_recipient_in_process', 'edit_recipient_outside_process')) = 0 THEN
-    INSERT INTO usergroups_services (group_id, service_id) 
+    INSERT INTO usergroups_services (group_id, service_id)
     SELECT usergroups.group_id, 'edit_recipient_in_process' FROM usergroups
     LEFT JOIN usergroups_services ON usergroups.group_id = usergroups_services.group_id AND usergroups_services.service_id = 'add_copy_in_process'
     WHERE service_id is null;
@@ -157,7 +157,7 @@ ALTER TABLE groupbasket ADD COLUMN list_display json DEFAULT '[]';
 DO $$ BEGIN
   IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'mlb_coll_ext') AND attname = 'recommendation_limit_date') = 1 THEN
     ALTER TABLE res_letterbox ADD COLUMN opinion_limit_date TIMESTAMP without TIME ZONE DEFAULT NULL;
-    UPDATE res_letterbox SET opinion_limit_date = mlb_coll_ext.recommendation_limit_date 
+    UPDATE res_letterbox SET opinion_limit_date = mlb_coll_ext.recommendation_limit_date
     FROM mlb_coll_ext
     WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND recommendation_limit_date IS NOT NULL;
     ALTER TABLE mlb_coll_ext DROP COLUMN IF EXISTS recommendation_limit_date;
@@ -227,7 +227,7 @@ VALUES ('ACKNOWLEDGEMENT_RECEIPTS', 'ACKNOWLEDGEMENT_RECEIPTS', 'Dépôt des AR'
 
 DO $$ BEGIN
   IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'res_letterbox') AND attname = 'sve_start_date') = 1 THEN
-    INSERT INTO acknowledgement_receipts (res_id, type, format, user_id, contact_address_id, creation_date, send_date, docserver_id, path, filename, fingerprint) 
+    INSERT INTO acknowledgement_receipts (res_id, type, format, user_id, contact_address_id, creation_date, send_date, docserver_id, path, filename, fingerprint)
     SELECT res_id, 'simple', 'html', 0, 0, sve_start_date, sve_start_date, 0, 0, 0, 0 FROM res_letterbox WHERE sve_start_date is not null;
     ALTER TABLE res_letterbox DROP COLUMN IF EXISTS sve_start_date;
   END IF;
@@ -258,14 +258,14 @@ END$$;
 ALTER TABLE res_mark_as_read DROP COLUMN IF EXISTS coll_id;
 
 UPDATE listinstance SET added_by_entity = 'superadmin' WHERE added_by_user = 'superadmin';
-UPDATE listinstance SET added_by_entity = 'superadmin' WHERE listinstance_id IN 
+UPDATE listinstance SET added_by_entity = 'superadmin' WHERE listinstance_id IN
 	(SELECT listinstance_id FROM listinstance LEFT JOIN entities ON listinstance.added_by_entity = entities.entity_id WHERE entities.entity_id IS null);
 
-UPDATE listinstance SET added_by_entity = 'superadmin' WHERE listinstance_id IN 
-	(SELECT listinstance_id 
-	 FROM listinstance 
-	 LEFT JOIN users_entities ON listinstance.added_by_user = users_entities.user_id 
-	 LEFT JOIN entities ON users_entities.entity_id = entities.entity_id 
+UPDATE listinstance SET added_by_entity = 'superadmin' WHERE listinstance_id IN
+	(SELECT listinstance_id
+	 FROM listinstance
+	 LEFT JOIN users_entities ON listinstance.added_by_user = users_entities.user_id
+	 LEFT JOIN entities ON users_entities.entity_id = entities.entity_id
 	 WHERE primary_entity = 'Y' AND entities.entity_id IS NULL);
 
 UPDATE listinstance SET added_by_entity =

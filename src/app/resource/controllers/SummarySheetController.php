@@ -398,9 +398,11 @@ class SummarySheetController
                 }
             } elseif ($unit['unit'] == 'diffusionList') {
                 $assignee    = '';
-                $copies      = [];
                 $destination = '';
                 $found       = false;
+                $roles = EntityModel::getRoles();
+                $rolesItems = [];
+                $nbItems = 0;
                 foreach ($args['data']['listInstances'] as $listKey => $listInstance) {
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
@@ -418,12 +420,31 @@ class SummarySheetController
                         if ($listInstance['item_mode'] == 'dest') {
                             $assignee = $item;
                         } else {
-                            $copies[] = $item;
+                            foreach ($roles as $role) {
+                                if ($listInstance['item_mode'] == $role['id'] || ($listInstance['item_mode'] == 'cc' && $role['id'] == 'copy')) {
+                                    $rolesItems[$role['id']]['item'][] = $item;
+                                    $rolesItems[$role['id']]['label'] = $role['label'];
+                                    $nbItems++;
+                                    continue;
+                                }
+                            }
                         }
+
                         unset($args['data']['listInstances'][$listKey]);
                         $found = true;
                     }
                 }
+
+                // Sort keys to be in the same order defined in the roles.xml file
+                $rolesIDs = array_column($roles, 'id');
+                $tmp = [];
+                foreach ($rolesIDs as $key) {
+                    if (!empty($rolesItems[$key])) {
+                        $tmp[$key] = $rolesItems[$key];
+                    }
+                }
+                $rolesItems = $tmp;
+
                 if (!empty($resource['destination'])) {
                     $destination = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['short_label']]);
                 }
@@ -433,7 +454,7 @@ class SummarySheetController
                     $assignee = _UNDEFINED;
                 }
                 $pdf->SetY($pdf->GetY() + 40);
-                if (($pdf->GetY() + 37 + count($copies) * 20) > $bottomHeight) {
+                if (($pdf->GetY() + 37 + $nbItems * 20) > $bottomHeight) {
                     $pdf->AddPage();
                 }
                 $pdf->SetFont('', 'B', 11);
@@ -444,11 +465,17 @@ class SummarySheetController
                 $pdf->MultiCell($widthAssignee, 20, _ASSIGNEE, 1, 'C', false, 0, '', '', true, 0, false, true, 20, 'M');
                 $pdf->SetFont('', 'B', 10);
                 $pdf->Cell($widthAssignee * 5, 20, "- {$assignee} {$destinationEntity}", 1, 1, 'L', false);
-                if (!empty($copies)) {
+
+                foreach ($rolesItems as $rolesItem) {
                     $pdf->SetFont('', '', 10);
-                    $pdf->MultiCell($widthAssignee, count($copies) * 20, _TO_CC, 1, 'C', false, 0, '', '', true, 0, false, true, count($copies) * 20, 'M');
-                    foreach ($copies as $copy) {
-                        $pdf->Cell($widthAssignee * 5, 20, "- {$copy}", 1, 2, 'L', false);
+                    $pdf->MultiCell($widthAssignee, count($rolesItem['item']) * 20, $rolesItem['label'], 1, 'C', false, 0, '', '', true, 0, false, true, count($rolesItem['item']) * 20, 'M');
+
+                    $nbItems = count($rolesItem['item']);
+                    $i = 0;
+                    foreach ($rolesItem['item'] as $item) {
+                        $nextLine = $i == ($nbItems - 1) ? 1 : 2;
+                        $pdf->Cell($widthAssignee * 5, 20, "- {$item}", 1, $nextLine, 'L', false);
+                        $i++;
                     }
                 }
             } elseif ($unit['unit'] == 'visaWorkflow') {

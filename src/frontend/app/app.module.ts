@@ -58,6 +58,7 @@ import { AttachmentsListComponent }             from './attachments/attachments-
 import { DiffusionsListComponent }             from './diffusions/diffusions-list.component';
 import { VisaWorkflowComponent }             from './visa/visa-workflow.component';
 import { AvisWorkflowComponent }             from './avis/avis-workflow.component';
+import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
 
 import { ForgotPasswordComponent }          from './login/forgotPassword/forgotPassword.component';
 import { UpdatePasswordComponent }          from './login/updatePassword/updatePassword.component';
@@ -117,7 +118,8 @@ import { UpdatePasswordComponent }          from './login/updatePassword/updateP
         ForgotPasswordComponent,
         UpdatePasswordComponent,
         ContactsListComponent,
-        ContactsListModalComponent
+        ContactsListModalComponent,
+        VisaWorkflowModalComponent
     ],
     entryComponents: [
         CustomSnackbarComponent,
@@ -141,7 +143,8 @@ import { UpdatePasswordComponent }          from './login/updatePassword/updateP
         RedirectActionComponent,
         SendShippingActionComponent,
         ViewDocActionComponent,
-        ContactsListModalComponent
+        ContactsListModalComponent,
+        VisaWorkflowModalComponent
     ],
     providers: [ HeaderService, FiltersListService ],
     bootstrap: [ AppComponent ]

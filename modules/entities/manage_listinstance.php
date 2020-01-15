@@ -808,8 +808,8 @@ $linkwithwhat =
             if (!empty($_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'])) {
                 $recipientEntities = \User\models\UserModel::getEntitiesById(['userId' => $_SESSION[$origin]['diff_list']['dest']['users'][0]['user_id']]);
                 $recipientEntities = array_column($recipientEntities, 'entity_id');
-                if (in_array($entities[0]['ID'], $recipientEntities)) {
-                    $entity_id_dest = $entities[0]['ID'];
+                if (in_array($_SESSION[$origin]['difflist_object']['object_id'], $recipientEntities)) {
+                    $entity_id_dest = $_SESSION[$origin]['difflist_object']['object_id'];
                 } else {
                     $entity_id_dest = $_SESSION[$origin]['diff_list']['dest']['users'][0]['entity_id'];
                 }
@@ -1056,12 +1056,12 @@ $linkwithwhat =
                             <?php
                             if ($_SESSION[$origin]['difflist_object']['object_label'] != '') {
                                 ?>
-                                <input class="button" name="auto_filter" id="auto_filter" type="button" onclick="$('what_services').value='<?php 
+                                <input class="button" name="auto_filter" id="auto_filter" type="button" onclick="$('what_services').value='<?php
                                     functions::xecho($_SESSION[$origin]['difflist_object']['object_label']); ?>';$('what_users').value='';" value="<?php echo _AUTO_FILTER; ?>"/>
                                 <?php
                             } elseif ($primaryEntityLabel != '') {
                                 ?>
-                                <input class="button" name="auto_filter" id="auto_filter" type="button" onclick="$('what_services').value='<?php 
+                                <input class="button" name="auto_filter" id="auto_filter" type="button" onclick="$('what_services').value='<?php
                                     functions::xecho($primaryEntityLabel); ?>';$('what_users').value='';" value="<?php echo _AUTO_FILTER; ?>"/>
                                 <?php
                             }
@@ -1138,7 +1138,7 @@ $linkwithwhat =
                                     }
                                 } ?>
 								</select>&nbsp;
-								<span onclick="add_user(<?php functions::xecho($j); ?>);" style="cursor: pointer"/> 
+								<span onclick="add_user(<?php functions::xecho($j); ?>);" style="cursor: pointer"/>
 									<i class="fa fa-user-plus fa-lg" title="<?php echo _ADD_USER_LISTDIFF; ?>"></i>
 								</span> <?php
                             } else {
@@ -1158,7 +1158,7 @@ $linkwithwhat =
             if (count($entities) > 0 && !isset($_REQUEST['specific_role'])) {
                 if ($allow_entities) {
                     $entityListDiff = array(); ?>
-                <div align="center"> 
+                <div align="center">
                     <h3 class="tit"><?php echo _ENTITIES_LIST; ?></h3>
                     <table cellpadding="0" cellspacing="0" border="0" class="listing spec">
                         <thead>
@@ -1197,18 +1197,18 @@ $linkwithwhat =
                                 if (count($possible_roles) > 0) {
                                     ?>
                                     <input type="hidden" id="entity_id_<?php functions::xecho($j); ?>" value="<?php functions::xecho($entities[$j]['ID']); ?>" />
-                                    <select name="role" id="entity_role_<?php functions::xecho($j); ?>" style="width:60%;"><?php 
+                                    <select name="role" id="entity_role_<?php functions::xecho($j); ?>" style="width:60%;"><?php
                                     foreach ($possible_roles as $role_id => $role_label) {
                                         ?>
                                         <option value="<?php functions::xecho($role_id); ?>"><?php functions::xecho($role_label); ?></option><?php
                                     } ?>
                                     </select>&nbsp;
-                                    <span onclick="add_entity(<?php functions::xecho($j); ?>);" style="cursor: pointer"/> 
+                                    <span onclick="add_entity(<?php functions::xecho($j); ?>);" style="cursor: pointer"/>
                                         <i class="fa fa-plus fa-lg" title="<?php echo _ADD_ENTITY_LISTDIFF; ?>"></i>
                                     </span> <?php
                                 } else {
                                     echo _NO_AVAILABLE_ROLE;
-                                } ?>  
+                                } ?>
                                 </td>
                             </tr> <?php
                     } ?>

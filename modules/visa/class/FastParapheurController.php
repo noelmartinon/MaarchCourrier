@@ -16,7 +16,7 @@ class FastParapheurController
 {
     public static function retrieveSignedMails($aArgs)
     {
-        foreach($aArgs['idsToRetrieve']['noVersion'] as $noVersion){
+        foreach ($aArgs['idsToRetrieve']['noVersion'] as $noVersion) {
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
                 <soapenv:Header/>
@@ -38,7 +38,7 @@ class FastParapheurController
             ]);
 
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-            if(!empty($isError ->Fault[0])){
+            if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
                 echo _PJ_NUMBER . $noVersion->res_id . ' ' . _AND_DOC_ORIG . $noVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
@@ -46,15 +46,15 @@ class FastParapheurController
 
             $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->historyResponse->children();
 
-            foreach ($response->return as $res){    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+            foreach ($response->return as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
                 $state      = (string) $res->stateName;
-                if($state == $aArgs['config']['data']['validatedState']){
+                if ($state == $aArgs['config']['data']['validatedState']) {
                     $response = self::download(['config' => $aArgs['config'], 'documentId' => $noVersion->external_id]);
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'validated';
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->format = 'pdf';
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->encodedFile = $response['b64FileContent'];
                     break;
-                }else if($state == $aArgs['config']['data']['refusedState']){
+                } elseif ($state == $aArgs['config']['data']['refusedState']) {
                     $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
                     $query = $GLOBALS['db']->query(
                         "SELECT user_id, firstname, lastname FROM listinstance LEFT JOIN users ON item_id = user_id WHERE res_id = ? AND item_mode = ?",
@@ -66,12 +66,12 @@ class FastParapheurController
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'refused';
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $res->lastname . ' ' . $res->firstname . ' : ' . $response;
                     break;
-                }else{
+                } else {
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'waiting';
                 }
             }
         }
-        foreach($aArgs['idsToRetrieve']['isVersion'] as $isVersion){
+        foreach ($aArgs['idsToRetrieve']['isVersion'] as $isVersion) {
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
                 <soapenv:Header/>
@@ -93,22 +93,22 @@ class FastParapheurController
             ]);
 
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-            if(!empty($isError ->Fault[0])){
+            if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
-                echo _PJ_NUMBER . $isVersion->res_id . ' ' . _AND_DOC_ORIG . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                echo _PJ_NUMBER . $isVersion->res_id_version . ' ' . _AND_DOC_ORIG . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
             }
 
             $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->historyResponse->children();
-            foreach ($response->return as $res){    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+            foreach ($response->return as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
                 $state = (string) $res->stateName;
-                if($state == $aArgs['config']['data']['validatedState']){
+                if ($state == $aArgs['config']['data']['validatedState']) {
                     $response = self::download(['config' => $aArgs['config'], 'documentId' => $isVersion->external_id]);
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'validated';
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->format = 'pdf';
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->encodedFile = $response['b64FileContent'];
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'validated';
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->format = 'pdf';
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->encodedFile = $response['b64FileContent'];
                     break;
-                }else if($state == $aArgs['config']['data']['refusedState']){
+                } elseif ($state == $aArgs['config']['data']['refusedState']) {
                     $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
                     $query = $GLOBALS['db']->query(
                         "SELECT user_id, firstname, lastname FROM listinstance LEFT JOIN users ON item_id = user_id WHERE res_id = ? AND item_mode = ?",
@@ -117,19 +117,20 @@ class FastParapheurController
                     $res = $query->fetchObject();
 
                     $response = self::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $isVersion->external_id]);
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'refused';
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->noteContent = $res->lastname . ' ' . $res->firstname . ' : ' . $response;
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'refused';
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->noteContent = $res->lastname . ' ' . $res->firstname . ' : ' . $response;
                     break;
-                }else{
-                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'waiting';
+                } else {
+                    $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'waiting';
                 }
             }
         }
         return $aArgs['idsToRetrieve'];
     }
 
-    public static function upload($aArgs){
-	    $circuitId          = $aArgs['circuitId'];
+    public static function upload($aArgs)
+    {
+        $circuitId          = $aArgs['circuitId'];
         $label              = $aArgs['label'];
         $subscriberId       = $aArgs['businessId'];
 
@@ -141,7 +142,7 @@ class FastParapheurController
             'data'                  => [$aArgs['resIdMaster']]
         ]);
 
-        if($annexes['letterbox'][0]['category_id'] !== 'outgoing'){
+        if ($annexes['letterbox'][0]['category_id'] !== 'outgoing') {
             $letterboxPath                    = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $annexes['letterbox'][0]['docserver_id'], 'select' => ['path_template']]);
             $annexes['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $annexes['letterbox'][0]['path']) . $annexes['letterbox'][0]['filename'];
         }
@@ -152,8 +153,8 @@ class FastParapheurController
             'data'                  => [$aArgs['resIdMaster'], 'print_folder']
         ]);
 
-        if(!empty($annexes['attachments'])){
-            for($i = 0; $i < count($annexes['attachments']); $i++){
+        if (!empty($annexes['attachments'])) {
+            for ($i = 0; $i < count($annexes['attachments']); $i++) {
                 $annexAttachmentInfo                    = \Attachment\models\AttachmentModel::getById(['id' => $annexes['attachments'][$i]['res_id'], 'isVersion' => false]);
                 $annexAttachmentPath                    = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $annexAttachmentInfo['docserver_id'], 'select' => ['path_template']]);
                 $annexes['attachments'][$i]['filePath'] = $annexAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $annexes['attachments'][$i]['path']) . $annexes['attachments'][$i]['filename'];
@@ -168,37 +169,39 @@ class FastParapheurController
         ]);
 
         $attachmentToFreeze = [];
-        for($i = 0; $i < count($attachments); $i++){
+        for ($i = 0; $i < count($attachments); $i++) {
             if (!empty($attachments[$i]['res_id'])) {
                 $resId  = $attachments[$i]['res_id'];
                 $collId = 'attachments_coll';
+                $adrInfo = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF']);
             } else {
-                $resId  = $attachments[$i]['res_id_master'];
+                $resId  = $attachments[$i]['res_id_version'];
                 $collId = 'attachments_version_coll';
+                $adrInfo = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF', 'isVersion' => true]);
             }
-            $adrInfo                = \Convert\models\AdrModel::getConvertedDocumentById(['resId' => $resId, 'collId' => $collId, 'type' => 'PDF']);
 
             $attachmentPath         =  \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
             $attachmentFilePath     = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
-            $attachmentFileName     = 'projet_courrier_' . $attachments[$i]['res_id_master'] . '_' . rand(0001,9999) . '.pdf';
+            $attachmentFileName     = 'projet_courrier_' . $attachments[$i]['res_id_master'] . '_' . rand(0001, 9999) . '.pdf';
 
             $zip            = new ZipArchive();
             $tmpPath        = \SrcCore\models\CoreConfigModel::getTmpPath();
             $zipFilePath    = $tmpPath . DIRECTORY_SEPARATOR
                 . $attachmentFileName . '.zip';  // The zip file need to have the same name as the attachment we want to sign
 
-            if ($zip->open($zipFilePath, ZipArchive::CREATE)!==TRUE) {
+            if ($zip->open($zipFilePath, ZipArchive::CREATE)!==true) {
                 exit(_ERROR_CREATE_ZIP . "<$zipFilePath>\n");
             }
             $zip->addFile($attachmentFilePath, $attachmentFileName);
 
-            if($annexes['letterbox'][0]['category_id'] !== 'outgoing'){
+            if ($annexes['letterbox'][0]['category_id'] !== 'outgoing') {
                 $zip->addFile($annexes['letterbox'][0]['filePath'], 'document_principal.' . $annexes['letterbox'][0]['format']);
             }
 
-            if(isset($annexes['attachments'])) {
+            if (isset($annexes['attachments'])) {
                 for ($j = 0; $j < count($annexes['attachments']); $j++) {
-                    $zip->addFile($annexes['attachments'][$j]['filePath'],
+                    $zip->addFile(
+                        $annexes['attachments'][$j]['filePath'],
                         'PJ_' . ($j + 1) . '.' . $annexes['attachments'][$j]['format']
                     );
                 }
@@ -237,11 +240,11 @@ class FastParapheurController
             ]);
 
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-            if(!empty($isError ->Fault[0])){
+            if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
                 //echo (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 return false;
-            }else{
+            } else {
                 $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
                 $attachmentToFreeze[$collId][$resId] = (string) $documentId;
             }
@@ -249,7 +252,8 @@ class FastParapheurController
         return $attachmentToFreeze;
     }
 
-    public static function download($aArgs){
+    public static function download($aArgs)
+    {
         $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
                 <soapenv:Header/>
@@ -271,17 +275,17 @@ class FastParapheurController
         ]);
 
         $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-        if(!empty($isError ->Fault[0])){
+        if (!empty($isError ->Fault[0])) {
             // TODO gestion des erreurs
             echo (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
             return false;
-        }else{
+        } else {
             $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->downloadResponse->children()->return;
             $returnedDocumentId = (string) $response->documentId;
-            if($aArgs['documentId'] !== $returnedDocumentId){
+            if ($aArgs['documentId'] !== $returnedDocumentId) {
                 // TODO gestion d'une potentiel erreur
                 return false;
-            }else{
+            } else {
                 $b64FileContent = $response->content;
                 return ['b64FileContent' => (string)$b64FileContent, 'documentId' => $returnedDocumentId];
             }
@@ -313,7 +317,7 @@ class FastParapheurController
             'data'      => [$aArgs['resIdMaster']]
         ])[0];
 
-        if(empty($signatory['business_id']) || substr($signatory['business_id'], 0, 3) == 'org'){
+        if (empty($signatory['business_id']) || substr($signatory['business_id'], 0, 3) == 'org') {
             $signatory['business_id'] = $config['data']['subscriberId'];
         }
 
@@ -346,5 +350,4 @@ class FastParapheurController
 
         return $response;
     }
-
 }

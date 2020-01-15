@@ -3741,13 +3741,35 @@ width:auto;
 }
 
 #sender_recipient_tr .typeahead__field input {
-    width: 225px;
-    margin-left: 17px;
+    all: unset;
+    text-align: left;
+    width: 200px;
+    border: 1px solid rgb(153, 153, 153);
+    color: rgb(102, 102, 102);
+    padding: 0.1em 0.2em;
+    background: white;
+    font-size: 10px;
+    padding-left: 2px !important;
+}
+
+#contact {
+    all: unset;
+    text-align: left;
+    width: 220px;
+    border: 1px solid rgb(153, 153, 153);
+    color: rgb(102, 102, 102);
+    padding: 0.1em 0.2em;
+    background: white;
+    font-size: 10px;
 }
 
 #sender_recipient_tr .typeahead__list {
     width: 225px;
-    margin-left: 17px;
+    /*margin-left: 17px;*/
+}
+
+.typeahead__container {
+    font: inherit !important;
 }
 
 .typeahead__list {

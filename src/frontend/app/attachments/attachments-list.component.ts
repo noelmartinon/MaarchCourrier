@@ -2,6 +2,8 @@ import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
+import { MatDialog } from '@angular/material';
+import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
 
 @Component({
     selector: 'app-attachments-list',
@@ -17,17 +19,19 @@ export class AttachmentsListComponent implements OnInit {
     resIds          : number[]  = [];
     pos             = 0;
     mailevaEnabled  : boolean   = false;
+    maarchParapheurEnabled: boolean = false;
 
     @Input('injectDatas') injectDatas: any;
     @Output('reloadBadgeAttachments') reloadBadgeNotes = new EventEmitter<string>();
 
-    constructor(public http: HttpClient, private notify: NotificationService) { }
+    constructor(public http: HttpClient, private notify: NotificationService, public dialog: MatDialog) { }
 
     ngOnInit(): void { }
 
     loadAttachments(resId: number) {
         this.resIds[0] = resId;
         this.loading = true;
+        this.checkMaarchParapheurEnabled();
         this.http.get("../../rest/resources/" + this.resIds[0] + "/attachments")
             .subscribe((data: any) => {
                 this.mailevaEnabled = data.mailevaEnabled;
@@ -37,6 +41,17 @@ export class AttachmentsListComponent implements OnInit {
                 });
                 this.reloadBadgeNotes.emit(`${this.attachments.length}`);
                 this.loading = false;
+            }, (err: any) => {
+                this.notify.error(err.error.errors);
+            });
+    }
+
+    checkMaarchParapheurEnabled() {
+        this.http.get("../../rest/externalSignatureBooks/enabled")
+            .subscribe((data: any) => {
+                if (data.enabledSignatureBook === 'maarchParapheur') {
+                    this.maarchParapheurEnabled = true;
+                }
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
@@ -62,5 +77,9 @@ export class AttachmentsListComponent implements OnInit {
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
+    }
+
+    openMaarchParapheurWorkflow(attachment: any) {
+        this.dialog.open(VisaWorkflowModalComponent, {data: {attachment : attachment}});
     }
 }

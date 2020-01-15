@@ -1047,4 +1047,6 @@ export const LANG_NL = {
     "contact_internal" : "Internal user", //_TO_TRANSLATE
     "contact_entity"   : "Entity", //_TO_TRANSLATE
     "contact_third"   : "Contact third", //_TO_TRANSLATE
+    "viewResource" : "View document", //_TO_TRANSLATE,
+    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE,
 };

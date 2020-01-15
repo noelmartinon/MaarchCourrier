@@ -3956,6 +3956,9 @@ if (!defined('_EMAIL_ACCOUNT')) {
 if (!defined('_HELP_KEYWORD_EMAIL')) {
     define('_HELP_KEYWORD_EMAIL', 'Email of the connected user');
 }
+if (!defined('_EMAIL_DRAFT_SAVED')) {
+    define("_EMAIL_DRAFT_SAVED", "Draft saved");
+}
 
 if (!defined('_INITIATOR')) {
     define('_INITIATOR', 'Initiating department');

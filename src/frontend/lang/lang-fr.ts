@@ -1071,4 +1071,7 @@ export const LANG_FR = {
     "sendActivationNotification": "Envoyer à nouveau le courriel d'activation",
     "activationNotificationSend": "Le courriel d'activation a été envoyé",
     "enableGroupMsg": "Ce groupe pourra potentiellement avoir accès à l'ensemble des fonctionnalités de l'application.",
+    "viewResource" : "Voir le document",
+    "externalVisaWorkflow" : "Circuit de visa Maarch parapheur",
+
 };
