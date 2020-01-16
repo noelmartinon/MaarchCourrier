@@ -142,7 +142,7 @@ class HomeController
                 'status.id as status_id',
                 'r.subject',
             ],
-            'limit'     => 5,
+            'limit'     => 10,
             'userId'    => $GLOBALS['userId']
         ]);
 
