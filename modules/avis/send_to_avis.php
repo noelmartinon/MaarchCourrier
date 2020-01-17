@@ -175,7 +175,7 @@ function check_form($form_id, $values)
     $avis = new avis_controler();
     $curr_avis_wf = $avis->getWorkflow($_SESSION['doc_id'], $_SESSION['current_basket']['coll_id'], 'AVIS_CIRCUIT');
 
-    if (count($curr_avis_wf['avis']) == 0) {
+    if (is_array($curr_avis_wf['avis']) && count($curr_avis_wf['avis']) == 0) {
         $_SESSION['action_error'] = _AVIS_WORKFLOW . " " . _MANDATORY;
         return false;
     }
