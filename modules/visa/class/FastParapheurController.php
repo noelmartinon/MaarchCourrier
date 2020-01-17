@@ -40,7 +40,7 @@ class FastParapheurController
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
             if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
-                echo _PJ_NUMBER . $noVersion->res_id . ' ' . _AND_DOC_ORIG . $noVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                echo 'PJ n° ' . $noVersion->res_id . ' et document original n° ' . $noVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
             }
 
@@ -95,7 +95,7 @@ class FastParapheurController
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
             if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
-                echo _PJ_NUMBER . $isVersion->res_id_version . ' ' . _AND_DOC_ORIG . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                echo 'PJ n° ' . $isVersion->res_id_version . ' et document original n° ' . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
             }
 
