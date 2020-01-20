@@ -226,7 +226,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     include_once 'modules/notes/class/notes_controler.php';
     include_once 'modules/avis/class/avis_controler.php';
     $note = new notes_controler();
-
+    $avis = new avis_controler();
 
     $db = new Database();
 
@@ -238,6 +238,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         $formValues[$id] = $value;
     }
 
+    $avis->processAvis($res_id, $formValues['opinion_limit_date']);
 
     //save note
     if ($formValues['note_content_to_users'] != '') {
