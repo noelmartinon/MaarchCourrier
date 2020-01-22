@@ -38,8 +38,8 @@ DO $$ BEGIN
 
       INSERT INTO redirected_baskets (owner_user_id, actual_user_id, basket_id, group_id) SELECT users.id, us.id, user_abs.basket_id, usergroups.id FROM usergroups, usergroup_content, user_abs, groupbasket, users, users us
         where usergroup_content.group_id = usergroups.group_id
-        and usergroup_content.user_id = user_abs.user_abs
-        and users.user_id = user_abs.user_abs
+        and usergroup_content.user_id = user_abs.basket_owner
+        and users.user_id = user_abs.basket_owner
         and us.user_id = user_abs.new_user
         and groupbasket.group_id = usergroup_content.group_id
         and groupbasket.basket_id = user_abs.basket_id;
