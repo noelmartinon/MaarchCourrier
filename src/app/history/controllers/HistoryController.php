@@ -111,6 +111,7 @@ class HistoryController
         }
 
         $order = !in_array($queryParams['order'], ['asc', 'desc']) ? '' : $queryParams['order'];
+        $queryParams['orderBy'] = (!empty($queryParams['orderBy']) && $queryParams['orderBy'] == 'userLabel') ? 'user_id' : null;
         $orderBy = !in_array($queryParams['orderBy'], ['event_date', 'user_id', 'info']) ? ['event_date DESC'] : ["{$queryParams['orderBy']} {$order}"];
 
         $history = HistoryModel::get([
