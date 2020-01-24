@@ -1063,4 +1063,5 @@ export const LANG_NL = {
     "viewActionsHistory": "View only actions in history", //_TO_TRANSLATE
     "dateAgo"   : "Since", //_TO_TRANSLATE
     "dateTo"   : "The", //_TO_TRANSLATE
+    "information" : "Information", //_TO_TRANSLATE
 };

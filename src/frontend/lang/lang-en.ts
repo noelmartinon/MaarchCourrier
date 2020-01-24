@@ -1037,4 +1037,5 @@ export const LANG_EN = {
     "viewActionsHistory": "View only actions in history",
     "dateAgo"   : "Since",
     "dateTo"   : "The",
+    "information" : "Information",
 };

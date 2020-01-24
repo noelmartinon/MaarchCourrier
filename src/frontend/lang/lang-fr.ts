@@ -1070,4 +1070,5 @@ export const LANG_FR = {
     "viewActionsHistory": "Afficher l'historique des actions",
     "dateAgo": "Il y a",
     "dateTo": "Le",
+    "information" : "Information",
 };
