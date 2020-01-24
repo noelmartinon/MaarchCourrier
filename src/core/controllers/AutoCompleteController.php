@@ -32,7 +32,7 @@ use User\models\UserModel;
 class AutoCompleteController
 {
     const LIMIT = 50;
-    const TINY_LIMIT = 10;
+    const TINY_LIMIT = 30;
 
     public static function getContacts(Request $request, Response $response)
     {
@@ -188,8 +188,8 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society']; //, 'address_num', 'address_street', 'address_town', 'address_postal_code'];
-        $cptF = count($fields);
+        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society','society_short']; //, 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+	$cptF = count($fields);
         foreach ($fields as $key => $field) {
             $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
             $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
