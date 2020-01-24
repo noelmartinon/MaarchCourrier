@@ -1,144 +1,70 @@
-<div class="admin-container" [class.admin-is-mobile]="mobileQuery.matches">
-    <mat-sidenav-container autosize class="admin-sidenav-container" >
-        <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56"
-            [opened]="mobileQuery.matches ? false : true">
-            <menu-shortcut></menu-shortcut>
-            <menu-nav></menu-nav>
-        </mat-sidenav>
-        <mat-sidenav-content>
-            <div *ngIf="loading" style="display:flex;height:100%;">
-                <mat-spinner style="margin:auto;"></mat-spinner>
+<mat-sidenav-container autosize class="maarch-container">
+    <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
+        [opened]="appService.getViewMode() ? false : true">
+        <header-panel [snavLeft]="snav"></header-panel>
+        <menu-shortcut></menu-shortcut>
+        <menu-nav></menu-nav>
+        <mat-nav-list>
+            <a mat-list-item *ngFor="let menu of subMenus" [class.active]="menu.current" [routerLink]="menu.route">
+                <mat-icon color="primary" mat-list-icon [class]="menu.icon"></mat-icon>
+                <p mat-line>
+                    {{menu.label}}
+                </p>
+            </a>
+        </mat-nav-list>
+        <mat-divider></mat-divider>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div class="bg-head">
+            <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
+                <div class="bg-head-title-label">
+                    <header-left [snavLeft]="snav"></header-left>
+                </div>
+                <div class="bg-head-title-tool">
+                    <header-right></header-right>
+                </div>
             </div>
-            <mat-card *ngIf="!loading" class="card-app-content">
-                <mat-tab-group (selectedIndexChange)="_setDataSource($event)">
-                    <mat-tab label="{{lang.history}}" *ngIf="accessHistory">
-                        <mat-card *ngIf="!loading" class="card-app-content">
-                            <div class="alert alert-warning" role="alert" [innerHTML]="lang.limitDataReached" *ngIf="limitExceeded">
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 col-xs-6">
-                                    <mat-form-field>
-                                        <input matInput (keyup)="applyFilter($event.target.value, 'normal')" placeholder="{{lang.filterBy}}">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-6 col-xs-6">
-                                    <mat-paginator #paginator [length]="100" [hidePageSize]="true"  [pageSize]="10">
-                                    </mat-paginator>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-6" style="padding-top:10px;">
-                                    <mat-form-field>
-                                        <input matInput [(ngModel)]="startDate" [max]="endDate" [matDatepicker]="pickerStart" placeholder="{{lang.since}}" (dateChange)="refreshHistory('normal')"
-                                            (focus)="pickerStart.open()">
-                                        <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-                                        <mat-datepicker #pickerStart touchUi="true" [startAt]="startDate"></mat-datepicker>
-                                    </mat-form-field>
-
-                                </div>
-                                <div class="col-sm-6" style="padding-top:10px;">
-                                    <mat-form-field>
-                                        <input matInput [(ngModel)]="endDate" [min]="startDate" [matDatepicker]="pickerEnd" placeholder="{{lang.until}}" (dateChange)="refreshHistory('normal')"
-                                            (focus)="pickerEnd.open()">
-                                        <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-                                        <mat-datepicker #pickerEnd touchUi="true" [startAt]="endDate"></mat-datepicker>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-                            <mat-table #table [dataSource]="dataSource" matSort matSortActive="event_date" #sort="matSort" matSortDirection="desc">
-                                <ng-container matColumnDef="event_date">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">{{lang.date}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" style="flex:1;">{{element.event_date | date : "dd/MM/y HH:mm"}}</mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="event_type">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;" [class.hide-for-mobile]="mobileQuery.matches">{{lang.event}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" style="flex:1;" [class.hide-for-mobile]="mobileQuery.matches"> {{element.event_type}} </mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="user_id">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;" [class.hide-for-mobile]="mobileQuery.matches">{{lang.user}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" style="flex:1;" [class.hide-for-mobile]="mobileQuery.matches"> {{element.user_id}} </mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="info">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:3;">{{lang.description}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" style="flex:3;"> {{element.info}} </mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="remote_ip">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;" [class.hide-for-mobile]="mobileQuery.matches">{{lang.ip}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" style="flex:1;" [class.hide-for-mobile]="mobileQuery.matches"> {{element.remote_ip}} </mat-cell>
-                                </ng-container>
-                                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-                            </mat-table>
-                            <div class="mat-paginator" style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">{{data.length}} {{lang.entries}}</div>
-                        </mat-card>
-                    </mat-tab>
-                    <mat-tab label="{{lang.historyBatch}}" *ngIf="accessBatchHistory">
-                        <mat-card *ngIf="!loading" class="card-app-content">
-                            <div class="alert alert-warning" role="alert" [innerHTML]="lang.limitDataReached" *ngIf="limitExceeded"></div>
-                            <div class="row">
-                                <div class="col-md-6 col-xs-6">
-                                    <mat-form-field>
-                                        <input matInput (keyup)="applyFilter($event.target.value, 'batch')" placeholder="{{lang.filterBy}}">
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-md-6 col-xs-6">
-                                    <mat-paginator #batchPaginator [length]="100" [hidePageSize]="true"  [pageSize]="10">
-                                    </mat-paginator>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6" style="padding-top:10px;">
-                                    <mat-form-field>
-                                        <input matInput [(ngModel)]="batchStartDate" [max]="batchEndDate" [matDatepicker]="pickerStart" placeholder="{{lang.since}}"
-                                            (dateChange)="refreshHistory('batch')" (focus)="pickerStart.open()">
-                                        <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
-                                        <mat-datepicker #pickerStart touchUi="true" [startAt]="batchStartDate"></mat-datepicker>
-                                    </mat-form-field>
-                                </div>
-                                <div class="col-sm-6" style="padding-top:10px;">
-                                    <mat-form-field>
-                                        <input matInput [(ngModel)]="batchEndDate" [min]="batchStartDate" [matDatepicker]="pickerEnd" placeholder="{{lang.until}}"
-                                            (dateChange)="refreshHistory('batch')" (focus)="pickerEnd.open()">
-                                        <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
-                                        <mat-datepicker #pickerEnd touchUi="true" [startAt]="batchEndDate"></mat-datepicker>
-                                    </mat-form-field>
-                                </div>
-                            </div>
-                            <mat-table #table [dataSource]="batchDataSource" #batchSort="matSort" matSort matSortActive="event_date" matSortDirection="desc">
-                                <ng-container matColumnDef="event_date">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.date}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element">{{element.event_date | date : "dd/MM/y HH:mm"}}</mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="total_processed">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header [class.hide-for-mobile]="mobileQuery.matches">{{lang.totalProcessed}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" [class.hide-for-mobile]="mobileQuery.matches"> {{element.total_processed}} </mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="total_errors">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header [class.hide-for-mobile]="mobileQuery.matches">{{lang.totalErrors}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" [class.hide-for-mobile]="mobileQuery.matches"> {{element.total_errors}} </mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="info">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.description}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element"> {{element.info}} </mat-cell>
-                                </ng-container>
-                                <ng-container matColumnDef="module_name">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header [class.hide-for-mobile]="mobileQuery.matches">{{lang.module}}</mat-header-cell>
-                                    <mat-cell *matCellDef="let element" [class.hide-for-mobile]="mobileQuery.matches"> {{element.module_name}} </mat-cell>
-                                </ng-container>
-                                <mat-header-row *matHeaderRowDef="batchDisplayedColumns"></mat-header-row>
-                                <mat-row *matRowDef="let row; columns: batchDisplayedColumns;"></mat-row>
-                            </mat-table>
-                        </mat-card>
-                    </mat-tab>
-                </mat-tab-group>
-            </mat-card>
-        </mat-sidenav-content>
-        <mat-sidenav #snav2 [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56"
-            position='end' [opened]="mobileQuery.matches ? false : false">
-            <mat-nav-list>
-                <h3 mat-subheader>Actions</h3>
-            </mat-nav-list>
-        </mat-sidenav>
-    </mat-sidenav-container>
-</div>
+            <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
+                <div style="display: grid;grid-template-columns: repeat(2, 1fr);grid-gap: 10px;width: 100%;">
+                    <mat-form-field (click)="startPicker.open()" style="cursor:pointer;" class="dateFilter">
+                        <mat-label style="color:white;">{{lang.since}}
+                        </mat-label>
+                        <input [(ngModel)]="appHistoryList.startDateFilter" matInput [matDatepicker]="startPicker"
+                            [placeholder]="lang.since" [max]="appHistoryList.endDateFilter" readonly style="cursor:pointer;"
+                            (dateChange)="appHistoryList.filterStartDate()">
+                        <mat-datepicker-toggle matSuffix [for]="startPicker" *ngIf="!appHistoryList.startDateFilter">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker [touchUi]="appService.getViewMode()" #startPicker>
+                        </mat-datepicker>
+                        <button mat-button color="warn" matSuffix mat-icon-button *ngIf="appHistoryList.startDateFilter"
+                            (click)="$event.stopPropagation();appHistoryList.startDateFilter = '';appHistoryList.filterStartDate()" [title]="lang.eraseValue">
+                            <mat-icon color="warn" class="fa fa-calendar-times">
+                            </mat-icon>
+                        </button>
+                    </mat-form-field>
+                    <mat-form-field (click)="endPicker.open()" style="cursor:pointer;" class="dateFilter">
+                        <mat-label style="color:white;">{{lang.until}}
+                        </mat-label>
+                        <input [(ngModel)]="appHistoryList.endDateFilter" matInput [matDatepicker]="endPicker"
+                            [placeholder]="lang.until" [min]="appHistoryList.startDateFilter" readonly style="cursor:pointer;"
+                            (dateChange)="appHistoryList.filterEndDate()">
+                        <mat-datepicker-toggle matSuffix [for]="endPicker" *ngIf="!appHistoryList.endDateFilter">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker [touchUi]="appService.getViewMode()" #endPicker>
+                        </mat-datepicker>
+                        <button mat-button color="warn" matSuffix mat-icon-button *ngIf="appHistoryList.endDateFilter"
+                            (click)="$event.stopPropagation();appHistoryList.endDateFilter = '';appHistoryList.filterEndDate()" [title]="lang.eraseValue">
+                            <mat-icon color="warn" class="fa fa-calendar-times">
+                            </mat-icon>
+                        </button>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="container" [class.fullContainer]="appService.getViewMode()">
+            <div class="container-content">
+                <app-history-list #appHistoryList></app-history-list>
+            </div>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

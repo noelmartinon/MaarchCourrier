@@ -122,41 +122,45 @@ abstract class ServiceModelAbstract
 
         if ($xmlfile) {
             $hasHistory = false;
+            $hasHistoryBatch = false;
             foreach ($xmlfile->SERVICE as $value) {
                 if ((string) $value->servicetype == $aArgs['type'] && (string) $value->enabled === 'true' && ((string) $value->system_service == 'true' || in_array((string) $value->id, $aArgs['userServices']))) {
-                    if ((string)$value->id == 'view_history' || (string)$value->id == 'view_history_batch') {
+                    if ((string)$value->id == 'view_history') {
                         $hasHistory = true;
+                    }
+                    if ((string)$value->id == 'view_history_batch') {
+                        $hasHistoryBatch = true;
                     }
                 }
             }
             foreach ($xmlfile->SERVICE as $value) {
-                $historyByPass = (string)$value->id == 'view_history' && $hasHistory;
-                if ($historyByPass || ((string) $value->servicetype == $aArgs['type'] && (string) $value->enabled === 'true' && ((string) $value->system_service == 'true' || in_array((string) $value->id, $aArgs['userServices'])))) {
-                    if ((string)$value->id != 'view_history_batch') {
-                        $category = (string)$value->category;
-                        $name = defined((string) $value->name) ? constant((string) $value->name) : (string) $value->name;
-                        $comment = defined((string) $value->comment) ? constant((string) $value->comment) : (string) $value->comment;
-                        if (empty($category)) {
-                            $applicationServices[] = [
-                                'id'            => (string)$value->id,
-                                'name'          => $name,
-                                'comment'       => $comment,
-                                'servicepage'   => (string)$value->servicepage,
-                                'shortcut'      => empty((string)$value->shortcut) ? 'false' : (string)$value->shortcut,
-                                'style'         => (string)$value->style,
-                                'angular'       => empty((string)$value->angular) ? 'false' : (string)$value->angular,
-                            ];
-                        } else {
-                            $applicationServices[$category][] = [
-                                'id'            => (string)$value->id,
-                                'name'          => $name,
-                                'comment'       => $comment,
-                                'servicepage'   => (string)$value->servicepage,
-                                'shortcut'      => empty((string)$value->shortcut) ? 'false' : (string)$value->shortcut,
-                                'style'         => (string)$value->style,
-                                'angular'       => empty((string)$value->angular) ? 'false' : (string)$value->angular,
-                            ];
-                        }
+                if (((string) $value->servicetype == $aArgs['type'] && (string) $value->enabled === 'true' && ((string) $value->system_service == 'true' || in_array((string) $value->id, $aArgs['userServices'])))) {
+                    if ($hasHistory && $hasHistoryBatch && (string)$value->id == 'view_history_batch') {
+                        continue;
+                    }
+                    $category = (string)$value->category;
+                    $name = defined((string) $value->name) ? constant((string) $value->name) : (string) $value->name;
+                    $comment = defined((string) $value->comment) ? constant((string) $value->comment) : (string) $value->comment;
+                    if (empty($category)) {
+                        $applicationServices[] = [
+                            'id'            => (string)$value->id,
+                            'name'          => $name,
+                            'comment'       => $comment,
+                            'servicepage'   => (string)$value->servicepage,
+                            'shortcut'      => empty((string)$value->shortcut) ? 'false' : (string)$value->shortcut,
+                            'style'         => (string)$value->style,
+                            'angular'       => empty((string)$value->angular) ? 'false' : (string)$value->angular,
+                        ];
+                    } else {
+                        $applicationServices[$category][] = [
+                            'id'            => (string)$value->id,
+                            'name'          => $name,
+                            'comment'       => $comment,
+                            'servicepage'   => (string)$value->servicepage,
+                            'shortcut'      => empty((string)$value->shortcut) ? 'false' : (string)$value->shortcut,
+                            'style'         => (string)$value->style,
+                            'angular'       => empty((string)$value->angular) ? 'false' : (string)$value->angular,
+                        ];
                     }
                 }
             }

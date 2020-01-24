@@ -111,6 +111,7 @@ class HistoryController
         }
 
         $order = !in_array($queryParams['order'], ['asc', 'desc']) ? '' : $queryParams['order'];
+        $queryParams['orderBy'] = (!empty($queryParams['orderBy']) && $queryParams['orderBy'] == 'userLabel') ? 'user_id' : null;
         $orderBy = !in_array($queryParams['orderBy'], ['event_date', 'user_id', 'info']) ? ['event_date DESC'] : ["{$queryParams['orderBy']} {$order}"];
 
         $history = HistoryModel::get([
@@ -242,6 +243,7 @@ class HistoryController
 
         $users = [];
         foreach ($usersInHistory as $value) {
+            $user = null;
             if (!empty($value['user_id'])) {
                 $user = UserModel::getByLogin(['login' => $value['user_id'], 'select' => ['id', 'firstname', 'lastname']]);
             }
@@ -250,5 +252,13 @@ class HistoryController
         }
 
         return $response->withJson(['actions' => $actions, 'systemActions' => $systemActions, 'users' => $users]);
+    }
+
+    public function getPrivileges(Request $request, Response $response)
+    {
+        $history = ServiceModel::hasService(['id' => 'view_history', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin']);
+        $historyBatch = ServiceModel::hasService(['id' => 'view_history_batch', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin']);
+
+        return $response->withJson(['history' => $history, 'historyBatch' => $historyBatch]);
     }
 }

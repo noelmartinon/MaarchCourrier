@@ -1050,5 +1050,18 @@ export const LANG_NL = {
     "listConfiguration": "Manage list display", //_TO_TRANSLATE
     "noticeGroupeOrder": "Drag and drop group to set order", //_TO_TRANSLATE
     "viewResource" : "View document", //_TO_TRANSLATE,
-    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE,
+    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE
+    "ADD": "Add", //_TO_TRANSLATE
+    "UP": "Update", //_TO_TRANSLATE
+    "DEL": "Delete", //_TO_TRANSLATE
+    "LOGIN": "Login", //_TO_TRANSLATE
+    "LOGOUT": "Logout", //_TO_TRANSLATE
+    "VIEW": "View", //_TO_TRANSLATE
+    "ERROR": "Error", //_TO_TRANSLATE
+    "systemActions": "System action(s)", //_TO_TRANSLATE
+    "viewAllHistory": "View all history", //_TO_TRANSLATE
+    "viewActionsHistory": "View only actions in history", //_TO_TRANSLATE
+    "dateAgo"   : "Since", //_TO_TRANSLATE
+    "dateTo"   : "The", //_TO_TRANSLATE
+    "information" : "Information", //_TO_TRANSLATE
 };

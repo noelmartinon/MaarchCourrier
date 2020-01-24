@@ -24,6 +24,7 @@ import { ReportsAdministrationComponent }               from './report/reports-a
 import { NotificationsAdministrationComponent }         from './notification/notifications-administration.component';
 import { NotificationAdministrationComponent }          from './notification/notification-administration.component';
 import { HistoryAdministrationComponent }               from './history/history-administration.component';
+import { HistoryBatchAdministrationComponent }          from './history/batch/history-batch-administration.component';
 import { UpdateStatusAdministrationComponent }          from './updateStatus/update-status-administration.component';
 import { ContactsGroupsAdministrationComponent }        from './contact/contacts-groups-administration.component';
 import { ContactsGroupAdministrationComponent }         from './contact/contacts-group-administration.component';
@@ -74,6 +75,7 @@ import { AppGuard } from '../../service/app.guard';
             { path: 'administration/notifications/new', canActivate: [AppGuard], component: NotificationAdministrationComponent },
             { path: 'administration/notifications/:identifier', canActivate: [AppGuard], component: NotificationAdministrationComponent },
             { path: 'administration/history', canActivate: [AppGuard], component: HistoryAdministrationComponent },
+            { path: 'administration/history-batch', canActivate: [AppGuard], component: HistoryBatchAdministrationComponent },
             { path: 'administration/update-status', canActivate: [AppGuard], component: UpdateStatusAdministrationComponent },
             { path: 'administration/contacts-groups', canActivate: [AppGuard], component: ContactsGroupsAdministrationComponent },
             { path: 'administration/contacts-groups/new', canActivate: [AppGuard], component: ContactsGroupAdministrationComponent },
