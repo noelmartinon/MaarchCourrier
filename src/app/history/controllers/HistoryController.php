@@ -242,7 +242,9 @@ class HistoryController
 
         $users = [];
         foreach ($usersInHistory as $value) {
-            $user = UserModel::getByLogin(['login' => $value['user_id'], 'select' => ['id', 'firstname', 'lastname']]);
+            if (!empty($value['user_id'])) {
+                $user = UserModel::getByLogin(['login' => $value['user_id'], 'select' => ['id', 'firstname', 'lastname']]);
+            }
 
             $users[] = ['id' => $user['id'] ?? null, 'login' => $value['user_id'], 'label' => !empty($user['id']) ? "{$user['firstname']} {$user['lastname']}" : null];
         }
