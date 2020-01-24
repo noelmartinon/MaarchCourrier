@@ -182,7 +182,7 @@ $app->put('/groups/{id}/reassign/{newGroupId}', \Group\controllers\GroupControll
 //Histories
 $app->get('/history', \History\controllers\HistoryController::class . ':get');
 $app->get('/history/availableFilters', \History\controllers\HistoryController::class . ':getAvailableFilters');
-$app->get('/histories', \History\controllers\HistoryController::class . ':get');
+$app->get('/history/privileges', \History\controllers\HistoryController::class . ':getPrivileges');
 $app->get('/histories/users/{userSerialId}', \History\controllers\HistoryController::class . ':getByUserId');
 
 //BatchHistory

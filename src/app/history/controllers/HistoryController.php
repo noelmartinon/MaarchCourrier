@@ -251,4 +251,12 @@ class HistoryController
 
         return $response->withJson(['actions' => $actions, 'systemActions' => $systemActions, 'users' => $users]);
     }
+
+    public function getPrivileges(Request $request, Response $response)
+    {
+        $history = ServiceModel::hasService(['id' => 'view_history', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin']);
+        $historyBatch = ServiceModel::hasService(['id' => 'view_history_batch', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'admin']);
+
+        return $response->withJson(['history' => $history, 'historyBatch' => $historyBatch]);
+    }
 }
