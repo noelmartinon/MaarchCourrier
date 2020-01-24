@@ -58,4 +58,21 @@ export class NotificationService {
             }
         }
     }
+
+    handleSoftErrors(err: any) {
+        console.log(err);
+        if (err.error !== undefined) {
+            if (err.error.errors !== undefined) {
+                this.error(err.error.errors);
+            } else if (err.error.exception !== undefined) {
+                this.error(err.error.exception[0].message);
+            } else if (err.error.error !== undefined) {
+                this.error(err.error.error.message);
+            } else {
+                this.error(`${err.status} : ${err.statusText}`);
+            }
+        } else {
+            this.error(err);
+        }
+    }
 }

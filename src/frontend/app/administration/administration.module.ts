@@ -30,6 +30,7 @@ import { PrioritiesAdministrationComponent }            from './priority/priorit
 import { PriorityAdministrationComponent }              from './priority/priority-administration.component';
 import { ReportsAdministrationComponent }               from './report/reports-administration.component';
 import { HistoryAdministrationComponent }               from './history/history-administration.component';
+import { HistoryBatchAdministrationComponent }               from './history/batch/history-batch-administration.component';
 import { UpdateStatusAdministrationComponent }          from './updateStatus/update-status-administration.component';
 import { NotificationsAdministrationComponent }         from './notification/notifications-administration.component';
 import { NotificationAdministrationComponent }          from './notification/notification-administration.component';
@@ -77,6 +78,7 @@ import { ShippingAdministrationComponent }              from './shipping/shippin
         PriorityAdministrationComponent,
         ReportsAdministrationComponent,
         HistoryAdministrationComponent,
+        HistoryBatchAdministrationComponent,
         UpdateStatusAdministrationComponent,
         ContactsGroupsAdministrationComponent,
         ContactsGroupAdministrationComponent,

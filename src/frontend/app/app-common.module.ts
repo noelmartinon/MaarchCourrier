@@ -11,6 +11,7 @@ import { RouterModule }                         from '@angular/router';
 import { DragDropModule }                         from '@angular/cdk/drag-drop';
 
 /*PLUGINS IMPORTS*/
+import { FunctionsService }                                                 from '../service/functions.service';
 import { SortPipe }                             from '../plugins/sorting.pipe';
 import { PdfViewerModule }                      from 'ng2-pdf-viewer';
 //import { SimplePdfViewerModule }                from 'simple-pdf-viewer';
@@ -20,6 +21,7 @@ import { CookieService }                        from 'ngx-cookie-service';
 import { TimeAgoPipe }                          from '../plugins/timeAgo.pipe';
 import { TimeLimitPipe }                        from '../plugins/timeLimit.pipe';
 import { FilterListPipe }                       from '../plugins/filterList.pipe';
+import { FullDatePipe }                       from '../plugins/fullDate.pipe';
 
 /*FRONT IMPORTS*/
 import { AppMaterialModule }                    from './app-material.module';
@@ -42,6 +44,7 @@ import { SearchHomeComponent }                        from './search/search-home
 /*SEARCH*/
 import { BasketHomeComponent }                        from './basket/basket-home.component';
 
+import { HistoryComponent }                        from './history/history.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any> {
@@ -55,6 +58,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
+        ReactiveFormsModule,
         HttpClientModule,
         RouterModule,
         PdfViewerModule,
@@ -76,10 +80,12 @@ export class MyHammerConfig extends HammerGestureConfig {
         TimeAgoPipe,
         TimeLimitPipe,
         FilterListPipe,
+        FullDatePipe,
         IndexingGroupModalComponent,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialTrigger,
         SmdFabSpeedDialActions,
+        HistoryComponent,
     ],
     exports: [
         CommonModule,
@@ -103,16 +109,19 @@ export class MyHammerConfig extends HammerGestureConfig {
         TimeAgoPipe,
         TimeLimitPipe,
         FilterListPipe,
+        FullDatePipe,
         PdfViewerModule,
         NgStringPipesModule,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialTrigger,
         SmdFabSpeedDialActions,
-        DragDropModule
+        DragDropModule,
+        HistoryComponent,
     ],
     providers: [
         LatinisePipe,
         CookieService,
+        FunctionsService,
         {
             provide: HAMMER_GESTURE_CONFIG,
             useClass: MyHammerConfig
