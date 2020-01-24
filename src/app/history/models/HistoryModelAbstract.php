@@ -19,19 +19,20 @@ use SrcCore\models\DatabaseModel;
 
 abstract class HistoryModelAbstract
 {
-    public static function get(array $aArgs)
+    public static function get(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['select']);
-        ValidatorModel::arrayType($aArgs, ['select', 'where', 'data', 'orderBy']);
-        ValidatorModel::intVal($aArgs, ['limit']);
+        ValidatorModel::notEmpty($args, ['select']);
+        ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy']);
+        ValidatorModel::intVal($args, ['offset', 'limit']);
 
         $aHistories = DatabaseModel::select([
-            'select'    => $aArgs['select'],
+            'select'    => $args['select'],
             'table'     => ['history'],
-            'where'     => empty($aArgs['where']) ? [] : $aArgs['where'],
-            'data'      => empty($aArgs['data']) ? [] : $aArgs['data'],
-            'order_by'  => empty($aArgs['orderBy']) ? [] : $aArgs['orderBy'],
-            'limit'     => empty($aArgs['limit']) ? 0 : $aArgs['limit']
+            'where'     => $args['where'] ?? [],
+            'data'      => $args['data'] ?? [],
+            'order_by'  => $args['orderBy'] ?? [],
+            'offset'    => $args['offset'] ?? 0,
+            'limit'     => $args['limit'] ?? 0
         ]);
 
         return $aHistories;
@@ -75,22 +76,5 @@ abstract class HistoryModelAbstract
         ]);
 
         return $aHistories;
-    }
-
-    public static function getFilter(array $aArgs = [])
-    {
-        ValidatorModel::notEmpty($aArgs, ['select','event_date']);
-        ValidatorModel::stringType($aArgs, ['select']);
-
-        $aReturn = DatabaseModel::select(
-            [
-            'select'   => ['DISTINCT('.$aArgs['select'].')'],
-            'table'    => ['history'],
-            'where'    => ["event_date >= date '".$aArgs['event_date']."'","event_date < date '".$aArgs['event_date']."' + interval '1 month'"],
-            'order_by' => [$aArgs['select'].' ASC']
-            ]
-        );
-
-        return $aReturn;
     }
 }

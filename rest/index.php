@@ -103,9 +103,6 @@ $app->get('/baskets/{id}/groups/data', \Basket\controllers\BasketController::cla
 $app->get('/sortedBaskets', \Basket\controllers\BasketController::class . ':getSorted');
 $app->put('/sortedBaskets/{id}', \Basket\controllers\BasketController::class . ':updateSort');
 
-//BatchHistories
-$app->get('/batchHistories', \History\controllers\BatchHistoryController::class . ':get');
-
 //Configurations
 $app->get('/configurations/{service}', \Configuration\controllers\ConfigurationController::class . ':getByService');
 $app->put('/configurations/{service}', \Configuration\controllers\ConfigurationController::class . ':update');
@@ -183,8 +180,14 @@ $app->put('/groups/{id}/services/{serviceId}', \Group\controllers\GroupControlle
 $app->put('/groups/{id}/reassign/{newGroupId}', \Group\controllers\GroupController::class . ':reassignUsers');
 
 //Histories
+$app->get('/history', \History\controllers\HistoryController::class . ':get');
+$app->get('/history/availableFilters', \History\controllers\HistoryController::class . ':getAvailableFilters');
 $app->get('/histories', \History\controllers\HistoryController::class . ':get');
 $app->get('/histories/users/{userSerialId}', \History\controllers\HistoryController::class . ':getByUserId');
+
+//BatchHistory
+$app->get('/batchHistory', \History\controllers\BatchHistoryController::class . ':get');
+$app->get('/batchHistory/availableFilters', \History\controllers\BatchHistoryController::class . ':getAvailableFilters');
 
 //Header
 $app->get('/header', \SrcCore\controllers\CoreController::class . ':getHeader');
