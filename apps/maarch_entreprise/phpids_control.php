@@ -66,7 +66,8 @@ if ($processIDS) {
                 'admin',
                 false,
                 'ok',
-                'ERROR'
+                'ERROR',
+                'tech'
             );
             if ($_SESSION['config']['debug'] == 'true') {
                 echo $result;
