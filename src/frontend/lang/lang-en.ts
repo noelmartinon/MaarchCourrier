@@ -592,6 +592,7 @@ export const LANG_EN = {
     "noAction"                              : "No action",
     "noAttachment"                          : "No attachment",
     "noAttachmentClickToAddOne"             : "No attachments available<br/><sub>Click on <i class=\"fa fa-paperclip fa-lg\" ></i><i class=\"fa fa-plus\"></i> to add one.</sub>",
+    "noAttachmentContact"                   : "No contact (external) linked to this attachment",
     "noAttachmentConversion"                : "No PDF conversion for this attachment",
     "noAttachmentInSignatoryBook"           : "No attachment in signature book",
     "noAttachmentToSend"                    : "No attachment to send",
