@@ -1024,4 +1024,5 @@ export const LANG_EN = {
     "contact_third"   : "Contact third",
     "viewResource" : "View document",
     "externalVisaWorkflow" : "Visa workflow Maarch Parapheur",
+    "infoMailevaAccount": "Indicate here your username and the INITIAL password communicated by Maileva when opening your account",
 };
