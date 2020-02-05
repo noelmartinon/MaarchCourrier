@@ -161,13 +161,15 @@ if (isset($_REQUEST['load'])) {
 
         $arrayPDO = [$id];
 
+        $nbLines = !empty($_REQUEST['lines']) ? $_REQUEST['lines'] : 'default';
+
         $tab = $request->PDOselect(
         $select,
         $where,
         $arrayPDO,
         $orderstr,
         $_SESSION['config']['databasetype'],
-        'default',
+        $nbLines,
         false,
         '',
         '',
