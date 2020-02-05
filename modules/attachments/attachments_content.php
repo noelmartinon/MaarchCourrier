@@ -124,12 +124,12 @@ if (isset($_POST['add']) && $_POST['add']) {
                         );
                         if ($newSize == 0) {
                             $error = _DOCSERVER_ERROR.' : '._NOT_ENOUGH_DISK_SPACE.'. '._MORE_INFOS; ?>
-                            <script type="text/javascript">
-                                var eleframe1 =  window.parent.top.document.getElementById('list_attach');
-                                eleframe1.location.href = '<?php
+<script type="text/javascript">
+    var eleframe1 = window.parent.top.document.getElementById('list_attach');
+    eleframe1.location.href = '<?php
                             echo $_SESSION['config']['businessappurl']; ?>index.php?display=true&module=attachments&page=frame_list_attachments&attach_type_exclude=converted_pdf,print_folder&mode=normal&load';
-                            </script>
-                            <?php
+</script>
+<?php
                             exit();
                         } else {
                             //GET FILE INFOS
@@ -428,7 +428,6 @@ if (isset($_POST['add']) && $_POST['add']) {
                                             );
                                         }
                                     }
-
                                 } else {
                                     //SAVE META DATAS IN DB
                                     $id = $resAttach->load_into_db(
@@ -537,7 +536,7 @@ if (isset($_POST['add']) && $_POST['add']) {
                                         'fingerprint'      => $storeResult['fingerPrint'],
                                     ]);
 
-                                    unset($_SESSION['upfile'][$attachNum]['fileNamePdfOnTmp']);
+                                    unset($_SESSION['upfile'][0]['fileNamePdfOnTmp']);
                                 }
 
                                 if ($id == false) {
@@ -605,8 +604,22 @@ if (isset($_POST['add']) && $_POST['add']) {
                         }
                         if (isset($_REQUEST['fromDetail']) && $_REQUEST['fromDetail'] == 'create') {
                             //Redirection vers bannette MyBasket s'il s'agit d'un courrier spontané et que l'utilisateur connecté est le destinataire du courrier
-                            if (isset($_SESSION['upfile'][$attachNum]['outgoingMail']) && $_SESSION['upfile'][$attachNum]['outgoingMail'] && $_SESSION['user']['UserId'] == $_SESSION['details']['diff_list']['dest']['users'][0]['user_id']) {
-                                $js .= "window.parent.top.location.href = 'index.php?page=view_baskets&module=basket&baskets=MyBasket&resid=".$_SESSION['doc_id']."&directLinkToAction';";
+                            if (isset($_SESSION['upfile'][0]['outgoingMail']) && $_SESSION['upfile'][0]['outgoingMail'] && $_SESSION['user']['UserId'] == $_SESSION['details']['diff_list']['dest']['users'][0]['user_id']) {
+                                $currentUser = \User\models\UserModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['id']]);
+                                $baskets = \Basket\models\BasketModel::getBasketsByLogin(['login' => $_SESSION['user']['UserId'], 'unneededBasketId' => ['IndexingBasket']]);
+                                foreach ($baskets as $basket) {
+                                    if ($basket['basket_id'] == 'MyBasket') {
+                                        $groupSerId  = $basket['groupSerialId'];
+                                        $basketSerId = $basket['basketSerialId'];
+                                        break;
+                                    }
+                                }
+                                if (!empty($groupSerId) && !empty($basketSerId)) {
+                                    $js .= "triggerAngular('#/basketList/users/".$currentUser['id']."/groups/".$groupSerId."/baskets/".$basketSerId."?resId=".$_SESSION['doc_id']."')";
+                                } else {
+                                    $js .= 'var eleframe1 =  window.parent.top.document.getElementById(\'list_attach\');';
+                                    $js .= 'eleframe1.src = \''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&attach_type_exclude=converted_pdf,print_folder&load\';';
+                                }
                             } else {
                                 if ($attachment_types == 'response_project' || $attachment_types == 'outgoing_mail' || $attachment_types == 'signed_response' || $attachment_types == 'aihp') {
                                     $js .= '$j(\'#responses_tab\').click();loadSpecificTab(\'uniqueDetailsIframe\',\''.$_SESSION['config']['businessappurl'].'index.php?display=true&module=attachments&page=frame_list_attachments&view_only=true&load&fromDetail=response&attach_type=response_project,outgoing_mail_signed,signed_response,outgoing_mail,aihp\');';

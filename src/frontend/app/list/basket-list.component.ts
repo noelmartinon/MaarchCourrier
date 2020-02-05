@@ -7,7 +7,7 @@ import { NotificationService } from '../notification.service';
 import { MatDialog, MatSidenav, MatPaginator, MatSort, MatBottomSheet } from '@angular/material';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { startWith, switchMap, map, catchError, takeUntil } from 'rxjs/operators';
+import { startWith, switchMap, map, catchError, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../service/header.service';
 import { FiltersListService } from '../../service/filtersList.service';
@@ -99,6 +99,7 @@ export class BasketListComponent implements OnInit {
 
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild('tableBasketListSort') sort: MatSort;
+    defaultResId: any;
 
     constructor(changeDetectorRef: ChangeDetectorRef, private router: Router, private route: ActivatedRoute, media: MediaMatcher, public http: HttpClient, public dialog: MatDialog, private sanitizer: DomSanitizer, private bottomSheet: MatBottomSheet, private headerService: HeaderService, public filtersListService: FiltersListService, private notify: NotificationService, public overlay: Overlay, public viewContainerRef: ViewContainerRef) {
         this.mobileMode = angularGlobals.mobileMode;
@@ -120,6 +121,10 @@ export class BasketListComponent implements OnInit {
 
         this.isLoadingResults = false;
 
+        this.route.queryParams.subscribe(params => {
+            this.defaultResId = params['resId'];
+        });
+
         this.route.params.subscribe(params => {
             this.destroy$.next(true);
 
@@ -138,7 +143,7 @@ export class BasketListComponent implements OnInit {
 
             this.listProperties = this.filtersListService.initListsProperties(this.currentBasketInfo.ownerId, this.currentBasketInfo.groupId, this.currentBasketInfo.basketId);
 
-            this.initResultList();
+            this.initResultList(this.defaultResId);
 
         },
             (err: any) => {
@@ -150,7 +155,7 @@ export class BasketListComponent implements OnInit {
         this.destroy$.next(true);
     }
 
-    initResultList() {
+    initResultList(resId: number) {
         this.resultListDatabase = new ResultListHttpDao(this.http, this.filtersListService);
         // If the user changes the sort order, reset back to the first page.
         this.paginator.pageIndex = this.listProperties.page;
@@ -177,6 +182,16 @@ export class BasketListComponent implements OnInit {
                     this.defaultAction = data.defaultAction;
                     this.headerService.setHeader(data.basketLabel);
                     return data.resources;
+                }),
+                tap((dataResources) => {
+                    if (resId) {
+                        dataResources.map((data:any) => {
+                            if (data.res_id == resId) {
+                                this.data = dataResources;
+                                this.launch(this.defaultAction, data);
+                            }
+                        });
+                    }
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
