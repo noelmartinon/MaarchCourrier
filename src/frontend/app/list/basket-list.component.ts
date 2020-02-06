@@ -263,7 +263,8 @@ export class BasketListComponent implements OnInit {
     }
 
     viewThumbnail(row: any) {
-        this.thumbnailUrl = this.coreUrl + 'rest/res/' + row.res_id + '/thumbnail';
+        let timeStamp = +new Date();
+        this.thumbnailUrl = this.coreUrl + 'rest/res/' + row.res_id + '/thumbnail?tsp=' + timeStamp;
         $j('#viewThumbnail').show();
         $j('#listContent').css({ "overflow": "hidden" });
     }
