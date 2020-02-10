@@ -232,7 +232,7 @@ if (isset($_REQUEST['load'])) {
             .'index.php?display=true&module=fileplan&page='
             .'fileplan_list_autocompletion';   												//Script pour l'autocompletion
         $paramsTab['searchBoxAutoCompletionMinChars'] = 2;                                  //Nombre minimum de caractere pour activer l'autocompletion (1 par defaut)
-        $paramsTab['linesToShow'] = count($tab);                                            //Nombre de lignes a afficher (parametre de config.xml par defaut)
+        $paramsTab['linesToShow'] = count($tab) == 0 ? 1 : count($tab);                     //Nombre de lignes a afficher (parametre de config.xml par defaut)
         $paramsTab['bool_showAddButton'] = true;                                            //Affichage du bouton Nouveau
         $paramsTab['addButtonLabel'] = _ADD_FILEPLAN;                                       //Libellé du bouton Nouveau
         $paramsTab['addButtonScript'] = "showFileplanForm('"
