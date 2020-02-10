@@ -124,7 +124,7 @@ class SignatureBookController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $attachment = AttachmentModel::getById(['id' => $aArgs['resId'], 'isVersion' => ($data['table'] == 'res_attachments'), 'select' => ['res_id_master']]);
+        $attachment = AttachmentModel::getById(['id' => $aArgs['resId'], 'isVersion' => ($data['table'] != 'res_attachments'), 'select' => ['res_id_master']]);
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['userId']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
