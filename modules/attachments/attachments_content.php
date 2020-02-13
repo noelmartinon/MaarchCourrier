@@ -1260,6 +1260,10 @@ if (isset($_POST['add']) && $_POST['add']) {
 
         $db->query("DELETE FROM res_version_attachments WHERE attachment_id_master = ? and status = 'TMP'", array($previous_attachment->attachment_id_master));
 
+        if ($_REQUEST['attachment_types'][0] == 'outgoing_mail') {
+            $db->query("DELETE FROM adr_letterbox WHERE res_id = ? and type = 'TNL'", array($_SESSION['doc_id']));
+        }
+
         //ADD ACTION IN HISTORY
         if ($_SESSION['history']['attachup'] == 'true') {
             $hist = new history();
