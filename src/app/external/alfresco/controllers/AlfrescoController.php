@@ -74,7 +74,7 @@ class AlfrescoController
             }
         }
 
-        return $response->withJson(['folders' => $folders]);
+        return $response->withJson($folders);
     }
 
     public function getChildrenFoldersById(Request $request, Response $response, array $args)
@@ -122,7 +122,7 @@ class AlfrescoController
             }
         }
 
-        return $response->withJson(['folders' => $folders]);
+        return $response->withJson($folders);
     }
 
     public function getFolders(Request $request, Response $response)
@@ -184,7 +184,7 @@ class AlfrescoController
             }
         }
 
-        return $response->withJson(['folders' => $folders]);
+        return $response->withJson($folders);
     }
 
     public function sendResource(Request $request, Response $response, array $args)
@@ -298,6 +298,40 @@ class AlfrescoController
                 return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
             }
 
+            $multipartBody = [
+                'filedata' => ['isFile' => true, 'filename' => $attachment['title'], 'content' => $fileContent],
+            ];
+            $curlResponse = CurlModel::execSimple([
+                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
+                'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
+                'method'        => 'POST',
+                'multipartBody' => $multipartBody
+            ]);
+            if ($curlResponse['code'] != 201) {
+                return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+            }
+
+            $attachmentId = $curlResponse['response']['entry']['id'];
+
+            $body = [
+                'properties' => [
+                    'cm:description'    => $attachment['identifier'],
+                ],
+            ];
+            $curlResponse = CurlModel::execSimple([
+                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentId}",
+                'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
+                'headers'       => ['content-type:application/json', 'Accept: application/json'],
+                'method'        => 'PUT',
+                'body'          => json_encode($body)
+            ]);
+            if ($curlResponse['code'] != 200) {
+                return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+            }
+
+            $externalId = json_decode($attachment['external_id'], true);
+            $externalId['alfrescoId'] = $attachmentId;
+            AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
         }
 
         return $response->withStatus(204);
