@@ -14,6 +14,11 @@
 
 namespace Alfresco\controllers;
 
+use Attachment\models\AttachmentModel;
+use Convert\controllers\ConvertPdfController;
+use Docserver\models\DocserverModel;
+use Resource\controllers\ResController;
+use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -24,49 +29,6 @@ use User\models\UserModel;
 
 class AlfrescoController
 {
-    public function get(Request $request, Response $response)
-    {
-        $enabledSignatureBook = null;
-
-
-        $id = 'a66121dd-57eb-48de-990a-e770341cdbb7';
-//        $id = 'bded6ba4-a085-4649-aef1-73fe5dca7819';
-        $id = '8944c9fb-2cee-41d0-89e0-5de36456ed3a';
-
-
-        $body = [
-            'name' => 'my file pdf',
-            'nodeType'  => 'cm:content'
-        ];
-        $multipartBody = [
-            'filedata' => ['isFile' => true, 'filename' => 'mon test4', 'content' => file_get_contents('install/samples/res_letterbox/empty.pdf')],
-        ];
-        $curlResponse = CurlModel::execSimple([
-            'url'           => "https://bluecourrier-alfresco-demo.atolcd.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/{$id}/children",
-            'basicAuth'     => [],
-            'method'        => 'POST',
-            'multipartBody' => $multipartBody
-        ]);
-
-        $createdId = $curlResponse['response']['entry']['id'];
-
-        $body = [
-            'properties' => [
-                'cm:title' => 'un titre',
-                'cm:description' => 'une description',
-            ],
-        ];
-        $curlResponse = CurlModel::execSimple([
-            'url'           => "https://bluecourrier-alfresco-demo.atolcd.com/alfresco/api/-default-/public/alfresco/versions/1/nodes/{$createdId}",
-            'basicAuth'     => [],
-            'headers'       => ['content-type:application/json', 'Accept: application/json'],
-            'method'        => 'PUT',
-            'body'          => json_encode($body)
-        ]);
-
-        return $response->withJson(['response' => $curlResponse['response']]);
-    }
-
     public function getRootFolders(Request $request, Response $response)
     {
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
@@ -102,7 +64,13 @@ class AlfrescoController
         $folders = [];
         if (!empty($curlResponse['response']['list']['entries'])) {
             foreach ($curlResponse['response']['list']['entries'] as $value) {
-                $folders[] = ['id' => $value['entry']['id'], 'name' => $value['entry']['name']];
+                $folders[] = [
+                    'id'        => $value['entry']['id'],
+                    'icon'      => 'fa fa-folder',
+                    'text'      => $value['entry']['name'],
+                    'parent'    => '#',
+                    'children'  => true
+                ];
             }
         }
 
@@ -144,7 +112,13 @@ class AlfrescoController
         $folders = [];
         if (!empty($curlResponse['response']['list']['entries'])) {
             foreach ($curlResponse['response']['list']['entries'] as $value) {
-                $folders[] = ['id' => $value['entry']['id'], 'name' => $value['entry']['name']];
+                $folders[] = [
+                    'id'        => $value['entry']['id'],
+                    'icon'      => 'fa fa-folder',
+                    'text'      => $value['entry']['name'],
+                    'parent'    => $args['id'],
+                    'children'  => true
+                ];
             }
         }
 
@@ -156,6 +130,8 @@ class AlfrescoController
         $queryParams = $request->getQueryParams();
         if (!Validator::stringType()->notEmpty()->validate($queryParams['search'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Query params search is empty']);
+        } elseif (strlen($queryParams['search']) < 3) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params search is too short']);
         }
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
@@ -198,10 +174,132 @@ class AlfrescoController
         $folders = [];
         if (!empty($curlResponse['response']['list']['entries'])) {
             foreach ($curlResponse['response']['list']['entries'] as $value) {
-                $folders[] = ['id' => $value['entry']['id'], 'name' => $value['entry']['name']];
+                $folders[] = [
+                    'id'        => $value['entry']['id'],
+                    'icon'      => 'fa fa-folder',
+                    'text'      => $value['entry']['name'],
+                    'parent'    => '#',
+                    'children'  => true
+                ];
             }
         }
 
         return $response->withJson(['folders' => $folders]);
+    }
+
+    public function sendResource(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
+
+        if (empty($loadedXml) || (string)$loadedXml->ENABLED != 'true') {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
+        } elseif (empty((string)$loadedXml->URI)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration URI is empty']);
+        }
+        $alfrescoUri = rtrim((string)$loadedXml->URI, '/');
+
+        $entity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.external_id']]);
+        if (empty($entity)) {
+            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity']);
+        }
+        $entityInformations = json_decode($entity['external_id'], true);
+        if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations']);
+        }
+//        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
+
+        $document = ResModel::getById(['select' => ['filename', 'subject', 'alt_identifier', 'external_id'], 'resId' => $args['resId']]);
+        if (empty($document)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
+        } elseif (empty($document['filename'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
+        }
+
+        $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $args['resId'], 'collId' => 'letterbox_coll']);
+        if (!empty($convertedDocument['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Conversion error : ' . $convertedDocument['errors']]);
+        }
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+
+        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+        if (!is_file($pathToDocument)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        }
+
+        $fileContent = file_get_contents($pathToDocument);
+        if ($fileContent === false) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        }
+
+        $multipartBody = [
+            'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
+        ];
+        $curlResponse = CurlModel::execSimple([
+            'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
+            'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
+            'method'        => 'POST',
+            'multipartBody' => $multipartBody
+        ]);
+        if ($curlResponse['code'] != 201) {
+            return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+        }
+
+        $documentId = $curlResponse['response']['entry']['id'];
+
+        $body = [
+            'properties' => [
+                'cm:description'    => $document['alt_identifier'],
+            ],
+        ];
+        $curlResponse = CurlModel::execSimple([
+            'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$documentId}",
+            'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
+            'headers'       => ['content-type:application/json', 'Accept: application/json'],
+            'method'        => 'PUT',
+            'body'          => json_encode($body)
+        ]);
+        if ($curlResponse['code'] != 200) {
+            return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+        }
+
+        $externalId = json_decode($document['external_id'], true);
+        $externalId['alfrescoId'] = $documentId;
+        ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+
+        $attachments = AttachmentModel::get([
+            'select'    => ['res_id', 'title', 'identifier', 'external_id'],
+            'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
+            'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
+        ]);
+        foreach ($attachments as $attachment) {
+            $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $attachment['res_id'], 'collId' => 'attachments_coll']);
+            if (empty($adrInfo['docserver_id'])) {
+                continue;
+            }
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
+            if (empty($docserver['path_template'])) {
+                return ['error' => 'Docserver does not exist ' . $adrInfo['docserver_id']];
+            }
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
+            if (!is_file($pathToDocument)) {
+                return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+            }
+
+            $fileContent = file_get_contents($pathToDocument);
+            if ($fileContent === false) {
+                return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+            }
+
+        }
+
+        return $response->withStatus(204);
     }
 }
