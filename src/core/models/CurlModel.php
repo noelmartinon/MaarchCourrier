@@ -281,9 +281,13 @@ class CurlModel
         $postData = '';
         foreach ($args['body'] as $key => $value) {
             $postData .= "--{$delimiter}\r\n";
-            $postData .= "Content-Disposition: form-data; name=\"{$key}\"\r\n";
-            $postData .= "\r\n";
-            $postData .= "{$value}\r\n";
+            if (is_array($value) && $value['isFile']) {
+                $postData .= "Content-Disposition: form-data; name=\"{$key}\"; filename=\"{$value['filename']}\"\r\n";
+                $postData .= "\r\n{$value['content']}\r\n";
+            } else {
+                $postData .= "Content-Disposition: form-data; name=\"{$key}\"\r\n";
+                $postData .= "\r\n{$value}\r\n";
+            }
         }
         $postData .= "--{$delimiter}--\r\n";
 
