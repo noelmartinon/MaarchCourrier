@@ -66,6 +66,7 @@ import { SendAvisWorkflowComponent }               from './actions/avis-workflow
 import { SendAvisParallelComponent }               from './actions/avis-parallel-send-action/send-avis-parallel-action.component';
 import { GiveAvisParallelActionComponent }               from './actions/avis-give-parallel-action/give-avis-parallel-action.component';
 import { ValidateAvisParallelComponent }               from './actions/avis-parallel-validate-action/validate-avis-parallel-action.component';
+import { SendAlfrescoActionComponent }               from './actions/send-alfresco-action/send-alfresco-action.component';
 
 import { FiltersListComponent }                 from './list/filters/filters-list.component';
 import { FiltersToolComponent }                 from './list/filters/filters-tool.component';
@@ -175,6 +176,7 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
         SendAvisParallelComponent,
         GiveAvisParallelActionComponent,
         ValidateAvisParallelComponent,
+        SendAlfrescoActionComponent,
         ActionsListComponent,
         PrintSeparatorComponent,
         FolderPinnedComponent,
@@ -244,6 +246,7 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
         redirectInitiatorEntityActionComponent,
         closeMailWithAttachmentsOrNotesActionComponent,
         SendSignatureBookActionComponent,
+        SendAlfrescoActionComponent,
         ViewDocActionComponent,
         FolderUpdateComponent,
         AddPrivateIndexingModelModalComponent,

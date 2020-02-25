@@ -1,0 +1,37 @@
+<h1 mat-dialog-title>{{data.action.label}}</h1>
+<div mat-dialog-content>
+    <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
+        <mat-spinner style="margin:auto;"></mat-spinner>
+    </div>
+    <mat-sidenav-container autosize style="height:100%;">
+        <mat-sidenav-content style="background: white;">
+            <div class="row" style="margin: 0;">
+                <div class="col-md-12">
+                    {{lang.makeActionOn}}
+                    <b *ngIf="data.resIds.length === 0" color="primary"
+                        class="highlight">{{lang.currentIndexingMail}}</b>
+                    <b *ngIf="data.resIds.length == 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
+                    <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
+                        {{lang.elements}}</b> ?
+                </div>
+                <div style="clear: both;">
+                    <mat-form-field class="smallInput" appearance="outline" floatLabel="never">
+                        <mat-icon color="primary" class="fa fa-search" matPrefix></mat-icon>
+                        <input type="text" id="autoCompleteInput" #autoCompleteInput
+                            [placeholder]="'Recherche un dossier'" matInput [formControl]="searchFolder">
+                    </mat-form-field>
+                    <div id="jstreeAlfresco"></div>
+                </div>
+
+                <div class="col-md-12" style="padding-top: 10px;">
+                    <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>
+                </div>
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>
+<div mat-dialog-actions class="actions">
+    <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidAction()"
+        (click)="onSubmit()">{{lang.validate}}</button>
+    <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+</div>
