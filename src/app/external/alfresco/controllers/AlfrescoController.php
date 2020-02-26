@@ -25,6 +25,7 @@ use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
+use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
 class AlfrescoController
@@ -153,9 +154,10 @@ class AlfrescoController
         }
 //        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
 
+        $search = addslashes($queryParams['search']);
         $body = [
             'query' => [
-                'query'     => "select * from cmis:folder where cmis:name like '{$queryParams['search']}%' and IN_TREE('{$entityInformations['alfrescoNodeId']}')",
+                'query'     => "select * from cmis:folder where cmis:name like '%{$search}%' and IN_TREE('{$entityInformations['alfrescoNodeId']}')",
                 'language'  => 'cmis',
             ],
             'fields' => ['id', 'name']
@@ -187,71 +189,70 @@ class AlfrescoController
         return $response->withJson($folders);
     }
 
-    public function sendResource(Request $request, Response $response, array $args)
+    public static function sendResource(array $args)
     {
-        if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
-        }
+        ValidatorModel::notEmpty($args, ['resId', 'folderId', 'userId']);
+        ValidatorModel::intVal($args, ['resId', 'userId']);
+        ValidatorModel::stringType($args, ['folderId']);
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
 
         if (empty($loadedXml) || (string)$loadedXml->ENABLED != 'true') {
-            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
+            return ['errors' => 'Alfresco configuration is not enabled'];
         } elseif (empty((string)$loadedXml->URI)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration URI is empty']);
+            return ['errors' => 'Alfresco configuration URI is empty'];
         }
         $alfrescoUri = rtrim((string)$loadedXml->URI, '/');
 
-        $entity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.external_id']]);
+        $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
         if (empty($entity)) {
-            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity']);
+            return ['errors' => 'User has no primary entity'];
         }
         $entityInformations = json_decode($entity['external_id'], true);
         if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations']);
+            return ['errors' => 'User primary entity has not enough alfresco informations'];
         }
 //        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
 
         $document = ResModel::getById(['select' => ['filename', 'subject', 'alt_identifier', 'external_id'], 'resId' => $args['resId']]);
         if (empty($document)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
+            return ['errors' => 'Document does not exist'];
         } elseif (empty($document['filename'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
+            return ['errors' => 'Document has no file'];
         }
 
         $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $args['resId'], 'collId' => 'letterbox_coll']);
         if (!empty($convertedDocument['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Conversion error : ' . $convertedDocument['errors']]);
+            return ['errors' => 'Conversion error : ' . $convertedDocument['errors']];
         }
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+            return ['errors' => 'Docserver does not exist'];
         }
 
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
         if (!is_file($pathToDocument)) {
-            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+            return ['errors' => 'Document not found on docserver'];
         }
 
         $fileContent = file_get_contents($pathToDocument);
         if ($fileContent === false) {
-            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+            return ['errors' => 'Document not found on docserver'];
         }
 
         $multipartBody = [
             'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
         ];
         $curlResponse = CurlModel::execSimple([
-            'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
+            'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
             'method'        => 'POST',
             'multipartBody' => $multipartBody
         ]);
         if ($curlResponse['code'] != 201) {
-            return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+            return ['errors' => "Send resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
-
         $documentId = $curlResponse['response']['entry']['id'];
 
         $body = [
@@ -267,73 +268,72 @@ class AlfrescoController
             'body'          => json_encode($body)
         ]);
         if ($curlResponse['code'] != 200) {
-            return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+            return ['errors' => "Update resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
 
         $externalId = json_decode($document['external_id'], true);
         $externalId['alfrescoId'] = $documentId;
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
-        $attachments = AttachmentModel::get([
-            'select'    => ['res_id', 'title', 'identifier', 'external_id'],
-            'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
-            'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
-        ]);
-        foreach ($attachments as $attachment) {
-            $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $attachment['res_id'], 'collId' => 'attachments_coll']);
-            if (empty($adrInfo['docserver_id'])) {
-                continue;
-            }
-            $docserver = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
-            if (empty($docserver['path_template'])) {
-                return ['error' => 'Docserver does not exist ' . $adrInfo['docserver_id']];
-            }
-            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
-            if (!is_file($pathToDocument)) {
-                return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
-            }
+//        $attachments = AttachmentModel::get([
+//            'select'    => ['res_id', 'title', 'identifier', 'external_id'],
+//            'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
+//            'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
+//        ]);
+//        foreach ($attachments as $attachment) {
+//            $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $attachment['res_id'], 'collId' => 'attachments_coll']);
+//            if (empty($adrInfo['docserver_id'])) {
+//                continue;
+//            }
+//            $docserver = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
+//            if (empty($docserver['path_template'])) {
+//                continue;
+//            }
+//            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
+//            if (!is_file($pathToDocument)) {
+//                continue;
+//            }
+//            $fileContent = file_get_contents($pathToDocument);
+//            if ($fileContent === false) {
+//                continue;
+//            }
+//
+//            $multipartBody = [
+//                'filedata' => ['isFile' => true, 'filename' => $attachment['title'], 'content' => $fileContent],
+//            ];
+//            $curlResponse = CurlModel::execSimple([
+//                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
+//                'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
+//                'method'        => 'POST',
+//                'multipartBody' => $multipartBody
+//            ]);
+//            if ($curlResponse['code'] != 201) {
+//                return ['errors' => "Send attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
+//            }
+//
+//            $attachmentId = $curlResponse['response']['entry']['id'];
+//
+//            $body = [
+//                'properties' => [
+//                    'cm:description'    => $attachment['identifier'],
+//                ],
+//            ];
+//            $curlResponse = CurlModel::execSimple([
+//                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentId}",
+//                'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
+//                'headers'       => ['content-type:application/json', 'Accept: application/json'],
+//                'method'        => 'PUT',
+//                'body'          => json_encode($body)
+//            ]);
+//            if ($curlResponse['code'] != 200) {
+//                return ['errors' => "Update attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
+//            }
+//
+//            $externalId = json_decode($attachment['external_id'], true);
+//            $externalId['alfrescoId'] = $attachmentId;
+//            AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
+//        }
 
-            $fileContent = file_get_contents($pathToDocument);
-            if ($fileContent === false) {
-                return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
-            }
-
-            $multipartBody = [
-                'filedata' => ['isFile' => true, 'filename' => $attachment['title'], 'content' => $fileContent],
-            ];
-            $curlResponse = CurlModel::execSimple([
-                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
-                'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
-                'method'        => 'POST',
-                'multipartBody' => $multipartBody
-            ]);
-            if ($curlResponse['code'] != 201) {
-                return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
-            }
-
-            $attachmentId = $curlResponse['response']['entry']['id'];
-
-            $body = [
-                'properties' => [
-                    'cm:description'    => $attachment['identifier'],
-                ],
-            ];
-            $curlResponse = CurlModel::execSimple([
-                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentId}",
-                'basicAuth'     => ['user' => $entityInformations['alfrescoLogin'], 'password' => $entityInformations['alfrescoPassword']],
-                'headers'       => ['content-type:application/json', 'Accept: application/json'],
-                'method'        => 'PUT',
-                'body'          => json_encode($body)
-            ]);
-            if ($curlResponse['code'] != 200) {
-                return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
-            }
-
-            $externalId = json_decode($attachment['external_id'], true);
-            $externalId['alfrescoId'] = $attachmentId;
-            AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
-        }
-
-        return $response->withStatus(204);
+        return true;
     }
 }

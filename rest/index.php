@@ -552,6 +552,5 @@ $app->get('/externalConnectionsEnabled', \SrcCore\controllers\CoreController::cl
 $app->get('/alfresco/rootFolders', \Alfresco\controllers\AlfrescoController::class . ':getRootFolders');
 $app->get('/alfresco/folders/{id}/children', \Alfresco\controllers\AlfrescoController::class . ':getChildrenFoldersById');
 $app->get('/alfresco/autocomplete/folders', \Alfresco\controllers\AlfrescoController::class . ':getFolders');
-$app->post('/alfresco/folders/{id}/resources/{resId}', \Alfresco\controllers\AlfrescoController::class . ':sendResource');
 
 $app->run();

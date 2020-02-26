@@ -16,6 +16,7 @@ use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Action\models\ActionModel;
 use Action\models\BasketPersistenceModel;
 use Action\models\ResMarkAsReadModel;
+use Alfresco\controllers\AlfrescoController;
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
 use Entity\controllers\ListInstanceController;
@@ -65,8 +66,9 @@ class ActionMethodController
         'sendToOpinionCircuitAction'             => 'sendToOpinionCircuit',
         'continueOpinionCircuitAction'           => 'continueOpinionCircuit',
         'giveOpinionParallelAction'              => 'giveOpinionParallel',
-        'validateParallelOpinionDiffusionAction' => 'validateParallelOpinionDiffusion',
-        'noConfirmAction'                        => null
+        'validateParallelOpinionDiffusionAction'    => 'validateParallelOpinionDiffusion',
+        'sendAlfrescoAction'                        => 'sendResourceAlfresco',
+        'noConfirmAction'                           => null
     ];
 
     public static function terminateAction(array $aArgs)
@@ -879,6 +881,19 @@ class ActionMethodController
             'where' => ['res_id = ?'],
             'data'  => [$args['resId']]
         ]);
+
+        return true;
+    }
+
+    public static function sendResourceAlfresco(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $sent = AlfrescoController::sendResource(['resId' => $args['resId'], 'folderId' => $args['data']['folderId'], 'userId' => $GLOBALS['id']]);
+        if (!empty($sent['errors'])) {
+            return ['errors' => [$sent['errors']]];
+        }
 
         return true;
     }
