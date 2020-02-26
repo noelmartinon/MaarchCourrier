@@ -14,6 +14,16 @@
                     <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                         {{lang.elements}}</b> ?
                 </div>
+                <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList" role="alert">
+                    <p>
+                        {{lang.canNotMakeAction}} :
+                    </p>
+                    <ul>
+                        <li *ngFor="let ressource of resourcesErrors">
+                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                        </li>
+                    </ul>
+                </div>
                 <div style="clear: both;">
                     <mat-form-field class="smallInput" appearance="outline" floatLabel="never">
                         <mat-icon color="primary" class="fa fa-search" matPrefix></mat-icon>

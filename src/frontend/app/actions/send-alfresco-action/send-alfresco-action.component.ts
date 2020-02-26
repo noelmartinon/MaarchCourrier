@@ -7,6 +7,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { map, tap, finalize, catchError, debounceTime, filter, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormControl } from '@angular/forms';
+import { FunctionsService } from '../../../service/functions.service';
 
 declare function $j(selector: any): any;
 
@@ -27,18 +28,22 @@ export class SendAlfrescoActionComponent implements OnInit {
 
     selectedFolder: number = null;
 
+    resourcesErrors: any[] = [];
+    noResourceToProcess: boolean = null;
+
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendAlfrescoActionComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any
+        @Inject(MAT_DIALOG_DATA) public data: any,
+        public functions: FunctionsService
     ) { }
 
     async ngOnInit(): Promise<void> {
         this.loading = true;
-        //await this.getRootAlfrescoFolders();
+        await this.checkAlfresco();
         this.loading = false;
         this.initTree();
 
@@ -77,6 +82,29 @@ export class SendAlfrescoActionComponent implements OnInit {
                     $j('#jstreeAlfresco').jstree("refresh");
                 })
             ).subscribe();
+    }
+
+    checkAlfresco() {
+        this.resourcesErrors = [];
+
+        return new Promise((resolve, reject) => {
+            this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkSendAlfresco', { resources: this.data.resIds })
+                .subscribe((data: any) => {
+
+                    if(!this.functions.empty(data.resourcesInformations.error)) {
+                        this.resourcesErrors = data.resourcesInformations.error;
+                        this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
+                    }
+                    if(!this.functions.empty(data.resourcesInformations.fatalError)) {
+                        this.notify.error(this.lang[data.resourcesInformations.fatalError.reason]);
+                        this.dialogRef.close();
+                    }
+                    resolve(true);
+                }, (err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close();
+                });
+        });
     }
 
     getRootAlfrescoFolders() {
@@ -204,7 +232,9 @@ export class SendAlfrescoActionComponent implements OnInit {
 
     executeAction() {
 
-        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNoteContent(), data: { folderId: this.selectedFolder } }).pipe(
+        const realResSelected: number[] = this.data.resIds.filter((resId: any) => this.resourcesErrors.map(resErr => resErr.res_id).indexOf(resId) === -1);
+        
+        this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNoteContent(), data: { folderId: this.selectedFolder } }).pipe(
             tap((data: any) => {
                 if (!data) {
                     this.dialogRef.close('success');
@@ -222,7 +252,7 @@ export class SendAlfrescoActionComponent implements OnInit {
     }
 
     isValidAction() {
-        if (this.selectedFolder !== null) {
+        if (this.selectedFolder !== null && !this.noResourceToProcess) {
             return true;
         } else {
             return false;
