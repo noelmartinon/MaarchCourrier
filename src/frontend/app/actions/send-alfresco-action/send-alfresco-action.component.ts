@@ -179,7 +179,7 @@ export class SendAlfrescoActionComponent implements OnInit {
 
                     //'data': this.alfrescoFolders,
                 },
-                "plugins": ["checkbox", "search", "sort"]
+                "plugins": ["checkbox"]
             });
             $j('#jstreeAlfresco')
                 // listen for event
@@ -204,7 +204,7 @@ export class SendAlfrescoActionComponent implements OnInit {
 
     executeAction() {
 
-        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNoteContent() }).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNoteContent(), data: { folderId: this.selectedFolder } }).pipe(
             tap((data: any) => {
                 if (!data) {
                     this.dialogRef.close('success');
