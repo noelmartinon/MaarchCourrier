@@ -1449,6 +1449,55 @@ class PreProcessActionController
         return $response->withJson(['errors' => $emptyFields, 'success' => $canClose]);
     }
 
+    public function checkSendAlfresco(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+        $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
+        if (empty($loadedXml) || (string)$loadedXml->ENABLED != 'true') {
+            return $response->withJson(['fatalError' => 'Alfresco configuration is not enabled', 'reason' => 'missingAlfrescoConfig']);
+        } elseif (empty((string)$loadedXml->URI)) {
+            return $response->withJson(['fatalError' => 'Alfresco configuration URI is empty', 'reason' => 'missingAlfrescoConfig']);
+        }
+
+        $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
+        if (empty($entity)) {
+            return $response->withJson(['fatalError' => 'User has no primary entity', 'reason' => 'userHasNoPrimaryEntity']);
+        }
+        $entityInformations = json_decode($entity['external_id'], true);
+        if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
+            return $response->withJson(['fatalError' => 'User primary entity has not enough alfresco informations', 'reason' => 'notEnoughAlfrescoInformations']);
+        }
+
+        $resourcesInformations = [];
+        foreach ($body['resources'] as $resId) {
+            $resource = ResModel::getById(['select' => ['filename', 'alt_identifier'], 'resId' => $resId]);
+            if (empty($resource['filename'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noFile'];
+                continue;
+            }
+
+            $resourcesInformations['success'][] = ['res_id' => $resId, 'alt_identifier' => $resource['alt_identifier']];
+        }
+
+        return $response->withJson(['resourcesInformations' => $resourcesInformations]);
+    }
+
     private static function getNonLockedResources(array $args)
     {
         ValidatorModel::notEmpty($args, ['resources', 'userId']);

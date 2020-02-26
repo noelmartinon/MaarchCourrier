@@ -600,6 +600,9 @@ export const LANG_NL = {
     "newSignature"                          : "Nieuwe handtekening",
     "newVersionAvailable"                   : "Er is een nieuwe versie beschikbaar",
     "next"                                  : "Volgende",
+    "missingAlfrescoConfig"                 : "Alfresco configuration is not enabled or incomplete",//_TO_TRANSLATE
+    "userHasNoPrimaryEntity"                : "User has no primary entity",//_TO_TRANSLATE
+    "notEnoughAlfrescoInformations"         : "User primary entity has not enough alfresco informations",//_TO_TRANSLATE
     "no"                                    : "Nee",
     "noAction"                              : "No action", //_TO_TRANSLATE
     "noAttachment"                          : "Zonder bijlage",
