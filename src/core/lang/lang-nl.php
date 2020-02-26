@@ -475,3 +475,4 @@ define("_CHRONO_NUMBER_MASTER", "Resource chrono number"); //TO TRANSLATE
 define("_SENT_BY", "Sent by"); //TO TRANSLATE
 define('_TO_CCI', 'On copy hidden'); //TO TRANSLATE
 define('_PRIMARY_INFORMATION', 'Primary information'); //TO TRANSLATE
+define('_SEND_ALFRESCO', 'Send to Aflresco'); //TO TRANSLATE
