@@ -890,11 +890,11 @@ class ActionMethodController
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
 
-        $sent = AlfrescoController::sendResource(['resId' => $args['resId'], 'folderId' => $args['data']['folderId'], 'userId' => $GLOBALS['id']]);
+        $sent = AlfrescoController::sendResource(['resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'folderId' => $args['data']['folderId'], 'folderName' => $args['data']['folderName']]);
         if (!empty($sent['errors'])) {
             return ['errors' => [$sent['errors']]];
         }
 
-        return true;
+        return ['history' => $sent['history']];
     }
 }

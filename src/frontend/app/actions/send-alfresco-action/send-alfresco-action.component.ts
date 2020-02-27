@@ -27,6 +27,7 @@ export class SendAlfrescoActionComponent implements OnInit {
     searchFolder = new FormControl();
 
     selectedFolder: number = null;
+    selectedFolderName: string = null;
 
     resourcesErrors: any[] = [];
     noResourceToProcess: boolean = null;
@@ -52,6 +53,7 @@ export class SendAlfrescoActionComponent implements OnInit {
                 debounceTime(300),
                 tap((value: any) => {
                     this.selectedFolder = null;
+                    this.selectedFolderName = null;
                     if (value.length === 0) {
                         $j('#jstreeAlfresco').jstree(true).settings.core.data =
                         {
@@ -62,7 +64,7 @@ export class SendAlfrescoActionComponent implements OnInit {
                             'data': (node: any) => {
                                 return { 'id': node.id };
                             }
-                        }
+                        };
                         $j('#jstreeAlfresco').jstree("refresh");
                     }
                 }),
@@ -78,7 +80,7 @@ export class SendAlfrescoActionComponent implements OnInit {
                         'data': (node: any) => {
                             return { 'id': node.id };
                         }
-                    }
+                    };
                     $j('#jstreeAlfresco').jstree("refresh");
                 })
             ).subscribe();
@@ -213,9 +215,11 @@ export class SendAlfrescoActionComponent implements OnInit {
                 // listen for event
                 .on('select_node.jstree', (e: any, data: any) => {
                     this.selectedFolder = data.node.id;
+                    this.selectedFolderName = data.node.text;
 
                 }).on('deselect_node.jstree', (e: any, data: any) => {
                     this.selectedFolder = null;
+                    this.selectedFolderName = null;
                 })
                 // create the instance
                 .jstree();
@@ -234,7 +238,7 @@ export class SendAlfrescoActionComponent implements OnInit {
 
         const realResSelected: number[] = this.data.resIds.filter((resId: any) => this.resourcesErrors.map(resErr => resErr.res_id).indexOf(resId) === -1);
         
-        this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNoteContent(), data: { folderId: this.selectedFolder } }).pipe(
+        this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNoteContent(), data: { folderId: this.selectedFolder, folderName: this.selectedFolderName } }).pipe(
             tap((data: any) => {
                 if (!data) {
                     this.dialogRef.close('success');

@@ -584,6 +584,7 @@ export const LANG_EN = {
     "missingAlfrescoConfig"                 : "Alfresco configuration is not enabled or incomplete",
     "userHasNoPrimaryEntity"                : "User has no primary entity",
     "notEnoughAlfrescoInformations"         : "User primary entity has not enough alfresco informations",
+    "alreadySentToAlfresco"                 : "Document already sent to Alfresco",
     "no"                                    : "No",
     "noAction"                              : "No action",
     "noAttachment"                          : "No attachment",

@@ -603,6 +603,7 @@ export const LANG_NL = {
     "missingAlfrescoConfig"                 : "Alfresco configuration is not enabled or incomplete",//_TO_TRANSLATE
     "userHasNoPrimaryEntity"                : "User has no primary entity",//_TO_TRANSLATE
     "notEnoughAlfrescoInformations"         : "User primary entity has not enough alfresco informations",//_TO_TRANSLATE
+    "alreadySentToAlfresco"                 : "Document already sent to Alfresco",//_TO_TRANSLATE
     "no"                                    : "Nee",
     "noAction"                              : "No action", //_TO_TRANSLATE
     "noAttachment"                          : "Zonder bijlage",

@@ -1486,9 +1486,14 @@ class PreProcessActionController
 
         $resourcesInformations = [];
         foreach ($body['resources'] as $resId) {
-            $resource = ResModel::getById(['select' => ['filename', 'alt_identifier'], 'resId' => $resId]);
+            $resource = ResModel::getById(['select' => ['filename', 'alt_identifier', 'external_id'], 'resId' => $resId]);
             if (empty($resource['filename'])) {
                 $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noFile'];
+                continue;
+            }
+            $externalId = json_decode($resource['external_id'], true);
+            if (!empty($externalId['alfrescoId'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'alreadySentToAlfresco'];
                 continue;
             }
 

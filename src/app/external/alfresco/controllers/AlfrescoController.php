@@ -193,7 +193,7 @@ class AlfrescoController
     {
         ValidatorModel::notEmpty($args, ['resId', 'folderId', 'userId']);
         ValidatorModel::intVal($args, ['resId', 'userId']);
-        ValidatorModel::stringType($args, ['folderId']);
+        ValidatorModel::stringType($args, ['folderId', 'folderName']);
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
 
@@ -377,6 +377,7 @@ class AlfrescoController
             AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
         }
 
-        return true;
+        $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
+        return ['history' => $message];
     }
 }
