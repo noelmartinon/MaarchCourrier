@@ -1161,7 +1161,7 @@ class functions
     /**
     * xss mitigation functions
     * Return protected chars
-    * @param  $data to encode
+    * @param  $data string encode
     * @param  $encoding ut8 by default
     */
     static function xssafe($data, $encoding='UTF-8')
