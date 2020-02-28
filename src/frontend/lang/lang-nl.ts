@@ -1064,4 +1064,5 @@ export const LANG_NL = {
     "dateAgo"   : "Since", //_TO_TRANSLATE
     "dateTo"   : "The", //_TO_TRANSLATE
     "information" : "Information", //_TO_TRANSLATE
+    "technicalId"    : "Technical identifier", //_TO_TRANSLATE
 };
