@@ -4,7 +4,7 @@ import { NotificationService } from '../../notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
-import { map, tap, finalize, catchError, debounceTime, filter, switchMap } from 'rxjs/operators';
+import { tap, finalize, catchError, debounceTime, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../service/functions.service';
@@ -109,59 +109,6 @@ export class SendAlfrescoActionComponent implements OnInit {
         });
     }
 
-    getRootAlfrescoFolders() {
-        return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/alfresco/rootFolders`).pipe(
-                map((data: any) => {
-                    data.folders = data.folders.map((folder: any) => {
-                        return {
-                            ...folder,
-                            icon: 'fa fa-folder',
-                            parent: '#',
-                            text: folder.name,
-                            children: true
-                        }
-                    });
-                    return data.folders;
-                }),
-                tap((folders: any) => {
-                    this.alfrescoFolders = folders;
-                    resolve(true);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    this.dialogRef.close();
-                    return of(false);
-                })
-            ).subscribe()
-        });
-    }
-
-    getAlfrescoFolder(folderId: string) {
-        this.http.get(`../../rest/folders/${folderId}/children`).pipe(
-            map((data: any) => {
-                data.folders = data.folders.map((folder: any) => {
-                    return {
-                        ...folder,
-                        id: folder.id,
-                        icon: 'fa fa-folder',
-                        text: folder.name,
-                        parent: '#',
-                        children: true
-                    }
-                });
-                return data.folders;
-            }),
-            tap((folders: any) => {
-                this.alfrescoFolders = folders;
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe()
-    }
-
     initTree() {
         setTimeout(() => {
             $j('#jstreeAlfresco').jstree({
@@ -215,13 +162,11 @@ export class SendAlfrescoActionComponent implements OnInit {
                 // listen for event
                 .on('select_node.jstree', (e: any, data: any) => {
                     this.selectedFolder = data.node.id;
-                    this.selectedFolderName = data.node.text;
-
+                    this.selectedFolderName = this.getNameWithParents(data.node.text, data.node.parent);
                 }).on('deselect_node.jstree', (e: any, data: any) => {
                     this.selectedFolder = null;
                     this.selectedFolderName = null;
                 })
-                // create the instance
                 .jstree();
         }, 0);
     }
@@ -256,10 +201,22 @@ export class SendAlfrescoActionComponent implements OnInit {
     }
 
     isValidAction() {
-        if (this.selectedFolder !== null && !this.noResourceToProcess) {
-            return true;
-        } else {
-            return false;
+        return this.selectedFolder !== null && !this.noResourceToProcess;
+    }
+
+    getNameWithParents(name: string, parentId: string) {
+        if (parentId === '#') {
+            return name;
         }
+        $j('#jstreeAlfresco').jstree(true).get_json('#', {flat:true}).forEach((folder: any) => {
+            if (folder.id == parentId) {
+                name = folder.text + "/" + name;
+                if (folder.parent != '#') {
+                    name = this.getNameWithParents(name, folder.parent);
+                }
+            }
+        });
+
+        return name;
     }
 }
