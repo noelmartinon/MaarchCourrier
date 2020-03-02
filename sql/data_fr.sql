@@ -4,16 +4,16 @@ TRUNCATE TABLE usergroups;
 TRUNCATE TABLE usergroups_services;
 DELETE FROM usergroups WHERE group_id = 'COURRIER';
 DELETE FROM usergroups_services WHERE group_id = 'COURRIER';
-INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (1, 'COURRIER', 'Opérateur de numérisation', True, '{"actions":["21"], "entities":[], "keywords":["ALL_ENTITIES"]}');
+INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (1, 'COURRIER', 'Opérateur de numérisation', True, '{"actions":["2", "20"], "entities":[], "keywords":["ALL_ENTITIES"]}');
 DELETE FROM usergroups WHERE group_id = 'AGENT';
 DELETE FROM usergroups_services WHERE group_id = 'AGENT';
-INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (2, 'AGENT', 'Utilisateur', True, '{"actions":["21"], "entities":[], "keywords":["ALL_ENTITIES"]}');
+INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (2, 'AGENT', 'Utilisateur', True, '{"actions":["2", "20"], "entities":[], "keywords":["ALL_ENTITIES"]}');
 DELETE FROM usergroups WHERE group_id = 'RESP_COURRIER';
 DELETE FROM usergroups_services WHERE group_id = 'RESP_COURRIER';
-INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (3, 'RESP_COURRIER', 'Superviseur Courrier', True, '{"actions":["21"], "entities":[], "keywords":["ALL_ENTITIES"]}');
+INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (3, 'RESP_COURRIER', 'Superviseur Courrier', True, '{"actions":["2", "20"], "entities":[], "keywords":["ALL_ENTITIES"]}');
 DELETE FROM usergroups WHERE group_id = 'RESPONSABLE';
 DELETE FROM usergroups_services WHERE group_id = 'RESPONSABLE';
-INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (4, 'RESPONSABLE', 'Manager', True, '{"actions":["21"], "entities":[], "keywords":["ALL_ENTITIES"]}');
+INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (4, 'RESPONSABLE', 'Manager', True, '{"actions":["2", "20"], "entities":[], "keywords":["ALL_ENTITIES"]}');
 DELETE FROM usergroups WHERE group_id = 'ADMINISTRATEUR_N1';
 DELETE FROM usergroups_services WHERE group_id = 'ADMINISTRATEUR_N1';
 INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (5, 'ADMINISTRATEUR_N1', 'Admin. Fonctionnel N1', False, '{"actions" : [], "entities" : [], "keywords" : []}');
@@ -40,7 +40,7 @@ DELETE FROM usergroups_services WHERE group_id = 'SERVICE';
 INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (12, 'SERVICE', 'Service', False, '{"actions" : [], "entities" : [], "keywords" : []}');
 DELETE FROM usergroups WHERE group_id = 'WEBSERVICE';
 DELETE FROM usergroups_services WHERE group_id = 'WEBSERVICE';
-INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (13, 'WEBSERVICE', 'Utilisateurs de WebService', True, '{"actions":["21"], "entities":[], "keywords":["ALL_ENTITIES"]}');
+INSERT INTO usergroups (id, group_id, group_desc, can_index, indexation_parameters) VALUES (13, 'WEBSERVICE', 'Utilisateurs de WebService', True, '{"actions":["2", "20"], "entities":[], "keywords":["ALL_ENTITIES"]}');
 select setval('usergroups_id_seq', (select max(id)+1 from usergroups), false);
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'admin');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'adv_search_mlb');
@@ -192,6 +192,7 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'admin_tag');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'sign_document');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'visa_documents');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'avis_documents');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'adv_search_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'create_contacts');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'update_contacts');
@@ -670,24 +671,24 @@ INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_eve
 DELETE FROM groupbasket WHERE basket_id = 'RetourCourrier';
 INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('COURRIER', 'RetourCourrier', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"canUpdate":true,"defaultTab":"info"}');
 DELETE FROM groupbasket WHERE basket_id = 'DdeAvisBasket';
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'DdeAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'DdeAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('ELU', 'DdeAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'DdeAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"opinionCircuit"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'DdeAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"opinionCircuit"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('ELU', 'DdeAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"opinionCircuit"}');
 DELETE FROM groupbasket WHERE basket_id = 'SupAvisBasket';
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'SupAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'SupAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'SupAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"opinionCircuit"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'SupAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"opinionCircuit"}');
 DELETE FROM groupbasket WHERE basket_id = 'RetAvisBasket';
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'RetAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'RetAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '[]');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'RetAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"notes"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'RetAvisBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]', 'processDocument', '{"defaultTab":"notes"}');
 DELETE FROM groupbasket WHERE basket_id = 'ValidationBasket';
 INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESP_COURRIER', 'ValidationBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"canUpdate":true,"defaultTab":"info"}');
 DELETE FROM groupbasket WHERE basket_id = 'InValidationBasket';
 DELETE FROM groupbasket WHERE basket_id = 'MyBasket';
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'MyBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '[]');
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'MyBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '[]');
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('ELU', 'MyBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '[]');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'MyBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"defaultTab":"dashboard"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'MyBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"defaultTab":"dashboard"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('ELU', 'MyBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"defaultTab":"dashboard"}');
 DELETE FROM groupbasket WHERE basket_id = 'LateMailBasket';
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'LateMailBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '[]');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'LateMailBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"defaultTab":"dashboard"}');
 DELETE FROM groupbasket WHERE basket_id = 'DepartmentBasket';
 INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('RESPONSABLE', 'DepartmentBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'viewDoc', '[]');
 DELETE FROM groupbasket WHERE basket_id = 'ParafBasket';
@@ -718,7 +719,7 @@ INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_eve
 DELETE FROM groupbasket WHERE basket_id = 'GedSampleBasket';
 INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'GedSampleBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'viewDoc', '[]');
 DELETE FROM groupbasket WHERE basket_id = 'IntervBasket';
-INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'IntervBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"canUpdate":true,"defaultTab":"info"}');
+INSERT INTO groupbasket (group_id, basket_id, list_display, list_event, list_event_data) VALUES ('AGENT', 'IntervBasket', '[{"value":"getPriority","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"}]', 'processDocument', '{"canUpdate":true,"defaultTab":"dashboard"}');
 
 
 -- Create Security
@@ -799,6 +800,12 @@ INSERT INTO folders (label, public, user_id, parent_id, level) VALUES ('actions 
 INSERT INTO folders (label, public, user_id, parent_id, level) VALUES ('cohésion sociale', 'TRUE', 21, 22, 1);
 
 -- Donnees manuelles
+------------
+--USERGROUPS
+------------
+UPDATE usergroups set indexation_parameters = '{"actions":["21", "2"], "entities":[], "keywords":["ALL_ENTITIES"]}' where group_id IN ('COURRIER', 'RESP_COURRIER');
+UPDATE usergroups set indexation_parameters = '{"actions":["2", "414", "20"], "entities":[], "keywords":["ALL_ENTITIES"]}' where group_id IN ('AGENT');
+
 ------------
 --ENTITIES_FOLDERS
 ------------
@@ -888,7 +895,8 @@ TRUNCATE TABLE contacts;
 INSERT INTO contacts VALUES (1, 'title1', 'Jean-Louis', 'ERCOLANI', 'MAARCH', '', 'Directeur Général', '11', 'Boulevard du Sud-Est', '', '', '99000', 'MAARCH LES BAINS', 'France', 'info@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
 INSERT INTO contacts VALUES (2, 'title1', 'Karim', 'SY', 'MAARCH', '', 'Administrateur', '', 'Sacré Coeur 3', '', 'Villa 9653 4ème phase', '', 'DAKAR', 'SENEGAL', 'info@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
 INSERT INTO contacts VALUES (3, 'title1', 'Laurent', 'GIOVANNONI', 'MAARCH', '', 'Directeur Général Adjoint', '11', 'Boulevard du Sud-Est', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'info@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
-INSERT INTO contacts VALUES (4, 'title1', 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', '', '', '13', 'RUE LA PREFECTURE', NULL, '', '', 'MAARCH LES BAINS', '', '', '', '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', 'Préfecture de Maarch Les Bains', 21, '2018-04-18 12:43:54.97424', '2018-04-18 16:28:38.498185', true, '{"m2m": "org_987654321_DGS_SF"}');
+--INSERT INTO contacts VALUES (4, 'title1', 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', '', '', '13', 'RUE LA PREFECTURE', NULL, '', '99000', 'MAARCH LES BAINS', '', '', '', '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', 'Préfecture de Maarch Les Bains', 21, '2018-04-18 12:43:54.97424', '2018-04-18 16:28:38.498185', true, '{"m2m": "org_987654321_DGS_SF"}');
+INSERT INTO contacts VALUES (4, 'title1', 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', '', '', '13', 'RUE LA PREFECTURE', NULL, '', '99000', 'MAARCH LES BAINS', '', '', '', NULL, 'Préfecture de Maarch Les Bains', 21, '2018-04-18 12:43:54.97424', '2018-04-18 16:28:38.498185', true, '{}');
 INSERT INTO contacts VALUES (5, 'title2', 'Brigitte', 'BERGER', 'ACME', '', 'Directrice Générale', '25', 'PLACE DES MIMOSAS', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'info@maarch.org', '', NULL, 'Archivage et Conservation des Mémoires Electroniques', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
 INSERT INTO contacts VALUES (6, 'title1', 'Bernard', 'PASCONTENT', '', '', '', '25', 'route de Pampelone', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'bernard.pascontent@gmail.com', '06 08 09 07 55', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
 INSERT INTO contacts VALUES (7, 'title1', 'Jacques', 'DUPONT', '', '', '', '1', 'rue du Peuplier', NULL, '', '92000', 'NANTERRE', '', '', '', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
@@ -1040,7 +1048,7 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (18, 'redirect', 'Qualifier le courrier', 'NEW', 'N', 'redirect', 'Y', 'redirectAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (19, '', 'Traiter courrier', 'COU', 'N', 'confirm_status', 'N', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (20, '', 'Cloturer', 'END', 'N', 'close_mail', 'Y', 'closeMailAction');
-INSERT INTO actions (id, label_action, id_status, is_system, history, component) VALUES (21, 'Enregistrer le courrier', 'INIT', 'N', 'Y', 'confirmAction');
+INSERT INTO actions (id, label_action, id_status, is_system, history, component) VALUES (21, 'Envoyer le courrier en validation', 'VAL', 'N', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (22, '', 'Attribuer au service', 'NEW', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (23, 'indexing', 'Attribuer au(x) service(s)', 'NEW', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (24, 'indexing', 'Remettre en validation', 'VAL', 'N', 'confirm_status', 'Y', 'confirmAction');
@@ -1057,7 +1065,7 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (407, '', 'Renvoyer pour traitement', 'COU', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (408, '', 'Refuser le visa et remonter le circuit', '_NOSTATUS_', 'N',  'rejection_visa_previous', 'N', 'rejectVisaBackToPreviousAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (410, '', 'Transmettre la réponse signée', 'EENV', 'N', 'interrupt_visa', 'Y', 'interruptVisaAction');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (414, '', 'Envoyer au parapheur', '_NOSTATUS_', 'N', 'send_to_visa', 'Y', 'sendSignatureBookAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (414, '', 'Envoyer au parapheur', 'EVIS', 'N', 'send_to_visa', 'Y', 'sendSignatureBookAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (416, '', 'Valider et poursuivre le circuit', '_NOSTATUS_', 'N', 'visa_workflow', 'Y', 'continueVisaCircuitAction');
 --INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, parameters) VALUES (417, '', 'Envoyer l''AR', 'SVX', 'N', 'send_to_contact_with_mandatory_attachment', 'Y', 'createAcknowledgementReceiptsAction', '{"mode": "manual"}');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (420, '', 'Classer sans suite', 'SSUITE', 'N', 'confirm_status', 'Y', 'confirmAction');
@@ -1081,7 +1089,7 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (529, '', 'Envoyer un pli postal Maileva', '_NOSTATUS_', 'N', 'send_shipping', 'Y', 'sendShippingAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (530, '', 'Re-Générér les accusés de réception papier si pb impression', '_NOSTATUS_', 'N', 'create_acknowledgement_receipt', 'Y', 'createAcknowledgementReceiptsAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (531, '', 'Envoyer pour annotation sur la tablette (Maarch Parapheur)', 'ATT_MP', 'N', 'sendToExternalSignatureBook', 'Y', 'sendExternalSignatoryBookAction');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, required_fields) VALUES (532, '', 'Cloturer intervention', 'END', 'N', 'close_mail', 'Y', 'closeMailAction','["indexingCustomField_2"]');
+--INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, required_fields) VALUES (532, '', 'Cloturer intervention', 'END', 'N', 'close_mail', 'Y', 'closeMailAction','["indexingCustomField_2"]');
 Select setval('actions_id_seq', (select max(id)+1 from actions), false);
 ------------
 -- BANNETTES SECONDAIRES
@@ -1655,8 +1663,12 @@ INSERT INTO shipping_templates (id, label, description, options, fee, entities, 
 Select setval('shipping_templates_id_seq', (select max(id)+1 from shipping_templates), false);
 
 /* Champs customs */
+TRUNCATE TABLE custom_fields;
 INSERT INTO custom_fields (id, label, type, "values") VALUES (1, 'Date de fin de contrat', 'date', '[]');
 INSERT INTO custom_fields (id, label, type, "values") VALUES (2, 'Adresse d''intervention', 'banAutocomplete', '[]');
+INSERT INTO custom_fields (id, label, type, values) VALUES (3, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Fax", "Chronopost", "Fedex", "Courrier AR", "Coursier", "Pli numérique", "Autre"]');
+INSERT INTO custom_fields (id, label, type, "values") VALUES (4, 'Référence courrier expéditeur', 'string', '[]');
+INSERT INTO custom_fields (id, label, type, "values") VALUES (5, 'Num recommandé', 'string', '[]');
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
 
 /* Modèles d'enregistrement */
@@ -1694,16 +1706,19 @@ INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_val
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (2, 'processLimitDate', TRUE, null, 'process');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (2, 'folders', FALSE, null, 'classifying');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (2, 'tags', FALSE, null, 'classifying');
-INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (2, 'initiator', TRUE, null, 'process');
 
 /* Interne */
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'doctype', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'priority', TRUE, null, 'mail');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'confidentiality', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'documentDate', TRUE, '"_TODAY"', 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'subject', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'senders', false, '[]', 'contact');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'initiator', TRUE, null, 'process');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'destination', TRUE, null, 'process');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'processLimitDate', TRUE, null, 'process');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'folders', FALSE, null, 'classifying');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (3, 'tags', FALSE, null, 'classifying');
 
 /* GED */
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (4, 'doctype', TRUE, null, 'mail');
@@ -1718,8 +1733,10 @@ INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_val
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'priority', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'confidentiality', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'documentDate', TRUE, null, 'mail');
-INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'arrivalDate', TRUE, null, 'mail');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'arrivalDate', TRUE, '"_TODAY"', 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'subject', TRUE, null, 'mail');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'indexingCustomField_3', FALSE, null, 'mail');
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'indexingCustomField_4', FALSE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'senders', TRUE, null, 'contact');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'recipients', FALSE, null, 'contact');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (5, 'initiator', TRUE, null, 'process');
