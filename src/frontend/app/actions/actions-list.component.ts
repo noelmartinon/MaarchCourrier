@@ -86,34 +86,37 @@ export class ActionsListComponent implements OnInit {
         if (action.component == 'v1Action' && this.arrRes.length > 1) {
             alert(this.lang.actionMassForbidden);
         } else {
-            
-            this.http.put('../../rest/resourcesList/users/' + this.currentBasketInfo.ownerId + '/groups/' + this.currentBasketInfo.groupId + '/baskets/' + this.currentBasketInfo.basketId + '/lock', { resources: this.arrRes })
-                .subscribe((data: any) => {
-                    try {
-                        let msgWarn = this.lang.warnLockRes + ' : ' + data.lockers.join(', ');
+            if (action.component == 'viewDoc') {
+                this[action.component]();
+            } else {
+                this.http.put('../../rest/resourcesList/users/' + this.currentBasketInfo.ownerId + '/groups/' + this.currentBasketInfo.groupId + '/baskets/' + this.currentBasketInfo.basketId + '/lock', { resources: this.arrRes })
+                    .subscribe((data: any) => {
+                        try {
+                            let msgWarn = this.lang.warnLockRes + ' : ' + data.lockers.join(', ');
 
-                        if (data.lockedResources != this.arrRes.length) {
-                            msgWarn += this.lang.warnLockRes2 + '.';
-                        }
+                            if (data.lockedResources != this.arrRes.length) {
+                                msgWarn += this.lang.warnLockRes2 + '.';
+                            }
 
-                        if (data.lockedResources > 0) {
-                            alert(data.lockedResources + ' ' + msgWarn);
-                        }
+                            if (data.lockedResources > 0) {
+                                alert(data.lockedResources + ' ' + msgWarn);
+                            }
 
-                        if (data.lockedResources != this.arrRes.length) {
-                            this.lock();
-                            this[action.component]();
+                            if (data.lockedResources != this.arrRes.length) {
+                                this.lock();
+                                this[action.component]();
+                            }
                         }
-                    }
-                    catch (error) {
-                        console.log(error);
-                        console.log(action.component);
-                        alert(this.lang.actionNotExist);
-                    }
-                    this.loading = false;
-                }, (err: any) => {
-                    this.notify.handleErrors(err);
-                });
+                        catch (error) {
+                            console.log(error);
+                            console.log(action.component);
+                            alert(this.lang.actionNotExist);
+                        }
+                        this.loading = false;
+                    }, (err: any) => {
+                        this.notify.handleErrors(err);
+                    });
+            }
         }
 
     }
