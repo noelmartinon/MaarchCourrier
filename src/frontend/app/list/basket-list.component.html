@@ -132,7 +132,7 @@
                                                         title="{{lang.barcode}}" class="fas fa-barcode"></i>
                                                     {{row.barcode}}</span>
                                             </ng-container>
-                                            <ng-container *ngIf="row.barcode == lang.undefined">
+                                            <ng-container *ngIf="row.alt_identifier != lang.undefined">
                                                 {{row.alt_identifier}}
                                             </ng-container>
                                         </span>
