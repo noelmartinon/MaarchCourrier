@@ -71,6 +71,8 @@ if (!empty($request_contact)) {
     $where = array_merge($where, [$request_contact]);
 }
 
+$where[] = '(enabled = \'Y\')';
+
 $contacts = \Contact\models\ContactModel::getOnView([
     'select'    => ['*'],
     'where'     => $where,

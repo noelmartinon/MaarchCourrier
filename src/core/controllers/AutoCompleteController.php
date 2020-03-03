@@ -207,6 +207,10 @@ class AutoCompleteController
             }
         }
 
+        if ($data['onlyContacts'] == "false") {
+            $where[] = '(enabled = \'Y\')';
+        }
+
         $contacts = ContactModel::getOnView([
             'select'    => ['*'],
             'where'     => $where,
