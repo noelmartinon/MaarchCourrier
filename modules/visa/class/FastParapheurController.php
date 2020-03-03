@@ -130,9 +130,9 @@ class FastParapheurController
 
     public static function upload($aArgs)
     {
-        $circuitId          = $aArgs['circuitId'];
-        $label              = $aArgs['label'];
-        $subscriberId       = $aArgs['businessId'];
+        $circuitId     = str_replace('.', '-', $aArgs['circuitId']);
+        $label         = $aArgs['label'];
+        $subscriberId  = $aArgs['businessId'];
 
         // Retrieve the annexes of the attachemnt to sign (other attachment and the original document)
         $annexes = [];
