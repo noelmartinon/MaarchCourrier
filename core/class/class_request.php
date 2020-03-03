@@ -132,7 +132,7 @@ class request extends dbquery
             $dist = " distinct ";
         }
         //LIMIT 100
-        $query = $db->limit_select($start, 500, $field_string, $table_string." ".$join, $where_string, $other, $dist);
+        $query = $db->limit_select($start, $limit, $field_string, $table_string." ".$join, $where_string, $other, $dist);
 
         if (preg_match('/_view/i', $query)) {
             $_SESSION['last_select_query'] = $query;
