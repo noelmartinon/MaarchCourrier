@@ -17,7 +17,6 @@ namespace Alfresco\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
-use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -49,7 +48,7 @@ class AlfrescoController
         if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
             return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations']);
         }
-//        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
+        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
 
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$entityInformations['alfrescoNodeId']}/children",
@@ -97,7 +96,7 @@ class AlfrescoController
         if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
             return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations']);
         }
-//        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
+        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
 
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
@@ -152,7 +151,7 @@ class AlfrescoController
         if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
             return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations']);
         }
-//        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
+        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
 
         $search = addslashes($queryParams['search']);
         $body = [
@@ -212,7 +211,7 @@ class AlfrescoController
         if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
             return ['errors' => 'User primary entity has not enough alfresco informations'];
         }
-//        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
+        $entityInformations['alfrescoPassword'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfrescoPassword']]);
 
         $document = ResModel::getById(['select' => ['filename', 'subject', 'alt_identifier', 'external_id'], 'resId' => $args['resId']]);
         if (empty($document)) {
@@ -288,14 +287,22 @@ class AlfrescoController
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
         $attachments = AttachmentModel::get([
-            'select'    => ['res_id', 'title', 'identifier', 'external_id'],
+            'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format'],
             'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
             'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
         ]);
         $firstAttachment = true;
         $attachmentsTitlesSent = [];
         foreach ($attachments as $attachment) {
-            $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $attachment['res_id'], 'collId' => 'attachments_coll']);
+            if ($attachment['format'] == 'xml') {
+                $adrInfo = [
+                    'docserver_id'  => $attachment['docserver_id'],
+                    'path'          => $attachment['path'],
+                    'filename'      => $attachment['filename']
+                ];
+            } else {
+                $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $attachment['res_id'], 'collId' => 'attachments_coll']);
+            }
             if (empty($adrInfo['docserver_id'])) {
                 continue;
             }
