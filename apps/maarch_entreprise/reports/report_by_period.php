@@ -84,7 +84,7 @@ $content .= '<div id="params">';
               while ($res = $stmt->fetchObject()) {
                   $content .= '<option';
                   $content .= " value='".$res->type_id."'>";
-                  $content .= $res->description.'</option>';
+                  $content .= functions::xssafe($res->description).'</option>';
               }
               $content .= '</select>';
               $js .= '$j("#doctypes_chosen").chosen({width: "95%", disable_search_threshold: 10, search_contains: true});';

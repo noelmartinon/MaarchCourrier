@@ -14,7 +14,6 @@
 
 namespace Contact\controllers;
 
-use Contact\controllers\ContactController;
 use Contact\models\ContactGroupModel;
 use Contact\models\ContactModel;
 use Group\controllers\PrivilegeController;
@@ -30,11 +29,9 @@ class ContactGroupController
     {
         $hasService = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']]);
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-
         $contactsGroups = ContactGroupModel::get();
         foreach ($contactsGroups as $key => $contactsGroup) {
-            if (!$contactsGroup['public'] && $user['id'] != $contactsGroup['owner'] && !$hasService) {
+            if (!$contactsGroup['public'] && $GLOBALS['id'] != $contactsGroup['owner'] && !$hasService) {
                 unset($contactsGroups[$key]);
                 continue;
             }
@@ -266,7 +263,7 @@ class ContactGroupController
 
             if (!empty($contact)) {
                 $email = $contact['email'];
-                $contact = ContactController::getFormattedContactWithAddress(['contact' => $contact, 'position' => $position])['contact'];
+                $contact = ContactController::getFormattedContactWithAddress(['contact' => $contact, 'position' => $position, 'color' => true])['contact'];
                 $contact['email'] = $email;
                 $contact['position'] = !empty($position) ? $position : 0;
                 $contacts[] = $contact;

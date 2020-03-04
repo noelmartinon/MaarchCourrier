@@ -81,6 +81,8 @@ class BasketController
 
         $data['isVisible'] = empty($data['isSearchBasket']) ? 'Y' : 'N';
         $data['flagNotif'] = empty($data['flagNotif']) ? 'N' : 'Y';
+
+        $data['basket_res_order'] = BasketController::uniqueBasketResOrder($data);
         BasketModel::create($data);
         HistoryController::add([
             'tableName' => 'baskets',
@@ -117,6 +119,7 @@ class BasketController
             return $response->withStatus(400)->withJson(['errors' => _INVALID_CLAUSE]);
         }
 
+        $data['basket_res_order'] = BasketController::uniqueBasketResOrder($data);
         $set = [
             'basket_name'       => $data['basket_name'],
             'basket_desc'       => $data['basket_desc'],
@@ -143,6 +146,24 @@ class BasketController
         ]);
 
         return $response->withJson(['success' => 'success']);
+    }
+
+    private static function uniqueBasketResOrder($args = [])
+    {
+        $resOrder = explode(',', $args['basket_res_order']);
+
+        $aOrders = [];
+        foreach ($resOrder as $order) {
+            $aOrder = explode(' ', trim($order));
+            $aOrders[trim($aOrder[0])] = trim($aOrder[1]);
+        }
+
+        $sOrders = '';
+        foreach ($aOrders as $column => $order) {
+            $sOrders .= $column . ' ' . $order . ', ';
+        }
+        
+        return rtrim($sOrders, ', ');
     }
 
     public function delete(Request $request, Response $response, array $aArgs)

@@ -13,14 +13,6 @@
 require_once 'core/class/class_functions.php';
 require_once 'core/class/class_history.php';
 
-class EmptyObject
-{
-    public function __construct()
-    {
-        $test = '';
-    }
-}
-
 class ExportControler extends ExportFunctions
 {
     public $collection = false;
@@ -29,7 +21,7 @@ class ExportControler extends ExportFunctions
     public $enclosure = false;
 
     public $object_export = false;
-    public $array_export = false;
+    public $array_export = [];
     public $pos = 0;
 
     public function __construct()
@@ -37,7 +29,6 @@ class ExportControler extends ExportFunctions
         $this->collection = $_SESSION['collection_id_choice'];
         $this->load_configuration();
         $this->retrieve_datas();
-        $this->insert_emptyColumns();
         $_SESSION['export']['filename'] = $this->make_csv();
     }
 
@@ -86,33 +77,8 @@ class ExportControler extends ExportFunctions
 
         $stmt = $db->query($query, $_SESSION['last_select_query_parameters']);
 
-        $this->object_export = new EmptyObject();
         while ($line = $stmt->fetchObject()) {
-            // STEP 1 : ADD HEADER
-            if ($this->pos == 0) {
-                $this->object_export->{$this->pos} = $this->retrieve_header();
-                $this->pos = 1;
-            }
-
-            // STEP 2 : FORMAT DATE
-            if ($line->doc_date) {
-                $line->doc_date = substr($line->doc_date, 0, 10);
-            }
-            if ($line->admission_date) {
-                $line->admission_date = substr($line->admission_date, 0, 10);
-            }
-            if ($line->process_limit_date) {
-                $line->process_limit_date = substr($line->process_limit_date, 0, 10);
-            }
-            if ($line->departure_date) {
-                $line->departure_date = substr($line->departure_date, 0,10);
-            }
-            $this->object_export->{$this->pos} = $line;
-
-            //STEP 3 : EXPORT OTHER DATA
-            $this->process_functions($line->res_id);
-
-            ++$this->pos;
+            $this->array_export[] = $line->res_id;
         }
     }
 
@@ -152,30 +118,6 @@ class ExportControler extends ExportFunctions
             );
     }
 
-    private function retrieve_header()
-    {
-        // HEADER DATA
-        $return = new StdClass();
-        $fields = $this->configuration->FIELD;
-        $i_max = count($fields);
-        for ($i = 0; $i < $i_max; ++$i) {
-            $field = $fields[$i];
-            $database_field = end(explode('.', $field->DATABASE_FIELD));
-            $return->{$database_field} = end($field->LIBELLE);
-        }
-
-        // HEADER FOR CUSTOM DATA
-        $fields = $this->configuration->FUNCTIONS;
-        for ($i = 0; $i < count($fields->FUNCTION); ++$i) {
-            $field = $fields->FUNCTION[$i];
-
-            $database_field = end($field->CALL);
-            $return->{$database_field} = end($field->LIBELLE);
-        }
-
-        return $return;
-    }
-
     private function encode()
     {
         foreach ($this->object_export as $line_name => $line_value) {
@@ -202,60 +144,106 @@ class ExportControler extends ExportFunctions
         return str_replace("\'", "'", $string);
     }
 
-    private function process_functions($res_id)
-    {
-        $functions = $this->configuration->FUNCTIONS->FUNCTION;
-        $functions_max = count($functions);
-        for ($i = 0; $i < $functions_max; ++$i) {
-            $function = $functions[$i];
-            $call = $function->CALL;
-            if (method_exists($this, $call)) {
-                eval('$this->'.$call.'(\''.$function->LIBELLE.'\',\''.$res_id.'\');');
-            }
-        }
-    }
-
-    private function insert_emptyColumns()
-    {
-        $emptys = $this->configuration->EMPTYS->EMPTY;
-        $emptys_max = count($emptys);
-        for ($i = 0; $i < $emptys_max; ++$i) {
-            $empty = $emptys[$i];
-            $libelle = end($empty->LIBELLE);
-            $colname = end($empty->COLNAME);
-            foreach ($this->object_export as $line_name => $line_value) {
-                $line_value->{$colname} = $libelle;
-                break;
-            }
-        }
-    }
-
     private function make_csv()
     {
-        // Manage encoding
-        $this->encode();
-
-        // Object2Array
-        $functions = new functions();
-        $this->array_export = $functions->object2array($this->object_export);
-
-        // Create temp path
-        do {
-            $csvName = $_SESSION['user']['UserId'].'-'.md5(date('Y-m-d H:i:s')).'.csv';
-            if (isset($pathToCsv) && !empty($pathToCsv)) {
-                $csvName = $_SESSION['user']['UserId'].'-'.md5($pathToCsv).'.csv';
-            }
-            $pathToCsv = $_SESSION['config']['tmppath'].$csvName;
-        } while (file_exists($pathToCsv));
-
-        // Write csv
-        $csv = fopen($pathToCsv, 'a+');
-        foreach ($this->array_export as $line) {
-            fputcsv($csv, $line, $this->delimiter, $this->enclosure);
+        $currentUser = \User\models\UserModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['id']]);
+        $rawTemplate = \Resource\models\ExportTemplateModel::get(['select' => ['delimiter', 'data'], 'where' => ['user_id = ?', 'format = ?'], 'data' => [$currentUser['id'], 'csv']]);
+        if (!empty($rawTemplate[0])) {
+            $rawTemplate = $rawTemplate[0];
+            $data = json_decode($rawTemplate['data'], true);
+        } else {
+            $rawTemplate = ['delimiter' => ';'];
+            $data = [
+                ["value" => "res_id", "label" => "Identifiant GED", "isFunction" => false],
+                ["value" => "doc_date", "label" => "Date d'arrivée", "isFunction" => false],
+                ["value" => "getInitiatorEntity", "label" => "Entité initiatrice", "isFunction" => true],
+                ["value" => "getDestinationEntity", "label" => "Entité traitante", "isFunction" => true],
+                ["value" => "getAssignee", "label" => "Destinataire", "isFunction" => true],
+                ["value" => "subject", "label" => "Objet", "isFunction" => false],
+                ["value" => "type_label", "label" => "Type de courrier", "isFunction" => false],
+                ["value" => "getStatus", "label" => "Statut", "isFunction" => true],
+                ["value" => "getPriority", "label" => "Priorité", "isFunction" => true],
+                ["value" => "getCopies", "label" => "Utilisateurs / Entités en copie", "isFunction" => true],
+                ["value" => "getCategory", "label" => "Catégorie", "isFunction" => true],
+                ["value" => "getSenders", "label" => "Expéditeurs", "isFunction" => true],
+                ["value" => "getRecipients", "label" => "Destinataires", "isFunction" => true],
+                ["value" => "getSignatories", "label" => "Signataires", "isFunction" => true],
+                ["value" => "getSignatureDates", "label" => "Date de signature", "isFunction" => true],
+                ["value" => "getTags", "label" => "Mots clés", "isFunction" => true],
+            ];
         }
-        fclose($csv);
 
-        // Return csvName
+        $select           = ['res_view_letterbox.res_id'];
+        $tableFunction    = [];
+        $leftJoinFunction = [];
+        $csvHead          = [];
+        foreach ($data as $value) {
+            $csvHead[] = $value['label'];
+            if (empty($value['value'])) {
+                continue;
+            }
+            if ($value['isFunction']) {
+                if ($value['value'] == 'getStatus') {
+                    $select[] = 'status.label_status AS "status.label_status"';
+                    $tableFunction[] = 'status';
+                    $leftJoinFunction[] = 'res_view_letterbox.status = status.id';
+                } elseif ($value['value'] == 'getPriority') {
+                    $select[] = 'priorities.label AS "priorities.label"';
+                    $tableFunction[] = 'priorities';
+                    $leftJoinFunction[] = 'res_view_letterbox.priority = priorities.id';
+                } elseif ($value['value'] == 'getCategory') {
+                    $select[] = 'res_view_letterbox.category_id';
+                } elseif ($value['value'] == 'getInitiatorEntity') {
+                    $select[] = 'enone.short_label AS "enone.short_label"';
+                    $tableFunction[] = 'entities enone';
+                    $leftJoinFunction[] = 'res_view_letterbox.initiator = enone.entity_id';
+                } elseif ($value['value'] == 'getDestinationEntity') {
+                    $select[] = 'entwo.short_label AS "entwo.short_label"';
+                    $tableFunction[] = 'entities entwo';
+                    $leftJoinFunction[] = 'res_view_letterbox.destination = entwo.entity_id';
+                } elseif ($value['value'] == 'getDestinationEntityType') {
+                    $select[] = 'enthree.entity_type AS "enthree.entity_type"';
+                    $tableFunction[] = 'entities enthree';
+                    $leftJoinFunction[] = 'res_view_letterbox.destination = enthree.entity_id';
+                } elseif ($value['value'] == 'getTypist') {
+                    $select[] = 'res_view_letterbox.typist';
+                } elseif ($value['value'] == 'getAssignee') {
+                    $select[] = 'res_view_letterbox.dest_user';
+                } elseif ($value['value'] == 'getDepartment') {
+                    $select[] = 'res_view_letterbox.department_number_id';
+                }
+            } else {
+                $select[] = "res_view_letterbox.{$value['value']}";
+            }
+        }
+
+        $order = 'CASE res_view_letterbox.res_id ';
+        foreach ($this->array_export as $key => $resId) {
+            $order .= "WHEN {$resId} THEN {$key} ";
+        }
+        $order .= 'END';
+
+        $aChunkedResources = array_chunk($this->array_export, 10000);
+        $resources = [];
+        foreach ($aChunkedResources as $chunkedResource) {
+            $resourcesTmp = \Resource\models\ResourceListModel::getOnView([
+                'select'    => $select,
+                'table'     => $tableFunction,
+                'leftJoin'  => $leftJoinFunction,
+                'where'     => ['res_view_letterbox.res_id in (?)'],
+                'data'      => [$chunkedResource],
+                'orderBy'   => [$order]
+            ]);
+            $resources = array_merge($resources, $resourcesTmp);
+        }
+
+        $file = \Resource\controllers\ExportController::getCsv(['delimiter' => $rawTemplate['delimiter'], 'data' => $data, 'resources' => $resources, 'chunkedResIds' => $aChunkedResources]);
+
+        $csvName = $_SESSION['user']['UserId'].'-'.md5(date('Y-m-d H:i:s')).'.csv';
+        $pathToCsv = $_SESSION['config']['tmppath'].$csvName;
+        file_put_contents($pathToCsv, stream_get_contents($file));
+        fclose($file);
+
         return $csvName;
     }
 }

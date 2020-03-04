@@ -103,7 +103,7 @@ abstract class basket_Abstract extends Database
 
         $user = \User\models\UserModel::getByLogin(['login' => $userData['UserId'], 'select' => ['id']]);
 
-        if (isset($userData['primarygroup']) && isset($userData['UserId'])) {
+        if (isset($userData['UserId'])) {
             $db = new Database();
             $stmt = $db->query("SELECT ubp.basket_id, ubp.group_serial_id FROM users_baskets_preferences ubp, baskets WHERE user_serial_id = ? AND ubp.display = TRUE AND ubp.basket_id = baskets.basket_id order by ubp.group_serial_id, baskets.basket_order, baskets.basket_name ", [$user['id']]);
             while ($res = $stmt->fetchObject()) {
@@ -113,7 +113,7 @@ abstract class basket_Abstract extends Database
             }
         }
 
-        if (isset($userData['primarygroup']) && isset($userData['UserId'])) {
+        if (isset($userData['UserId'])) {
             $absBasketsArr = $this->load_basket_abs($userData['UserId']);
             $_SESSION['user']['baskets'] = array_merge(
                $_SESSION['user']['baskets'],

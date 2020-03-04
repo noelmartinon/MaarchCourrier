@@ -70,4 +70,11 @@ export class FunctionsService {
             return date;
         }
     }
+
+    listSortingDataAccessor(data: any, sortHeaderId: any) {
+        if (typeof data[sortHeaderId] === 'string') {
+            return data[sortHeaderId].toLowerCase();
+        }
+        return data[sortHeaderId];
+    }
 }

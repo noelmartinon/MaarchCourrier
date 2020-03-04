@@ -6,13 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { XParaphComponent } from './x-paraph/x-paraph.component';
 import { MaarchParaphComponent } from './maarch-paraph/maarch-paraph.component';
+import { FastParaphComponent } from './fast-paraph/fast-paraph.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
     templateUrl: "send-external-signatory-book-action.component.html",
     styleUrls: ['send-external-signatory-book-action.component.scss'],
-    providers: [NotificationService],
 })
 export class SendExternalSignatoryBookActionComponent implements OnInit {
 
@@ -45,6 +45,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     
     @ViewChild('xParaph', { static: false }) xParaph: XParaphComponent;
     @ViewChild('maarchParapheur', { static: false }) maarchParapheur: MaarchParaphComponent;
+    @ViewChild('fastParapheur', { static: false }) fastParapheur: FastParaphComponent;
 
     constructor(
         public http: HttpClient,
@@ -61,30 +62,10 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
 
     onSubmit() {
         this.loading = true;
-        if ( this.data.resIds.length === 0) {
-            // this.indexDocumentAndExecuteAction();
-        } else {
+        if ( this.data.resIds.length > 0) {
             this.executeAction();
         }
     }
-
-    /* indexDocumentAndExecuteAction() {
-        
-        this.http.post('../../rest/resources', this.data.resource).pipe(
-            tap((data: any) => {
-                this.data.resIds = [data.resId];
-            }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, {resource : this.data.resIds[0], note : this.noteEditor.getNoteContent()})),
-            tap(() => {
-                this.dialogRef.close('success');
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe()
-    } */
 
     checkExternalSignatureBook() {
         this.loading = true;
@@ -107,6 +88,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
+                    this.dialogRef.close();
                     return of(false);
                 })
             ).subscribe();
@@ -120,10 +102,10 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         realResSelected = this[this.signatoryBookEnabled].getRessources();
         datas = this[this.signatoryBookEnabled].getDatas();
         
-        this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNoteContent(), data: datas}).pipe(
+        this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas}).pipe(
             tap((data: any) => {
                 if (!data) {
-                    this.dialogRef.close('success');
+                    this.dialogRef.close(realResSelected);
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
@@ -131,7 +113,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

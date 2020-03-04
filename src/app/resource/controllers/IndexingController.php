@@ -26,6 +26,7 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\ValidatorModel;
 use User\models\UserGroupModel;
@@ -96,7 +97,7 @@ class IndexingController
         }
 
         $body['data'] = empty($body['data']) ? [] : $body['data'];
-        $body['note'] = empty($body['note']) ? null : $body['note'];
+        $body['note'] = empty($body['note']) ? [] : $body['note'];
 
         if (!empty($actionRequiredFields)) {
             $requiredFieldsValid = ActionController::checkRequiredFields(['resId' => $body['resource'], 'actionRequiredFields' => $actionRequiredFields]);
@@ -250,14 +251,7 @@ class IndexingController
     {
         $allowedFiles = StoreController::getAllowedFiles();
 
-        $uploadMaxFilesize = ini_get('upload_max_filesize');
-        $uploadMaxFilesize = StoreController::getBytesSizeFromPhpIni(['size' => $uploadMaxFilesize]);
-        $postMaxSize = ini_get('post_max_size');
-        $postMaxSize = StoreController::getBytesSizeFromPhpIni(['size' => $postMaxSize]);
-        $memoryLimit = ini_get('memory_limit');
-        $memoryLimit = StoreController::getBytesSizeFromPhpIni(['size' => $memoryLimit]);
-
-        $maximumSize = min($uploadMaxFilesize, $postMaxSize, $memoryLimit);
+        $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
         $maximumSizeLabel = round($maximumSize / 1048576, 3) . ' Mo';
 
         return $response->withJson(['informations' => ['maximumSize' => $maximumSize, 'maximumSizeLabel' => $maximumSizeLabel, 'allowedFiles' => $allowedFiles]]);

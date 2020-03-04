@@ -36,7 +36,7 @@
                 </mat-option>
             </mat-optgroup>
         </mat-autocomplete>
-        <button mat-icon-button matSuffix *ngIf="avisWorkflow.items.length > 0" color="primary"
+        <button mat-icon-button matSuffix *ngIf="avisWorkflow.items.length > 0 && showListModels" color="primary"
             (click)="$event.stopPropagation();openPromptSaveModel()">
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
@@ -46,7 +46,7 @@
         <div class="emptyContent" *ngIf="avisWorkflow.items.length === 0">
             {{lang.noPerson}}
         </div>
-        <mat-list-item *ngFor="let diffusion of avisWorkflow.items;let i=index" cdkDrag class="columns workflow"
+        <mat-list-item disableRipple *ngFor="let diffusion of avisWorkflow.items;let i=index" cdkDrag class="columns workflow"
             [cdkDragDisabled]="!adminMode || !functions.empty(diffusion.process_date)"
             [class.notDraggable]="!adminMode || !functions.empty(diffusion.process_date)"
             [class.notEditable]="!adminMode" [class.processed]="diffusion.process_date != null">

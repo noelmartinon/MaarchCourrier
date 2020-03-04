@@ -5,7 +5,7 @@ import { NotificationService } from '../notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { HeaderService } from '../../service/header.service';
 import { FiltersListService } from '../../service/filtersList.service';
 
@@ -28,23 +28,23 @@ import { FunctionsService } from '../../service/functions.service';
 import { PrintedFolderModalComponent } from '../printedFolder/printed-folder-modal.component';
 
 
-
 @Component({
     templateUrl: "process.component.html",
     styleUrls: [
         'process.component.scss',
         '../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [NotificationService, AppService, ActionsService, ContactService],
+    providers: [AppService, ActionsService, ContactService],
 })
 export class ProcessComponent implements OnInit {
 
     lang: any = LANG;
 
-    loading: boolean = false;
+    loading: boolean = true;
 
     detailMode: boolean = false;
     navButton: any = null;
+    isMailing: boolean = false;
 
     currentResourceLock: any = null;
 
@@ -95,16 +95,16 @@ export class ProcessComponent implements OnInit {
             count: 0
         },
         {
+            id: 'emails',
+            icon: 'fas fa-envelope',
+            label: this.lang.mailsSentAlt,
+            count: 0
+        },
+        {
             id: 'diffusionList',
             icon: 'fas fa-share-alt',
             label: this.lang.diffusionList,
             editMode: false,
-            count: 0
-        },
-        {
-            id: 'emails',
-            icon: 'fas fa-envelope',
-            label: this.lang.mailsSentAlt,
             count: 0
         },
         {
@@ -149,7 +149,7 @@ export class ProcessComponent implements OnInit {
     @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
-    @ViewChild('appDocumentViewer', { static: true }) appDocumentViewer: DocumentViewerComponent;
+    @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
     @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
@@ -189,7 +189,7 @@ export class ProcessComponent implements OnInit {
 
         this.headerService.setHeader(this.lang.eventProcessDoc);
 
-        this.route.params.subscribe(params => {
+        this.route.params.subscribe(params => {            
             if (typeof params['detailResId'] !== "undefined") {
                 this.initDetailPage(params);
             } else {
@@ -200,7 +200,29 @@ export class ProcessComponent implements OnInit {
         });
     }
 
-    initProcessPage(params: any) {
+    checkAccesDocument(resId: number) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../../rest/resources/${resId}/isAllowed`).pipe(
+                tap((data: any) => {
+                    if (data.isAllowed) {
+                        resolve(true);
+                    } else {
+                        this.notify.error(this.lang.documentOutOfPerimeter);
+                        this.router.navigate([`/home`]);
+                    }
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.router.navigate([`/home`]);
+                    return of(false);
+                })
+            )
+            .subscribe();
+        });
+    }
+
+    async initProcessPage(params: any) {
+        
         this.detailMode = false;
 
         this.currentUserId = params['userSerialId'];
@@ -217,6 +239,8 @@ export class ProcessComponent implements OnInit {
             label: this.lang.backBasket, 
             route: `/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`
         }
+
+        await this.checkAccesDocument(this.currentResourceInformations.resId);
 
         this.lockResource();
         this.loadBadges();
@@ -251,7 +275,11 @@ export class ProcessComponent implements OnInit {
         ).subscribe();
     }
 
-    initDetailPage(params: any) {
+    async initDetailPage(params: any) {
+        this._activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
+            this.isMailing = !this.functions.empty(paramMap.get('isMailing')) ;
+        });
+        
         this.detailMode = true;
         this.currentResourceInformations = {
             resId: params['detailResId'],
@@ -262,6 +290,8 @@ export class ProcessComponent implements OnInit {
             label: this.lang.back, 
             route: `__GOBACK`
         }
+
+        await this.checkAccesDocument(this.currentResourceInformations.resId);
 
         this.loadBadges();
         this.loadResource();
@@ -282,7 +312,11 @@ export class ProcessComponent implements OnInit {
             tap((data: any) => {
                 this.currentResourceInformations = data;
                 this.resourceFollowed = data.followed;
-                this.loadSenders();
+                if (this.currentResourceInformations.categoryId !== 'outgoing') {
+                    this.loadSenders();
+                } else {
+                    this.loadRecipients();
+                }
                 this.setEditDataPrivilege();
                 this.loadAvaibleIntegrations(data.integrations);
                 this.headerService.setHeader(this.detailMode ? this.lang.detailDoc : this.lang.eventProcessDoc, this.lang[this.currentResourceInformations.categoryId]);
@@ -298,6 +332,9 @@ export class ProcessComponent implements OnInit {
     setEditDataPrivilege() {
         if (this.detailMode) {
             this.canEditData =  this.privilegeService.hasCurrentUserPrivilege('edit_resource') && this.currentResourceInformations.statusAlterable;
+            if (this.isMailing && this.isToolEnabled('attachments')) {
+                this.currentTool = 'attachments';
+            }
         } else {
             this.http.get(`../../rest/resources/${this.currentResourceInformations.resId}/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/processingData`).pipe(
                 tap((data: any) => {
@@ -415,6 +452,58 @@ export class ProcessComponent implements OnInit {
         }
     }
 
+    loadRecipients() {
+
+        if (this.currentResourceInformations.recipients === undefined || this.currentResourceInformations.recipients.length === 0) {
+            this.hasContact = false;
+            this.senderLightInfo = { 'displayName': this.lang.noSelectedContact, 'filling': null };
+        } else if (this.currentResourceInformations.recipients.length == 1) {
+            this.hasContact = true;
+            if (this.currentResourceInformations.recipients[0].type === 'contact') {
+                this.http.get('../../rest/contacts/' + this.currentResourceInformations.recipients[0].id).pipe(
+                    tap((data: any) => {
+                        const arrInfo = [];
+                        if (this.empty(data.firstname) && this.empty(data.lastname)) {
+                            if (!this.functions.empty(data.fillingRate)) {
+                                this.senderLightInfo = { 'displayName': data.company, 'filling': this.contactService.getFillingColor(data.fillingRate.thresholdLevel) };
+                            } else {
+                                this.senderLightInfo = { 'displayName': data.company };
+                            }
+
+                        } else {
+                            arrInfo.push(data.firstname);
+                            arrInfo.push(data.lastname);
+                            if (!this.empty(data.company)) {
+                                arrInfo.push('(' + data.company + ')');
+                            }
+                            if (!this.functions.empty(data.fillingRate)) {
+                                this.senderLightInfo = { 'displayName': arrInfo.filter(info => info !== '').join(' '), 'filling': this.contactService.getFillingColor(data.fillingRate.thresholdLevel) };
+                            } else {
+                                this.senderLightInfo = { 'displayName': arrInfo.filter(info => info !== '').join(' ') };
+                            }
+
+                        }
+                    })
+                ).subscribe();
+            } else if (this.currentResourceInformations.recipients[0].type == 'entity') {
+                this.http.get('../../rest/entities/' + this.currentResourceInformations.recipients[0].id).pipe(
+                    tap((data: any) => {
+                        this.senderLightInfo = { 'displayName': data.entity_label, 'filling': null };
+                    })
+                ).subscribe();
+            } else if (this.currentResourceInformations.recipients[0].type == 'user') {
+                this.http.get('../../rest/users/' + this.currentResourceInformations.recipients[0].id).pipe(
+                    tap((data: any) => {
+                        this.senderLightInfo = { 'displayName': data.firstname + ' ' + data.lastname, 'filling': null };
+                    })
+                ).subscribe();
+            }
+        } else if (this.currentResourceInformations.recipients.length > 1) {
+            this.hasContact = true;
+            this.senderLightInfo = { 'displayName': this.currentResourceInformations.recipients.length + ' ' + this.lang.recipients, 'filling': null };
+        }
+    }
+
     lockResource() {
         this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
             catchError((err: any) => {
@@ -478,7 +567,7 @@ export class ProcessComponent implements OnInit {
         }
     }
 
-    processAction() {
+    async processAction() {
         if (this.indexingForm.isValidForm()) {
             if (this.isToolModified()) {
                 const dialogRef = this.openConfirmModification();
@@ -489,16 +578,22 @@ export class ProcessComponent implements OnInit {
                         }
                     }),
                     filter((data: string) => data === 'ok'),
-                    tap(() => {
+                    tap(async () => {
                         this.saveTool();
+                        if (this.appDocumentViewer.isEditingTemplate()) {
+                            await this.appDocumentViewer.saveMainDocument();
+                        }
                     }),
                     finalize(() => this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false)),
                     catchError((err: any) => {
-                        this.notify.handleErrors(err);
+                        this.notify.handleSoftErrors(err);
                         return of(false);
                     })
                 ).subscribe();
             } else {
+                if (this.appDocumentViewer.isEditingTemplate()) {
+                    await this.appDocumentViewer.saveMainDocument();
+                }
                 this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
             }
         } else {
@@ -616,7 +711,7 @@ export class ProcessComponent implements OnInit {
 
     openContact() {
         if (this.hasContact) {
-            this.dialog.open(ContactsListModalComponent, { data: { title: `${this.currentResourceInformations.chrono} - ${this.currentResourceInformations.subject}`, mode: 'senders', resId: this.currentResourceInformations.resId } });
+            this.dialog.open(ContactsListModalComponent, { data: { title: `${this.currentResourceInformations.chrono} - ${this.currentResourceInformations.subject}`, mode: this.currentResourceInformations.categoryId !== 'outgoing' ? 'senders' : 'recipients', resId: this.currentResourceInformations.resId } });
         }
     }
 
@@ -653,7 +748,6 @@ export class ProcessComponent implements OnInit {
     async saveTool() {
         if (this.currentTool === 'info' && this.indexingForm !== undefined) {
             await this.indexingForm.saveData();
-            this.loadBadges();
         } else if (this.currentTool === 'diffusionList' && this.appDiffusionsList !== undefined) {
             await this.appDiffusionsList.saveListinstance();
             this.loadBadges();
@@ -689,6 +783,7 @@ export class ProcessComponent implements OnInit {
 
         if (this.resourceFollowed) {
             this.http.post('../../rest/resources/follow', { resources: [this.currentResourceInformations.resId] }).pipe(
+                tap(() => this.headerService.nbResourcesFollowed++),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
                     return of(false);
@@ -696,6 +791,7 @@ export class ProcessComponent implements OnInit {
             ).subscribe();
         } else {
             this.http.request('DELETE', '../../rest/resources/unfollow', { body: { resources: [this.currentResourceInformations.resId] } }).pipe(
+                tap(() => this.headerService.nbResourcesFollowed--),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
                     return of(false);

@@ -48,8 +48,14 @@
     &-item {
         font-size: 14px !important;
         align-items: center;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        grid-gap: 20px;
     }
+}
+
+.attachments {
+    grid-template-columns: 1fr 2fr 1fr 1fr;
 }
 
 .printedFolderContainer {
@@ -60,4 +66,9 @@
 
 .mat-expansion-panel-header[aria-disabled="true"] {
     color: initial !important;
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

@@ -97,7 +97,8 @@
             <div class="autoCompleteInfoResult smallInputInfo create-contact"
                 *ngIf="canAdd && (noResultFound !== null || options.length > 0) && !loading" disabled>
                 <a style="cursor: pointer;" (click)="$event.stopPropagation();openContact()">
-                    {{lang.createContact}} ?
+                    <mat-icon matSuffix class="fas fa-plus-circle" style="padding-top: 5px"></mat-icon>
+                    {{lang.createContact}}
                 </a>
             </div>
         </mat-autocomplete>
@@ -125,6 +126,7 @@
                             *ngIf="!empty(this.valuesToDisplay[item.id].company)">
                             ({{this.valuesToDisplay[item.id].company}})</ng-container>
                     </span>
+                    <i *ngIf="!functions.empty(valuesToDisplay[item.id].fillingRate.color)" class="fa fa-circle" [style.color]="valuesToDisplay[item.id].fillingRate.color" style="font-size: 9px;"></i>
                     <mat-icon matChipRemove class="fa fa-times" *ngIf="!controlAutocomplete.disabled"></mat-icon>
                 </mat-chip>
             </ng-container>

@@ -158,6 +158,7 @@ export const LANG_NL = {
     "chooseRedirectGroup"                   : "Kies een vervangingsgroep",
     "chosenDatas"                           : "_TO_TRANSLATE",
     "chosenModel"                           : "Gebruikt model",
+    "loadedFile"                            : "Loaded file", //_TO_TRANSLATE
     "chrono"                                : "Chrono",
     "chronoNumber"                          : "Chrononummer",
     "chronoNumberShort"                     : "Chrono Num", //_TO_TRANSLATE
@@ -286,6 +287,7 @@ export const LANG_NL = {
     "diffusionModelModification"            : "Wijziging van een verdelingsmodel",
     "diffusionModels"                       : "Verdelingsmodellen",
     "diffusionModelUpdated"                 : "Verdelingsmodel bijgewerkt",
+    "diffusionModelAdded"                   : "Diffusion model added", //_TO_TRANSLATE
     "diffusionType"                         : "Modeltype",
     "disable"                               : "Uitschakelen",
     "disableBasket"                         : "Het bakje uitschakelen",
@@ -813,7 +815,8 @@ export const LANG_NL = {
     "sameLevelMyPrimaryEntity"              : "Same level of my primary entity", //_TO_TRANSLATE
     "saturday"                              : "Zaterdag",
     "save"                                  : "Bewaren",
-    "manageNumericPackage"                    : "Een digitale brief bewaren",
+    "manageNumericPackage"                  : "Een digitale brief bewaren",
+    "saveNumericPackage"                    : "Save numeric package", //_TO_TRANSLATE
     "sbSignatures"                          : "Handtekeningen van de parafeerder",
     "script"                                : "Script",
     "scriptCreated"                         : "Script aangemaakt",
@@ -1506,7 +1509,7 @@ export const LANG_NL = {
     "criteriaContactFieldDesc": "Search the company, the name, the firstname or a part of these elements", //_TO_TRANSLATE
     "mailInformations": "Mail informations", //_TO_TRANSLATE
     "visaNote": "Order", //_TO_TRANSLATE
-    "chooseBAN": "Choose a BAN", //_TO_TRANSLATE
+    "chooseBAN": "Choose an address", //_TO_TRANSLATE
     "click": "Click", //_TO_TRANSLATE
     "removeNote" : "Remove note", //_TO_TRANSLATE
     "editNote" : "Edit note", //_TO_TRANSLATE
@@ -1580,20 +1583,39 @@ export const LANG_NL = {
     "tagUpdated" : "Tag updated", //_TO_TRANSLATE
     "tagMerged" : "Tag merged", //_TO_TRANSLATE
     "mergeWith" : "Merge with", //_TO_TRANSLATE
-    "willBeTransferredToNewTag" : "will be transferred to tag ", //_TO_TRANSLATE
+    "willBeTransferredToNewTag" : "Number of mails that will be transferred to the tag ", //_TO_TRANSLATE
     "detailDoc" : "Detail page", //_TO_TRANSLATE
     "emptySubject" : "Empty subject", //_TO_TRANSLATE
     "noAvailableMenu" : "No available menu", //_TO_TRANSLATE
+    "mailNotPresentInBasket" : "Mail not present in basket", //_TO_TRANSLATE
     "emailSent" : "Email sent", //_TO_TRANSLATE
     "emailCannotSent" : "Error during sending email", //_TO_TRANSLATE
+    "sentToFastParapheur" : "Send to FAST-Parapheur", //_TO_TRANSLATE
     "editAcknowledgementReceipt" : "Edit the acknowledgement receipt", //_TO_TRANSLATE
     "insufficientPrivilege" : "Privilege insuffisant", //TRANSLATE
     "cannotMergeTags" : "This tag has a parent or children : impossible to merge tags",//_TO_TRANSLATE
     "mergeTagWith" : "Merge this tag with",//_TO_TRANSLATE
     "generateAndDownloadPrintedFolder" : "Generate the printed folder", //_TO_TRANSLATE
+    "printedFolder" : "Printed folder", //_TO_TRANSLATE
     "mainDocument" : "Main document", //_TO_TRANSLATE
     "attachSummarySheet" : "Attach the summary sheet", //_TO_TRANSLATE
-    "generateSeparators" : "Generate separators for each elements", //_TO_TRANSLATE
+    "generateSeparators" : "Generate separators for each attachments and acknowledgement receipt", //_TO_TRANSLATE
     "theTag" : "The tag",//_TO_TRANSLATE
-    "willBeDeletedAndMerged" : "will be deleted and merged with the tag",//_TO_TRANSLATE
+    "addUsers" : "Add users", //_TO_TRANSLATE
+    "willBeDeletedAndMerged" : "will be deleted and merged with the tag", //_TO_TRANSLATE
+    "mailing" : "Mailing", //_TO_TRANSLATE
+    "goToBasket" : "Go to basket...", //_TO_TRANSLATE
+    "manualSendingAR" : "Manual sending...", //_TO_TRANSLATE
+    "enableMailing" : "Enable mailing",  //_TO_TRANSLATE
+    "disableMailing" : "Disable mailing", //_TO_TRANSLATE
+    "selectContact" : "select a contact", //_TO_TRANSLATE
+    "mailingMsg" : "<b>Mailing enbled</b> : <br><br><p>A <b>master</b> attachment will be created without merged field <b>contact</b> (attachmentRecipient).</p><p>If you click on Mailing, the attachmenets will be generated <b>NOW</b>.<br><br>If you click on Validate, They will be generated <b>BEFORE</b> to send to the first <b>signatory</b> of visa circuit.</p><p><b>One</b> attachment will be generated for <b>each contact</b> linked to the mail.</p>", //_TO_TRANSLATE
+    "attachmentGenerated" : "Attachment generated", //_TO_TRANSLATE
+    "mustEditAttachmentFirst" : "You must edit the attachment first", //_TO_TRANSLATE
+    "saveAndClose" : "Save and close", //_TO_TRANSLATE
+    "opinionCircuit" : "Opinion circuit", //_TO_TRANSLATE 
+    "visaCircuit" : "Visa circuit",  //_TO_TRANSLATE
+    "shippingUnavailable" : "<b>Warning </b> Shipping is not activated. Check the configuration file mailevaConfig.xml", //_TO_TRANSLATE
+    "diffNoDestmsg" : "No <b>assignee</b> defined, you <b>can't</b> modify the diffusion list.", //_TO_TRANSLATE
+    "noDest" : "No <b>assignee</b> defined",
 };

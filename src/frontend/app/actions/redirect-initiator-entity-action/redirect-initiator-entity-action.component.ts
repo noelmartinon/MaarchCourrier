@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 @Component({
     templateUrl: "redirect-initiator-entity-action.component.html",
     styleUrls: ['redirect-initiator-entity-action.component.scss'],
-    providers: [NotificationService],
 })
 export class redirectInitiatorEntityActionComponent implements OnInit {
 
@@ -37,6 +36,7 @@ export class redirectInitiatorEntityActionComponent implements OnInit {
             }, (err) => {
                 this.notify.error(err.error.errors);
                 this.loadingInit = false;
+                this.dialogRef.close();
             });
     }
 
@@ -46,20 +46,16 @@ export class redirectInitiatorEntityActionComponent implements OnInit {
     }
 
     executeAction() {
-        // let realResSelected: string[];
-        // console.log(this.resourcesInfo.withEntity);
-        // realResSelected = this.resourcesInfo.withEntity.map((e: any) => { return e.res_id; });
-        // console.log(realResSelected);
-        this.http.put(this.data.processActionRoute, { resources: this.resourcesInfo.withEntity, note: this.noteEditor.getNoteContent() }).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.resourcesInfo.withEntity, note: this.noteEditor.getNote() }).pipe(
             tap((data: any) => {
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
                 }
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.resourcesInfo.withEntity);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

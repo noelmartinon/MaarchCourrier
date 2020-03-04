@@ -17,7 +17,6 @@ namespace Basket\models;
 use SrcCore\models\ValidatorModel;
 use Resource\models\ResModel;
 use SrcCore\controllers\PreparedClauseController;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use User\models\UserBasketPreferenceModel;
 use User\models\UserModel;
@@ -84,7 +83,7 @@ abstract class BasketModelAbstract
     public static function create(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['id', 'basket_name', 'basket_desc', 'clause', 'isVisible', 'flagNotif']);
-        ValidatorModel::stringType($aArgs, ['id', 'basket_name', 'color', 'basket_desc', 'clause', 'isVisible', 'flagNotif']);
+        ValidatorModel::stringType($aArgs, ['id', 'basket_name', 'color', 'basket_desc', 'clause', 'isVisible', 'flagNotif', 'basket_res_order']);
 
         DatabaseModel::insert([
             'table'         => 'baskets',
@@ -97,6 +96,7 @@ abstract class BasketModelAbstract
                 'flag_notif'        => $aArgs['flagNotif'],
                 'color'             => $aArgs['color'],
                 'coll_id'           => 'letterbox_coll',
+                'basket_res_order'  => $aArgs['basket_res_order'],
             ]
         ]);
 

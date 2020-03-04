@@ -14,7 +14,6 @@
 
 namespace ExternalSummary\controllers;
 
-
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Email\models\EmailModel;
 use MessageExchange\models\MessageExchangeModel;
@@ -26,7 +25,6 @@ use User\models\UserModel;
 
 class SummaryController
 {
-
     public static function getByResId(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
@@ -38,14 +36,28 @@ class SummaryController
             return $response->withStatus(403)->withJson(['errors' => 'Query limit is not an int val']);
         }
 
-        $emails = EmailModel::get(['select' => ['object', 'send_date', 'user_id', 'status'], 'where' => ['document->>\'id\' = ?', 'status in (?)'], 'data' => [$args['resId'], ['SENT', 'ERROR']], 'limit' => (int)$queryParams['limit']]);
+        $emails = EmailModel::get([
+            'select'  => ['object', 'send_date', 'user_id', 'status'],
+            'where'   => ['document->>\'id\' = ?', 'status in (?)'],
+            'data'    => [$args['resId'], ['SENT', 'ERROR']],
+            'orderBy' => ['send_date desc'],
+            'limit'   => (int)$queryParams['limit']
+        ]);
+
         foreach ($emails as $key => $value) {
             $userInfo = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $value['user_id']]);
             $emails[$key]['userInfo'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
             $emails[$key]['type']     = 'email';
             unset($emails[$key]['user_id']);
         }
-        $acknowledgementReceipts = AcknowledgementReceiptModel::get(['select' => ['send_date', 'user_id'], 'where' => ['res_id = ?', 'format = ?', 'send_date is not null'], 'data' => [$args['resId'], 'pdf'], 'limit' => (int)$queryParams['limit']]);
+
+        $acknowledgementReceipts = AcknowledgementReceiptModel::get([
+            'select'  => ['send_date', 'user_id'],
+            'where'   => ['res_id = ?', 'format = ?', 'send_date is not null'],
+            'data'    => [$args['resId'], 'pdf'],
+            'orderBy' => ['send_date desc'],
+            'limit'   => (int)$queryParams['limit']
+        ]);
         foreach ($acknowledgementReceipts as $key => $value) {
             $userInfo = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $value['user_id']]);
             $acknowledgementReceipts[$key]['userInfo'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
@@ -54,7 +66,14 @@ class SummaryController
             $acknowledgementReceipts[$key]['status']   = 'SENT';
             unset($acknowledgementReceipts[$key]['user_id']);
         }
-        $maarch2ged = MessageExchangeModel::get(['select' => ['type', 'date as send_date', 'account_id'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$args['resId'], 'S'], 'limit' => (int)$queryParams['limit']]);
+
+        $maarch2ged = MessageExchangeModel::get([
+            'select'  => ['type', 'date as send_date', 'account_id'],
+            'where'   => ['res_id_master = ?', 'status = ?'],
+            'data'    => [$args['resId'], 'S'],
+            'orderBy' => ['date desc'],
+            'limit'   => (int)$queryParams['limit']
+        ]);
         foreach ($maarch2ged as $key => $value) {
             if (!empty($value['account_id'])) {
                 $userInfo = UserModel::getByLogin(['select' => ['firstname', 'lastname'], 'login' => $value['account_id']]);

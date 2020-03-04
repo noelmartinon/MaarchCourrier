@@ -53,6 +53,7 @@ import { SendExternalSignatoryBookActionComponent }   from './actions/send-exter
 import { SendExternalNoteBookActionComponent }   from './actions/send-external-note-book-action/send-external-note-book-action.component';
 import { XParaphComponent }                         from './actions/send-external-signatory-book-action/x-paraph/x-paraph.component';
 import { MaarchParaphComponent }                         from './actions/send-external-signatory-book-action/maarch-paraph/maarch-paraph.component';
+import { FastParaphComponent }                  from './actions/send-external-signatory-book-action/fast-paraph/fast-paraph.component';
 import { ProcessActionComponent }               from './actions/process-action/process-action.component';
 import { ViewDocActionComponent }               from './actions/view-doc-action/view-doc-action.component';
 import { RedirectActionComponent }               from './actions/redirect-action/redirect-action.component';
@@ -78,8 +79,6 @@ import { ExportComponent }                      from './list/export/export.compo
 import { NoteEditorComponent }                  from './notes/note-editor.component';
 import { NotesListComponent }                   from './notes/notes.component';
 import { AttachmentsListComponent }             from './attachments/attachments-list.component';
-import { VisaWorkflowComponent }             from './visa/visa-workflow.component';
-import { AvisWorkflowComponent }             from './avis/avis-workflow.component';
 
 import { PrintSeparatorComponent }                        from './separator/print-separator/print-separator.component';
 
@@ -139,8 +138,6 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
         NotesListComponent,
         NoteEditorComponent,
         AttachmentsListComponent,
-        VisaWorkflowComponent,
-        AvisWorkflowComponent,
         FiltersListComponent,
         FiltersToolComponent,
         ToolsListComponent,
@@ -163,6 +160,7 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
         SendExternalNoteBookActionComponent,
         XParaphComponent,
         MaarchParaphComponent,
+        FastParaphComponent,
         ProcessActionComponent,
         ViewDocActionComponent,
         RedirectActionComponent,

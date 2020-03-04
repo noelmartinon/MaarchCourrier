@@ -14,6 +14,7 @@
 
 namespace SrcCore\controllers;
 
+use Configuration\models\ConfigurationModel;
 use Email\controllers\EmailController;
 use Firebase\JWT\JWT;
 use SrcCore\models\AuthenticationModel;
@@ -74,7 +75,6 @@ class AuthenticationController
                 $loggingMethod = CoreConfigModel::getLoggingMethod();
 
                 if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'])) {
-
                     $passwordRules = PasswordModel::getEnabledRules();
                     if (!empty($passwordRules['renewal'])) {
                         $currentDate = new \DateTime();
@@ -147,10 +147,18 @@ class AuthenticationController
         UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$args['userId']]]);
 
         $url = UrlController::getCoreUrl() . 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+        $configuration = json_decode($configuration['value'], true);
+        if (!empty($configuration['from'])) {
+            $sender = $configuration['from'];
+        } else {
+            $sender = $args['userEmail'];
+        }
         EmailController::createEmail([
             'userId'    => $args['userId'],
             'data'      => [
-                'sender'        => ['email' => $args['userEmail']],
+                'sender'        => ['email' => $sender],
                 'recipients'    => [$args['userEmail']],
                 'object'        => _NOTIFICATIONS_USER_CREATION_SUBJECT,
                 'body'          => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_USER_CREATION_FOOTER,

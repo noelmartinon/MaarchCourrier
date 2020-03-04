@@ -266,32 +266,8 @@ export class SentResourceListComponent implements OnInit {
                 tap(() => {
                     this.loadList();
                     setTimeout(() => {
-                        this.sentResources.map((draftElement: any) => {
-                            if (draftElement.status == 'WAITING' && draftElement.type == 'email') {
-                                this.http.get(`../../rest/emails/${draftElement.id}`).pipe(
-                                    tap((data: any) => {
-                                        if (data.status == 'SENT' || data.status == 'ERROR') {
-                                            if (data.status == 'SENT') {
-                                                this.notify.success(this.lang.emailSent);
-                                            } else {
-                                                this.notify.error(this.lang.emailCannotSent);
-                                            }
-                                            this.sentResources.map((element: any, key: number) => {
-                                                if (element.id == draftElement.id && element.type == 'email') {
-                                                    this.sentResources[key].status = data.status;
-                                                    this.sentResources[key].sendDate = data.sendDate;
-                                                }
-                                            });
-                                        }
-                                    })
-                                ).subscribe();
-                            }
-                        });
-                        setTimeout(() => {
-                            this.dataSource = new MatTableDataSource(this.sentResources);
-                            this.dataSource.sort = this.sort;
-                        }, 0);
-                    }, 3000);
+                        this.refreshWaitingElements();
+                    }, 5000);
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -299,5 +275,33 @@ export class SentResourceListComponent implements OnInit {
                 })
             ).subscribe();
         }
+    }
+
+    refreshWaitingElements() {
+        this.sentResources.map((draftElement: any) => {
+            if (draftElement.status == 'WAITING' && draftElement.type == 'email') {
+                this.http.get(`../../rest/emails/${draftElement.id}`).pipe(
+                    tap((data: any) => {
+                        if (data.status == 'SENT' || data.status == 'ERROR') {
+                            if (data.status == 'SENT') {
+                                this.notify.success(this.lang.emailSent);
+                            } else {
+                                this.notify.error(this.lang.emailCannotSent);
+                            }
+                            this.sentResources.map((element: any, key: number) => {
+                                if (element.id == draftElement.id && element.type == 'email') {
+                                    this.sentResources[key].status = data.status;
+                                    this.sentResources[key].sendDate = data.sendDate;
+                                }
+                            });
+                        }
+                    })
+                ).subscribe();
+            }
+        });
+        setTimeout(() => {
+            this.dataSource = new MatTableDataSource(this.sentResources);
+            this.dataSource.sort = this.sort;
+        }, 0);
     }
 }

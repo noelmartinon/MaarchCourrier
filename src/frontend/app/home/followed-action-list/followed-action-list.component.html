@@ -10,7 +10,7 @@
         {{this.contextMenuTitle}}
     </div>
     <button *ngIf="selectedRes.length == 1" mat-menu-item [matMenuTriggerFor]="baskets" (menuOpened)="getBaskets()">
-        <span>Accéder à la bannette...</span>
+        <span>{{lang.goToBasket}}</span>
     </button>
     <mat-menu #baskets="matMenu" [class]="'folderListMenu'">
         <ng-container *ngFor="let group of basketList.groups | sortBy : 'groupName'">
@@ -21,6 +21,9 @@
                 </button>
             </ng-container>
         </ng-container>
+        <div class="noAvailableBasket" *ngIf="basketList.groups.length == 0">
+            {{lang.mailNotPresentInBasket}}
+        </div>
     </mat-menu>
     <mat-divider></mat-divider>
     <button mat-menu-item class="folderAction" (click)="unFollow()" [disabled]="selectedRes.length === 0">

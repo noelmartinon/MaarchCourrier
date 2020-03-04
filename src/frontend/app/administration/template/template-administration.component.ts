@@ -377,7 +377,7 @@ export class TemplateAdministrationComponent implements OnInit {
     }
 
     updateTemplateType() {
-        if (this.template.template_target == 'attachments') {
+        if (this.template.template_target == 'attachments' || this.template.template_target == 'indexingFile') {
             this.template.template_type = 'OFFICE';
         } else if (this.template.template_target == 'notifications' || this.template.template_target == 'doctypes' || this.template.template_target == 'sendmail') {
             this.template.template_type = 'HTML';

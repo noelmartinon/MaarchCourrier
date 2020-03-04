@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../app/translate.component';
-import {tap, catchError, filter, finalize, exhaustMap} from 'rxjs/operators';
+import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
 import { of, Subject, Observable } from 'rxjs';
 import { NotificationService } from '../notification.service';
 import { ConfirmActionComponent } from './confirm-action/confirm-action.component';
@@ -33,6 +33,7 @@ import { SendAvisParallelComponent } from './avis-parallel-send-action/send-avis
 import { GiveAvisParallelActionComponent } from './avis-give-parallel-action/give-avis-parallel-action.component';
 import { ValidateAvisParallelComponent } from './avis-parallel-validate-action/validate-avis-parallel-action.component';
 import { HeaderService } from '../../service/header.service';
+import { FunctionsService } from '../../service/functions.service';
 import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
 
 @Injectable()
@@ -64,7 +65,8 @@ export class ActionsService {
         public dialog: MatDialog,
         private notify: NotificationService,
         private router: Router,
-        public headerService: HeaderService
+        public headerService: HeaderService,
+        private functions: FunctionsService
     ) {
     }
 
@@ -119,6 +121,11 @@ export class ActionsService {
 
         if (this.setActionInformations(action, userId, groupId, null, null)) {
             this.setResourceInformations(datas);
+
+            if (datas['followed']) {
+                this.headerService.nbResourcesFollowed++;
+            }
+
             this.loading = true;
             try {
                 this[action.component]();
@@ -131,32 +138,35 @@ export class ActionsService {
         }
     }
 
-
     launchAction(action: any, userId: number, groupId: number, basketId: number, resIds: number[], datas: any, lockRes: boolean = true) {
         if (this.setActionInformations(action, userId, groupId, basketId, resIds)) {
             this.loading = true;
             this.lockMode = lockRes;
             this.setResourceInformations(datas);
             if (this.lockMode) {
-                this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
-                    tap((data: any) => {
-                        if (this.canExecuteAction(data.lockedResources, data.lockers, resIds)) {
-                            try {
-                                this.lockResource();
-                                this[action.component](action.data);
+                if (action.component == 'viewDoc') {
+                    this[action.component](action.data);
+                } else {
+                    this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
+                        tap((data: any) => {
+                            if (this.canExecuteAction(data.lockedResources, data.lockers, resIds)) {
+                                try {
+                                    this.lockResource();
+                                    this[action.component](action.data);
+                                }
+                                catch (error) {
+                                    console.log(error);
+                                    console.log(action);
+                                    alert(this.lang.actionNotExist);
+                                }
                             }
-                            catch (error) {
-                                console.log(error);
-                                console.log(action);
-                                alert(this.lang.actionNotExist);
-                            }
-                        }
-                    }),
-                    catchError((err: any) => {
-                        this.notify.handleErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                }
             } else {
                 try {
                     this[action.component]();
@@ -166,8 +176,7 @@ export class ActionsService {
                     console.log(action);
                     alert(this.lang.actionNotExist);
                 }
-            } 
-            
+            }
         }
     }
 
@@ -188,7 +197,6 @@ export class ActionsService {
             return false;
         }
     }
-
 
     lockResource() {
         this.currentResourceLock = setInterval(() => {
@@ -231,17 +239,17 @@ export class ActionsService {
         }
     }
 
-    unlockResourceAfterActionModal(state: string) {
+    unlockResourceAfterActionModal(resIds: any) {
         this.stopRefreshResourceLock();
-        if (state !== 'success' && this.lockMode) {
+        if (this.functions.empty(resIds) && this.lockMode) {
             this.unlockResource();
         }
     }
 
-    endAction(status: any) {
+    endAction(resIds: any) {
         this.notify.success(this.lang.action + ' : "' + this.currentAction.label + '" ' + this.lang.done);
 
-        this.eventAction.next();
+        this.eventAction.next(resIds);
     }
 
     /* OPEN SPECIFIC ACTION */
@@ -254,12 +262,12 @@ export class ActionsService {
         });
 
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -276,12 +284,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -298,12 +306,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
                 let firstGroup: number = 0;
                 let redirectAfterClose = '';
                 this.headerService.user.groups.filter((group: any) => group.can_index === true).forEach((group: any) => {
@@ -315,11 +323,11 @@ export class ActionsService {
                     }
                 });
                 if (redirectAfterClose != '') {
-                    this.router.navigate([redirectAfterClose], { queryParams: {refresh: new Date().getTime()} });
+                    this.router.navigate([redirectAfterClose], { queryParams: { refresh: new Date().getTime() } });
                 } else if (firstGroup == 0) {
                     this.router.navigate(['/home']);
                 } else {
-                    this.router.navigate(['/indexing/' + firstGroup], { queryParams: {refresh: new Date().getTime()} });
+                    this.router.navigate(['/indexing/' + firstGroup], { queryParams: { refresh: new Date().getTime() } });
                 }
             }),
             finalize(() => this.loading = false),
@@ -337,12 +345,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -359,12 +367,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -381,12 +389,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -403,12 +411,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -425,12 +433,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -447,12 +455,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -469,12 +477,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -491,12 +499,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -520,12 +528,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -542,12 +550,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -563,12 +571,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -585,12 +593,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -607,12 +615,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -629,12 +637,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -647,7 +655,7 @@ export class ActionsService {
 
     noConfirmAction(options: any = null) {
         let dataActionToSend = this.setDatasActionToSend();
-        if ( dataActionToSend.resIds.length === 0) {
+        if (dataActionToSend.resIds.length === 0) {
             this.http.post('../../rest/resources', dataActionToSend.resource).pipe(
                 tap((data: any) => {
                     dataActionToSend.resIds = [data.resId];
@@ -655,8 +663,8 @@ export class ActionsService {
                 exhaustMap(() => this.http.put(dataActionToSend.indexActionRoute, {
                     resource: dataActionToSend.resIds[0]
                 })),
-                tap((result: any) => {
-                    this.endAction(result);
+                tap(() => {
+                    this.endAction(dataActionToSend.resIds);
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
@@ -665,9 +673,9 @@ export class ActionsService {
                 })
             ).subscribe();
         } else {
-            this.http.put(dataActionToSend.processActionRoute, {resources : this.setDatasActionToSend().resIds}).pipe(
-                tap((result: any) => {
-                    this.endAction(result);
+            this.http.put(dataActionToSend.processActionRoute, { resources: this.setDatasActionToSend().resIds }).pipe(
+                tap((resIds: any) => {
+                    this.endAction(resIds);
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
@@ -695,12 +703,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -717,12 +725,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -739,12 +747,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -761,12 +769,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -783,12 +791,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -805,12 +813,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -827,12 +835,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -849,12 +857,12 @@ export class ActionsService {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -885,6 +893,4 @@ export class ActionsService {
             })
         ).subscribe();
     }
-
-    
 }

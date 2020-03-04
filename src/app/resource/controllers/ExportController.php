@@ -42,9 +42,7 @@ class ExportController
 {
     public function getExportTemplates(Request $request, Response $response)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
-
-        $rawTemplates = ExportTemplateModel::getByUserId(['userId' => $currentUser['id']]);
+        $rawTemplates = ExportTemplateModel::getByUserId(['userId' => $GLOBALS['id']]);
 
         $templates = ['pdf' => ['data' => []], 'csv' => ['data' => []]];
         foreach ($rawTemplates as $rawTemplate) {
@@ -206,7 +204,7 @@ class ExportController
         return $response->withHeader('Content-Type', $contentType);
     }
 
-    private static function getCsv(array $aArgs)
+    public static function getCsv(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['delimiter', 'data', 'resources', 'chunkedResIds']);
         ValidatorModel::stringType($aArgs, ['delimiter']);
@@ -239,7 +237,7 @@ class ExportController
                         $copies       = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $csvContent[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $csvContent[] = str_replace('rest/', "apps/maarch_entreprise/index.php?page=details&dir=indexing_searching&id={$resource['res_id']}", \Url::coreurl());
+                        $csvContent[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", \Url::coreurl());
                     } elseif ($value['value'] == 'getParentFolder') {
                         $csvContent[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {
@@ -351,7 +349,7 @@ class ExportController
                         $copies    = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $content[] = str_replace('rest/', "apps/maarch_entreprise/index.php?page=details&dir=indexing_searching&id={$resource['res_id']}", \Url::coreurl());
+                        $content[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", \Url::coreurl());
                     } elseif ($value['value'] == 'getParentFolder') {
                         $content[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {

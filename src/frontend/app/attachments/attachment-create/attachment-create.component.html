@@ -6,11 +6,13 @@
         <span style="flex: 1;">
             {{lang.attachmentCreation}}
         </span>
-        <button *ngIf="!loading" [title]="lang.close" mat-icon-button
-            (click)="dialogRef.close();">
+        <button *ngIf="!loading" [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="attach-content">
+        <div *ngIf="loading" class="loading">
+            <mat-spinner style="margin:auto;"></mat-spinner>
+        </div>
         <mat-tab-group #pjList style="width: 100%;" [(selectedIndex)]="indexTab" *ngIf="!loading">
             <mat-tab *ngFor="let attachment of attachments; let i=index" [disabled]="isDocLoading()">
                 <ng-template mat-tab-label>
@@ -20,8 +22,8 @@
                             <mat-icon class="fa fa-minus"></mat-icon>
                         </button></span>
                 </ng-template>
-                <div style="display:flex;height:100%;">
-                    <div class="attachment-form" *ngIf="!loading">
+                <div style="height:100%;overflow: auto;">
+                    <div class="attachment-form col-md-3 col-sm-12" *ngIf="!loading">
                         <div class="attachment-form-item">
                             <plugin-select-search [label]="lang.type" [placeholderLabel]="lang.type"
                                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes"
@@ -49,8 +51,28 @@
                                     *ngIf="attachment['title'].valid && !isEmptyField(attachment['title'])"></i>
                             </div>
                         </div>
-                        <div class="attachment-form-item">
-                            <app-contact-autocomplete [control]="attachment['recipient']" style="width:100%;" [singleMode]="true" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()">
+                        <div class="attachment-form-item" *ngIf="resourceContacts.length > 1">
+                            <plugin-select-search [label]="lang.selectContact"
+                                [placeholderLabel]="lang.selectContact" [datas]="resourceContacts"
+                                [returnValue]="'object'" [formControlSelect]="selectedContact"
+                                (afterSelected)="selectContact($event)" style="width:100%;">
+                            </plugin-select-search>
+                            <div class="fieldState">
+                                <button mat-icon-button color="primary"
+                                    [title]="sendMassMode ? lang.disableMailing : lang.enableMailing"
+                                    [class.active]="sendMassMode" (click)="toggleSendMass()">
+                                    <mat-icon class="fas fa-mail-bulk"></mat-icon>
+                                </button>
+                                <i class="fas fa-asterisk noMandatory"></i>
+                            </div>
+                        </div>
+                        <div class="attachment-form-item" *ngIf="sendMassMode" style="display: block;">
+                            <div class="alert alert-info" role="alert" [innerHTML]="lang.mailingMsg"></div>
+                        </div>
+                        <div class="attachment-form-item" *ngIf="!sendMassMode">
+                            <app-contact-autocomplete *ngIf="!loadingContact" [control]="attachment['recipient']"
+                                style="width:100%;" [singleMode]="true"
+                                (retrieveDocumentEvent)="appDocumentViewer.saveDocService()">
                             </app-contact-autocomplete>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk noMandatory"></i>
@@ -83,7 +105,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="documentContent">
+                    <div class="documentContent col-md-9 col-sm-12">
                         <app-document-viewer #appDocumentViewer style="height:100%;width:100%;position: relative;"
                             [editMode]="true" [mode]="'attachment'" (triggerEvent)="setDatasViewer(i)">
                         </app-document-viewer>
@@ -96,7 +118,7 @@
             </mat-tab>
             <mat-tab disabled class="addPJ">
                 <ng-template mat-tab-label>
-                    <span><button mat-icon-button [title]="lang.newAttachment"
+                    <span><button mat-icon-button [disabled]="sendMassMode" [title]="lang.newAttachment"
                             (click)="$event.stopPropagation();newPj()">
                             <mat-icon class="fa fa-plus"></mat-icon>
                         </button></span>
@@ -107,6 +129,8 @@
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary" *ngIf="creationMode && !loading" (click)="onSubmit()"
             [disabled]="isDocLoading()">{{lang.validate}}</button>
+        <button mat-raised-button color="primary" *ngIf="sendMassMode && !loading" (click)="onSubmit('mailing')"
+            [disabled]="isDocLoading()">{{lang.mailing}}</button>
         <button mat-raised-button mat-button *ngIf="creationMode && !loading" [disabled]="isDocLoading()"
             [mat-dialog-close]="">{{lang.cancel}}</button>
     </div>

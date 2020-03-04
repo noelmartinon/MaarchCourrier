@@ -36,7 +36,6 @@
                         <mat-icon mat-list-icon class="contact-group fa fa-sitemap"
                             [title]="lang.contactsParameters_department"></mat-icon>
                         <p mat-line class="contact-content"> {{contact.department}} </p>
-                        <p mat-line class="contact-content" *ngIf="!empty(contact.addressAdditional1)"> ({{contact.addressAdditional1}}) </p>
                     </mat-list-item>
                     <mat-list-item class="contact-item" *ngIf="!empty(contact.email)">
                         <mat-icon mat-list-icon class="contact-group far fa-envelope" [title]="lang.email"></mat-icon>
@@ -50,7 +49,7 @@
                     <mat-list-item class="contact-address" (click)="goTo(contact)" [title]="lang.address" *ngIf="!empty(contact.addressNumber) || !empty(contact.addressStreet) || !empty(contact.addressAdditional2) || !empty(contact.addressPostcode) || !empty(contact.addressTown) || !empty(contact.addressCountry)">
                         <mat-icon mat-list-icon class="contact-group fas fa-map-marker-alt"></mat-icon>
                         <p mat-line class="contact-content" *ngIf="!empty(contact.addressNumber) || !empty(contact.addressStreet)"> {{contact.addressNumber}} {{contact.addressStreet}} </p>
-                        <p mat-line class="contact-content" *ngIf="!empty(contact.addressAdditional2)"> ({{contact.addressAdditional2}}) </p>
+                        <p mat-line class="contact-content" *ngIf="!empty(contact.addressAdditional1) || !empty(contact.addressAdditional2)">{{contact.addressAdditional1}} {{contact.addressAdditional2}} </p>
                         <p mat-line class="contact-content" *ngIf="!empty(contact.addressPostcode) || !empty(contact.addressTown)"> {{contact.addressPostcode}} {{contact.addressTown}} </p>
                         <p mat-line class="contact-content" *ngIf="!empty(contact.addressCountry)"> {{contact.addressCountry}} </p>
                     </mat-list-item>
@@ -64,7 +63,7 @@
                     <mat-list>
                         <mat-list-item class="contact-item" *ngIf="!empty(contact.communicationMeans)" [title]="lang.communicationMean">
                             <mat-icon mat-list-icon class="contact-group fas fa-hashtag"></mat-icon>
-                            <p mat-line class="contact-content"> {{contact.communicationMeans}} </p>
+                            <p mat-line class="contact-content" [title]="contact.communicationMeans.url !== undefined ? contact.communicationMeans.url : contact.communicationMeans.email"> {{contact.communicationMeans.url !== undefined ? contact.communicationMeans.url : contact.communicationMeans.email}} </p>
                         </mat-list-item>
                         <ng-container *ngFor="let keyVal of contact.customFields | keyvalue" >
                             <mat-list-item class="contact-item" *ngIf="keyVal.value.value !== null">

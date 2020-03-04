@@ -69,28 +69,9 @@ class EntityController
             }
         }
 
-        $unneededRoles = ['visa', 'sign'];
         $entity['types'] = EntityModel::getTypes();
-        $entity['roles'] = EntityModel::getRoles();
         $listTemplateTypes = ListTemplateModel::getTypes(['select' => ['difflist_type_roles'], 'where' => ['difflist_type_id = ?'], 'data' => ['entity_id']]);
         $rolesForService = empty($listTemplateTypes[0]['difflist_type_roles']) ? [] : explode(' ', $listTemplateTypes[0]['difflist_type_roles']);
-        foreach ($entity['roles'] as $key => $role) {
-            if ($role['id'] == 'dest') {
-                $entity['roles'][$key]['label'] = _ASSIGNEE . ' / ' . _REDACTOR ;
-            }
-            if (in_array($role['id'], $unneededRoles)) {
-                unset($entity['roles'][$key]);
-                continue;
-            }
-            if (in_array($role['id'], $rolesForService)) {
-                $entity['roles'][$key]['available'] = true;
-            } else {
-                $entity['roles'][$key]['available'] = false;
-            }
-            if ($role['id'] == 'copy') {
-                $entity['roles'][$key]['id'] = 'cc';
-            }
-        }
 
         //List Templates
         $listTemplates = ListTemplateModel::get([

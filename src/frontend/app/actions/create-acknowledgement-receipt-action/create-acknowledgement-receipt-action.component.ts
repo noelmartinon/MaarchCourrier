@@ -37,6 +37,9 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
         sendList: []
     };
 
+    realResSelected: number[]= [];
+    currentMode: string = '';
+
     manualAR: boolean = false;
     arMode: 'auto' | 'manual' | 'both' = 'auto';
 
@@ -52,32 +55,33 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     ngOnInit(): void {
         this.loadingInit = true;
 
-        this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkAcknowledgementReceipt', { resources: this.data.resIds })
+        this.checkAcknowledgementReceipt();
+    }
+
+    checkAcknowledgementReceipt() {
+        this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkAcknowledgementReceipt?' + this.currentMode, { resources: this.data.resIds })
             .subscribe((data: any) => {
                 this.acknowledgement = data;
+                this.realResSelected = data.sendList;
                 this.loadingInit = false;
                 this.arMode = data.mode;
                 this.arModeInit(this.arMode);
             }, (err) => {
                 this.notify.error(err.error.errors);
+                this.dialogRef.close();
                 this.loadingInit = false;
             });
     }
 
     arModeInit(mode : string) {
         if (mode === 'manual') {
-            this.manualAR = true;
-            setTimeout(() => {
-                this.initMce();
-            }, 0);
+            this.toggleArManual(true);
         }
     }
 
     onSubmit() {
         this.loading = true;
-        if (this.data.resIds.length === 0) {
-            // this.indexDocumentAndExecuteAction();
-        } else {
+        if (this.data.resIds.length > 0) {
             this.executeAction();
         }
     }
@@ -86,33 +90,16 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
         tinymce.remove();
     }
 
-    /* indexDocumentAndExecuteAction() {
-            
-            this.http.post('../../rest/resources', this.data.resource).pipe(
-                tap((data: any) => {
-                    this.data.resIds = [data.resId];
-                }),
-                exhaustMap(() => this.http.put(this.data.indexActionRoute, {resource : this.data.resIds[0], note : this.noteEditor.getNoteContent()})),
-                tap(() => {
-                    this.dialogRef.close('success');
-                }),
-                finalize(() => this.loading = false),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe()
-        } */
-
     executeAction() {
         let data = null;
         if (this.manualAR) {
             data = {
                 subject : this.emailsubject,
-                content : tinymce.get('emailSignature').getContent()
+                content : tinymce.get('emailSignature').getContent(),
+                manual  : true
             }
         }
-        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNoteContent(), data }).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.realResSelected, note: this.noteEditor.getNote(), data }).pipe(
             tap((data: any) => {
                 if (data && data.data != null) {
                     this.downloadAcknowledgementReceipt(data.data);
@@ -121,11 +108,11 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                     this.notify.error(data.errors);
                     console.log(data.errors); 
                 }
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.realResSelected);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -165,16 +152,22 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     toggleArManual(state: boolean) {
         if (state) {
+            this.currentMode = 'mode=manual';
+            this.checkAcknowledgementReceipt();
             this.manualAR = true;
-
-            this.emailsubject = `[AR] ${this.data.resource.subject}`;
-            this.emailsubject = this.emailsubject.substring(0, 100)
+            if (this.data.resIds.length === 1) {
+                this.emailsubject = this.data.resource.subject;
+                this.emailsubject = this.emailsubject.substring(0, 100);
+            }
+            
             this.initEmailModelsList();
             this.initSignEmailModelsList();
             setTimeout(() => {
                 this.initMce();
-            }, 0);
+            }, 800);
         } else {
+            this.currentMode = 'mode=auto';
+            this.checkAcknowledgementReceipt();
             tinymce.remove();
             this.manualAR = false;
         }

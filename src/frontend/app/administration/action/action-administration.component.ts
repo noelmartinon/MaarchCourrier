@@ -15,7 +15,7 @@ declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "action-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class ActionAdministrationComponent implements OnInit {
 
@@ -39,6 +39,9 @@ export class ActionAdministrationComponent implements OnInit {
     selectedValue: any;
     arMode: any;
 
+    selectActionPageId = new FormControl();
+    selectStatusId = new FormControl();
+
     constructor(
         public http: HttpClient, 
         private route: ActivatedRoute, 
@@ -46,9 +49,7 @@ export class ActionAdministrationComponent implements OnInit {
         private notify: NotificationService, 
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService) {
-        $j("link[href='merged_css.php']").remove();
-    }
+        public functions: FunctionsService) { }
 
     ngOnInit(): void {
         this.loading = true;
@@ -63,8 +64,15 @@ export class ActionAdministrationComponent implements OnInit {
                 this.http.get('../../rest/initAction')
                     .subscribe((data: any) => {
                         this.action = data.action;
+                        this.selectActionPageId.setValue(this.action.actionPageId);
+                        this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
-                        this.statuses = data.statuses;
+                        this.statuses = data.statuses.map((status: any) => {
+                            return {
+                                id : status.id,
+                                label: status.label_status
+                            }
+                        });
 
                         this.actionPages = data['actionPages'];
                         this.keywordsList = data.keywordsList;
@@ -81,8 +89,15 @@ export class ActionAdministrationComponent implements OnInit {
                 this.http.get('../../rest/actions/' + params['id'])
                     .subscribe(async (data: any) => {
                         this.action = data.action;
+                        this.selectActionPageId.setValue(this.action.actionPageId);
+                        this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
-                        this.statuses = data.statuses;
+                        this.statuses = data.statuses.map((status: any) => {
+                            return {
+                                id : status.id,
+                                label: status.label_status
+                            }
+                        });
                         this.actionPages = data['actionPages'];
                         this.keywordsList = data.keywordsList;
                         this.headerService.setHeader(this.lang.actionCreation, data.action.label_action);
@@ -107,6 +122,7 @@ export class ActionAdministrationComponent implements OnInit {
     }
 
     getCustomFields() {
+        this.action.actionPageId = this.selectActionPageId.value;
         return new Promise((resolve, reject) => {
             if (this.action.actionPageId=='close_mail' && this.functions.empty(this.availableCustomFields)) {
                 this.http.get('../../rest/customFields').pipe(

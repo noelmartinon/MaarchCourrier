@@ -1,6 +1,7 @@
 <div class="admin-container" [class.admin-is-mobile]="appService.getViewMode()">
-    <mat-sidenav-container autosize class="admin-sidenav-container" >
-        <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()" fixedTopGap="56"
+    <mat-sidenav-container autosize class="admin-sidenav-container">
+        <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'"
+            [fixedInViewport]="appService.getViewMode()" fixedTopGap="56"
             [opened]="appService.getViewMode() ? false : true">
             <menu-shortcut></menu-shortcut>
             <menu-nav></menu-nav>
@@ -16,42 +17,40 @@
                     <div class="form-group">
                         <div class="col-sm-12">
                             <mat-form-field>
-                                <input matInput [(ngModel)]="action.label_action" required name="action_name" id="action_name" title="{{lang.label}}"
-                                    type="text" placeholder="{{lang.label}}" maxlength="255">
+                                <input matInput [(ngModel)]="action.label_action" required name="action_name"
+                                    id="action_name" title="{{lang.label}}" type="text" placeholder="{{lang.label}}"
+                                    maxlength="255">
                             </mat-form-field>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12">
-                            <mat-form-field>
-                                <mat-select id="status" name="status" title="{{lang.associatedStatus}}" placeholder="{{lang.associatedStatus}}" [(ngModel)]="action.id_status"
-                                    required>
-                                    <mat-option *ngFor="let status of statuses" [value]="status.id">
-                                        {{status.label_status}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <plugin-select-search [showLabel]="true" [class]="''" [label]="lang.associatedStatus"
+                                [placeholderLabel]="lang.associatedStatus" [formControlSelect]="selectStatusId"
+                                [datas]="statuses" (afterSelected)="action.id_status = selectStatusId.value"
+                                style="width:100%;">
+                            </plugin-select-search>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12">
-                            <mat-form-field>
-                                <mat-select id="actionPageId" name="actionPageId" title="{{lang.actionCarriedOut}}" placeholder="{{lang.actionCarriedOut}}" [(ngModel)]="action.actionPageId" (selectionChange)="getCustomFields()">
-                                    <mat-option *ngFor="let action of actionPages" [value]="action.id">
-                                        {{action.label}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <plugin-select-search [showLabel]="true" [class]="''" [label]="lang.actionCarriedOut"
+                                [placeholderLabel]="lang.actionCarriedOut" [formControlSelect]="selectActionPageId"
+                                [datas]="actionPages" (afterSelected)="getCustomFields()" style="width:100%;">
+                            </plugin-select-search>
                         </div>
                     </div>
-                    <div class="form-group" *ngIf="!this.functions.empty(availableCustomFields) && action.actionPageId=='close_mail'">
+                    <div class="form-group"
+                        *ngIf="!this.functions.empty(availableCustomFields) && action.actionPageId=='close_mail'">
                         <div class="col-sm-12">
-                            <plugin-select-search [showLabel]="true" [class]="input-form-filled" [label]="lang.checkEmptyFields" [placeholderLabel]="lang.checkEmptyFields"
+                            <plugin-select-search [showLabel]="true" [class]="input-form-filled"
+                                [label]="lang.checkEmptyFields" [placeholderLabel]="lang.checkEmptyFields"
                                 [formControlSelect]="customFieldsFormControl" [datas]="availableCustomFields"
                                 (afterSelected)="getSelectedFields()" style="width:100%;">
                             </plugin-select-search>
                             <mat-chip-list class="checkbox-selected-list">
-                                <mat-chip *ngFor="let fieldValue of selectedFieldsValue; let i = index" selected [removable]="true" (removed)="removeSelectedFields(i)">
+                                <mat-chip *ngFor="let fieldValue of selectedFieldsValue; let i = index" selected
+                                    [removable]="true" (removed)="removeSelectedFields(i)">
                                     {{fieldValue}}
                                     <mat-icon matChipRemove class="fa fa-times-circle"></mat-icon>
                                 </mat-chip>
@@ -61,7 +60,9 @@
                     <div class="form-group" *ngIf="action.actionPageId=='create_acknowledgement_receipt'">
                         <div class="col-sm-12">
                             <mat-form-field>
-                                <mat-select [required]="action.actionPageId=='create_acknowledgement_receipt'" id="generateARmode" name="generateARmode" title="{{lang.generateARMode}}" placeholder="{{lang.generateARMode}}" [(ngModel)]="arMode">
+                                <mat-select [required]="action.actionPageId=='create_acknowledgement_receipt'"
+                                    id="generateARmode" name="generateARmode" title="{{lang.generateARMode}}"
+                                    placeholder="{{lang.generateARMode}}" [(ngModel)]="arMode">
                                     <mat-option value="auto">{{lang.autoAR}}</mat-option>
                                     <mat-option value="manual">{{lang.manualAR}}</mat-option>
                                     <mat-option value="both">{{lang.bothAR}}</mat-option>
@@ -72,7 +73,8 @@
                     <div class="form-group">
                         <div class="col-sm-12">
                             <mat-form-field>
-                                <mat-select id="keyword" name="keyword" title="{{lang.keyword}}" placeholder="{{lang.keyword}}" [(ngModel)]="action.keyword">
+                                <mat-select id="keyword" name="keyword" title="{{lang.keyword}}"
+                                    placeholder="{{lang.keyword}}" [(ngModel)]="action.keyword">
                                     <mat-option *ngFor="let keyword of keywordsList" [value]="keyword.value">
                                         {{keyword.label}}
                                     </mat-option>
@@ -82,14 +84,17 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12" style="text-align:center;">
-                            <mat-slide-toggle name="history" title="{{lang.actionHistoryDesc}}" id="history" color="primary" [(ngModel)]="action.history"
-                                [checked]="action.history == 'Y'">{{lang.actionHistory}}</mat-slide-toggle>
+                            <mat-slide-toggle name="history" title="{{lang.actionHistoryDesc}}" id="history"
+                                color="primary" [(ngModel)]="action.history" [checked]="action.history == 'Y'">
+                                {{lang.actionHistory}}</mat-slide-toggle>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12">
                             <mat-form-field>
-                                <mat-select id="categorieslist" name="categorieslist" title="{{lang.chooseCategoryAssociation}}" placeholder="{{lang.chooseCategoryAssociation}}"
+                                <mat-select id="categorieslist" name="categorieslist"
+                                    title="{{lang.chooseCategoryAssociation}}"
+                                    placeholder="{{lang.chooseCategoryAssociation}}"
                                     [(ngModel)]="action.actionCategories" multiple required>
                                     <mat-option *ngFor="let category of categoriesList" [value]="category.id">
                                         {{category.label}}
@@ -100,14 +105,16 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12" style="text-align:center;">
-                            <button mat-raised-button color="primary" type="submit" [disabled]="!actionsFormUp.form.valid">{{lang.save}}</button>
+                            <button mat-raised-button color="primary" type="submit"
+                                [disabled]="!actionsFormUp.form.valid">{{lang.save}}</button>
                         </div>
                     </div>
                 </form>
             </mat-card>
         </mat-sidenav-content>
-        <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()" fixedTopGap="56"
-            position='end' [opened]="appService.getViewMode() ? false : false" style="overflow-x:hidden;">
+        <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'"
+            [fixedInViewport]="appService.getViewMode()" fixedTopGap="56" position='end'
+            [opened]="appService.getViewMode() ? false : false" style="overflow-x:hidden;">
             <mat-list>
                 <h3 mat-subheader>Action(s)</h3>
             </mat-list>

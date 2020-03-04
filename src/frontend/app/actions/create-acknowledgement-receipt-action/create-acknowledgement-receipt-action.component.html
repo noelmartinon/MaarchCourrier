@@ -5,18 +5,18 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <p *ngIf="acknowledgement.sendEmail || acknowledgement.sendPaper">{{lang.makeActionOn}}
+            <p *ngIf="arMode == 'both' || acknowledgement.sendEmail || acknowledgement.sendPaper">{{lang.makeActionOn}}
                 <b *ngIf="data.resIds.length === 0" color="primary" class="highlight">{{lang.currentIndexingMail}}</b>
                 <b *ngIf="data.resIds.length == 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
                 <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                     {{lang.elements}}</b> ?
-                <div *ngIf="arMode !== 'manual' && arMode !== 'auto'">
+                <div *ngIf="arMode == 'both'">
                     <mat-slide-toggle [(ngModel)]="manualAR" color="primary" (change)="toggleArManual($event.checked)">
                         {{lang.editAcknowledgementReceipt}}</mat-slide-toggle>
                 </div>
-                <div *ngIf="manualAR">
+                <div *ngIf="manualAR && realResSelected.length > 0">
                     <mat-form-field floatLabel="never">
-                        <span matPrefix class="attachLabel">{{lang.object}}&nbsp;:&nbsp;</span>
+                        <span matPrefix><span class="attachLabel">{{lang.object}}&nbsp;:&nbsp;</span>[AR]&nbsp;</span>
                         <input matInput [(ngModel)]="emailsubject" maxlength="100">
                     </mat-form-field>
                     <div class="models">

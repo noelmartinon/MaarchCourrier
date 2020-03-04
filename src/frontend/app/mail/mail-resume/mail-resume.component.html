@@ -16,8 +16,7 @@
             </div>
         </ng-template>
 
-        <div class="info" [class.arType]="mail.type === 'aknowledgement_receipt'">
-            {{mail.object | shorten: 110: '...'}}
+        <div class="info" [class.arType]="mail.type === 'aknowledgement_receipt'" [innerHTML]="mail.object | shorten: 110: '...'">    
         </div>
 
         <div class="date">

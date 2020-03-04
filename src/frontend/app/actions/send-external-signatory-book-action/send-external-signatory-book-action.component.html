@@ -27,6 +27,9 @@
                     </ul>
                 </div>
                 <div>
+                    <app-fast-paraph #fastParapheur *ngIf="signatoryBookEnabled=='fastParapheur'"
+                        [additionalsInfos]="additionalsInfos" [externalSignatoryBookDatas]="externalSignatoryBookDatas">
+                    </app-fast-paraph>
                     <app-maarch-paraph #maarchParapheur *ngIf="signatoryBookEnabled=='maarchParapheur'"
                         [additionalsInfos]="additionalsInfos" [externalSignatoryBookDatas]="externalSignatoryBookDatas">
                     </app-maarch-paraph>

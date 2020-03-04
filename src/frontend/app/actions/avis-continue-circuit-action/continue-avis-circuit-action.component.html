@@ -51,7 +51,7 @@
                        readonly style="cursor:pointer;" disabled>
             </mat-form-field>
 
-            <app-note-editor #noteEditor [title]="lang.addOpinion" [resIds]="data.resIds"></app-note-editor>
+            <app-note-editor #noteEditor [title]="lang.addOpinion" [resIds]="data.resIds" [disableRestriction]="true"></app-note-editor>
             <app-avis-workflow *ngIf="data.resIds.length == 1" [adminMode]="false" [resId]="data.resIds[0]"
                 #appAvisWorkflow>
             </app-avis-workflow>

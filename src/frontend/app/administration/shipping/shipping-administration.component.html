@@ -10,6 +10,9 @@
                 <mat-spinner style="margin:auto;"></mat-spinner>
             </div>
             <mat-card *ngIf="!loading" class="card-app-content">
+                <div *ngIf="!shippingAvailable" class="alert-message alert-message-danger" role="alert" [innerHTML]="lang.shippingUnavailable" style="max-width: 100%">
+                </div>
+
                 <form class="form-horizontal" (ngSubmit)="onSubmit()" #shippingForm="ngForm">
                     <div class="form-group">
                         <div class="col-sm-12">

@@ -45,7 +45,7 @@
                     </mat-icon>
                 </button>
             </mat-form-field>
-            <app-note-editor *ngIf="data.resIds.length === 1 && !noResourceToProcess" #noteEditor [title]="lang.addOpinionReason" [content]="opinionContent" [resIds]="data.resIds"></app-note-editor>
+            <app-note-editor *ngIf="data.resIds.length === 1 && !noResourceToProcess" #noteEditor [title]="lang.addOpinionReason" [content]="opinionContent" [resIds]="data.resIds" [disableRestriction]="true"></app-note-editor>
             <app-avis-workflow *ngIf="data.resIds.length === 1  && !noResourceToProcess"
                 [adminMode]="true" [mode]="'parallel'" #appAvisWorkflow>
             </app-avis-workflow>

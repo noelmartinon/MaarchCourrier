@@ -7,7 +7,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
-import {FunctionsService} from "../../../service/functions.service";
+import { FunctionsService } from "../../../service/functions.service";
 
 @Component({
     templateUrl: "reset-visa-action.component.html",
@@ -27,8 +27,8 @@ export class ResetVisaActionComponent implements OnInit {
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         public dialogRef: MatDialogRef<ResetVisaActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService
@@ -51,13 +51,14 @@ export class ResetVisaActionComponent implements OnInit {
                         this.resourcesWarnings = data.resourcesInformations.warning;
                     }
 
-                    if(!this.functions.empty(data.resourcesInformations.error)) {
+                    if (!this.functions.empty(data.resourcesInformations.error)) {
                         this.resourcesErrors = data.resourcesInformations.error;
                         this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
                     }
                     resolve(true);
                 }, (err: any) => {
                     this.notify.handleSoftErrors(err);
+                    this.dialogRef.close();
                 });
         });
     }
@@ -68,9 +69,9 @@ export class ResetVisaActionComponent implements OnInit {
     }
 
     executeAction() {
-        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNoteContent()}).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNote() }).pipe(
             tap(() => {
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

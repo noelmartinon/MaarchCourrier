@@ -27,6 +27,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     @Input('datas') datas: any = [];
 
+    @Input('returnValue') returnValue: 'id' | 'object' = 'id';
+
     @Input('label') label: string;
 
     @Input('showResetOption') showResetOption: boolean;

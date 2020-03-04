@@ -34,6 +34,7 @@ export class NoteEditorComponent implements OnInit {
     @Input('entitiesNoteRestriction') entitiesNoteRestriction: string[];
     @Input('noteId') noteId: number;
     @Input('defaultRestriction') defaultRestriction: boolean;
+    @Input('disableRestriction') disableRestriction: boolean = false;
     @Output('refreshNotes') refreshNotes = new EventEmitter<string>();
 
     searchTerm: FormControl = new FormControl();
@@ -55,6 +56,9 @@ export class NoteEditorComponent implements OnInit {
 
         if (this.upMode) {
             this.content = this.noteContent;
+            if (this.content.startsWith(`[${this.lang.avisUserState}]`) || this.content.startsWith(`[${this.lang.avisUserAsk.toUpperCase()}]`)) {
+                this.disableRestriction = true;
+            }
             this.entitiesRestriction = this.entitiesNoteRestriction;
         }
 
@@ -122,6 +126,15 @@ export class NoteEditorComponent implements OnInit {
 
     getNoteContent() {
         return this.content;
+    }
+
+    setNoteContent(content: string) {
+        this.content = content;
+    }
+
+
+    getNote() {
+        return {content: this.content, entities: this.entitiesRestriction};
     }
 
     selectTemplate(template: any) {

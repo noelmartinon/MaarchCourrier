@@ -28,10 +28,13 @@
                         {{lang.draft}}
                     </span>
                     <span *ngIf="row.status === 'WAITING'" style="flex:1;color:orange;font-weight: bold;">
-                        En cours d'envoi...
+                        {{lang.emailSendInProgress}}
                     </span>
                     <span *ngIf="row.status === 'ERROR'" style="flex:1;color:red;font-weight: bold;">
                         {{lang.notSent}}
+                    </span>
+                    <span *ngIf="row.status !== 'ERROR' && row.type == 'acknowledgementReceipt' && functions.empty(row.sendDate)" style="flex:1;color:orange">
+                        {{lang.manualSendingAR}}
                     </span>
                     <span style="flex:1" *ngIf="!functions.empty(row.operationDate)" [title]="row.operationDate | fullDate">
                         {{lang.delivery}} : <b>{{row.operationDate | timeAgo : 'full'}}</b>

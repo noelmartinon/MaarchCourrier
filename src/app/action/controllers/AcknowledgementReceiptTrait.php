@@ -28,7 +28,6 @@ use SrcCore\models\ValidatorModel;
 use Template\models\TemplateModel;
 use User\models\UserModel;
 
-
 trait AcknowledgementReceiptTrait
 {
     public static function createAcknowledgementReceipts(array $args)
@@ -40,10 +39,15 @@ trait AcknowledgementReceiptTrait
         if (empty($resource) || $resource['category_id'] != 'incoming') {
             return [];
         }
+        if ($args['data']['manual'] && $args['parameters']['mode'] == 'auto') {
+            return [];
+        } elseif (!$args['data']['manual'] && $args['parameters']['mode'] == 'manual') {
+            return [];
+        }
 
         $subjectResource = $resource['subject'] ?? '';
 
-        if (!empty($args['parameters']['mode']) && ($args['parameters']['mode'] == 'both' || $args['parameters']['mode'] == 'manual')) {
+        if ($args['data']['manual']) {
             $contentToSend = $args['data']['content'] ?? null;
             $subjectToSend = !empty($args['data']['subject']) ? $args['data']['subject'] : $subjectResource;
         } else {
@@ -73,21 +77,24 @@ trait AcknowledgementReceiptTrait
         } else {
             $templateAttachmentType = 'simple';
         }
-        $template = TemplateModel::getWithAssociation([
-            'select'    => ['template_content', 'template_path', 'template_file_name'],
-            'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
-            'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
-        ]);
-        if (empty($template[0])) {
-            return [];
+
+        if (!$args['data']['manual']) {
+            $template = TemplateModel::getWithAssociation([
+                'select'    => ['template_content', 'template_path', 'template_file_name'],
+                'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
+                'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
+            ]);
+            if (empty($template[0])) {
+                return [];
+            }
+    
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TEMPLATES', 'select' => ['path_template']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $template[0]['template_path']) . $template[0]['template_file_name'];
         }
 
-        $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TEMPLATES', 'select' => ['path_template']]);
-        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $template[0]['template_path']) . $template[0]['template_file_name'];
-
         $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'mail']]);
-        $ids = [];
-        $errors = [];
+        $ids          = [];
+        $errors       = [];
         $emailsToSend = [];
         DatabaseModel::beginTransaction();
         foreach ($contactsToProcess as $contactToProcess) {
@@ -113,7 +120,7 @@ trait AcknowledgementReceiptTrait
                 }
                 $format = 'html';
             } else {
-                if (empty($contentToSend)) {
+                if (!$args['data']['manual']) {
                     if (!file_exists($pathToDocument) || !is_file($pathToDocument)) {
                         DatabaseModel::rollbackTransaction();
                         return [];
@@ -169,7 +176,7 @@ trait AcknowledgementReceiptTrait
         }
         DatabaseModel::commitTransaction();
 
-        if (!empty($emailsToSend)) {
+        if (!empty($emailsToSend) && !empty($resource['destination'])) {
             $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['email', 'id']]);
         }
         foreach ($emailsToSend as $email) {

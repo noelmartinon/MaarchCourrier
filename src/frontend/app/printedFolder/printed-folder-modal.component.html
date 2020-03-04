@@ -10,6 +10,9 @@
         <mat-spinner style="margin:auto;"></mat-spinner>
     </div>
     <ng-template #loadingTemplate>
+        <div class="example-loading-shade" *ngIf="isLoadingResults">
+            <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+        </div>
         <div style="padding: 10px;">
             <mat-slide-toggle color="primary" [(ngModel)]="summarySheet"
                 (change)="$event.checked ? openSummarySheet() : false">{{lang.attachSummarySheet}}</mat-slide-toggle>
@@ -18,17 +21,17 @@
             <mat-slide-toggle color="primary" [(ngModel)]="withSeparator">{{lang.generateSeparators}}</mat-slide-toggle>
         </div>
         <div class="printedFolderContainer">
-            <mat-expansion-panel hideToggle disabled>
+            <mat-expansion-panel *ngIf="mainDocumentInformation.format !== null" hideToggle disabled [title]="!mainDocumentInformation.canConvert ? 'Aucune version pdf trouvé!' : ''">
                 <mat-expansion-panel-header>
                     <mat-panel-title style="color: #135f7f;font-weight: bold;">
-                        <mat-checkbox color="primary" [(ngModel)]="mainDocument" disableRipple>{{lang.mainDocument}}
+                        <mat-checkbox color="primary" [(ngModel)]="mainDocument" [disabled]="!mainDocumentInformation.canConvert" disableRipple>{{lang.mainDocument}}
                         </mat-checkbox>
                     </mat-panel-title>
                 </mat-expansion-panel-header>
             </mat-expansion-panel>
             <ng-container *ngFor="let keyVal of printedFolderElement | keyvalue">
                 <div class="printedFolderElement" *ngIf="printedFolderElement[keyVal.key].length > 0">
-                    <mat-expansion-panel>
+                    <mat-expansion-panel >
                         <mat-expansion-panel-header>
                             <mat-panel-title style="color: #135f7f;font-weight: bold;">
                                 <mat-checkbox color="primary"
@@ -40,26 +43,26 @@
                         </mat-expansion-panel-header>
                         <mat-selection-list [formControl]="selectedPrintedFolderElement[keyVal.key]" color="primary"
                             class="printedFolderElement-content">
-                            <mat-list-option class="printedFolderElement-option" checkboxPosition="before"
-                                *ngFor="let element of printedFolderElement[keyVal.key]" [value]="element.id">
-                                <div class="printedFolderElement-item">
-                                    <div color="primary" style="flex:1;font-size: 80%"
+                            <mat-list-option class="printedFolderElement-option" [title]="!element.canConvert ? 'Aucune version pdf trouvé!' : ''" [class.disabled]="!element.canConvert" checkboxPosition="before"
+                                *ngFor="let element of printedFolderElement[keyVal.key]" [disabled]="!element.canConvert" [value]="element.id">
+                                <div class="printedFolderElement-item {{keyVal.key}}">
+                                    <div color="primary" style="flex:1;font-size: 80%;padding-right: 10px;"
                                         *ngIf="!functions.empty(element.chrono)">
                                         {{element.chrono}}
                                     </div>
-                                    <div color="primary" style="flex:1;display: flex;font-size: 80%;white-space: pre;"
+                                    <div color="primary" style="flex:1;display: flex;font-size: 80%;white-space: pre;padding-right: 10px;"
                                         *ngIf="!functions.empty(element.recipients)">
                                         {{lang.for | ucfirst}} : {{element.recipients}}
                                     </div>
                                     <div *ngIf="!functions.empty(element.creator)" color="primary"
-                                        style="flex:1;font-size: 80%">
+                                        style="flex:1;font-size: 80%;padding-right: 10px;">
                                         {{element.creator}}
                                     </div>
-                                    <div style="flex:2" [title]="element.label"
+                                    <div style="flex:2;padding-right: 10px;" [title]="element.label"
                                         [innerHTML]="element.label | shorten: 150: '...'">
                                     </div>
                                     <div *ngIf="!functions.empty(element.type)" color="primary"
-                                        style="flex:1;font-size: 80%">
+                                        style="flex:1;font-size: 80%;white-space: pre;padding-right: 10px;">
                                         {{element.type}}
                                     </div>
 
@@ -79,6 +82,6 @@
 
 </mat-dialog-content>
 <div mat-dialog-actions class="actions">
-    <button mat-raised-button color="primary" [disabled]="isEmptySelection()"
+    <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection()"
         (click)="onSubmit()">{{lang.validate}}</button>
 </div>

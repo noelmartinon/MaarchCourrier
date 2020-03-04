@@ -335,7 +335,7 @@ else
 			{
 				//$src1 .= "&labels[]=".$_SESSION['labels1'][$i];
 			}
-			$_SESSION['GRAPH']['VALUES']='';
+			$_SESSION['GRAPH']['VALUES']=[];
 			for($i=0;$i<count($val_an);$i++)
 			{
 				$_SESSION['GRAPH']['VALUES'][$i]=$val_an[$i];
@@ -360,6 +360,9 @@ else
 		{
 			if($report_type == 'graph')
 			{
+			    if (!is_array($_SESSION['GRAPH']['VALUES'])) {
+                    $_SESSION['GRAPH']['VALUES'] = [$_SESSION['GRAPH']['VALUES']];
+                }
 				echo "{label: ['".utf8_encode(str_replace(",", "','", addslashes(implode(",", $_SESSION['labels1']))))."'] ".
 					", data: ['".utf8_encode(str_replace(",", "','", addslashes(implode(",", $_SESSION['GRAPH']['VALUES']))))."']".
 					", title: '".addslashes($title)."'}";
@@ -659,7 +662,7 @@ else
 				}
 
 				$src1 = $_SESSION['config']['businessappurl']."index.php?display=true&module=reports&page=graphs&type=histo&largeur=$largeur&hauteur=600&marge_bas=300&title=".$title;
-				$_SESSION['GRAPH']['VALUES']='';
+				$_SESSION['GRAPH']['VALUES']=[];
 				for($i=0;$i<count($vol_an);$i++)
 				{
 					$_SESSION['GRAPH']['VALUES'][$i]=$vol_an[$i];
@@ -717,7 +720,10 @@ else
 			}
 
 			$totalCourrier=array();
-			$totalEntities = count($entities);
+            $totalEntities = 0;
+			if (!empty($entities) && is_countable($entities)) {
+			    $totalEntities = count($entities);
+            }
 
 			foreach(array_keys($_SESSION['coll_categories']['letterbox_coll']) as $key)
 			{
@@ -751,7 +757,7 @@ else
 
 				$src1 = $_SESSION['config']['businessappurl']."index.php?display=true&module=reports&page=graphs&type=histo&largeur=$largeur&hauteur=600&marge_bas=150&title=".$title;
 
-				$_SESSION['GRAPH']['VALUES']='';
+				$_SESSION['GRAPH']['VALUES']=[];
 				for($i=0;$i<count($vol_an);$i++)
 				{
 					//$src1 .= "&values[]=".$vol_an[$i];

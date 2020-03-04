@@ -12,7 +12,6 @@ import {FunctionsService} from "../../../service/functions.service";
 @Component({
     templateUrl: "reject-visa-back-to-previous-action.component.html",
     styleUrls: ['reject-visa-back-to-previous-action.component.scss'],
-    providers: [NotificationService],
 })
 export class RejectVisaBackToPrevousActionComponent implements OnInit {
 
@@ -59,6 +58,7 @@ export class RejectVisaBackToPrevousActionComponent implements OnInit {
                     resolve(true);
                 }, (err: any) => {
                     this.notify.handleSoftErrors(err);
+                    this.dialogRef.close();
                 });
         });
     }
@@ -69,13 +69,13 @@ export class RejectVisaBackToPrevousActionComponent implements OnInit {
     }
 
     executeAction() {
-        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNoteContent()}).pipe(
+        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNote()}).pipe(
             tap(() => {
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

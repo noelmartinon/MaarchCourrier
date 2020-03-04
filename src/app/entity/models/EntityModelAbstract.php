@@ -39,23 +39,23 @@ abstract class EntityModelAbstract
         return $aEntities;
     }
 
-    public static function getById(array $aArgs)
+    public static function getById(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['id']);
-        ValidatorModel::intVal($aArgs, ['id']);
+        ValidatorModel::notEmpty($args, ['id']);
+        ValidatorModel::intVal($args, ['id']);
 
-        $aEntity = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+        $entity = DatabaseModel::select([
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
             'table'     => ['entities'],
             'where'     => ['id = ?'],
-            'data'      => [$aArgs['id']]
+            'data'      => [$args['id']]
         ]);
 
-        if (empty($aEntity[0])) {
+        if (empty($entity[0])) {
             return [];
         }
 
-        return $aEntity[0];
+        return $entity[0];
     }
 
     public static function getByEntityId(array $aArgs)

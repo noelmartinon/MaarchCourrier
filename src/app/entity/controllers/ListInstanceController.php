@@ -53,9 +53,13 @@ class ListInstanceController
         $listInstances = ListInstanceModel::get(['select' => ['*'], 'where' => ['res_id = ?', 'difflist_type = ?'], 'data' => [$args['resId'], 'entity_id']]);
         foreach ($listInstances as $key => $value) {
             if ($value['item_type'] == 'entity_id') {
-                $listInstances[$key]['labelToDisplay'] = Entitymodel::getByEntityId(['entityId' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
+                $entity = Entitymodel::getByEntityId(['entityId' => $value['item_id'], 'select' => ['entity_label', 'id']]);
+                $listInstances[$key]['itemSerialId'] = $entity['id'];
+                $listInstances[$key]['labelToDisplay'] = $entity['entity_label'];
                 $listInstances[$key]['descriptionToDisplay'] = '';
             } else {
+                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id']]);
+                $listInstances[$key]['itemSerialId'] = $user['id'];
                 $listInstances[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['login' => $value['item_id']]);
                 $listInstances[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']])['entity_label'];
             }
@@ -71,21 +75,18 @@ class ListInstanceController
         }
 
         $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'users.id', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature'], 'id' => $aArgs['resId']]);
-        $itemsRemoved = [];
         foreach ($listInstances as $key => $value) {
             $listInstances[$key]['item_id'] = $listInstances[$key]['id'];
             $listInstances[$key]['item_type'] = 'user';
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
-            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['id']])) {
-                $itemsRemoved[] = $listInstances[$key]['labelToDisplay'];
-                unset($listInstances[$key]);
-                continue;
+
+            $listInstances[$key]['hasPrivilege'] = true;
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['id']])) {
+                $listInstances[$key]['hasPrivilege'] = false;
             }
         }
 
-        $listInstances = array_values($listInstances);
-
-        return $response->withJson(['circuit' => $listInstances, 'itemsRemoved' => $itemsRemoved]);
+        return $response->withJson(['circuit' => $listInstances]);
     }
 
     public function getOpinionCircuitByResId(Request $request, Response $response, array $aArgs)
@@ -95,21 +96,17 @@ class ListInstanceController
         }
 
         $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'users.id', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
-        $itemsRemoved = [];
         foreach ($listInstances as $key => $value) {
             $listInstances[$key]['item_id'] = $listInstances[$key]['id'];
             $listInstances[$key]['item_type'] = 'user';
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
-            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['id']])) {
-                $itemsRemoved[] = $listInstances[$key]['labelToDisplay'];
-                unset($listInstances[$key]);
-                continue;
+            $listInstances[$key]['hasPrivilege'] = true;
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['id']])) {
+                $listInstances[$key]['hasPrivilege'] = false;
             }
         }
 
-        $listInstances = array_values($listInstances);
-
-        return $response->withJson(['circuit' => $listInstances, 'itemsRemoved' => $itemsRemoved]);
+        return $response->withJson(['circuit' => $listInstances]);
     }
 
     public function getParallelOpinionByResId(Request $request, Response $response, array $aArgs)

@@ -10,7 +10,6 @@ declare function $j(selector: any): any;
     selector: 'app-maarch-paraph',
     templateUrl: "maarch-paraph.component.html",
     styleUrls: ['maarch-paraph.component.scss'],
-    providers: [NotificationService],
 })
 export class MaarchParaphComponent implements OnInit {
 

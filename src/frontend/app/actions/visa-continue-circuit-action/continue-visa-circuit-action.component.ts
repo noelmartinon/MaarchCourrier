@@ -65,6 +65,7 @@ export class ContinueVisaCircuitActionComponent implements OnInit {
                 resolve(true);
             }, (err: any) => {
                 this.notify.handleSoftErrors(err);
+                this.dialogRef.close();
             });
         });
     }
@@ -76,10 +77,10 @@ export class ContinueVisaCircuitActionComponent implements OnInit {
 
     executeAction(realResSelected: number[]) {
 
-        this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNoteContent()}).pipe(
+        this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote()}).pipe(
             tap((data: any) => {
                 if (!data) {
-                    this.dialogRef.close('success');
+                    this.dialogRef.close(realResSelected);
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
@@ -87,7 +88,7 @@ export class ContinueVisaCircuitActionComponent implements OnInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

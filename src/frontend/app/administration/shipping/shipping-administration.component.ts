@@ -6,6 +6,8 @@ import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '../../../service/app.service';
+import {catchError, tap} from "rxjs/operators";
+import {of} from "rxjs";
 
 declare function $j(selector: any): any;
 
@@ -61,6 +63,8 @@ export class ShippingAdministrationComponent implements OnInit {
     ];
     hidePassword: boolean = true;
 
+    shippingAvailable: boolean = false;
+
 
 
     constructor( 
@@ -78,6 +82,18 @@ export class ShippingAdministrationComponent implements OnInit {
 
         window['MainHeaderComponent'].setSnav(this.sidenavLeft);
         window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
+
+        this.http.get("../../rest/externalConnectionsEnabled").pipe(
+            tap((data: any) => {
+                console.log(data);
+                this.shippingAvailable = data.connection.maileva === true;
+                console.log(this.shippingAvailable)
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
 
         this.route.params.subscribe(params => {
             if (typeof params['id'] == "undefined") {

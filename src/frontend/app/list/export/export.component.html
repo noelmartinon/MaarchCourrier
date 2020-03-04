@@ -43,7 +43,7 @@
             <div class="row exportList">
                 <div class="col-md-6 available-data">
                     <h2><span class="title">{{lang.availableDatas}}</span> <i class="fa fa-plus-circle removeAllDatas" color="primary" title="{{lang.addAllDatas}}" (click)="addAllData()"></i></h2>
-                    <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="dataAvailable" [cdkDropListConnectedTo]="[dataExportList]" class="cdk-list" (cdkDropListDropped)="drop($event)">
+                    <div id="availableElements" cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="dataAvailable" [cdkDropListConnectedTo]="[dataExportList]" class="cdk-list" (cdkDropListDropped)="drop($event)">
                         <div class="columns" *ngFor="let item of dataAvailable | sortBy: 'label' | filterList:listFilter.value:'label'"
                             cdkDrag id="{{item.value}}">{{item.label}} <i class="fa fa-plus" color="primary" style="cursor:pointer;"
                                 (click)="addData(item)"></i></div>
@@ -56,7 +56,7 @@
 
                 <div class="col-md-6 active-data">
                     <h2><span class="title">{{lang.chosenDatas}}</span> <i class="fa fa-minus-circle removeAllDatas" color="warn" title="{{lang.removeAllDatas}}" (click)="removeAllData()"></i></h2>
-                    <div cdkDropList #dataExportList="cdkDropList" [cdkDropListData]="exportModel.data"
+                    <div id="selectedElements" cdkDropList #dataExportList="cdkDropList" [cdkDropListData]="exportModel.data"
                         [cdkDropListConnectedTo]="[dataAvailableList]" class="cdk-list" (cdkDropListDropped)="drop($event)">
                         <div class="columns" *ngFor="let item of exportModel.data;let i = index" cdkDrag id="{{item.value}}">{{item.label}} <i
                                 class="fa fa-minus" color="warn" style="cursor:pointer;" (click)="removeData(i)"></i></div>

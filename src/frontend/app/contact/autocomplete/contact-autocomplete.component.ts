@@ -14,6 +14,7 @@ import { PrivilegeService } from '../../../service/privileges.service';
 import { ContactModalComponent } from '../../administration/contact/modal/contact-modal.component';
 import { ContactService } from '../../../service/contact.service';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     selector: 'app-contact-autocomplete',
@@ -22,7 +23,7 @@ import { DocumentViewerComponent } from '../../viewer/document-viewer.component'
         'contact-autocomplete.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [NotificationService, AppService, SortPipe, ContactService]
+    providers: [AppService, SortPipe, ContactService]
 })
 
 export class ContactAutocompleteComponent implements OnInit {
@@ -70,6 +71,7 @@ export class ContactAutocompleteComponent implements OnInit {
         private latinisePipe: LatinisePipe,
         private privilegeService: PrivilegeService,
         private contactService: ContactService,
+        public functions: FunctionsService
     ) {
 
     }
@@ -168,7 +170,10 @@ export class ContactAutocompleteComponent implements OnInit {
                 type: '',
                 firstname: '',
                 lastname: this.lang.undefined,
-                company: ''
+                company: '',
+                fillingRate: {
+                    color: ''
+                }
             };
 
             if (contact.type === 'contact') {
@@ -178,9 +183,11 @@ export class ContactAutocompleteComponent implements OnInit {
                             type: 'contact',
                             firstname: data.firstname,
                             lastname: data.lastname,
-                            company: data.company
+                            company: data.company,
+                            fillingRate: !this.functions.empty(data.fillingRate) ? {
+                                color: this.contactService.getFillingColor(data.fillingRate.thresholdLevel)
+                            } : ''
                         };
-
                     }),
                     finalize(() => this.loadingValues = false),
                     catchError((err: any) => {
@@ -195,6 +202,9 @@ export class ContactAutocompleteComponent implements OnInit {
                             type: 'user',
                             firstname: data.firstname,
                             lastname: data.lastname,
+                            fillingRate: {
+                                color: ''
+                            }
                         };
                     }),
                     finalize(() => this.loadingValues = false),
@@ -209,6 +219,9 @@ export class ContactAutocompleteComponent implements OnInit {
                         this.valuesToDisplay[data.id] = {
                             type: 'entity',
                             lastname: data.entity_label,
+                            fillingRate: {
+                                color: ''
+                            }
                         };
                     }),
                     finalize(() => this.loadingValues = false),
@@ -229,7 +242,10 @@ export class ContactAutocompleteComponent implements OnInit {
                         return {
                             id: contact.id,
                             type: contact.type,
-                            lastname: contact.contact
+                            lastname: contact.contact,
+                            fillingRate: !this.functions.empty(contact.thresholdLevel) ? {
+                                color: this.contactService.getFillingColor(contact.thresholdLevel)
+                            } : ''
                         }
                     });
                     return contacts;

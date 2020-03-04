@@ -28,7 +28,7 @@
                     <button mat-button color="primary" [title]="lang.generateAndDownloadPrintedFolder"
                         (click)="openPrintedFolderPrompt()">
                         <mat-icon class="fa fa-print" style="height:auto"></mat-icon>
-                        {{lang.generateAndDownloadPrintedFolder}}
+                        {{lang.printedFolder}}
                     </button>
                 </div>
                 <div class="banner" [style.borderColor]="currentPriorityColor">
@@ -37,7 +37,7 @@
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
-                        <app-history-workflow-resume [resId]="currentResourceInformations.resId"
+                        <app-history-workflow-resume *ngIf="!loading" [resId]="currentResourceInformations.resId"
                             (goTo)="currentTool = 'history'">
                         </app-history-workflow-resume>
                     </div>
@@ -48,7 +48,7 @@
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
-                        <app-note-resume [resId]="currentResourceInformations.resId" (goTo)="currentTool = 'notes'">
+                        <app-note-resume *ngIf="!loading" [resId]="currentResourceInformations.resId" (goTo)="currentTool = 'notes'">
                         </app-note-resume>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
-                        <app-attachments-resume [resId]="currentResourceInformations.resId"
+                        <app-attachments-resume *ngIf="!loading" [resId]="currentResourceInformations.resId"
                             (goTo)="currentTool = 'attachments'">
                         </app-attachments-resume>
                     </div>
@@ -69,12 +69,12 @@
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
-                        <app-mail-resume [resId]="currentResourceInformations.resId" (goTo)="currentTool = 'emails'">
+                        <app-mail-resume *ngIf="!loading" [resId]="currentResourceInformations.resId" (goTo)="currentTool = 'emails'">
                         </app-mail-resume>
                     </div>
                 </div>
             </ng-container>
-            <ng-container *ngIf="!isModalOpen(); else elseTemplate">
+            <ng-container *ngIf="!isModalOpen() && !loading; else elseTemplate">
                 <app-history-list *ngIf="currentTool === 'history' && !loading" #appHistoryList
                     [resId]="currentResourceInformations.resId">
                 </app-history-list>
@@ -102,7 +102,7 @@
                     [adminMode]="detailMode ? privilegeService.hasCurrentUserPrivilege('config_avis_workflow_in_detail') : privilegeService.hasCurrentUserPrivilege('config_avis_workflow')">
                 </app-avis-workflow>
                 <app-attachments-list *ngIf="currentTool === 'attachments' && !loading" #appAttachmentsList
-                    [resId]="currentResourceInformations.resId" [target]="'process'"
+                    [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" [target]="'process'"
                     (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
                 <app-indexing-form *ngIf="currentTool === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
@@ -202,7 +202,7 @@
                                     {{this.currentResourceInformations.chrono}}</div>
                             </div>
                             <div class="content-item" (click)="openContact()" style="cursor:pointer">
-                                <div>{{lang.senders}} :</div>
+                                <div>{{this.currentResourceInformations.categoryId !== 'outgoing' ? lang.senders : lang.recipient}} :</div>
                                 <div class="content-item-value">{{senderLightInfo.displayName}} <i
                                         *ngIf="this.senderLightInfo.filling" class="fas fa-circle"
                                         style="font-size: 8px" [style.color]="this.senderLightInfo.filling"></i></div>
@@ -247,7 +247,7 @@
         </div>
         <div class="document-container" [class.fullContainer]="appService.getViewMode()">
             <div class="content">
-                <app-document-viewer #appDocumentViewer style="height:100%;width:100%;" [editMode]="canEditData"
+                <app-document-viewer #appDocumentViewer *ngIf="!loading" style="height:100%;width:100%;" [editMode]="canEditData"
                     [resId]="currentResourceInformations.resId"
                     [title]="currentResourceInformations.chrono + ' - ' + currentResourceInformations.subject"
                     [sidenavLeft]="sidenavLeft">
@@ -296,7 +296,7 @@
             [adminMode]="detailMode ? privilegeService.hasCurrentUserPrivilege('config_avis_workflow_in_detail') : privilegeService.hasCurrentUserPrivilege('config_avis_workflow')">
         </app-avis-workflow>
         <app-attachments-list *ngIf="modal.id === 'attachments'  && !loading" #appAttachmentsList
-            [resId]="currentResourceInformations.resId" (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
+            [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
         </app-attachments-list>
         <app-indexing-form *ngIf="modal.id === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
             [indexingFormId]="currentResourceInformations.modelId" [resId]="currentResourceInformations.resId"

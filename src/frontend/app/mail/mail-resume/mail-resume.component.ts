@@ -54,7 +54,7 @@ export class MailResumeComponent implements OnInit {
                     }
 
                     return {
-                        object: object,
+                        object: !this.functions.empty(object) ? object : `<i>${this.lang.emptySubject}<i>`,
                         send_date: elem.send_date,
                         status: elem.status,
                         userInfo: elem.userInfo,

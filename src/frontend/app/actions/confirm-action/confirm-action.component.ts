@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 @Component({
     templateUrl: "confirm-action.component.html",
     styleUrls: ['confirm-action.component.scss'],
-    providers: [NotificationService],
 })
 export class ConfirmActionComponent implements OnInit {
 
@@ -18,10 +17,10 @@ export class ConfirmActionComponent implements OnInit {
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-    
+
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         public dialogRef: MatDialogRef<ConfirmActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
@@ -30,7 +29,7 @@ export class ConfirmActionComponent implements OnInit {
 
     onSubmit() {
         this.loading = true;
-        if ( this.data.resIds.length === 0) {
+        if (this.data.resIds.length === 0) {
             this.indexDocumentAndExecuteAction();
         } else {
             this.executeAction();
@@ -38,14 +37,14 @@ export class ConfirmActionComponent implements OnInit {
     }
 
     indexDocumentAndExecuteAction() {
-        
+
         this.http.post('../../rest/resources', this.data.resource).pipe(
             tap((data: any) => {
                 this.data.resIds = [data.resId];
             }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, {resource : this.data.resIds[0], note : this.noteEditor.getNoteContent()})),
+            exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote() })),
             tap(() => {
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -56,9 +55,9 @@ export class ConfirmActionComponent implements OnInit {
     }
 
     executeAction() {
-        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNoteContent()}).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNote() }).pipe(
             tap(() => {
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

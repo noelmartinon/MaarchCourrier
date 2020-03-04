@@ -1,6 +1,6 @@
 <mat-sidenav-container autosize class="maarch-container">
     <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        [opened]="appService.getViewMode() ? false : true">
+        [opened]="appService.getViewMode() ? false : true" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">
         <header-panel [snavLeft]="snav"></header-panel>
         <menu-shortcut></menu-shortcut>
         <menu-nav></menu-nav>
@@ -65,7 +65,7 @@
                         </mat-row>
                     </mat-table>
                     <div class="mat-paginator"
-                        style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
+                        style="min-height:48px;display: flex;justify-content: end;align-items: center;padding-left: 20px;">
                         {{resultsLength}} {{lang.tags}}</div>
                 </div>
             </div>

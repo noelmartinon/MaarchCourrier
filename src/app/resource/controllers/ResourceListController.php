@@ -433,7 +433,7 @@ class ResourceListController
         }
 
         $body['data'] = empty($body['data']) ? [] : $body['data'];
-        $body['note'] = empty($body['note']) ? null : $body['note'];
+        $body['note'] = empty($body['note']) ? [] : $body['note'];
 
         $method = ActionMethodController::COMPONENTS_ACTIONS[$action['component']];
         $methodResponses = [];

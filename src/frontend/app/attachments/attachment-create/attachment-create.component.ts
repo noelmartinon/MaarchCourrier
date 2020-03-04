@@ -1,15 +1,18 @@
-import { Component, OnInit, Input, EventEmitter, Output, Inject, ViewChildren, QueryList, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Inject, ViewChildren, QueryList} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { catchError, tap, finalize, exhaustMap, filter } from 'rxjs/operators';
-import { of, forkJoin, Subject } from 'rxjs';
+import {catchError, tap, filter, distinctUntilChanged} from 'rxjs/operators';
+import { of } from 'rxjs';
 import { NotificationService } from '../../notification.service';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatTabGroup } from '@angular/material';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { AppService } from '../../../service/app.service';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { FunctionsService } from '../../../service/functions.service';
+import { ContactService } from '../../../service/contact.service';
+import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact-autocomplete.component';
 
 @Component({
     templateUrl: "attachment-create.component.html",
@@ -17,7 +20,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
         'attachment-create.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, SortPipe],
+    providers: [AppService, SortPipe, ContactService],
 })
 
 export class AttachmentCreateComponent implements OnInit {
@@ -25,6 +28,8 @@ export class AttachmentCreateComponent implements OnInit {
     lang: any = LANG;
 
     loading: boolean = true;
+
+    sendMassMode: boolean = false;
 
     sendingData: boolean = false;
 
@@ -40,10 +45,17 @@ export class AttachmentCreateComponent implements OnInit {
 
     indexTab: number = 0;
 
+    resourceContacts: any[] = [];
+
+    selectedContact = new FormControl();
+
+    loadingContact: boolean = false;
+
     @Input('resId') resId: number = null;
 
 
     @ViewChildren('appDocumentViewer') appDocumentViewer: QueryList<DocumentViewerComponent>;
+    @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     constructor(
         public http: HttpClient,
@@ -52,41 +64,168 @@ export class AttachmentCreateComponent implements OnInit {
         public appService: AppService,
         private notify: NotificationService,
         private sortPipe: SortPipe,
-        public dialog: MatDialog) {
+        public dialog: MatDialog,
+        public functions: FunctionsService,
+        private contactService: ContactService, ) {
     }
 
-    ngOnInit(): void {
-        this.loadAttachmentTypes();
+    async ngOnInit(): Promise<void> {
+
+        await this.loadAttachmentTypes();
+
+        await this.loadResource();
+
+        this.loading = false;
     }
 
     loadAttachmentTypes() {
-        this.http.get('../../rest/attachmentsTypes').pipe(
-            tap((data: any) => {
-                Object.keys(data.attachmentsTypes).forEach(templateType => {
-                    if (data.attachmentsTypes[templateType].show) {
-                        this.attachmentsTypes.push({
-                            id: templateType,
-                            ...data.attachmentsTypes[templateType]
-                        });
-                    }
-                });
-                this.attachmentsTypes = this.sortPipe.transform(this.attachmentsTypes, 'label');
-            }),
-            exhaustMap(() => this.http.get(`../../rest/resources/${this.data.resIdMaster}?light=true`)),
-            tap((data: any) => {
-                this.attachments.push({
-                    title: new FormControl({ value: data.subject, disabled: false }, [Validators.required]),
-                    recipient: new FormControl({ value: '', disabled: false }),
-                    type: new FormControl({ value: '', disabled: false }, [Validators.required]),
-                    validationDate: new FormControl({ value: '', disabled: false }),
-                    format: new FormControl({ value: '', disabled: false }, [Validators.required]),
-                    encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required])
-                });
+        return new Promise((resolve, reject) => {
+            this.http.get('../../rest/attachmentsTypes').pipe(
+                tap((data: any) => {
+                    Object.keys(data.attachmentsTypes).forEach(templateType => {
+                        if (data.attachmentsTypes[templateType].show) {
+                            this.attachmentsTypes.push({
+                                id: templateType,
+                                ...data.attachmentsTypes[templateType]
+                            });
+                        }
+                    });
+                    this.attachmentsTypes = this.sortPipe.transform(this.attachmentsTypes, 'label');
+                    resolve(true)
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
 
-                this.attachFormGroup.push(new FormGroup(this.attachments[0]));
-            }),
-            finalize(() => this.loading = false)
-        ).subscribe();
+    loadResource() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../../rest/resources/${this.data.resIdMaster}?light=true`).pipe(
+                tap(async (data: any) => {
+                    let contact: any = '';
+                    if (data.categoryId === 'outgoing') {
+                        if (!this.functions.empty(data.recipients) && data.recipients.length > 0) {
+                            await this.getContacts(data.recipients);
+                            contact = !this.functions.empty(data.recipients) ? [{ id: this.resourceContacts[0].id, type: this.resourceContacts[0].type }] : '';
+                        }
+                    } else {
+                        if (!this.functions.empty(data.senders) && data.senders.length > 0) {
+                            await this.getContacts(data.senders);
+                            contact = !this.functions.empty(data.senders) ? [{ id: this.resourceContacts[0].id, type: this.resourceContacts[0].type }] : '';
+                        }
+                    }
+
+                    this.attachments.push({
+                        title: new FormControl({ value: data.subject, disabled: false }, [Validators.required]),
+                        recipient: new FormControl({ value: contact, disabled: false }),
+                        type: new FormControl({ value: '', disabled: false }, [Validators.required]),
+                        validationDate: new FormControl({ value: '', disabled: false }),
+                        format: new FormControl({ value: '', disabled: false }, [Validators.required]),
+                        encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required])
+                    });
+
+                    this.attachFormGroup.push(new FormGroup(this.attachments[0]));
+
+                    if (data.categoryId === 'outgoing') {
+                        if (!this.functions.empty(data.recipients) && data.recipients.length > 1) {
+                            this.toggleSendMass();
+                        }
+                    } else {
+                        if (!this.functions.empty(data.senders) &&  data.senders.length > 1) {
+                            this.toggleSendMass();
+                        }
+                    }
+
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    async getContacts(contacts: any) {
+        this.resourceContacts = [];
+        await Promise.all(contacts.map(async (elem: any) => {
+            await this.getContact(elem.id, elem.type);
+        }));
+
+        this.resourceContacts = this.sortPipe.transform(this.resourceContacts, 'label');
+    }
+
+    selectContact(contact: any) {
+
+        this.loadingContact = true;
+        const contactChosen = JSON.parse(JSON.stringify(this.resourceContacts.filter(resContact => resContact.id === contact.id && resContact.type === contact.type)[0]));
+
+        this.attachments[this.indexTab].recipient.setValue([contactChosen]);
+
+        setTimeout(() => {
+            this.loadingContact = false;
+        }, 0);
+
+        this.selectedContact.reset();
+    }
+
+    getContact(contactId: number, type: string) {
+        return new Promise((resolve, reject) => {
+            if (type === 'contact') {
+                this.http.get('../../rest/contacts/' + contactId).pipe(
+                    tap((data: any) => {
+                        this.resourceContacts.push({
+                            id: data.id,
+                            type: 'contact',
+                            label: this.contactService.formatContact(data)
+                        });
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else if (type === 'user') {
+                this.http.get('../../rest/users/' + contactId).pipe(
+                    tap((data: any) => {
+                        this.resourceContacts.push({
+                            id: data.id,
+                            type: 'user',
+                            label: `${data.firstname} ${data.lastname}`
+                        });
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else if (type === 'entity') {
+                this.http.get('../../rest/entities/' + contactId).pipe(
+                    tap((data: any) => {
+                        this.resourceContacts.push({
+                            id: data.id,
+                            type: 'entity',
+                            label: data.entity_label
+                        });
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
+        });
     }
 
     selectAttachType(attachment: any, type: any) {
@@ -111,38 +250,71 @@ export class AttachmentCreateComponent implements OnInit {
         return formattedAttachments;
     }
 
-    onSubmit() {
+    onSubmit(mode: string = 'default') {
         this.appDocumentViewer.toArray()[this.indexTab].getFile().pipe(
+            distinctUntilChanged(),
             tap((data) => {
                 this.attachments[this.indexTab].encodedFile.setValue(data.content);
                 this.attachments[this.indexTab].format.setValue(data.format);
             }),
-            tap(() => {
+            tap(async () => {
                 if (this.isValid()) {
+                    let resId: any = null;
                     this.sendingData = true;
                     const attach = this.formatAttachments();
-                    let arrayRoutes: any = [];
-                    this.attachments.forEach((element, index: number) => {
-                        arrayRoutes.push(this.http.post('../../rest/attachments', attach[index]));
-                    });
 
-                    forkJoin(arrayRoutes).pipe(
-                        tap(() => {
-                            this.notify.success(this.lang.attachmentAdded);
-                            this.dialogRef.close('success');
-                        }),
-                        finalize(() => this.sendingData = false),
-                        catchError((err: any) => {
-                            this.notify.handleErrors(err);
-                            return of(false);
-                        })
-                    ).subscribe();
+                    
+                    await Promise.all(this.attachments.map(async (element: any, index: number) => {
+                        resId = await this.saveAttachment(attach[index]);
+                    }));
+
+                    if (this.sendMassMode && resId !== null && mode === 'mailing') {
+                        await this.generateMailling(resId);
+                    }
+                    
+
+                    this.sendingData = false;
+                    this.notify.success(this.lang.attachmentAdded);
+                    this.dialogRef.close('success');
+
                 } else {
                     this.sendingData = false;
                     this.notify.error(this.lang.mustCompleteAllAttachments);
                 }
             })
         ).subscribe();
+    }
+
+    saveAttachment(attachment: any) {
+        attachment.status = this.sendMassMode ? 'SEND_MASS' : 'A_TRA';
+
+        return new Promise((resolve, reject) => {
+            this.http.post(`../../rest/attachments`, attachment).pipe(
+                tap((data: any) => {
+                    resolve(data.id);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    generateMailling(resId: number) {
+        return new Promise((resolve, reject) => {
+            this.http.post(`../../rest/attachments/${resId}/mailing`, {}).pipe(
+                tap(() => {
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     isValid() {
@@ -189,6 +361,9 @@ export class AttachmentCreateComponent implements OnInit {
             }
         });
         datas['resId'] = this.data.resIdMaster;
+        if (this.sendMassMode) {
+            datas['inMailing'] = true;
+        }
         this.appDocumentViewer.toArray()[i].setDatas(datas);
     }
 
@@ -200,18 +375,18 @@ export class AttachmentCreateComponent implements OnInit {
                 this.attachments[this.indexTab].format.setValue(data.format);
                 this.attachments.push({
                     title: new FormControl({ value: '', disabled: false }, [Validators.required]),
-                    recipient: new FormControl({ value: null, disabled: false }),
+                    recipient: new FormControl({ value: !this.functions.empty(this.resourceContacts[this.attachments.length]) ? [{ id: this.resourceContacts[this.attachments.length].id, type: this.resourceContacts[this.attachments.length].type }] : null, disabled: false }),
                     type: new FormControl({ value: '', disabled: false }, [Validators.required]),
                     validationDate: new FormControl({ value: null, disabled: false }),
                     encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
                     format: new FormControl({ value: '', disabled: false }, [Validators.required])
                 });
-        
+
                 this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
                 this.indexTab = this.attachments.length - 1;
             }),
         ).subscribe();
-    
+
     }
 
     removePj(i: number) {
@@ -251,6 +426,21 @@ export class AttachmentCreateComponent implements OnInit {
             return false;
         } else {
             return true;
+        }
+    }
+
+    toggleSendMass() {
+        if (this.sendMassMode) {
+            this.sendMassMode = !this.sendMassMode;
+            this.selectedContact.enable();
+        } else {
+            if (this.attachments.length === 1) {
+                this.sendMassMode = !this.sendMassMode;
+                this.selectedContact.disable();
+            } else {
+                this.notify.error('Veuillez supprimer les <b>autres onglets PJ</b> avant de passer en <b>publipostage</b>.');
+            }
+
         }
     }
 }

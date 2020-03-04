@@ -754,6 +754,8 @@ export class ProfileComponent implements OnInit {
         this.http.put('../../rest/currentUser/profile', this.user)
             .subscribe(() => {
                 this.notify.success(this.lang.modificationSaved);
+                this.headerService.user.firstname = this.user.firstname;
+                this.headerService.user.lastname = this.user.lastname;
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

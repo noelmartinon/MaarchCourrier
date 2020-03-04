@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 @Component({
     templateUrl: "update-acknowledgement-send-date-action.component.html",
     styleUrls: ['../close-mail-action/close-mail-action.component.scss'],
-    providers: [NotificationService],
 })
 export class UpdateAcknowledgementSendDateActionComponent implements OnInit {
 
@@ -28,35 +27,15 @@ export class UpdateAcknowledgementSendDateActionComponent implements OnInit {
 
     onSubmit() {
         this.loading = true;
-        if ( this.data.resIds.length === 0) {
-            // this.indexDocumentAndExecuteAction();
-        } else {
+        if ( this.data.resIds.length > 0) {
             this.executeAction();
         }
     }
 
-    /* indexDocumentAndExecuteAction() {
-        
-        this.http.post('../../rest/resources', this.data.resource).pipe(
-            tap((data: any) => {
-                this.data.resIds = [data.resId];
-            }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, {resource : this.data.resIds[0], note : this.noteEditor.getNoteContent()})),
-            tap(() => {
-                this.dialogRef.close('success');
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe()
-    } */
-
     executeAction() {
-        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNoteContent(), data : {send_date : (this.acknowledgementSendDate.getTime() / 1000).toString()}}).pipe(
+        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNote(), data : {send_date : (this.acknowledgementSendDate.getTime() / 1000).toString()}}).pipe(
             tap(() => {
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

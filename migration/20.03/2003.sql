@@ -82,11 +82,17 @@ where group_id in (
     ) and groupbasket.basket_id = actions_groupbaskets.basket_id
 );
 
+UPDATE groupbasket SET list_event_data = '{"defaultTab":"info"}'
+WHERE list_event = 'processDocument' AND (list_event_data IS NULL OR list_event_data = '');
+
 -- /!\ Do not move : update actions AFTER all updates on groupbasket
 DELETE FROM actions_categories WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
 DELETE FROM actions_groupbaskets WHERE id_action in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
 DELETE FROM groupbasket_redirect WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
 DELETE FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail');
+
+ALTER TABLE actions DROP COLUMN IF EXISTS parameters;
+ALTER TABLE actions ADD COLUMN parameters jsonb NOT NULL DEFAULT '{}';
 
 UPDATE actions SET component = 'rejectVisaBackToPreviousAction' WHERE action_page = 'rejection_visa_previous';
 UPDATE actions SET component = 'redirectInitiatorEntityAction' WHERE action_page = 'redirect_visa_entity';
@@ -524,7 +530,6 @@ DO $$ BEGIN
     DELETE FROM actions_groupbaskets WHERE id_action in (SELECT id FROM actions WHERE enabled = 'N');
     DELETE FROM groupbasket_redirect WHERE action_id in (SELECT id FROM actions WHERE enabled = 'N');
     DELETE FROM actions WHERE enabled = 'N';
-    ALTER TABLE actions ADD COLUMN parameters jsonb NOT NULL DEFAULT '{}';
   END IF;
 END$$;
 
@@ -572,9 +577,11 @@ FROM usergroups_services WHERE group_id IN (
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_indexing'
 FROM usergroups_services WHERE service_id = 'edit_recipient_outside_process';
+
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_details'
 FROM usergroups_services WHERE service_id = 'edit_recipient_outside_process';
+
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_except_recipient_details'
 FROM usergroups_services WHERE service_id = 'update_list_diff_in_details';
@@ -582,9 +589,11 @@ FROM usergroups_services WHERE service_id = 'update_list_diff_in_details';
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_process'
 FROM usergroups_services WHERE service_id = 'edit_recipient_in_process';
+
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_except_recipient_process'
-FROM usergroups_services WHERE group_id not in (SELECT distinct(group_id) FROM usergroups_services WHERE service_id = 'edit_recipient_in_process');
+FROM usergroups_services us WHERE group_id NOT IN (SELECT distinct(group_id) FROM usergroups_services WHERE service_id = 'edit_recipient_in_process') 
+AND group_id NOT IN (SELECT group_id FROM usergroups_services us2 WHERE us2.group_id = us.group_id and service_id = 'update_diffusion_except_recipient_process');
 
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_except_recipient_indexing'
@@ -786,6 +795,13 @@ DO $$ BEGIN
   END IF;
 END$$;
 UPDATE baskets set basket_clause = replace(basket_clause, 'nature_id' , 'custom_fields->>''1''');
+
+UPDATE baskets SET basket_clause = replace(basket_clause, 's.attachment_id = r.res_id', 's.document_id = r.res_id AND s.document_type = ''attachment''')
+WHERE basket_clause ILIKE '%s.attachment_id = r.res_id%';
+
+UPDATE baskets SET basket_clause = replace(basket_clause, 'attachment_id', 'document_id')
+WHERE basket_clause ILIKE '%attachment_id%';
+
 
 UPDATE history SET user_id = (select user_id from users order by user_id='superadmin' desc limit 1) where user_id = '';
 

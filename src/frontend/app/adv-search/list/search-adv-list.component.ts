@@ -56,6 +56,7 @@ export class SearchAdvListComponent implements OnInit {
     ngOnInit(): void {
         this.loading = true;
         this.initResourceList();
+        this.selectedRes = [];
     }
 
     initResourceList() {
@@ -76,7 +77,6 @@ export class SearchAdvListComponent implements OnInit {
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.search);
                 }),
                 map(data => {
-                    this.selectedRes = [];
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
                     this.resultsLength = data.count;

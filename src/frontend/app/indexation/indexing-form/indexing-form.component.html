@@ -69,7 +69,7 @@
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'select'">
-                                    <plugin-select-search [showResetOption]="adminMode" [label]="field.label"
+                                    <plugin-select-search [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
                                         [placeholderLabel]="!adminMode ? lang.chooseValue : lang.defaultValue"
                                         [formControlSelect]="arrFormControl[field.identifier]" [datas]="field.values"
                                         (afterSelected)="launchEvent($event, field)" style="width:100%;">

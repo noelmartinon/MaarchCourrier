@@ -26,6 +26,7 @@ use Entity\models\ListTemplateModel;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
 use History\controllers\HistoryController;
 use MessageExchange\controllers\MessageExchangeReviewController;
+use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
@@ -46,7 +47,7 @@ class ActionMethodController
         'closeMailAction'                        => 'closeMailAction',
         'closeMailWithAttachmentsOrNotesAction'  => 'closeMailWithAttachmentsOrNotesAction',
         'redirectAction'                         => 'redirect',
-        'closeAndIndexAction'                    => 'closeAndIndexAction',
+        'closeAndIndexAction'                    => 'closeMailAction',
         'updateDepartureDateAction'              => 'updateDepartureDateAction',
         'enabledBasketPersistenceAction'         => 'enabledBasketPersistenceAction',
         'disabledBasketPersistenceAction'        => 'disabledBasketPersistenceAction',
@@ -71,16 +72,16 @@ class ActionMethodController
         'noConfirmAction'                           => null
     ];
 
-    public static function terminateAction(array $aArgs)
+    public static function terminateAction(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['id', 'resources']);
-        ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::arrayType($aArgs, ['resources']);
-        ValidatorModel::stringType($aArgs, ['basketName', 'note', 'history']);
+        ValidatorModel::notEmpty($args, ['id', 'resources']);
+        ValidatorModel::intVal($args, ['id']);
+        ValidatorModel::arrayType($args, ['resources', 'note']);
+        ValidatorModel::stringType($args, ['basketName', 'history']);
 
         $set = ['locker_user_id' => null, 'locker_time' => null, 'modification_date' => 'CURRENT_TIMESTAMP'];
 
-        $action = ActionModel::getById(['id' => $aArgs['id'], 'select' => ['label_action', 'id_status', 'history']]);
+        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history']]);
         if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
             $set['status'] = $action['id_status'];
         }
@@ -88,31 +89,37 @@ class ActionMethodController
         ResModel::update([
             'set'   => $set,
             'where' => ['res_id in (?)'],
-            'data'  => [$aArgs['resources']]
+            'data'  => [$args['resources']]
         ]);
 
-        foreach ($aArgs['resources'] as $resource) {
-            if (!empty(trim($aArgs['note']))) {
-                NoteModel::create([
+        foreach ($args['resources'] as $resource) {
+            if (!empty(trim($args['note']['content']))) {
+                $noteId = NoteModel::create([
                     'resId'     => $resource,
                     'user_id'   => $GLOBALS['id'],
-                    'note_text' => $aArgs['note']
+                    'note_text' => $args['note']['content']
                 ]);
+
+                if (!empty($noteId) && !empty($args['note']['entities'])) {
+                    foreach ($args['note']['entities'] as $entity) {
+                        NoteEntityModel::create(['item_id' => $entity, 'note_id' => $noteId]);
+                    }
+                }
             }
 
             if ($action['history'] == 'Y') {
-                $info = "{$action['label_action']}{$aArgs['history']}";
-                $info = empty($aArgs['basketName']) ? $info : "{$aArgs['basketName']} : {$info}";
+                $info = "{$action['label_action']}{$args['history']}";
+                $info = empty($args['basketName']) ? $info : "{$args['basketName']} : {$info}";
                 HistoryController::add([
                     'tableName' => 'res_letterbox',
                     'recordId'  => $resource,
-                    'eventType' => 'ACTION#' . $aArgs['id'],
+                    'eventType' => 'ACTION#' . $args['id'],
                     'moduleId'  => 'resource',
-                    'eventId'   => $aArgs['id'],
+                    'eventId'   => $args['id'],
                     'info'      => $info
                 ]);
 
-                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $aArgs['id'], 'userId' => $GLOBALS['userId']]);
+                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['userId']]);
             }
         }
 
@@ -123,7 +130,6 @@ class ActionMethodController
     {
         ValidatorModel::notEmpty($aArgs, ['resId']);
         ValidatorModel::intVal($aArgs, ['resId']);
-        ValidatorModel::stringType($aArgs, ['note']);
 
         ResModel::update(['set' => ['closing_date' => 'CURRENT_TIMESTAMP'], 'where' => ['res_id = ?', 'closing_date is null'], 'data' => [$aArgs['resId']]]);
 
@@ -134,7 +140,7 @@ class ActionMethodController
     {
         ValidatorModel::notEmpty($aArgs, ['resId']);
         ValidatorModel::intVal($aArgs, ['resId']);
-        ValidatorModel::stringType($aArgs, ['note']);
+        ValidatorModel::arrayType($aArgs, ['note']);
 
         $attachments = AttachmentModel::get([
             'select' => [1],
@@ -144,23 +150,11 @@ class ActionMethodController
 
         $notes = NoteModel::getByUserIdForResource(['select' => ['user_id', 'id'], 'resId' => $aArgs['resId'], 'userId' => $GLOBALS['id']]);
 
-        if (empty($attachments) && empty($notes) && empty($aArgs['note'])) {
+        if (empty($attachments) && empty($notes) && empty($aArgs['note']['content'])) {
             return ['errors' => ['No attachments or notes']];
         }
 
-        ResModel::update(['set' => ['closing_date' => 'CURRENT_TIMESTAMP'], 'where' => ['res_id = ?', 'closing_date is null'], 'data' => [$aArgs['resId']]]);
-
-        return true;
-    }
-
-    public static function closeAndIndexAction(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['resId']);
-        ValidatorModel::intVal($aArgs, ['resId']);
-
-        ResModel::update(['set' => ['closing_date' => 'CURRENT_TIMESTAMP'], 'where' => ['res_id = ?', 'closing_date is null'], 'data' => [$aArgs['resId']]]);
-
-        return true;
+        return ActionMethodController::closeMailAction($aArgs);
     }
 
     public static function updateAcknowledgementSendDateAction(array $aArgs)
@@ -411,6 +405,7 @@ class ActionMethodController
     {
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
+        ValidatorModel::arrayType($args, ['note']);
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
         $config = [];
@@ -432,7 +427,7 @@ class ActionMethodController
                 'processingUser'  => $args['data']['processingUser'],
                 'objectSent'      => 'mail',
                 'userId'          => $GLOBALS['userId'],
-                'note'            => $args['note'] ?? null
+                'note'            => $args['note']['content'] ?? null
             ]);
             if (!empty($sentInfo['error'])) {
                 return ['errors' => [$sentInfo['error']]];

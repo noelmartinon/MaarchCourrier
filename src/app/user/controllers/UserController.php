@@ -17,6 +17,7 @@ namespace User\controllers;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
+use Configuration\models\ConfigurationModel;
 use ContentManagement\controllers\DocumentEditorController;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
@@ -340,7 +341,7 @@ class UserController
             if (!in_array($listTemplate['entity_id'], $allEntities)) {
                 $isListTemplateDeletable = false;
             }
-            $listTemplateEntities[] = $listTemplate['object_id'];
+            $listTemplateEntities[] = $listTemplate['entity_id'];
         }
 
         if (!$isListInstanceDeletable || !$isListTemplateDeletable) {
@@ -353,7 +354,7 @@ class UserController
             $formattedLTEntities = [];
             $listTemplateEntities = array_unique($listTemplateEntities);
             foreach ($listTemplateEntities as $listTemplateEntity) {
-                $entity = Entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listTemplateEntity]);
+                $entity = Entitymodel::getById(['select' => ['short_label'], 'id' => $listTemplateEntity]);
                 $formattedLTEntities[] = $entity['short_label'];
             }
 
@@ -515,7 +516,7 @@ class UserController
         $user['nbFollowedResources'] = $userFollowed[0]['nb'];
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
-        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS)) {
+        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS) && $user['user_id'] != 'superadmin') {
             $user['canModifyPassword'] = false;
         }
 
@@ -523,8 +524,15 @@ class UserController
             if (!$basket['allowed']) {
                 unset($user['baskets'][$key]);
             }
+            unset($user['baskets'][$key]['basket_clause']);
         }
         $user['baskets'] = array_values($user['baskets']);
+        foreach ($user['groups'] as $key => $group) {
+            unset($user['groups'][$key]['where_clause']);
+        }
+        foreach ($user['assignedBaskets'] as $key => $basket) {
+            unset($user['assignedBaskets'][$key]['basket_clause']);
+        }
 
         return $response->withJson($user);
     }
@@ -1644,10 +1652,17 @@ class UserController
         UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$user['id']]]);
 
         $url = UrlController::getCoreUrl() . 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+        $configuration = json_decode($configuration['value'], true);
+        if (!empty($configuration['from'])) {
+            $sender = $configuration['from'];
+        } else {
+            $sender = $user['mail'];
+        }
         $email = EmailController::createEmail([
             'userId'    => $user['id'],
             'data'      => [
-                'sender'        => ['email' => $user['mail']],
+                'sender'        => ['email' => $sender],
                 'recipients'    => [$user['mail']],
                 'object'        => _NOTIFICATIONS_FORGOT_PASSWORD_SUBJECT,
                 'body'          => _NOTIFICATIONS_FORGOT_PASSWORD_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_FORGOT_PASSWORD_FOOTER,

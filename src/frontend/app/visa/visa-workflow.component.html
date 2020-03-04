@@ -1,7 +1,7 @@
 
 <mat-list *ngIf="!loading">
     <mat-form-field appearance="outline" *ngIf="adminMode && !linkedToMaarchParapheur">
-        <input type="text" #searchVisaSignUserInput matInput placeholder="Ajouter des personnes" id="searchVisaSignUserInput"
+        <input type="text" #searchVisaSignUserInput matInput placeholder="{{lang.addUsers}}" id="searchVisaSignUserInput"
             [formControl]="searchVisaSignUser" [matAutocomplete]="autoGroup">
         <mat-autocomplete #autoGroup="matAutocomplete" (optionSelected)="addItemToWorkflow($event.option.value)" (opened)="initFilterVisaModelList()">
             <mat-option disabled *ngIf="visaModelListNotLoaded">
@@ -36,7 +36,7 @@
                 </mat-option>
             </mat-optgroup>
         </mat-autocomplete>
-        <button mat-icon-button matSuffix *ngIf="visaWorkflow.items.length > 0" color="primary"
+        <button mat-icon-button matSuffix *ngIf="visaWorkflow.items.length > 0 && showListModels" color="primary"
             (click)="$event.stopPropagation();openPromptSaveModel()">
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
@@ -50,7 +50,7 @@
         <div class="emptyContent" *ngIf="visaWorkflow.items.length === 0">
             {{lang.noPerson}}
         </div>
-        <mat-list-item *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag class="columns workflow"
+        <mat-list-item disableRipple *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag class="columns workflow"
             [cdkDragDisabled]="!adminMode || !functions.empty(diffusion.process_date)"
             [class.notDraggable]="!adminMode || !functions.empty(diffusion.process_date)"
             [class.notEditable]="!adminMode"
@@ -85,7 +85,7 @@
                     <div class="workflowLineSubLabel">
                         {{diffusion.item_entity}}
                     </div>
-                    <div class="workflowLineSubLabel" *ngIf="(!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment))">
+                    <div class="workflowLineSubLabel" *ngIf="showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))">
                         <mat-form-field>
                             <input matInput class="comment" [disabled]="!adminMode || diffusion.process_date != null" [placeholder]="lang.visaNote" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>

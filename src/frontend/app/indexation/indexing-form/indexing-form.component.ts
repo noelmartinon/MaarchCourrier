@@ -785,6 +785,12 @@ export class IndexingFormComponent implements OnInit {
                             field.default_value = new Date();
                         }
 
+                        if (field.identifier == 'initiator' && this.mode == 'indexation' && this.functions.empty(field.default_value)) {
+                            if (this.headerService.user.entities[0]) {
+                                field.default_value = this.headerService.user.entities.filter((entity: any) => entity.primary_entity == 'Y')[0].id;
+                            }
+                        }
+
                         if (fieldExist) {
                             this['indexingModels_' + field.unit].push(field);
                             this.initValidator(field);

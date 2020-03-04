@@ -273,7 +273,7 @@ define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Bevestiging en bijwerking van de ver
 define('_NOT_INCOMING_CATEGORY', 'Categorie verschillend van \'Inkomende post\''); //_TO_TRANSLATE
 define('_AR_ALREADY_GENERATED', 'Ontvangstbevestiging gegenereerd maar niet verzonden'); //_TO_TRANSLATE
 define('_NO_CONTACT', 'Geen bijbehorend contact'); //_TO_TRANSLATE
-define('_USER_MISSING_INFORMATIONS', 'Ontbrekende informatie op de contactkaart'); //_TO_TRANSLATE
+define('_USER_MISSING_INFORMATIONS', 'A contact have no email, neither valide postal address'); //_TO_TRANSLATE
 define('_NO_TEMPLATE', 'Geen sjabloon'); //_TO_TRANSLATE
 define('_NO_EMAIL_TEMPLATE', 'Geen elektronisch sjabloon'); //_TO_TRANSLATE
 define('_NO_PAPER_TEMPLATE', 'Geen papieren sjabloon'); //_TO_TRANSLATE
@@ -356,6 +356,8 @@ define("_EMAIL_WAIT", "Waiting to be send_TO_TRANSLATE");
 define("_EMAIL_SENT", "Sent_TO_TRANSLATE");
 define("_EMAIL_ERROR", "Error when sending_TO_TRANSLATE");
 define("_EMAIL_DRAFT_SAVED", "Draft saved_TO_TRANSLATE");
+define("_EMAIL_ERROR_SENT", "Not sent"); //TO TRANSLATE
+define("_EMAIL_SENDING", "Sending email..."); //TO TRANSLATE
 
 define("_MAILEVA_ADDED", "Shipping Maileva added_TO_TRANSLATE");
 define("_MAILEVA_UPDATED", "Shipping Maileva updated_TO_TRANSLATE");

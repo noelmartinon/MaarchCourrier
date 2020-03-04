@@ -24,7 +24,7 @@
 
 ::ng-deep.fixedWidth {
     .mat-menu-content {
-        width: 265px;
+        min-width: 265px;
     }
 }
 

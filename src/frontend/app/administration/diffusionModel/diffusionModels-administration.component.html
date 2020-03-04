@@ -31,8 +31,8 @@
                         </mat-paginator>
                     </div>
                 </div>
-                <mat-table #table [dataSource]="dataSource" matSort matSortActive="title" matSortDirection="asc">
-                    <ng-container matColumnDef="title">
+                <mat-table #table [dataSource]="dataSource" matSort matSortActive="label" matSortDirection="asc">
+                    <ng-container matColumnDef="label">
                         <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.label}}</mat-header-cell>
                         <mat-cell *matCellDef="let element" style="flex:2;">
                         {{element.title}} </mat-cell>
@@ -42,10 +42,10 @@
                         <mat-cell *matCellDef="let element" style="flex:2;" [class.hide-for-mobile]="appService.getViewMode()">
                         {{element.description}} </mat-cell>
                     </ng-container>
-                    <ng-container matColumnDef="object_type">
+                    <ng-container matColumnDef="typeLabel">
                         <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.type}}</mat-header-cell>
                         <mat-cell *matCellDef="let element" style="flex:2;" >
-                        {{element.type}} </mat-cell>
+                        {{element.typeLabel}} </mat-cell>
                     </ng-container>
                     <ng-container matColumnDef="actions">
                         <mat-header-cell *matHeaderCellDef style="flex:1;"></mat-header-cell>

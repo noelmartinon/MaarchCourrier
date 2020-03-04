@@ -65,9 +65,7 @@ function get_form_txt($values, $path_manage_action, $id_action, $table, $module,
 
             $htmlModal = IParapheurController::getModal($config);
         } elseif ($config['id'] == 'fastParapheur') {
-            include_once 'modules/visa/class/FastParapheurController.php';
-
-            $htmlModal = FastParapheurController::getModal($config);
+            // Already In V2
         } elseif ($config['id'] == 'maarchParapheur') {
             // Already in V2
         }
@@ -162,14 +160,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 include_once 'modules/visa/class/IParapheurController.php';
                 $attachmentToFreeze = IParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
             } elseif ($config['id'] == 'fastParapheur') {
-                include_once 'modules/visa/class/FastParapheurController.php';
-                $sendedInfo = FastParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
-                if (!empty($sendedInfo['error'])) {
-                    var_dump($sendedInfo['error']);
-                    exit;
-                } else {
-                    $attachmentToFreeze = $sendedInfo['sended'];
-                }
+                // Already In V2
             } elseif ($config['id'] == 'maarchParapheur') {
                 // Already In V2
             }

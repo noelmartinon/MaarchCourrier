@@ -8,6 +8,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
+import {FunctionsService} from "../../../service/functions.service";
 
 declare function $j(selector: any): any;
 
@@ -52,7 +53,8 @@ export class TemplatesAdministrationComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
-        public appService: AppService
+        public appService: AppService,
+        public functions: FunctionsService
     ) {
         $j("link[href='merged_css.php']").remove();
     }
@@ -71,6 +73,9 @@ export class TemplatesAdministrationComponent implements OnInit {
                 setTimeout(() => {
                     this.dataSource = new MatTableDataSource(this.templates);
                     this.dataSource.paginator = this.paginator;
+                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
+                    this.sort.active = 'template_label';
+                    this.sort.direction = 'asc';
                     this.dataSource.sort = this.sort;
                 }, 0);
             }, (err) => {

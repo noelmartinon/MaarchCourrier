@@ -12,6 +12,7 @@ import { DocumentViewerComponent } from '../../viewer/document-viewer.component'
 import { PrivilegeService } from '../../../service/privileges.service';
 import { HeaderService } from '../../../service/header.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     selector: 'app-attachment-page',
@@ -28,6 +29,7 @@ export class AttachmentPageComponent implements OnInit {
     lang: any = LANG;
 
     loading: boolean = true;
+    sendMassMode: boolean = false;
     sendingData: boolean = false;
 
     attachmentsTypes: any[] = [];
@@ -52,116 +54,170 @@ export class AttachmentPageComponent implements OnInit {
         private notify: NotificationService,
         private sortPipe: SortPipe,
         public headerService: HeaderService,
-        public privilegeService: PrivilegeService) {
+        public privilegeService: PrivilegeService,
+        public functions: FunctionsService) {
     }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
         this.hidePanel = this.data.hidePanel !== undefined ? this.data.hidePanel : false;
 
-        this.http.get('../../rest/attachmentsTypes').pipe(
-            tap((data: any) => {
-                Object.keys(data.attachmentsTypes).forEach(templateType => {
-                    if (data.attachmentsTypes[templateType].show) {
-                        this.attachmentsTypes.push({
-                            id: templateType,
-                            ...data.attachmentsTypes[templateType]
-                        });
+        await this.loadAttachmentTypes();
+        await this.loadAttachment();
+
+        this.loading = false;
+    }
+
+    loadAttachmentTypes() {
+        return new Promise((resolve, reject) => {
+            this.http.get('../../rest/attachmentsTypes').pipe(
+                tap((data: any) => {
+                    Object.keys(data.attachmentsTypes).forEach(templateType => {
+                        if (data.attachmentsTypes[templateType].show) {
+                            this.attachmentsTypes.push({
+                                id: templateType,
+                                ...data.attachmentsTypes[templateType]
+                            });
+                        }
+                    });
+                    this.attachmentsTypes = this.sortPipe.transform(this.attachmentsTypes, 'label');
+                    resolve(true)
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    loadAttachment() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../../rest/attachments/${this.data.resId}`).pipe(
+                tap((data: any) => {
+                    let contact: any = null;
+
+                    if ((this.privilegeService.hasCurrentUserPrivilege('manage_attachments') || this.headerService.user.id === data.typist) && data.status !== 'SIGN' && data.status !== 'FRZ') {
+                        this.editMode = true;
                     }
-                });
 
-            }),
-            exhaustMap(() => this.http.get("../../rest/attachments/" + this.data.resId)),
-            tap((data: any) => {
-                //this.attachment = data;
-                let contact: any = null;
+                    if (data.recipientId !== null && data.status !== 'SEND_MASS') {
+                        contact = [{
+                            id: data.recipientId,
+                            type: data.recipientType
+                        }];
+                    }
 
-                if ((this.privilegeService.hasCurrentUserPrivilege('manage_attachments') || this.headerService.user.id === data.typist) && data.status !== 'SIGN' && data.status !== 'FRZ') {
-                    this.editMode = true;
+                    this.sendMassMode = data.status === 'SEND_MASS';
+
+                    this.attachment = {
+                        typist: new FormControl({ value: data.typist, disabled: true }, [Validators.required]),
+                        typistLabel: new FormControl({ value: data.typistLabel, disabled: true }, [Validators.required]),
+                        creationDate: new FormControl({ value: data.creationDate, disabled: true }, [Validators.required]),
+                        modificationDate: new FormControl({ value: data.modificationDate, disabled: true }),
+                        modifiedBy: new FormControl({ value: data.modifiedBy, disabled: true }),
+                        signatory: new FormControl({ value: data.signatory, disabled: true }),
+                        signDate: new FormControl({ value: data.signDate, disabled: true }),
+                        resId: new FormControl({ value: this.data.resId, disabled: true }, [Validators.required]),
+                        chrono: new FormControl({ value: data.chrono, disabled: true }),
+                        originId: new FormControl({ value: data.originId, disabled: true }),
+                        resIdMaster: new FormControl({ value: data.resIdMaster, disabled: true }, [Validators.required]),
+                        status: new FormControl({ value: data.status, disabled: true }, [Validators.required]),
+                        relation: new FormControl({ value: data.relation, disabled: true }, [Validators.required]),
+                        title: new FormControl({ value: data.title, disabled: !this.editMode }, [Validators.required]),
+                        recipient: new FormControl({ value: contact, disabled: !this.editMode }),
+                        type: new FormControl({ value: data.type, disabled: !this.editMode }, [Validators.required]),
+                        validationDate: new FormControl({ value: data.validationDate !== null ? new Date(data.validationDate) : null, disabled: !this.editMode }),
+                        signedResponse: new FormControl({ value: data.signedResponse, disabled: false }),
+                        encodedFile: new FormControl({ value: '_CURRENT_FILE', disabled: !this.editMode }, [Validators.required]),
+                        format: new FormControl({ value: data.format, disabled: true }, [Validators.required])
+                    };
+
+                    this.versions = data.versions;
+
+                    this.attachFormGroup = new FormGroup(this.attachment);
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    createNewVersion(mode: string = 'default') {
+        this.sendingData = true;
+        this.appAttachmentViewer.getFile().pipe(
+            tap((data) => {
+                this.attachment.encodedFile.setValue(data.content);
+                this.attachment.format.setValue(data.format);
+                if (this.functions.empty(this.attachment.encodedFile.value)) {
+                    this.notify.error(this.lang.mustEditAttachmentFirst);
+                    this.sendingData = false;
                 }
-
-                if (data.recipientId !== null) {
-                    contact = [{
-                        id: data.recipientId,
-                        type: data.recipientType
-                    }];
-                }
-                
-
-                this.attachment = {
-                    typist: new FormControl({ value: data.typist, disabled: true }, [Validators.required]),
-                    typistLabel: new FormControl({ value: data.typistLabel, disabled: true }, [Validators.required]),
-                    creationDate: new FormControl({ value: data.creationDate, disabled: true }, [Validators.required]),
-                    modificationDate: new FormControl({ value: data.modificationDate, disabled: true }),
-                    modifiedBy: new FormControl({ value: data.modifiedBy, disabled: true }),
-                    signatory: new FormControl({ value: data.signatory, disabled: true }),
-                    signDate: new FormControl({ value: data.signDate, disabled: true }),
-                    resId: new FormControl({ value: this.data.resId, disabled: true }, [Validators.required]),
-                    chrono: new FormControl({ value: data.chrono, disabled: true }),
-                    originId: new FormControl({ value: data.originId, disabled: true }),
-                    resIdMaster: new FormControl({ value: data.resIdMaster, disabled: true }, [Validators.required]),
-                    status: new FormControl({ value: data.status, disabled: true }, [Validators.required]),
-                    relation: new FormControl({ value: data.relation, disabled: true }, [Validators.required]),
-                    title: new FormControl({ value: data.title, disabled: !this.editMode }, [Validators.required]),
-                    recipient: new FormControl({ value: contact, disabled: !this.editMode }),
-                    type: new FormControl({ value: data.type, disabled: !this.editMode }, [Validators.required]),
-                    validationDate: new FormControl({ value: data.validationDate !== null ? new Date(data.validationDate) : null, disabled: !this.editMode }),
-                    signedResponse: new FormControl({ value: data.signedResponse, disabled: false }),
-                    encodedFile: new FormControl({ value: '_CURRENT_FILE', disabled: !this.editMode }, [Validators.required]),
-                    format: new FormControl({ value: data.format, disabled: true }, [Validators.required])
-                };
-
-                this.versions = data.versions;
-
-                this.attachFormGroup = new FormGroup(this.attachment);
-
-                this.loading = false;
             }),
+            filter(() => !this.functions.empty(this.attachment.encodedFile.value)),
+            exhaustMap(() => this.http.post(`../../rest/attachments`, this.getAttachmentValues(true, mode))),
+            tap(async (data: any) => {
+                if (this.sendMassMode && mode === 'mailing') {
+                    await this.generateMailling(data.id);
+                    this.notify.success(this.lang.attachmentGenerated);
+                } else {
+                    this.notify.success(this.lang.newVersionAdded);
+                }
+                this.dialogRef.close('success');
+            }),
+            finalize(() => this.sendingData = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 this.dialogRef.close('');
                 return of(false);
             })
         ).subscribe();
     }
 
-    createNewVersion() {
+    updateAttachment(mode: string = 'default') {
+
         this.sendingData = true;
         this.appAttachmentViewer.getFile().pipe(
             tap((data) => {
                 this.attachment.encodedFile.setValue(data.content);
                 this.attachment.format.setValue(data.format);
             }),
-            exhaustMap(() => this.http.post(`../../rest/attachments`, this.getAttachmentValues(true))),
-            tap(() => {
-                this.notify.success(this.lang.newVersionAdded);
+            exhaustMap(() => this.http.put(`../../rest/attachments/${this.attachment.resId.value}`, this.getAttachmentValues(false, mode))),
+            tap(async () => {
+                if (this.sendMassMode && mode === 'mailing') {
+                    await this.generateMailling(this.attachment.resId.value);
+                    this.notify.success(this.lang.attachmentGenerated);
+                } else {
+                    this.notify.success(this.lang.attachmentUpdated);
+                }
                 this.dialogRef.close('success');
             }),
             finalize(() => this.sendingData = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
+                this.dialogRef.close('');
                 return of(false);
             })
         ).subscribe();
     }
 
-    updateAttachment() {       
-        this.sendingData = true;
-        this.appAttachmentViewer.getFile().pipe(
-            tap((data) => {
-                this.attachment.encodedFile.setValue(data.content);
-                this.attachment.format.setValue(data.format);
-            }),
-            exhaustMap(() => this.http.put(`../../rest/attachments/${this.attachment.resId.value}`, this.getAttachmentValues())),
-            tap(() => {
-                this.notify.success(this.lang.attachmentUpdated);
-                this.dialogRef.close('success');
-            }),
-            finalize(() => this.sendingData = false),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+    generateMailling(resId: number) {
+        return new Promise((resolve, reject) => {
+            this.http.post(`../../rest/attachments/${resId}/mailing`, {}).pipe(
+                tap(() => {
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     enableForm(state: boolean) {
@@ -178,7 +234,7 @@ export class AttachmentPageComponent implements OnInit {
         });
     }
 
-    getAttachmentValues(newAttachment: boolean = false) {
+    getAttachmentValues(newAttachment: boolean = false, mode: string) {
         let attachmentValues = {};
         Object.keys(this.attachment).forEach(element => {
             if (this.attachment[element] !== undefined && (this.attachment[element].value !== null && this.attachment[element].value !== undefined)) {
@@ -187,7 +243,7 @@ export class AttachmentPageComponent implements OnInit {
                     let month = this.attachment[element].value.getMonth() + 1;
                     let year = this.attachment[element].value.getFullYear();
                     attachmentValues[element] = ('00' + day).slice(-2) + '-' + ('00' + month).slice(-2) + '-' + year + ' 23:59:59';
-                } else if(element === 'recipient') {
+                } else if (element === 'recipient') {
                     attachmentValues['recipientId'] = this.attachment[element].value.length > 0 ? this.attachment[element].value[0].id : null;
                     attachmentValues['recipientType'] = this.attachment[element].value.length > 0 ? this.attachment[element].value[0].type : null;
                 } else {
@@ -198,6 +254,9 @@ export class AttachmentPageComponent implements OnInit {
                         attachmentValues['encodedFile'] = null;
                     }
                     //attachmentValues['format'] = this.appAttachmentViewer.getFile().format;
+                }
+                if (mode === 'mailing') {
+                    attachmentValues['inMailing'] = true;
                 }
             }
         });

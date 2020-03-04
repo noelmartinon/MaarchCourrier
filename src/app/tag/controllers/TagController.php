@@ -38,12 +38,9 @@ class TagController
         ]);
         $countResources = array_column($countResources, 'count', 'tag_id');
 
-        $hasChildren = TagController::hasChildren(['ids' => $ids]);
-
         foreach ($tags as $key => $tag) {
             $tags[$key]['countResources'] = $countResources[$tag['id']] ?? 0;
             $tags[$key]['links'] = json_decode($tags[$key]['links'], true);
-            $tags[$key]['canMerge'] = empty($tag['parent_id']) && !$hasChildren[$tag['id']];
         }
 
         return $response->withJson(['tags' => $tags]);
@@ -69,12 +66,12 @@ class TagController
         $tag['links'] = json_decode($tag['links'], true);
 
         $childTags = TagModel::get([
-            'select' => ['count(1)'],
+            'select' => [1],
             'where'  => ['parent_id = ?'],
             'data'   => [$tag['id']]
         ]);
 
-        $tag['canMerge'] = empty($tag['parent_id']) && $childTags[0]['count'] == 0;
+        $tag['canMerge'] = empty($tag['parent_id']) && empty($childTags);
 
         return $response->withJson($tag);
     }
@@ -315,34 +312,37 @@ class TagController
             return $response->withStatus(404)->withJson(['errors' => 'Merge tag not found']);
         }
 
-        if (!empty($tagMerge['parent_id']) || !empty($tagMaster['parent_id'])) {
+        if (!empty($tagMerge['parent_id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Cannot merge tag : tag has a parent']);
         }
 
         $childTags = TagModel::get([
             'select' => ['count(1)'],
-            'where'  => ['parent_id in (?)'],
-            'data'   => [[$tagMaster['id'], $tagMerge['id']]]
+            'where'  => ['parent_id = ?'],
+            'data'   => [$tagMerge['id']]
         ]);
         if ($childTags[0]['count'] > 0) {
             return $response->withStatus(400)->withJson(['errors' => 'Cannot merge tag : tag has a child']);
         }
 
         $tagResMaster = ResourceTagModel::get([
-           'where'  => ['tag_id = ?'],
+            'where' => ['tag_id = ?'],
             'data'  => [$tagMaster['id']]
         ]);
         $tagResMaster = array_column($tagResMaster, 'res_id');
 
-        if (!empty($tagResMaster)) {
-            ResourceTagModel::update([
-                'set'   => [
-                    'tag_id' => $tagMaster['id']
-                ],
-                'where' => ['tag_id = ?', 'res_id not in (?)'],
-                'data'  => [$tagMerge['id'], $tagResMaster]
-            ]);
+        if (empty($tagResMaster)) {
+            $tagResMaster = [0];
         }
+
+        ResourceTagModel::update([
+            'set'   => [
+                'tag_id' => $tagMaster['id']
+            ],
+            'where' => ['tag_id = ?', 'res_id not in (?)'],
+            'data'  => [$tagMerge['id'], $tagResMaster]
+        ]);
+
 
         ResourceTagModel::delete([
            'where'  => ['tag_id = ?'],
@@ -497,27 +497,5 @@ class TagController
             }
         }
         return false;
-    }
-
-    private static function hasChildren(array $args)
-    {
-        ValidatorModel::notEmpty($args, ['ids']);
-        ValidatorModel::arrayType($args, ['ids']);
-
-        $tags = array_fill_keys($args['ids'], false);
-
-        $childTags = TagModel::get([
-            'select'  => ['count(id)', 'parent_id'],
-            'where'   => ['parent_id in (?)'],
-            'data'    => [$args['ids']],
-            'groupBy' => ['parent_id']
-        ]);
-        $children = array_column($childTags, 'count', 'parent_id');
-
-        foreach ($tags as $id => $item) {
-            $tags[$id] = !empty($children[$id]) && $children[$id] > 0;
-        }
-
-        return $tags;
     }
 }

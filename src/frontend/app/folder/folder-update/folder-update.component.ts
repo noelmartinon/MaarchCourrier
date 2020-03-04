@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, Inject } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, Inject, HostListener } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
@@ -32,7 +32,15 @@ export class FolderUpdateComponent implements OnInit {
 
     sharingFolderCLone: any[] = [];
 
+    holdShift: boolean = false;
+
     entities: any[] = [];
+    @HostListener('document:keydown.Shift', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+        this.holdShift = true;
+    }
+    @HostListener('document:keyup', ['$event']) onKeyupHandler(event: KeyboardEvent) {
+        this.holdShift = false;
+    }
 
     constructor(
         public http: HttpClient,
@@ -67,7 +75,7 @@ export class FolderUpdateComponent implements OnInit {
 
                 this.entities = data.entities;
                 data.entities.forEach((element: any) => {
-                    if (this.folder.sharing.entities.map((data: any) => data.entity_id).indexOf(element.serialId) > -1 
+                    if (this.folder.sharing.entities.map((data: any) => data.entity_id).indexOf(element.serialId) > -1
                         || this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(element.serialId) > -1) {
                         element.state.selected = true;
                     }
@@ -96,8 +104,8 @@ export class FolderUpdateComponent implements OnInit {
 
                     if (element.id === this.folder.id || currentParentId === element.parent_id) {
                         currentParentId = element.id;
-                        element['state'].opened = false; 
-                        element['state'].disabled = true; 
+                        element['state'].opened = false;
+                        element['state'].disabled = true;
                     }
                     element.parent = element.parent_id;
                     element.text = element.label;
@@ -105,7 +113,7 @@ export class FolderUpdateComponent implements OnInit {
                 return data;
             }),
             tap((data: any) => {
-                
+
                 this.initFoldersTree(data.folders);
             }),
             catchError((err: any) => {
@@ -123,7 +131,7 @@ export class FolderUpdateComponent implements OnInit {
                 "three_state": false //no cascade selection
             },
             'core': {
-                force_text : true,
+                force_text: true,
                 'themes': {
                     'name': 'proton',
                     'responsive': true
@@ -159,7 +167,7 @@ export class FolderUpdateComponent implements OnInit {
                 "three_state": false //no cascade selection
             },
             'core': {
-                force_text : true,
+                force_text: true,
                 'themes': {
                     'name': 'proton',
                     'responsive': true
@@ -189,20 +197,25 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     selectEntity(newEntity: any) {
-        if (!this.functions.empty(newEntity.keyword)) {
-            this.folder.sharing.entities.push(
-                {
-                    keyword: newEntity.keyword,
-                    edition: false
-                }
-            );
+        if (this.holdShift) {
+            $j('#jstree').jstree('deselect_all');
+            this.folder.sharing.entities = [];
         } else {
-            this.folder.sharing.entities.push(
-                {
-                    entity_id: newEntity.serialId,
-                    edition: false
-                }
-            );
+            if (!this.functions.empty(newEntity.keyword)) {
+                this.folder.sharing.entities.push(
+                    {
+                        keyword: newEntity.keyword,
+                        edition: false
+                    }
+                );
+            } else {
+                this.folder.sharing.entities.push(
+                    {
+                        entity_id: newEntity.serialId,
+                        edition: false
+                    }
+                );
+            }
         }
     }
 

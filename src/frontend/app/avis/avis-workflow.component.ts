@@ -4,7 +4,7 @@ import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FunctionsService } from '../../service/functions.service';
-import { tap, exhaustMap, map, startWith, catchError, finalize, filter, debounceTime, switchMap } from 'rxjs/operators';
+import { tap, exhaustMap, map, startWith, catchError, finalize, filter } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { LatinisePipe } from 'ngx-pipes';
 import { Observable, of } from 'rxjs';
@@ -44,6 +44,8 @@ export class AvisWorkflowComponent implements OnInit {
     @Input('injectDatas') injectDatas: any;
     @Input('adminMode') adminMode: boolean;
     @Input('resId') resId: number = null;
+
+    @Input('showListModels') showListModels: boolean = true;
 
     @Input('mode') mode: 'parallel' | 'circuit' = 'circuit';
 
@@ -86,7 +88,7 @@ export class AvisWorkflowComponent implements OnInit {
     loadAvisRoles() {
         return new Promise((resolve, reject) => {
             this.http.get(`../../rest/roles`).pipe(
-                tap((data:any) => {
+                tap((data: any) => {
                     this.availableRoles = data.roles.filter((role: any) => ['avis', 'avis_copy', 'avis_info'].indexOf(role.id) > -1).map((role: any) => {
                         return {
                             id: role.id,
@@ -104,7 +106,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     getRoleLabel(id: string) {
-        return this.availableRoles.filter(role => role.id === id) [0].label;
+        return this.availableRoles.filter(role => role.id === id)[0].label;
     }
 
     loadListModel(entityId: number) {
@@ -121,8 +123,9 @@ export class AvisWorkflowComponent implements OnInit {
                             item_entity: item.descriptionToDisplay,
                         }
                     });
-                    this.loading = false;
                 }
+                this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
+                this.loading = false;
             });
     }
 
@@ -233,7 +236,9 @@ export class AvisWorkflowComponent implements OnInit {
         if (this.avisModelListNotLoaded) {
             await this.loadAvisUsersList();
 
-            await this.loadAvisModelList();
+            if (this.showListModels) {
+                await this.loadAvisModelList();
+            }
 
             this.searchAvisUser.reset();
 
@@ -300,7 +305,7 @@ export class AvisWorkflowComponent implements OnInit {
                 })
             ).subscribe();
         });
-        
+
     }
 
     loadParallelWorkflow(resId: number) {
@@ -309,22 +314,22 @@ export class AvisWorkflowComponent implements OnInit {
         this.avisWorkflow.items = [];
         return new Promise((resolve, reject) => {
             this.http.get("../../rest/resources/" + resId + "/parallelOpinion")
-            .subscribe((data: any) => {
-                data.forEach((element: any) => {
-                    this.avisWorkflow.items.push(
-                        {
-                            ...element,
-                            difflist_type: 'entity_id'
-                        });
+                .subscribe((data: any) => {
+                    data.forEach((element: any) => {
+                        this.avisWorkflow.items.push(
+                            {
+                                ...element,
+                                difflist_type: 'entity_id'
+                            });
+                    });
+                    this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
+                    this.loading = false;
+                    resolve(true);
+                }, (err: any) => {
+                    this.notify.handleErrors(err);
                 });
-                this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items))
-                this.loading = false;
-                resolve(true);
-            }, (err: any) => {
-                this.notify.handleErrors(err);
-            });
         });
-        
+
     }
 
     loadDefaultWorkflow(resId: number) {
@@ -364,7 +369,7 @@ export class AvisWorkflowComponent implements OnInit {
         return this.avisWorkflow.items.length;
     }
 
-    changeRole(role: any, i : number) {
+    changeRole(role: any, i: number) {
         this.avisWorkflow.items[i].item_mode = role.id;
     }
 
@@ -417,7 +422,7 @@ export class AvisWorkflowComponent implements OnInit {
                         return of(false);
                     })
                 ).subscribe();
-            } else {     
+            } else {
                 const arrAvis = resIds.map(resId => {
                     return {
                         resId: resId,
@@ -440,46 +445,50 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     addItemToWorkflow(item: any) {
-        if (item.type === 'user') {
-            this.avisWorkflow.items.push({
-                item_id: item.id,
-                item_type: 'user',
-                item_entity: item.entity,
-                item_mode: 'avis',
-                labelToDisplay: item.label,
-                externalId: !this.functions.empty(item.externalId) ? item.externalId : null,
-                difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
-            });
-            this.searchAvisUser.reset();
-            this.searchAvisUserInput.nativeElement.blur();
-        } else if (item.type === 'entity') {
-            this.http.get(`../../rest/listTemplates/${item.id}`).pipe(
-                tap((data: any) => {
-                    this.avisWorkflow.items = this.avisWorkflow.items.concat(
-                        data.listTemplate.items.map((itemTemplate: any) => {
-                            return {
-                                item_id: itemTemplate.item_id,
-                                item_type: 'user',
-                                labelToDisplay: itemTemplate.idToDisplay,
-                                item_entity: itemTemplate.descriptionToDisplay,
-                                item_mode: 'avis',
-                                difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
-                            }
-                        })
-                    );
-                    this.searchAvisUser.reset();
-                    this.searchAvisUserInput.nativeElement.blur();
-                })
-            ).subscribe();
-        }
+        return new Promise((resolve, reject) => {
+            if (item.type === 'user') {
+                this.avisWorkflow.items.push({
+                    item_id: item.id,
+                    item_type: 'user',
+                    item_entity: item.entity,
+                    item_mode: 'avis',
+                    labelToDisplay: item.label,
+                    externalId: !this.functions.empty(item.externalId) ? item.externalId : null,
+                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
+                });
+                this.searchAvisUser.reset();
+                this.searchAvisUserInput.nativeElement.blur();
+                resolve(true);
+            } else if (item.type === 'entity') {
+                this.http.get(`../../rest/listTemplates/${item.id}`).pipe(
+                    tap((data: any) => {
+                        this.avisWorkflow.items = this.avisWorkflow.items.concat(
+                            data.listTemplate.items.filter((itemTemplate: any) => itemTemplate.hasPrivilege === true).map((itemTemplate: any) => {
+                                return {
+                                    item_id: itemTemplate.item_id,
+                                    item_type: 'user',
+                                    labelToDisplay: itemTemplate.idToDisplay,
+                                    item_entity: itemTemplate.descriptionToDisplay,
+                                    item_mode: 'avis',
+                                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
+                                }
+                            })
+                        );
+                        this.searchAvisUser.reset();
+                        this.searchAvisUserInput.nativeElement.blur();
+                        resolve(true);
+                    })
+                ).subscribe();
+            }
+        });
+    }
+
+    resetWorkflow() {
+        this.avisWorkflow.items = [];
     }
 
     emptyWorkflow() {
-        if (this.avisWorkflow.items.length === 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.avisWorkflow.items.length === 0;
     }
 
     workflowEnd() {

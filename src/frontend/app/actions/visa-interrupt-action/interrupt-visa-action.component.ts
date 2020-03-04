@@ -6,12 +6,11 @@ import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import {FunctionsService} from "../../../service/functions.service";
+import { FunctionsService } from "../../../service/functions.service";
 
 @Component({
     templateUrl: "interrupt-visa-action.component.html",
     styleUrls: ['interrupt-visa-action.component.scss'],
-    providers: [NotificationService],
 })
 export class InterruptVisaActionComponent implements OnInit {
 
@@ -26,8 +25,8 @@ export class InterruptVisaActionComponent implements OnInit {
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         public dialogRef: MatDialogRef<InterruptVisaActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService
@@ -50,13 +49,14 @@ export class InterruptVisaActionComponent implements OnInit {
                         this.resourcesWarnings = data.resourcesInformations.warning;
                     }
 
-                    if(!this.functions.empty(data.resourcesInformations.error)) {
+                    if (!this.functions.empty(data.resourcesInformations.error)) {
                         this.resourcesErrors = data.resourcesInformations.error;
                         this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
                     }
                     resolve(true);
                 }, (err: any) => {
                     this.notify.handleSoftErrors(err);
+                    this.dialogRef.close();
                 });
         });
     }
@@ -67,13 +67,13 @@ export class InterruptVisaActionComponent implements OnInit {
     }
 
     executeAction() {
-        this.http.put(this.data.processActionRoute, {resources : this.data.resIds, note : this.noteEditor.getNoteContent()}).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.data.resIds, note: this.noteEditor.getNote() }).pipe(
             tap(() => {
-                this.dialogRef.close('success');
+                this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

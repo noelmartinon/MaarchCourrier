@@ -498,6 +498,22 @@ abstract class UserModelAbstract
         return $aEntities;
     }
 
+    public static function getEntitiesById(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['id', 'select']);
+        ValidatorModel::intVal($args, ['id']);
+        ValidatorModel::arrayType($args, ['select']);
+
+        $entities = DatabaseModel::select([
+            'select'    => $args['select'],
+            'table'     => ['users, users_entities, entities'],
+            'where'     => ['users.user_id = users_entities.user_id', 'users_entities.entity_id = entities.entity_id', 'users.id = ?'],
+            'data'      => [$args['id']]
+        ]);
+
+        return $entities;
+    }
+
     public static function updateStatus(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['id', 'status']);

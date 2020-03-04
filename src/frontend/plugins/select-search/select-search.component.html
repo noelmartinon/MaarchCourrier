@@ -19,7 +19,7 @@
       {{lang.noResult}}
     </div>
     <mat-option *ngIf="showResetOption" [value]="null"></mat-option>
-    <mat-option *ngFor="let value of filteredDatas | async" [value]="value.id"
+    <mat-option *ngFor="let value of filteredDatas | async" [value]="returnValue === 'id' ? value.id : value"
       [title]="value.title !== undefined ? value.title : value.label" [disabled]="value.disabled"
       [class.opt-group]="value.isTitle" [style.color]="value.color" [innerHTML]="value.label">
     </mat-option>

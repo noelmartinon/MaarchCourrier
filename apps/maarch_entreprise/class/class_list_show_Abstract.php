@@ -1139,16 +1139,6 @@ class list_show_Abstract extends functions
 
                                         <?php
                                             }
-                                        } else {
-                                            ?>
-                                <a href="<?php echo $path_ban.$param_comp; ?>" class="actionList" onclick="return(confirm('<?php echo _REALLY_SUSPEND.' ';
-                                            if (isset($page_name) && $page_name == 'users') {
-                                                echo $complete_name;
-                                            } else {
-                                                echo $admin_id;
-                                            } ?> ?'));"><i class="fa fa-pause fa-2x" title="<?php echo _SUSPEND; ?>"></i></a>
-                            <?php
-                                        }
                                     }
                                 }
                             } ?>

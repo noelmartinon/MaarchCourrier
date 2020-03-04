@@ -13,6 +13,7 @@ import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
+import {FunctionsService} from "../../../service/functions.service";
 
 declare function $j(selector: any): any;
 
@@ -55,6 +56,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         private dialog: MatDialog,
+        public functions: FunctionsService
     ) { }
 
     ngOnInit(): void {
@@ -73,6 +75,9 @@ export class IndexingModelsAdministrationComponent implements OnInit {
                 setTimeout(() => {
                     this.dataSource = new MatTableDataSource(this.indexingModels);
                     this.dataSource.paginator = this.paginator;
+                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
+                    this.sort.active = 'label';
+                    this.sort.direction = 'asc';
                     this.dataSource.sort = this.sort;
                 }, 0);
             }),

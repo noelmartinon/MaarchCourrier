@@ -160,9 +160,17 @@ class EmailController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
+        $sender = json_decode($rawEmail['sender'], true);
+        $entityLabel = null;
+        if (!empty($sender['entityId'])) {
+            $entityLabel = EntityModel::getById(['select' => ['entity_label'], 'id' => $sender['entityId']]);
+            $entityLabel = $entityLabel['entity_label'];
+        }
+        $sender['label'] = $entityLabel;
+
         $email = [
             'id'            => $rawEmail['id'],
-            'sender'        => json_decode($rawEmail['sender'], true),
+            'sender'        => $sender,
             'recipients'    => json_decode($rawEmail['recipients'], true),
             'cc'            => json_decode($rawEmail['cc'], true),
             'cci'           => json_decode($rawEmail['cci'], true),
@@ -741,9 +749,14 @@ class EmailController
         }
 
         if (!empty($args['data']['sender']['email'])) {
-            $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $args['userId']]);
+            $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+            $configuration = json_decode($configuration['value'], true);
 
+            $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $args['userId']]);
             $emails = array_column($availableEmails, 'email');
+            if (!empty($configuration['from'])) {
+                $emails[] = $configuration['from'];
+            }
             if (!in_array($args['data']['sender']['email'], $emails)) {
                 return ['errors' => 'Data sender email is not allowed', 'code' => 400];
             }

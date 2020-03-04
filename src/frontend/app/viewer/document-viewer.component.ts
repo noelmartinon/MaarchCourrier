@@ -481,7 +481,7 @@ export class DocumentViewerComponent implements OnInit {
         if (this.allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
             this.dialog.open(AlertComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.notAllowedExtension + ' !', msg: this.lang.file + ' : <b>' + file.name + '</b>, ' + this.lang.type + ' : <b>' + file.type + '</b><br/><br/><u>' + this.lang.allowedExtensions + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
             return false;
-        } else if (file.size > this.maxFileSize) {
+        } else if (file.size > this.maxFileSize && this.maxFileSize > 0) {
             this.dialog.open(AlertComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.maxFileSizeReached + ' ! ', msg: this.lang.maxFileSize + ' : ' + this.maxFileSizeLabel } });
             return false;
         } else {
@@ -543,27 +543,27 @@ export class DocumentViewerComponent implements OnInit {
                     return of(false);
                 }
             );
-        } else {            
+        } else {
             await this.loadMainDocumentSubInformations();
-            console.log(this.file.subinfos.mainDocVersions.length);
-            if (this.file.subinfos.mainDocVersions.length > 0) {
+
+            if (this.file.subinfos.mainDocVersions.length === 0) {
+                this.noFile = true;
+                this.loading = false;
+            } else if (!this.file.subinfos.canConvert) {
+                this.file.contentMode = 'route';
+                this.file.content = `../../rest/resources/${resId}/originalContent`;
+                this.noConvertedFound = true;
+                this.loading = false;
+            } else {
                 this.requestWithLoader(`../../rest/resources/${resId}/content?mode=base64`).subscribe(
                     (data: any) => {
-                        this.file.creatorId = data.originalCreatorId;
-                        if (!this.file.subinfos.mainDocPDFVersions) {
+                        if (data.encodedDocument) {
                             this.file.contentMode = 'route';
+                            this.file.format = data.originalFormat;
                             this.file.content = `../../rest/resources/${resId}/originalContent`;
-                            this.noConvertedFound = true;
+                            this.file.contentView = `../../rest/resources/${resId}/content?mode=view`;
+                            this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                             this.loading = false;
-                        } else {
-                            if (data.encodedDocument) {
-                                this.file.contentMode = 'route';
-                                this.file.format = data.originalFormat;
-                                this.file.content = `../../rest/resources/${resId}/originalContent`;
-                                this.file.contentView = `../../rest/resources/${resId}/content?mode=view`;
-                                this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
-                                this.loading = false;
-                            }
                         }
                     },
                     (err: any) => {
@@ -573,11 +573,7 @@ export class DocumentViewerComponent implements OnInit {
                         return of(false);
                     }
                 );
-            } else {
-                this.noFile = true;
-                this.loading = false;
             }
-            
         }
     }
 
@@ -594,21 +590,24 @@ export class DocumentViewerComponent implements OnInit {
                         commentedDocVersions = data.NOTE.indexOf(data.DOC[data.DOC.length - 1]) > -1 ? true : false;
                         mainDocPDFVersions = data.PDF.indexOf(data.DOC[data.DOC.length - 1]) > -1 ? true : false;
                     }
-                    
+
                     this.file.subinfos = {
                         mainDocVersions: mainDocVersions,
                         signedDocVersions: signedDocVersions,
                         commentedDocVersions: commentedDocVersions,
-                        mainDocPDFVersions : mainDocPDFVersions
+                        mainDocPDFVersions: mainDocPDFVersions
                     };
-                    
+                }),
+                exhaustMap(() => this.http.get(`../../rest/resources/${this.resId}/fileInformation`)),
+                tap((data: any) => {
+                    this.file.subinfos.canConvert = data.information.canConvert;
                     resolve(true);
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
                     return of(false);
                 })
-            ).subscribe(); 
+            ).subscribe();
         });
     }
 
@@ -902,29 +901,33 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     saveMainDocument() {
-        this.getFile().pipe(
-            map((data: any) => {
-                const formatdatas = {
-                    encodedFile: data.content,
-                    format: data.format,
-                    resId: this.resId
-                }
-                return formatdatas;
-            }),
-            exhaustMap((data) => this.http.put(`../../rest/resources/${this.resId}?onlyDocument=true`, data)),
-            tap(() => {
-                this.closeEditor();
-                this.loadRessource(this.resId);
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve, reject) => {
+            this.getFile().pipe(
+                map((data: any) => {
+                    const formatdatas = {
+                        encodedFile: data.content,
+                        format: data.format,
+                        resId: this.resId
+                    }
+                    return formatdatas;
+                }),
+                exhaustMap((data) => this.http.put(`../../rest/resources/${this.resId}?onlyDocument=true`, data)),
+                tap(() => {
+                    this.closeEditor();
+                    this.loadRessource(this.resId);
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    resolve(false);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     openResourceVersion(version: number, type: string) {
-        
+
         const title = type !== 'PDF' ? this.lang[type + '_version'] : `${this.lang.version} ${version}`;
 
         // TO SHOW ORIGINAL DOC (because autoload signed doc)

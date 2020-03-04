@@ -142,7 +142,7 @@ class CurlModel
 
         $cookies = [];
         if (!empty($aArgs['options'][CURLOPT_HEADER])) {
-            preg_match_all('/Set-Cookie:\s*([;]*)/mi', $rawResponse, $matches);
+            preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $rawResponse, $matches);
             foreach ($matches[1] as $item) {
                 $cookie = explode("=", $item);
                 $cookies = array_merge($cookies, [$cookie[0] => $cookie[1]]);

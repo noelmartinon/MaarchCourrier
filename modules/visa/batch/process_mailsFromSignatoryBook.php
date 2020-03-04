@@ -189,8 +189,6 @@ try {
             $signatoryBook = "/modules/visa/class/IxbusController.php";
         } elseif ($configRemoteSignatoryBook['id'] == 'iParapheur') {
             $signatoryBook = "/modules/visa/class/IParapheurController.php";
-        } elseif ($configRemoteSignatoryBook['id'] == 'fastParapheur') {
-            $signatoryBook = "/modules/visa/class/FastParapheurController.php";
         }
     } else {
         $GLOBALS['logger']->write('no signatory book enabled', 'ERROR', 102);
@@ -205,7 +203,7 @@ try {
     } elseif (is_file($GLOBALS['MaarchDirectory'] . $signatoryBook)) {
         $classToInclude = $GLOBALS['MaarchDirectory'] . $signatoryBook;
         Bt_myInclude($classToInclude);
-    } elseif (!in_array($configRemoteSignatoryBook['id'], ['maarchParapheur', 'xParaph'])) {
+    } elseif (!in_array($configRemoteSignatoryBook['id'], ['maarchParapheur', 'xParaph', 'fastParapheur'])) {
         $GLOBALS['logger']->write('No class detected', 'ERROR', 102);
         echo "\nNo class detected ! \nThe batch cannot be launched !\n\n";
         exit(102);
@@ -253,7 +251,7 @@ if ($configRemoteSignatoryBook['id'] == 'ixbus') {
 } elseif ($configRemoteSignatoryBook['id'] == 'iParapheur') {
     $retrievedMails = IParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
 } elseif ($configRemoteSignatoryBook['id'] == 'fastParapheur') {
-    $retrievedMails = FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
 } elseif ($configRemoteSignatoryBook['id'] == 'maarchParapheur') {
     $retrievedMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
 } elseif ($configRemoteSignatoryBook['id'] == 'xParaph') {
@@ -269,7 +267,11 @@ while ($reqResult = $stmt->fetchObject()) {
     $idsToRetrieve['resLetterbox'][$reqResult->res_id] = $reqResult;
 }
 if (!empty($idsToRetrieve['resLetterbox'])) {
-    $retrievedLetterboxMails        = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve]);
+    if ($configRemoteSignatoryBook['id'] == 'maarchParapheur') {
+        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve]);
+    } elseif ($configRemoteSignatoryBook['id'] == 'fastParapheur') {
+        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    }
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'];
 }
 
@@ -308,8 +310,8 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
         if (!empty($value->encodedFile)) {
             \SrcCore\models\DatabaseModel::delete([
                 'table' => 'res_attachments',
-                'where' => ['res_id_master = ?', 'status = ?', 'relation = ?'],
-                'data'  => [$value->res_id_master, 'SIGN', $value->relation]
+                'where' => ['res_id_master = ?', 'status = ?', 'relation = ?', 'origin = ?'],
+                'data'  => [$value->res_id_master, 'SIGN', $value->relation, $value->res_id . ',res_attachments']
             ]);
 
             $GLOBALS['logger']->write('Create validated Attachment', 'INFO');

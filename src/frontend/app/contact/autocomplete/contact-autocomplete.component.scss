@@ -10,8 +10,9 @@
 }
 
 .mat-chip.mat-standard-chip {
-    color: white;
-    background-color: lighten($primary, 10%);
+    color: lighten($primary, 10%);
+    background-color: white;
+    border: solid 1px lighten($primary, 10%);
 }
 
 .noResult {
@@ -170,8 +171,9 @@
     height: auto;
     position: sticky;
     bottom: 0px;
-    width: 95px;
+    width: auto;
     padding: 0px;
     background: white;
     box-shadow: 1px 0px 2px 0px rgba(0,0,0,0.12);
+    font-size: 11px;
 }

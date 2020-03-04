@@ -14,6 +14,7 @@
 
 namespace SrcCore\controllers;
 
+use Resource\controllers\StoreController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
@@ -112,5 +113,19 @@ class CoreController
         }
 
         return $response->withJson(['connection' => $connections]);
+    }
+
+    public static function getMaximumAllowedSizeFromPhpIni()
+    {
+        $uploadMaxFilesize = ini_get('upload_max_filesize');
+        $uploadMaxFilesize = StoreController::getBytesSizeFromPhpIni(['size' => $uploadMaxFilesize]);
+        $postMaxSize = ini_get('post_max_size');
+        $postMaxSize = $postMaxSize == 0 ? $uploadMaxFilesize : StoreController::getBytesSizeFromPhpIni(['size' => $postMaxSize]);
+        $memoryLimit = ini_get('memory_limit');
+        $memoryLimit = $memoryLimit < 1 ? $uploadMaxFilesize : StoreController::getBytesSizeFromPhpIni(['size' => $memoryLimit]);
+
+        $maximumSize = min($uploadMaxFilesize, $postMaxSize, $memoryLimit);
+
+        return $maximumSize;
     }
 }

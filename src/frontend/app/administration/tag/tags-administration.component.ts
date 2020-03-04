@@ -12,6 +12,7 @@ import { tap, finalize, filter, exhaustMap, catchError } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material';
+import {FunctionsService} from "../../../service/functions.service";
 
 @Component({
     templateUrl: "tags-administration.component.html",
@@ -43,7 +44,8 @@ export class TagsAdministrationComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        public functions: FunctionsService
     ) { }
 
     ngOnInit(): void {
@@ -61,6 +63,9 @@ export class TagsAdministrationComponent implements OnInit {
                     this.dataSource = new MatTableDataSource(data.tags);
                     this.resultsLength = data.tags.length;
                     this.dataSource.paginator = this.paginator;
+                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
+                    this.sort.active = 'label';
+                    this.sort.direction = 'asc';
                     this.dataSource.sort = this.sort;
                 }, 0);
 

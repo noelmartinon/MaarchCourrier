@@ -272,7 +272,7 @@ define('_RESET_LETTER', 'Reset workflow');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Confirm and update departure date');
 define('_NOT_INCOMING_CATEGORY', 'Not incomping category');
 define('_NO_CONTACT', 'No associated contact');
-define('_USER_MISSING_INFORMATIONS', 'Missing informations in contact card');
+define('_USER_MISSING_INFORMATIONS', 'A contact have no email, neither valide postal address');
 define('_NO_TEMPLATE', 'No template');
 define('_NO_EMAIL_TEMPLATE', 'No electronic template');
 define('_NO_PAPER_TEMPLATE', 'No paper template');
@@ -354,6 +354,8 @@ define("_EMAIL_WAIT", "Waiting to be send");
 define("_EMAIL_SENT", "Sent");
 define("_EMAIL_ERROR", "Error when sending");
 define("_EMAIL_DRAFT_SAVED", "Draft saved");
+define("_EMAIL_ERROR_SENT", "Not sent");
+define("_EMAIL_SENDING", "Sending email...");
 
 define("_MAILEVA_ADDED", "Shipping Maileva added");
 define("_MAILEVA_UPDATED", "Shipping Maileva updated");

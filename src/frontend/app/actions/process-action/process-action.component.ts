@@ -7,7 +7,6 @@ import { HttpClient } from '@angular/common/http';
 @Component({
     templateUrl: "process-action.component.html",
     styleUrls: ['process-action.component.scss'],
-    providers: [NotificationService],
 })
 export class ProcessActionComponent implements OnInit {
 

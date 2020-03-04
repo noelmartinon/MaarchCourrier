@@ -265,7 +265,7 @@ export class ContactsListAdministrationRedirectModalComponent {
     lang: any               = LANG;
     modalTitle: string      = this.lang.confirmAction;
     redirectContact: number;
-    processMode: string;
+    processMode: string = 'delete';
 
     constructor(
         public http: HttpClient,

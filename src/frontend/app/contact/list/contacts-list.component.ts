@@ -156,7 +156,7 @@ export class ContactsListComponent implements OnInit {
 
         Object.keys(data).forEach(element => {
             arrCustomFields.push({
-                label: this.customFields.filter(custom => custom.id == element)[0].label,
+                label: this.customFields.filter(custom => custom.id == element).length > 0 ? this.customFields.filter(custom => custom.id == element)[0].label : element,
                 value: data[element]
             });
         });

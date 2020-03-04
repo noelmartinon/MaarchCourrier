@@ -94,10 +94,11 @@ export class ValidateAvisParallelComponent implements AfterViewInit {
 
     executeAction(realResSelected: number[]) {
         const noteContent: string = `[${this.lang.avisUserAsk.toUpperCase()}] ${this.noteEditor.getNoteContent()} ← ${this.lang.validateBy} ${this.headerService.user.firstname} ${this.headerService.user.lastname}`;
-        this.http.put(this.data.processActionRoute, { resources: realResSelected, data: { note: noteContent, opinionLimitDate: this.functions.formatDateObjectToDateString(this.opinionLimitDate, true), opinionCircuit: this.appAvisWorkflow.getWorkflow() } }).pipe(
+        this.noteEditor.setNoteContent(noteContent);
+        this.http.put(this.data.processActionRoute, { resources: realResSelected, data: { note: this.noteEditor.getNote(), opinionLimitDate: this.functions.formatDateObjectToDateString(this.opinionLimitDate, true), opinionCircuit: this.appAvisWorkflow.getWorkflow() } }).pipe(
             tap((data: any) => {
                 if (!data) {
-                    this.dialogRef.close('success');
+                    this.dialogRef.close(realResSelected);
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
@@ -105,25 +106,17 @@ export class ValidateAvisParallelComponent implements AfterViewInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
     }
 
-    isValidAction() {     
+    isValidAction() {
         if (this.data.resIds.length === 1) {
-            if (!this.noResourceToProcess && this.noteEditor !== undefined && this.appAvisWorkflow !== undefined && !this.appAvisWorkflow.emptyWorkflow() && !this.appAvisWorkflow.workflowEnd() && !this.functions.empty(this.noteEditor.getNoteContent()) && !this.functions.empty(this.functions.formatDateObjectToDateString(this.opinionLimitDate))) {
-                return true;
-            } else {
-                return false;
-            }
+            return !this.noResourceToProcess && this.noteEditor !== undefined && this.appAvisWorkflow !== undefined && !this.appAvisWorkflow.emptyWorkflow() && !this.appAvisWorkflow.workflowEnd() && !this.functions.empty(this.noteEditor.getNoteContent()) && !this.functions.empty(this.functions.formatDateObjectToDateString(this.opinionLimitDate));
         } else {
-            if (!this.noResourceToProcess) {
-                return true;
-            } else {
-                return false;
-            }
+            return !this.noResourceToProcess;
         }
     }
 }

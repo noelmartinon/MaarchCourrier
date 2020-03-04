@@ -5,6 +5,7 @@
     <div *ngIf="isEmptyList() && !loading" style="text-align:center;font-size:24px;font-weight:bold;opacity:0.3;">
         {{lang.noDiffusionList}}
     </div>
+    <div *ngIf="hasNoDest" class="alert-message alert-message-danger" role="alert" [innerHTML]="lang.diffNoDestmsg"></div>
     <ng-container *ngFor="let role of availableRoles">
         <mat-expansion-panel *ngIf="diffList[role.id].items.length > 0" class="diffusionList"
             [expanded]="role.id === 'dest' || this.adminMode || expanded">
@@ -15,15 +16,15 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
             <mat-list>
-                <mat-list-item class="item-diffusion-list"
+                <mat-list-item disableRipple class="item-diffusion-list"
                     *ngFor="let diffusion of diffList[role.id].items;let i=index">
                     <mat-icon mat-list-icon color="primary" class="fa"
                         [class.fa-user]="diffusion.item_type === 'user_id' || diffusion.item_type === 'user'"
                         [class.fa-sitemap]="diffusion.item_type === 'entity_id' || diffusion.item_type === 'entity'"></mat-icon>
                     <div class="item-diffusion">
-                        <p mat-line [title]="diffusion.labelToDisplay">{{diffusion.labelToDisplay}}</p>
-                        <p mat-line class="subInfo" [title]="diffusion.descriptionToDisplay">
-                            {{diffusion.descriptionToDisplay}}</p>
+                        <p mat-line [title]="diffusion.itemLabel">{{diffusion.itemLabel}}</p>
+                        <p mat-line class="subInfo" [title]="diffusion.itemSubLabel">
+                            {{diffusion.itemSubLabel}}</p>
                     </div>
                     <div *ngIf="role.id === 'dest' && target === 'redirect' && adminMode" >
                         <button mat-icon-button (click)="loadDestUserList()" [matMenuTriggerFor]="menuDestUserList"
@@ -57,63 +58,6 @@
         </mat-expansion-panel>
     </ng-container>
 </ng-container>
-<div *ngIf="loading" style="display:flex;height:100%;">
+<div *ngIf="loading" style="display:flex;">
     <mat-spinner style="margin:auto;"></mat-spinner>
 </div>
-<!--<mat-list *ngIf="!loading">
-    <div *ngIf="diffList.length == 0" style="text-align:center;font-size:24px;font-weight:bold;opacity:0.3;">
-        {{lang.noDiffusionList}}
-    </div>
-    <plugin-autocomplete *ngIf="injectDatas.editable" [labelPlaceholder]="lang.addUserOrEntity"
-        [routeDatas]="['/rest/autocomplete/users','/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
-        [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="addElem($event)"></plugin-autocomplete>
-    <div cdkDropListGroup class="roleList">
-        <ng-container *ngFor="let role of availableRoles">
-            <h3 mat-subheader>{{role.label}}</h3>
-            <mat-divider></mat-divider>
-            <div cdkDropList [id]="role.id" #dataAvailableList="cdkDropList" [cdkDropListData]="diffList[role.id].items"
-                class="cdk-list" (cdkDropListDropped)="drop($event)"
-                [cdkDropListEnterPredicate]="role.id == 'dest' ? noReturnPredicate : allPredicate"
-                [cdkDropListDisabled]="role.id == 'dest' || !injectDatas.editable">
-                <div *ngIf="diffList[role.id].items.length === 0" style="text-align:center;">
-                    <span
-                        style="opacity: 0.5;text-align: center;font-size: 10px;padding: 10px;">{{lang.noPerson}}</span>
-                    <button mat-icon-button *ngIf="role.id == 'dest' && injectDatas.editable"
-                        (click)="loadDestUserList()" [matMenuTriggerFor]="menuDestUserList"
-                        title="{{lang.chooseAnotherEntityUser}}">
-                        <mat-icon class="fa fa-edit" color="primary"></mat-icon>
-                    </button>
-                </div>
-                <mat-menu #menuDestUserList="matMenu">
-                    <button mat-menu-item *ngFor="let userDest of userDestList" (click)="changeDest(userDest)">
-                        <span>{{userDest.labelToDisplay}}</span>
-                    </button>
-                </mat-menu>
-                <mat-list-item *ngFor="let diffusion of diffList[role.id].items;let i=index" cdkDrag
-                    cdkDragBoundary=".roleList" class="columns"
-                    [cdkDragDisabled]="diffusion.item_type == 'entity_id' || !injectDatas.editable"
-                    [class.notDraggable]="(diffusion.item_type == 'entity_id' || role.id == 'dest') && injectDatas.editable"
-                    [class.notEditable]="!injectDatas.editable">
-                    <mat-icon *ngIf="diffusion.item_type == 'user_id'" mat-list-icon class="fa fa-user fa-2x"
-                        color="primary"></mat-icon>
-                    <h4 mat-line *ngIf="diffusion.item_type == 'user_id'">{{diffusion.labelToDisplay}}</h4>
-                    <p mat-line *ngIf="diffusion.item_type == 'user_id'" style="opacity:0.5;">
-                        {{diffusion.descriptionToDisplay}} </p>
-                    <button mat-icon-button *ngIf="role.id == 'dest' && injectDatas.editable"
-                        (click)="loadDestUserList()" [matMenuTriggerFor]="menuDestUserList"
-                        title="{{lang.chooseAnotherEntityUser}}">
-                        <mat-icon class="fa fa-edit" color="primary"></mat-icon>
-                    </button>
-                    <button mat-icon-button *ngIf="role.id != 'dest' && injectDatas.editable"
-                        (click)="deleteItem(role.id,i)" title="{{lang.delete}}">
-                        <mat-icon class="fa fa-times" color="warn"></mat-icon>
-                    </button>
-                    <mat-icon *ngIf="diffusion.item_type == 'entity_id'" mat-list-icon class="fa fa-sitemap fa-2x"
-                        color="primary"></mat-icon>
-                    <h4 *ngIf="diffusion.item_type == 'entity_id'" mat-line>{{diffusion.labelToDisplay}}</h4>
-                    <p *ngIf="diffusion.item_type == 'entity_id'" mat-line style="opacity:0.5;"> &nbsp; </p>
-                </mat-list-item>
-            </div>
-        </ng-container>
-    </div>
-</mat-list>-->

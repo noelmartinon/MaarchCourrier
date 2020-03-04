@@ -73,7 +73,8 @@ import { DiffusionsListComponent }             from './diffusions/diffusions-lis
 
 import { DocumentViewerComponent }             from './viewer/document-viewer.component';
 import { HeaderService } from '../service/header.service';
-
+import { VisaWorkflowComponent }             from './visa/visa-workflow.component';
+import { AvisWorkflowComponent }             from './avis/avis-workflow.component';
 
 
 export class MyHammerConfig extends HammerGestureConfig {
@@ -132,7 +133,9 @@ export class MyHammerConfig extends HammerGestureConfig {
         ContactsFormComponent,
         CustomSnackbarComponent,
         HistoryComponent,
-        AddressBanAutocompleteComponent
+        AddressBanAutocompleteComponent,
+        VisaWorkflowComponent,
+        AvisWorkflowComponent
     ],
     exports: [
         CommonModule,
@@ -177,7 +180,9 @@ export class MyHammerConfig extends HammerGestureConfig {
         ContactAutocompleteComponent,
         ContactsFormComponent,
         HistoryComponent,
-        AddressBanAutocompleteComponent
+        AddressBanAutocompleteComponent,
+        VisaWorkflowComponent,
+        AvisWorkflowComponent
     ],
     providers: [
         HeaderService,

@@ -40,7 +40,7 @@ echo '<form id="formlogin" method="post" action="'
                 }
                 echo '<br><p>';
                 echo '<label>&nbsp;</label>';
-                    echo '<input type="submit" class="button" name="submit" value="'._CONNECT.'" />';
+                    echo '<input type="submit" class="button submitButton" name="submit" value="'._CONNECT.'" />';
                 echo '</p>';
             echo '<div class="error">';
             if (isset($_SESSION['error'])) {

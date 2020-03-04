@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 @Component({
     templateUrl: "send-external-note-book-action.component.html",
     styleUrls: ['send-external-note-book-action.component.scss'],
-    providers: [NotificationService],
 })
 export class SendExternalNoteBookActionComponent implements OnInit {
 
@@ -48,6 +47,7 @@ export class SendExternalNoteBookActionComponent implements OnInit {
             finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
+                this.dialogRef.close();
                 return of(false);
             })
         ).subscribe();
@@ -56,30 +56,10 @@ export class SendExternalNoteBookActionComponent implements OnInit {
     onSubmit() {
         this.loading = true;
 
-        if ( this.data.resIds.length === 0) {
-            // this.indexDocumentAndExecuteAction();
-        } else {
+        if ( this.data.resIds.length > 0) {
             this.executeAction();
         }
     }
-
-    /* indexDocumentAndExecuteAction() {
-        
-        this.http.post('../../rest/resources', this.data.resource).pipe(
-            tap((data: any) => {
-                this.data.resIds = [data.resId];
-            }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, {resource : this.data.resIds[0], note : this.noteEditor.getNoteContent()})),
-            tap(() => {
-                this.dialogRef.close('success');
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe()
-    } */
 
     executeAction() {
         let realResSelected: string[];
@@ -88,10 +68,10 @@ export class SendExternalNoteBookActionComponent implements OnInit {
         realResSelected = this.additionalsInfos.mails.map((e: any) => { return e.res_id; });
         datas = this.externalSignatoryBookDatas;
 
-        this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNoteContent(), data: datas}).pipe(
+        this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas}).pipe(
             tap((data: any) => {
                 if (!data) {
-                    this.dialogRef.close('success');
+                    this.dialogRef.close(realResSelected);
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);

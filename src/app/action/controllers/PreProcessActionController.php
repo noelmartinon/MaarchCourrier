@@ -163,7 +163,19 @@ class PreProcessActionController
             return $response->withStatus(400)->withJson(['errors' => 'Action does not exist']);
         }
         $parameters = json_decode($action['parameters'], true);
-        $mode = $parameters['mode'] ?? 'auto';
+        $mode       = $parameters['mode'] ?? 'auto';
+        $data       = $request->getQueryParams();
+
+        if (empty($data['mode']) && $mode == 'both') {
+            $currentMode = 'auto';
+        } elseif (empty($data['mode']) && $mode != 'both') {
+            $currentMode = $mode;
+        } elseif (!empty($data['mode'])) {
+            $currentMode = $data['mode'];
+        }
+        if (!in_array($currentMode, ['manual', 'auto'])) {
+            $currentMode = 'auto';
+        }
 
         $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
 
@@ -241,13 +253,11 @@ class PreProcessActionController
 
             $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['process_mode']]);
 
-            if (empty($resource['destination'])) {
+            if (empty($resource['destination']) && $currentMode == 'auto') {
                 $noSendAR['number'] += 1;
                 $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_ENTITY];
                 continue;
             }
-
-            $entity = EntityModel::getByEntityId(['select' => ['entity_label'], 'entityId' => $resource['destination']]);
 
             if ($doctype['process_mode'] == 'SVA') {
                 $templateAttachmentType = 'sva';
@@ -256,21 +266,24 @@ class PreProcessActionController
             } else {
                 $templateAttachmentType = 'simple';
             }
-
-            $template = TemplateModel::getWithAssociation([
-                'select'    => ['template_content', 'template_path', 'template_file_name'],
-                'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
-                'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
-            ]);
-
-            if (empty($template[0])) {
-                $noSendAR['number'] += 1;
-                $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_TEMPLATE . ' \'' . $templateAttachmentType . '\' ' . _FOR_ENTITY . ' ' .$entity['entity_label'] ];
-                continue;
+            
+            if ($currentMode == 'auto') {
+                $entity   = EntityModel::getByEntityId(['select' => ['entity_label'], 'entityId' => $resource['destination']]);
+                $template = TemplateModel::getWithAssociation([
+                    'select'    => ['template_content', 'template_path', 'template_file_name'],
+                    'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
+                    'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
+                ]);
+    
+                if (empty($template[0])) {
+                    $noSendAR['number'] += 1;
+                    $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_TEMPLATE . ' \'' . $templateAttachmentType . '\' ' . _FOR_ENTITY . ' ' .$entity['entity_label'] ];
+                    continue;
+                }
+    
+                $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TEMPLATES', 'select' => ['path_template']]);
+                $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $template[0]['template_path']) . $template[0]['template_file_name'];
             }
-
-            $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TEMPLATES', 'select' => ['path_template']]);
-            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $template[0]['template_path']) . $template[0]['template_file_name'];
 
             //Verify sending
             $acknowledgements = AcknowledgementReceiptModel::get([
@@ -329,7 +342,7 @@ class PreProcessActionController
                 }
 
                 if (!empty($contact['email'])) {
-                    if (empty($template[0]['template_content'])) {
+                    if (empty($template[0]['template_content']) && $currentMode == 'auto') {
                         $noSendAR['number'] += 1;
                         $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_EMAIL_TEMPLATE . ' \'' . $templateAttachmentType . '\' ' . _FOR_ENTITY . ' ' . $entity['entity_label'] ];
                         continue 2;
@@ -337,7 +350,7 @@ class PreProcessActionController
                         $email += 1;
                     }
                 } elseif (!empty($contact['address_street']) && !empty($contact['address_town']) && !empty($contact['address_postcode'])) {
-                    if (!file_exists($pathToDocument) || !is_file($pathToDocument)) {
+                    if ((!file_exists($pathToDocument) || !is_file($pathToDocument)) && $currentMode == 'auto') {
                         $noSendAR['number'] += 1;
                         $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_PAPER_TEMPLATE . ' \'' . $templateAttachmentType . '\' ' . _FOR_ENTITY . ' ' . $entity['entity_label'] ];
                         continue 2;
@@ -404,9 +417,7 @@ class PreProcessActionController
                 // TODO
             } elseif ($signatureBookEnabled == 'iParapheur') {
                 // TODO
-            } elseif ($signatureBookEnabled == 'fastParapheur') {
-                // TODO
-            } elseif ($signatureBookEnabled == 'maarchParapheur') {
+            } elseif (in_array($signatureBookEnabled, ['maarchParapheur', 'fastParapheur'])) {
                 if (is_array($data['resources']) && count($data['resources']) == 1) {
                     $resDestination = ResModel::getById([
                         'select'   => ['destination'],
@@ -1394,7 +1405,7 @@ class PreProcessActionController
         if (empty($action)) {
             return $response->withStatus(400)->withJson(['errors' => 'Action does not exist']);
         }
-        $parameters = json_decode($action['parameters']);
+        $parameters = json_decode($action['parameters'], true);
         $actionRequiredFields = $parameters['requiredFields'] ?? [];
 
         $canClose = [];

@@ -215,7 +215,7 @@ VALUES (8, 7, 'PDF', 'CONVERT_ATTACH', 'tests#', 'rep_standard_demande_intervent
 -- to paraph documents ppetit
 INSERT INTO adr_attachments (id, res_id, type, docserver_id, path, filename, fingerprint)
 VALUES (9, 8, 'PDF', 'CONVERT_ATTACH', 'tests#', 'rep_standard_demande_intervention.pdf', '0');
-Select setval('adr_attachments_id_seq', (select max(res_id)+1 from adr_attachments), false);
+Select setval('adr_attachments_id_seq', (select max(res_id)+2 from adr_attachments), false);
 
 TRUNCATE TABLE listinstance;
 ALTER SEQUENCE listinstance_id_seq restart WITH 1;

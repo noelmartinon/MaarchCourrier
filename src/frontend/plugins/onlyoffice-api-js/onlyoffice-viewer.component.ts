@@ -5,12 +5,11 @@ import {
     Input,
     EventEmitter,
     Output,
-    HostListener,
-    ViewChild
+    HostListener
 } from '@angular/core';
 import './onlyoffice-api.js';
 import { HttpClient } from '@angular/common/http';
-import { Subject, Observable, of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import { catchError, tap, filter } from 'rxjs/operators';
 import { LANG } from '../../app/translate.component';
 import { ConfirmComponent } from '../modal/confirm.component';
@@ -119,7 +118,6 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
                 this.isSaving = false;
                 this.triggerAfterUpdatedDoc.emit();
                 this.eventAction.next(this.file);
-                this.eventAction.complete();
             })
         ).subscribe();
     }

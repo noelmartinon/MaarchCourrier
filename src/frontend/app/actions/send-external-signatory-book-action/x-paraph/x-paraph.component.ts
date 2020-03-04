@@ -13,7 +13,6 @@ declare function $j(selector: any): any;
     selector: 'app-x-paraph',
     templateUrl: "x-paraph.component.html",
     styleUrls: ['x-paraph.component.scss'],
-    providers: [NotificationService],
 })
 export class XParaphComponent implements OnInit {
 

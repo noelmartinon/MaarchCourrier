@@ -6,6 +6,12 @@
     }
 }
 
+.loading {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
 .attach-container {
     position: relative;
     display: flex;
@@ -40,10 +46,10 @@
 }
 
 .attachment-form {
-    width: 300px;
     padding: 10px;
     overflow: auto;
-
+    position: sticky;
+    top: 0px;
     &-item {
         display: flex;
         align-items: center;
@@ -100,4 +106,9 @@
     background: $primary;
     overflow: auto;
     color: white;
+    height: 100%;
+}
+
+.active {
+    color: $secondary;
 }

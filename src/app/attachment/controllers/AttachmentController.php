@@ -32,6 +32,7 @@ use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -148,7 +149,7 @@ class AttachmentController
     public function update(Request $request, Response $response, array $args)
     {
         $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['res_id_master', 'status', 'typist']]);
-        if (empty($attachment) || !in_array($attachment['status'], ['A_TRA', 'TRA'])) {
+        if (empty($attachment) || !in_array($attachment['status'], ['A_TRA', 'TRA', 'SEND_MASS'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Attachment does not exist']);
         }
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
@@ -276,7 +277,7 @@ class AttachmentController
         $attachments = AttachmentModel::get([
             'select'    => [
                 'res_id as "resId"', 'identifier as chrono', 'title', 'typist', 'modified_by as "modifiedBy"', 'creation_date as "creationDate"', 'modification_date as "modificationDate"',
-                'relation', 'status', 'attachment_type as type', 'in_signature_book as "inSignatureBook"', 'in_send_attach as "inSendAttach"'
+                'relation', 'status', 'attachment_type as type', 'in_signature_book as "inSignatureBook"', 'in_send_attach as "inSendAttach"', 'format'
             ],
             'where'     => ['res_id_master = ?', 'status not in (?)', 'attachment_type not in (?)'],
             'data'      => [$args['resId'], ['DEL', 'OBS'], $excludeAttachmentTypes],
@@ -309,6 +310,9 @@ class AttachmentController
                     $attachments[$key]['signDate'] = $signedResponse[0]['creation_date'];
                 }
             }
+
+            $attachments[$key]['canConvert'] = ConvertPdfController::canConvert(['extension' => $attachments[$key]['format']]);
+            unset($attachments[$key]['format']);
         }
 
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
@@ -695,8 +699,6 @@ class AttachmentController
                 'resIdMaster'       => $attachment['res_id_master'],
                 'chrono'            => $attachment['identifier'],
                 'type'              => $attachment['attachment_type'],
-                'recipientId'       => $recipient['item_id'],
-                'recipientType'     => 'contact',
                 'inSignatureBook'   => true
             ];
 
@@ -805,6 +807,11 @@ class AttachmentController
             $mimeType = $finfo->buffer($file);
             if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType])) {
                 return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeType}"];
+            }
+
+            $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
+            if ($maximumSize > 0 && strlen($file) > $maximumSize) {
+                return ['errors' => "Body encodedFile size is over limit"];
             }
         }
 

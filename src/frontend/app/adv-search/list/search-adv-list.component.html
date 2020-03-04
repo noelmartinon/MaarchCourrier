@@ -24,7 +24,7 @@
                     title="{{lang.selectAllResInBasket}}" (change)="toggleAllRes($event)"></mat-checkbox>
             </mat-header-cell>
             <mat-cell *matCellDef="let row" style="width: 70px;flex: initial;">
-                <mat-checkbox color="primary" [checked]="row.checked" (change)="toggleRes($event,row)"
+                <mat-checkbox color="primary" [checked]="this.selectedRes.indexOf(row.resId) !== -1" (change)="toggleRes($event,row)"
                     (click)="$event.stopPropagation();" [disabled]="row.resId == currentResId">
                 </mat-checkbox>
             </mat-cell>

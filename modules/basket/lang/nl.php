@@ -570,6 +570,3 @@ if (!defined('_REDIRECT_TO_DEP_OK')) {
 if (!defined('_AUTHORISED_ENTITIES')) {
     define('_AUTHORISED_ENTITIES', 'Lijst van de toegelaten eenheden');
 }
-if (!defined('_SPREAD_SEARCH_TO_BASKETS')) {
-    define('_SPREAD_SEARCH_TO_BASKETS', 'Omvang van de opzoeking');
-}
