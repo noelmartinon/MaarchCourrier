@@ -90,7 +90,7 @@ class request extends dbquery
         //Extracts data from the second argument : the where clause
         if (trim($where) <> "") {
             $where_string = $where;
-            //$where_string = " where ".$where;
+        //$where_string = " where ".$where;
         } else {
             $where_string = "";
         }
@@ -117,7 +117,7 @@ class request extends dbquery
                     if (preg_match('/'.$_SESSION['user']['security'][$coll]['DOC']['table'].'/', $table_string) || preg_match('/'.$_SESSION['user']['security'][$coll]['DOC']['view'].'/', $table_string)) {
                         if (empty($where_string)) {
                             $where_string = "( ".$_SESSION['user']['security'][$coll]['DOC']['where']." ) ";
-                            //$where_string = " where ( ".$_SESSION['user']['security'][$coll]['DOC']['where']." ) ";
+                        //$where_string = " where ( ".$_SESSION['user']['security'][$coll]['DOC']['where']." ) ";
                         } else {
                             $where_string = ''.$where_string." and ( ".$_SESSION['user']['security'][$coll]['DOC']['where']." ) ";
                         }
@@ -131,7 +131,8 @@ class request extends dbquery
         if ($distinct_argument == true) {
             $dist = " distinct ";
         }
-        //LIMIT 100
+        //LIMIT 500
+        $limit = $limit == 21790 ? $limit : 500;
         $query = $db->limit_select($start, $limit, $field_string, $table_string." ".$join, $where_string, $other, $dist);
 
         if (preg_match('/_view/i', $query)) {
@@ -154,7 +155,7 @@ class request extends dbquery
             foreach (array_keys($line) as $resval) {
                 if ($resval == '__full_count') {
                     $_SESSION['save_list']['full_count'] = $line[$resval];
-                } else if (!is_int($resval)) {
+                } elseif (!is_int($resval)) {
                     array_push(
                         $temp,
                         array(
@@ -169,7 +170,7 @@ class request extends dbquery
         }
         if (count($result) == 0 && $catch_error) {
             return true;
-        } else if (count($result) == 0) {
+        } elseif (count($result) == 0) {
             $_SESSION['save_list']['full_count'] = 0;
         }
         return $result;
@@ -274,7 +275,7 @@ class request extends dbquery
         return $stmt;
     }
 
-        /*************************************************************************
+    /*************************************************************************
     * Returns instruction to get date or part of the date
     *
     * Parameters
@@ -293,36 +294,38 @@ class request extends dbquery
         
         case "MYSQL":
             switch ($arg) {
-            case 'year'     : return ' date_format('.$date_field.', %Y)';
-            case 'month'    : return ' date_format('.$date_field.', %m)';
-            case 'day'      : return ' date_format('.$date_field.', %d)';
-            case 'hour'     : return ' date_format('.$date_field.', %k)';
-            case 'minute'   : return ' date_format('.$date_field.', %i)';
-            case 'second'   : return ' date_format('.$date_field.', %s)';
-            default         : return ' date('.$date_field.')';
+            case 'year': return ' date_format('.$date_field.', %Y)';
+            case 'month': return ' date_format('.$date_field.', %m)';
+            case 'day': return ' date_format('.$date_field.', %d)';
+            case 'hour': return ' date_format('.$date_field.', %k)';
+            case 'minute': return ' date_format('.$date_field.', %i)';
+            case 'second': return ' date_format('.$date_field.', %s)';
+            default: return ' date('.$date_field.')';
             }
         
+            // no break
         case "POSTGRESQL":
             switch ($arg) {
-            case 'year'     : return " date_part( 'year', ".$date_field.")";
-            case 'month'    : return " date_part( 'month', ".$date_field.")";
-            case 'day'      : return " date_part( 'day', ".$date_field.")";
-            case 'hour'     : return " date_part( 'hour', ".$date_field.")";
-            case 'minute'   : return " date_part( 'minute', ".$date_field.")";
-            case 'second'   : return " date_part( 'second', ".$date_field.")";
-            default         : return ' date('.$date_field.')';
+            case 'year': return " date_part( 'year', ".$date_field.")";
+            case 'month': return " date_part( 'month', ".$date_field.")";
+            case 'day': return " date_part( 'day', ".$date_field.")";
+            case 'hour': return " date_part( 'hour', ".$date_field.")";
+            case 'minute': return " date_part( 'minute', ".$date_field.")";
+            case 'second': return " date_part( 'second', ".$date_field.")";
+            default: return ' date('.$date_field.')';
             }
         
+            // no break
         case "ORACLE":
             switch ($arg) {
-            case 'year'     : return " to_char(".$date_field.", 'YYYY')";
-            case 'month'    : return " to_char(".$date_field.", 'MM')";
-            case 'day'      : return " to_char(".$date_field.", 'DD')";
-            case 'hour'     : return " to_char(".$date_field.", 'HH24')";
-            case 'minute'   : return " to_char(".$date_field.", 'MI')";
-            case 'second'   : return " to_char(".$date_field.", 'SS')";
+            case 'year': return " to_char(".$date_field.", 'YYYY')";
+            case 'month': return " to_char(".$date_field.", 'MM')";
+            case 'day': return " to_char(".$date_field.", 'DD')";
+            case 'hour': return " to_char(".$date_field.", 'HH24')";
+            case 'minute': return " to_char(".$date_field.", 'MI')";
+            case 'second': return " to_char(".$date_field.", 'SS')";
             //default         : return " to_char(".$date_field.", 'DD/MM/YYYY')";
-            default         : return $date_field;
+            default: return $date_field;
             }
     
         }
