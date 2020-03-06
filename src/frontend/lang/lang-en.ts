@@ -1040,7 +1040,6 @@ export const LANG_EN = {
     "dateTo"   : "The",
     "information" : "Information",
     "technicalId"    : "Technical identifier",
-    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur",
     "infoMailevaAccount": "Indicate here your username and the INITIAL password communicated by Maileva when opening your account",
     "langISO": "en-US",
 };
