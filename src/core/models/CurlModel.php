@@ -125,7 +125,9 @@ class CurlModel
                 'Cache-Control: no-cache',
                 'Pragma: no-cache',
                 'Content-length: ' . strlen($aArgs['xmlPostString']),
-            ]
+            ],
+            CURLOPT_SSL_VERIFYHOST  => false,
+            CURLOPT_SSL_VERIFYPEER  => false
         ];
 
         if (!empty($aArgs['soapAction'])) {

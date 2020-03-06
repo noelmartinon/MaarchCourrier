@@ -1065,4 +1065,7 @@ export const LANG_NL = {
     "dateTo"   : "The", //_TO_TRANSLATE
     "information" : "Information", //_TO_TRANSLATE
     "technicalId"    : "Technical identifier", //_TO_TRANSLATE
+    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE
+    "infoMailevaAccount": "Indicate here your username and the INITIAL password communicated by Maileva when opening your account", //_TO_TRANSLATE
+
 };

@@ -195,6 +195,8 @@ if (isset($_REQUEST['load'])) {
 </html>
 <?php
 } else {
+    $nbLines = !empty($_REQUEST['lines']) ? $_REQUEST['lines'] : 'default';
+
         $request = new request;
         $attachArr = $request->PDOselect(
         $select,
@@ -202,7 +204,7 @@ if (isset($_REQUEST['load'])) {
         $arrayPDO,
         $orderstr,
         $_SESSION['config']['databasetype'],
-        'default',
+        $nbLines,
         false,
         '',
         '',

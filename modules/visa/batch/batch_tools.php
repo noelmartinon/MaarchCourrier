@@ -249,6 +249,10 @@ function Bt_createAttachment($aArgs = [])
         exit;
     }
 
+    if ($attachmentType == 'outgoing_mail') {
+        $GLOBALS['db']->query("DELETE FROM adr_letterbox WHERE res_id = ? and type = 'TNL'", [$aArgs['res_id_master']]);
+    }
+
     return json_decode($rawResponse, true);
 }
 
