@@ -1038,4 +1038,5 @@ export const LANG_EN = {
     "dateAgo"   : "Since",
     "dateTo"   : "The",
     "information" : "Information",
+    "technicalId"    : "Technical identifier",
 };

@@ -1071,4 +1071,5 @@ export const LANG_FR = {
     "dateAgo": "Il y a",
     "dateTo": "Le",
     "information" : "Information",
+    "technicalId"    : "Identifiant technique",
 };

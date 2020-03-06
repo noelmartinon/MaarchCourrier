@@ -61,6 +61,12 @@
                 </div>
             </mat-cell>
         </ng-container>
+        <ng-container matColumnDef="record_id">
+            <mat-header-cell *matHeaderCellDef>{{lang.technicalId}}</mat-header-cell>
+            <mat-cell mat-cell *matCellDef="let element">
+                    {{element.record_id}}
+            </mat-cell>
+        </ng-container>
         <ng-container matColumnDef="userLabel">
             <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.user | ucfirst}}</mat-header-cell>
             <mat-cell *matCellDef="let element">

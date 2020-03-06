@@ -27,7 +27,7 @@ export class HistoryComponent implements OnInit {
 
     data: any;
 
-    displayedColumnsHistory: string[] = ['event_date', 'userLabel', 'info', 'remote_ip'];
+    displayedColumnsHistory: string[] = ['event_date', 'record_id', 'userLabel', 'info', 'remote_ip'];
 
     isLoadingResults = true;
     routeUrl: string = '../../rest/history';
