@@ -59,11 +59,20 @@ $fields = "($fields)";
 
 $where = [];
 $requestData = [];
-foreach ($searchItems as $item) {
+foreach ($searchItems as $keyItem => $item) {
     if (strlen($item) >= 2) {
         $where[] = $fields;
+        $isIncluded = false;
+        foreach ($searchItems as $key => $value) {
+            if ($keyItem == $key) {
+                continue;
+            }
+            if (strpos($value, $item) === 0) {
+                $isIncluded = true;
+            }
+        }
         for ($i = 0; $i < $cptF; $i++) {
-            $requestData[] = "%{$item}%";
+            $requestData[] = ($isIncluded ? "%{$item}" : "%{$item}%");
         }
     }
 }
@@ -71,6 +80,8 @@ foreach ($searchItems as $item) {
 if (!empty($request_contact)) {
     $where = array_merge($where, [$request_contact]);
 }
+
+$where[] = '(enabled = \'Y\')';
 
 $contacts = \Contact\models\ContactModel::getOnView([
     'select'    => ['*'],

@@ -65,15 +65,15 @@ abstract class MessageExchangeModelAbstract
 
     public static function updateStatusMessage(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['status','reference']);
+        ValidatorModel::notEmpty($aArgs, ['status','messageId']);
 
         DatabaseModel::update([
             'table'     => 'message_exchange',
             'set'       => [
                 'status'     => $aArgs['status']
             ],
-            'where'     => ['reference = ?'],
-            'data'      => [$aArgs['reference']]
+            'where'     => ['message_id = ?'],
+            'data'      => [$aArgs['messageId']]
         ]);
 
         return true;

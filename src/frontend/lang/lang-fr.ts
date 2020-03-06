@@ -1074,4 +1074,5 @@ export const LANG_FR = {
     "technicalId"    : "Identifiant technique",
     "externalVisaWorkflow" : "Circuit de visa Maarch parapheur",
     "infoMailevaAccount": "Indiquer ici votre identifiant ainsi que le mot de passe INITIAL communiqué par Maileva lors de l'ouverture de votre compte",
+    "langISO": "fr-FR",
 };
