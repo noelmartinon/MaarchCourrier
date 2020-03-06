@@ -68,11 +68,11 @@ unset($_SESSION['fromContactTree']);
         <?php if ($admin->test_admin('admin_contacts', 'apps', false)) { ?>
         <td width="33%">
 
-                <a href="<?php 
+                <a href="<?php
                     echo $_SESSION['config']['businessappurl']
                     ;?>index.php?admin=contacts&page=manage_duplicates">
                     <h2>
-                        <i class="fa fa-magic fa-2x"></i>&nbsp;<?php 
+                        <i class="fa fa-magic fa-2x"></i>&nbsp;<?php
                         echo _MANAGE_DUPLICATES;?>
                     </h2>
                 </a>
@@ -80,10 +80,10 @@ unset($_SESSION['fromContactTree']);
         </td>
         <?php } ?>
         <td align="left">
-            <input class="button" type="button" value="<?php echo _EXPORT_CONTACT;?>" onclick="window.open('<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=admin&page=export_admin_list'?>');window.location.reload();"/>      
+            <input class="button" type="button" value="<?php echo _EXPORT_CONTACT;?>" onclick="window.open('<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=admin&page=export_admin_list'?>');window.location.reload();"/>
         </td>
         <td align="right">
-            <input class="button" type="button" value="<?php echo _MANAGE_CONTACT_ADDRESSES_LIST;?>" onclick="window.location.href='<?php echo $_SESSION['config']['businessappurl'] . 'index.php?page=contact_addresses_list'?>'"/>      
+            <input class="button" type="button" value="<?php echo _MANAGE_CONTACT_ADDRESSES_LIST;?>" onclick="window.location.href='<?php echo $_SESSION['config']['businessappurl'] . 'index.php?page=contact_addresses_list'?>'"/>
         </td>
    </tr>
 </table>
@@ -110,11 +110,13 @@ if (isset($_REQUEST['selectedObject']) && ! empty($_REQUEST['selectedObject'])) 
     foreach($what_table as $key => $what_a){
         $sql_lastname[] = " lower(lastname) LIKE lower(:what_".$key.")";
         $sql_society[] = " lower(society) LIKE lower(:what_".$key.")";
+        $sql_society_short[] = " lower(society_short) LIKE lower(:what_".$key.")";
         $arrayPDO = array_merge($arrayPDO, array(":what_".$key => $what_a."%"));
     }
 
     $where .= " (" . implode(' OR ', $sql_lastname) . " ";
-    $where .= " or " . implode(' OR ', $sql_society) . ") ";
+    $where .= " or " . implode(' OR ', $sql_society) . " ";
+    $where .= " or " . implode(' OR ', $sql_society_short) . ") ";
 
 }
 $list = new list_show();

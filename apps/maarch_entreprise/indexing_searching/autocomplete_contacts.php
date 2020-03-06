@@ -45,14 +45,15 @@ if (is_array($multi_sessions_address_id) && count($multi_sessions_address_id) > 
 }
 
 /********************* V2 CONTACTS *****************************/
-  
+
 $searchItems = explode(' ', $_REQUEST['Input']);
 
-$fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+$fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'society_short', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
 foreach ($fields as $key => $field) {
     $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
     $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
 }
+$cptF = count($fields);
 $fields = implode(' OR ', $fields);
 $fields = "($fields)";
 
@@ -61,7 +62,7 @@ $requestData = [];
 foreach ($searchItems as $item) {
     if (strlen($item) >= 2) {
         $where[] = $fields;
-        for ($i = 0; $i < 9; $i++) {
+        for ($i = 0; $i < $cptF; $i++) {
             $requestData[] = "%{$item}%";
         }
     }
