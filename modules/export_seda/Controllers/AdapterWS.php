@@ -14,15 +14,13 @@ class AdapterWS
     public function send($messageObject, $messageId, $type)
     {
         $transfer = new Transfer();
-
-        $message = $this->db->getMessageByIdentifier($messageId);
-        $res = $transfer->transfer('maarchcourrier', $message->reference, $type);
+        $res = $transfer->transfer('maarchcourrier', $messageId, $type);
 
         if ($res['status'] == 1) {
-            $this->db->updateStatusMessage($message->reference, 'E');
+            $this->db->updateStatusMessage($messageId, 'E');
             return $res;
         }
 
-        $this->db->updateStatusMessage($message->reference, 'S');
+        $this->db->updateStatusMessage($messageId, 'S');
     }
 }
