@@ -240,6 +240,7 @@ class ContactController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
+
         $ext = ResModel::getExtById(['resId' => $args['resId']]);
 
         if (empty($ext)) {
@@ -583,7 +584,7 @@ class ContactController
 
                 $phone = '';
 
-                if (!empty($phone) && ($user['user_id'] == $GLOBALS['userIdd']
+                if (!empty($phone) && ($user['user_id'] == $GLOBALS['userId']
                         || ServiceModel::hasService(['id' => 'view_personal_data', 'userId' => $GLOBALS['userId'], 'location' => 'apps', 'type' => 'use']))) {
                     $phone = $user['phone'];
                 }
@@ -614,6 +615,7 @@ class ContactController
                     'occupancy' => $nonPrimaryEntities,
                     'department' => $primaryEntity['entity_label']
                 ];
+
                 $contact['filling'] = '';
 
                 $contacts[] = $contact;

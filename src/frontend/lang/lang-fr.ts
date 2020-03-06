@@ -617,7 +617,7 @@ export const LANG_FR = {
     "noAction"                              : "Aucune action",
     "noAttachment"                          : "Sans pièce jointe",
     "noAttachmentClickToAddOne"             : "Aucune pièce jointe disponible<br/><sub>Cliquez sur <i class=\"fa fa-paperclip fa-lg\" ></i><i class=\"fa fa-plus\"></i> pour en ajouter une.</sub>",
-    "noAttachmentContact"                   : "Aucun contact attaché pour cette pièce jointe",
+    "noAttachmentContact"                   : "Aucun contact (externe) attaché pour cette pièce jointe",
     "noAttachmentConversion"                : "La pièce jointe n'a pas de conversion PDF",
     "noAttachmentInSignatoryBook"           : "Aucune pièce jointe éligible : non intégrée au parapheur, ou gelée",
     "noAttachmentToSend"                    : "Aucune pièce jointe à envoyer",
@@ -1073,5 +1073,6 @@ export const LANG_FR = {
     "enableGroupMsg": "Ce groupe pourra potentiellement avoir accès à l'ensemble des fonctionnalités de l'application.",
     "viewResource" : "Voir le document",
     "externalVisaWorkflow" : "Circuit de visa Maarch parapheur",
+    "infoMailevaAccount": "Indiquer ici votre identifiant ainsi que le mot de passe INITIAL communiqué par Maileva lors de l'ouverture de votre compte",
 
 };

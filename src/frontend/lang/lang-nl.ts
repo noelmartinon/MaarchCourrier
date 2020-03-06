@@ -1048,5 +1048,6 @@ export const LANG_NL = {
     "contact_entity"   : "Entity", //_TO_TRANSLATE
     "contact_third"   : "Contact third", //_TO_TRANSLATE
     "viewResource" : "View document", //_TO_TRANSLATE,
-    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE,
+    "externalVisaWorkflow" : "Visa workflow Maarch Parapheur", //_TO_TRANSLATE
+    "infoMailevaAccount": "Indicate here your username and the INITIAL password communicated by Maileva when opening your account", //_TO_TRANSLATE
 };
