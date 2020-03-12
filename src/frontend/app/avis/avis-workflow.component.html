@@ -37,7 +37,7 @@
             </mat-optgroup>
         </mat-autocomplete>
         <button mat-icon-button matSuffix *ngIf="avisWorkflow.items.length > 0 && showListModels" color="primary"
-            (click)="$event.stopPropagation();openPromptSaveModel()">
+            (click)="$event.stopPropagation();openPromptSaveModel()" title="{{lang.saveAsPrivateModel}}">
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
     </mat-form-field>
@@ -56,6 +56,7 @@
             <mat-icon
                 [ngClass]="{'fa fa-user fa-2x': functions.empty(diffusion.picture),'avatar': !functions.empty(diffusion.picture)}"
                 mat-list-icon color="primary"
+                [class.invalid]="!diffusion.hasPrivilege"
                 [style.background-image]="!functions.empty(diffusion.picture) ? 'url('+diffusion.picture+')' : ''">
             </mat-icon>
             <ng-container *ngIf="!adminMode || diffusion.process_date != null">
@@ -65,10 +66,10 @@
             </ng-container>
             <div mat-line class="workflowLine">
                 <div class="workflowLineContainer">
-                    <div class="workflowLineLabel">
+                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege">
                         {{diffusion.labelToDisplay}}
                     </div>
-                    <div class="workflowLineSubLabel">
+                    <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege">
                         {{diffusion.item_entity}}
                     </div>
                     <div *ngIf="diffusion.process_date != null" class="workflowLineProcessDate"
@@ -81,6 +82,9 @@
                     <mat-menu #menu="matMenu">
                         <button mat-menu-item *ngFor="let role of availableRoles" (click)="changeRole(role, i)">{{role.label}}</button>
                     </mat-menu>
+                </div>
+                <div *ngIf="!diffusion.hasPrivilege" class="invalid">
+                    {{lang.noPrivileges}}
                 </div>
             </div>
             <button mat-icon-button *ngIf="adminMode && functions.empty(diffusion.process_date)"

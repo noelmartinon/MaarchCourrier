@@ -89,8 +89,13 @@ foreach ($customs as $custom) {
 
                 $column = (string)$value->column;
                 $csColumn = "custom_fields->>''{$fieldId}''";
-                \Basket\models\BasketModel::update(['postSet' => ['basket_clause' => "REPLACE(basket_clause, '{$column}', '{$csColumn}')"], 'where' => ['1 = ?'], 'data' => [1]]);
+
+                if ($type == 'date') {
+                    $csColumn = "($csColumn)::date";
+                }
+
                 \Basket\models\BasketModel::update(['postSet' => ['basket_clause' => "REPLACE(basket_clause, 'doc_{$column}', '{$csColumn}')"], 'where' => ['1 = ?'], 'data' => [1]]);
+                \Basket\models\BasketModel::update(['postSet' => ['basket_clause' => "REPLACE(basket_clause, '{$column}', '{$csColumn}')"], 'where' => ['1 = ?'], 'data' => [1]]);
                 $resources = \Resource\models\ResModel::get([
                     'select'    => ['res_id', $column],
                     'where'     => [$column . ' is not null'],

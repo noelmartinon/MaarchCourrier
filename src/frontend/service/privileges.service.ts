@@ -519,6 +519,19 @@ export class PrivilegeService {
         }
     ];
 
+    shortcuts: any[] = [
+        {
+            "id": "followed",
+            "label": this.lang.followedMail,
+            "comment": this.lang.followedMail,
+            "route": "/followed",
+            "style": "fas fa-star",
+            "unit": "application",
+            "angular": true,
+            "shortcut" : true
+        }
+    ];
+
     constructor(public headerService: HeaderService) { }
 
     getAllPrivileges() {
@@ -591,8 +604,8 @@ export class PrivilegeService {
         return this.menus.map(elem => elem.unit).filter((elem, pos, arr) => arr.indexOf(elem) === pos);
     }
 
-    getCurrentUserShortcuts(): Array<menu> {
-        let shortcuts: any[] = [
+    resfreshUserShortcuts() {
+        this.shortcuts = [
             {
                 "id": "followed",
                 "label": this.lang.followedMail,
@@ -605,7 +618,7 @@ export class PrivilegeService {
             }
         ];
         
-        shortcuts = shortcuts.concat(this.menus.filter(elem => elem.shortcut === true).filter(elem => this.headerService.user.privileges.indexOf(elem.id) > -1));
+        this.shortcuts = this.shortcuts.concat(this.menus.filter(elem => elem.shortcut === true).filter(elem => this.headerService.user.privileges.indexOf(elem.id) > -1));
 
         if (this.headerService.user.groups.filter((group: any) => group.can_index === true).length > 0) {
             const indexingGroups: any[] = [];
@@ -628,10 +641,8 @@ export class PrivilegeService {
                 'shortcut' : true,
                 "groups": indexingGroups
             };
-            shortcuts.push(indexingShortcut);
+            this.shortcuts.push(indexingShortcut);
         }
-
-        return shortcuts;
     }
 
     getAdministrations(): Array<administration> {

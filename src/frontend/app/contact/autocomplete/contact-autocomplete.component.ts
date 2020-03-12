@@ -330,8 +330,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     openContact(contact: any = null) {
         this.retrieveDocumentEvent.emit();
-
-        const dialogRef = this.dialog.open(ContactModalComponent, { maxWidth: '100vw', panelClass: 'contact-modal-container', disableClose: true, data: { editMode: this.canUpdate, contactId: contact !== null ? contact.id : null, contactType: contact !== null ? contact.type : null } });
+        const dialogRef = this.dialog.open(ContactModalComponent, { maxWidth: '100vw', width: contact === null ? '99vw' : 'auto', panelClass: contact === null ? 'maarch-full-height-modal' : 'maarch-modal', disableClose: true, data: { editMode: this.canUpdate, contactId: contact !== null ? contact.id : null, contactType: contact !== null ? contact.type : null } });
 
         dialogRef.afterClosed().pipe(
             filter((data: number) => data !== undefined),

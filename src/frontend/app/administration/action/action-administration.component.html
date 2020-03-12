@@ -1,123 +1,124 @@
-<div class="admin-container" [class.admin-is-mobile]="appService.getViewMode()">
-    <mat-sidenav-container autosize class="admin-sidenav-container">
-        <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'"
-            [fixedInViewport]="appService.getViewMode()" fixedTopGap="56"
-            [opened]="appService.getViewMode() ? false : true">
-            <menu-shortcut></menu-shortcut>
-            <menu-nav></menu-nav>
-        </mat-sidenav>
-        <mat-sidenav-content>
-            <div *ngIf="loading" style="display:flex;height:100%;">
-                <mat-spinner style="margin:auto;"></mat-spinner>
+<mat-sidenav-container autosize class="maarch-container">
+    <mat-sidenav-content>
+        <div class="bg-head">
+            <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
+                <div class="bg-head-title-label">
+                    <header-left></header-left>
+                </div>
+                <div class="bg-head-title-tool">
+                    <header-right></header-right>
+                </div>
             </div>
-            <mat-card *ngIf="!loading" class="card-app-content">
-                <div *ngIf="action.is_system == true" class="alert alert-danger" role="alert">
-                    <b>{{lang.isSytemAction}} !</b> {{lang.doNotModifyUnlessExpert}}</div>
-                <form class="form-horizontal" (ngSubmit)="onSubmit()" #actionsFormUp="ngForm">
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <mat-form-field>
-                                <input matInput [(ngModel)]="action.label_action" required name="action_name"
-                                    id="action_name" title="{{lang.label}}" type="text" placeholder="{{lang.label}}"
-                                    maxlength="255">
-                            </mat-form-field>
+            <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
+            </div>
+        </div>
+        <div class="container" [class.fullContainer]="appService.getViewMode()">
+            <div class="container-content">
+                <div *ngIf="loading" style="display:flex;height:100%;">
+                    <mat-spinner style="margin:auto;"></mat-spinner>
+                </div>
+                <mat-card *ngIf="!loading" class="card-app-content">
+                    <div *ngIf="action.is_system == true" class="alert alert-danger" role="alert">
+                        <b>{{lang.isSytemAction}} !</b> {{lang.doNotModifyUnlessExpert}}</div>
+                    <form class="form-horizontal" (ngSubmit)="onSubmit()" #actionsFormUp="ngForm">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <mat-form-field>
+                                    <input matInput [(ngModel)]="action.label_action" required name="action_name"
+                                           id="action_name" title="{{lang.label}}" type="text" placeholder="{{lang.label}}"
+                                           maxlength="255">
+                                </mat-form-field>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <plugin-select-search [showLabel]="true" [class]="''" [label]="lang.associatedStatus"
-                                [placeholderLabel]="lang.associatedStatus" [formControlSelect]="selectStatusId"
-                                [datas]="statuses" (afterSelected)="action.id_status = selectStatusId.value"
-                                style="width:100%;">
-                            </plugin-select-search>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <plugin-select-search [showLabel]="true" [class]="''" [label]="lang.associatedStatus"
+                                                      [placeholderLabel]="lang.associatedStatus" [formControlSelect]="selectStatusId"
+                                                      [datas]="statuses" (afterSelected)="action.id_status = selectStatusId.value"
+                                                      style="width:100%;">
+                                </plugin-select-search>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <plugin-select-search [showLabel]="true" [class]="''" [label]="lang.actionCarriedOut"
-                                [placeholderLabel]="lang.actionCarriedOut" [formControlSelect]="selectActionPageId"
-                                [datas]="actionPages" (afterSelected)="getCustomFields()" style="width:100%;">
-                            </plugin-select-search>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <plugin-select-search [showLabel]="true" [class]="''" [label]="lang.actionCarriedOut"
+                                                      [placeholderLabel]="lang.actionCarriedOut" [formControlSelect]="selectActionPageId"
+                                                      [datas]="actionPages" (afterSelected)="getCustomFields()" style="width:100%;">
+                                </plugin-select-search>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group"
-                        *ngIf="!this.functions.empty(availableCustomFields) && action.actionPageId=='close_mail'">
-                        <div class="col-sm-12">
-                            <plugin-select-search [showLabel]="true" [class]="input-form-filled"
-                                [label]="lang.checkEmptyFields" [placeholderLabel]="lang.checkEmptyFields"
-                                [formControlSelect]="customFieldsFormControl" [datas]="availableCustomFields"
-                                (afterSelected)="getSelectedFields()" style="width:100%;">
-                            </plugin-select-search>
-                            <mat-chip-list class="checkbox-selected-list">
-                                <mat-chip *ngFor="let fieldValue of selectedFieldsValue; let i = index" selected
-                                    [removable]="true" (removed)="removeSelectedFields(i)">
-                                    {{fieldValue}}
-                                    <mat-icon matChipRemove class="fa fa-times-circle"></mat-icon>
-                                </mat-chip>
-                            </mat-chip-list>
+                        <div class="form-group"
+                             *ngIf="!this.functions.empty(availableCustomFields) && action.actionPageId=='close_mail'">
+                            <div class="col-sm-12">
+                                <plugin-select-search [showLabel]="true" [class]="input-form-filled"
+                                                      [label]="lang.checkEmptyFields" [placeholderLabel]="lang.checkEmptyFields"
+                                                      [formControlSelect]="customFieldsFormControl" [datas]="availableCustomFields"
+                                                      (afterSelected)="getSelectedFields()" style="width:100%;">
+                                </plugin-select-search>
+                                <mat-chip-list class="checkbox-selected-list">
+                                    <mat-chip *ngFor="let fieldValue of selectedFieldsValue; let i = index" selected
+                                              [removable]="true" (removed)="removeSelectedFields(i)">
+                                        {{fieldValue}}
+                                        <mat-icon matChipRemove class="fa fa-times-circle"></mat-icon>
+                                    </mat-chip>
+                                </mat-chip-list>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group" *ngIf="action.actionPageId=='create_acknowledgement_receipt'">
-                        <div class="col-sm-12">
-                            <mat-form-field>
-                                <mat-select [required]="action.actionPageId=='create_acknowledgement_receipt'"
-                                    id="generateARmode" name="generateARmode" title="{{lang.generateARMode}}"
-                                    placeholder="{{lang.generateARMode}}" [(ngModel)]="arMode">
-                                    <mat-option value="auto">{{lang.autoAR}}</mat-option>
-                                    <mat-option value="manual">{{lang.manualAR}}</mat-option>
-                                    <mat-option value="both">{{lang.bothAR}}</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                        <div class="form-group" *ngIf="action.actionPageId=='create_acknowledgement_receipt'">
+                            <div class="col-sm-12">
+                                <mat-form-field>
+                                    <mat-select [required]="action.actionPageId=='create_acknowledgement_receipt'"
+                                                id="generateARmode" name="generateARmode" title="{{lang.generateARMode}}"
+                                                placeholder="{{lang.generateARMode}}" [(ngModel)]="arMode">
+                                        <mat-option value="auto">{{lang.autoAR}}</mat-option>
+                                        <mat-option value="manual">{{lang.manualAR}}</mat-option>
+                                        <mat-option value="both">{{lang.bothAR}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <mat-form-field>
-                                <mat-select id="keyword" name="keyword" title="{{lang.keyword}}"
-                                    placeholder="{{lang.keyword}}" [(ngModel)]="action.keyword">
-                                    <mat-option *ngFor="let keyword of keywordsList" [value]="keyword.value">
-                                        {{keyword.label}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <mat-form-field>
+                                    <mat-select id="keyword" name="keyword" title="{{lang.keyword}}"
+                                                placeholder="{{lang.keyword}}" [(ngModel)]="action.keyword">
+                                        <mat-option *ngFor="let keyword of keywordsList" [value]="keyword.value">
+                                            {{keyword.label}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12" style="text-align:center;">
-                            <mat-slide-toggle name="history" title="{{lang.actionHistoryDesc}}" id="history"
-                                color="primary" [(ngModel)]="action.history" [checked]="action.history == 'Y'">
-                                {{lang.actionHistory}}</mat-slide-toggle>
+                        <div class="form-group">
+                            <div class="col-sm-12" style="text-align:center;">
+                                <mat-slide-toggle name="history" title="{{lang.actionHistoryDesc}}" id="history"
+                                                  color="primary" [(ngModel)]="action.history" [checked]="action.history == 'Y'">
+                                    {{lang.actionHistory}}</mat-slide-toggle>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <mat-form-field>
-                                <mat-select id="categorieslist" name="categorieslist"
-                                    title="{{lang.chooseCategoryAssociation}}"
-                                    placeholder="{{lang.chooseCategoryAssociation}}"
-                                    [(ngModel)]="action.actionCategories" multiple required>
-                                    <mat-option *ngFor="let category of categoriesList" [value]="category.id">
-                                        {{category.label}}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <mat-form-field>
+                                    <mat-select id="categorieslist" name="categorieslist"
+                                                title="{{lang.chooseCategoryAssociation}}"
+                                                placeholder="{{lang.chooseCategoryAssociation}}"
+                                                [(ngModel)]="action.actionCategories" multiple required>
+                                        <mat-option *ngFor="let category of categoriesList" [value]="category.id">
+                                            {{category.label}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12" style="text-align:center;">
-                            <button mat-raised-button color="primary" type="submit"
-                                [disabled]="!actionsFormUp.form.valid">{{lang.save}}</button>
+                        <div class="form-group">
+                            <div class="col-sm-12" style="text-align:center;">
+                                <button mat-raised-button color="primary" type="submit"
+                                        [disabled]="!actionsFormUp.form.valid">{{lang.save}}</button>
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </mat-card>
-        </mat-sidenav-content>
-        <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'"
-            [fixedInViewport]="appService.getViewMode()" fixedTopGap="56" position='end'
-            [opened]="appService.getViewMode() ? false : false" style="overflow-x:hidden;">
-            <mat-list>
-                <h3 mat-subheader>Action(s)</h3>
-            </mat-list>
-        </mat-sidenav>
-    </mat-sidenav-container>
-</div>
+                    </form>
+                </mat-card>
+            </div>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

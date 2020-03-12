@@ -22,18 +22,6 @@
 		<parameter name="template_path" type="docserver_path" />
 		<parameter name="entitieslist" type="identifier" />
 	</validationRule>
-	
-	<validationRule name="templates_ajax_content_for_mails" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="id" type="integer" />
-		<parameter name="templateId" type="integer" />
-        <parameter name="mode" type="string" />
-	</validationRule>
-
-	<validationRule name="templates_ajax_content_for_notes" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="templateId" type="integer" />
-	</validationRule>
 
 	<validationRule name="admin_change_templates" extends="standardForm" mode="error">
 		<parameter name="template_style" type="string" />

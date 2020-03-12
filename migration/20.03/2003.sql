@@ -13,6 +13,7 @@ UPDATE parameters SET description = 'Département par défaut sélectionné dans
 DROP VIEW IF EXISTS res_view_letterbox;
 DROP VIEW IF EXISTS res_view_attachments;
 DROP VIEW IF EXISTS view_folders;
+DROP VIEW IF EXISTS res_view_business;
 
 /*USERS*/
 ALTER TABLE users DROP COLUMN IF EXISTS reset_token;
@@ -83,7 +84,7 @@ where group_id in (
 );
 
 UPDATE groupbasket SET list_event_data = '{"defaultTab":"info"}'
-WHERE list_event = 'processDocument' AND (list_event_data IS NULL OR list_event_data = '');
+WHERE list_event = 'processDocument' AND (list_event_data IS NULL OR list_event_data::text = '');
 
 -- /!\ Do not move : update actions AFTER all updates on groupbasket
 DELETE FROM actions_categories WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
@@ -410,7 +411,7 @@ ALTER TABLE res_letterbox ADD COLUMN IF NOT EXISTS scan_batch CHARACTER VARYING 
 ALTER TABLE res_letterbox ADD COLUMN IF NOT EXISTS scan_postmark CHARACTER VARYING (50) DEFAULT NULL::character varying;
 
 ALTER TABLE res_letterbox DROP COLUMN IF EXISTS custom_fields;
-ALTER TABLE res_letterbox ADD COLUMN custom_fields jsonb;
+ALTER TABLE res_letterbox ADD COLUMN custom_fields jsonb DEFAULT '{}';
 
 ALTER TABLE res_letterbox DROP COLUMN IF EXISTS linked_resources;
 ALTER TABLE res_letterbox ADD COLUMN linked_resources jsonb NOT NULL DEFAULT '[]';
@@ -533,6 +534,7 @@ DO $$ BEGIN
   END IF;
 END$$;
 
+UPDATE listinstance SET item_mode = 'cc' WHERE item_mode = 'copy';
 DELETE FROM usergroups_services WHERE service_id = 'admin_fileplan';
 DELETE FROM usergroups_services WHERE service_id = 'put_doc_in_fileplan';
 DELETE FROM usergroups_services WHERE service_id = 'fileplan';

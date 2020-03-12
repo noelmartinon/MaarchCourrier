@@ -4,6 +4,7 @@
             "SrcCore\\"                 : "src/core/",
             "AcknowledgementReceipt\\"  : "src/app/acknowledgementReceipt/",
             "Action\\"                  : "src/app/action/",
+            "Administration\\"          : "src/app/administration/",
             "Attachment\\"              : "src/app/attachment/",
             "Basket\\"                  : "src/app/basket/",
             "Configuration\\"           : "src/app/configuration/",

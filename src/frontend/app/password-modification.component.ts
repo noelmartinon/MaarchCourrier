@@ -17,43 +17,43 @@ declare var angularGlobals: any;
 })
 export class PasswordModificationComponent implements OnInit {
 
-    dialogRef                       : MatDialogRef<any>;
-    config                          : any       = {};
+    dialogRef: MatDialogRef<any>;
+    config: any = {};
 
-    lang            : any       = LANG;
-    loading         : boolean   = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    user            : any       = {};
-    ruleText        : string    = '';
-    otherRuleText   : string;
-    hidePassword    : boolean   = true;
-    passLength      : any       = false;
-    arrValidator    : any[]     = [];
-    validPassword   : boolean   = false;
-    matchPassword   : boolean   = false;
-    isLinear        : boolean   = false;
-    firstFormGroup  : FormGroup;
+    user: any = {};
+    ruleText: string = '';
+    otherRuleText: string;
+    hidePassword: boolean = true;
+    passLength: any = false;
+    arrValidator: any[] = [];
+    validPassword: boolean = false;
+    matchPassword: boolean = false;
+    isLinear: boolean = false;
+    firstFormGroup: FormGroup;
 
-    passwordRules   : any = {
-        minLength           : { enabled: false, value: 0 },
-        complexityUpper     : { enabled: false, value: 0 },
-        complexityNumber    : { enabled: false, value: 0 },
-        complexitySpecial   : { enabled: false, value: 0 },
-        renewal             : { enabled: false, value: 0 },
-        historyLastUse      : { enabled: false, value: 0 },
+    passwordRules: any = {
+        minLength: { enabled: false, value: 0 },
+        complexityUpper: { enabled: false, value: 0 },
+        complexityNumber: { enabled: false, value: 0 },
+        complexitySpecial: { enabled: false, value: 0 },
+        renewal: { enabled: false, value: 0 },
+        historyLastUse: { enabled: false, value: 0 },
     };
 
-    passwordModel   : any = {
-        currentPassword : "",
-        newPassword     : "",
-        reNewPassword   : "",
+    passwordModel: any = {
+        currentPassword: "",
+        newPassword: "",
+        reNewPassword: "",
     };
 
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        private _formBuilder: FormBuilder, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        private _formBuilder: FormBuilder,
         public dialog: MatDialog,
         public appService: AppService
     ) {
@@ -76,18 +76,18 @@ export class PasswordModificationComponent implements OnInit {
     ngOnInit(): void {
         this.prepare();
         setTimeout(() => {
-            this.config = {data:{user:this.user,state:'BEGIN'},disableClose: true};
+            this.config = { panelClass: 'maarch-modal', data: { user: this.user, state: 'BEGIN' }, disableClose: true };
             this.dialogRef = this.dialog.open(InfoChangePasswordModalComponent, this.config);
         }, 0);
 
         this.http.get('../../rest/passwordRules')
             .subscribe((data: any) => {
-                let valArr : ValidatorFn[] = [];
+                let valArr: ValidatorFn[] = [];
                 let ruleTextArr: String[] = [];
                 let otherRuleTextArr: String[] = [];
 
                 valArr.push(Validators.required);
-                
+
                 data.rules.forEach((rule: any) => {
                     if (rule.label == 'minLength') {
                         this.passwordRules.minLength.enabled = rule.enabled;
@@ -121,13 +121,13 @@ export class PasswordModificationComponent implements OnInit {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label]+'.');
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
                         }
                     } else if (rule.label == 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
                         this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2']+'.');
+                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2'] + '.');
                         }
                     }
                 });
@@ -169,14 +169,14 @@ export class PasswordModificationComponent implements OnInit {
         if (group.controls['newPasswordCtrl'].value == group.controls['retypePasswordCtrl'].value) {
             return false;
         } else {
-            group.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
-            return {'mismatch': true};
+            group.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
+            return { 'mismatch': true };
         }
     }
 
     getErrorMessage() {
         if (this.firstFormGroup.controls['newPasswordCtrl'].value != this.firstFormGroup.controls['retypePasswordCtrl'].value) {
-            this.firstFormGroup.controls['retypePasswordCtrl'].setErrors({'mismatch': true});
+            this.firstFormGroup.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
         } else {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         }
@@ -203,7 +203,7 @@ export class PasswordModificationComponent implements OnInit {
         this.passwordModel.reNewPassword = this.firstFormGroup.controls['retypePasswordCtrl'].value;
         this.http.put('../../rest/users/' + angularGlobals.user.id + '/password', this.passwordModel)
             .subscribe(() => {
-                this.config = {data:{state:'END'},disableClose: true};
+                this.config = { panelClass: 'maarch-modal', data: { state: 'END' }, disableClose: true };
                 this.dialogRef = this.dialog.open(InfoChangePasswordModalComponent, this.config);
             }, (err: any) => {
                 this.notify.error(err.error.errors);
@@ -220,7 +220,7 @@ export class PasswordModificationComponent implements OnInit {
 })
 export class InfoChangePasswordModalComponent {
 
-    lang    : any = LANG;
+    lang: any = LANG;
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<InfoChangePasswordModalComponent>) {
     }

@@ -1,13 +1,5 @@
 <?php
 
-if (!defined('_PRINTFOLDER')) {
-    define('_PRINTFOLDER', "Dossier d'impression");
-}
-
-if (!defined('_NO_PDF_FILE')) {
-    define('_NO_PDF_FILE', 'Aucun PDF présent pour ce fichier');
-}
-
 // CIRCUIT DE VISA
 if (!defined('_VISA_WORKFLOW')) {
     define('_VISA_WORKFLOW', 'Circuit de visa');
@@ -18,30 +10,12 @@ if (!defined('_INTERRUPT_WORKFLOW')) {
 if (!defined('_VISA_WORKFLOW_COMMENT')) {
     define('_VISA_WORKFLOW_COMMENT', 'Gestion du circuit de visa');
 }
-if (!defined('_VIEW_VISA_WORKFLOW')) {
-    define('_VIEW_VISA_WORKFLOW', 'Visualisation du circuit de visa');
-}
-if (!defined('_VIEW_VISA_WORKFLOW_DESC')) {
-    define('_VIEW_VISA_WORKFLOW_DESC', "Permet de visualiser le circuit de visa dans les parties de liste de diffusion et dans celles d'avancement.");
-}
-if (!defined('_EMPTY_USER_LIST')) {
-    define('_EMPTY_USER_LIST', 'La liste des utilisateurs est vide');
-}
-if (!defined('_EMPTY_VISA_WORKFLOW')) {
-    define('_EMPTY_VISA_WORKFLOW', 'Aucun circuit de visa paramétré');
-}
 
 if (!defined('_NO_VISA')) {
     define('_NO_VISA', 'Aucune personne désignée en visa');
 }
 if (!defined('_NO_RESPONSE_PROJECT_VISA')) {
     define('_NO_RESPONSE_PROJECT_VISA', 'Veuillez intégrer au moins une pièce jointe au parapheur.');
-}
-if (!defined('_NO_CONVERTED_PDF_VISA')) {
-    define('_NO_CONVERTED_PDF_VISA', 'Veuillez éditer votre/vos pièce(s) jointe(s)');
-}
-if (!defined('_PLEASE_CONVERT_PDF_VISA')) {
-    define('_PLEASE_CONVERT_PDF_VISA', 'Veuillez éditer les pièces jointes suivantes : ');
 }
 
 // CIRCUIT D"AVIS

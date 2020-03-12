@@ -135,15 +135,11 @@ export class DiffusionsListComponent implements OnInit {
 
             if (listInstance !== undefined) {
                 listInstance.forEach((element: any) => {
-                    if (element.item_mode == 'cc') {
-                        element.item_mode = 'copy';
-                    }
-
                     if (this.keepRoles.indexOf(element.item_mode) > -1 && this.diffList[element.item_mode].items.filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type).length === 0) {
                         this.diffList[element.item_mode].items.push(element);
                     }
-                    if (this.keepDestForRedirection && element.item_mode == "dest" && this.diffList["copy"].items.filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type).length === 0) {
-                        this.diffList["copy"].items.push(element);
+                    if (this.keepDestForRedirection && element.item_mode == "dest" && this.diffList["cc"].items.filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type).length === 0) {
+                        this.diffList["cc"].items.push(element);
                     }
                 });
             }
@@ -165,7 +161,7 @@ export class DiffusionsListComponent implements OnInit {
                         const obj: any = {
                             listmodel_id: item.id,
                             listinstance_id: item.listinstance_id,
-                            item_mode: item.item_mode === 'cc' ? 'copy' : item.item_mode,
+                            item_mode: item.item_mode,
                             item_type: item.item_type,
                             itemSerialId: item.item_id,
                             itemId: '',
@@ -176,7 +172,7 @@ export class DiffusionsListComponent implements OnInit {
                             process_comment: null,
                         };
                         return obj;
-                    }))
+                    }));
                     return data.listTemplates;
                 }),
                 tap((templates: any) => {
@@ -198,16 +194,16 @@ export class DiffusionsListComponent implements OnInit {
 
                         const obj: any = {
                             listinstance_id: item.listinstance_id,
-                            item_mode: item.item_mode === 'cc' ? 'copy' : item.item_mode,
+                            item_mode: item.item_mode,
                             item_type: item.item_type === 'user_id' ? 'user' : 'entity',
-                            itemSerialId: item.item_type === 'user_id' ? item.userId : null,
+                            itemSerialId: item.itemSerialId,
                             itemId: item.item_id,
                             itemLabel: item.labelToDisplay,
                             itemSubLabel: item.descriptionToDisplay,
                             difflist_type: item.difflist_type,
                             process_date: null,
                             process_comment: null,
-                        }
+                        };
                         return obj;
                     });
                     return data.listInstance;
@@ -239,7 +235,9 @@ export class DiffusionsListComponent implements OnInit {
         const diffusions: any = await this.getListinstance(resId);
         this.removeAllItems();
         diffusions.forEach((element: any) => {
-            this.diffList[element.item_mode].items.push(element);
+            if (!this.functions.empty(this.diffList[element.item_mode])) {
+                this.diffList[element.item_mode].items.push(element);
+            }
         });
 
         if (diffusions.filter((elem: any) => elem.item_mode === 'dest').length === 0 && !this.availableRoles.filter(role => role.id === 'dest')[0].canUpdate && this.adminMode) {
@@ -291,7 +289,7 @@ export class DiffusionsListComponent implements OnInit {
                     data.roles = data.roles.map((role: any) => {
                         return {
                             ...role,
-                            id: role.id === 'cc' ? 'copy' : role.id,
+                            id: role.id,
                         }
                     });
                     return data.roles;
@@ -327,21 +325,24 @@ export class DiffusionsListComponent implements OnInit {
 
     getCurrentListinstance() {
         let listInstanceFormatted: any = [];
-
-        Object.keys(this.diffList).forEach(role => {
-            if (this.diffList[role].items.length > 0) {
-                this.diffList[role].items.forEach((element: any) => {
-                    listInstanceFormatted.push({
-                        difflist_type: element.difflist_type,
-                        item_id: element.itemSerialId,
-                        item_mode: role === 'copy' ? 'cc' : role,
-                        item_type: element.item_type,
-                        process_date: element.process_date,
-                        process_comment: element.process_comment,
+        
+        if (this.diffList !== null) {
+            Object.keys(this.diffList).forEach(role => {
+                if (this.diffList[role].items.length > 0) {
+                    this.diffList[role].items.forEach((element: any) => {
+                        listInstanceFormatted.push({
+                            difflist_type: element.difflist_type,
+                            item_id: element.itemSerialId,
+                            item_mode: role === 'copy' ? 'cc' : role,
+                            item_type: element.item_type,
+                            process_date: element.process_date,
+                            process_comment: element.process_comment,
+                        });
                     });
-                });
-            }
-        });
+                }
+            });
+        }
+        
 
         return listInstanceFormatted;
     }
@@ -382,38 +383,50 @@ export class DiffusionsListComponent implements OnInit {
     }
 
     async addElem(element: any) {
-        let item_mode: any = 'copy';
+        let item_mode: any = 'cc';
 
-        if (this.diffList["dest"].items.length === 0) {
-            item_mode = await this.isUserInCurrentEntity(element.serialId) && this.availableRoles.filter(role => role.id === 'dest')[0].canUpdate ? 'dest' : 'copy';
+        if (this.hasEmptyDest() && element.type == 'user') {
+            item_mode = await this.isUserInCurrentEntity(element.serialId) && this.availableRoles.filter(role => role.id === 'dest')[0].canUpdate ? 'dest' : 'cc';
         }
 
-        if (this.diffList["copy"].items.map((e: any) => { return e.itemId; }).indexOf(element.id) == -1) {
-            let itemType = '';
-            if (element.type == 'user') {
-                itemType = 'user';
-            } else {
-                itemType = 'entity';
-            }
+        let itemType = '';
+        if (element.type == 'user') {
+            itemType = 'user';
+        } else {
+            itemType = 'entity';
+        }
 
-            const newElemListModel: any = {
-                listinstance_id: null,
-                item_mode: item_mode,
-                item_type: itemType,
-                itemSerialId: element.serialId,
-                itemId: element.id,
-                itemLabel: element.idToDisplay,
-                itemSubLabel: element.descriptionToDisplay,
-                difflist_type: 'entity_id',
-                process_date: null,
-                process_comment: null,
-            };
+        const newElemListModel: any = {
+            listinstance_id: null,
+            item_mode: item_mode,
+            item_type: itemType,
+            itemSerialId: element.serialId,
+            itemId: element.id,
+            itemLabel: element.idToDisplay,
+            itemSubLabel: element.descriptionToDisplay,
+            difflist_type: 'entity_id',
+            process_date: null,
+            process_comment: null,
+        };
+
+        if (!this.isItemInThisRole(newElemListModel, 'cc')) {
             this.diffList[item_mode].items.unshift(newElemListModel);
 
             if (this.diffFormControl !== undefined) {
                 this.setFormValues();
             }
         }
+    }
+
+    isItemInThisRole(element: any, roleId: string) {
+        const result = this.diffList[roleId].items.map((item: any, index: number) => {
+                return {
+                    ...item,
+                    index: index
+                }
+            }).filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type);
+
+        return result.length > 0;
     }
 
     isUserInCurrentEntity(userId: number) {
@@ -494,10 +507,9 @@ export class DiffusionsListComponent implements OnInit {
                     if (this.diffList['dest'].items.length > 0) {
                         const destUser = this.diffList['dest'].items[0];
 
-                        this.diffList[oldRole.id].items.map((item: any) => item.id).
-                            indexFound = this.diffList[oldRole.id].items.map((item: any) => item.userId).indexOf(destUser.userId);
+                        indexFound = this.diffList[oldRole.id].items.map((item: any) => item.itemSerialId).indexOf(destUser.itemSerialId);
 
-                        if (indexFound === -1) {
+                        if (indexFound === -1 && !this.isItemInThisRole(destUser, oldRole.id)) {
                             destUser.item_mode = oldRole.id;
                             this.diffList[oldRole.id].items.push(destUser);
                         }
@@ -525,7 +537,7 @@ export class DiffusionsListComponent implements OnInit {
                         this.triggerEvent.emit(allowedEntitiesIds);
                     }
                 } else {
-                    this.dialog.open(AlertComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.userUnauthorized, msg: "<b>" + user.itemLabel + "</b> " + this.lang.notInAuthorizedEntities } });
+                    this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.userUnauthorized, msg: "<b>" + user.itemLabel + "</b> " + this.lang.notInAuthorizedEntities } });
                 }
             }),
         ).subscribe();
@@ -534,13 +546,14 @@ export class DiffusionsListComponent implements OnInit {
     changeUserRole(user: any, oldRole: any, newRole: any) {
         let indexFound: number;
 
-        indexFound = this.diffList[oldRole.id].items.map((item: any) => item.userId).indexOf(user.userId);
-
+        indexFound = this.diffList[oldRole.id].items.map((item: any) => item.itemSerialId).indexOf(user.itemSerialId);
         if (indexFound > -1) {
             this.diffList[oldRole.id].items.splice(indexFound, 1);
         }
-        user.item_mode = newRole.id;
-        this.diffList[newRole.id].items.push(user);
+        if (!this.isItemInThisRole(user, newRole.id)) {
+            user.item_mode = newRole.id;
+            this.diffList[newRole.id].items.push(user);
+        }
         if (this.diffFormControl !== undefined) {
             this.setFormValues();
         }
@@ -552,7 +565,7 @@ export class DiffusionsListComponent implements OnInit {
             arrValues = arrValues.concat(
                 this.diffList[role].items.map((item: any) => {
                     return {
-                        id: item.itemId,
+                        id: item.itemSerialId,
                         mode: role,
                         type: item.item_type === 'user' ? 'user' : 'entity'
                     }

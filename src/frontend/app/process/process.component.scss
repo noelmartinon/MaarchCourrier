@@ -1,12 +1,5 @@
 @import "../../css/vars.scss";
 
-.panel-left {
-    ::ng-deep.mat-drawer-inner-container {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
 .document-container {
     flex: 1;
 

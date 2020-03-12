@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 import { HistoryComponent } from '../../history/history.component';
@@ -9,15 +8,14 @@ import { PrivilegeService } from '../../../service/privileges.service';
 import { HeaderService } from '../../../service/header.service';
 
 @Component({
-    selector: 'contact-list',
+    selector: 'admin-history',
     templateUrl: "history-administration.component.html",
     styleUrls: ['history-administration.component.scss'],
     providers: [AppService]
 })
 export class HistoryAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
 
@@ -46,11 +44,14 @@ export class HistoryAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         private privilegeService: PrivilegeService,
-        private headerService: HeaderService) { }
+        private headerService: HeaderService,
+        private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.history.toLowerCase(), '', '');
 
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
+        
         if (this.privilegeService.hasCurrentUserPrivilege('view_history_batch')) {
             this.subMenus = [
                 {

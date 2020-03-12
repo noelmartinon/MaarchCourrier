@@ -1,40 +1,44 @@
-<h1 mat-dialog-title>{{data.action.label}}</h1>
-<div mat-dialog-content>
-    <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
-        <mat-spinner style="margin:auto;"></mat-spinner>
-    </div>
-    <div class="row">
-        <div class="col-md-12" *ngIf="emptyMandatoryFields.length > 0">
-            <div *ngIf="data.resIds.length > 1" class="alert-message alert-message-danger mailList" role="alert">
-                <p>{{lang.cannotCloseMails}} :</p>
-                <ul>
-                    <li *ngFor="let emptyFields of emptyMandatoryFields">
-                        <b>{{emptyFields.chrono}}</b> : {{emptyFields.fields}}
-                    </li>
-                </ul>
-            </div>
-            <div *ngIf="data.resIds.length < 2" class="alert-message alert-message-danger mailList" role="alert">
-                <p>{{lang.cannotCloseThisMail}} : {{emptyMandatoryFields[0].fields}}</p>
-            </div>
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>{{data.action.label}}</h1>
+    <div mat-dialog-content>
+        <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
+            <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
-        <ng-container *ngIf="data.resIds.length === 0 || canCloseResIds.length > 0">
-            <div class="col-md-12">
-                {{lang.makeActionOn}}
-                <b *ngIf="data.resIds.length === 0" color="primary" class="highlight">{{lang.currentIndexingMail}}</b>
-                <b *ngIf="data.resIds.length === 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
-                <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{canCloseResIds.length}}
-                    {{lang.elements}}</b> ?
-                <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;"
-                    [innerHTML]="lang.updateClosingDate"></div>
+        <div class="row">
+            <div class="col-md-12" *ngIf="emptyMandatoryFields.length > 0">
+                <div *ngIf="data.resIds.length > 1" class="alert-message alert-message-danger mailList" role="alert">
+                    <p>{{lang.cannotCloseMails}} :</p>
+                    <ul>
+                        <li *ngFor="let emptyFields of emptyMandatoryFields">
+                            <b>{{emptyFields.chrono}}</b> : {{emptyFields.fields}}
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="data.resIds.length < 2" class="alert-message alert-message-danger mailList" role="alert">
+                    <p>{{lang.cannotCloseThisMail}} : {{emptyMandatoryFields[0].fields}}</p>
+                </div>
             </div>
-            <div class="col-md-12">
-                <app-note-editor #noteEditor [resIds]="canCloseResIds"></app-note-editor>
-            </div>
-        </ng-container>
+            <ng-container *ngIf="data.resIds.length === 0 || canCloseResIds.length > 0">
+                <div class="col-md-12">
+                    {{lang.makeActionOn}}
+                    <b *ngIf="data.resIds.length === 0" color="primary"
+                        class="highlight">{{lang.currentIndexingMail}}</b>
+                    <b *ngIf="data.resIds.length === 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
+                    <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{canCloseResIds.length}}
+                        {{lang.elements}}</b> ?
+                    <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;"
+                        [innerHTML]="lang.updateClosingDate"></div>
+                </div>
+                <div class="col-md-12">
+                    <app-note-editor #noteEditor [resIds]="canCloseResIds"></app-note-editor>
+                </div>
+            </ng-container>
+        </div>
     </div>
-</div>
-<div mat-dialog-actions class="actions">
-    <button mat-raised-button mat-button color="primary" [disabled]="loading || canCloseResIds.length == 0"
-        (click)="onSubmit()">{{lang.validate}}</button>
-    <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions class="actions">
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || canCloseResIds.length == 0"
+            (click)="onSubmit()">{{lang.validate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+    </div>
 </div>

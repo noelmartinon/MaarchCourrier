@@ -20,8 +20,9 @@
                 autocomplete="off" (click)="$event.stopPropagation();" (keydown)="$event.stopPropagation()">
         </mat-form-field>
         <ng-container *ngIf="!loading; else elseTemplate">
-            <button *ngIf="pinnedFolder" mat-menu-item class="noFolder" disabled>{{lang.myPinnedFolder}}</button>
-            <button *ngIf="foldersList.length === 0 && !loading" mat-menu-item class="noFolder"
+            <button *ngIf="pinnedFolder && foldersList.length !== 0" mat-menu-item class="noFolder" disabled>{{lang.myPinnedFolder}}</button>
+            <button *ngIf="pinnedFolder && foldersList.length === 0" mat-menu-item class="noFolder" disabled>{{lang.noPinnedFolder}}</button>
+            <button *ngIf="!pinnedFolder && foldersList.length === 0 && !loading" mat-menu-item class="noFolder"
                 disabled>{{lang.noAvailableFolder}}</button>
             <button mat-menu-item *ngFor="let folder of foldersList | sortBy : 'label'" class="labelFolder"
                 (click)="classifyDocuments(folder)" [title]="folder.label"><i class="fa fa-users private"

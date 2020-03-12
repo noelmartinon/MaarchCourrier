@@ -14,7 +14,6 @@
 
 namespace Resource\controllers;
 
-
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
 use Contact\controllers\ContactController;
@@ -87,7 +86,7 @@ class FolderPrintController
         $unitsSummarySheet = [];
         if (!empty($body['summarySheet'])) {
             $unitsSummarySheet = $body['summarySheet'];
-        } else if (count($body['resources']) > 1) {
+        } elseif (count($body['resources']) > 1) {
             $unitsSummarySheet = $defaultUnits;
         }
 
@@ -343,7 +342,7 @@ class FolderPrintController
                 } else {
                     $emails = EmailModel::get([
                         'select'  => ['id', 'user_id', 'sender', 'recipients', 'cc', 'cci', 'object', 'body', 'document', 'send_date', 'status'],
-                        'where'   => ["cast(document->>'id' as INT) = ? ", "object NOT LIKE '[AR]%'"],
+                        'where'   => ["cast(document->>'id' as INT) = ? ", "(object NOT LIKE '[AR]%' OR object is null)"],
                         'data'    => [$resource['resId']],
                         'orderBy' => ['creation_date desc']
                     ]);
@@ -546,19 +545,19 @@ class FolderPrintController
 
         $pdf->SetFont('', '', 10);
         $pdf->MultiCell($width, 30, '<b>' . _CREATED_BY . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $creator['firstname'] . ' ' . $creator['lastname'] , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $creator['firstname'] . ' ' . $creator['lastname'], 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _CREATED . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $creationDate , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $creationDate, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _SENT_DATE . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
         $pdf->MultiCell($width, 30, $sendDate, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _FORMAT . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $acknowledgementReceipt['format'] , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $acknowledgementReceipt['format'], 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _SENT_TO . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $displayContact , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $displayContact, 1, 'L', false, 1, '', '', true, 0, true);
 
 
         $tmpDir = CoreConfigModel::getTmpPath();
@@ -602,7 +601,7 @@ class FolderPrintController
 
         if ($attachment['recipient_type'] == 'user') {
             $displayContact = UserModel::getLabelledUserById(['id' => $attachment['recipient_id']]);
-        } else if ($attachment['recipient_type'] == 'contact') {
+        } elseif ($attachment['recipient_type'] == 'contact') {
             $contact = ContactModel::getById([
                 'select' => ['id', 'firstname', 'lastname', 'email', 'address_number', 'address_street', 'address_postcode',
                              'address_town', 'address_country', 'company'],
@@ -642,28 +641,28 @@ class FolderPrintController
         $pdf->SetFont('', '', 10);
 
         $pdf->MultiCell($width, 30, '<b>' . _CHRONO_NUMBER_MASTER . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $chronoResource , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $chronoResource, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _SUBJECT . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
         $pdf->MultiCell($width, 30, $attachment['title'], 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _CREATED_BY . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $creator['firstname'] . ' ' . $creator['lastname'] , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $creator['firstname'] . ' ' . $creator['lastname'], 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _CREATED . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $creationDate , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $creationDate, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _FORMAT . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $attachment['format'] , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $attachment['format'], 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _STATUS . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $status , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $status, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _DOCTYPE . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $attachmentType , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $attachmentType, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($width, 30, '<b>' . _CONTACT . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($width, 30, $displayContact , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($width, 30, $displayContact, 1, 'L', false, 1, '', '', true, 0, true);
 
 
         $tmpDir = CoreConfigModel::getTmpPath();
@@ -705,11 +704,13 @@ class FolderPrintController
         $recipientsCopyHidden = implode(", ", $recipientsCopyHidden);
         $recipientsCopyHidden = !empty($recipientsCopyHidden) ? $recipientsCopyHidden : _UNDEFINED;
 
+        $subject = !empty($email['object']) ? $email['object'] : "<i>" . _EMPTY_SUBJECT . "</i>";
+
         if ($email['status'] == 'SENT') {
             $status = _EMAIL_SENT;
-        } else if ($email['status'] == 'DRAFT') {
+        } elseif ($email['status'] == 'DRAFT') {
             $status = _EMAIL_DRAFT;
-        } else if ($email['status'] == 'WAITING') {
+        } elseif ($email['status'] == 'WAITING') {
             $status = _EMAIL_SENDING;
         } else {
             $status = _EMAIL_ERROR_SENT;
@@ -740,16 +741,16 @@ class FolderPrintController
         $pdf->MultiCell($widthThreeQuarter, 30, $recipients, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($widthQuarter, 30, '<b>' . _TO_CC . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $recipientsCopy , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($widthThreeQuarter, 30, $recipientsCopy, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($widthQuarter, 30, '<b>' . _TO_CCI . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $recipientsCopyHidden , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($widthThreeQuarter, 30, $recipientsCopyHidden, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($widthQuarter, 30, '<b>' . _SUBJECT . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $email['object'] , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($widthThreeQuarter, 30, $subject, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->MultiCell($widthQuarter, 30, '<b>' . _STATUS . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $status , 1, 'L', false, 1, '', '', true, 0, true);
+        $pdf->MultiCell($widthThreeQuarter, 30, $status, 1, 'L', false, 1, '', '', true, 0, true);
 
         $pdf->SetY($pdf->GetY() + 5);
 

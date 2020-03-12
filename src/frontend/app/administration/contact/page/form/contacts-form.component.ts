@@ -40,7 +40,6 @@ declare var angularGlobals: any;
 })
 export class ContactsFormComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
 
@@ -163,6 +162,17 @@ export class ContactsFormComponent implements OnInit {
             values: []
         },
         {
+            id: 'addressAdditional1',
+            unit: 'address',
+            label: this.lang.contactsParameters_addressAdditional1,
+            type: 'string',
+            control: new FormControl(),
+            required: false,
+            display: false,
+            filling: false,
+            values: []
+        },
+        {
             id: 'addressNumber',
             unit: 'address',
             label: this.lang.contactsParameters_addressNumber,
@@ -177,17 +187,6 @@ export class ContactsFormComponent implements OnInit {
             id: 'addressStreet',
             unit: 'address',
             label: this.lang.contactsParameters_addressStreet,
-            type: 'string',
-            control: new FormControl(),
-            required: false,
-            display: false,
-            filling: false,
-            values: []
-        },
-        {
-            id: 'addressAdditional1',
-            unit: 'address',
-            label: this.lang.contactsParameters_addressAdditional1,
             type: 'string',
             control: new FormControl(),
             required: false,

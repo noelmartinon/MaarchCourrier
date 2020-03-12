@@ -1,9 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
@@ -18,10 +17,6 @@ import { MatDialog } from '@angular/material';
     providers: [AppService]
 })
 export class TagAdministrationComponent implements OnInit {
-
-    /*HEADER*/
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
     id: string;
     creationMode: boolean;
@@ -57,10 +52,7 @@ export class TagAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
-
+        
         this.route.params.subscribe((params) => {
             if (typeof params['id'] == "undefined") {
                 this.headerService.setHeader(this.lang.tagCreation);
@@ -157,7 +149,7 @@ export class TagAdministrationComponent implements OnInit {
 
         const dialogMessage = `${this.lang.confirmAction}<br/><br/>${this.lang.theTag}<b> "${this.tag.label.value}" </b>${this.lang.willBeDeletedAndMerged}<b> "${selectedTag.label}"</b><br/><br/>${this.lang.willBeTransferredToNewTag}<b> "${selectedTag.label}"</b> : <b>${this.tag.countResources.value}</b>`;
 
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: `${this.lang.mergeWith}  "${selectedTag.label}"`, msg: dialogMessage } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.lang.mergeWith}  "${selectedTag.label}"`, msg: dialogMessage } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.put(`../../rest/mergeTags`, { idMaster: selectedTag.id, idMerge: this.id })),

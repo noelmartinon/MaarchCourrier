@@ -83,15 +83,15 @@ abstract class MessageExchangeModelAbstract
 
     public static function updateStatusMessage(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['status','reference']);
+        ValidatorModel::notEmpty($aArgs, ['status','messageId']);
 
         DatabaseModel::update([
             'table'     => 'message_exchange',
             'set'       => [
                 'status'     => $aArgs['status']
             ],
-            'where'     => ['reference = ?'],
-            'data'      => [$aArgs['reference']]
+            'where'     => ['message_id = ?'],
+            'data'      => [$aArgs['messageId']]
         ]);
 
         return true;
@@ -251,12 +251,11 @@ abstract class MessageExchangeModelAbstract
         ValidatorModel::stringType($args, ['messageId']);
 
         $messages = DatabaseModel::select([
-                'select' => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+                'select' => empty($args['select']) ? ['*'] : $args['select'],
                 'table'  => ['unit_identifier'],
                 'where'  => ['message_id = ?'],
-                'data'   => [$aArgs['message_id']]
-            ]
-        );
+                'data'   => [$args['message_id']]
+            ]);
 
         return $messages;
     }

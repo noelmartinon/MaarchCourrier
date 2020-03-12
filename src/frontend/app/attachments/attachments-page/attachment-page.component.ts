@@ -296,7 +296,7 @@ export class AttachmentPageComponent implements OnInit {
 
     setNewVersion() {
         if (!this.newVersion) {
-            const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.createNewVersion, msg: this.lang.confirmAction } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.createNewVersion, msg: this.lang.confirmAction } });
 
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
@@ -313,7 +313,7 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     deleteSignedVersion() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.deleteSignedVersion, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.deleteSignedVersion, msg: this.lang.confirmAction } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -350,6 +350,36 @@ export class AttachmentPageComponent implements OnInit {
             return false;
         } else {
             return true;
+        }
+    }
+
+    isEditing() {
+        if (this.functions.empty(this.appAttachmentViewer)) {
+            return false;
+        }
+        if (this.appAttachmentViewer.editor.async) {
+            return this.appAttachmentViewer.isEditingTemplate();
+        }
+        return !this.appAttachmentViewer.isEditingTemplate();
+    }
+
+    closeModal() {
+
+        if (this.appAttachmentViewer.isEditingTemplate()) {
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.close, msg: this.lang.editingDocumentMsg } });
+
+            dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                tap(() => {
+                    this.dialogRef.close();
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.dialogRef.close();
         }
     }
 }

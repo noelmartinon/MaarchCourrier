@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, Renderer2 } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
-import { map, tap, catchError, filter, exhaustMap, debounceTime, distinctUntilChanged, switchMap, finalize } from 'rxjs/operators';
+import { map, tap, catchError, filter, exhaustMap, debounceTime, switchMap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '../../notification.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
@@ -102,6 +102,7 @@ export class FolderMenuComponent implements OnInit {
             tap(() => {
                 this.foldersService.getPinnedFolders();
                 this.refreshList.emit();
+                this.refreshFolders.emit();
                 this.notify.success(this.lang.mailClassified);
             }),
             catchError((err) => {
@@ -112,15 +113,16 @@ export class FolderMenuComponent implements OnInit {
     }
 
     unclassifyDocuments(folder: any) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.unclassifyQuestion + ' <b>' + this.resIds.length + '</b>&nbsp;' + this.lang.mailsInFolder + ' ?' } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.unclassifyQuestion + ' <b>' + this.resIds.length + '</b>&nbsp;' + this.lang.mailsInFolder + ' ?' } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../../rest/folders/' + folder.id + '/resources', { body: { resources: this.resIds } })),
-            tap((data: any) => {
+            tap(() => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.foldersService.getPinnedFolders();
                 this.refreshList.emit();
+                this.refreshFolders.emit();
             })
         ).subscribe();
     }

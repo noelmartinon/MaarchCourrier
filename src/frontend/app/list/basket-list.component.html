@@ -1,21 +1,10 @@
     <mat-sidenav-container class="maarch-container">
-        <mat-sidenav #snavLeft class="panel-left" #snav [mode]="appService.getViewMode() ? 'over' : 'side'"
-            [fixedInViewport]="appService.getViewMode()" [opened]="appService.getViewMode() ? false : true" autoFocus="false"
-            style="overflow-x:hidden;" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">
-            <header-panel [snavLeft]="snav"></header-panel>
-            <menu-shortcut #menuShortcut></menu-shortcut>
-            <menu-nav></menu-nav>
-            <basket-home #basketHome (refreshEvent)="refreshDao()" [snavL]="snav"
-                [currentBasketInfo]="currentBasketInfo"></basket-home>
-            <mat-divider></mat-divider>
-            <panel-folder #panelFolder (refreshEvent)="refreshDao()"></panel-folder>
-        </mat-sidenav>
         <mat-sidenav-content>
             <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;"><img style="max-height: 100vh;" src="{{thumbnailUrl}}" /></mat-card>
             <div class="bg-head">
                 <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                     <div class="bg-head-title-label">
-                        <header-left [snavLeft]="snav"></header-left>
+                        <header-left></header-left>
                     </div>
                     <div class="bg-head-title-tool">
                        <header-right></header-right>
@@ -57,7 +46,7 @@
                             <span>
                                 <app-actions-list #actionsList (refreshEvent)="refreshDao()"
                                     [contextMode]="false" [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
-                                    [currentBasketInfo]="currentBasketInfo" [currentResource]="currentResource" (refreshPanelFolders)="panelFolder.refreshFoldersTree()"></app-actions-list>
+                                    [currentBasketInfo]="currentBasketInfo" [currentResource]="currentResource" (refreshPanelFolders)="foldersService.getFolders()"></app-actions-list>
                             </span>
                         </div>
                     </div>
@@ -209,5 +198,5 @@
         </mat-sidenav>
     </mat-sidenav-container>
     <app-actions-list (refreshEvent)="refreshDao()" (refreshEventAfterAction)="refreshDaoAfterAction()" #actionsListContext [contextMode]="true"
-        [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" [currentBasketInfo]="currentBasketInfo" (refreshPanelFolders)="panelFolder.refreshFoldersTree()">
+        [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" [currentBasketInfo]="currentBasketInfo" (refreshPanelFolders)="foldersService.getFolders()">
     </app-actions-list>

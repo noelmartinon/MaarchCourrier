@@ -50,11 +50,6 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Contacts group not found']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-        if ($contactsGroup['owner'] != $user['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
         $contactsGroup['labelledOwner'] = UserModel::getLabelledUserById(['id' => $contactsGroup['owner']]);
         $contactsGroup['contacts']      = ContactGroupController::getFormattedListById(['id' => $aArgs['id']])['list'];
         $contactsGroup['nbContacts']    = count($contactsGroup['contacts']);
@@ -72,8 +67,7 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-        $existingGroup = ContactGroupModel::get(['select' => [1], 'where' => ['label = ?', 'owner = ?'], 'data' => [$data['label'], $user['id']]]);
+        $existingGroup = ContactGroupModel::get(['select' => [1], 'where' => ['label = ?', 'owner = ?'], 'data' => [$data['label'], $GLOBALS['id']]]);
         if (!empty($existingGroup)) {
             return $response->withStatus(400)->withJson(['errors' => _CONTACTS_GROUP_LABEL_ALREADY_EXISTS]);
         }
@@ -89,7 +83,7 @@ class ContactGroupController
         }
 
         $data['public']       = $data['public'] ? 'true' : 'false';
-        $data['owner']        = $user['id'];
+        $data['owner']        = $GLOBALS['id'];
         $data['entity_owner'] = $entityOwner;
 
         $id = ContactGroupModel::create($data);
@@ -113,8 +107,7 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Contacts Group does not exist']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-        if ($contactsGroup['owner'] != $user['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+        if ($contactsGroup['owner'] != $GLOBALS['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -126,7 +119,7 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $existingGroup = ContactGroupModel::get(['select' => [1], 'where' => ['label = ?', 'owner = ?', 'id != ?'], 'data' => [$data['label'], $user['id'], $aArgs['id']]]);
+        $existingGroup = ContactGroupModel::get(['select' => [1], 'where' => ['label = ?', 'owner = ?', 'id != ?'], 'data' => [$data['label'], $GLOBALS['id'], $aArgs['id']]]);
         if (!empty($existingGroup)) {
             return $response->withStatus(400)->withJson(['errors' => _CONTACTS_GROUP_LABEL_ALREADY_EXISTS]);
         }
@@ -155,8 +148,7 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Contacts Group does not exist']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-        if ($contactsGroup['owner'] != $user['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+        if ($contactsGroup['owner'] != $GLOBALS['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -186,8 +178,7 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Contacts Group does not exist']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-        if ($contactsGroup['owner'] != $user['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+        if ($contactsGroup['owner'] != $GLOBALS['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -228,8 +219,7 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Contacts Group does not exist']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id'], 'login' => $GLOBALS['userId']]);
-        if ($contactsGroup['owner'] != $user['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+        if ($contactsGroup['owner'] != $GLOBALS['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 

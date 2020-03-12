@@ -57,132 +57,6 @@ abstract class SendmailAbstract extends Database
         $_SESSION['history']['maildel'] = (string) $hist->maildel;
     }
 
-    public function CheckEmailAdress($adress)
-    {
-        $error = '';
-        if (!empty($adress)) {
-            $adressArray = explode(',', trim($adress));
-            for ($i=0; $i < count($adressArray); $i++) {
-                if (!empty($adressArray[$i])) {
-                    $this->wash($adressArray[$i], 'mail', _EMAIL.": ".$adressArray[$i], 'yes', 0, 255);
-                    if (!empty($_SESSION['error'])) {
-                        $error .= $_SESSION['error'];
-                        $_SESSION['error']='';
-                    }
-                }
-            }
-            $error = str_replace("<br />", "###", $error);
-        }
-        return $error;
-    }
-
-    public function getJoinedFiles($coll_id, $table, $id, $from_res_attachment = false)
-    {
-        // $joinedFiles = array();
-        // $db = new Database();
-        // if ($from_res_attachment === false) {
-        //     $stmt = $db->query(
-        //         "select res_id, description, subject, title, format, filesize, relation from "
-        //         . $table . " where res_id = ? and status <> 'DEL'",
-        //         array($id)
-        //     );
-        // } else {
-        //     include_once 'modules/attachments/attachments_tables.php';
-        //     $stmt = $db->query(
-        //         "SELECT rva.res_id, rva.res_id_version, rva.description, rva.subject, rva.title, rva.format, rva.filesize, rva.res_id_master, rva.attachment_type, rva.identifier, cv2.society, cv2.firstname, cv2.lastname, rva.filename, rva.path
-        //         FROM res_view_attachments rva LEFT JOIN contacts_v2 cv2 ON rva.dest_contact_id = cv2.contact_id WHERE rva.res_id_master = ? and rva.coll_id = ? and rva.status <> 'DEL' and rva.status <> 'OBS' and rva.attachment_type NOT IN ('converted_pdf','print_folder') ORDER BY rva.attachment_type, rva.description",
-        //         array($id, $coll_id)
-        //     );
-        // }
-
-        // while ($res = $stmt->fetchObject()) {
-        //     $pdf_exist = true;
-        //     if ($from_res_attachment) {
-        //         require_once 'modules/attachments/class/attachments_controler.php';
-        //         $ac = new attachments_controler();
-        //         if ($res->res_id != 0) {
-        //             $idFile = $res->res_id;
-        //             $isVersion = false;
-        //         } else {
-        //             $idFile = $res->res_id_version;
-        //             $isVersion = true;
-        //         }
-        //         $convertedDocument =  \Convert\models\AdrModel::getConvertedDocumentById(['select' => ['docserver_id', 'path', 'filename'], 'type' => 'PDF', 'resId' => $idFile, 'collId' => 'attachments_coll', 'isVersion' => $isVersion]);
-        //         $viewLink = $_SESSION['config']['businessappurl']
-        //                 .'index.php?display=true&module=attachments&page=view_attachment&res_id_master='
-        //                 .$id.'&id='.$res->res_id;
-                
-        //         if (!empty($convertedDocument)) {
-        //             $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template']]);
-        //             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
-                    
-                    
-        //             if (!file_exists($pathToDocument)) {
-        //                 $pdf_exist = false;
-        //             }
-        //         } else {
-        //             $pdf_exist = false;
-        //         }
-        //     } else {
-        //         $idFile = $res->res_id;
-        //         $convertedDocument =  \Convert\models\AdrModel::getConvertedDocumentById(['select' => ['docserver_id', 'path', 'filename'], 'type' => 'PDF', 'resId' => $idFile, 'collId' => 'letterbox_coll', 'isVersion' => $isVersion]);
-        //         $viewLink = $_SESSION['config']['businessappurl']
-        //                 .'index.php?display=true&dir=indexing_searching&page=view_resource_controler&id='
-        //                 .$id;
-        //         if (!empty($convertedDocument)) {
-        //             $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template']]);
-        //             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
-                    
-        //             if (!file_exists($pathToDocument)) {
-        //                 $pdf_exist = false;
-        //             }
-        //         } else {
-        //             $pdf_exist = false;
-        //         }
-        //     }
-        //     $label = '';
-        //     //Tile, or subject or description
-        //     if (strlen(trim($res->title)) > 0) {
-        //         $label = $res->title;
-        //     } elseif (strlen(trim($res->subject)) > 0) {
-        //         $label = $res->subject;
-        //     } elseif (strlen(trim($res->description)) > 0) {
-        //         $label = $res->description;
-        //     }
-
-        //     array_push(
-        //         $joinedFiles,
-        //         array('id'            => $idFile, //ID
-        //             'label'           => $this->show_string($label), //Label
-        //             'format'          => $res->format, //Format
-        //             'filesize'        => $res->filesize, //Filesize
-        //             'is_version'      => $isVersion,
-        //             'pdf_exist'       => $pdf_exist,
-        //             'version'         => '',
-        //             'attachment_type' => $res->attachment_type,
-        //             'identifier'      => $res->identifier,
-        //             'society'         => $res->society,
-        //             'firstname'       => $res->firstname,
-        //             'lastname'        => $res->lastname,
-        //         )
-        //     );
-        // }
-
-        // return $joinedFiles;
-    }
-
-    public function rawToHtml($text)
-    {
-        //...
-        $text = str_replace("\r\n", PHP_EOL, $text);
-        $text = str_replace("\r", PHP_EOL, $text);
-        //
-
-        //$text = str_replace(PHP_EOL, "<br />", $text);
-        //
-        return $text;
-    }
-
     public function htmlToRaw($text)
     {
         //
@@ -194,57 +68,11 @@ abstract class SendmailAbstract extends Database
         return $text;
     }
 
-    public function updateAdressInputField($ajaxPath, $adressArray, $inputField, $readOnly = false)
-    {
-        $content = '';
-        //Init with loading div
-        $content .= '<div id="loading_'.$inputField.'" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></i></div>';
-        //Get info from session array and display tag
-        if (isset($adressArray[$inputField]) && count($adressArray[$inputField]) > 0) {
-            foreach ($adressArray[$inputField] as $key => $adress) {
-                if (!empty($adress)) {
-                    $content .= '<div class="email_element" id="'.$key.'_'.$adress.'">'.$adress;
-                    if ($readOnly === false) {
-                        $content .= '&nbsp;<div class="email_delete_button" id="'.$key.'"'
-                            . 'onclick="updateAdress(\''.$ajaxPath
-                            .'&mode=adress\', \'del\', \''.$adress.'\', \''
-                            .$inputField.'\', this.id);" alt="'._DELETE.'" title="'
-                            ._DELETE.'">x</div>';
-                    }
-                    $content .= '</div>';
-                }
-            }
-        }
-        return $content;
-    }
-
-    public function updateContactInputField($ajaxPath, $adressArray, $inputField, $readOnly = false)
-    {
-        $content = '<div id="loading_'.$inputField.'" style="display:none;"><i class="fa fa-spinner fa-spin" title="loading..."></i></div>';
-        //Get info from session array and display tag
-        if (isset($adressArray[$inputField]) && count($adressArray[$inputField]) > 0) {
-            foreach ($adressArray[$inputField] as $key => $adress) {
-                if (!empty($adress)) {
-                    $content .= '<div class="email_element" id="'.$key.'_'.$adress.'">'.$adress;
-                    if ($readOnly === false) {
-                        $content .= '&nbsp;<div class="email_delete_button" id="'.$key.'"'
-                            . 'onclick="updateDestUser(\''.$ajaxPath
-                            .'&mode=destUser\', \'del\', this.id, \''
-                            .$inputField.'\', this.id);" alt="'._DELETE.'" title="'
-                            ._DELETE.'">x</div>';
-                    }
-                    $content .= '</div>';
-                }
-            }
-        }
-        return $content;
-    }
-
     public function getResource($collectionArray, $coll_id, $res_id)
     {
         $viewResourceArr = array();
 
-        for ($i=0;$i<count($collectionArray);$i++) {
+        for ($i=0; $i<count($collectionArray); $i++) {
             if ($collectionArray[$i]['id'] == $coll_id) {
                 //Get table
                 $table = $collectionArray[$i]['table'];
@@ -387,131 +215,6 @@ abstract class SendmailAbstract extends Database
         return $viewAttachmentArr;
     }
 
-    public function getVersion($collectionArray, $coll_id, $res_id_master, $res_version)
-    {
-        $viewVersionArr = array();
-
-        //Parse collection
-        for ($i=0;$i<count($collectionArray);$i++) {
-            if ($collectionArray[$i]['id'] == $coll_id) {
-                //Get table
-                $table = $collectionArray[$i]['table'];
-                //Get adress
-                $adrTable = $collectionArray[$i]['adr'];
-                //Get versions table
-                $versionTable = $collectionArray[$i]['version_table'];
-                break;
-            }
-        }
-
-        //Have version table
-        if ($versionTable <> '') {
-            $db = new Database();
-            $stmt = $db->query(
-                "select res_id, description, subject, title, docserver_id, "
-                . "path, filename,format, filesize, relation from "
-                . $versionTable . " where res_id = ? and res_id_master = ? and status <> 'DEL'",
-                array($res_version, $res_id_master)
-            );
-            //$db->show();
-            //Have new version
-            if ($stmt->rowCount() > 0) {
-                $line = $stmt->fetchObject();
-                //Tile, or subject or description
-                if (strlen(trim($line->title)) > 0) {
-                    $label = $line->title;
-                } elseif (strlen(trim($line->subject)) > 0) {
-                    $label = $line->subject;
-                } elseif (strlen(trim($line->description)) > 0) {
-                    $label = $line->description;
-                }
-
-                //Get file from docserver
-                include_once 'core/core_tables.php';
-                include_once 'core/docservers_tools.php';
-
-                $docserver = $line->docserver_id;
-                $path = $line->path;
-                $filename = $line->filename;
-                $format = $line->format;
-                $stmt = $db->query(
-                    "select path_template from " . _DOCSERVERS_TABLE_NAME
-                    . " where docserver_id = ? ",
-                    array($docserver)
-                );
-                //$db->show();
-                $lineDoc = $stmt->fetchObject();
-                $docserver = $lineDoc->path_template;
-                $file = $docserver . $path . $filename;
-                $file = str_replace("#", DIRECTORY_SEPARATOR, $file);
-
-                //Is there a corresponding file?
-                if (file_exists($file)) {
-                    $mimeType = Ds_getMimeType($file);
-
-                    $fileNameOnTmp = 'tmp_file_' . rand()
-                        . '.' . strtolower($format);
-                    $filePathOnTmp = $_SESSION['config']
-                        ['tmppath'] . DIRECTORY_SEPARATOR
-                        . $fileNameOnTmp;
-                    copy($file, $filePathOnTmp);
-
-                    $viewVersionArr = array(
-                        'status' => 'ok',
-                        'label' => $this->show_string($label),
-                        'mime_type' => $mimeType,
-                        'ext' => $format,
-                        'file_content' => '',
-                        'tmp_path' => $_SESSION['config']
-                        ['tmppath'],
-                        'file_path' => $filePathOnTmp,
-                        'called_by_ws' => '',
-                        'error' => ''
-                    );
-                } else {
-                    $viewVersionArr = array(
-                        'status' => 'ko',
-                        'label' => '',
-                        'mime_type' => '',
-                        'ext' => '',
-                        'file_content' => '',
-                        'tmp_path' => '',
-                        'file_path' => '',
-                        'called_by_ws' => '',
-                        'error' => _FILE_NOT_EXISTS_ON_THE_SERVER
-                    );
-                }
-            } else {
-                $viewVersionArr = array(
-                    'status' => 'ko',
-                    'label' => '',
-                    'mime_type' => '',
-                    'ext' => '',
-                    'file_content' => '',
-                    'tmp_path' => '',
-                    'file_path' => '',
-                    'called_by_ws' => '',
-                    'error' => _NO_RIGHT_ON_RESOURCE_OR_RESOURCE_NOT_EXISTS
-                );
-            }
-        } else {
-            $viewVersionArr = array(
-                'status' => 'ko',
-                'label' => '',
-                'mime_type' => '',
-                'ext' => '',
-                'file_content' => '',
-                'tmp_path' => '',
-                'file_path' => '',
-                'called_by_ws' => '',
-                'error' => _NO_VERSION_TABLE_FOR_THIS_COLLECTION
-            );
-        }
-        // $this->show_array($viewVersionArr);
-
-        return $viewVersionArr;
-    }
-
     public function createFilename($label, $extension)
     {
         $search = array(
@@ -597,26 +300,6 @@ abstract class SendmailAbstract extends Database
         return $arrayEntitiesMails;
     }
 
-    public function checkAttachedEntitiesMails()
-    {
-        $db = new Database;
-        $core_tools = new core_tools();
-
-        $entitiesMails = array();
-        if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
-            $entitiesMails = $this->getAttachedEntitiesMails($_SESSION['user']['UserId']);
-        }
-
-        $stmt = $db->query("SELECT mail FROM users WHERE user_id = ? ", array($_SESSION['user']['UserId']));
-        $res = $stmt->fetchObject();
-
-        if ($res->mail<>"") {
-            $entitiesMails[$res->mail] = "";
-        }
-
-        return $entitiesMails;
-    }
-
     public function explodeSenderEmail($senderEmail)
     {
         if (strpos($senderEmail, ",") === false) {
@@ -624,19 +307,6 @@ abstract class SendmailAbstract extends Database
         } else {
             $explode = explode(",", $senderEmail);
             return $explode[1];
-        }
-    }
-
-    public function emailStatus(array $args)
-    {
-        if ($args['status'] == 'SENT') {
-            return _EMAIL_SENT;
-        } elseif ($args['status'] == 'ERROR') {
-            return _EMAIL_ERROR;
-        } elseif ($args['status'] == 'WAITING') {
-            return _EMAIL_WAIT;
-        } else {
-            return _EMAIL_DRAFT;
         }
     }
 }

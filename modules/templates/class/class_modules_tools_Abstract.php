@@ -79,37 +79,4 @@ abstract class templates_Abstract extends Database
             
         return $return;
     }
-    
-    
-    public function getAllItemsLinkedToModel($template_id, $field ='')
-    {
-        $db = new Database();
-        $items = array();
-        if (empty($template_id)) {
-            return $items;
-        }
-
-        if (empty($field)) {
-            $items['destination'] = [];
-            foreach (array_keys($items) as $key) {
-                $stmt2 = $db->query(
-                    "select value_field from ".$_SESSION['tablename']['temp_templates_association']." where template_id = ? ",
-                                    array($template_id)
-                        );
-                while ($res = $stmt2->fetchOject()) {
-                    array_push($items[$key], $res->value_field);
-                }
-            }
-        } else {
-            $items[$field] = [];
-            $stmt = $db->query(
-                "select value_field from ".$_SESSION['tablename']['temp_templates_association']." where template_id = ? ",
-                            array($template_id)
-                    );
-            while ($res = $stmt->fetchObject()) {
-                array_push($items[$field], $res->value_field);
-            }
-        }
-        return $items;
-    }
 }

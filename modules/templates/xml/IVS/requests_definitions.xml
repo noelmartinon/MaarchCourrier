@@ -17,16 +17,6 @@
         <parameter name="page" value="templates_management_controler"/>
         <parameter name="module" value="templates"/>
     </requestDefinition>
-	<requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="templates_ajax_content_for_mails" >
-        <parameter name="page" value="templates_ajax_content_for_mails"/>
-        <parameter name="module" value="templates"/>
-        <parameter name="display" value="true"/>
-    </requestDefinition>
-	<requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="templates_ajax_content_for_notes" >
-        <parameter name="page" value="templates_ajax_content_for_notes"/>
-        <parameter name="module" value="templates"/>
-        <parameter name="display" value="true"/>
-    </requestDefinition>
     <requestDefinition method="GET" path="/apps/maarch_entreprise/index.php" validationRule="file_iframe" >
         <parameter name="page" value="file_iframe"/>
         <parameter name="module" value="templates"/>

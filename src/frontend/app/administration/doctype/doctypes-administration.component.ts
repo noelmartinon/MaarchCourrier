@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
@@ -7,20 +7,19 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { AppService } from '../../../service/app.service';
 
 declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "doctypes-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 
 export class DoctypesAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -50,15 +49,16 @@ export class DoctypesAdministrationComponent implements OnInit {
         private notify: NotificationService, 
         public dialog: MatDialog, 
         private headerService: HeaderService,
-        public appService: AppService
+        public appService: AppService,
+        private viewContainerRef: ViewContainerRef
     ) {
         $j("link[href='merged_css.php']").remove();
     }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.documentTypes);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
+        
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
@@ -368,7 +368,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                         $j('#jstree').jstree('select_node', this.doctypes[0]);
                         this.notify.success(this.lang.documentTypeDeleted);
                     } else {
-                        this.config = { data: {count: data.deleted, types: data.doctypes} };
+                        this.config = { panelClass: 'maarch-modal', data: {count: data.deleted, types: data.doctypes} };
                         this.dialogRef = this.dialog.open(DoctypesAdministrationRedirectModalComponent, this.config);
                         this.dialogRef.afterClosed().subscribe((result: any) => {
                         if (result) {

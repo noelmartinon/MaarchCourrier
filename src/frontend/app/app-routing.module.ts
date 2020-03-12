@@ -10,13 +10,13 @@ import { BasketListComponent }              from './list/basket-list.component';
 import { SignatureBookComponent }           from './signature-book.component';
 import { SaveNumericPackageComponent }      from './save-numeric-package.component';
 import { PrintSeparatorComponent }          from './separator/print-separator/print-separator.component';
-import { AppGuard, AfterProcessGuard }     from '../service/app.guard';
+import { AppGuard, AfterProcessGuard }      from '../service/app.guard';
 import { FolderDocumentListComponent }      from './folder/document-list/folder-document-list.component';
 import { IndexationComponent }              from './indexation/indexation.component';
 import { ForgotPasswordComponent }          from './login/forgotPassword/forgotPassword.component';
 import { UpdatePasswordComponent }          from './login/updatePassword/updatePassword.component';
-import { ProcessComponent } from './process/process.component';
-import {FollowedDocumentListComponent} from "./home/followed-list/followed-document-list.component";
+import { ProcessComponent }                 from './process/process.component';
+import { FollowedDocumentListComponent }    from "./home/followed-list/followed-document-list.component";
 
 @NgModule({
     imports: [

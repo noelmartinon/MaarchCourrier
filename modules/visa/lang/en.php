@@ -1,13 +1,5 @@
 <?php
 
-if (!defined('_PRINTFOLDER')) {
-    define('_PRINTFOLDER', 'Print folder');
-}
-
-if (!defined('_NO_PDF_FILE')) {
-    define('_NO_PDF_FILE', 'No pdf file for this file');
-}
-
 // CIRCUIT DE VISA
 if (!defined('_VISA_WORKFLOW')) {
     define('_VISA_WORKFLOW', 'Visa workflow');
@@ -18,30 +10,12 @@ if (!defined('_INTERRUPT_WORKFLOW')) {
 if (!defined('_VISA_WORKFLOW_COMMENT')) {
     define('_VISA_WORKFLOW_COMMENT', 'Visa workflow management');
 }
-if (!defined('_VIEW_VISA_WORKFLOW')) {
-    define('_VIEW_VISA_WORKFLOW', 'Visa workflow view');
-}
-if (!defined('_VIEW_VISA_WORKFLOW_DESC')) {
-    define('_VIEW_VISA_WORKFLOW_DESC', 'Allows to view the visa workflow in the parts of diffusion list and in those of progress.');
-}
-if (!defined('_EMPTY_USER_LIST')) {
-    define('_EMPTY_USER_LIST', 'Users list is empty');
-}
-if (!defined('_EMPTY_VISA_WORKFLOW')) {
-    define('_EMPTY_VISA_WORKFLOW', 'No set visa flow');
-}
 
 if (!defined('_NO_VISA')) {
     define('_NO_VISA', 'No designed person on visa');
 }
 if (!defined('_NO_RESPONSE_PROJECT_VISA')) {
     define('_NO_RESPONSE_PROJECT_VISA', 'Please, integrate at least one attachment to signature book');
-}
-if (!defined('_NO_CONVERTED_PDF_VISA')) {
-    define('_NO_CONVERTED_PDF_VISA', 'Please edit your attachment(s)');
-}
-if (!defined('_PLEASE_CONVERT_PDF_VISA')) {
-    define('_PLEASE_CONVERT_PDF_VISA', 'Please edit the following attachments : ');
 }
 
 // CIRCUIT D"AVIS

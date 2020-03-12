@@ -72,8 +72,6 @@ export class DocumentViewerComponent implements OnInit {
     @Input('attachType') attachType: string = null;
     @Input('format') format: string = null;
 
-    @Input() sidenavLeft: MatSidenav = null;
-
     @Output('triggerEvent') triggerEvent = new EventEmitter<string>();
 
     private eventAction = new Subject<any>();
@@ -400,7 +398,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     cleanFile() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -435,9 +433,7 @@ export class DocumentViewerComponent implements OnInit {
             const objFile = JSON.parse(JSON.stringify(this.file));
             objFile.content = objFile.contentMode === 'route' ? null : objFile.content;
 
-            const myObservable = of(objFile);
-
-            return myObservable;
+            return of(objFile);
         }
     }
 
@@ -479,10 +475,10 @@ export class DocumentViewerComponent implements OnInit {
     isExtensionAllowed(file: any) {
         const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
         if (this.allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
-            this.dialog.open(AlertComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.notAllowedExtension + ' !', msg: this.lang.file + ' : <b>' + file.name + '</b>, ' + this.lang.type + ' : <b>' + file.type + '</b><br/><br/><u>' + this.lang.allowedExtensions + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.notAllowedExtension + ' !', msg: this.lang.file + ' : <b>' + file.name + '</b>, ' + this.lang.type + ' : <b>' + file.type + '</b><br/><br/><u>' + this.lang.allowedExtensions + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
             return false;
         } else if (file.size > this.maxFileSize && this.maxFileSize > 0) {
-            this.dialog.open(AlertComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.maxFileSizeReached + ' ! ', msg: this.lang.maxFileSize + ' : ' + this.maxFileSizeLabel } });
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.maxFileSizeReached + ' ! ', msg: this.lang.maxFileSize + ' : ' + this.maxFileSizeLabel } });
             return false;
         } else {
             return true;
@@ -618,7 +614,7 @@ export class DocumentViewerComponent implements OnInit {
         } else {
             confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmSecond;
         }
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.templateEdition, msg: confirmMsg } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.templateEdition, msg: confirmMsg } });
 
         this.dialogRef.afterClosed().pipe(
             tap((data: string) => {
@@ -765,11 +761,7 @@ export class DocumentViewerComponent implements OnInit {
 
     isEditingTemplate() {
         if (this.editor.mode === 'onlyoffice') {
-            if (this.onlyofficeViewer !== undefined) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.onlyofficeViewer !== undefined;
         } else {
             return this.editInProgress;
         }
@@ -908,7 +900,7 @@ export class DocumentViewerComponent implements OnInit {
                         encodedFile: data.content,
                         format: data.format,
                         resId: this.resId
-                    }
+                    };
                     return formatdatas;
                 }),
                 exhaustMap((data) => this.http.put(`../../rest/resources/${this.resId}?onlyDocument=true`, data)),
@@ -936,7 +928,7 @@ export class DocumentViewerComponent implements OnInit {
         this.http.get(`../../rest/resources/${this.resId}/content/${version}?type=${type}`).pipe(
             tap((data: any) => {
 
-                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, height: '90vh', width: '90vw', data: { title: `${title}`, base64: data.encodedDocument } });
+                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument } });
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -946,7 +938,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     unsignMainDocument() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.UNSIGN, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.UNSIGN, msg: this.lang.confirmAction } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -960,5 +952,13 @@ export class DocumentViewerComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    isEditorLoaded() {
+        if (this.isEditingTemplate()) {
+            return this.isEditingTemplate() && this.isDocModified;
+        } else {
+            return true;
+        }
     }
 }

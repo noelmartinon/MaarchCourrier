@@ -51,20 +51,14 @@ export class SendAvisParallelComponent implements AfterViewInit {
         this.loading = true;
         if (this.data.resIds.length === 0) {
             let res = await this.indexDocument();
-            if (res) {
-                res = await this.appAvisWorkflow.saveAvisWorkflow(this.data.resIds);
-            }
+
             if (res) {
                 this.executeAction(this.data.resIds);
             }
         } else {
             const realResSelected: number[] = this.data.resIds.filter((resId: any) => this.resourcesError.map(resErr => resErr.res_id).indexOf(resId) === -1);
 
-            const res = await this.appAvisWorkflow.saveAvisWorkflow(realResSelected);
-
-            if (res) {
-                this.executeAction(realResSelected);
-            }
+            this.executeAction(realResSelected);
         }
         this.loading = false;
     }

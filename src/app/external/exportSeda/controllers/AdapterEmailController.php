@@ -55,7 +55,7 @@ class AdapterEmailController
                 ]
             ]);
 
-            MessageExchangeModel::updateStatusMessage(['reference' => $messageObject->MessageIdentifier->value, 'status' => 'I']);
+            MessageExchangeModel::updateStatusMessage(['messageId' => $messageId, 'status' => 'I']);
         }
 
         return $res;

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,12 +14,12 @@ declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "notifications-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class NotificationsAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     notifications: any[] = [];
     loading: boolean = false;
@@ -54,6 +54,9 @@ export class NotificationsAdministrationComponent implements OnInit {
         filterValue = filterValue.trim(); // Remove whitespace
         filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
         this.dataSource.filter = filterValue;
+        this.dataSource.filterPredicate = (template, filter: string) => {
+            return this.functions.filterUnSensitive(template, filter, ['notification_id', 'description']);
+        };
     }
 
     constructor(
@@ -61,7 +64,8 @@ export class NotificationsAdministrationComponent implements OnInit {
         private notify: NotificationService, 
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private viewContainerRef: ViewContainerRef
     ) {
         $j("link[href='merged_css.php']").remove();
     }
@@ -69,9 +73,8 @@ export class NotificationsAdministrationComponent implements OnInit {
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.notifications);
 
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
-
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
+        
         this.loading = true;
 
         this.http.get('../../rest/notifications')

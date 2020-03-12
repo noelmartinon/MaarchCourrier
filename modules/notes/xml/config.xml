@@ -10,9 +10,4 @@
 		<not_notes>notes</not_notes>
 		<note_entities>note_entities</note_entities>
 	</TABLENAME>
-	<HISTORY>
-		<noteadd>true</noteadd>
-		<noteup>true</noteup>
-		<notedel>true</notedel>
-	</HISTORY>
 </root>

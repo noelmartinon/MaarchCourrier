@@ -163,3 +163,8 @@
 .comment:disabled {
     color: black;
 }
+
+.unauthorized {
+    color: $warn;
+    text-decoration: line-through;
+}

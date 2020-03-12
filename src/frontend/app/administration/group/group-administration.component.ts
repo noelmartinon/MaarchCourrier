@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -12,8 +12,7 @@ import { AppService } from '../../../service/app.service';
 import { PrivilegeService } from '../../../service/privileges.service';
 import { tap, catchError, exhaustMap, map, finalize, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
-import { MatSelectionList, MatDialog, MatSlideToggle } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 
 declare function $j(selector: any): any;
@@ -21,11 +20,10 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "group-administration.component.html",
     styleUrls: ['group-administration.component.scss'],
-    providers: [NotificationService, AppService, PrivilegeService]
+    providers: [AppService]
 })
 export class GroupAdministrationComponent implements OnInit {
-    /*HEADER*/
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
+
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
     lang: any = LANG;
@@ -54,7 +52,7 @@ export class GroupAdministrationComponent implements OnInit {
     @ViewChild('sortBaskets', { static: true }) sortBaskets: MatSort;
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild('sortUsers', { static: true }) sortUsers: MatSort;
-    @ViewChild('appShortcut', { static: false }) appShortcut: MenuShortcutComponent;
+
 
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim();
@@ -85,16 +83,14 @@ export class GroupAdministrationComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             if (typeof params['id'] == "undefined") {
-                this.headerService.setHeader(this.lang.groupCreation);
 
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
+                this.headerService.setHeader(this.lang.groupCreation);
 
                 this.creationMode = true;
                 this.loading = false;
             } else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
+                
+                
 
                 this.creationMode = false;
                 this.http.get("../../rest/groups/" + params['id'] + "/details")
@@ -271,11 +267,9 @@ export class GroupAdministrationComponent implements OnInit {
 
     }
 
-    resfreshShortcut() {
-        this.headerService.resfreshCurrentUser();
-        setTimeout(() => {
-            this.appShortcut.loadShortcuts();
-        }, 200);
+    async resfreshShortcut() {
+        await this.headerService.resfreshCurrentUser();
+        this.privilegeService.resfreshUserShortcuts();
     }
 
     getCurrentPrivListDiff(serviceId: string) {
@@ -308,7 +302,7 @@ export class GroupAdministrationComponent implements OnInit {
     toggleService(ev: any, service: any) {
         if (ev.checked) {
             if (service.id === 'admin_groups') {
-                const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.confirmAction, msg: this.lang.enableGroupMsg } });
+                const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirmAction, msg: this.lang.enableGroupMsg } });
 
                 dialogRef.afterClosed().pipe(
                     tap((data: string) => {

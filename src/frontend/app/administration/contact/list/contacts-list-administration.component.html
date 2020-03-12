@@ -1,9 +1,5 @@
 <mat-sidenav-container autosize class="maarch-container">
-    <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        [opened]="appService.getViewMode() ? false : true" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">
-        <header-panel [snavLeft]="snav"></header-panel>
-        <menu-shortcut></menu-shortcut>
-        <menu-nav></menu-nav>
+    <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader>{{lang.actions}}</h3>
             <a mat-list-item routerLink="/administration/contacts/list/new">
@@ -22,13 +18,12 @@
                 </p>
             </a>
         </mat-nav-list>
-        <mat-divider></mat-divider>
-    </mat-sidenav>
+    </ng-template>
     <mat-sidenav-content>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left [snavLeft]="snav"></header-left>
+                    <header-left></header-left>
                 </div>
                 <div class="bg-head-title-tool">
                     <header-right></header-right>
@@ -50,8 +45,8 @@
                         </mat-form-field>
                     </div>
                     <div class="table-head-tool">
-                        <mat-paginator #paginatorContactList [length]="resultsLength" [hidePageSize]="true" [pageSize]="10"
-                            class="paginatorResultList"></mat-paginator>
+                        <mat-paginator #paginatorContactList [length]="resultsLength" [hidePageSize]="true"
+                            [pageSize]="10" class="paginatorResultList"></mat-paginator>
                     </div>
                 </div>
                 <div style="height:90%;overflow:auto;position:absolute;width:100%;">
@@ -61,8 +56,10 @@
                             <mat-header-cell *matHeaderCellDef style="flex: initial;width: 60px;"
                                 [class.hide-for-mobile]="appService.getViewMode()">
                             </mat-header-cell>
-                            <mat-cell mat-cell *matCellDef="let element" style="flex: initial;width: 60px;" [class.hide-for-mobile]="appService.getViewMode()">
-                                <i class="fas fa-circle threshold_{{element.filling.thresholdLevel}}" [title]="lang.contactFilledTo + ' ' + element.filling.rate + '%'"></i>
+                            <mat-cell mat-cell *matCellDef="let element" style="flex: initial;width: 60px;"
+                                [class.hide-for-mobile]="appService.getViewMode()">
+                                <i class="fas fa-circle threshold_{{element.filling.thresholdLevel}}"
+                                    [title]="lang.contactFilledTo + ' ' + element.filling.rate + '%'"></i>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="firstname">
@@ -82,9 +79,11 @@
                                 {{element.company}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="formatedAddress">
-                            <mat-header-cell *matHeaderCellDef style="flex: 2;" [class.hide-for-mobile]="appService.getViewMode()">
+                            <mat-header-cell *matHeaderCellDef style="flex: 2;"
+                                [class.hide-for-mobile]="appService.getViewMode()">
                                 {{lang.address}}</mat-header-cell>
-                            <mat-cell *matCellDef="let element" style="flex: 2;" [class.hide-for-mobile]="appService.getViewMode()">
+                            <mat-cell *matCellDef="let element" style="flex: 2;"
+                                [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.formatedAddress}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="actions">
@@ -113,7 +112,7 @@
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{resultsLength}} {{lang.contacts}}</div>
+                        {{resultsLength}} {{lang.contactsAlt}}</div>
                 </div>
                 <div class="table-head">
                 </div>

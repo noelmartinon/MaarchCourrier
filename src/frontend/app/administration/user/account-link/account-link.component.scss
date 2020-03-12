@@ -1,8 +1,5 @@
 @import '../../../../css/vars.scss';
 
-.mat-dialog-title {
-    padding: 10px;
-}
 .avatarAccount {
     border: solid 3px #F99830;
     height: 45px !important;
@@ -10,12 +7,4 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-}
-
-.modal-container{
-    height: auto;
-}
-
-.modal-body{
-    min-height: auto;
 }

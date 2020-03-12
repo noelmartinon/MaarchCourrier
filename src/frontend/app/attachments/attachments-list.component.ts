@@ -82,7 +82,7 @@ export class AttachmentsListComponent implements OnInit {
                     this.attachments = data.attachments;
                     this.attachments.forEach((element: any) => {
                         if (this.filterAttachTypes.filter(attachType => attachType.id === element.type).length === 0) {
-                            this.filterAttachTypes.push( {
+                            this.filterAttachTypes.push({
                                 id: element.type,
                                 label: element.typeLabel
                             });
@@ -122,7 +122,7 @@ export class AttachmentsListComponent implements OnInit {
                 this.attachments = data.attachments;
                 this.attachments.forEach((element: any) => {
                     if (this.filterAttachTypes.filter(attachType => attachType.id === element.type).length === 0) {
-                        this.filterAttachTypes.push( {
+                        this.filterAttachTypes.push({
                             id: element.type,
                             label: element.typeLabel
                         });
@@ -176,7 +176,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     showAttachment(attachment: any) {
-        this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'modal-container', disableClose: true, data: { resId: attachment.resId} });
+        this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'attachment-modal-container', disableClose: true, data: { resId: attachment.resId } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),
@@ -191,7 +191,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     createAttachment() {
-        this.dialogRef = this.dialog.open(AttachmentCreateComponent, { disableClose: true, panelClass: 'modal-container', height: '90vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', data: { resIdMaster: this.resId } });
+        this.dialogRef = this.dialog.open(AttachmentCreateComponent, { disableClose: true, panelClass: 'attachment-modal-container', height: '90vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', data: { resIdMaster: this.resId } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),
@@ -207,7 +207,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     deleteAttachment(attachment: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -229,6 +229,6 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     openMaarchParapheurWorkflow(attachment: any) {
-        this.dialog.open(VisaWorkflowModalComponent, {data: {attachment : attachment}});
+        this.dialog.open(VisaWorkflowModalComponent, { panelClass: 'maarch-modal', data: { attachment: attachment } });
     }
 }

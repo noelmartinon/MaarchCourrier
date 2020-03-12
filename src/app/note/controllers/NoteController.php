@@ -125,6 +125,15 @@ class NoteController
             'eventId'   => 'noteadd'
         ]);
 
+        HistoryController::add([
+            'tableName' => 'res_letterbox',
+            'recordId'  => $body['resId'],
+            'eventType' => 'ADD',
+            'info'      => _NOTE_ADDED,
+            'moduleId'  => 'resource',
+            'eventId'   => 'resourceModification'
+        ]);
+
         return $response->withJson(['noteId' => $noteId]);
     }
 
@@ -134,7 +143,7 @@ class NoteController
             return $response->withStatus(403)->withJson(['errors' => 'Note out of perimeter']);
         }
 
-        $note = NoteModel::getById(['select' => ['user_id'], 'id' => $args['id']]);
+        $note = NoteModel::getById(['select' => ['user_id', 'identifier'], 'id' => $args['id']]);
         if (empty($note) || $note['user_id'] != $GLOBALS['id']) {
             return $response->withStatus(403)->withJson(['errors' => 'Note out of perimeter']);
         }
@@ -183,6 +192,15 @@ class NoteController
             'eventId'   => 'noteModification'
         ]);
 
+        HistoryController::add([
+            'tableName' => 'res_letterbox',
+            'recordId'  => $note['identifier'],
+            'eventType' => 'UP',
+            'info'      => _NOTE_UPDATED,
+            'moduleId'  => 'resource',
+            'eventId'   => 'resourceModification'
+        ]);
+
         return $response->withStatus(204);
     }
 
@@ -192,7 +210,7 @@ class NoteController
             return $response->withStatus(403)->withJson(['errors' => 'Note out of perimeter']);
         }
 
-        $note = NoteModel::getById(['select' => ['user_id'], 'id' => $args['id']]);
+        $note = NoteModel::getById(['select' => ['user_id', 'identifier'], 'id' => $args['id']]);
         if (empty($note) || $note['user_id'] != $GLOBALS['id']) {
             return $response->withStatus(403)->withJson(['errors' => 'Note out of perimeter']);
         }
@@ -213,6 +231,15 @@ class NoteController
             'info'      => _NOTE_DELETED,
             'moduleId'  => 'notes',
             'eventId'   => 'noteSuppression'
+        ]);
+
+        HistoryController::add([
+            'tableName' => 'res_letterbox',
+            'recordId'  => $note['identifier'],
+            'eventType' => 'DEL',
+            'info'      => _NOTE_DELETED,
+            'moduleId'  => 'resource',
+            'eventId'   => 'resourceModification'
         ]);
 
         return $response->withStatus(204);

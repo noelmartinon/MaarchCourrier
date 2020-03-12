@@ -23,24 +23,8 @@
     <validationRule name="vi_checkSignFile" extends="standardForm" mode="error">
     	<parameter name="res_id" type="integer" />
     </validationRule>
-    <validationRule name="vi_create_sep" extends="standardForm" mode="error">
-    	<parameter name="service" type="string" />
-    	<parameter name="path" type="string" />
-    	<parameter name="label" type="string" />
-    </validationRule>
     <validationRule name="vi_encodePinCode" extends="standardForm" mode="error">
     	<parameter name="pinCode" type="string" />
-    </validationRule>
-    <validationRule name="vi_load_listmodel_visa" extends="standardForm" mode="error">
-    	<parameter name="objectType" type="identifier" />
-		<parameter name="objectId" type="identifier" />
-    </validationRule>
-    <validationRule name="vi_getVisaModelByTitle" extends="standardForm" mode="error">
-        <parameter name="title" type="string" />
-    </validationRule>
-    <validationRule name="vi_saveVisaModel" extends="standardForm" mode="error">
-    	<parameter name="title" type="string" />
-    	<parameter name="userList" type="string" />
     </validationRule>
     <validationRule name="vi_saveVisaWF" extends="standardForm" mode="error">
     	<parameter name="res_id" type="integer" />

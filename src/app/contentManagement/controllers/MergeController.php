@@ -346,13 +346,34 @@ class MergeController
             $args['path'] = null;
         }
 
+        $barcodeFile = CoreConfigModel::getTmpPath() . mt_rand() ."_{$args['userId']}_barcode.png";
+        $generator = new \PiBarCode();
+        $generator->setCode($args['chrono']);
+        $generator->setType('C128');
+        $generator->setSize(30, 50);
+        $generator->setText($args['chrono']);
+        $generator->hideCodeType();
+        $generator->setFiletype('PNG');
+        $generator->writeBarcodeFile($barcodeFile);
+
         if (!empty($args['path'])) {
             if ($extension == 'odt') {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
-            //            $tbs->LoadTemplate("{$args['path']}#content.xml;styles.xml", OPENTBS_ALREADY_UTF8);
             } elseif ($extension == 'docx') {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
-            //            $tbs->LoadTemplate("{$args['path']}#word/header1.xml;word/footer1.xml", OPENTBS_ALREADY_UTF8);
+                $templates = ['word/header1.xml', 'word/header2.xml', 'word/header3.xml', 'word/footer1.xml', 'word/footer2.xml', 'word/footer3.xml'];
+                foreach ($templates as $template) {
+                    if ($tbs->Plugin(OPENTBS_FILEEXISTS, $template)) {
+                        $tbs->LoadTemplate("#{$template}", OPENTBS_ALREADY_UTF8);
+                        if ($args['type'] == 'resource') {
+                            $tbs->MergeField('res_letterbox', ['alt_identifier' => $args['chrono']]);
+                        } elseif ($args['type'] == 'attachment') {
+                            $tbs->MergeField('attachment', ['chrono' => $args['chrono']]);
+                        }
+                        $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile]);
+                    }
+                }
+                $tbs->PlugIn(OPENTBS_SELECT_MAIN);
             } else {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
             }
@@ -363,15 +384,6 @@ class MergeController
         } elseif ($args['type'] == 'attachment') {
             $tbs->MergeField('attachment', ['chrono' => $args['chrono']]);
         }
-        $barcodeFile = CoreConfigModel::getTmpPath() . mt_rand() ."_{$args['userId']}_barcode.png";
-        $generator = new \PiBarCode();
-        $generator->setCode($args['chrono']);
-        $generator->setType('C128');
-        $generator->setSize(30, 50);
-        $generator->setText($args['chrono']);
-        $generator->hideCodeType();
-        $generator->setFiletype('PNG');
-        $generator->writeBarcodeFile($barcodeFile);
 
         $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile]);
 

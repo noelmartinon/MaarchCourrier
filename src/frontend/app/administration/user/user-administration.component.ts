@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -14,7 +14,6 @@ import { HeaderService } from '../../../service/header.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AccountLinkComponent } from './account-link/account-link.component';
 import { AppService } from '../../../service/app.service';
-import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
 import { PrivilegeService } from '../../../service/privileges.service';
 
 declare function $j(selector: any): any;
@@ -22,11 +21,12 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "user-administration.component.html",
     styleUrls: ['user-administration.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class UserAdministrationComponent implements OnInit {
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
+
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
     loading: boolean = false;
@@ -88,8 +88,6 @@ export class UserAdministrationComponent implements OnInit {
     canViewPersonalDatas: boolean = false;
     canManagePersonalDatas: boolean = false;
 
-    @ViewChild('appShortcut', { static: false }) appShortcut: MenuShortcutComponent;
-
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
     applyFilter(filterValue: string) {
@@ -123,7 +121,8 @@ export class UserAdministrationComponent implements OnInit {
         private headerService: HeaderService, 
         private _formBuilder: FormBuilder,
         public appService: AppService,
-        private privilegeService: PrivilegeService
+        private privilegeService: PrivilegeService,
+        private viewContainerRef: ViewContainerRef
     ) {
         $j("link[href='merged_css.php']").remove();
         window['angularUserAdministrationComponent'] = {
@@ -136,9 +135,10 @@ export class UserAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.route.params.subscribe((params: any) => {
+
+            this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
+
             if (typeof params['id'] == "undefined") {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
 
                 this.headerService.setHeader(this.lang.userCreation);
                 this.creationMode = true;
@@ -146,8 +146,6 @@ export class UserAdministrationComponent implements OnInit {
                 this.canManagePersonalDatas = this.privilegeService.hasCurrentUserPrivilege('manage_personal_data');
                 this.loading = false;
             } else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
 
                 this.creationMode = false;
                 this.serialId = params['id'];
@@ -163,7 +161,9 @@ export class UserAdministrationComponent implements OnInit {
                             this.canManagePersonalDatas = this.privilegeService.hasCurrentUserPrivilege('manage_personal_data');
                         }
                         
-                        
+                        if (this.canManagePersonalDatas) {
+                            this.canViewPersonalDatas = true;
+                        }
                         if (!this.canViewPersonalDatas) {
                             this.user.phone = '****';
                         }
@@ -203,7 +203,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     linkMaarchParapheurAccount() {
-        const dialogRef = this.dialog.open(AccountLinkComponent, { autoFocus: false, data: { user: this.user } });
+        const dialogRef = this.dialog.open(AccountLinkComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { user: this.user } });
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 if (result.inMaarchParapheur) {
@@ -389,14 +389,12 @@ export class UserAdministrationComponent implements OnInit {
                 "role": group.role
             };
             this.http.post("../../rest/users/" + this.serialId + "/groups", groupReq)
-                .subscribe((data: any) => {
+                .subscribe(async (data: any) => {
                     this.user.groups = data.groups;
                     this.user.baskets = data.baskets;
                     if (this.headerService.user.id == this.serialId) {
-                        this.headerService.resfreshCurrentUser();
-                        setTimeout(() => {
-                            this.appShortcut.loadShortcuts();   
-                        }, 200); 
+                        await this.headerService.resfreshCurrentUser();
+                        this.privilegeService.resfreshUserShortcuts();
                     }
                     this.notify.success(this.lang.groupAdded);
                 }, (err) => {
@@ -404,15 +402,13 @@ export class UserAdministrationComponent implements OnInit {
                 });
         } else {
             this.http.delete("../../rest/users/" + this.serialId + "/groups/" + group.group_id)
-                .subscribe((data: any) => {
+                .subscribe(async (data: any) => {
                     this.user.groups = data.groups;
                     this.user.baskets = data.baskets;
                     this.user.redirectedBaskets = data.redirectedBaskets;
                     if (this.headerService.user.id == this.serialId) {
-                        this.headerService.resfreshCurrentUser();
-                        setTimeout(() => {
-                            this.appShortcut.loadShortcuts();   
-                        }, 200); 
+                        await this.headerService.resfreshCurrentUser();
+                        this.privilegeService.resfreshUserShortcuts();
                     }
                     this.notify.success(this.lang.groupDeleted);
                 }, (err) => {
@@ -486,7 +482,7 @@ export class UserAdministrationComponent implements OnInit {
                             this.notify.error(err.error.errors);
                         });
                 } else {
-                    this.config = { data: { hasConfidentialityInstances: data['hasConfidentialityInstances'], hasListTemplates: data['hasListTemplates'] } };
+                    this.config = { panelClass: 'maarch-modal', data: { hasConfidentialityInstances: data['hasConfidentialityInstances'], hasListTemplates: data['hasListTemplates'] } };
                     this.dialogRef = this.dialog.open(UserAdministrationRedirectModalComponent, this.config);
                     this.dialogRef.afterClosed().subscribe((result: any) => {
                         this.mode = 'delete';

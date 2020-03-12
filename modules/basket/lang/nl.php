@@ -303,15 +303,6 @@ if (!defined('_MISSING')) {
 if (!defined('_BACK_FROM_VACATION')) {
     define('_BACK_FROM_VACATION', 'bij terugkeer na afwezigheid');
 }
-if (!defined('_MISSING_ADVERT_TITLE')) {
-    define('_MISSING_ADVERT_TITLE', 'Afwezigheidsbeheer');
-}
-if (!defined('_MISSING_ADVERT_01')) {
-    define('_MISSING_ADVERT_01', 'Deze account is momenteel in “afwezigheids”modus gezet en de brieven worden naar een andere gebruiker omgeleid.');
-}
-if (!defined('_MISSING_ADVERT_02')) {
-    define('_MISSING_ADVERT_02', 'Indien u zich met deze account wil verbinden, zal de modus “afwezig” verwijderd worden.<br/> De omleiding van de brieven zal voltooid worden en de applicatie zal opnieuw ingeschakeld worden');
-}
 if (!defined('_MISSING_CHOOSE')) {
     define('_MISSING_CHOOSE', 'Wilt u verdergaan?');
 }

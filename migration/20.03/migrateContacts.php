@@ -206,6 +206,10 @@ foreach ($customs as $custom) {
             }
         }
 
+        if ($contactInfo['creation_date'] == 'NULL') {
+            $contactInfo['creation_date'] = 'NOW()';
+        }
+
         $contact = $id . $contactInfoSeparator
             . $contactInfo['civility'] . $contactInfoSeparator
             . $contactInfo['firstname'] . $contactInfoSeparator
@@ -375,8 +379,9 @@ foreach ($customs as $custom) {
     $valuesOld= '';
     $firstDone = false;
     foreach ($ids as $newId => $value) {
-        $oldAddressId = $value['oldAddressId'];
-        $oldContactId = $value['oldContactId'];
+        $oldAddressId = !empty($value['oldAddressId']) ? $value['oldAddressId'] : 'NULL';
+        $oldContactId = !empty($value['oldContactId']) ? $value['oldContactId'] : 'NULL';
+
         if ($firstDone) {
             $valuesOld .= ', ';
         }
@@ -436,7 +441,7 @@ function addCustomFields($args = [])
         'table'  => ['contacts_filling']
     ]);
 
-    $fillingValues = json_decode($fillingValues[0]['rating_columns']);
+    $fillingValues = json_decode($fillingValues[0]['rating_columns'], true);
 
     $customFields = [];
     $aValues      = [];
@@ -643,7 +648,7 @@ function migrateContactParameters()
         'table'  => ['contacts_filling']
     ]);
 
-    $fillingValues = json_decode($fillingValues[0]['rating_columns']);
+    $fillingValues = json_decode($fillingValues[0]['rating_columns'], true);
 
     $contactParameters = [
         ['oldIdentifier' => 'title',                'identifier' => 'civility',             'mandatory' => 'false', 'filling' => 'false', 'searchable' => 'false', 'displayable' => 'false'],

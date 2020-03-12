@@ -81,7 +81,7 @@ class ListInstanceController
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
 
             $listInstances[$key]['hasPrivilege'] = true;
-            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['id']])) {
+            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['id']])) {
                 $listInstances[$key]['hasPrivilege'] = false;
             }
         }
@@ -100,8 +100,9 @@ class ListInstanceController
             $listInstances[$key]['item_id'] = $listInstances[$key]['id'];
             $listInstances[$key]['item_type'] = 'user';
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+
             $listInstances[$key]['hasPrivilege'] = true;
-            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['id']])) {
+            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['id']])) {
                 $listInstances[$key]['hasPrivilege'] = false;
             }
         }
@@ -149,7 +150,7 @@ class ListInstanceController
             return $response->withStatus($controller['code'])->withJson(['errors' => $controller['errors']]);
         }
 
-        $resIds = array_column($body['data'], 'resId');
+        $resIds = array_column($body, 'resId');
         $resIds = array_unique($resIds);
         foreach ($resIds as $resId) {
             HistoryController::add([

@@ -140,3 +140,12 @@
 .valid {
     color: $accent;
 }
+
+.invalid {
+    color: $warn;
+}
+
+.unauthorized {
+    color: $warn;
+    text-decoration: line-through;
+}

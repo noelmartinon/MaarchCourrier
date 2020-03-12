@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -6,29 +6,29 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
+import { FunctionsService } from "../../../service/functions.service";
 
 declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "baskets-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class BasketsAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang                            : any       = LANG;
-    loading                         : boolean   = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    baskets                         : any[]     = [];
-    basketsOrder                    : any[]     = [];
+    baskets: any[] = [];
+    basketsOrder: any[] = [];
 
-    displayedColumns    = ['basket_id', 'basket_name', 'basket_desc', 'actions'];
-    dataSource          : any;
+    displayedColumns = ['basket_id', 'basket_name', 'basket_desc', 'actions'];
+    dataSource: any;
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -36,22 +36,25 @@ export class BasketsAdministrationComponent implements OnInit {
         filterValue = filterValue.trim(); // Remove whitespace
         filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
         this.dataSource.filter = filterValue;
+        this.dataSource.filterPredicate = (template: any, filter: string) => {
+            return this.functions.filterUnSensitive(template, filter, ['basket_id', 'basket_name', 'basket_desc']);
+        };
     }
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService
-        ) {
-            $j("link[href='merged_css.php']").remove();
+        public functions: FunctionsService,
+        private viewContainerRef: ViewContainerRef
+    ) {
+        $j("link[href='merged_css.php']").remove();
     }
 
     ngOnInit(): void {
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.baskets);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
 
         this.loading = true;
 

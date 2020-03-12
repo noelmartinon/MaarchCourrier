@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
@@ -43,7 +43,6 @@ export class ProcessComponent implements OnInit {
     loading: boolean = true;
 
     detailMode: boolean = false;
-    navButton: any = null;
     isMailing: boolean = false;
 
     currentResourceLock: any = null;
@@ -146,8 +145,8 @@ export class ProcessComponent implements OnInit {
     };
 
 
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
     @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
@@ -186,7 +185,7 @@ export class ProcessComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu', 'form');
         this.headerService.setHeader(this.lang.eventProcessDoc);
 
         this.route.params.subscribe(params => {            
@@ -234,7 +233,7 @@ export class ProcessComponent implements OnInit {
             mailtracking: false
         };
 
-        this.navButton = { 
+        this.headerService.sideBarButton = { 
             icon: 'fa fa-inbox', 
             label: this.lang.backBasket, 
             route: `/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`
@@ -248,7 +247,7 @@ export class ProcessComponent implements OnInit {
 
         if (this.appService.getViewMode()) {
             setTimeout(() => {
-                this.sidenavLeft.open();
+                this.headerService.sideNavLeft.open();
             }, 800);
         }
 
@@ -285,7 +284,7 @@ export class ProcessComponent implements OnInit {
             resId: params['detailResId'],
             mailtracking: false
         };
-        this.navButton = { 
+        this.headerService.sideBarButton = { 
             icon: 'fas fa-arrow-left', 
             label: this.lang.back, 
             route: `__GOBACK`
@@ -298,7 +297,7 @@ export class ProcessComponent implements OnInit {
 
         if (this.appService.getViewMode()) {
             setTimeout(() => {
-                this.sidenavLeft.open();
+                this.headerService.sideNavLeft.open();
             }, 800);
         }
     }
@@ -579,12 +578,13 @@ export class ProcessComponent implements OnInit {
                     }),
                     filter((data: string) => data === 'ok'),
                     tap(async () => {
-                        this.saveTool();
+                        await this.saveTool();
                         if (this.appDocumentViewer.isEditingTemplate()) {
                             await this.appDocumentViewer.saveMainDocument();
                         }
+
+                        this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false)
                     }),
-                    finalize(() => this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false)),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
                         return of(false);
@@ -695,7 +695,7 @@ export class ProcessComponent implements OnInit {
     }
 
     openConfirmModification() {
-        return this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.saveModifiedData, buttonValidate: this.lang.yes, buttonCancel: this.lang.no } });
+        return this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.saveModifiedData, buttonValidate: this.lang.yes, buttonCancel: this.lang.no } });
     }
 
     confirmModification() {
@@ -705,13 +705,23 @@ export class ProcessComponent implements OnInit {
         }, 400);
     }
 
+    async saveModificationBeforeClose() {
+        if (this.isToolModified() && !this.isModalOpen()) {
+            await this.saveTool();
+        }
+
+        if (this.appDocumentViewer.isEditingTemplate()) {
+            await this.appDocumentViewer.saveMainDocument();
+        }
+    }
+
     refreshBadge(nbRres: any, id: string) {
         this.processTool.filter(tool => tool.id === id)[0].count = nbRres;
     }
 
     openContact() {
         if (this.hasContact) {
-            this.dialog.open(ContactsListModalComponent, { data: { title: `${this.currentResourceInformations.chrono} - ${this.currentResourceInformations.subject}`, mode: this.currentResourceInformations.categoryId !== 'outgoing' ? 'senders' : 'recipients', resId: this.currentResourceInformations.resId } });
+            this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${this.currentResourceInformations.chrono} - ${this.currentResourceInformations.subject}`, mode: this.currentResourceInformations.categoryId !== 'outgoing' ? 'senders' : 'recipients', resId: this.currentResourceInformations.resId } });
         }
     }
 
@@ -747,7 +757,9 @@ export class ProcessComponent implements OnInit {
 
     async saveTool() {
         if (this.currentTool === 'info' && this.indexingForm !== undefined) {
+            console.log('saving data...');
             await this.indexingForm.saveData();
+            console.log('data saved !');
         } else if (this.currentTool === 'diffusionList' && this.appDiffusionsList !== undefined) {
             await this.appDiffusionsList.saveListinstance();
             this.loadBadges();
@@ -813,6 +825,6 @@ export class ProcessComponent implements OnInit {
     }
 
     openPrintedFolderPrompt() {
-        this.dialog.open(PrintedFolderModalComponent, { data: { resId: this.currentResourceInformations.resId } });
+        this.dialog.open(PrintedFolderModalComponent, { panelClass: 'maarch-modal', data: { resId: this.currentResourceInformations.resId } });
     }
 }

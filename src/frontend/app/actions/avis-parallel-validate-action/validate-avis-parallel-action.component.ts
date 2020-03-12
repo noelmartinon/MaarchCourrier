@@ -14,7 +14,7 @@ import { HeaderService } from '../../../service/header.service';
     templateUrl: "validate-avis-parallel-action.component.html",
     styleUrls: ['validate-avis-parallel-action.component.scss'],
 })
-export class ValidateAvisParallelComponent implements AfterViewInit {
+export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
 
     lang: any = LANG;
     loading: boolean = false;

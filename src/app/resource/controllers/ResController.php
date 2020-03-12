@@ -534,7 +534,7 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if (!empty($convertedDocument['fingerprint']) && $convertedDocument['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -846,7 +846,7 @@ class ResController extends ResourceControlController
         }
 
         $queryParams = $request->getQueryParams();
-        if ($args['fieldId'] == 'destination' && !empty($queryParams['alt'])) {
+        if ($args['fieldId'] == 'destination' && !empty($queryParams['alt']) && !empty($resource['destination'])) {
             $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['id']]);
             $resource['destination'] = $entity['id'];
         }
@@ -1062,6 +1062,9 @@ class ResController extends ResourceControlController
             'data'   => [$GLOBALS['userId']]
         ]);
         $entities = array_column($entities, 'id');
+        if (empty($entities)) {
+            $entities = [0];
+        }
         $idToDelete = FolderModel::getWithEntitiesAndResources([
             'select'    => ['resources_folders.id'],
             'where'     => ['resources_folders.res_id = ?', '(entities_folders.entity_id in (?) OR folders.user_id = ? OR keyword = ?)'],

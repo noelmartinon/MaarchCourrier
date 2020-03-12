@@ -142,7 +142,7 @@ class DoctypeController
             'description'                   => $data['description'],
             'doctypes_first_level_id'       => $data['doctypes_first_level_id'],
             'doctypes_second_level_id'      => $data['doctypes_second_level_id'],
-            'retention_final_disposition'   => $data['retention_final_disposition'],
+            'retention_final_disposition'   => empty($data['retention_final_disposition']) ? null : $data['retention_final_disposition'],
             'retention_rule'                => $data['retention_rule'],
             'duration_current_use'          => $data['duration_current_use'],
             "process_delay"                 => $data['process_delay'],

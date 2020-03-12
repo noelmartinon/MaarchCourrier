@@ -1,9 +1,5 @@
 <mat-sidenav-container autosize class="maarch-container">
-    <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        [opened]="appService.getViewMode() ? false : true" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">
-        <header-panel [snavLeft]="snav"></header-panel>
-        <menu-shortcut></menu-shortcut>
-        <menu-nav></menu-nav>
+    <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <a mat-list-item *ngFor="let menu of subMenus" [class.active]="menu.current" [routerLink]="menu.route">
                 <mat-icon color="primary" mat-list-icon [class]="menu.icon"></mat-icon>
@@ -12,13 +8,12 @@
                 </p>
             </a>
         </mat-nav-list>
-        <mat-divider></mat-divider>
-    </mat-sidenav>
+    </ng-template>
     <mat-sidenav-content>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left [snavLeft]="snav"></header-left>
+                    <header-left></header-left>
                 </div>
                 <div class="bg-head-title-tool">
                     <header-right></header-right>
@@ -30,14 +25,15 @@
                         <mat-label style="color:white;">{{lang.since}}
                         </mat-label>
                         <input [(ngModel)]="appHistoryList.startDateFilter" matInput [matDatepicker]="startPicker"
-                            [placeholder]="lang.since" [max]="appHistoryList.endDateFilter" readonly style="cursor:pointer;"
-                            (dateChange)="appHistoryList.filterStartDate()">
+                            [placeholder]="lang.since" [max]="appHistoryList.endDateFilter" readonly
+                            style="cursor:pointer;" (dateChange)="appHistoryList.filterStartDate()">
                         <mat-datepicker-toggle matSuffix [for]="startPicker" *ngIf="!appHistoryList.startDateFilter">
                         </mat-datepicker-toggle>
                         <mat-datepicker [touchUi]="appService.getViewMode()" #startPicker>
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="appHistoryList.startDateFilter"
-                            (click)="$event.stopPropagation();appHistoryList.startDateFilter = '';appHistoryList.filterStartDate()" [title]="lang.eraseValue">
+                            (click)="$event.stopPropagation();appHistoryList.startDateFilter = '';appHistoryList.filterStartDate()"
+                            [title]="lang.eraseValue">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>
@@ -46,14 +42,15 @@
                         <mat-label style="color:white;">{{lang.until}}
                         </mat-label>
                         <input [(ngModel)]="appHistoryList.endDateFilter" matInput [matDatepicker]="endPicker"
-                            [placeholder]="lang.until" [min]="appHistoryList.startDateFilter" readonly style="cursor:pointer;"
-                            (dateChange)="appHistoryList.filterEndDate()">
+                            [placeholder]="lang.until" [min]="appHistoryList.startDateFilter" readonly
+                            style="cursor:pointer;" (dateChange)="appHistoryList.filterEndDate()">
                         <mat-datepicker-toggle matSuffix [for]="endPicker" *ngIf="!appHistoryList.endDateFilter">
                         </mat-datepicker-toggle>
                         <mat-datepicker [touchUi]="appService.getViewMode()" #endPicker>
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="appHistoryList.endDateFilter"
-                            (click)="$event.stopPropagation();appHistoryList.endDateFilter = '';appHistoryList.filterEndDate()" [title]="lang.eraseValue">
+                            (click)="$event.stopPropagation();appHistoryList.endDateFilter = '';appHistoryList.filterEndDate()"
+                            [title]="lang.eraseValue">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>

@@ -54,6 +54,7 @@ export class ToolsListComponent implements OnInit {
 
     openExport(): void {
         this.dialog.open(ExportComponent, {
+            panelClass: 'maarch-modal',
             width: '800px',
             data: {
                 ownerId: this.currentBasketInfo.ownerId,
@@ -66,7 +67,7 @@ export class ToolsListComponent implements OnInit {
 
     openSummarySheet(): void {
         this.dialog.open(SummarySheetComponent, {
-            panelClass: 'summary-sheet-dialog',
+            panelClass: 'maarch-full-height-modal',
             width: '800px',
             data: {
                 ownerId: this.currentBasketInfo.ownerId,

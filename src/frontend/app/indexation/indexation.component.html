@@ -1,9 +1,5 @@
 <mat-sidenav-container class="maarch-container">
-    <mat-sidenav #snavLeft class="panel-left" #snav [mode]="appService.getViewMode() ? 'over' : 'side'"
-        [fixedInViewport]="appService.getViewMode()" [opened]="appService.getViewMode() ? false : true"
-        autoFocus="false" style="overflow-x:hidden;" [ngStyle]="{'width': appService.getViewMode() ? '95%' : '600px'}">
-        <header-panel [snavLeft]="snav" [navButton]="{icon: 'fa fa-home', label: lang.backHome, route : '/home'}">
-        </header-panel>
+    <ng-template #adminMenuTemplate>
         <ng-container *ngIf="indexingModels.length > 0">
             <div class="listModels">
                 <button mat-button class="button-form-primary listModels-button"
@@ -57,7 +53,8 @@
             </div>
             <div class="indexing-form-container">
                 <app-indexing-form *ngIf="currentIndexingModel.id !== undefined" #indexingForm
-                    [groupId]="currentGroupId" [indexingFormId]="currentIndexingModel.id" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
+                    [groupId]="currentGroupId" [indexingFormId]="currentIndexingModel.id"
+                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
             </div>
             <div class="actions-indexing-form">
                 <ng-container
@@ -105,12 +102,12 @@
             </div>
         </ng-container>
         <div *ngIf="indexingModels.length === 0" class="emptyModel" [innerHTML]="lang.noAvailableIndexingModel"></div>
-    </mat-sidenav>
+    </ng-template>
     <mat-sidenav-content>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left [snavLeft]="snav"></header-left>
+                    <header-left></header-left>
                 </div>
                 <div class="bg-head-title-tool">
                     <header-right></header-right>
@@ -119,15 +116,10 @@
         </div>
         <div class="document-container" [class.fullContainer]="appService.getViewMode()">
             <div class="content">
-                <app-document-viewer #appDocumentViewer [editMode]="true" [tmpFilename]="tmpFilename" (triggerEvent)="refreshDatas()" [sidenavLeft]="sidenavLeft"
-                    style="height:100%;width:100%;">
+                <app-document-viewer #appDocumentViewer [editMode]="true" [tmpFilename]="tmpFilename"
+                    (triggerEvent)="refreshDatas()" style="height:100%;width:100%;">
                 </app-document-viewer>
             </div>
         </div>
     </mat-sidenav-content>
-    <mat-sidenav #snav2 [fixedInViewport]="appService.getViewMode()" position='end'
-        [opened]="appService.getViewMode() ? false : false" [mode]="appService.getViewMode() ? 'over' : 'side'"
-        class="panel-right" style="overflow-x:hidden;" [class.docView]="!filtersListService.filterMode"
-        [ngStyle]="{'width': appService.getViewMode() ? '80%' : '30%'}" autoFocus="false">
-    </mat-sidenav>
 </mat-sidenav-container>

@@ -1,9 +1,5 @@
 <mat-sidenav-container class="maarch-container">
-    <mat-sidenav #snavLeft class="panel-left" #snav [mode]="appService.getViewMode() ? 'over' : 'side'"
-        [fixedInViewport]="appService.getViewMode()" [opened]="appService.getViewMode() ? false : true"
-        autoFocus="false" style="overflow-x:hidden;" [ngStyle]="{'width': appService.getViewMode() ? '95%' : '600px'}">
-        <header-panel [snavLeft]="snav" [navButton]="navButton">
-        </header-panel>
+    <ng-template #adminMenuTemplate>
         <div class="listModels">
             <div class="processTool">
                 <div class="processTool-module jiggle" *ngFor="let module of processTool"
@@ -152,7 +148,7 @@
                     </ng-container>
                 </mat-menu>
                 <button mat-button *ngIf="!appService.getViewMode()"
-                    [disabled]="actionService.loading || selectedAction.id === 0" class="button-form-primary-filled"
+                    [disabled]="actionService.loading || selectedAction.id === 0 || (appDocumentViewer !== undefined && !appDocumentViewer.isEditorLoaded())" class="button-form-primary-filled"
                     style="width: 150px;align-items: center;justify-content: center;text-align: center;display: flex;"
                     (click)="onSubmit()">{{lang.validate}}</button>
                 <button mat-icon-button *ngIf="appService.getViewMode()" class="button-form-primary"
@@ -162,12 +158,12 @@
             </ng-container>
             <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="lang.noAvailableActionProcess"></div>
         </div>
-    </mat-sidenav>
-    <mat-sidenav-content>
+    </ng-template>
+    <mat-sidenav-content class="process-content">
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left [snavLeft]="snav"></header-left>
+                    <header-left></header-left>
                 </div>
                 <div class="bg-head-title-tool">
                     <header-right></header-right>
@@ -249,20 +245,12 @@
             <div class="content">
                 <app-document-viewer #appDocumentViewer *ngIf="!loading" style="height:100%;width:100%;" [editMode]="canEditData"
                     [resId]="currentResourceInformations.resId"
-                    [title]="currentResourceInformations.chrono + ' - ' + currentResourceInformations.subject"
-                    [sidenavLeft]="sidenavLeft">
+                    [title]="currentResourceInformations.chrono + ' - ' + currentResourceInformations.subject">
                 </app-document-viewer>
             </div>
         </div>
-    </mat-sidenav-content>
-    <mat-sidenav #snav2 [fixedInViewport]="appService.getViewMode()" position='end'
-        [opened]="appService.getViewMode() ? false : false" [mode]="appService.getViewMode() ? 'over' : 'side'"
-        class="panel-right" style="overflow-x:hidden;" [class.docView]="!filtersListService.filterMode"
-        [ngStyle]="{'width': appService.getViewMode() ? '80%' : '30%'}" autoFocus="false">
-    </mat-sidenav>
-</mat-sidenav-container>
-<div class="modal-module {{modal.id}}" cdkDrag *ngFor="let modal of modalModule; let i=index"
-    [class.largeModal]="modal.id === 'info'">
+        <div class="modal-module {{modal.id}}" cdkDrag *ngFor="let modal of modalModule; let i=index"
+    [class.largeModal]="modal.id === 'info'" cdkDragBoundary=".process-content">
     <div class="modal-module-title" cdkDragHandle>
         <span>
             {{modal.label}}
@@ -272,7 +260,7 @@
         </button>
     </div>
     <div class="modal-module-content">
-        <app-history-list *ngIf="currentTool === 'history' && !loading" #appHistoryList
+        <app-history-list *ngIf="modal.id === 'history' && !loading" #appHistoryList
             [resId]="currentResourceInformations.resId">
         </app-history-list>
         <app-notes-list *ngIf="modal.id === 'notes' && !loading" #appNotesList [editMode]="true"
@@ -322,3 +310,10 @@
         </div>
     </div>
 </div>
+    </mat-sidenav-content>
+    <mat-sidenav #snav2 [fixedInViewport]="appService.getViewMode()" position='end'
+        [opened]="appService.getViewMode() ? false : false" [mode]="appService.getViewMode() ? 'over' : 'side'"
+        class="panel-right" style="overflow-x:hidden;" [class.docView]="!filtersListService.filterMode"
+        [ngStyle]="{'width': appService.getViewMode() ? '80%' : '30%'}" autoFocus="false">
+    </mat-sidenav>
+</mat-sidenav-container>

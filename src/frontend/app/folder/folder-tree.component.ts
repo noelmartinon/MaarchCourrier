@@ -16,6 +16,7 @@ import { FoldersService } from './folders.service';
 import { FormControl } from '@angular/forms';
 import { PluginAutocomplete } from '../../plugins/autocomplete/autocomplete.component';
 import { HeaderService } from '../../service/header.service';
+import { FolderCreateModalComponent } from './folder-create-modal/folder-create-modal.component';
 
 declare function $j(selector: any): any;
 /**
@@ -297,16 +298,17 @@ export class FolderTreeComponent implements OnInit {
         this.createItemNode = false;
     }
 
-    createFolderRoot() {
-        this.http.post("../../rest/folders", { label: this.autocomplete.getValue() }).pipe(
+    openCreateFolderModal() {
+        this.dialogRef = this.dialog.open(FolderCreateModalComponent, { panelClass: 'maarch-modal' });
+        this.dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'success'),
             tap(() => {
                 this.autocomplete.resetValue();
                 this.getFolders();
                 this.foldersService.getPinnedFolders();
             }),
-            tap(() => this.notify.success(this.lang.folderAdded)),
             catchError((err) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -314,7 +316,7 @@ export class FolderTreeComponent implements OnInit {
 
     deleteNode(node: any) {
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -373,7 +375,7 @@ export class FolderTreeComponent implements OnInit {
     }
 
     openFolderAdmin(node: any) {
-        this.dialogRef = this.dialog.open(FolderUpdateComponent, { autoFocus: false, data: { folderId: node.id } });
+        this.dialogRef = this.dialog.open(FolderUpdateComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { folderId: node.id } });
 
         this.dialogRef.afterClosed().pipe(
             tap((data) => {

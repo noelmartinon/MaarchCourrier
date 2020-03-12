@@ -1,57 +1,61 @@
-<h1 mat-dialog-title>{{data.action.label}}</h1>
-<div mat-dialog-content>
-    <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
-        <mat-spinner style="margin:auto;"></mat-spinner>
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>{{data.action.label}}</h1>
+    <div mat-dialog-content>
+        <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
+            <mat-spinner style="margin:auto;"></mat-spinner>
+        </div>
+        <mat-sidenav-container autosize style="height:100%;">
+            <mat-sidenav-content style="background: white;padding:10px;">
+                <div>
+                    {{lang.makeActionOn}}
+                    <b *ngIf="data.resIds.length === 0" color="primary"
+                        class="highlight">{{lang.currentIndexingMail}}</b>
+                    <b *ngIf="data.resIds.length == 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
+                    <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
+                        {{lang.elements}}</b> ?
+                </div>
+                <div class="alert-message alert-message-info" *ngIf="data.resIds.length == 1  && !noResourceToProcess"
+                    role="alert" style="margin-top: 30px;"
+                    [innerHTML]="'<b>' + ownerOpinion + '</b> '+ lang.askOpinionUser + ' :<br/><br/>' + opinionContent">
+                </div>
+
+                <div class="alert-message alert-message-info" *ngIf="data.resIds.length > 1 && !noResourceToProcess"
+                    role="alert" style="margin-top: 30px;" [innerHTML]="lang.askOpinion"></div>
+
+                <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList"
+                    role="alert">
+                    <p>
+                        {{lang.canNotMakeAction}} :
+                    </p>
+                    <ul>
+                        <li *ngFor="let ressource of resourcesErrors">
+                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="resourcesWarnings.length > 0" class="alert-message alert-message-info mailList"
+                    role="alert">
+                    <ul style="margin: 0;padding-bottom: 0px;">
+                        <li *ngFor="let ressource of resourcesWarnings">
+                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                        </li>
+                    </ul>
+                </div>
+                <mat-form-field *ngIf="data.resIds.length === 1 && !noResourceToProcess" appearance="outline"
+                    style="cursor:pointer;margin-top: 10px;">
+                    <mat-label>{{lang.opinionLimitDate}}</mat-label>
+                    <input matInput [(ngModel)]="opinionLimitDate" readonly style="cursor:pointer;" disabled>
+                </mat-form-field>
+
+                <app-note-editor #noteEditor [title]="lang.addOpinion" [resIds]="data.resIds"
+                    [disableRestriction]="true"></app-note-editor>
+            </mat-sidenav-content>
+        </mat-sidenav-container>
     </div>
-    <mat-sidenav-container autosize style="height:100%;">
-        <mat-sidenav-content style="background: white;padding:10px;">
-            <div>
-                {{lang.makeActionOn}}
-                <b *ngIf="data.resIds.length === 0" color="primary" class="highlight">{{lang.currentIndexingMail}}</b>
-                <b *ngIf="data.resIds.length == 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
-                <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
-                    {{lang.elements}}</b> ?
-            </div>
-            <div class="alert-message alert-message-info"
-                *ngIf="data.resIds.length == 1  && !noResourceToProcess"
-                role="alert" style="margin-top: 30px;"
-                [innerHTML]="'<b>' + ownerOpinion + '</b> '+ lang.askOpinionUser + ' :<br/><br/>' + opinionContent">
-            </div>
-
-            <div class="alert-message alert-message-info"
-                *ngIf="data.resIds.length > 1 && !noResourceToProcess"
-                role="alert" style="margin-top: 30px;" [innerHTML]="lang.askOpinion"></div>
-
-            <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList" role="alert">
-                <p>
-                    {{lang.canNotMakeAction}} :
-                </p>
-                <ul>
-                    <li *ngFor="let ressource of resourcesErrors">
-                        <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
-                    </li>
-                </ul>
-            </div>
-            <div *ngIf="resourcesWarnings.length > 0" class="alert-message alert-message-info mailList" role="alert">
-                <ul style="margin: 0;padding-bottom: 0px;">
-                    <li *ngFor="let ressource of resourcesWarnings">
-                        <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
-                    </li>
-                </ul>
-            </div>
-
-            <mat-form-field *ngIf="data.resIds.length === 1 && !noResourceToProcess" appearance="outline" style="cursor:pointer;margin-top: 10px;">
-                <mat-label>{{lang.opinionLimitDate}}</mat-label>
-                <input matInput [(ngModel)]="opinionLimitDate"
-                       readonly style="cursor:pointer;" disabled>
-            </mat-form-field>
-
-            <app-note-editor #noteEditor [title]="lang.addOpinion" [resIds]="data.resIds" [disableRestriction]="true"></app-note-editor>
-        </mat-sidenav-content>
-    </mat-sidenav-container>
-</div>
-<div mat-dialog-actions class="actions">
-    <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidAction()"
-        (click)="onSubmit()">{{lang.validate}}</button>
-    <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions class="actions">
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidAction()"
+            (click)="onSubmit()">{{lang.validate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+    </div>
 </div>

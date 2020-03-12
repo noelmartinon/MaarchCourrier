@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { LANG } from '../app/translate.component';
+import {LatinisePipe} from "ngx-pipes";
 
 @Injectable()
 export class FunctionsService {
 
     lang: any = LANG;
 
-    constructor() { }
+    constructor(public latinisePipe: LatinisePipe) { }
 
     empty(value: any) {
         if (value === null || value === undefined) {
@@ -76,5 +77,17 @@ export class FunctionsService {
             return data[sortHeaderId].toLowerCase();
         }
         return data[sortHeaderId];
+    }
+
+    filterUnSensitive(template: any, filter: string, filteredColumns: any) {
+        let filterReturn = false;
+        filter = this.latinisePipe.transform(filter);
+        filteredColumns.forEach((column:any) => {
+            if (typeof template[column] !== 'string') {
+                template[column] = JSON.stringify(template[column]);
+            }
+            filterReturn = filterReturn || this.latinisePipe.transform(template[column].toLowerCase()).includes(filter);
+        });
+        return filterReturn;
     }
 }

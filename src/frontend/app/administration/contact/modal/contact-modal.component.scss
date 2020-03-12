@@ -1,23 +1,5 @@
 @import '../../../../css/vars.scss';
 
-.mat-dialog-title {
-    padding: 10px;
-    display: flex;
-    align-items: center;
-}
-
-.modal-container {
-    min-height: 250px;
-    height: auto;
-    padding: 0px !important;
-    margin: 0;
-    flex: 1;
-    position: relative;
-}
-
-.modal-body {
-    min-height: auto;
-}
 
 .admin-contact {
     display: flex;

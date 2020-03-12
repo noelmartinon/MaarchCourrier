@@ -16,7 +16,7 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "home.component.html",
     styleUrls: ['home.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class HomeComponent implements OnInit {
 
@@ -35,8 +35,6 @@ export class HomeComponent implements OnInit {
     public innerHtml    : SafeHtml;
     displayedColumns    : string[] = ['res_id', 'subject', 'creation_date'];
 
-    @ViewChild('snav', { static: true }) snav: MatSidenav;
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
 
     constructor(
@@ -58,8 +56,6 @@ export class HomeComponent implements OnInit {
             this.displayedColumns = ['res_id', 'subject'];
         }
         this.headerService.setHeader(this.lang.home);
-        window['MainHeaderComponent'].setSnav(this.snav);
-        window['MainHeaderComponent'].setSnavRight(null);
 
         let event = new Date();
         let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };

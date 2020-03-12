@@ -3,6 +3,7 @@ import { NgModule }                             from '@angular/core';
 import { SharedModule }                         from '../app-common.module';
 
 import { AdministrationRoutingModule }          from './administration-routing.module';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 import { AdministrationComponent }                      from './home/administration.component';
 import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent }      from './user/users-administration.component';
@@ -41,8 +42,6 @@ import { TemplatesAdministrationComponent }             from './template/templat
 import { TemplateAdministrationComponent, TemplateAdministrationCheckEntitiesModalComponent }              from './template/template-administration.component';
 import { SecuritiesAdministrationComponent }            from './security/securities-administration.component';
 import { SendmailAdministrationComponent }              from './sendmail/sendmail-administration.component';
-
-import { TechnicalAdministrationComponent }             from './technical/technical-administration.component';
 import { ListAdministrationComponent }                  from './basket/list/list-administration.component';
 import { ShippingsAdministrationComponent }              from './shipping/shippings-administration.component';
 import { ShippingAdministrationComponent }              from './shipping/shipping-administration.component';
@@ -50,7 +49,6 @@ import { CustomFieldsAdministrationComponent }              from './customField/
 import { IndexingModelAdministrationComponent }              from './indexingModel/indexing-model-administration.component';
 import { IndexingModelsAdministrationComponent }              from './indexingModel/indexing-models-administration.component';
 import { ContactsListAdministrationComponent, ContactsListAdministrationRedirectModalComponent} from './contact/list/contacts-list-administration.component';
-import { ContactsHomeAdministrationComponent }              from './contact/home/contacts-home-administration.component';
 import { ContactsCustomFieldsAdministrationComponent }              from './contact/customField/contacts-custom-fields-administration.component';
 import { ContactsPageAdministrationComponent }              from './contact/page/contacts-page-administration.component';
 import { TagsAdministrationComponent }              from './tag/tags-administration.component';
@@ -59,6 +57,7 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
 @NgModule({
     imports:      [
         SharedModule,
+        NgxChartsModule,
         AdministrationRoutingModule
     ],
     declarations: [
@@ -105,8 +104,6 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         TemplateAdministrationComponent,
         SecuritiesAdministrationComponent,
         SendmailAdministrationComponent,
-        TechnicalAdministrationComponent,
-        ListAdministrationComponent,
         ListAdministrationComponent,
         TemplateAdministrationCheckEntitiesModalComponent,
         ShippingsAdministrationComponent,
@@ -117,7 +114,6 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         IndexingModelsAdministrationComponent,
         ContactsListAdministrationComponent,
         ContactsListAdministrationRedirectModalComponent,
-        ContactsHomeAdministrationComponent,
         ContactsCustomFieldsAdministrationComponent,
         ContactsPageAdministrationComponent,
         TagsAdministrationComponent,
@@ -131,10 +127,7 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         BasketAdministrationSettingsModalComponent,
         BasketAdministrationGroupListModalComponent,
         DoctypesAdministrationRedirectModalComponent,
-        TechnicalAdministrationComponent,
         ContactsListAdministrationRedirectModalComponent,
-        ListAdministrationComponent,
-        ListAdministrationComponent,
         TemplateAdministrationCheckEntitiesModalComponent,
         AccountLinkComponent
     ],

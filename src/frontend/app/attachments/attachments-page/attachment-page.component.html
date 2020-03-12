@@ -168,10 +168,10 @@
                         </mat-expansion-panel>
                     </div>
                 </ng-container>
-                <mat-tab-group [selectedIndex]="1" class="pjList" *ngIf="!loading" animationDuration="0" style="height: 100%">
+                <mat-tab-group [selectedIndex]="1" [class.header-less-tabs]="!isEditing()" [class.pjList]="isEditing()" *ngIf="!loading" animationDuration="0" style="height: 100%">
                         <mat-tab label="Document principal" *ngIf="attachment.res_id_master !== null">
                             <ng-template matTabContent>
-                                <app-document-viewer #appDocumentViewer style="height:100%;width:100%;" [editMode]="false"
+                                <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
                                     [resId]="attachment.resIdMaster.value" [title]="'Document principal'">
                                 </app-document-viewer>
                             </ng-template>
@@ -180,7 +180,7 @@
                             <ng-template mat-tab-label>
                                 <span style="color:green">{{lang.signedAttachment}}</span>
                             </ng-template>
-                            <app-document-viewer #appDocumentViewer style="height:100%;width:100%;" [editMode]="false"
+                            <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
                                 [resId]="attachment.signedResponse.value" [mode]="'attachment'"
                                 [title]="attachment.chrono.value + ' - ' + attachment.title.value + ' (' + lang.signed + ')'">
                             </app-document-viewer>
@@ -189,7 +189,7 @@
                             <ng-template mat-tab-label>
                                 <span style="color:#135f7f">{{lang.attachment}}</span>
                             </ng-template>
-                            <app-document-viewer #appAttachmentViewer style="height:100%;width:100%;" [editMode]="editMode"
+                            <app-document-viewer #appAttachmentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="editMode"
                                 [resId]="data.resId" [resIdMaster]="attachment['resIdMaster'].value" [mode]="'attachment'"
                                 [format]="attachment['format'].value" [attachType]="attachment['type'].value" [infoPanel]="snavLeft"
                                 (triggerEvent)="setDatasViewer($event)"
@@ -199,7 +199,7 @@
                         <mat-tab label="{{lang.attachment}} ({{lang.version}} {{version.relation}})"
                             *ngFor="let version of versions">
                             <ng-template matTabContent>
-                                <app-document-viewer #appDocumentViewer style="height:100%;width:100%;" [editMode]="false"
+                                <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
                                     [resId]="version.resId" [mode]="'attachment'" [format]="attachment['format'].value"
                                     [title]="attachment.chrono.value + ' - ' + attachment.title.value + ' (' + version.relation + ')'">
                                 </app-document-viewer>
@@ -214,11 +214,11 @@
         <button mat-raised-button color="primary" *ngIf="!newVersion && sendMassMode && !loading" (click)="updateAttachment('mailing')"
             [disabled]="!loading && (!editMode || !attachFormGroup.valid)">{{lang.mailing}}</button>
         <button mat-raised-button color="primary" *ngIf="newVersion" (click)="createNewVersion()"
-            [disabled]="!editMode || appAttachmentViewer.isEditingTemplate()">{{lang.createNewVersion}}</button>
+            [disabled]="!editMode || isEditing()">{{lang.createNewVersion}}</button>
         <button mat-raised-button color="primary" *ngIf="newVersion && sendMassMode && !loading" (click)="createNewVersion('mailing')"
-            [disabled]="!editMode || appAttachmentViewer.isEditingTemplate()">{{lang.mailing}}</button>
+            [disabled]="!editMode || isEditing()">{{lang.mailing}}</button>
         <button mat-raised-button color="warn" *ngIf=" !loading && attachment.status.value === 'SIGN' && (privilegeService.hasCurrentUserPrivilege('sign_document') || this.headerService.user.id == attachment.typist.value)"
             (click)="deleteSignedVersion()">{{lang.deleteSignedVersion}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.close}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" (click)="closeModal()">{{lang.close}}</button>
     </div>
 </div>

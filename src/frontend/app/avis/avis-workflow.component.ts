@@ -422,7 +422,7 @@ export class AvisWorkflowComponent implements OnInit {
                         return of(false);
                     })
                 ).subscribe();
-            } else {
+            } else if (this.isValidWorkflow()) {
                 const arrAvis = resIds.map(resId => {
                     return {
                         resId: resId,
@@ -440,6 +440,9 @@ export class AvisWorkflowComponent implements OnInit {
                         return of(false);
                     })
                 ).subscribe();
+            } else {
+                this.notify.error(this.getError());
+                resolve(false);
             }
         });
     }
@@ -454,7 +457,8 @@ export class AvisWorkflowComponent implements OnInit {
                     item_mode: 'avis',
                     labelToDisplay: item.label,
                     externalId: !this.functions.empty(item.externalId) ? item.externalId : null,
-                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
+                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id',
+                    hasPrivilege : true
                 });
                 this.searchAvisUser.reset();
                 this.searchAvisUserInput.nativeElement.blur();
@@ -463,14 +467,15 @@ export class AvisWorkflowComponent implements OnInit {
                 this.http.get(`../../rest/listTemplates/${item.id}`).pipe(
                     tap((data: any) => {
                         this.avisWorkflow.items = this.avisWorkflow.items.concat(
-                            data.listTemplate.items.filter((itemTemplate: any) => itemTemplate.hasPrivilege === true).map((itemTemplate: any) => {
+                            data.listTemplate.items.map((itemTemplate: any) => {
                                 return {
                                     item_id: itemTemplate.item_id,
                                     item_type: 'user',
                                     labelToDisplay: itemTemplate.idToDisplay,
                                     item_entity: itemTemplate.descriptionToDisplay,
                                     item_mode: 'avis',
-                                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
+                                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id',
+                                    hasPrivilege : itemTemplate.hasPrivilege
                                 }
                             })
                         );
@@ -487,6 +492,18 @@ export class AvisWorkflowComponent implements OnInit {
         this.avisWorkflow.items = [];
     }
 
+    isValidWorkflow() {
+        if (this.avisWorkflow.items.filter((item: any) => !item.hasPrivilege).length === 0 && this.avisWorkflow.items.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    getError() {
+        return this.lang.mustDeleteUsersWithNoPrivileges;
+    }
+
     emptyWorkflow() {
         return this.avisWorkflow.items.length === 0;
     }
@@ -500,7 +517,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     openPromptSaveModel() {
-        const dialogRef = this.dialog.open(AddAvisModelModalComponent, { data: { avisWorkflow: this.avisWorkflow.items } });
+        const dialogRef = this.dialog.open(AddAvisModelModalComponent, { panelClass: 'maarch-modal', data: { avisWorkflow: this.avisWorkflow.items } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => !this.functions.empty(data)),
@@ -522,7 +539,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     deletePrivateModel(model: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

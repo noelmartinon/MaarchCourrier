@@ -87,14 +87,14 @@ export class FollowedActionListComponent implements OnInit {
     }
 
     unFollow() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
             tap((data: any) => {
                 this.notify.success(this.lang.removedFromFolder);
-                this.headerService.nbResourcesFollowed--;
+                this.headerService.nbResourcesFollowed -= this.selectedRes.length;
                 this.refreshDaoAfterAction();
             })
         ).subscribe();

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, EventEmitter, ElementRef, Input, Output } from '@angular/core';
+import {Component, OnInit, ViewChild, EventEmitter, Input, Output} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
@@ -8,6 +8,7 @@ import { map, catchError, filter, tap } from 'rxjs/operators';
 import { FunctionsService } from '../../service/functions.service';
 import { PrivilegeService } from '../../service/privileges.service';
 import { SentResourcePageComponent } from './sent-resource-page/sent-resource-page.component';
+import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sent-numeric-package-page.component';
 
 @Component({
     selector: 'app-sent-resource-list',
@@ -18,9 +19,6 @@ export class SentResourceListComponent implements OnInit {
 
     lang: any = LANG;
     loading: boolean = true;
-
-    filtersChange = new EventEmitter();
-
 
     dataSource: any;
     displayedColumns: string[] = ['creationDate'];
@@ -53,7 +51,7 @@ export class SentResourceListComponent implements OnInit {
     async loadList() {
         this.sentResources = [];
         this.loading = true;
-        await this.initAcknowledgementReceipList();
+        await this.initAcknowledgementReceiptList();
         await this.initEmailList();
         await this.initMessageExchange();
         await this.initShippings();
@@ -68,8 +66,8 @@ export class SentResourceListComponent implements OnInit {
         this.loading = false;
     }
 
-    initAcknowledgementReceipList() {
-        return new Promise((resolve, reject) => {
+    initAcknowledgementReceiptList() {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.resId}/acknowledgementReceipts?type=ar`).pipe(
                 map((data: any) => {
                     data = data.map((item: any) => {
@@ -77,11 +75,13 @@ export class SentResourceListComponent implements OnInit {
                         if (!this.functions.empty(item.contact.email)) {
                             email = item.contact.email;
                         } else {
-                            email = this.lang.contactDeleted;
+                            email = this.lang.withoutEmail;
                         }
                         let name;
-                        if (!this.functions.empty(item.contact.firstname) && !this.functions.empty(item.contact.lastname)) {
-                            name = `${item.contact.firstname} ${item.contact.lastname}`
+                        if (!this.functions.empty(item.contact.firstname) || !this.functions.empty(item.contact.lastname)) {
+                            name = item.contact.firstname + ' ' + item.contact.lastname;
+                        } else if (!this.functions.empty(item.contact.company)) {
+                            name = item.contact.company;
                         } else {
                             name = this.lang.contactDeleted;
                         }
@@ -119,7 +119,7 @@ export class SentResourceListComponent implements OnInit {
     }
 
     initEmailList() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.resId}/emails?type=email`).pipe(
                 map((data: any) => {
                     data.emails = data.emails.map((item: any) => {
@@ -156,7 +156,7 @@ export class SentResourceListComponent implements OnInit {
     }
 
     initMessageExchange() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.resId}/messageExchanges`).pipe(
                 map((data: any) => {
                     data.messageExchanges = data.messageExchanges.map((item: any) => {
@@ -170,11 +170,11 @@ export class SentResourceListComponent implements OnInit {
                             type: 'm2m_ARCHIVETRANSFER',
                             typeColor: '#F99830',
                             desc: this.lang.m2m_ARCHIVETRANSFER,
-                            status: item.status,
+                            status: item.status.toUpperCase(),
                             hasAttach: false,
                             hasNote: false,
                             hasMainDoc: false,
-                            canManage: false
+                            canManage: true
                         }
                     });
                     return data.messageExchanges;
@@ -194,7 +194,7 @@ export class SentResourceListComponent implements OnInit {
     }
 
     initShippings() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.resId}/shippings`).pipe(
                 map((data: any) => {
                     data = data.map((item: any) => {
@@ -231,7 +231,9 @@ export class SentResourceListComponent implements OnInit {
     }
 
     initFilter() {
+        console.log(this.sentResources);
         this.sentResources.forEach((element: any) => {
+            console.log(this.filterTypes.filter(type => type.id === element.type).length);
             if (this.filterTypes.filter(type => type.id === element.type).length === 0) {
                 this.filterTypes.push({
                     id: element.type,
@@ -241,13 +243,18 @@ export class SentResourceListComponent implements OnInit {
         });
     }
 
-    processPostData(data: any) {
-        return data;
-    }
-
     filterType(ev: any) {
         this.currentFilter = ev.value;
         this.dataSource.filter = ev.value;
+    }
+
+    open(row: any = {id: null, type: null}) {
+
+        if (row.type === 'm2m_ARCHIVETRANSFER') {
+            this.openPromptNumericPackage(row);
+        } else {
+            this.openPromptMail(row);
+        }
     }
 
     openPromptMail(row: any = {id: null, type: null}) {
@@ -259,12 +266,39 @@ export class SentResourceListComponent implements OnInit {
         }
 
         if (row.canManage || row.id === null) {
-            const dialogRef = this.dialog.open(SentResourcePageComponent, { maxWidth: '90vw', width: '750px', minHeight:'500px', disableClose: true, data: { title: title, resId: this.resId, emailId: row.id, emailType: row.type } });
+            const dialogRef = this.dialog.open(SentResourcePageComponent, { panelClass: 'maarch-modal', width:'60vw', disableClose: true, data: { title: title, resId: this.resId, emailId: row.id, emailType: row.type } });
 
             dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'success'),
+                filter((data: any) => data.state === 'success' || data === 'success'),
                 tap(() => {
-                    this.loadList();
+                    this.refreshEmailList();
+                    setTimeout(() => {
+                        this.refreshWaitingElements();
+                    }, 5000);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
+    }
+
+    openPromptNumericPackage(row: any = {id: null, type: null}) {
+
+        let title = this.lang.sendElement;
+
+        if (row.id !== null) {
+            title = this.lang[row.type];
+        }
+
+        if (row.canManage || row.id === null) {
+            const dialogRef = this.dialog.open(SentNumericPackagePageComponent, { panelClass: 'maarch-modal', width:'60vw', disableClose: true, data: { title: title, resId: this.resId, emailId: row.id } });
+
+            dialogRef.afterClosed().pipe(
+                filter((data: any) => data.state === 'success' || data === 'success'),
+                tap(() => {
+                    this.refreshEmailList();
                     setTimeout(() => {
                         this.refreshWaitingElements();
                     }, 5000);
@@ -278,7 +312,7 @@ export class SentResourceListComponent implements OnInit {
     }
 
     refreshWaitingElements() {
-        this.sentResources.map((draftElement: any) => {
+        this.sentResources.forEach((draftElement: any) => {
             if (draftElement.status == 'WAITING' && draftElement.type == 'email') {
                 this.http.get(`../../rest/emails/${draftElement.id}`).pipe(
                     tap((data: any) => {
@@ -288,7 +322,7 @@ export class SentResourceListComponent implements OnInit {
                             } else {
                                 this.notify.error(this.lang.emailCannotSent);
                             }
-                            this.sentResources.map((element: any, key: number) => {
+                            this.sentResources.forEach((element: any, key: number) => {
                                 if (element.id == draftElement.id && element.type == 'email') {
                                     this.sentResources[key].status = data.status;
                                     this.sentResources[key].sendDate = data.sendDate;
@@ -303,5 +337,47 @@ export class SentResourceListComponent implements OnInit {
             this.dataSource = new MatTableDataSource(this.sentResources);
             this.dataSource.sort = this.sort;
         }, 0);
+    }
+
+    refreshEmailList() {
+        return new Promise((resolve) => {
+            this.http.get(`../../rest/resources/${this.resId}/emails?type=email`).pipe(
+                map((data: any) => {
+                    data.emails = data.emails.map((item: any) => {
+                        return {
+                            id: item.id,
+                            sender: item.sender.email,
+                            recipients: item.recipients,
+                            creationDate: item.creation_date,
+                            sendDate: item.send_date,
+                            type: 'email',
+                            typeColor: '#5bc0de',
+                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.lang.emptySubject}<i>`,
+                            status: item.status,
+                            hasAttach: !this.functions.empty(item.document.attachments),
+                            hasNote: !this.functions.empty(item.document.notes),
+                            hasMainDoc: item.document.isLinked,
+                            canManage: true
+                        }
+                    });
+                    return data.emails;
+                }),
+                tap((data: any) => {
+                    const sentResourcesNoEmails = this.sentResources.filter(elem => elem.type !== 'email');
+                    this.sentResources = sentResourcesNoEmails.concat(data);
+                    setTimeout(() => {
+                        this.dataSource = new MatTableDataSource(this.sentResources);
+                        this.dataSource.sort = this.sort;
+                    }, 0);
+                    this.initFilter();
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    resolve(false);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }

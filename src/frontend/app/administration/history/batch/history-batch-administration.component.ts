@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild, EventEmitter, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, ElementRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
 import { HeaderService } from '../../../../service/header.service';
-import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../service/app.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+import { takeUntil, startWith, switchMap, map, catchError, tap, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../../service/functions.service';
 import { LatinisePipe } from 'ngx-pipes';
@@ -20,8 +19,7 @@ import { PrivilegeService } from '../../../../service/privileges.service';
 })
 export class HistoryBatchAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
     loading: boolean = false;
@@ -70,9 +68,12 @@ export class HistoryBatchAdministrationComponent implements OnInit {
         public dialog: MatDialog,
         public functions: FunctionsService,
         private latinisePipe: LatinisePipe,
-        private privilegeService: PrivilegeService) { }
+        private privilegeService: PrivilegeService,
+        private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
+
         if (this.privilegeService.hasCurrentUserPrivilege('view_history')) {
             this.subMenus = [
                 {
@@ -138,7 +139,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
         data.history = data.history.map((item: any) => {
             return {
                 ...item,
-                total_errors : item.total_errors === null ? 0 : item.total_errors
+                total_errors: item.total_errors === null ? 0 : item.total_errors
             }
         })
         return data;
@@ -158,13 +159,13 @@ export class HistoryBatchAdministrationComponent implements OnInit {
 
             this.http.get("../../rest/batchHistory/availableFilters").pipe(
                 map((data: any) => {
-                    let returnData = {modules: [{}], totalErrors: [{}]};
+                    let returnData = { modules: [{}], totalErrors: [{}] };
                     returnData.modules = data.modules;
 
                     returnData.totalErrors = [
                         {
-                            id : 'errorElement',
-                            label : this.lang.totalErrors
+                            id: 'errorElement',
+                            label: this.lang.totalErrors
                         }
                     ];
 

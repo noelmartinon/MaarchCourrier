@@ -179,9 +179,9 @@ function migrateMessageExchangeVersion($args = [])
 function migrateShippingVersion($args = [])
 {
     \SrcCore\models\DatabaseModel::update([
-        'set'   => ['attachment_id' => $args['newResId'], 'is_version' => 'false'],
+        'set'   => ['document_id' => $args['newResId'], 'is_version' => 'false'],
         'table' => 'shippings',
-        'where' => ['attachment_id = ?', 'is_version = ?'],
+        'where' => ['document_id = ?', 'is_version = ?'],
         'data'  => [$args['oldResId'], 'true']
     ]);
 }

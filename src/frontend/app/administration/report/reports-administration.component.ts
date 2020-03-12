@@ -1,8 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 
@@ -10,13 +9,10 @@ declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "reports-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class ReportsAdministrationComponent implements OnInit {
-    /*HEADER*/
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
-    
+
     lang: any = LANG;
 
     groups: any[] = [];
@@ -37,9 +33,7 @@ export class ReportsAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.reports);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
-
+        
         this.loading = true;
 
         this.http.get('../../rest/reports/groups')

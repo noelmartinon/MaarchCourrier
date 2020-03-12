@@ -1,9 +1,4 @@
 <requestDefinitions>
-	<requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="notes_ajax_content" >
-        <parameter name="page" value="notes_ajax_content"/>
-        <parameter name="module" value="notes"/>
-        <parameter name="display" value="true" />
-    </requestDefinition>
 	<requestDefinition method="GET" path="/apps/maarch_entreprise/index.php" validationRule="notes" >
         <parameter name="page" value="notes"/>
         <parameter name="module" value="notes"/>
@@ -18,10 +13,5 @@
         <parameter name="page" value="notes"/>
         <parameter name="module" value="notes"/>
         <parameter name="display" value="true" />
-    </requestDefinition>
-	<requestDefinition method="GET" path="/apps/maarch_entreprise/index.php" validationRule="note_details" >
-        <parameter name="page" value="note_details"/>
-        <parameter name="module" value="notes"/>
-        <parameter name="display" value="true"/>
     </requestDefinition>
 </requestDefinitions>

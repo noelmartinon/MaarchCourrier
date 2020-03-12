@@ -6,8 +6,8 @@
                 (triggerEvent)="goTo($event)" appearance="outline"></plugin-autocomplete>
         </div>
         <div>
-            <button mat-icon-button color="primary" title="{{lang.addRootFolder}}" (click)="createFolderRoot()" [disabled]="autocomplete.getValue() === '' || autocomplete.getValue() === null">
-                <mat-icon class="fa fa-plus"></mat-icon>
+            <button mat-icon-button color="primary" title="{{lang.addRootFolder}}" (click)="openCreateFolderModal()">
+                <mat-icon class="fas fa-folder-plus"></mat-icon>
             </button>
         </div>
     </div>
@@ -25,7 +25,8 @@
                 <button class="expandButton" mat-icon-button disabled></button>
                 <a mat-list-item disableRipple class="folderTreeItem"
                     [class.selectedFolder]="foldersService.getCurrentFolder().id == node.id"
-                    (mouseenter)="showAction(node)" (mouseleave)="hideAction(node)" (click)="foldersService.goToFolder(node)">
+                    (mouseenter)="showAction(node)" (mouseleave)="hideAction(node)"
+                    (click)="foldersService.goToFolder(node)">
                     <span style="width: 90%;overflow: hidden;text-overflow: ellipsis;">
                         <span class="treeLabel" [title]="node.label" [class.drag]="node.drag">
                             <i class="fa fa-users private" *ngIf="node.public" title="{{lang.sharedFolder}}"></i>
@@ -48,7 +49,7 @@
                             </mat-icon>
                             <span>{{node.pinned ? lang.unpinFolder : lang.pinFolder}}</span>
                         </button>
-                        <button mat-menu-item [disabled]="createItemNode || !node.canAdd"
+                        <button mat-menu-item [disabled]="createItemNode || !node.canAdd || node.level > 6"
                             (click)="addNewItem(node)">{{lang.addSubFolder}}</button>
                         <button mat-menu-item (click)="deleteNode(node)"
                             [disabled]="!node.canDelete">{{lang.delete}}</button>
@@ -85,7 +86,8 @@
                 </button>
                 <a mat-list-item disableRipple class="folderTreeItem"
                     [class.selectedFolder]="foldersService.getCurrentFolder().id == node.id"
-                    (mouseleave)="hideAction(node)" (mouseenter)="showAction(node)" (click)="foldersService.goToFolder(node)">
+                    (mouseleave)="hideAction(node)" (mouseenter)="showAction(node)"
+                    (click)="foldersService.goToFolder(node)">
                     <span style="width: 90%;overflow: hidden;text-overflow: ellipsis;">
                         <span class="treeLabel" [title]="node.label" [class.drag]="node.drag">
                             <i class="fa fa-users private" *ngIf="node.public" title="{{lang.sharedFolder}}"></i>
@@ -109,12 +111,30 @@
                             <span>{{node.pinned ? lang.unpinFolder : lang.pinFolder}}</span>
                         </button>
 
-                        <button mat-menu-item [disabled]="createItemNode || !node.canAdd"
-                            (click)="addNewItem(node)">{{lang.addSubFolder}}</button>
-                        <button mat-menu-item (click)="deleteNode(node)"
-                            [disabled]="!node.canDelete">{{lang.delete}}</button>
+                        <button mat-menu-item [disabled]="createItemNode || !node.canAdd || node.level > 6"
+                            (click)="addNewItem(node)">
+                            <mat-icon style="width: auto;height: auto;">
+                                <i class="fas fa-folder-plus"></i>
+                            </mat-icon>
+                            <span>{{lang.addSubFolder}}</span>
+                        </button>
+                        <button mat-menu-item (click)="deleteNode(node)" [disabled]="!node.canDelete">
+                            <mat-icon style="width: auto;height: auto;">
+                                <i class="far fa-trash-alt"></i>
+                            </mat-icon>
+                            <span>
+                                {{lang.delete}}
+                            </span>
+                        </button>
                         <button mat-menu-item (click)="openFolderAdmin(node)"
-                            [disabled]="!node.edition">{{lang.properties}}</button>
+                            [disabled]="!node.edition">
+                            <mat-icon style="width: auto;height: auto;">
+                                <i class="fas fa-sliders-h"></i>
+                            </mat-icon>
+                            <span>
+                                {{lang.properties}}
+                            </span>
+                        </button>
                     </mat-menu>
                 </a>
             </mat-tree-node>

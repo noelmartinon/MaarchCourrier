@@ -133,18 +133,17 @@ abstract class ResModelAbstract
 
         $resources = DatabaseModel::select([
             'select'    => $aArgs['select'],
-            'table'     => ['history, res_letterbox r, status, priorities'],
+            'table'     => ['history, res_letterbox, status'],
             'where'     => [
                 'history.user_id = ?', 'history.table_name IN (?)',
                 'history.record_id IS NOT NULL', 'history.record_id != ?',
                 'history.event_id != ?', 'history.event_id NOT LIKE ?',
-                'CAST(history.record_id AS INT) = r.res_id',
-                'r.res_id = r.res_id', 'r.status != ?',
-                'r.status = status.id',
-                'r.priority = priorities.id'
+                'CAST(history.record_id AS INT) = res_letterbox.res_id',
+                'res_letterbox.status != ?',
+                'res_letterbox.status = status.id'
             ],
             'data'      => [$aArgs['userId'], ['res_letterbox', 'res_view_letterbox'], 'none', 'linkup', 'attach%', 'DEL'],
-            'groupBy'   => ['r.subject', 'r.creation_date', 'r.res_id', 'r.alt_identifier', 'r.closing_date', 'r.process_limit_date', 'status.id', 'status.label_status', 'status.img_filename', 'priorities.color', 'priorities.label'],
+            'groupBy'   => ['res_letterbox.subject', 'res_letterbox.creation_date', 'res_letterbox.res_id', 'res_letterbox.alt_identifier', 'res_letterbox.closing_date', 'res_letterbox.process_limit_date', 'status.id', 'status.label_status', 'status.img_filename'],
             'order_by'  => ['MAX(history.event_date) DESC'],
             'limit'     => $aArgs['limit']
         ]);

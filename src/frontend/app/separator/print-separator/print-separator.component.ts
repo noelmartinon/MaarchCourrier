@@ -66,9 +66,6 @@ export class PrintSeparatorComponent implements OnInit {
             $j('#jstree')
             .on('select_node.jstree', (e: any, data: any) => {
                 this.separator.entities = $j('#jstree').jstree(true).get_checked(); // to trigger disable button if no entities
-                if (data.event) {
-                    data.instance.select_node(data.node.children_d);
-                }
             })
             .on('deselect_node.jstree', (e: any, data: any) => {
                 this.separator.entities = $j('#jstree').jstree(true).get_checked(); // to trigger disable button if no entities

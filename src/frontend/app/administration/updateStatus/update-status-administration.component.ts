@@ -12,12 +12,9 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "update-status-administration.component.html",
     styleUrls: ['update-status-administration.component.css'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class UpdateStatusAdministrationComponent implements OnInit {
-
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
 
     lang                            : any       = LANG;
     loading                         : boolean   = false;
@@ -40,9 +37,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.updateStatus);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
-
+        
         this.loading = true;
 
         this.http.get('../../rest/autocomplete/statuses').pipe(

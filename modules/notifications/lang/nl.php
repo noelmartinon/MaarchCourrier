@@ -195,9 +195,6 @@ if (!defined('_HELLO_NOTE')) {
 if (!defined('_NOTE_BODY')) {
     define('_NOTE_BODY', 'De opmerking is de volgende:');
 }
-if (!defined('_NOTE_DETAILS')) {
-    define('_NOTE_DETAILS', 'Deze opmerking werd toegevoegd door:');
-}
 if (!defined('_NOTE_DATE_DETAILS')) {
     define('_NOTE_DATE_DETAILS', 'op');
 }
@@ -404,7 +401,4 @@ if (!defined('_DEPARTMENT')) {
 }
 if (!defined('_NOTE_BODY')) {
     define('_NOTE_BODY', 'De opmerking is de volgende: ');
-}
-if (!defined('_NOTE_DETAILS')) {
-    define('_NOTE_DETAILS', 'Deze opmerking werd toegevoegd door: ');
 }

@@ -18,7 +18,6 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 })
 export class DiffusionModelAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
     lang: any = LANG;
@@ -62,17 +61,14 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.route.params.subscribe(async params => {
+            
             if (typeof params['id'] == "undefined") {
                 this.headerService.setHeader(this.lang.diffusionModelCreation);
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
 
                 this.creationMode = true;
                 this.loading = false;
 
             } else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
 
                 this.creationMode = false;
 
@@ -189,11 +185,22 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         }   
     }
 
+    checkPrivileges(items: any) {
+        var isValid = true;
+
+        items.forEach((item: any) => {
+            if (!item.hasPrivilege) {
+                isValid = false;
+            }
+        });
+        return isValid;
+    }
+
     isValidForm() {
         if (this.diffusionModel.type === 'visaCircuit') {
-            return this.appVisaWorkflow !== undefined && this.appVisaWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '';
+            return this.appVisaWorkflow !== undefined && this.appVisaWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '' && this.checkPrivileges(this.appVisaWorkflow.getWorkflow());
         } else {
-            return this.appAvisWorkflow !== undefined && this.appAvisWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '';
+            return this.appAvisWorkflow !== undefined && this.appAvisWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '' && this.checkPrivileges(this.appAvisWorkflow.getWorkflow());
         }
     }
 

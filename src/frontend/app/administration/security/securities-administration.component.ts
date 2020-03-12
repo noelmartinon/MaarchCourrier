@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '../../notification.service';
 import { HeaderService }        from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -10,13 +9,10 @@ declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "securities-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class SecuritiesAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
-    
     lang        : any = LANG;
     loading     : boolean = false;
 
@@ -46,9 +42,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.securitiesAdministration);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
-
+        
         this.loading = true;
 
         this.http.get('../../rest/passwordRules')
@@ -91,7 +85,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
         if (!this.passwordRules['lockTime'].enabled && !this.passwordRules['minLength'].enabled && !this.passwordRules['lockAttempts'].enabled && !this.passwordRules['renewal'].enabled && !this.passwordRules['historyLastUse'].enabled) {
             return true;
         } else {
-            false;
+            return false;
         }
     }
 

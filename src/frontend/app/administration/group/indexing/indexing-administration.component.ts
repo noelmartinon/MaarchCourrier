@@ -196,7 +196,7 @@ export class IndexingAdministrationComponent implements OnInit {
             if (index > -1) {
                 this.indexingInfo.actions.push(this.actionList[index]);
                 this.actionList.splice(index, 1);
-            };
+            }
         });
     }
 
@@ -293,7 +293,7 @@ export class IndexingAdministrationComponent implements OnInit {
     }
 
     removeAction(index: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

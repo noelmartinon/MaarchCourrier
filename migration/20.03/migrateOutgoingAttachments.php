@@ -202,17 +202,19 @@ foreach ($customs as $custom) {
         $documentWithNote++;
     }
 
-    \SrcCore\models\DatabaseModel::delete([
-        'table' => 'res_attachments',
-        'where' => ['res_id in (?)'],
-        'data'  => [$attachmentToDelete]
-    ]);
+    if (!empty($attachmentToDelete)) {
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'res_attachments',
+            'where' => ['res_id in (?)'],
+            'data'  => [$attachmentToDelete]
+        ]);
 
-    \SrcCore\models\DatabaseModel::delete([
-        'table' => 'adr_attachments',
-        'where' => ['res_id in (?)'],
-        'data'  => [$attachmentToDelete]
-    ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'adr_attachments',
+            'where' => ['res_id in (?)'],
+            'data'  => [$attachmentToDelete]
+        ]);
+    }
 
     printf("Migration outgoing_mail, outgoing_mail_signed (CUSTOM {$custom}) : " . $migrated . " courier(s) départ(s) trouvé(s) et migré(s). ".$documentWithNote." courrier(s) annoté(s)\n");
 }

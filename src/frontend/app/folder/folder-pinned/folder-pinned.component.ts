@@ -1,30 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 
-import { NotificationService } from '../../notification.service';
-import { MatDialog } from '@angular/material';
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
 import { FoldersService } from '../folders.service';
 
 @Component({
     selector: 'folder-pinned',
     templateUrl: "folder-pinned.component.html",
     styleUrls: ['folder-pinned.component.scss'],
-    providers: [NotificationService],
 })
 export class FolderPinnedComponent implements OnInit {
 
     lang: any = LANG;
     
     subscription: Subscription;
+
+    @Input('noInit') noInit: boolean = false;
     
     constructor(
         public http: HttpClient,
-        private notify: NotificationService,
-        private dialog: MatDialog,
-        private router: Router,
         public foldersService: FoldersService
     ) {
         // Event after process action 
@@ -35,7 +30,9 @@ export class FolderPinnedComponent implements OnInit {
 
     ngOnInit(): void {
         this.foldersService.initFolder();
-        this.foldersService.getPinnedFolders();
+        if (!this.noInit) {
+            this.foldersService.getPinnedFolders();
+        }
     }
 
     gotToFolder(folder: any) {

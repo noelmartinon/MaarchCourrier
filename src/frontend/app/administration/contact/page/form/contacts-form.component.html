@@ -247,6 +247,23 @@
                                 <mat-icon class="fa fa-trash"></mat-icon>
                             </button>
                         </mat-list-item>
+                        <ng-container
+                            *ngIf="unit.id === 'address' && addressBANMode && ['addressAdditional1', 'addressAdditional2'].indexOf(field.id) > -1">
+                            <mat-list-item class="contact-item">
+                                <p mat-line class="contact-content" *ngIf="field.display">
+                                    <mat-form-field>
+                                        <input matInput [formControl]="field.control" [placeholder]="field.label"
+                                            [required]="field.required">
+                                        <mat-error *ngIf="field.control.hasError('required')">
+                                            {{lang.requiredField}}</mat-error>
+                                    </mat-form-field>
+                                </p>
+                                <button *ngIf="field.display" [disabled]="!canDelete(field)" mat-icon-button matSuffix
+                                    color="warn" (click)="removeField(field)">
+                                    <mat-icon class="fa fa-trash"></mat-icon>
+                                </button>
+                            </mat-list-item>
+                        </ng-container>
 
                         <ng-container *ngIf="unit.id === 'address' && addressBANMode && i === 0">
                             <mat-list-item>
@@ -289,12 +306,15 @@
                                             [title]="lang.address">
                                             <mat-icon mat-list-icon color="primary"
                                                 class="contact-group fas fa-map-marker-alt"></mat-icon>
+                                            <p mat-line class="contact-content" *ngIf="!isEmptyValue(getValue('addressAdditional1'))">
+                                                {{getValue('addressAdditional1')}}
+                                            </p>
                                             <p mat-line class="contact-content">
                                                 {{getValue('addressNumber')}}
                                                 {{getValue('addressStreet')}}
                                             </p>
-                                            <p mat-line class="contact-content">
-                                                {{getValue('addressAdditional1')}} {{getValue('addressAdditional2')}}
+                                            <p mat-line class="contact-content" *ngIf="!isEmptyValue(getValue('addressAdditional2'))">
+                                                {{getValue('addressAdditional2')}}
                                             </p>
                                             <p mat-line class="contact-content">
                                                 {{getValue('addressPostcode')}}

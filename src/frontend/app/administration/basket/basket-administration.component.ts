@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -9,7 +9,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-import { FormControl } from '@angular/forms';
 import { AppService } from '../../../service/app.service';
 
 declare function $j(selector: any): any;
@@ -17,12 +16,12 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "basket-administration.component.html",
     styleUrls: ['basket-administration.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class BasketAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     dialogRef: MatDialogRef<any>;
 
@@ -66,27 +65,23 @@ export class BasketAdministrationComponent implements OnInit {
         private notify: NotificationService, 
         public dialog: MatDialog, 
         private headerService: HeaderService,
-        public appService: AppService) {
+        public appService: AppService,
+        private viewContainerRef: ViewContainerRef) {
             $j("link[href='merged_css.php']").remove();
     }
 
     ngOnInit(): void {
-
         this.loading = true;
-
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
+        
         this.route.params.subscribe((params: any) => {
             if (typeof params['id'] == "undefined") {
                 this.headerService.setHeader(this.lang.basketCreation);
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
-
                 this.creationMode = true;
                 this.basketIdAvailable = false;
                 this.loading = false;
             } else {
-                this.orderColumnsSelected = [];
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
+                this.orderColumnsSelected = [];      
 
                 this.creationMode = false;
                 this.basketIdAvailable = true;
@@ -152,7 +147,7 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     openSettings(group: any, action: any) {
-        this.config = { data: { group: group, action: action } };
+        this.config = { panelClass: 'maarch-modal', data: { group: group, action: action } };
         this.dialogRef = this.dialog.open(BasketAdministrationSettingsModalComponent, this.config);
         this.dialogRef.afterClosed().subscribe((result: any) => {
             if (result) {
@@ -261,7 +256,7 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     linkGroup() {
-        this.config = { data: { basketId: this.basket.id, groups: this.allGroups, linkedGroups: this.basketGroups } };
+        this.config = { panelClass: 'maarch-modal', data: { basketId: this.basket.id, groups: this.allGroups, linkedGroups: this.basketGroups } };
         this.dialogRef = this.dialog.open(BasketAdministrationGroupListModalComponent, this.config);
         this.dialogRef.afterClosed().subscribe((result: any) => {
             if (result) {

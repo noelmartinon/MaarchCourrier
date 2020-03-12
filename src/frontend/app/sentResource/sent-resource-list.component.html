@@ -16,16 +16,19 @@
     </div>
     <mat-table #table [dataSource]="dataSource" matSort matSortActive="creationDate" matSortDirection="desc">
         <ng-container matColumnDef="creationDate">
-            <mat-cell *matCellDef="let row" class="dataLine" [class.canManage]="row.canManage" style="flex: 1;padding: 0px;flex-direction: column;" (click)="openPromptMail(row)">
+            <mat-cell *matCellDef="let row" class="dataLine" [class.canManage]="row.canManage" style="flex: 1;padding: 0px;flex-direction: column;" (click)="open(row)">
                 <div class="subinfo">
-                    <span style="flex:1" [title]="row.creationDate | fullDate">
-                        {{lang.createdAlt}} : <b>{{row.creationDate | timeAgo : 'full'}}</b>
+                    <span *ngIf="(row.sendDate === null && row.status === 'SENT' && row.type == 'm2m_ARCHIVETRANSFER') || row.type != 'm2m_ARCHIVETRANSFER'" style="flex:1" [title]="row.creationDate | fullDate">
+                        {{row.type == 'm2m_ARCHIVETRANSFER' ? lang.sent : lang.createdAlt}} : <b>{{row.creationDate | timeAgo : 'full'}}</b>
                     </span>
                     <span *ngIf="row.sendDate !== null" style="flex:1;color:green" [title]="row.sendDate | fullDate">
-                        {{lang.sent}} : <b>{{row.sendDate | timeAgo : 'full'}}</b>
+                        {{row.type == 'm2m_ARCHIVETRANSFER' ? 'Reçu' : lang.sent}} : <b>{{row.sendDate | timeAgo : 'full'}}</b>
                     </span>
                     <span *ngIf="row.status === 'DRAFT'" style="flex:1;color:orange">
                         {{lang.draft}}
+                    </span>
+                    <span *ngIf="row.sendDate === null && row.status === 'SENT'" style="flex:1;color:orange">
+                        En attente de réception
                     </span>
                     <span *ngIf="row.status === 'WAITING'" style="flex:1;color:orange;font-weight: bold;">
                         {{lang.emailSendInProgress}}
@@ -36,7 +39,7 @@
                     <span *ngIf="row.status !== 'ERROR' && row.type == 'acknowledgementReceipt' && functions.empty(row.sendDate)" style="flex:1;color:orange">
                         {{lang.manualSendingAR}}
                     </span>
-                    <span style="flex:1" *ngIf="!functions.empty(row.operationDate)" [title]="row.operationDate | fullDate">
+                    <span style="flex:1;color:green" *ngIf="!functions.empty(row.operationDate)" [title]="row.operationDate | fullDate">
                         {{lang.delivery}} : <b>{{row.operationDate | timeAgo : 'full'}}</b>
                     </span>
                 </div>
@@ -67,5 +70,8 @@
     </mat-table>
     <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="lang.sendElement" (click)="openPromptMail()">
         <mat-icon style="height: auto;width: auto;" class="fa fa-plus"></mat-icon>
+    </button>
+    <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="lang.sendNumericPackage" (click)="openPromptNumericPackage()">
+        <mat-icon style="height: auto;width: auto;font-size: 20px;" class="fas fa-route"></mat-icon>
     </button>
 </ng-template>

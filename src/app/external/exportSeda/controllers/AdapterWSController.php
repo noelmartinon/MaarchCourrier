@@ -20,14 +20,13 @@ class AdapterWSController
 {
     public function send($messageObject, $messageId, $type)
     {
-        $message = MessageExchangeModel::getMessageByIdentifier(['messageId' => $messageId]);
-        $res     = TransferController::transfer('maarchcourrier', $message['reference'], $type);
+        $res     = TransferController::transfer('maarchcourrier', $messageId, $type);
 
         if ($res['status'] == 1) {
-            MessageExchangeModel::updateStatusMessage(['reference' => $message['reference'], 'status' => 'E']);
+            MessageExchangeModel::updateStatusMessage(['messageId' => $messageId, 'status' => 'E']);
             return $res;
         }
 
-        MessageExchangeModel::updateStatusMessage(['reference' => $message['reference'], 'status' => 'S']);
+        MessageExchangeModel::updateStatusMessage(['messageId' => $messageId, 'status' => 'S']);
     }
 }

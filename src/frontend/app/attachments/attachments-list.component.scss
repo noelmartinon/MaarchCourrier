@@ -1,7 +1,6 @@
 @import '../../css/vars.scss';
 
 .mat-card {
-    box-shadow: none;
     border: solid 1px #E0E0E0;
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.75);
 }
@@ -55,7 +54,6 @@
 }
 
 .stateInfo {
-    display: block;
     font-size: 12px;
     color: $primary;
     position: absolute;
@@ -71,7 +69,6 @@
 }
 
 .statusInfo {
-    display: block;
     font-size: 12px;
     color: #666;
     opacity: 0.5;
@@ -190,15 +187,13 @@
 
 .addPjProcess {
     position: sticky;
-    bottom: 5px;
     z-index: 2;
-    bottom: 80px;
+    bottom: 0px;
     margin-left: 10px;
 }
 
 .addPjPanel {
     position: sticky;
-    bottom: 5px;
     z-index: 2;
     bottom: 10px;
     margin-left: 10px;

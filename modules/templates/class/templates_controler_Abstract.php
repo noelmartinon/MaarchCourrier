@@ -498,41 +498,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
         return $return;
     }
     
-    /**
-    * Return all templates in an array for an entity
-    *
-    * @param $entityId entity identifier
-    * @return array of templates
-    */
-    public function getAllTemplatesForProcess($entityId)
-    {
-        include_once 'core/class/docservers_controler.php';
-
-        $db = new Database();
-        $stmt = $db->query(
-            'select * from ' . _TEMPLATES_TABLE_NAME . ' t, ' . _TEMPLATES_ASSOCIATION_TABLE_NAME . ' ta '
-            . 'where t.template_id = ta.template_id and ta.value_field = ? ORDER BY t.template_label',
-            [$entityId]
-        );
-        $docservers_controler = new docservers_controler();
-        $docserverTemplate = $docservers_controler->get('TEMPLATES');
-        $templates = [];
-        while ($res = $stmt->fetchObject()) {
-            array_push(
-                $templates,
-                array(
-                    'ID' => $res->template_id,
-                    'LABEL' => $res->template_label,
-                    'TYPE' => $res->template_type,
-                    'TARGET' => $res->template_target,
-                    'ATTACHMENT_TYPE' => $res->template_attachment_type,
-                    'FILE' => $docserverTemplate->path_template.str_replace('#', '/', $res->template_path).$res->template_file_name
-                )
-            );
-        }
-        return $templates;
-    }
-    
     public function updateTemplateEntityAssociation($templateId)
     {
         $db = new Database();
@@ -549,65 +514,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
                 array($templateId, $_SESSION['m_admin']['templatesEntitiesSelected'][$i])
             );
         }
-    }
-    
-    public function getAllItemsLinkedToModel($templateId, $field ='')
-    {
-        $db = new Database();
-        $items = array();
-        if (empty($templateId)) {
-            return $items;
-        }
-        if (empty($field)) {
-            $items['destination'] = [];
-            $stmt = $db->query(
-                "select value_field from "
-                . _TEMPLATES_ASSOCIATION_TABLE_NAME
-                . " where template_id = ?",
-                array($templateId)
-            );
-            while ($res = $stmt->fetchObject()) {
-                array_push($items['destination'], $res->value_field);
-            }
-        } else {
-            $items[$field] = [];
-            $stmt = $db->query(
-                "select value_field from "
-                . _TEMPLATES_ASSOCIATION_TABLE_NAME
-                . " where template_id = ?",
-                array($templateId)
-            );
-            while ($res = $stmt->fetchObject()) {
-                array_push($items[$field], $res->value_field);
-            }
-        }
-        return $items;
-    }
-    
-    public function getTemplatesStyles($dir, $stylesArray)
-    {
-        $this->stylesArray = $stylesArray;
-        //Browse all files of the style template dir
-        $classScan = dir($dir);
-        while (($filescan = $classScan->read()) != false) {
-            if ($filescan == '.' || $filescan == '..' || $filescan == '.svn') {
-                continue;
-            } elseif (is_dir($dir . $folder . $filescan)) {
-                $this->getTemplatesStyles($dir . $folder . $filescan . '/', $this->stylesArray);
-            } else {
-                $filePath = $dir . $folder . '/' . $filescan;
-                $info = pathinfo($filePath);
-                array_push(
-                    $this->stylesArray,
-                    array(
-                        'fileName' => basename($filePath, '.' . $info['extension']),
-                        'fileExt'  => strtoupper($info['extension']),
-                        'filePath' => $filePath,
-                    )
-                );
-            }
-        }
-        return $this->stylesArray;
     }
     
     public function getTemplatesDatasources($configXml)
@@ -632,52 +538,6 @@ abstract class templates_controler_Abstract extends ObjectControler implements O
             );
         }
         return $datasources;
-    }
-    
-    public function getTemplatesTargets()
-    {
-        $targets = array();
-        //attachments
-        array_push(
-            $targets,
-            array(
-                'id' => 'attachments',
-                'label'  => _ATTACHMENTS,
-            )
-        );
-        //notifications
-        array_push(
-            $targets,
-            array(
-                'id' => 'notifications',
-                'label'  => _NOTIFICATIONS,
-            )
-        );
-        //doctypes
-        array_push(
-            $targets,
-            array(
-                'id' => 'doctypes',
-                'label'  => _DOCTYPES,
-            )
-        );
-        //notes
-        array_push(
-            $targets,
-            array(
-                'id' => 'notes',
-                'label'  => _NOTES,
-            )
-        );
-        //sendmail
-        array_push(
-             $targets,
-             array(
-                 'id' => 'sendmail',
-                 'label'  => _SENDMAIL,
-             )
-         );
-        return $targets;
     }
     
     //returns file ext

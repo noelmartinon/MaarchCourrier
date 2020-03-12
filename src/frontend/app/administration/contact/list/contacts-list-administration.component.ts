@@ -1,12 +1,12 @@
-import {Component, OnInit, ViewChild, EventEmitter, Inject} from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
-import { HeaderService }        from '../../../../service/header.service';
+import { HeaderService } from '../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../service/app.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
-import {MatPaginator, MatSort, MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import { MatPaginator, MatSort, MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { FormControl } from '@angular/forms';
@@ -20,14 +20,14 @@ import { FunctionsService } from '../../../../service/functions.service';
 })
 export class ContactsListAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
     loading: boolean = false;
 
     filtersChange = new EventEmitter();
-    
+
     data: any;
 
     displayedColumnsContact: string[] = ['filling', 'firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
@@ -39,49 +39,52 @@ export class ContactsListAdministrationComponent implements OnInit {
 
     searchContact = new FormControl();
     search: string = '';
-    dialogRef                               : MatDialogRef<any>;
+    dialogRef: MatDialogRef<any>;
 
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     @ViewChild('tableContactListSort', { static: true }) sort: MatSort;
 
     private destroy$ = new Subject<boolean>();
 
-    subMenus:any [] = [
+    subMenus: any[] = [
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label : this.lang.contactsList,
+            label: this.lang.contactsList,
             current: true
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label : this.lang.customFields,
+            label: this.lang.customFieldsAdmin,
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label : this.lang.contactsParameters,
+            label: this.lang.contactsParameters,
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label : this.lang.contactsGroups,
+            label: this.lang.contactsGroups,
             current: false
         },
     ];
-    
+
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public dialog: MatDialog,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService,
+        private viewContainerRef: ViewContainerRef) { }
+        
 
     ngOnInit(): void {
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.loading = true;
         this.initContactList();
         this.initAutocompleteContacts();
@@ -141,7 +144,7 @@ export class ContactsListAdministrationComponent implements OnInit {
     deleteContact(contact: any) {
 
         if (contact.isUsed) {
-            this.dialogRef = this.dialog.open(ContactsListAdministrationRedirectModalComponent, {autoFocus: false});
+            this.dialogRef = this.dialog.open(ContactsListAdministrationRedirectModalComponent, { panelClass: 'maarch-modal', autoFocus: false });
             this.dialogRef.afterClosed().subscribe((result: any) => {
                 if (typeof result != "undefined" && result != '') {
                     var queryparams = '';
@@ -159,7 +162,7 @@ export class ContactsListAdministrationComponent implements OnInit {
                 this.dialogRef = null;
             });
         } else {
-            const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
                 exhaustMap(() => this.http.delete(`../../rest/contacts/${contact.id}`)),
@@ -176,11 +179,11 @@ export class ContactsListAdministrationComponent implements OnInit {
     }
 
     toggleContact(contact: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.suspend, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.suspend, msg: this.lang.confirmAction } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.put(`../../rest/contacts/${contact.id}/activation`, {enabled : !contact.enabled})),
+            exhaustMap(() => this.http.put(`../../rest/contacts/${contact.id}/activation`, { enabled: !contact.enabled })),
             tap((data: any) => {
                 this.refreshDao();
                 if (!contact.enabled === true) {
@@ -208,7 +211,7 @@ export class ContactsListAdministrationComponent implements OnInit {
                         this.search = '';
                         this.paginator.pageIndex = 0;
                         this.refreshDao();
-                    }   
+                    }
                 }),
                 debounceTime(300),
                 filter(value => value.length > 2),
@@ -249,7 +252,7 @@ export class ContactListHttpDao {
     constructor(private http: HttpClient) { }
 
     getRepoIssues(sort: string, order: string, page: number, href: string, search: string): Observable<ContactList> {
-        
+
         let offset = page * 10;
         const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
 
@@ -262,8 +265,8 @@ export class ContactListHttpDao {
     providers: [NotificationService]
 })
 export class ContactsListAdministrationRedirectModalComponent {
-    lang: any               = LANG;
-    modalTitle: string      = this.lang.confirmAction;
+    lang: any = LANG;
+    modalTitle: string = this.lang.confirmAction;
     redirectContact: number;
     processMode: string = 'delete';
 

@@ -1,4 +1,4 @@
-.summary-sheet-dialog {
+/*.summary-sheet-dialog {
     .mat-dialog-container {
         position: relative;
         height: 99vh !important;
@@ -10,7 +10,7 @@
     max-height: 92vh;
     padding-bottom: 10px;
     overflow-x: hidden;
-}
+}*/
 
 ::ng-deep.mat-expansion-panel-body {
     padding-bottom: 50px;
@@ -109,6 +109,7 @@
 
 .actions {
     justify-content: center;
+    position: relative;
 }
 
 .loader {
@@ -129,9 +130,9 @@
 }
 
 .qrcode {    
-    .mat-button-toggle-label-content {
-        padding-left: 7px;
-        line-height: 40px;
+    ::ng-deep.mat-button-toggle-label-content {
+        padding-left: 7px !important;
+        line-height: 40px !important;
     }
 }
 

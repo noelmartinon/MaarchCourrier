@@ -86,7 +86,7 @@ export class LinkedResourceListComponent implements OnInit {
                 
                 if (key === 'senders' && linkeRes[key].length > 1) {
                     if (linkeRes[key].length > 1) {
-                        linkeRes[key] = linkeRes[key].length + ' ' + this.lang.contacts;
+                        linkeRes[key] = linkeRes[key].length + ' ' + this.lang.contactsAlt;
                     } else {
                         linkeRes[key] = linkeRes[key][0];
                     }
@@ -107,7 +107,7 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     unlinkResource(row: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.unlink, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.unlink, msg: this.lang.confirmAction } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -139,7 +139,7 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     openSearchResourceModal() {
-        const dialogRef =  this.dialog.open(LinkResourceModalComponent, { width: '80%',data: { resId: this.resId, currentLinkedRes : this.linkedResources.map(res => res.resId) } });
+        const dialogRef =  this.dialog.open(LinkResourceModalComponent, { panelClass: 'maarch-full-height-modal', minWidth: '80%',data: { resId: this.resId, currentLinkedRes : this.linkedResources.map(res => res.resId) } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),
             tap(() => {
@@ -154,6 +154,6 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     openContact(row: any, mode: string) {
-        this.dialog.open(ContactsListModalComponent, { data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+        this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
     }
 }

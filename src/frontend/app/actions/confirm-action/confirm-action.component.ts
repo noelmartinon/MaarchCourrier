@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, exhaustMap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import {HeaderService} from "../../../service/header.service";
+import {FunctionsService} from "../../../service/functions.service";
 
 @Component({
     templateUrl: "confirm-action.component.html",
@@ -22,7 +24,9 @@ export class ConfirmActionComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<ConfirmActionComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any
+        @Inject(MAT_DIALOG_DATA) public data: any,
+        private headerService: HeaderService,
+        private functions: FunctionsService
     ) { }
 
     ngOnInit(): void { }
@@ -44,11 +48,14 @@ export class ConfirmActionComponent implements OnInit {
             }),
             exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote() })),
             tap(() => {
+                if (!this.functions.empty(this.data.resource['followed']) && this.data.resource['followed']) {
+                    this.headerService.nbResourcesFollowed++;
+                }
                 this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe()
@@ -61,7 +68,7 @@ export class ConfirmActionComponent implements OnInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

@@ -13,8 +13,9 @@ import { Subject, of } from 'rxjs';
 import { catchError, tap, filter } from 'rxjs/operators';
 import { LANG } from '../../app/translate.component';
 import { ConfirmComponent } from '../modal/confirm.component';
-import { MatDialogRef, MatDialog, MatSidenav } from '@angular/material';
+import { MatDialogRef, MatDialog } from '@angular/material';
 import { NotificationService } from '../../app/notification.service';
+import { HeaderService } from '../../service/header.service';
 
 declare var DocsAPI: any;
 declare function $j(selector: any): any;
@@ -33,8 +34,6 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
-
-    @Input() sidenavLeft: MatSidenav = null;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
@@ -80,10 +79,10 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
         }
     }
 
-    constructor(public http: HttpClient, public dialog: MatDialog, private notify: NotificationService) { }
+    constructor(public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, public headerService: HeaderService) { }
 
     quit() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.close, msg: this.lang.confirmCloseEditor } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.close, msg: this.lang.confirmCloseEditor } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -95,10 +94,8 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
     }
 
     closeEditor() {
-        console.log('close');
-
-        if (this.sidenavLeft !== null) {
-            this.sidenavLeft.open();
+        if (this.headerService.sideNavLeft !== null) {
+            this.headerService.sideNavLeft.open();
         }
         $j("iframe[name='frameEditor']").css("position", "initial");
         this.fullscreenMode = false;
@@ -313,15 +310,17 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
         $j("iframe[name='frameEditor']").css("left", "0px");
 
         if (!this.fullscreenMode) {
-            if (this.sidenavLeft !== null) {
-                this.sidenavLeft.close();
+            if (this.headerService.sideNavLeft !== null) {
+                this.headerService.sideNavLeft.close();
             }
             $j("iframe[name='frameEditor']").css("position", "fixed");
+            $j("iframe[name='frameEditor']").css("z-index", "2");
         } else {
-            if (this.sidenavLeft !== null) {
-                this.sidenavLeft.open();
+            if (this.headerService.sideNavLeft !== null) {
+                this.headerService.sideNavLeft.open();
             }
             $j("iframe[name='frameEditor']").css("position", "initial");
+            $j("iframe[name='frameEditor']").css("z-index", "1");
         }
         this.fullscreenMode = !this.fullscreenMode;
     }

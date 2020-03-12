@@ -28,3 +28,4 @@ php ./migrateContacts.php
 php ./migrateTemplates.php
 php ./migrateOutgoingTemplate.php
 php ./migrateLinkedResources.php
+php ./migrateThesaurus.php

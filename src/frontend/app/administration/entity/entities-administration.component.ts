@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -6,7 +6,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ConfirmModalComponent } from '../../confirmModal.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { Router } from '@angular/router';
@@ -24,13 +23,13 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "entities-administration.component.html",
     styleUrls: ['entities-administration.component.css'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class EntitiesAdministrationComponent implements OnInit {
     /*HEADER*/
     titleHeader: string;
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     dialogRef: MatDialogRef<any>;
 
@@ -82,13 +81,14 @@ export class EntitiesAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         private router: Router,
         public appService: AppService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private viewContainerRef: ViewContainerRef
     ) { }
 
     async ngOnInit(): Promise<void> {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.entities);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
+        
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
@@ -392,7 +392,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     removeEntity() {
         if (this.currentEntity.documents > 0 || this.currentEntity.redirects > 0 || this.currentEntity.instances > 0 || this.currentEntity.users.length > 0 || this.currentEntity.templates.length > 0) {
-            this.config = { data: { entity: this.currentEntity } };
+            this.config = { panelClass: 'maarch-modal', data: { entity: this.currentEntity } };
             this.dialogRef = this.dialog.open(EntitiesAdministrationRedirectModalComponent, this.config);
             this.dialogRef.afterClosed().subscribe((result: any) => {
                 if (result) {
@@ -560,7 +560,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     deleteDiffList() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete(`../../rest/listTemplates/${this.currentEntity.listTemplate.id}`)),
@@ -591,43 +591,46 @@ export class EntitiesAdministrationComponent implements OnInit {
                 }
             })
         };
-
-        if (this.functions.empty(newDiffList.items)) {
-            this.http.delete(`../../rest/listTemplates/${this.idVisaCircuit}`).pipe(
-                tap(() => {
-                    this.idVisaCircuit = null;
-                    this.notify.success(this.lang.diffusionModelDeleted);
-                    this.appVisaWorkflow.loadListModel(this.currentEntity.id);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        } else if (!this.functions.empty(this.idVisaCircuit)) {
-            this.http.put(`../../rest/listTemplates/${this.idVisaCircuit}`, newDiffList).pipe(
-                tap(() => {
-                    this.notify.success(this.lang.diffusionModelUpdated);
-                    this.appVisaWorkflow.loadListModel(this.currentEntity.id);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+        if (!this.appVisaWorkflow.isValidWorkflow()) {
+            this.notify.error(this.appVisaWorkflow.getError());
         } else {
-            this.http.post(`../../rest/listTemplates?admin=true`, newDiffList).pipe(
-                tap((data: any) => {
-                    this.idVisaCircuit = data.id;
-                    this.notify.success(this.lang.diffusionModelUpdated);
-                    this.appVisaWorkflow.loadListModel(this.currentEntity.id);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }
+            if (this.functions.empty(newDiffList.items)) {
+                this.http.delete(`../../rest/listTemplates/${this.idVisaCircuit}`).pipe(
+                    tap(() => {
+                        this.idVisaCircuit = null;
+                        this.notify.success(this.lang.diffusionModelDeleted);
+                        this.appVisaWorkflow.loadListModel(this.currentEntity.id);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else if (!this.functions.empty(this.idVisaCircuit)) {
+                this.http.put(`../../rest/listTemplates/${this.idVisaCircuit}`, newDiffList).pipe(
+                    tap(() => {
+                        this.notify.success(this.lang.diffusionModelUpdated);
+                        this.appVisaWorkflow.loadListModel(this.currentEntity.id);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else {
+                this.http.post(`../../rest/listTemplates?admin=true`, newDiffList).pipe(
+                    tap((data: any) => {
+                        this.idVisaCircuit = data.id;
+                        this.notify.success(this.lang.diffusionModelUpdated);
+                        this.appVisaWorkflow.loadListModel(this.currentEntity.id);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
+        }   
     }
 
     saveDiffListOpinion() {
@@ -691,8 +694,8 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     toggleRole(role: any) {
         if (role.usedIn.length > 0) {
-            this.config = { data: { msg: this.lang.confirmAction, warn: this.lang.roleUsedInTemplateInfo + " : <b>" + role.usedIn.join(', ') + '</b><br/>' + this.lang.roleUsedInTemplateInfo2 } };
-            let dialogRef = this.dialog.open(ConfirmModalComponent, this.config);
+            let dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { title: this.lang.confirmAction, msg: this.lang.roleUsedInTemplateInfo + " : <b>" + role.usedIn.join(', ') + '</b><br/>' + this.lang.roleUsedInTemplateInfo2 } });
+
             dialogRef.afterClosed().subscribe(result => {
                 if (result === "ok") {
                     role.available = !role.available;
@@ -778,7 +781,10 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 }
 @Component({
-    templateUrl: "entities-administration-redirect-modal.component.html"
+    templateUrl: "entities-administration-redirect-modal.component.html",
+    styles: [
+        ".alert-message { max-width: inherit; }"
+    ]
 })
 export class EntitiesAdministrationRedirectModalComponent {
     lang: any = LANG;

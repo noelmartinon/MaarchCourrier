@@ -157,6 +157,7 @@ class XParaphController
         $pages  = $pdf->getPages();
 
         $searchableArray = ["[xParaphSignature]"];
+        $pageCount = 0;
 
         foreach ($pages as $page) {
             $pageCount++;

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, Inject, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
@@ -12,7 +12,6 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "folder-update.component.html",
     styleUrls: ['folder-update.component.scss'],
-    providers: [NotificationService],
 })
 export class FolderUpdateComponent implements OnInit {
 
@@ -102,7 +101,7 @@ export class FolderUpdateComponent implements OnInit {
                         element['state'].selected = true;
                     }
 
-                    if (element.id === this.folder.id || currentParentId === element.parent_id) {
+                    if (element.id === this.folder.id || currentParentId === element.parent_id || !element.canEdit) {
                         currentParentId = element.id;
                         element['state'].opened = false;
                         element['state'].disabled = true;

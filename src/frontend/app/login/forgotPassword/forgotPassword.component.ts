@@ -5,8 +5,9 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../notification.service';
 import { finalize } from 'rxjs/operators';
 import { LANG } from '../../translate.component';
+import { HeaderService } from '../../../service/header.service';
 
-declare function $j(selector: any) : any;
+declare function $j(selector: any): any;
 
 @Component({
     templateUrl: 'forgotPassword.component.html',
@@ -22,15 +23,18 @@ export class ForgotPasswordComponent implements OnInit {
     };
     labelButton: string = this.lang.send;
 
-    constructor(public http: HttpClient, iconReg: MatIconRegistry, sanitizer: DomSanitizer, public notificationService: NotificationService) {
+    constructor(
+        public http: HttpClient,
+        iconReg: MatIconRegistry,
+        sanitizer: DomSanitizer,
+        public notificationService: NotificationService,
+        private headerService: HeaderService
+    ) {
         iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('static.php?filename=logo_white.svg'));
-        $j('#bodyloginCustom').remove();
-        $j('main-header').remove();
     }
 
-    ngOnInit(): void { 
-        $j('#bodyloginCustom').remove();
-        $j('main-header').remove();
+    ngOnInit(): void {
+        this.headerService.hideSideBar = true;
     }
 
     generateLink() {

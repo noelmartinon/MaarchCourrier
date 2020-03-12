@@ -33,10 +33,10 @@ export class HeaderPanelComponent implements OnInit {
     ngOnInit(): void { }
 
     goTo() {
-        if (this.navButton.route === '__GOBACK') {
+        if (this.headerService.sideBarButton.route === '__GOBACK') {
             this._location.back();
         } else {
-            this.router.navigate([this.navButton.route]);
+            this.router.navigate([this.headerService.sideBarButton.route]);
         }
 
     }

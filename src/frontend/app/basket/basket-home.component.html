@@ -42,7 +42,7 @@
                         </p>
                     </a>
                     <a mat-list-item
-                        [ngClass]="{'selectedBasket': currentBasketInfo.basketId == basket.id && currentBasketInfo.ownerId == basket.owner_user_id && currentBasketInfo.groupId == regroupedBasket.groupSerialId}"
+                        [ngClass]="{'selectedBasket': headerService.currentBasketInfo.basketId == basket.id && headerService.currentBasketInfo.ownerId == basket.owner_user_id && headerService.currentBasketInfo.groupId == regroupedBasket.groupSerialId}"
                         *ngIf="!basket.redirected" (click)="refreshDatas(basket);closePanelLeft();"
                         routerLink="/basketList/users/{{basket.owner_user_id}}/groups/{{regroupedBasket.groupSerialId}}/baskets/{{basket.id}}"
                         style="cursor:pointer;"
@@ -63,7 +63,7 @@
             <mat-nav-list>
                 <a mat-list-item
                     *ngFor="let basket of homeData.assignedBaskets | filterList:listFilter.value:'basket_name'"
-                    [ngClass]="{'selectedBasket': currentBasketInfo.basketId==basket.id && currentBasketInfo.ownerId==basket.owner_user_id && currentBasketInfo.groupId==basket.group_id}"
+                    [ngClass]="{'selectedBasket': headerService.currentBasketInfo.basketId==basket.id && headerService.currentBasketInfo.ownerId==basket.owner_user_id && headerService.currentBasketInfo.groupId==basket.group_id}"
                     routerLink="/basketList/users/{{basket.owner_user_id}}/groups/{{basket.group_id}}/baskets/{{basket.id}}">
                     <mat-icon *ngIf="!appService.getViewMode()" style="color:#666" mat-list-icon
                         class="fa fa-paper-plane"></mat-icon>

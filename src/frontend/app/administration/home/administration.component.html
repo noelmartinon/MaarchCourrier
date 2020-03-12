@@ -1,17 +1,9 @@
 <mat-sidenav-container class="maarch-container">
-    <mat-sidenav #snavLeft class="panel-left" #snav [mode]="appService.getViewMode() ? 'over' : 'side'"
-        [fixedInViewport]="appService.getViewMode()" [opened]="appService.getViewMode() ? false : true" autoFocus="false" style="overflow-x:hidden;"
-        [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">
-        <header-panel [snavLeft]="snav"></header-panel>
-        <menu-shortcut></menu-shortcut>
-        <menu-nav></menu-nav>
-        <mat-divider></mat-divider>
-    </mat-sidenav>
     <mat-sidenav-content>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left [snavLeft]="snav"></header-left>
+                    <header-left></header-left>
                 </div>
                 <div class="bg-head-title-tool">
                     <header-right></header-right>
@@ -21,52 +13,46 @@
             </div>
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
-            <div class="container-content">
+            <div class="container-content" style="display: flex;flex-direction: column;">
                 <div class="loading" *ngIf="loading">
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
-                <div *ngIf="!loading" class="row adminArea">
-                    <div class="col-md-6 col-sm-12 col-xs-12 adminArea_1" *ngIf="organisationServices">
-                        <div class="adminArea-label">{{lang.organization}}</div>
-                        <button class="col-md-4 col-xs-6 adminArea-button"
-                            mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of organisationServices | sortBy : 'label'"
-                            (click)="goToSpecifiedAdministration(modService)">
-                            <i class="{{modService.style}} fa-4x"></i>
-                            <br />{{modService.label}}</button>
-                    </div>
-
-                    <div class="col-md-6 col-sm-12 col-xs-12 adminArea_2" *ngIf="productionServices">
-                        <div class="adminArea-label">{{lang.production}}</div>
-                        <button class="col-md-4 col-xs-6 adminArea-button"
-                            mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of productionServices | sortBy : 'label'"
-                            (click)="goToSpecifiedAdministration(modService)">
-                            <i class="{{modService.style}} fa-4x"></i>
-                            <br />{{modService.label}}</button>
-                    </div>
-                    <div class="col-md-6 col-sm-12 col-xs-12 adminArea_3" *ngIf="classementServices">
-                        <div class="adminArea-label">{{lang.classifying}}</div>
-                        <button class="col-md-4 col-xs-6 adminArea-button"
-                            mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of classementServices | sortBy : 'label'"
-                            (click)="goToSpecifiedAdministration(modService)">
-                            <i class="{{modService.style}} fa-4x"></i>
-                            <br />{{modService.label}}</button>
-                    </div>
-                    <div class="col-md-6 col-sm-12 col-xs-12 adminArea_4" *ngIf="supervisionServices">
-                        <div class="adminArea-label">{{lang.supervision}}</div>
-                        <ng-container>
-                            <button class="col-md-4 col-xs-6 adminArea-button"
-                                mat-button color="primary" matTooltip="{{modService.comment}}" *ngFor="let modService of supervisionServices | sortBy : 'label'"
-                                (click)="goToSpecifiedAdministration(modService)">
-                                <i class="{{modService.style}} fa-4x"></i>
-                                <br />{{modService.label}}</button>
-                        </ng-container>
-                    </div>
+                <div
+                    style="display: grid;grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));gap: 20px;padding:20px;">
+                    <mat-card class="countCard" *ngFor="let shortcut of shortcutsAdmin" matRipple
+                        (click)="goToSpecifiedAdministration(shortcut)">
+                        <div mat-card-avatar class="avatarCount" style="margin-right: 10px;">
+                            <i class="{{shortcut.style}}" style="position: absolute;"></i>
+                        </div>
+                        <span style="font-size: 40px;">{{shortcut.count}}</span>&nbsp;
+                        {{shortcut.label}}
+                    </mat-card>
+                </div>
+                <mat-divider></mat-divider>
+                <mat-form-field style="padding:10px;font-size: 10px;width: 250px !important;">
+                    <input matInput #searchServiceInput [formControl]="searchService" [placeholder]="lang.filterBy">
+                </mat-form-field>
+                <div
+                    style="margin: 20px;display: grid;grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));gap: 20px;padding:20px;padding-top:0px;margin-top:0px;">
+                    <button mat-button *ngFor="let administration of filteredAdministrations | async | sortBy : 'label'"
+                        [title]="administration.comment" style="font-size:20px;height:80px;"
+                        (click)="goToSpecifiedAdministration(administration)">
+                        <div style="display: flex;align-items: center;">
+                            <span style="padding-right: 10px;">
+                                <i class="avatarCount2 {{administration.style}}"></i>
+                            </span>
+                            <span class="countLabel" style="white-space: initial;text-align: left;">
+                                {{administration.label}}
+                            </span>
+                        </div>
+                    </button>
                 </div>
             </div>
         </div>
     </mat-sidenav-content>
-    <mat-sidenav #snav2 [fixedInViewport]="appService.getViewMode()" position='end' [opened]="appService.getViewMode() ? false : false"
-        [mode]="appService.getViewMode() ? 'over' : 'side'" class="panel-right" style="overflow-x:hidden;" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '30%'}"
+    <mat-sidenav #snav2 [fixedInViewport]="appService.getViewMode()" position='end'
+        [opened]="appService.getViewMode() ? false : false" [mode]="appService.getViewMode() ? 'over' : 'side'"
+        class="panel-right" style="overflow-x:hidden;" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '30%'}"
         autoFocus="false">
     </mat-sidenav>
 </mat-sidenav-container>

@@ -3,13 +3,6 @@
     	<parameter name="objectType" type="identifier" />
 		<parameter name="objectId" type="identifier" />
     </validationRule>
-    <validationRule name="saveAvisModel" extends="standardForm" mode="error">
-    	<parameter name="id_list" type="string" />
-    	<parameter name="title" type="string" />
-    	<parameter name="conseillers" type="string" />
-    	<parameter name="consignes" type="string" />
-		<parameter name="list_sign" type="string" />
-    </validationRule>
     <validationRule name="update_AvisPage" extends="standardForm" mode="error">
     	<parameter name="res_id" type="integer" />
     	<parameter name="coll_id" type="collection_list" />

@@ -42,7 +42,7 @@ class EntitySeparatorController
 
         $entitiesList = [];
         if ($body['target'] == 'generic') {
-            $entitiesList['GÉNÉRIQUE'] = 'Maarch Courrier';
+            $entitiesList['GENERIQUE'] = 'Maarch Courrier';
         } else {
             if (!Validator::arrayType()->notEmpty()->validate($body['entities'])) {
                 return $response->withStatus(403)->withJson(['errors' => 'entities is not set or empty']);

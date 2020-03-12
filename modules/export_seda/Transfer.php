@@ -30,7 +30,7 @@ class Transfer
         }
     }
 
-    public function transfer($target, $reference, $type = null)
+    public function transfer($target, $messageId, $type = null)
     {
         $adapter = '';
         $res['status'] = 0;
@@ -48,9 +48,9 @@ class Transfer
 
         // [0] = url, [1] = header, [2] = cookie, [3] = data
         if ($type) {
-            $param = $adapter->getInformations($reference, $type);
+            $param = $adapter->getInformations($messageId, $type);
         } else {
-            $param = $adapter->getInformations($reference);
+            $param = $adapter->getInformations($messageId);
         }
 
         try {

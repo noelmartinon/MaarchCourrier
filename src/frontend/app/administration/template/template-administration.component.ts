@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -14,13 +14,12 @@ declare var tinymce: any;
 @Component({
     templateUrl: "template-administration.component.html",
     styleUrls: ['template-administration.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class TemplateAdministrationComponent implements OnInit {
 
-    /*HEADER*/
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang                    : any = LANG;
     loading                 : boolean = false;
@@ -52,7 +51,8 @@ export class TemplateAdministrationComponent implements OnInit {
         private notify: NotificationService, 
         private headerService: HeaderService, 
         public dialog: MatDialog,
-        public appService: AppService
+        public appService: AppService,
+        private viewContainerRef: ViewContainerRef
     ) {
         $j("link[href='merged_css.php']").remove();
         window['angularTemplateComponent'] = {
@@ -64,10 +64,11 @@ export class TemplateAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.route.params.subscribe(params => {
+
+            this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
+
             if (typeof params['id'] == "undefined") {
                 this.headerService.setHeader(this.lang.templateCreation);
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
 
                 this.creationMode = true;
 
@@ -80,8 +81,6 @@ export class TemplateAdministrationComponent implements OnInit {
 
                     });
             } else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
 
                 this.creationMode = false;
                 this.http.get('../../rest/templates/' + params['id'] + '/details')
@@ -321,6 +320,7 @@ export class TemplateAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     if (data.checkEntities) {
                         this.config = {
+                            panelClass: 'maarch-modal',
                             data: {
                                 entitiesList: data.checkEntities,
                                 template_attachment_type: this.template.template_attachment_type
@@ -342,6 +342,7 @@ export class TemplateAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     if (data.checkEntities) {
                         this.config = {
+                            panelClass: 'maarch-modal',
                             data: {
                                 entitiesList: data.checkEntities,
                                 template_attachment_type: this.template.template_attachment_type

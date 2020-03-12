@@ -28,6 +28,10 @@ class TagController
     {
         $tags = TagModel::get(['orderBy' => ['label']]);
 
+        if (empty($tags)) {
+            return $response->withJson(['tags' => []]);
+        }
+
         $ids = array_column($tags, 'id');
 
         $countResources = ResourceTagModel::get([

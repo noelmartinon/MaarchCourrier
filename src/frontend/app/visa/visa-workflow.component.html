@@ -37,7 +37,7 @@
             </mat-optgroup>
         </mat-autocomplete>
         <button mat-icon-button matSuffix *ngIf="visaWorkflow.items.length > 0 && showListModels" color="primary"
-            (click)="$event.stopPropagation();openPromptSaveModel()">
+            (click)="$event.stopPropagation();openPromptSaveModel()" title="{{lang.saveAsPrivateModel}}">
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
     </mat-form-field>
@@ -45,6 +45,7 @@
         [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
         [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event, true)" appearance="outline">
     </plugin-autocomplete>
+    <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="this.lang.itemRemovedFromVisaTemplate + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
         <div class="emptyContent" *ngIf="visaWorkflow.items.length === 0">
@@ -61,6 +62,7 @@
             <mat-icon
                 [ngClass]="{'fa fa-user fa-2x': functions.empty(diffusion.picture),'avatar': !functions.empty(diffusion.picture)}"
                 mat-list-icon color="primary"
+                [class.invalid]="!diffusion.hasPrivilege"
                 [style.background-image]="!functions.empty(diffusion.picture) ? 'url('+diffusion.picture+')' : ''" style="position: relative;">
                 <i *ngIf="!functions.empty(diffusion.process_comment)" class="far fa-comment-dots commentBubble" [matTooltip]="diffusion.process_comment"></i>
             </mat-icon>
@@ -79,13 +81,13 @@
             </ng-container>
             <div mat-line class="workflowLine">
                 <div class="workflowLineContainer">
-                    <div class="workflowLineLabel">
+                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege">
                         {{diffusion.labelToDisplay}}
                     </div>
-                    <div class="workflowLineSubLabel">
+                    <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege">
                         {{diffusion.item_entity}}
                     </div>
-                    <div class="workflowLineSubLabel" *ngIf="showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))">
+                    <div class="workflowLineSubLabel" *ngIf="(showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege">
                         <mat-form-field>
                             <input matInput class="comment" [disabled]="!adminMode || diffusion.process_date != null" [placeholder]="lang.visaNote" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
@@ -98,13 +100,15 @@
                             title='{{diffusion.process_date | fullDate}}'
                             color="warn">{{lang.interrupted}} {{diffusion.process_date | timeAgo : 'full'}}</div>
                 </div>
-                <div>
+                <div *ngIf="diffusion.hasPrivilege">
                     <button class="currentRoleButton" [color]="diffusion.requested_signature ? 'primary': '' "
                         [disabled]="!adminMode || !functions.empty(diffusion.process_date)" mat-raised-button
                         title="{{lang[diffusion.currentRole+'User']}}"
                         (click)="changeRole(i)">{{diffusion.requested_signature ? lang.signUser : lang.visaUser}}</button>
                 </div>
-
+                <div *ngIf="!diffusion.hasPrivilege" class="invalid">
+                    {{lang.noPrivileges}}
+                </div>
             </div>
             <button mat-icon-button *ngIf="adminMode && functions.empty(diffusion.process_date)"
                 (click)="deleteItem(i)">

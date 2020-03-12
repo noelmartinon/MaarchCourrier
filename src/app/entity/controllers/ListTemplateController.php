@@ -327,11 +327,11 @@ class ListTemplateController
                     $listTemplateItems[$itemKey]['labelToDisplay'] = "{$user['firstname']} {$user['lastname']}";
                     $listTemplateItems[$itemKey]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
 
-                    $listTemplateItems[$key]['hasPrivilege'] = true;
+                    $listTemplateItems[$itemKey]['hasPrivilege'] = true;
                     if ($listTemplate['type'] == 'visaCircuit' && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['item_id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['item_id']])) {
-                        $listTemplateItems[$key]['hasPrivilege'] = false;
+                        $listTemplateItems[$itemKey]['hasPrivilege'] = false;
                     } elseif ($listTemplate['type'] == 'opinionCircuit' && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['item_id']])) {
-                        $listTemplateItems[$key]['hasPrivilege'] = false;
+                        $listTemplateItems[$itemKey]['hasPrivilege'] = false;
                     }
 
                     $externalId = json_decode($user['external_id'], true);
@@ -343,6 +343,7 @@ class ListTemplateController
                     }
                 }
             }
+            $listTemplates[$key]['items'] = array_values($listTemplateItems);
         }
 
         return $response->withJson(['listTemplates' => $listTemplates]);
@@ -601,6 +602,7 @@ class ListTemplateController
                 $listTemplateItems[$key]['hasPrivilege'] = false;
             }
         }
+        $circuit['items'] = array_values($listTemplateItems);
 
         return $response->withJson(['circuit' => $circuit]);
     }

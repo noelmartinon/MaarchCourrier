@@ -159,8 +159,6 @@ if (!defined("_HELLO_NOTE"))
     define("_HELLO_NOTE", "Bonjour, vous avez une nouvelle annotation pour le courrier");
 if (!defined("_NOTE_BODY"))
     define("_NOTE_BODY", "L'annotation est la suivante : ");
-if (!defined("_NOTE_DETAILS"))
-    define("_NOTE_DETAILS", "Cette annotation à été ajoutée par : ");
 if (!defined("_NOTE_DATE_DETAILS"))
     define("_NOTE_DATE_DETAILS", "le");
 if (!defined("_LINK_TO_MAARCH"))

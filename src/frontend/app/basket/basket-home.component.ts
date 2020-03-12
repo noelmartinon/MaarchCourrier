@@ -5,8 +5,10 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../service/app.service';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { MatExpansionPanel } from '@angular/material';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { NotificationService } from '../notification.service';
+import { HeaderService } from '../../service/header.service';
+import { ActionsService } from '../actions/actions.service';
 
 declare function $j(selector: any) : any;
 
@@ -31,16 +33,28 @@ export class BasketHomeComponent implements OnInit {
     @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
     @ViewChild('basketPanel', { static: true }) basketPanel: MatExpansionPanel;
     editOrderGroups: boolean = false;
+    subscription: Subscription;
 
     constructor(
         public http: HttpClient,
         public appService: AppService,
-        private notify: NotificationService
+        public headerService: HeaderService,
+        private notify: NotificationService,
+        public actionService: ActionsService,
     ) {
+
+        this.subscription = this.actionService.catchAction().subscribe(message => {
+            this.refreshBasketHome();
+        });
     }
 
     ngOnInit(): void {
         this.getMyBaskets();
+    }
+
+    ngOnDestroy() {
+        // unsubscribe to ensure no memory leaks
+        this.subscription.unsubscribe();
     }
 
     getMyBaskets() {

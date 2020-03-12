@@ -176,7 +176,7 @@ class ResourceControlController
             if (empty($entity)) {
                 return ['errors' => "Body initiator does not exist"];
             }
-            if ($body['initiator'] != $entity['entity_id']) {
+            if ($resource['initiator'] != $entity['entity_id']) {
                 $userEntities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
                 $userEntities = array_column($userEntities, 'id');
                 if (!in_array($body['initiator'], $userEntities)) {

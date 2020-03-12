@@ -13,10 +13,9 @@
     <div class="col-md-8" style="margin-top:20px;">
         <div class="formType">
             <div class="formType-title">
-                {{lang.actionChosen}}
+                {{lang.availableIndexingActions}}
             </div>
-            <mat-hint class="infoActions">
-                {{lang.actionsInfo}}
+            <mat-hint class="infoActions" [innerHTML]="lang.actionsInfo">
             </mat-hint>
             <plugin-autocomplete [labelPlaceholder]="lang.linkNewAction"  [datas]="actionList" [targetSearchKey]="'label_action'"
                 (triggerEvent)="addAction($event)" appearance="outline"></plugin-autocomplete>

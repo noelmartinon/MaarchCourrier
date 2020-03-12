@@ -1,9 +1,10 @@
-<div class="modalContent">
-  <h1 *ngIf="data.title !== ''" mat-dialog-title>{{data.title}}</h1>
-  <div *ngIf="data.msg !== ''" mat-dialog-content>
-    <div class="alert-message alert-message-info" [innerHTML]="data.msg"></div>
-  </div>
-  <div mat-dialog-actions>
-    <button class="actions" color="primary" mat-raised-button (click)="this.dialogRef.close();">{{lang.ok}}</button>
-  </div>
+<div class="mat-dialog-content-container">
+    <h1 *ngIf="data.title !== ''" mat-dialog-title>{{data.title}}</h1>
+    <div *ngIf="data.msg !== ''" mat-dialog-content>
+        <div class="alert-message alert-message-info" [innerHTML]="data.msg"></div>
+    </div>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions>
+        <button class="actions" color="primary" mat-raised-button (click)="this.dialogRef.close();">{{lang.ok}}</button>
+    </div>
 </div>

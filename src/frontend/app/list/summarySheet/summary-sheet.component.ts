@@ -1,19 +1,16 @@
-import { Component, OnInit, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { formatDate } from '@angular/common';
 import { FunctionsService } from '../../../service/functions.service';
 
 declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "summary-sheet.component.html",
-    styleUrls: ['summary-sheet.component.scss'],
-    providers: [NotificationService],
-    encapsulation: ViewEncapsulation.None
+    styleUrls: ['summary-sheet.component.scss']
 })
 export class SummarySheetComponent implements OnInit {
 

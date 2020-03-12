@@ -1,22 +1,18 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService }        from '../../../service/header.service';
-import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../service/app.service';
 
 declare function $j(selector: any): any;
 
 @Component({
     templateUrl: "parameter-administration.component.html",
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class ParameterAdministrationComponent implements OnInit {
-
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
 
     lang                            : any       = LANG;
     loading                         : boolean   = false;
@@ -41,16 +37,13 @@ export class ParameterAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.route.params.subscribe((params) => {
+
             if (typeof params['id'] == "undefined") {
                 this.headerService.setHeader(this.lang.parameterCreation);
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
 
                 this.creationMode = true;
                 this.loading = false;
             } else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
 
                 this.creationMode = false;
                 this.http.get("../../rest/parameters/" + params['id'])

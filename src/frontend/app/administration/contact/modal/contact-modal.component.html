@@ -1,4 +1,4 @@
-<div [class.admin-contact]="mode === 'update'">
+<div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
         <span style="flex: 1;">
             {{creationMode ? lang.contactCreation : lang.contact}}
@@ -13,16 +13,20 @@
                     (onSubmitEvent)="dialogRef.close($event)"></app-contact-form>
                 <app-contacts-list *ngIf="mode === 'read'" [contact]="contact"></app-contacts-list>
             </mat-sidenav-content>
-            <mat-sidenav #drawer position='end' mode="side"
-                style="overflow-x:hidden;width: 50%;" autoFocus="false">
-                <app-document-viewer *ngIf="loadedDocument" #appDocumentViewer style="height:100%;width:100%;position: relative;"
-                    [editMode]="false" [base64]="headerService.getLastLoadedFile()">
+            <mat-sidenav #drawer position='end' mode="side" style="overflow-x:hidden;width: 50%;" autoFocus="false">
+                <app-document-viewer *ngIf="loadedDocument" #appDocumentViewer
+                    style="height:100%;width:100%;position: relative;" [editMode]="false"
+                    [base64]="headerService.getLastLoadedFile()">
                 </app-document-viewer>
             </mat-sidenav>
         </mat-sidenav-container>
     </mat-dialog-content>
+    <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions" *ngIf="canUpdate && mode === 'read' && contact.type === 'contact'">
-        <button mat-raised-button color="primary"
-            (click)="switchMode()">{{lang.update}}</button>
+        <button mat-raised-button color="primary" (click)="switchMode()">{{lang.update}}</button>
     </div>
 </div>
+
+<!--<div [class.admin-contact]="mode === 'update'">
+
+</div>-->

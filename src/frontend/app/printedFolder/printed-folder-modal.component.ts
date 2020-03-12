@@ -35,7 +35,7 @@ export class PrintedFolderModalComponent {
         notes: [],
         emails: [],
         acknowledgementReceipts: []
-    }
+    };
 
     selectedPrintedFolderElement: any = {};
 
@@ -64,7 +64,7 @@ export class PrintedFolderModalComponent {
     }
 
     getMainDocInfo() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.data.resId}/fileInformation`).pipe(
                 map((data: any) => {   
                     data = {
@@ -87,7 +87,7 @@ export class PrintedFolderModalComponent {
     }
 
     getAttachments() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get("../../rest/resources/" + this.data.resId + "/attachments").pipe(
                 map((data: any) => {
                     data.attachments = data.attachments.map((attachment: any) => {
@@ -97,7 +97,8 @@ export class PrintedFolderModalComponent {
                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.lang.undefined,
                            type: attachment.typeLabel,
                            creationDate: attachment.creationDate,
-                           canConvert : attachment.canConvert
+                           canConvert : attachment.canConvert,
+                           status: attachment.status
                         }
                     });
                     return data.attachments;
@@ -117,7 +118,7 @@ export class PrintedFolderModalComponent {
     }
 
     getEmails() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.data.resId}/emails?type=email`).pipe(
                 map((data: any) => {
                     data.emails = data.emails.map((item: any) => {
@@ -128,7 +129,7 @@ export class PrintedFolderModalComponent {
                             label: !this.functions.empty(item.object) ? item.object : `<i>${this.lang.emptySubject}<i>`,
                             canConvert : true
                         }
-                    })
+                    });
                     return data.emails;
                 }),
                 tap((data: any) => {
@@ -146,7 +147,7 @@ export class PrintedFolderModalComponent {
     }
 
     getNotes() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.data.resId}/notes`).pipe(
                 map((data: any) => {
                     data.notes = data.notes.map((item: any) => {
@@ -157,7 +158,7 @@ export class PrintedFolderModalComponent {
                             label: item.value,
                             canConvert : true
                         }
-                    })
+                    });
                     return data.notes;
                 }),
                 tap((data: any) => {
@@ -175,7 +176,7 @@ export class PrintedFolderModalComponent {
     }
 
     getAcknowledgementReceips() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/resources/${this.data.resId}/acknowledgementReceipts?type=ar`).pipe(
                 map((data: any) => {
                     data = data.map((item: any) => {
@@ -200,7 +201,7 @@ export class PrintedFolderModalComponent {
                             label: item.format === 'html' ? this.lang.ARelectronic : this.lang.ARPaper,
                             canConvert : true
                         }
-                    })
+                    });
                     return data;
                 }),
                 tap((data: any) => {
@@ -267,7 +268,7 @@ export class PrintedFolderModalComponent {
             withSeparator : this.withSeparator,
             summarySheet : this.summarySheet,
             resources : []
-        }
+        };
         let resource = {
             resId : this.data.resId,
             document : this.mainDocument,
@@ -285,7 +286,7 @@ export class PrintedFolderModalComponent {
     openSummarySheet(): void {
 
         const dialogRef = this.dialog.open(SummarySheetComponent, {
-            panelClass: 'summary-sheet-dialog',
+            panelClass: 'maarch-full-height-modal',
             width: '800px',
             data: {
                 paramMode : true

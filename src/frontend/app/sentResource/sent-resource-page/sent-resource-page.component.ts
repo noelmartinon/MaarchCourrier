@@ -128,7 +128,7 @@ export class SentResourcePageComponent implements OnInit {
                 this.setDefaultInfo();
             }
         }
-        this.loading = false;
+        //this.loading = false;
         setTimeout(() => {
             this.initMce();
         }, 0);
@@ -137,14 +137,22 @@ export class SentResourcePageComponent implements OnInit {
     initMce() {
         tinymce.init({
             selector: "textarea#emailSignature",
+            base_url: '../../node_modules/tinymce/',
+            setup: (editor: any) => {
+                editor.on('init', (e: any) => {
+                    console.log('The Editor has initialized.');
+                    this.loading = false;
+                });
+            },
             readonly: this.emailStatus === 'SENT',
+            height: '400',
             suffix: '.min',
             language: this.lang.langISO.replace('-', '_'),
             language_url: `../../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
             menubar: false,
             statusbar: false,
             plugins: [
-                'autolink', 'autoresize'
+                'autolink'
             ],
             external_plugins: {
                 'maarch_b64image': "../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js"
@@ -375,7 +383,7 @@ export class SentResourcePageComponent implements OnInit {
                     };
                     this.recipients = [{
                         label: !this.functions.empty(data.acknowledgementReceipt.contact) ? this.contactService.formatContact(data.acknowledgementReceipt.contact) : this.lang.contactDeleted,
-                        email: !this.functions.empty(data.acknowledgementReceipt.contact.email) ? data.acknowledgementReceipt.contact.email : this.lang.contactDeleted
+                        email: !this.functions.empty(data.acknowledgementReceipt.contact.email) ? data.acknowledgementReceipt.contact.email : this.lang.withoutEmail
                     }];
 
                     this.emailStatus = 'SENT';
@@ -578,7 +586,7 @@ export class SentResourcePageComponent implements OnInit {
                 this.notify.error(this.lang.badEmailsFormat);
             } else {
                 if (this.emailsubject === '') {
-                    const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.warnEmptySubject } });
+                    const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.warnEmptySubject } });
 
                     dialogRef.afterClosed().pipe(
                         filter((data: string) => data === 'ok'),
@@ -617,7 +625,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     deleteEmail() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -714,7 +722,7 @@ export class SentResourcePageComponent implements OnInit {
             $j('.tox-editor-header').show();
             tinymce.get('emailSignature').setContent(tinymce.get('emailSignature').getContent());
         } else {
-            const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.switchInPlainText, msg: this.lang.confirmSwitchInPlanText } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.switchInPlainText, msg: this.lang.confirmSwitchInPlanText } });
             dialogRef.afterClosed().pipe(
                 tap((data: string) => {
                     if (data === 'ok') {

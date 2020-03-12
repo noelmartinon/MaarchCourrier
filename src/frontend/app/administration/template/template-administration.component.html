@@ -1,229 +1,298 @@
-<div class="admin-container" [class.admin-is-mobile]="appService.getViewMode()">
-    <mat-sidenav-container autosize class="admin-sidenav-container" >
-        <mat-sidenav #snav [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()" fixedTopGap="56"
-            [opened]="appService.getViewMode() ? false : true">
-            <menu-shortcut></menu-shortcut>
-            <menu-nav></menu-nav>
-            <mat-nav-list *ngIf="!creationMode && !loading">
-                <h3 mat-subheader>{{lang.actions}}</h3>
-                <a mat-list-item [disableRipple]="lockFound || template.template_target == 'acknowledgementReceipt'" [class.disabled]="lockFound || template.template_target == 'acknowledgementReceipt'" (click)="duplicateTemplate()">
-                    <mat-icon color="primary" mat-list-icon class="fa fa-copy"></mat-icon>
-                    <p mat-line>
-                        {{lang.duplicate}}
-                    </p>
-                </a>
-            </mat-nav-list>
-            <mat-divider></mat-divider>
-        </mat-sidenav>
-        <mat-sidenav-content>
-            <div *ngIf="loading" style="display:flex;height:100%;">
-                <mat-spinner style="margin:auto;"></mat-spinner>
+<mat-sidenav-container autosize class="maarch-container">
+    <ng-template #adminMenuTemplate>
+        <mat-nav-list *ngIf="!creationMode && !loading">
+            <h3 mat-subheader>{{lang.actions}}</h3>
+            <a mat-list-item [disableRipple]="lockFound || template.template_target == 'acknowledgementReceipt'"
+                [class.disabled]="lockFound || template.template_target == 'acknowledgementReceipt'"
+                (click)="duplicateTemplate()">
+                <mat-icon color="primary" mat-list-icon class="fa fa-copy"></mat-icon>
+                <p mat-line>
+                    {{lang.duplicate}}
+                </p>
+            </a>
+        </mat-nav-list>
+    </ng-template>
+    <mat-sidenav-content>
+        <div class="bg-head">
+            <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
+                <div class="bg-head-title-label">
+                    <header-left></header-left>
+                </div>
+                <div class="bg-head-title-tool">
+                    <header-right></header-right>
+                </div>
             </div>
-            <mat-card *ngIf="!loading" class="card-app-content">
-                <form class="form-horizontal" (ngSubmit)="onSubmit()" #templatesFormUp="ngForm">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                    <input matInput [(ngModel)]="template.template_label" required name="template_label" id="template_label" title="{{lang.templateName}}"
-                                        type="text" placeholder="{{lang.templateName}}" maxlength="255">
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                    <textarea matInput [(ngModel)]="template.template_comment" required name="template_comment" id="template_comment" placeholder="{{lang.description}}"
-                                        title="{{lang.description}}" matTextareaAutosize matAutosizeMinRows="2" matAutosizeMaxRows="5">
-                                    </textarea>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                    <mat-select [disabled]="!creationMode" id="template_target" name="template_target" title="{{lang.templateTarget}}" placeholder="{{lang.templateTarget}}"
-                                        [(ngModel)]="template.template_target" (ngModelChange)="updateTemplateType()">
-                                        <mat-option value="">{{lang.noTarget}}</mat-option>
-                                        <mat-option value="acknowledgementReceipt">{{lang.acknowledgementReceipt}}</mat-option>
-                                        <mat-option value="notes">{{lang.notes}}</mat-option>
-                                        <mat-option value="sendmail">{{lang.sendmail}}</mat-option>
-                                        <mat-option value="indexingFile">{{lang.indexingFile}}</mat-option>
-                                        <mat-option value="notifications">{{lang.notifications}}</mat-option>
-                                        <mat-option value="attachments">{{lang.attachments}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="form-group" *ngIf="template.template_target == 'attachments'">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                    <mat-select id="template_attachment_type" name="template_attachment_type" title="{{lang.attachmentType}}" placeholder="{{lang.attachmentType}}"
-                                        [(ngModel)]="template.template_attachment_type">
-                                        <mat-option value="all">{{lang.allAttachments}}</mat-option>
-                                        <mat-option *ngFor="let value of attachmentTypesList" [value]="value.id">
-                                            {{value.label}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                        </div>
-
-                         <div class="form-group" *ngIf="template.template_target == 'acknowledgementReceipt'">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                        <mat-select [disabled]="!creationMode" id="template_attachment_type" name="template_attachment_type" title="{{lang.acknowledgementReceiptType}}" placeholder="{{lang.acknowledgementReceiptType}}"
-                                        [(ngModel)]="template.template_attachment_type" required>
-                                        <mat-option value="simple">{{lang.ARsimple}}</mat-option>
-                                        <mat-option value="sva">{{lang.ARsva}}</mat-option>
-                                        <mat-option value="svr">{{lang.ARsvr}}</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>
-                        </div>
-
-                        <div class="form-group" [hidden]="template.template_target=='attachments' || template.template_target=='notifications' || template.template_target=='doctypes' || template.template_target=='notes' || template.template_target=='acknowledgementReceipt'">
-                            <div class="col-sm-12">
-                                <mat-radio-group [disabled]="!creationMode" required name="template_type" [(ngModel)]="template.template_type">
-                                    <mat-radio-button style="margin-left:10px" color="primary" name="template_type" value="OFFICE" [checked]="template.template_type=='OFFICE'"
-                                        *ngIf="template.template_target=='attachments' || template.template_target==''">{{lang.office}}</mat-radio-button>
-                                    <mat-radio-button style="margin-left:10px" color="primary" name="template_type" value="HTML" [checked]="template.template_type=='HTML'"
-                                        *ngIf="template.template_target=='sendmail' || template.template_target=='doctypes' || template.template_target == 'notifications' || template.template_target == ''"
-                                        (click)="initMce('textarea#templateHtml')">{{lang.html}}</mat-radio-button>
-                                    <mat-radio-button style="margin-left:10px" color="primary" name="template_type" value="TXT" [checked]="template.template_type=='TXT'"
-                                        *ngIf="template.template_target=='sendmail' || template.template_target=='notes' || template.template_target == ''">{{lang.txt}}</mat-radio-button>
-                                </mat-radio-group>
-                            </div>
-                        </div>
-                        <div class="form-group" *ngIf="template.template_type=='OFFICE'">
-                            <div class="col-md-12" style="display: none;">
-                                <div class="form-inline hide">
-                                    <div class="form-group">
-                                        <input type="file" name="files[]" id="uploadSignFileOffice" (change)="uploadFileTrigger($event)" accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml‌.slideshow,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.presentation,application/vnd.oasis.opendocument.spreadsheet">
-                                    </div>
+            <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
+            </div>
+        </div>
+        <div class="container" [class.fullContainer]="appService.getViewMode()">
+            <div class="container-content">
+                <div *ngIf="loading" style="display:flex;height:100%;">
+                    <mat-spinner style="margin:auto;"></mat-spinner>
+                </div>
+                <mat-card *ngIf="!loading" class="card-app-content">
+                    <form class="form-horizontal" (ngSubmit)="onSubmit()" #templatesFormUp="ngForm">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <input matInput [(ngModel)]="template.template_label" required
+                                            name="template_label" id="template_label" title="{{lang.templateName}}"
+                                            type="text" placeholder="{{lang.templateName}}" maxlength="255">
+                                    </mat-form-field>
                                 </div>
                             </div>
-                            <div class="col-sm-12">
-                                <mat-form-field *ngIf="creationMode || template.template_style">
-                                    <mat-select id="template_style" [disabled]="!creationMode" name="template_style" title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
-                                        [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()" [required]="template.template_target!='acknowledgementReceipt'">
-                                        <mat-optgroup label="{{lang.loadedFile}} :">
-                                            <mat-option class="selectFile" (click)="clickOnUploader('uploadSignFileOffice')" value="uploadFile">
-                                                <mat-icon class="fa fa-paperclip" color="primary" style="height:auto;"></mat-icon> {{buttonFileName}}
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <textarea matInput [(ngModel)]="template.template_comment" required
+                                            name="template_comment" id="template_comment"
+                                            placeholder="{{lang.description}}" title="{{lang.description}}"
+                                            matTextareaAutosize matAutosizeMinRows="2" matAutosizeMaxRows="5">
+                                    </textarea>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <mat-select [disabled]="!creationMode" id="template_target"
+                                            name="template_target" title="{{lang.templateTarget}}"
+                                            placeholder="{{lang.templateTarget}}" [(ngModel)]="template.template_target"
+                                            (ngModelChange)="updateTemplateType()">
+                                            <mat-option value="">{{lang.noTarget}}</mat-option>
+                                            <mat-option value="acknowledgementReceipt">{{lang.acknowledgementReceipt}}
                                             </mat-option>
-                                        </mat-optgroup>
-                                        <ng-container *ngFor="let extension of extensionModels">
-                                            <mat-optgroup label="{{extension}} :">
-                                                <ng-container *ngFor="let default of defaultTemplatesList">
-                                                    <mat-option *ngIf="extension == default.fileExt" value="{{default.fileExt}}: {{default.fileName}}">
-                                                        {{default.fileExt}}: {{default.fileName}}
-                                                    </mat-option>
-                                                </ng-container>
-                                            </mat-optgroup>
-                                        </ng-container>
-                                    </mat-select>
-                                </mat-form-field>
-                                <button mat-raised-button color="default" type="button" (click)="$event.stopPropagation();startJnlp()" *ngIf="((creationMode && template.template_style != 'uploadFile' && template.template_style) || (!creationMode))" [disabled]="lockFound">{{lang.templateEdition}}</button>
-                                <button mat-raised-button color="default" type="button" (click)="$event.stopPropagation();clickOnUploader('uploadSignFileOffice')" *ngIf="((creationMode && template.template_style && template.template_style == 'uploadFile') || (!creationMode))" [disabled]="lockFound">{{lang.importFile}}</button>        
-                            </div>
-                        </div>
-                        <div class="form-group" *ngIf="template.template_type=='TXT'">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                    <textarea matInput [(ngModel)]="template.template_content" name="templateTxt" id="templateTxt" placeholder="{{lang.contentTxtTemplate}}"
-                                        title="{{lang.contentTxtTemplate}}" matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="5" [required]="template.template_target!='acknowledgementReceipt'">
-                                    </textarea>
-                                </mat-form-field>
-                            </div>
-                        </div>
-                        <div class="form-group" *ngIf="template.template_type=='HTML'">
-                            <div class="col-sm-12">
-                                <div id="html_mode" style="display: block; width:100%;">
-                                    <textarea [(ngModel)]="template.template_content" name="templateHtml" id="templateHtml" style="width:100%" rows="15" cols="60" [required]="template.template_target!='acknowledgementReceipt'"></textarea>
+                                            <mat-option value="notes">{{lang.notes}}</mat-option>
+                                            <mat-option value="sendmail">{{lang.sendmail}}</mat-option>
+                                            <mat-option value="indexingFile">{{lang.indexingFile}}</mat-option>
+                                            <mat-option value="notifications">{{lang.notifications}}</mat-option>
+                                            <mat-option value="attachments">{{lang.attachments}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group" *ngIf="template.template_target=='notifications'">
-                            <div class="col-sm-12">
-                                <mat-form-field>
-                                    <mat-select id="template_datasource" name="template_datasource" title="{{lang.templateDatasource}}" placeholder="{{lang.templateDatasource}}"
-                                        [(ngModel)]="template.template_datasource">
-                                        <mat-option value="">{{lang.noDatasource}}</mat-option>
-                                        <ng-container *ngFor="let datasource of datasourcesList">
-                                            <mat-option *ngIf="displayDatasources(datasource)" [value]="datasource.id">{{datasource.label}}</mat-option>
-                                        </ng-container>
-                                    </mat-select>
-                                </mat-form-field>
+                            <div class="form-group" *ngIf="template.template_target == 'attachments'">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <mat-select id="template_attachment_type" name="template_attachment_type"
+                                            title="{{lang.attachmentType}}" placeholder="{{lang.attachmentType}}"
+                                            [(ngModel)]="template.template_attachment_type">
+                                            <mat-option value="all">{{lang.allAttachments}}</mat-option>
+                                            <mat-option *ngFor="let value of attachmentTypesList" [value]="value.id">
+                                                {{value.label}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group" *ngIf="template.template_type=='OFFICE_HTML'">
-                            <mat-tab-group (selectedTabChange)="loadTab($event);">
-                                <mat-tab label="{{lang.electronicTemplate}}">
-                                    <div class="col-sm-12">
-                                        <div id="html_mode" style="display: block; width:100%;">
-                                            <textarea [(ngModel)]="template.template_content" name="templateOfficeHtml" id="templateOfficeHtml" style="width:100%" rows="15" cols="60" [required]="template.template_target!='acknowledgementReceipt'"></textarea>
+                            <div class="form-group" *ngIf="template.template_target == 'acknowledgementReceipt'">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <mat-select [disabled]="!creationMode" id="template_attachment_type"
+                                            name="template_attachment_type" title="{{lang.acknowledgementReceiptType}}"
+                                            placeholder="{{lang.acknowledgementReceiptType}}"
+                                            [(ngModel)]="template.template_attachment_type" required>
+                                            <mat-option value="simple">{{lang.ARsimple}}</mat-option>
+                                            <mat-option value="sva">{{lang.ARsva}}</mat-option>
+                                            <mat-option value="svr">{{lang.ARsvr}}</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="form-group"
+                                [hidden]="template.template_target=='attachments' || template.template_target=='notifications' || template.template_target=='doctypes' || template.template_target=='notes' || template.template_target=='acknowledgementReceipt'">
+                                <div class="col-sm-12">
+                                    <mat-radio-group [disabled]="!creationMode" required name="template_type"
+                                        [(ngModel)]="template.template_type">
+                                        <mat-radio-button style="margin-left:10px" color="primary" name="template_type"
+                                            value="OFFICE" [checked]="template.template_type=='OFFICE'"
+                                            *ngIf="template.template_target=='attachments' || template.template_target==''">
+                                            {{lang.office}}</mat-radio-button>
+                                        <mat-radio-button style="margin-left:10px" color="primary" name="template_type"
+                                            value="HTML" [checked]="template.template_type=='HTML'"
+                                            *ngIf="template.template_target=='sendmail' || template.template_target=='doctypes' || template.template_target == 'notifications' || template.template_target == ''"
+                                            (click)="initMce('textarea#templateHtml')">{{lang.html}}</mat-radio-button>
+                                        <mat-radio-button style="margin-left:10px" color="primary" name="template_type"
+                                            value="TXT" [checked]="template.template_type=='TXT'"
+                                            *ngIf="template.template_target=='sendmail' || template.template_target=='notes' || template.template_target == ''">
+                                            {{lang.txt}}</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="template.template_type=='OFFICE'">
+                                <div class="col-md-12" style="display: none;">
+                                    <div class="form-inline hide">
+                                        <div class="form-group">
+                                            <input type="file" name="files[]" id="uploadSignFileOffice"
+                                                (change)="uploadFileTrigger($event)"
+                                                accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml‌.slideshow,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.presentation,application/vnd.oasis.opendocument.spreadsheet">
                                         </div>
                                     </div>
-                                </mat-tab>
-                                <mat-tab label="{{lang.paperTemplate}}">
-                                    <div class="col-md-12" style="display: none;">
-                                        <div class="form-inline hide">
-                                            <div class="form-group">
-                                                <input type="file" name="files[]" id="uploadSignFileOfficeHtml" (change)="uploadFileTrigger($event)" accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml‌.slideshow,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.presentation,application/vnd.oasis.opendocument.spreadsheet">
+                                </div>
+                                <div class="col-sm-12">
+                                    <mat-form-field *ngIf="creationMode || template.template_style">
+                                        <mat-select id="template_style" [disabled]="!creationMode" name="template_style"
+                                            title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
+                                            [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()"
+                                            [required]="template.template_target!='acknowledgementReceipt'">
+                                            <mat-optgroup label="{{lang.loadedFile}} :">
+                                                <mat-option class="selectFile"
+                                                    (click)="clickOnUploader('uploadSignFileOffice')"
+                                                    value="uploadFile">
+                                                    <mat-icon class="fa fa-paperclip" color="primary"
+                                                        style="height:auto;"></mat-icon> {{buttonFileName}}
+                                                </mat-option>
+                                            </mat-optgroup>
+                                            <ng-container *ngFor="let extension of extensionModels">
+                                                <mat-optgroup label="{{extension}} :">
+                                                    <ng-container *ngFor="let default of defaultTemplatesList">
+                                                        <mat-option *ngIf="extension == default.fileExt"
+                                                            value="{{default.fileExt}}: {{default.fileName}}">
+                                                            {{default.fileExt}}: {{default.fileName}}
+                                                        </mat-option>
+                                                    </ng-container>
+                                                </mat-optgroup>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <button mat-raised-button color="default" type="button"
+                                        (click)="$event.stopPropagation();startJnlp()"
+                                        *ngIf="((creationMode && template.template_style != 'uploadFile' && template.template_style) || (!creationMode))"
+                                        [disabled]="lockFound">{{lang.templateEdition}}</button>
+                                    <button mat-raised-button color="default" type="button"
+                                        (click)="$event.stopPropagation();clickOnUploader('uploadSignFileOffice')"
+                                        *ngIf="((creationMode && template.template_style && template.template_style == 'uploadFile') || (!creationMode))"
+                                        [disabled]="lockFound">{{lang.importFile}}</button>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="template.template_type=='TXT'">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <textarea matInput [(ngModel)]="template.template_content" name="templateTxt"
+                                            id="templateTxt" placeholder="{{lang.contentTxtTemplate}}"
+                                            title="{{lang.contentTxtTemplate}}" matTextareaAutosize
+                                            matAutosizeMinRows="5" matAutosizeMaxRows="5"
+                                            [required]="template.template_target!='acknowledgementReceipt'">
+                                    </textarea>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="template.template_type=='HTML'">
+                                <div class="col-sm-12">
+                                    <div id="html_mode" style="display: block; width:100%;">
+                                        <textarea [(ngModel)]="template.template_content" name="templateHtml"
+                                            id="templateHtml" style="width:100%" rows="15" cols="60"
+                                            [required]="template.template_target!='acknowledgementReceipt'"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="template.template_target=='notifications'">
+                                <div class="col-sm-12">
+                                    <mat-form-field>
+                                        <mat-select id="template_datasource" name="template_datasource"
+                                            title="{{lang.templateDatasource}}"
+                                            placeholder="{{lang.templateDatasource}}"
+                                            [(ngModel)]="template.template_datasource">
+                                            <mat-option value="">{{lang.noDatasource}}</mat-option>
+                                            <ng-container *ngFor="let datasource of datasourcesList">
+                                                <mat-option *ngIf="displayDatasources(datasource)"
+                                                    [value]="datasource.id">{{datasource.label}}</mat-option>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="form-group" *ngIf="template.template_type=='OFFICE_HTML'">
+                                <mat-tab-group (selectedTabChange)="loadTab($event);">
+                                    <mat-tab label="{{lang.electronicTemplate}}">
+                                        <div class="col-sm-12">
+                                            <div id="html_mode" style="display: block; width:100%;">
+                                                <textarea [(ngModel)]="template.template_content"
+                                                    name="templateOfficeHtml" id="templateOfficeHtml" style="width:100%"
+                                                    rows="15" cols="60"
+                                                    [required]="template.template_target!='acknowledgementReceipt'"></textarea>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <mat-form-field>
-                                            <mat-select id="template_style" [disabled]="!creationMode && template.template_file_name != null" name="template_style" title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
-                                                [(ngModel)]="template.template_style" (ngModelChange)="resetFileUploaded()" [required]="template.template_target!='acknowledgementReceipt'">
-                                                <mat-optgroup label="{{lang.loadedFile}} :">
-                                                    <mat-option (click)="clickOnUploader('uploadSignFileOfficeHtml')" style="text-align: center;" value="uploadFile">
-                                                        <mat-icon class="fa fa-paperclip" color="primary" style="height:auto;"></mat-icon> {{buttonFileName}}
-                                                    </mat-option>
-                                                </mat-optgroup>
-                                                <ng-container *ngFor="let extension of extensionModels">
-                                                    <mat-optgroup label="{{extension}} :">
-                                                        <ng-container *ngFor="let default of defaultTemplatesList">
-                                                            <mat-option *ngIf="extension == default.fileExt" value="{{default.fileExt}}: {{default.fileName}}">
-                                                                {{default.fileExt}}: {{default.fileName}}
-                                                            </mat-option>
-                                                        </ng-container>
+                                    </mat-tab>
+                                    <mat-tab label="{{lang.paperTemplate}}">
+                                        <div class="col-md-12" style="display: none;">
+                                            <div class="form-inline hide">
+                                                <div class="form-group">
+                                                    <input type="file" name="files[]" id="uploadSignFileOfficeHtml"
+                                                        (change)="uploadFileTrigger($event)"
+                                                        accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml‌.slideshow,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.presentation,application/vnd.oasis.opendocument.spreadsheet">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <mat-form-field>
+                                                <mat-select id="template_style"
+                                                    [disabled]="!creationMode && template.template_file_name != null"
+                                                    name="template_style" title="{{lang.defaultTemplate}}"
+                                                    placeholder="{{lang.chosenModel}}"
+                                                    [(ngModel)]="template.template_style"
+                                                    (ngModelChange)="resetFileUploaded()"
+                                                    [required]="template.template_target!='acknowledgementReceipt'">
+                                                    <mat-optgroup label="{{lang.loadedFile}} :">
+                                                        <mat-option
+                                                            (click)="clickOnUploader('uploadSignFileOfficeHtml')"
+                                                            style="text-align: center;" value="uploadFile">
+                                                            <mat-icon class="fa fa-paperclip" color="primary"
+                                                                style="height:auto;"></mat-icon> {{buttonFileName}}
+                                                        </mat-option>
                                                     </mat-optgroup>
-                                                </ng-container>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        <button mat-raised-button color="default" type="button" (click)="$event.stopPropagation();startJnlp()" 
-                                                *ngIf="template.template_file_name != null || (template.template_style != 'uploadFile' && template.template_style)" 
+                                                    <ng-container *ngFor="let extension of extensionModels">
+                                                        <mat-optgroup label="{{extension}} :">
+                                                            <ng-container *ngFor="let default of defaultTemplatesList">
+                                                                <mat-option *ngIf="extension == default.fileExt"
+                                                                    value="{{default.fileExt}}: {{default.fileName}}">
+                                                                    {{default.fileExt}}: {{default.fileName}}
+                                                                </mat-option>
+                                                            </ng-container>
+                                                        </mat-optgroup>
+                                                    </ng-container>
+                                                </mat-select>
+                                            </mat-form-field>
+                                            <button mat-raised-button color="default" type="button"
+                                                (click)="$event.stopPropagation();startJnlp()"
+                                                *ngIf="template.template_file_name != null || (template.template_style != 'uploadFile' && template.template_style)"
                                                 [disabled]="lockFound">{{lang.templateEdition}}</button>
-                                        <button mat-raised-button color="default" type="button" (click)="$event.stopPropagation();clickOnUploader('uploadSignFileOfficeHtml')" 
-                                                *ngIf="template.template_file_name != null || (template.template_style && template.template_style == 'uploadFile')" 
+                                            <button mat-raised-button color="default" type="button"
+                                                (click)="$event.stopPropagation();clickOnUploader('uploadSignFileOfficeHtml')"
+                                                *ngIf="template.template_file_name != null || (template.template_style && template.template_style == 'uploadFile')"
                                                 [disabled]="lockFound">{{lang.importFile}}</button>
-                                    </div>
-                                </mat-tab>
-                            </mat-tab-group>
+                                        </div>
+                                    </mat-tab>
+                                </mat-tab-group>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-12" style="text-align:center;">
-                            <button mat-raised-button color="primary" type="submit" [disabled]="!templatesFormUp.form.valid || lockFound">{{lang.save}}</button>
+                        <div class="form-group">
+                            <div class="col-sm-12" style="text-align:center;">
+                                <button mat-raised-button color="primary" type="submit"
+                                    [disabled]="!templatesFormUp.form.valid || lockFound">{{lang.save}}</button>
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </mat-card>
-        </mat-sidenav-content>
-        <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()" fixedTopGap="56"
-            position='end' [opened]="appService.getViewMode() ? false : true" style="overflow-x:hidden;width:400px;">
-            <mat-list>
-                <h3 mat-subheader>{{lang.chooseEntityAssociationModel}}</h3>
-                <div style="padding:10px;">
-                    <mat-form-field>
-                        <input matInput id="jstree_search" name="jstree_search" type="text" placeholder="{{lang.searchEntities}}">
-                    </mat-form-field>
-                    <div id="jstree"></div>
-                </div>
-            </mat-list>
-        </mat-sidenav>
-    </mat-sidenav-container>
-</div>
+                    </form>
+                </mat-card>
+            </div>
+        </div>
+    </mat-sidenav-content>
+
+    <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
+        fixedTopGap="56" position='end' [opened]="!appService.getViewMode()" style="overflow-x:hidden;width:400px;">
+        <mat-list>
+            <h3 mat-subheader>{{lang.chooseEntityAssociationModel}}</h3>
+            <div style="padding:10px;">
+                <mat-form-field>
+                    <input matInput id="jstree_search" name="jstree_search" type="text"
+                        placeholder="{{lang.searchEntities}}">
+                </mat-form-field>
+                <div id="jstree"></div>
+            </div>
+        </mat-list>
+    </mat-sidenav>
+</mat-sidenav-container>

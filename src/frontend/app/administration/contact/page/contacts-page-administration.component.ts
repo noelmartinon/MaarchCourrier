@@ -1,9 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
 import { HeaderService } from '../../../../service/header.service';
-import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../service/app.service';
 import { MatDialog } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,12 +9,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 @Component({
     templateUrl: "contacts-page-administration.component.html",
     styleUrls: ['contacts-page-administration.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class ContactsPageAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
     loading: boolean = false;
@@ -33,7 +30,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label : this.lang.customFields,
+            label : this.lang.customFieldsAdmin,
             current: false
         },
         {
@@ -58,24 +55,23 @@ export class ContactsPageAdministrationComponent implements OnInit {
         private router: Router,
         private headerService: HeaderService,
         public appService: AppService,
-        public dialog: MatDialog) { }
+        public dialog: MatDialog,
+        private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {
 
         this.loading = true;
 
         this.route.params.subscribe((params: any) => {
-            if (typeof params['id'] == "undefined") {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
+            
+            this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
+            if (typeof params['id'] == "undefined") {
                 this.headerService.setHeader(this.lang.contactCreation);
                 this.creationMode = true;
                 this.loading = false;
 
             } else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
 
                 this.headerService.setHeader(this.lang.contactModification);
 

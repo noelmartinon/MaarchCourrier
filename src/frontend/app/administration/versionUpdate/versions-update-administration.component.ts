@@ -16,11 +16,10 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "versions-update-administration.component.html",
     styleUrls: ['versions-update-administration.component.scss'],
-    providers: [NotificationService, AppService],
+    providers: [AppService],
 })
 export class VersionsUpdateAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
     lang: any = LANG;
@@ -42,9 +41,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.updateVersionControl);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
-
+        
         this.loading = true;
 
         this.http.get('../../rest/versionsUpdate').pipe(
@@ -63,7 +60,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
 
     updateVersionAccess() {
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { data: { title: this.lang.confirm + ' ?', msg: this.lang.updateInfo  } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', data: { title: this.lang.confirm + ' ?', msg: this.lang.updateInfo  } });
         this.dialogRef.afterClosed().pipe(
             filter((data) => {
                 this.dialogRef = null;
@@ -78,7 +75,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
             }),
             exhaustMap(() => this.http.put('../../rest/versionsUpdate', {})),
             tap(() => {
-                this.dialogRef = this.dialog.open(AlertComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.updateOk, msg: '' } });
+                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateOk, msg: '' } });
             }),
             exhaustMap(() => this.dialogRef.afterClosed()),
             tap(() => {

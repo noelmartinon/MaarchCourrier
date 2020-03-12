@@ -1,104 +1,5 @@
-.errorVisa{
-	color: #ea0000;
-    font-weight: bold;
-    text-align: center;
-    font-size: 1.4em;
-}
-#visa_listDoc{
-	border:1px solid black;
-	height:95%;
-	width:15%;
-	float: left;
-}
-
-#visa_left{
-	height:95%;
-	width:41%;
-	margin-left:1%;
-	float: left;
-}
-
-#tabricatorLeft{
-	height:99.5%;
-	min-width:0;
-	width:99.5%;
-	margin-bottom:0px;
-}
-
-#visa_right{
-	height:95%;
-	width:41%;
-	margin-left:1%;
-	float: left;
-}
-
-#tabricatorRight{
-	height:90%;
-	min-width:0;
-	width:99.5%;
-}
-
-#visa_listDoc .toolbar{
-	height: 4%;
-	width: 100%;
-}
-
-#visa_listDoc .toolbar table{
-	text-align:center;
-	width:100%;
-}
-
-#modalPIN{
-	padding-top:50px;
-	z-index: 1050;
-	width: 300px;
-	height: 80px;
-	border: 2px solid #000;
-	display: none;
-	position: absolute;
-	background-color: #F2F2F2;
-	left: 40%;
-	top: 40%;
-	text-align: center;
-}
-
-#modalSaveVisaModel{
-	padding-top:20px;
-	z-index: 1050;
-	width: 300px;
-	height: 80px;
-	border: 2px solid #000;
-	display: none;
-	position: absolute;
-	background-color: #F2F2F2;
-	left: 40%;
-	top: 10%;
-	text-align: center;
-}
-
-.listDocsBasket{
-	border-collapse: collapse;
-	height: 96%;
-	width: 100%;
-	overflow-y: scroll;
-}
-
-.listDocsBasket div{
-	width:100%;
-	border-bottom: thin solid black;
-}
-
 .selectedId{
 	background-color:#F99830;
-}
-
-
-.listDocsBasket li{
-	padding:5px;
-}
-
-#tab_visaSetWorkflow td{
-	white-space: pre;
 }
 
 [draggable=true]{
@@ -169,20 +70,6 @@
 .vised .visaUserStatus{
 	opacity: 1;
 }
-.visaUserInfo{
-	width: 55%;
-	font-weight: bold;
-}
-
-.visaUserInfo .nbRes{
-	background-color: grey;
-	font-weight: normal;
-}
-
-.visaUserInfo sub{
-	font-weight: normal;
-}
-
 .droptarget:hover.vised #dropZone{
 	visibility: hidden;
 }
@@ -478,7 +365,7 @@ img.panelSelectedThumbnail,img:hover.panelSelectedThumbnail{
     cursor:pointer;
 }
 
-.actions{
+/* .actions{
     float:right;
     width: 25%;
     padding: 5px;
@@ -487,7 +374,7 @@ img.panelSelectedThumbnail,img:hover.panelSelectedThumbnail{
     text-transform: initial;
     border-left: solid 1px black;
     border-right: solid 1px black;
-}
+} */
 .actions i{
    width:5%;
 }
@@ -819,7 +706,6 @@ img.panelSelectedThumbnail,img:hover.panelSelectedThumbnail{
 
 .panelRightAddPj{
     display: block;
-    padding:10px;
     margin: auto;
     margin-bottom: 10px; 
     font-size: 10px;

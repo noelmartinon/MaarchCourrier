@@ -9,19 +9,16 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { startWith, switchMap, map, catchError, takeUntil, tap, exhaustMap, filter } from 'rxjs/operators';
+import { startWith, switchMap, map, catchError, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../../service/header.service';
 
 import { Overlay } from '@angular/cdk/overlay';
 import { PanelListComponent } from '../../list/panel/panel-list.component';
 import { AppService } from '../../../service/app.service';
-import { PanelFolderComponent } from '../panel/panel-folder.component';
 import { BasketHomeComponent } from '../../basket/basket-home.component';
-import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { FolderActionListComponent } from '../folder-action-list/folder-action-list.component';
 import { FiltersListService } from '../../../service/filtersList.service';
-import { trigger, transition, style, animate } from '@angular/animations';
 import { FoldersService } from '../folders.service';
 import { FunctionsService } from '../../../service/functions.service';
 
@@ -55,7 +52,6 @@ export class FolderDocumentListComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     displayedColumnsBasket: string[] = ['resId'];
@@ -104,7 +100,6 @@ export class FolderDocumentListComponent implements OnInit {
 
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
-    @ViewChild('panelFolder', { static: false }) panelFolder: PanelFolderComponent;
     @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
 
     constructor(
@@ -119,7 +114,7 @@ export class FolderDocumentListComponent implements OnInit {
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
         public appService: AppService,
-        private foldersService: FoldersService,
+        public foldersService: FoldersService,
         public functions: FunctionsService) {
 
         $j("link[href='merged_css.php']").remove();
@@ -131,6 +126,9 @@ export class FolderDocumentListComponent implements OnInit {
                 if(result.content.id == this.folderInfo.id) {
                     this.refreshFolderInformations();
                 }
+            }
+            if (result.type === 'function' && result.content === 'refreshDao') {
+                this.refreshDao();
             }
         });
     }
@@ -167,17 +165,12 @@ export class FolderDocumentListComponent implements OnInit {
                         };
                     this.foldersService.setFolder(this.folderInfo);
                     this.headerService.setHeader(this.folderInfo.label, '', 'fa fa-folder-open');
-                    setTimeout(() => {
-                        this.basketHome.togglePanel(false);
-                    }, 200);
 
                 });
             this.basketUrl = '../../rest/folders/' + params['folderId'] + '/resources';
             this.filtersListService.filterMode = false;
             this.selectedRes = [];
             this.sidenavRight.close();
-            window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-            window['MainHeaderComponent'].setSnavRight(null);
 
             this.listProperties = this.filtersListService.initListsProperties(this.headerService.user.id, 0, params['folderId'], 'folder');
 

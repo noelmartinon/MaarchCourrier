@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { AppService } from '../../../service/app.service';
@@ -13,6 +12,8 @@ import { tap } from 'rxjs/internal/operators/tap';
 import { catchError, map, finalize, filter, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import {FunctionsService} from "../../../service/functions.service";
+import {LatinisePipe} from "ngx-pipes";
 
 @Component({
     templateUrl: "diffusionModels-administration.component.html",
@@ -20,8 +21,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 })
 export class DiffusionModelsAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft: MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
     loading: boolean = false;
@@ -39,6 +39,18 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
         filterValue = filterValue.trim();
         filterValue = filterValue.toLowerCase();
         this.dataSource.filter = filterValue;
+        this.dataSource.filterPredicate = (template, filter: string) => {
+            let filterReturn = false;
+            filter = this.latinisePipe.transform(filter);
+            this.displayedColumns.forEach((column:any) => {
+                if (column === 'description' || column === 'typeLabel') {
+                    filterReturn = filterReturn || this.latinisePipe.transform(template[column].toLowerCase()).includes(filter);
+                } else if (column === 'label') {
+                    filterReturn = filterReturn || this.latinisePipe.transform(template['title'].toLowerCase()).includes(filter);
+                }
+            });
+            return filterReturn;
+        };
     }
 
     constructor(
@@ -46,13 +58,16 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
         private notify: NotificationService,
         public dialog: MatDialog,
         private headerService: HeaderService,
-        public appService: AppService
+        public appService: AppService,
+        public functions: FunctionsService,
+        private latinisePipe: LatinisePipe,
+        private viewContainerRef: ViewContainerRef
     ) { }
 
     async ngOnInit(): Promise<void> {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.diffusionModels);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
+        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.workflowModels);
+
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
@@ -107,7 +122,7 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
     }
 
     delete(listTemplate: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete("../../rest/listTemplates/" + listTemplate['id'])),

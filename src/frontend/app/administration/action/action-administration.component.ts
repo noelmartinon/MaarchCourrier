@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -19,9 +19,7 @@ declare function $j(selector: any): any;
 })
 export class ActionAdministrationComponent implements OnInit {
 
-    /*HEADER*/
-    @ViewChild('snav', { static: true }) public  sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
     lang: any = LANG;
     creationMode: boolean;
@@ -43,10 +41,10 @@ export class ActionAdministrationComponent implements OnInit {
     selectStatusId = new FormControl();
 
     constructor(
-        public http: HttpClient, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService) { }
@@ -55,9 +53,8 @@ export class ActionAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.route.params.subscribe(params => {
+
             if (typeof params['id'] == "undefined") {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
 
                 this.creationMode = true;
 
@@ -69,7 +66,7 @@ export class ActionAdministrationComponent implements OnInit {
                         this.categoriesList = data.categoriesList;
                         this.statuses = data.statuses.map((status: any) => {
                             return {
-                                id : status.id,
+                                id: status.id,
                                 label: status.label_status
                             }
                         });
@@ -81,9 +78,7 @@ export class ActionAdministrationComponent implements OnInit {
                     });
             }
             else {
-                window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-                window['MainHeaderComponent'].setSnavRight(null);
-                
+
                 this.creationMode = false;
 
                 this.http.get('../../rest/actions/' + params['id'])
@@ -94,7 +89,7 @@ export class ActionAdministrationComponent implements OnInit {
                         this.categoriesList = data.categoriesList;
                         this.statuses = data.statuses.map((status: any) => {
                             return {
-                                id : status.id,
+                                id: status.id,
                                 label: status.label_status
                             }
                         });
@@ -103,9 +98,12 @@ export class ActionAdministrationComponent implements OnInit {
                         this.headerService.setHeader(this.lang.actionCreation, data.action.label_action);
                         await this.getCustomFields();
                         this.loading = false;
-                        if (this.action.actionPageId=='close_mail') {
+                        if (this.action.actionPageId == 'close_mail') {
                             this.customFieldsFormControl = new FormControl({ value: this.action.parameters.requiredFields, disabled: false });
-                            this.selectedFieldsId = this.action.parameters.requiredFields;
+                            this.selectedFieldsId = [];
+                            if (this.action.parameters.requiredFields) {
+                                this.selectedFieldsId = this.action.parameters.requiredFields;
+                            }
                             this.selectedFieldsId.forEach((element: any) => {
                                 this.availableCustomFields.forEach((availableElement: any) => {
                                     if (availableElement.id == element) {
@@ -113,7 +111,7 @@ export class ActionAdministrationComponent implements OnInit {
                                     }
                                 });
                             });
-                        } else if (this.action.actionPageId=='create_acknowledgement_receipt') {
+                        } else if (this.action.actionPageId == 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
                         }
                     });
@@ -124,11 +122,11 @@ export class ActionAdministrationComponent implements OnInit {
     getCustomFields() {
         this.action.actionPageId = this.selectActionPageId.value;
         return new Promise((resolve, reject) => {
-            if (this.action.actionPageId=='close_mail' && this.functions.empty(this.availableCustomFields)) {
+            if (this.action.actionPageId == 'close_mail' && this.functions.empty(this.availableCustomFields)) {
                 this.http.get('../../rest/customFields').pipe(
                     tap((data: any) => {
                         this.availableCustomFields = data.customFields.map((info: any) => {
-                            info.id = 'indexingCustomField_' + info.id; 
+                            info.id = 'indexingCustomField_' + info.id;
                             return info;
                         });
                         return resolve(true);
@@ -163,10 +161,10 @@ export class ActionAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.action.actionPageId=='close_mail') {
-            this.action.parameters = { requiredFields: this.selectedFieldsId};
-        } else if (this.action.actionPageId=='create_acknowledgement_receipt') {
-            this.action.parameters = { mode: this.arMode};
+        if (this.action.actionPageId == 'close_mail') {
+            this.action.parameters = { requiredFields: this.selectedFieldsId };
+        } else if (this.action.actionPageId == 'create_acknowledgement_receipt') {
+            this.action.parameters = { mode: this.arMode };
         }
         if (this.creationMode) {
             this.http.post('../../rest/actions', this.action)

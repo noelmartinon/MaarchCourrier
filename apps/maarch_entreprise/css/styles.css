@@ -1541,7 +1541,7 @@ th.ref {
     left: 0;
     right: 0;
     margin: auto;
-
+    border-radius: 5px;
     border: 2px #24b0ed solid;
     /*position: absolute;
     margin: auto;*/
@@ -1582,14 +1582,14 @@ th.ref {
     width: 255px;
 }
 
-#formlogin input {
+/* #formlogin input {
     width: 120px;
 }
 
 #formlogin input.button {
     width: auto;
     margin: 0;
-}
+} */
 
 #formlogin p.buttons,
 #post .forms .buttons {
@@ -1597,9 +1597,9 @@ th.ref {
     margin: 0;
 }
 
-#formlogin select {
+/* #formlogin select {
     width: 140px;
-}
+} */
 
 
 
@@ -2274,22 +2274,6 @@ hr {
     margin-left: 330px;
 }
 
-#choose_exp_link {
-    margin-left: 0px;
-}
-
-#info_user_welcome {
-    width: 100%;
-    padding-top: 10px;
-    border: 1px solid #BBBBBB;
-    background-color: White;
-    padding-bottom: 20px;
-    margin: 0px 0px 15px 0px;
-    padding: 5px 5px 2px 5px;
-    line-height: 1.8em;
-}
-
-
 #info_user .button,
 #select_folder .button {
     width: 125px;
@@ -2330,21 +2314,6 @@ hr {
     /*font-weight: bold;*/
     /* color:rgb(22, 173, 235); */
     font-size: 12px;
-}
-
-.dir_second_level {
-    margin-left: 20px;
-    margin-top: 0px;
-    margin-bottom: 15px;
-    font-size: 12px;
-}
-
-.dir_third_level {
-    margin-left: 20px;
-    margin-top: 0px;
-    margin-bottom: 10px;
-    font-size: 11px;
-
 }
 
 #link_right {
@@ -2680,18 +2649,6 @@ margin-right: 12px;*/
     font-size: 14px;
 }
 
-.header_menu {
-    display: none;
-    background-color: #135F7F;
-    height: 23px;
-    color: white;
-
-    font-weight: bold;
-    font-size: 1.3em;
-    text-align: right;
-    border-bottom: 2px solid #FFFFFF;
-}
-
 .footer_menu {
     background-color: #135F7F;
     width: 100%;
@@ -2721,10 +2678,6 @@ margin-right: 12px;*/
 .footer_menu a {
     padding-left: 5px;
     padding-right: 10px;
-}
-
-.header_menu_blank {
-    height: 10px;
 }
 
 .img_credits_maarch_box {
@@ -3000,59 +2953,6 @@ height: 100%;*/
     margin-bottom: 10px;
 }
 
-#content_process {
-    text-align: left;
-}
-
-/***********  ScrollBox *********************/
-.scrollbox_scrollbar {
-    float: left;
-    width: 10px;
-    height: 380px;
-    padding: 0;
-    margin: 0;
-    background: url(static.php?filename=scrollbox_blank.gif) top left no-repeat;
-
-}
-
-.scrollbox_up_button {
-    background: url(static.php?filename=scrollbox_up.png) no-repeat scroll right top;
-    /*_background:none;
-    _filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../static.php?filename=scrollbox_up.png', sizingMethod='crop');*/
-    height: 7px;
-
-    width: 10px;
-    display: block;
-
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-}
-
-.scrollbox_down_button {
-    background: url(static.php?filename=down.png) no-repeat scroll right top;
-    /*_background:none;
-    _filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../static.php?filename=scrollbox_down.png', sizingMethod='crop');*/
-    height: 7px;
-    width: 10px;
-    display: block;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-}
-
-.scrollbox_handle {
-    background: url(static.php?filename=scrollbox_middle.png) top left no-repeat;
-    /*  _background:none;
-    _filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../static.php?filename=scrollbox_middle.png', sizingMethod='crop');*/
-    width: 10px;
-    height: 10px;
-    display: block;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-}
-
 #hist_courrier_frame .listing {
     width: 100%;
 }
@@ -3073,40 +2973,6 @@ height: 100%;*/
 .thisword {
     background-color: #ffff59;
     color: #000000;
-}
-
-#welcome_box_right {
-    border: 1px;
-    float: right;
-    /*min-width: 40%;*/
-    width: 38%;
-    margin: 0 10px 0 13px;
-    display: inline;
-    /*position:absolute;*/
-}
-
-#welcome_box_left_quick_lunch {
-    border: 1px;
-    float: left;
-    min-width: 55%;
-    margin: 0 10px 0 13px;
-    /*display:relative;*/
-}
-
-#welcome_box_left_baskets {
-    border: 1px;
-    float: left;
-    min-width: 55%;
-    margin: 0 10px 0 13px;
-    /*display:relative;*/
-}
-
-#welcome_box_left_text {
-    border: 100px;
-    /*float: left;*/
-    width: 97%;
-    margin: 0 10px 0 13px;
-    /*display:relative;*/
 }
 
 .scroll_div {
@@ -3546,6 +3412,9 @@ input.button {
     border-radius: 4px !important;
     font-size: 13px;
     font-weight: 500;
+    width: 100% !important;
+    height: 32px;
+    text-align: center !important;
 }
 
 .submitButton:active {
@@ -3560,4 +3429,13 @@ input.button {
 
 .submitButton::-moz-focus-inner {
     border: 0;
+}
+
+.standardConnectInput {
+    width: 100% !important; 
+    height: 32px; 
+    padding: 6px 12px !important; 
+    font-size: 14px; 
+    border: 1px solid #cccccc !important; 
+    border-radius: 4px;
 }

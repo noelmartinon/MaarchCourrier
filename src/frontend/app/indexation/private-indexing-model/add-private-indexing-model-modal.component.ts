@@ -6,12 +6,9 @@ import { NotificationService } from '../../notification.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-declare function $j(selector: any): any;
-
 @Component({
     templateUrl: "add-private-indexing-model-modal.component.html",
     styleUrls: ['add-private-indexing-model-modal.component.scss'],
-    providers: [NotificationService]
 })
 export class AddPrivateIndexingModelModalComponent {
     lang: any               = LANG;

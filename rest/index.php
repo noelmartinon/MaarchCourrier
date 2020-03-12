@@ -54,6 +54,11 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
 //Initialize
 $app->get('/initialize', \SrcCore\controllers\CoreController::class . ':initialize');
 
+//Acknowledgement Receipt
+$app->post('/acknowledgementReceipts', \AcknowledgementReceipt\controllers\AcknowledgementReceiptController::class . ':createPaperAcknowledgement');
+$app->get('/acknowledgementReceipts/{id}', \AcknowledgementReceipt\controllers\AcknowledgementReceiptController::class . ':getById');
+$app->get('/acknowledgementReceipts/{id}/content', \AcknowledgementReceipt\controllers\AcknowledgementReceiptController::class . ':getAcknowledgementReceipt');
+
 //Actions
 $app->get('/actions', \Action\controllers\ActionController::class . ':get');
 $app->get('/initAction', \Action\controllers\ActionController::class . ':initAction');
@@ -62,10 +67,8 @@ $app->post('/actions', \Action\controllers\ActionController::class . ':create');
 $app->put('/actions/{id}', \Action\controllers\ActionController::class . ':update');
 $app->delete('/actions/{id}', \Action\controllers\ActionController::class . ':delete');
 
-//Acknowledgement Receipt
-$app->post('/acknowledgementReceipts', \AcknowledgementReceipt\controllers\AcknowledgementReceiptController::class . ':createPaperAcknowledgement');
-$app->get('/acknowledgementReceipts/{id}', \AcknowledgementReceipt\controllers\AcknowledgementReceiptController::class . ':getById');
-$app->get('/acknowledgementReceipts/{id}/content', \AcknowledgementReceipt\controllers\AcknowledgementReceiptController::class . ':getAcknowledgementReceipt');
+//Administration
+$app->get('/administration/details', \Administration\controllers\AdministrationController::class . ':getDetails');
 
 //Attachments
 $app->post('/attachments', \Attachment\controllers\AttachmentController::class . ':create');
@@ -98,6 +101,7 @@ $app->get('/autocomplete/folders', \SrcCore\controllers\AutoCompleteController::
 $app->get('/autocomplete/tags', \SrcCore\controllers\AutoCompleteController::class . ':getTags');
 $app->get('/autocomplete/ouM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getOuM2MAnnuary');
 $app->get('/autocomplete/businessIdM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getBusinessIdM2MAnnuary');
+$app->get('/autocomplete/contacts/m2m', \SrcCore\controllers\AutoCompleteController::class . ':getAvailableContactsForM2M');
 
 //Baskets
 $app->get('/baskets', \Basket\controllers\BasketController::class . ':get');
@@ -310,9 +314,6 @@ $app->get('/roles', \Entity\controllers\ListTemplateController::class . ':getRol
 //Circuits
 $app->get('/availableCircuits', \Entity\controllers\ListTemplateController::class . ':getAvailableCircuits');
 $app->put('/circuits/{type}', \Entity\controllers\ListInstanceController::class . ':updateCircuits');
-
-//MessageExchanges
-$app->get('/messageExchanges/{id}', \MessageExchange\controllers\MessageExchangeController::class . ':getById');
 
 //Notes
 $app->post('/notes', \Note\controllers\NoteController::class . ':create');
@@ -538,10 +539,14 @@ $app->get('/administration/notifications/new', \Notification\controllers\Notific
 $app->get('/notifications/{id}', \Notification\controllers\NotificationController::class . ':getBySid');
 $app->post('/scriptNotification', \Notification\controllers\NotificationScheduleController::class . ':createScriptNotification');
 
+//External MessageExchanges
+$app->get('/messageExchanges/{id}', \MessageExchange\controllers\MessageExchangeController::class . ':getById');
+$app->get('/messageExchanges/{id}/archiveContent', \MessageExchange\controllers\MessageExchangeController::class . ':getArchiveContentById');
 $app->post('/saveNumericPackage', \MessageExchange\controllers\ReceiveMessageExchangeController::class . ':saveMessageExchange');
 $app->post('/saveMessageExchangeReturn', \MessageExchange\controllers\ReceiveMessageExchangeController::class . ':saveMessageExchangeReturn');
 $app->post('/saveMessageExchangeReview', \MessageExchange\controllers\MessageExchangeReviewController::class . ':saveMessageExchangeReview');
 $app->post('/resources/{resId}/messageExchange', \MessageExchange\controllers\SendMessageExchangeController::class . ':createMessageExchange');
+$app->get('/messageExchangesInitialization', \MessageExchange\controllers\SendMessageExchangeController::class . ':getInitialization');
 
 //ExternalSignatoryBooks
 $app->get('/maarchParapheur/user/{id}/picture', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getUserPicture');

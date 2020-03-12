@@ -512,7 +512,6 @@ class SummarySheetController
                         $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, $nextLine, '', '', true, 0, true);
                     }
                 }
-
             } elseif ($unit['unit'] == 'senderRecipientInformations') {
                 $senders = null;
                 if (in_array('senders', $fieldsIdentifier)) {
@@ -573,11 +572,11 @@ class SummarySheetController
                     $pdf->Cell($widthMultiCell, 15, _SENDERS, 1, 0, 'C', false);
                     $pdf->Cell($widthCell, 15, '', 0, 0, 'C', false);
                     $pdf->Cell($widthMultiCell, 15, _RECIPIENTS, 1, 1, 'C', false);
-                } else if ($senders !== null && $recipients === null) {
+                } elseif ($senders !== null && $recipients === null) {
                     $correspondents = $senders;
 
                     $pdf->Cell($widthMultiCell, 15, _SENDERS, 1, 1, 'C', false);
-                } else if ($senders === null && $recipients !== null) {
+                } elseif ($senders === null && $recipients !== null) {
                     $correspondents = $recipients;
 
                     $pdf->Cell($widthMultiCell, 15, _RECIPIENTS, 1, 1, 'C', false);
@@ -611,7 +610,6 @@ class SummarySheetController
                         $pdf->MultiCell($widthCell, 40, '', 0, 'L', false, 0, '', '', true, 0, true);
                     }
                 }
-
             } elseif ($unit['unit'] == 'diffusionList') {
                 $assignee    = '';
                 $destination = '';
@@ -625,7 +623,14 @@ class SummarySheetController
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
                         $item = '';
                         if ($listInstance['item_type'] == 'user_id') {
-                            $item = UserModel::getLabelledUserById(['login' => $listInstance['item_id']]);
+                            $user = UserModel::getLabelledUserById(['login' => $listInstance['item_id']]);
+                            $entity = UserModel::getPrimaryEntityByUserId(['userId' => $listInstance['item_id']]);
+
+                            if ($listInstance['item_mode'] == 'dest') {
+                                $item = $user;
+                            } else {
+                                $item = $user . " (" . $entity['entity_label'] . ")";
+                            }
                         } elseif ($listInstance['item_type'] == 'entity_id') {
                             $item = $listInstance['item_id'];
                             $entity = EntityModel::getByEntityId(['entityId' => $listInstance['item_id'], 'select' => ['short_label']]);
@@ -734,8 +739,11 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
+                        $user = UserModel::getLabelledUserById(['login' => $listInstance['item_id']]);
+                        $entity = UserModel::getPrimaryEntityByUserId(['userId' => $listInstance['item_id']]);
+                        $userLabel = $user . " (" . $entity['entity_label'] . ")";
                         $users[] = [
-                            'user'  => UserModel::getLabelledUserById(['login' => $listInstance['item_id']]),
+                            'user'  => $userLabel,
                             'date'  => TextFormatModel::formatDate($listInstance['process_date']),
                         ];
                         unset($args['data']['listInstancesOpinion'][$listKey]);

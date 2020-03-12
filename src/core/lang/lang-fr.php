@@ -472,3 +472,4 @@ define("_SENT_BY", "Envoyé par");
 define('_TO_CCI', 'En copie caché');
 define('_PRIMARY_INFORMATION', 'Informations principales');
 define('_SEND_ALFRESCO', 'Envoyer vers Alfresco');
+define("_EMPTY_SUBJECT", "Objet vide");

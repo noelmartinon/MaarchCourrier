@@ -1,7 +1,7 @@
 <div *ngIf="loading" class='visaContent'>
     <i class="fa fa-spinner fa-spin fa-5x" style="margin-left: 50%;margin-top: 16%;font-size: 8em"></i>
 </div>
-<div *ngIf="!loading" class='visaContent' style="margin-top: -64px;">
+<div *ngIf="!loading" class='visaContent'>
     <div class="titleSignatureBook">
         <div id="tabSignatureBook">
             <div *ngIf="signatureBook.documents[0] && !signatureBook.documents[0].inSignatureBook" title="{{lang.mail}}" class="item" [ngClass]="{'activeTabSignatureBook': headerTab == 'document'}" (click)="changeSignatureBookLeftContent('document')">

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
@@ -35,13 +35,8 @@ export class MenuShortcutComponent implements OnInit {
         this.router = _router;
     }
 
-    ngOnInit(): void {
-        this.loadShortcuts();
-    }
+    ngOnInit(): void { }
 
-    loadShortcuts() {
-        this.shortcuts = this.privilegeService.getCurrentUserShortcuts();
-    }
 
     onSpeedDialFabClicked(group: any, shortcut: any) {
         this.router.navigate(['/indexing/' + group.id]);

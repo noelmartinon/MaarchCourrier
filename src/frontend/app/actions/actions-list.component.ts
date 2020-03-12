@@ -55,7 +55,6 @@ export class ActionsListComponent implements OnInit {
     ngOnInit(): void { }
 
     open(x: number, y: number, row: any) {
-
         this.loadActionList();
         // Adjust the menu anchor position
         this.contextMenuPosition.x = x + 'px';
@@ -76,6 +75,12 @@ export class ActionsListComponent implements OnInit {
     }
 
     launchEvent(action: any, row: any) {
+        if (action.component === null) {
+            action.component = 'documentDetails';
+            this.actionService.launchAction(action, this.currentBasketInfo.ownerId, this.currentBasketInfo.groupId, this.currentBasketInfo.basketId, this.selectedRes, this.currentResource, false);
+            return;
+        }
+
         this.arrRes = [];
         this.currentAction = action;
 

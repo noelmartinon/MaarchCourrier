@@ -22,7 +22,6 @@ use Entity\models\EntityModel;
 use ExportSeda\controllers\SendMessageController;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
-use MessageExchange\controllers\ReceiveMessageExchangeController;
 use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
 use Resource\controllers\ResController;
@@ -36,6 +35,26 @@ use Slim\Http\Response;
 
 class SendMessageExchangeController
 {
+    public function getInitialization(Request $request, Response $response)
+    {
+        $rawEntities = EntityModel::getWithUserEntities([
+            'select' => ['entities.id', 'entities.entity_label', 'entities.business_id'],
+            'where' => ['users_entities.user_id = ?', 'business_id is not null', 'business_id != ?'],
+            'data'  => [$GLOBALS['userId'], '']
+        ]);
+
+        $entities = [];
+        foreach ($rawEntities as $key => $entity) {
+            $entities[] = [
+                'id' => $entity['id'],
+                'label' => $entity['entity_label'],
+                'm2m'   => $entity['business_id']
+            ];
+        }
+
+        return $response->withJson(['entities' => $entities]);
+    }
+
     public static function saveMessageExchange($aArgs = [])
     {
         $dataObject = $aArgs['dataObject'];

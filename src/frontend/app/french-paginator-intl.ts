@@ -21,7 +21,6 @@ const frenchRangeLabel = (page: number, pageSize: number, length: number) => {
 
 export function getFrenchPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
-  paginatorIntl.itemsPerPageLabel = 'Afficher:';
   paginatorIntl.nextPageLabel = 'Page suivante';
   paginatorIntl.previousPageLabel = 'Page précédente';
   paginatorIntl.getRangeLabel = frenchRangeLabel;

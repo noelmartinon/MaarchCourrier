@@ -122,10 +122,6 @@ export class ActionsService {
         if (this.setActionInformations(action, userId, groupId, null, null)) {
             this.setResourceInformations(datas);
 
-            if (datas['followed']) {
-                this.headerService.nbResourcesFollowed++;
-            }
-
             this.loading = true;
             try {
                 this[action.component]();
@@ -202,6 +198,9 @@ export class ActionsService {
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: this.currentResIds }).pipe(
                 catchError((err: any) => {
+                    if (err.status == 403) {
+                        clearInterval(this.currentResourceLock);
+                    }
                     this.notify.handleErrors(err);
                     return of(false);
                 })
@@ -256,6 +255,7 @@ export class ActionsService {
     confirmAction(options: any = null) {
 
         const dialogRef = this.dialog.open(ConfirmActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -281,6 +281,7 @@ export class ActionsService {
         const dialogRef = this.dialog.open(CloseMailActionComponent, {
             disableClose: true,
             width: '500px',
+            panelClass: 'maarch-modal',
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
@@ -301,6 +302,7 @@ export class ActionsService {
 
     closeAndIndexAction(options: any = null) {
         const dialogRef = this.dialog.open(CloseAndIndexActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -340,6 +342,7 @@ export class ActionsService {
 
     redirectInitiatorEntityAction(options: any = null) {
         const dialogRef = this.dialog.open(redirectInitiatorEntityActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -362,6 +365,7 @@ export class ActionsService {
 
     closeMailWithAttachmentsOrNotesAction(options: any = null) {
         const dialogRef = this.dialog.open(closeMailWithAttachmentsOrNotesActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -384,6 +388,7 @@ export class ActionsService {
 
     updateAcknowledgementSendDateAction(options: any = null) {
         const dialogRef = this.dialog.open(UpdateAcknowledgementSendDateActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -406,6 +411,7 @@ export class ActionsService {
 
     createAcknowledgementReceiptsAction(options: any = null) {
         const dialogRef = this.dialog.open(CreateAcknowledgementReceiptActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '600px',
             data: this.setDatasActionToSend()
@@ -428,6 +434,7 @@ export class ActionsService {
 
     updateDepartureDateAction(options: any = null) {
         const dialogRef = this.dialog.open(UpdateDepartureDateActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -516,13 +523,14 @@ export class ActionsService {
 
     viewDoc(options: any = null) {
         this.dialog.open(ViewDocActionComponent, {
-            panelClass: 'no-padding-full-dialog',
+            panelClass: 'maarch-modal',
             data: this.setDatasActionToSend()
         });
     }
 
     sendExternalSignatoryBookAction(options: any = null) {
         const dialogRef = this.dialog.open(SendExternalSignatoryBookActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -545,6 +553,7 @@ export class ActionsService {
 
     sendExternalNoteBookAction(options: any = null) {
         const dialogRef = this.dialog.open(SendExternalNoteBookActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -567,6 +576,7 @@ export class ActionsService {
 
     redirectAction(options: any = null) {
         const dialogRef = this.dialog.open(RedirectActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             data: this.setDatasActionToSend()
         });
@@ -588,6 +598,7 @@ export class ActionsService {
 
     sendShippingAction(options: any = null) {
         const dialogRef = this.dialog.open(SendShippingActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             minWidth: '500px',
             data: this.setDatasActionToSend()
@@ -610,6 +621,7 @@ export class ActionsService {
 
     sendSignatureBookAction(options: any = null) {
         const dialogRef = this.dialog.open(SendSignatureBookActionComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
@@ -632,6 +644,7 @@ export class ActionsService {
 
     continueVisaCircuitAction(options: any = null) {
         const dialogRef = this.dialog.open(ContinueVisaCircuitActionComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
@@ -664,6 +677,9 @@ export class ActionsService {
                     resource: dataActionToSend.resIds[0]
                 })),
                 tap(() => {
+                    if (!this.functions.empty(dataActionToSend.resource['followed']) && dataActionToSend.resource['followed']) {
+                        this.headerService.nbResourcesFollowed++;
+                    }
                     this.endAction(dataActionToSend.resIds);
                 }),
                 finalize(() => this.loading = false),
@@ -696,8 +712,13 @@ export class ActionsService {
         this.router.navigate([`/signatureBook/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/resources/${this.currentResIds}`]);
     }
 
+    documentDetails(options: any = null) {
+        this.router.navigate([`/resources/${this.currentResIds}`]);
+    }
+
     rejectVisaBackToPreviousAction(options: any = null) {
         const dialogRef = this.dialog.open(RejectVisaBackToPrevousActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -720,6 +741,7 @@ export class ActionsService {
 
     resetVisaAction(options: any = null) {
         const dialogRef = this.dialog.open(ResetVisaActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -742,6 +764,7 @@ export class ActionsService {
 
     interruptVisaAction(options: any = null) {
         const dialogRef = this.dialog.open(InterruptVisaActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -764,6 +787,7 @@ export class ActionsService {
 
     sendToOpinionCircuitAction(options: any = null) {
         const dialogRef = this.dialog.open(SendAvisWorkflowComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
@@ -786,6 +810,7 @@ export class ActionsService {
 
     sendToParallelOpinion(options: any = null) {
         const dialogRef = this.dialog.open(SendAvisParallelComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
@@ -808,6 +833,7 @@ export class ActionsService {
 
     continueOpinionCircuitAction(options: any = null) {
         const dialogRef = this.dialog.open(ContinueAvisCircuitActionComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
@@ -830,6 +856,7 @@ export class ActionsService {
 
     giveOpinionParallelAction(options: any = null) {
         const dialogRef = this.dialog.open(GiveAvisParallelActionComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
@@ -852,6 +879,7 @@ export class ActionsService {
 
     validateParallelOpinionDiffusionAction(options: any = null) {
         const dialogRef = this.dialog.open(ValidateAvisParallelComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()

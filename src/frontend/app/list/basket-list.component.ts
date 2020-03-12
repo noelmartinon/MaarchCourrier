@@ -17,10 +17,8 @@ import { FiltersToolComponent } from './filters/filters-tool.component';
 
 import { ActionsListComponent } from '../actions/actions-list.component';
 import { Overlay } from '@angular/cdk/overlay';
-import { BasketHomeComponent } from '../basket/basket-home.component';
 import { PanelListComponent } from './panel/panel-list.component';
 import { AppService } from '../../service/app.service';
-import { PanelFolderComponent } from '../folder/panel/panel-folder.component';
 import { FoldersService } from '../folder/folders.service';
 import { ActionsService } from '../actions/actions.service';
 import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
@@ -31,7 +29,7 @@ declare function $j(selector: any): any;
 @Component({
     templateUrl: "basket-list.component.html",
     styleUrls: ['basket-list.component.scss'],
-    providers: [NotificationService, AppService],
+    providers: [AppService],
 })
 export class BasketListComponent implements OnInit {
 
@@ -52,7 +50,6 @@ export class BasketListComponent implements OnInit {
 
     dragInit: boolean = true;
 
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     displayedColumnsBasket: string[] = ['resId'];
@@ -98,8 +95,6 @@ export class BasketListComponent implements OnInit {
     @ViewChild('actionsListContext', { static: true }) actionsList: ActionsListComponent;
     @ViewChild('filtersTool', { static: true }) filtersTool: FiltersToolComponent;
     @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
-    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
-    @ViewChild('panelFolder', { static: true }) panelFolder: PanelFolderComponent;
 
     currentSelectedChrono: string = '';
 
@@ -119,7 +114,7 @@ export class BasketListComponent implements OnInit {
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
         public appService: AppService,
-        private foldersService: FoldersService,
+        public foldersService: FoldersService,
         private actionService: ActionsService) {
         _activatedRoute.queryParams.subscribe(
             params => this.specificChrono = params.chrono
@@ -133,7 +128,6 @@ export class BasketListComponent implements OnInit {
         });
         this.subscription2 = this.actionService.catchAction().subscribe((message: any) => {
             this.refreshDaoAfterAction();
-            this.panelFolder.refreshFoldersTree();
         });
 
         $j("link[href='merged_css.php']").remove();
@@ -156,11 +150,11 @@ export class BasketListComponent implements OnInit {
                 groupId: params['groupSerialId'],
                 basketId: params['basketId']
             };
+            this.headerService.currentBasketInfo =  this.currentBasketInfo;
+            
             this.filtersListService.filterMode = false;
             this.selectedRes = [];
             this.sidenavRight.close();
-            window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-            window['MainHeaderComponent'].setSnavRight(null);
 
             this.listProperties = this.filtersListService.initListsProperties(this.currentBasketInfo.ownerId, this.currentBasketInfo.groupId, this.currentBasketInfo.basketId, 'basket', this.specificChrono);
 
@@ -273,7 +267,6 @@ export class BasketListComponent implements OnInit {
     refreshDaoAfterAction() {
         this.sidenavRight.close();
         this.refreshDao();
-        this.basketHome.refreshBasketHome();
         const e: any = { checked: false };
         this.toggleAllRes(e);
     }
@@ -319,7 +312,7 @@ export class BasketListComponent implements OnInit {
                     key.event = true;
                     if (key.displayValue.length > 1) {
                         key.displayTitle = key.displayValue.join(' - ');
-                        key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.lang.contacts;
+                        key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.lang.contactsAlt;
                     } else {
                         key.displayValue = key.displayValue[0];
                     }
@@ -484,7 +477,7 @@ export class BasketListComponent implements OnInit {
     }
 
     openContact(row: any, mode: string) {
-        this.dialog.open(ContactsListModalComponent, { data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+        this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
     }
 
     viewDocument(row: any) {

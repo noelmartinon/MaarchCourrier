@@ -1145,27 +1145,30 @@ class ResourceListController
             'where'  => $whereFolders,
             'data'   => $dataFolders
         ]);
-        $resIds = array_column($resIds, 'res_id');
 
-        $userEntities = EntityModel::getWithUserEntities([
-            'select' => ['entities.id'],
-            'where'  => ['users_entities.user_id = ?'],
-            'data'   => [$GLOBALS['userId']]
-        ]);
-        $userEntities = array_column($userEntities, 'id');
-
-        $rawFolders = FolderModel::getWithEntitiesAndResources([
-            'select'  => ['folders.id', 'folders.label', 'count(resources_folders.res_id) as count'],
-            'where'   => ['resources_folders.res_id in (?)', '(folders.user_id = ? OR entities_folders.entity_id in (?) or keyword = ?)'],
-            'data'    => [$resIds, $GLOBALS['id'], $userEntities, 'ALL_ENTITIES'],
-            'groupBy' => ['folders.id', 'folders.label']
-        ]);
-        foreach ($rawFolders as $key => $value) {
-            $folders[] = [
-                'id'    => empty($value['id']) ? null : $value['id'],
-                'label' => empty($value['label']) ? '_UNDEFINED' : $value['label'],
-                'count' => $value['count']
-            ];
+        if (!empty($resIds)) {
+            $resIds = array_column($resIds, 'res_id');
+    
+            $userEntities = EntityModel::getWithUserEntities([
+                'select' => ['entities.id'],
+                'where'  => ['users_entities.user_id = ?'],
+                'data'   => [$GLOBALS['userId']]
+            ]);
+            $userEntities = array_column($userEntities, 'id');
+    
+            $rawFolders = FolderModel::getWithEntitiesAndResources([
+                'select'  => ['folders.id', 'folders.label', 'count(resources_folders.res_id) as count'],
+                'where'   => ['resources_folders.res_id in (?)', '(folders.user_id = ? OR entities_folders.entity_id in (?) or keyword = ?)'],
+                'data'    => [$resIds, $GLOBALS['id'], $userEntities, 'ALL_ENTITIES'],
+                'groupBy' => ['folders.id', 'folders.label']
+            ]);
+            foreach ($rawFolders as $key => $value) {
+                $folders[] = [
+                    'id'    => empty($value['id']) ? null : $value['id'],
+                    'label' => empty($value['label']) ? '_UNDEFINED' : $value['label'],
+                    'count' => $value['count']
+                ];
+            }
         }
 
         $priorities = (count($priorities) >= 2) ? $priorities : [];

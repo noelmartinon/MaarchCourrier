@@ -17,6 +17,7 @@ namespace Home\controllers;
 use Basket\models\BasketModel;
 use Basket\models\RedirectBasketModel;
 use Group\models\GroupModel;
+use Priority\models\PriorityModel;
 use Resource\models\ResModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -131,25 +132,37 @@ class HomeController
     {
         $lastResources = ResModel::getLastResources([
             'select'    => [
-                'r.alt_identifier',
-                'r.closing_date',
-                'r.creation_date',
-                'priorities.color as priority_color',
-                'r.process_limit_date',
-                'r.res_id',
-                'r.confidentiality',
+                'res_letterbox.alt_identifier',
+                'res_letterbox.closing_date',
+                'res_letterbox.creation_date',
+                'res_letterbox.priority',
+                'res_letterbox.process_limit_date',
+                'res_letterbox.res_id',
+                'res_letterbox.subject',
+                'res_letterbox.confidentiality',
                 'status.img_filename as status_icon',
                 'status.label_status as status_label',
-                'status.id as status_id',
-                'r.subject',
+                'status.id as status_id'
             ],
             'limit'     => 5,
             'userId'    => $GLOBALS['userId']
         ]);
+        if (!empty($lastResources)) {
+            $priorities = array_column($lastResources, 'priority');
+            $priorities = PriorityModel::get(['select' => ['id', 'color'], 'where' => ['id in (?)'], 'data' => [$priorities]]);
 
-        return $response->withJson([
-            'lastResources'     => $lastResources,
-        ]);
+            foreach ($lastResources as $key => $lastResource) {
+                if (!empty($lastResource['priority'])) {
+                    foreach ($priorities as $priority) {
+                        if ($lastResource['priority'] == $priority['id']) {
+                            $lastResources[$key]['priority_color'] = $priority['color'];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $response->withJson(['lastResources' => $lastResources]);
     }
 
     public function getMaarchParapheurDocuments(Request $request, Response $response)

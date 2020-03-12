@@ -1,7 +1,7 @@
-<h1 mat-dialog-title>{{lang.templateAssociateEntities}}</h1>
-<mat-dialog-content >
-    <div class="modal-body">
-        <div class="alert alert-warning" role="alert">
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>{{lang.templateAssociateEntities}}</h1>
+    <mat-dialog-content>
+        <div class="alert-message alert-message-info" role="alert">
             <p>{{lang.templateCheckEntities}}<b>{{lang['AR'+data.template_attachment_type]}}</b></p>
         </div>
         <mat-list>
@@ -10,9 +10,8 @@
                 <span mat-line> {{entity.entity_label}} </span>
             </mat-list-item>
         </mat-list>
-    </div>
+    </mat-dialog-content>
     <mat-dialog-actions>
-        <button mat-raised-button color="primary" type="submit"
-            (click)="dialogRef.close()">{{lang.close}}</button>
+        <button mat-raised-button color="primary" type="submit" (click)="dialogRef.close()">{{lang.close}}</button>
     </mat-dialog-actions>
-</mat-dialog-content>
+</div>

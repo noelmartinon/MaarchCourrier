@@ -33,9 +33,6 @@ if (!defined("_READ")) {
 if (!defined("_ADDITION_NOTE")) {
     define("_ADDITION_NOTE", "Note addition");
 }
-if (!defined("_ADDITION_NOTE_PRIVATE")) {
-    define("_ADDITION_NOTE_PRIVATE", "Private note addition");
-}
 if (!defined("_NOTES_ADDED")) {
     define("_NOTES_ADDED", "Added note");
 }
@@ -57,21 +54,11 @@ if (!defined("_NOTES_COMMENT")) {
 if (!defined("_OF")) {
     define("_OF", "of");
 }
-if (!defined("_NOTE_DONT_EXIST")) {
-    define("_NOTE_DONT_EXIST", "This note doesn't exist");
-}
-if (!defined("_THIS_NOTE_IS_VISIBLE_BY")) {
-    define("_THIS_NOTE_IS_VISIBLE_BY", "Limit this note to the following departments (if it's empty, the note is public)");
-}
 
 //TEMPLATES FOR NOTES
 if (!defined("_NOTE_TEMPLATE")) {
     define("_NOTE_TEMPLATE", "Note template");
 }
-if (!defined("_SELECT_NOTE_TEMPLATE")) {
-    define("_SELECT_NOTE_TEMPLATE", "Select a note template");
-}
-
 
 if (!defined("_NOTE")) {
     define("_NOTE", "Note");

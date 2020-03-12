@@ -702,10 +702,14 @@ class AttachmentController
                 'inSignatureBook'   => true
             ];
 
-            $isStored = StoreController::storeAttachment($data);
-            if (!empty($isStored['errors'])) {
-                return ['errors' => $isStored['errors']];
+            $id = StoreController::storeAttachment($data);
+            if (!empty($id['errors'])) {
+                return ['errors' => $id['errors']];
             }
+            ConvertPdfController::convert([
+                'resId'     => $id,
+                'collId'    => 'attachments_coll'
+            ]);
         } else {
             foreach ($recipients as $key => $recipient) {
                 $mergedDocument = MergeController::mergeDocument([
@@ -724,11 +728,15 @@ class AttachmentController
                     'recipientType'     => 'contact',
                     'inSignatureBook'   => true
                 ];
-    
-                $isStored = StoreController::storeAttachment($data);
-                if (!empty($isStored['errors'])) {
-                    return ['errors' => $isStored['errors']];
+
+                $id = StoreController::storeAttachment($data);
+                if (!empty($id['errors'])) {
+                    return ['errors' => $id['errors']];
                 }
+                ConvertPdfController::convert([
+                    'resId'     => $id,
+                    'collId'    => 'attachments_coll'
+                ]);
             }
         }
 

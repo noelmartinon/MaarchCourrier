@@ -1,14 +1,19 @@
-<mat-expansion-panel class="folderList" [expanded]="!foldersService.getLoader()">
+<mat-expansion-panel class="folderList" expanded *ngIf="foldersService.getPinnedList().length > 0">
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            <i class="fa fa-thumbtack panelIconMenu"></i>&nbsp;{{lang.myPinnedFolder}}
+        </mat-panel-title>
+    </mat-expansion-panel-header>
+    <folder-pinned [noInit]="true"></folder-pinned>
+</mat-expansion-panel>
+<mat-divider></mat-divider>
+<mat-expansion-panel class="folderList" [expanded]="false">
     <mat-expansion-panel-header>
         <mat-panel-title>
             <i class="fa fa-folder panelIconMenu"></i>&nbsp;{{lang.folders}}
         </mat-panel-title>
     </mat-expansion-panel-header>
-    <folder-pinned></folder-pinned>
-    <button mat-button class="showFolderTree" (click)="showTree = !showTree">
-        <span>
-            <mat-icon class="fa {{showTree ? 'fa-chevron-up' : 'fa-chevron-down'}}"></mat-icon>&nbsp;{{showTree ? lang.hideFoldersTree : lang.showFoldersTree}}
-        </span>
-    </button>
-    <folder-tree #folderTree *ngIf="showTree" [selectedId]="id" (refreshDocList)="refreshDocList()"></folder-tree>
+    <ng-template matExpansionPanelContent>
+        <folder-tree #folderTree [selectedId]="id" (refreshDocList)="refreshDocList()"></folder-tree>
+    </ng-template>
 </mat-expansion-panel>

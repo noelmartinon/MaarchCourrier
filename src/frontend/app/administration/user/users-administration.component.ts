@@ -1,9 +1,8 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../notification.service';
@@ -18,12 +17,11 @@ declare var angularGlobals: any;
 @Component({
     templateUrl: "users-administration.component.html",
     styleUrls: ['users-administration.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class UsersAdministrationComponent implements OnInit {
 
-    @ViewChild('snav', { static: true }) public sidenavLeft   : MatSidenav;
-    @ViewChild('snav2', { static: true }) public sidenavRight : MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     dialogRef                               : MatDialogRef<any>;
 
@@ -53,6 +51,9 @@ export class UsersAdministrationComponent implements OnInit {
         filterValue = filterValue.trim(); // Remove whitespace
         filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
         this.dataSource.filter = filterValue;
+        this.dataSource.filterPredicate = (template, filter: string) => {
+            return this.functions.filterUnSensitive(template, filter, ['id', 'user_id', 'lastname', 'firstname', 'mail']);
+        };
     }
 
     constructor(
@@ -61,15 +62,16 @@ export class UsersAdministrationComponent implements OnInit {
         public dialog: MatDialog, 
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private viewContainerRef: ViewContainerRef
     ) {
         $j("link[href='merged_css.php']").remove();
     }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.users);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(null);
+        
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.user = angularGlobals.user;
         this.loading = true;
@@ -143,6 +145,7 @@ export class UsersAdministrationComponent implements OnInit {
 
                     if (response.isDeletable) {
                         this.config = {
+                            panelClass: 'maarch-modal',
                             data: {
                                 userDestRedirect: user,
                                 isDeletable: response.isDeletable,
@@ -152,6 +155,7 @@ export class UsersAdministrationComponent implements OnInit {
                         };
                     } else {
                         this.config = {
+                            panelClass: 'maarch-modal',
                             data: {
                                 userDestRedirect: user,
                                 isDeletable: response.isDeletable,
@@ -414,7 +418,6 @@ export class UsersAdministrationComponent implements OnInit {
 @Component({
     templateUrl: "users-administration-redirect-modal.component.html",
     styleUrls: ['users-administration-redirect-modal.scss'],
-    providers: [NotificationService]
 })
 export class UsersAdministrationRedirectModalComponent {
     lang: any               = LANG;

@@ -351,7 +351,7 @@ class EmailController
         return $response->withJson(['emails' => $availableEmails]);
     }
 
-    public static function getInitializationByResId(Request $request, Response $response, array $args)
+    public function getInitializationByResId(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);

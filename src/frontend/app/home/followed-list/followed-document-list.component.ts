@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { merge, Observable, of as observableOf, Subject, of, Subscription } from 'rxjs';
+import {merge, Observable, of as observableOf, Subject, Subscription} from 'rxjs';
 import { NotificationService } from '../../notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -20,7 +20,6 @@ import { BasketHomeComponent } from '../../basket/basket-home.component';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { FollowedActionListComponent } from '../followed-action-list/followed-action-list.component';
 import { FiltersListService } from '../../../service/filtersList.service';
-import { trigger, transition, style, animate } from '@angular/animations';
 import {MenuShortcutComponent} from "../../menu/menu-shortcut.component";
 import { FoldersService } from '../../folder/folders.service';
 
@@ -54,7 +53,6 @@ export class FollowedDocumentListComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     displayedColumnsBasket: string[] = ['resId'];
@@ -93,6 +91,7 @@ export class FollowedDocumentListComponent implements OnInit {
     };
 
     private destroy$ = new Subject<boolean>();
+    subscription: Subscription;
 
     @ViewChild('actionsListContext', { static: true }) actionsList: FollowedActionListComponent;
     @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
@@ -117,9 +116,16 @@ export class FollowedDocumentListComponent implements OnInit {
         public overlay: Overlay,
         public viewContainerRef: ViewContainerRef,
         public appService: AppService,
-        private foldersService: FoldersService) {
+        public foldersService: FoldersService) {
 
         $j("link[href='merged_css.php']").remove();
+
+        // Event after process action
+        this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
+            if (result.type === 'function' && result.content === 'refreshDao') {
+                this.refreshDao();
+            }
+        });
     }
 
     ngOnInit(): void {
@@ -141,8 +147,6 @@ export class FollowedDocumentListComponent implements OnInit {
             this.filtersListService.filterMode = false;
             this.selectedRes = [];
 
-            window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-            window['MainHeaderComponent'].setSnavRight(null);
 
             this.listProperties = this.filtersListService.initListsProperties(this.headerService.user.id, 0, null, 'followed');
 
@@ -334,7 +338,7 @@ export class FollowedDocumentListComponent implements OnInit {
     }
 
     unfollowMail(row: any) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

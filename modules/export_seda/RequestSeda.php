@@ -197,7 +197,7 @@ class RequestSeda
 
         $this->statement['getUnitIdentifierByResId']->execute($queryParams);
 
-        $unitIdentifier = $res = $this->statement['getUnitIdentifierByResId']->fetchObject();
+        $unitIdentifier = $this->statement['getUnitIdentifierByResId']->fetchObject();
 
         return $unitIdentifier;
     }
@@ -802,14 +802,14 @@ class RequestSeda
         return true;
     }
 
-    public function updateStatusMessage($reference, $status)
+    public function updateStatusMessage($messageId, $status)
     {
         $queryParams = [];
         $queryParams[] = $status;
-        $queryParams[] = $reference;
+        $queryParams[] = $messageId;
 
         try {
-            $query = "UPDATE message_exchange SET status = ? WHERE reference = ?";
+            $query = "UPDATE message_exchange SET status = ? WHERE message_id = ?";
 
             $smtp = $this->db->query($query, $queryParams);
         } catch (Exception $e) {

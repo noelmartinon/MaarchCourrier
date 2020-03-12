@@ -14,6 +14,7 @@
 
 namespace MessageExchange\controllers;
 
+use Docserver\models\DocserverModel;
 use MessageExchange\models\MessageExchangeModel;
 use Resource\controllers\ResController;
 use Respect\Validation\Validator;
@@ -154,7 +155,6 @@ class MessageExchangeController
         $user = UserModel::getLabelledUserById(['login' => $message['account_id']]);
         $sender = $user . ' (' . $message['sender_org_name'] . ')';
 
-        $recipient = $message['recipient_org_name'] . ' (' . $message['recipient_org_identifier'] . ')';
         if ($message['status'] == 'S') {
             $status = 'sent';
         } elseif ($message['status'] == 'E') {
@@ -166,26 +166,65 @@ class MessageExchangeController
         }
 
         $messageExchange = [
-            'messageId'         => $message['message_id'],
-            'creationDate'      => $message['date'],
-            'type'              => $messageType,
-            'sender'            => $sender,
-            'recipient'         => $recipient,
-            'receptionDate'     => $message['reception_date'],
-            'operationDate'     => $message['operation_date'],
-            'status'            => $status,
-            'operationComments' => $operationComments,
-            'from'              => $from,
-            'communicationType' => $communicationType,
-            'contactInfo'       => $contactInfo,
-            'body'              => $body,
-            'object'            => $object,
-            'notes'             => $notes,
-            'attachments'       => $attachments,
-            'resMasterAttached' => $resMasterAttached,
-            'disposition'       => $disposition
+            'messageId'                 => $message['message_id'],
+            'creationDate'              => $message['date'],
+            'type'                      => $messageType,
+            'sender'                    => $sender,
+            'recipient'                 => ['label' => $message['recipient_org_name'], 'm2m' => $message['recipient_org_identifier']],
+            'receptionDate'             => $message['reception_date'],
+            'operationDate'             => $message['operation_date'],
+            'status'                    => $status,
+            'operationComments'         => $operationComments,
+            'from'                      => $from,
+            'communicationType'         => $communicationType,
+            'contactInfo'               => $contactInfo,
+            'body'                      => $body,
+            'object'                    => $object,
+            'notes'                     => $notes,
+            'attachments'               => $attachments,
+            'resMasterAttached'         => $resMasterAttached,
+            'disposition'               => $disposition,
+            'reference'                 => $message['reference']
         ];
 
         return $response->withJson(['messageExchange' => $messageExchange]);
+    }
+
+    public static function getArchiveContentById(Request $request, Response $response, array $args)
+    {
+        if (!Validator::stringType()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query param id is not a string']);
+        }
+
+        $message = MessageExchangeModel::getMessageByIdentifier([
+            'select'    => ['docserver_id', 'path', 'filename', 'res_id_master'],
+            'messageId' => $args['id']
+        ]);
+        if (empty($message)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Message not found']);
+        }
+
+        if (empty($message['res_id_master']) || !ResController::hasRightByResId(['resId' => [$message['res_id_master']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $message['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+
+        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $message['path']) . $message['filename'];
+        if (!file_exists($pathToDocument)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
+        }
+
+        $fileContent = file_get_contents($pathToDocument);
+
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
+
+        $response->write($fileContent);
+        $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.zip");
+        return $response->withHeader('Content-Type', $mimeType);
     }
 }

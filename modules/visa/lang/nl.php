@@ -4,12 +4,7 @@
  * See LICENCE.txt file at the root folder for more details.
  * This file is part of Maarch software.
  */
-if (!defined('_PRINTFOLDER')) {
-    define('_PRINTFOLDER', 'Afdrukmap');
-}
-if (!defined('_NO_PDF_FILE')) {
-    define('_NO_PDF_FILE', 'Geen PDF voor dit bestand aanwezig');
-}
+
 if (!defined('_VISA_WORKFLOW')) {
     define('_VISA_WORKFLOW', 'Goedkeuringscircuit');
 }
@@ -19,29 +14,11 @@ if (!defined('_INTERRUPT_WORKFLOW')) {
 if (!defined('_VISA_WORKFLOW_COMMENT')) {
     define('_VISA_WORKFLOW_COMMENT', 'Beheer van het goedkeuringscircuit');
 }
-if (!defined('_VIEW_VISA_WORKFLOW')) {
-    define('_VIEW_VISA_WORKFLOW', 'Weergave van het goedkeuringscircuit');
-}
-if (!defined('_VIEW_VISA_WORKFLOW_DESC')) {
-    define('_VIEW_VISA_WORKFLOW_DESC', 'Om het goedkeuringscircuit weer te geven in de delen van de verdelingslijst en in de vooruitgangslijsten.');
-}
-if (!defined('_EMPTY_USER_LIST')) {
-    define('_EMPTY_USER_LIST', 'De lijst van gebruikers is leeg');
-}
-if (!defined('_EMPTY_VISA_WORKFLOW')) {
-    define('_EMPTY_VISA_WORKFLOW', 'Geen ingesteld berichtencircuit');
-}
 if (!defined('_NO_VISA')) {
     define('_NO_VISA', 'Geen persoon aangeduid in de goedkeuring');
 }
 if (!defined('_NO_RESPONSE_PROJECT_VISA')) {
     define('_NO_RESPONSE_PROJECT_VISA', 'Gelieve minstens één bijlage in de parafeerder te integreren.');
-}
-if (!defined('_NO_CONVERTED_PDF_VISA')) {
-    define('_NO_CONVERTED_PDF_VISA', 'Bewerk uw bijlage(n)');
-}
-if (!defined('_PLEASE_CONVERT_PDF_VISA')) {
-    define('_PLEASE_CONVERT_PDF_VISA', 'Bewerk de volgende bijlagen:');
 }
 if (!defined('_AVIS_WORKFLOW')) {
     define('_AVIS_WORKFLOW', 'Berichtencircuit');

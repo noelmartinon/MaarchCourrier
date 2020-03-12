@@ -48,8 +48,9 @@
                     </mat-list-item>
                     <mat-list-item class="contact-address" (click)="goTo(contact)" [title]="lang.address" *ngIf="!empty(contact.addressNumber) || !empty(contact.addressStreet) || !empty(contact.addressAdditional2) || !empty(contact.addressPostcode) || !empty(contact.addressTown) || !empty(contact.addressCountry)">
                         <mat-icon mat-list-icon class="contact-group fas fa-map-marker-alt"></mat-icon>
+                        <p mat-line class="contact-content" *ngIf="!empty(contact.addressAdditional1)"> {{contact.addressAdditional1}}</p>
                         <p mat-line class="contact-content" *ngIf="!empty(contact.addressNumber) || !empty(contact.addressStreet)"> {{contact.addressNumber}} {{contact.addressStreet}} </p>
-                        <p mat-line class="contact-content" *ngIf="!empty(contact.addressAdditional1) || !empty(contact.addressAdditional2)">{{contact.addressAdditional1}} {{contact.addressAdditional2}} </p>
+                        <p mat-line class="contact-content" *ngIf="!empty(contact.addressAdditional2)">{{contact.addressAdditional2}} </p>
                         <p mat-line class="contact-content" *ngIf="!empty(contact.addressPostcode) || !empty(contact.addressTown)"> {{contact.addressPostcode}} {{contact.addressTown}} </p>
                         <p mat-line class="contact-content" *ngIf="!empty(contact.addressCountry)"> {{contact.addressCountry}} </p>
                     </mat-list-item>

@@ -72,16 +72,19 @@ class FolderController
                 ])
             );
 
+            $folderScope = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $folder['id'], 'edition' => true]);
+
             $insert = [
-                'name'       => $folder['label'],
-                'id'         => $folder['id'],
-                'label'      => $folder['label'],
-                'public'     => $folder['public'],
-                'user_id'    => $folder['user_id'],
-                'parent_id'  => $folder['parent_id'],
-                'level'      => $folder['level'],
+                'name'           => $folder['label'],
+                'id'             => $folder['id'],
+                'label'          => $folder['label'],
+                'public'         => $folder['public'],
+                'user_id'        => $folder['user_id'],
+                'parent_id'      => $folder['parent_id'],
+                'level'          => $folder['level'],
                 'countResources' => $count,
-                'pinned'    => $isPinned
+                'pinned'         => $isPinned,
+                'canEdit'        => !empty($folderScope)
             ];
             if ($folder['level'] == 0) {
                 array_splice($tree, 0, 0, [$insert]);
@@ -255,6 +258,12 @@ class FolderController
             $data['parent_id'] = null;
             $level = 0;
         } else {
+            $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $data['parent_id'], 'edition' => true]);
+            if (empty($folder)) {
+                if (empty($folder[0])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Parent Folder not found or out of your perimeter']);
+                }
+            }
             $folderParent = FolderModel::getById(['id' => $data['parent_id'], 'select' => ['folders.id', 'parent_id', 'level']]);
             $level = $folderParent['level'] + 1;
         }
@@ -317,7 +326,7 @@ class FolderController
         foreach ($data['sharing']['entities'] as $item) {
             if (isset($item['entity_id'])) {
                 $entities[] = $item;
-            } else if (isset($item['keyword'])) {
+            } elseif (isset($item['keyword'])) {
                 $keywords[] = $item;
             }
         }

@@ -289,8 +289,6 @@ class AnnuaryController
             $search  = @ldap_search($ldap, "ou={$organization},{$annuary['baseDN']}", "(initials={$entityId})", ['entryUUID']);
             $entries = ldap_get_entries($ldap, $search);
             return ['entryUUID' => $entries[0]['entryuuid'][0]];
-
-            break;
         }
 
         return ['errors' => _NO_M2M_ANNUARY_AVAILABLE];

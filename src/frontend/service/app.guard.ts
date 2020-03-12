@@ -21,9 +21,19 @@ export class AppGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
         // TO DO : CAN BE REMOVE AFTER FULL V2
         localStorage.setItem('PreviousV2Route', state.url);
-
+        this.headerService.resetSideNavSelection();
+        if (route.url.filter((url: any) => url == 'signatureBook').length > 0) {
+            this.headerService.hideSideBar = true;
+        } else {       
+            this.headerService.hideSideBar = false;
+        }
+        if (route.url.filter((url: any) => url == 'administration').length > 0 || route.url.filter((url: any) => url == 'profile').length > 0) { 
+            this.headerService.sideBarAdmin = true;
+        } else {
+            this.headerService.sideBarAdmin = false;
+        }
+        
         if (this.headerService.user.id === undefined) {
-            
             return this.http.get('../../rest/currentUser/profile')
                 .pipe(
                     map((data: any) => {
@@ -37,7 +47,9 @@ export class AppGuard implements CanActivate {
                             preferences: data.preferences,
                             privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : data.privileges
                         };
+                        
                         this.headerService.nbResourcesFollowed = data.nbFollowedResources;
+                        this.privilegeService.resfreshUserShortcuts();
                         return true;
                     })
                 );
@@ -51,13 +63,16 @@ export class AppGuard implements CanActivate {
     providedIn: 'root'
 })
 export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
-    canDeactivate(component: ProcessComponent): boolean {
+    constructor() { }
+
+    async canDeactivate(component: ProcessComponent): Promise<boolean> {
         if (!component.isActionEnded() && !component.detailMode) {
             component.unlockResource();
         }
-        if (component.currentTool === 'info' && component.indexingForm.isResourceModified()) {
+
+        if ((component.isToolModified() && !component.isModalOpen()) || component.appDocumentViewer.isEditingTemplate()) {
             if (confirm(component.lang.saveModifiedData)) {
-                component.confirmModification();
+                await component.saveModificationBeforeClose();
             }
         }
         /*if(component.hasUnsavedData()){

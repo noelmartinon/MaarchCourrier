@@ -1,9 +1,3 @@
-function cleanTitle(str) {
-    //permet de supprimer les # dans le titre qui bloque l'ouverture de l'applet java
-    var res = str.replace(/#/g, " ");
-    return(res);
-}
-
 function activePjTab(target) {
 
     $j('[id^=PjDocument_],#MainDocument').css('background-color', 'rgb(197, 197, 197)');

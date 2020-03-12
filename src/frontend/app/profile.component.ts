@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, QueryList, ViewChildren, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
 import { NotificationService } from './notification.service';
@@ -24,7 +24,7 @@ declare var angularGlobals: any;
 @Component({
     templateUrl: "profile.component.html",
     styleUrls: ['profile.component.css'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class ProfileComponent implements OnInit {
 
@@ -79,7 +79,7 @@ export class ProfileComponent implements OnInit {
     loadingSign : boolean = false;
 
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     //Redirect Baskets
     selectionBaskets = new SelectionModel<Element>(true, []);
@@ -168,7 +168,8 @@ export class ProfileComponent implements OnInit {
         public dialog: MatDialog, 
         private _formBuilder: FormBuilder, 
         private headerService: HeaderService,
-        public appService: AppService
+        public appService: AppService,
+        private viewContainerRef: ViewContainerRef
     ) {
         $j("link[href='merged_css.php']").remove();
         window['angularProfileComponent'] = {
@@ -404,8 +405,7 @@ export class ProfileComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.myProfile);
-        window['MainHeaderComponent'].setSnav(this.sidenavLeft);
-        window['MainHeaderComponent'].setSnavRight(this.sidenavRight);
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 

@@ -263,7 +263,7 @@ export class PluginAutocomplete implements OnInit {
 
             newElem[this.key] = this.myControl.value;
 
-            this.dialogRef = this.dialog.open(ConfirmComponent, { autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: 'Voulez-vous créer cet élément <b>' + newElem[this.key] + '</b>&nbsp;?' } });
+            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: 'Voulez-vous créer cet élément <b>' + newElem[this.key] + '</b>&nbsp;?' } });
 
             this.dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
