@@ -159,6 +159,7 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         array (
             'Attachment\\' => 11,
             'Alfresco\\' => 9,
+            'Administration\\' => 15,
             'Action\\' => 7,
             'AcknowledgementReceipt\\' => 23,
         ),
@@ -461,6 +462,10 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         'Alfresco\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/app/external/alfresco',
+        ),
+        'Administration\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/app/administration',
         ),
         'Action\\' => 
         array (
