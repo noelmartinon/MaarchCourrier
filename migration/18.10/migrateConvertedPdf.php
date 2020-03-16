@@ -71,6 +71,8 @@ foreach ($customs as $custom) {
                     echo "OK!\n";
                     echo "Insertion dans la table adr_attachments...\n";
               
+                    $query = "DELETE FROM adr_attachments WHERE res_id = ? and type = 'PDF'";
+                    $db->query($query, [$convertedAttachment->real_res_id]);
                     $query = "INSERT INTO adr_attachments(res_id, type, docserver_id, path, filename, fingerprint) VALUES (?, ?, ?, ?, ?, ?)";
                     $tmp = $db->query($query, [$convertedAttachment->real_res_id, 'PDF', 'CONVERT_ATTACH', $convertedAttachment->convert_path, $convertedAttachment->convert_filename, $convertedAttachment->convert_fingerprint]);
                     if ($tmp) {
@@ -119,6 +121,8 @@ foreach ($customs as $custom) {
                     echo "OK!\n";
                     echo "Insertion dans la table adr_attachments_version...\n";
               
+                    $query = "DELETE FROM adr_attachments_version WHERE res_id = ? and type = 'PDF'";
+                    $db->query($query, [$convertedAttachment->real_res_id]);
                     $query = "INSERT INTO adr_attachments_version(res_id, type, docserver_id, path, filename, fingerprint) VALUES (?, ?, ?, ?, ?, ?)";
                     $tmp = $db->query($query, [$convertedAttachment->real_res_id, 'PDF', 'CONVERT_ATTACH_VERSION', $convertedAttachment->convert_path, $convertedAttachment->convert_filename, $convertedAttachment->convert_fingerprint]);
                     if ($tmp) {
