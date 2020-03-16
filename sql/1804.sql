@@ -398,6 +398,9 @@ ALTER TABLE groupbasket DROP COLUMN IF EXISTS sublist_lock_clause;
 DROP TABLE IF EXISTS groupbasket_difflist_types;
 DROP TABLE IF EXISTS groupbasket_difflist_roles;
 
+UPDATE actions_groupbaskets SET used_in_action_page = 'Y', used_in_basketlist = 'Y' WHERE used_in_action_page = 'N' and used_in_basketlist = 'N' and default_action_list = 'Y';
+UPDATE actions_groupbaskets SET used_in_action_page = 'Y' WHERE used_in_action_page = 'N' and used_in_basketlist = 'N' and default_action_list = 'N';
+
 /*LISTMODELS*/
 ALTER TABLE listmodels DROP COLUMN IF EXISTS listmodel_type;
 ALTER TABLE listmodels DROP COLUMN IF EXISTS coll_id;
