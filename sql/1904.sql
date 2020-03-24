@@ -327,6 +327,8 @@ DO $$ BEGIN
   END IF;
 END$$;
 
+DELETE FROM usergroups WHERE enabled = 'N';
+
 /* RE-CREATE VIEW*/
 CREATE OR REPLACE VIEW res_view_letterbox AS
  SELECT r.tablename,
