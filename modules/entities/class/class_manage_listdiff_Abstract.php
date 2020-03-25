@@ -355,15 +355,11 @@ abstract class diffusion_list_Abstract extends functions
         $fromQualif = false
     ) {
         // Fix : superadmin can edit visa workflow in detail
-        if ($creatorUser == 'superadmin') {
+        if ($creatorUser == 'superadmin' || empty($creatorEntity)) {
             $creatorEntity = '';
         }
 
         $oldListInst = $this->get_listinstance($resId, false, $collId, $difflistType);
-        /*echo 'old<br/>';
-        var_dump($oldListInst);
-        echo 'new<br/>';
-        var_dump($diffList);*/
 
         require_once 'core/class/class_history.php';
         $hist = new history();
