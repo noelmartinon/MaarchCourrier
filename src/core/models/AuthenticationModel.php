@@ -29,8 +29,8 @@ class AuthenticationModel
         $aReturn = DatabaseModel::select([
             'select'    => ['password'],
             'table'     => ['users'],
-            'where'     => ['lower(user_id) = lower(?)', 'status != ?', '(locked_until is null OR locked_until < CURRENT_TIMESTAMP)'],
-            'data'      => [$args['userId'], 'DEL']
+            'where'     => ['lower(user_id) = lower(?)', 'status = ?', 'enabled = ?', '(locked_until is null OR locked_until < CURRENT_TIMESTAMP)'],
+            'data'      => [$args['userId'], 'OK', 'Y']
         ]);
 
         if (empty($aReturn[0])) {
