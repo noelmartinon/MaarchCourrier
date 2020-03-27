@@ -23,8 +23,8 @@ Documentation : https://docs.maarch.org/gitbook/html/MaarchCourrier/20.03/
 ## Requis techniques
 
 * Apache2.x
-* PostgreSQL 9.x
-* PHP 7.1, 7.2. 7.3
+* PostgreSQL >= 9.6
+* PHP 7.2, 7.3, 7.4
    * Extensions PHP (adaptées à votre version de PHP) : PHP-[XSL](http://php.net/manual/en/book.xsl.php), PHP-[XML-RPC](http://php.net/manual/en/book.xmlrpc.php), PHP-[Gettext](http://php.net/manual/en/b$
    * Bibliothèques pear/CLITools
 * [ImageMagick](http://imagemagick.org/), avec PHP-[ImageMagick](http://php.net/manual/en/book.imagick.php)
