@@ -29,8 +29,8 @@ class AuthenticationModel
         $aReturn = DatabaseModel::select([
             'select'    => ['password'],
             'table'     => ['users'],
-            'where'     => ['lower(user_id) = lower(?)', 'status = ?', '(locked_until is null OR locked_until < CURRENT_TIMESTAMP)'],
-            'data'      => [$args['userId'], 'OK']
+            'where'     => ['lower(user_id) = lower(?)', 'status in (?, ?)', '(locked_until is null OR locked_until < CURRENT_TIMESTAMP)'],
+            'data'      => [$args['userId'], 'OK', 'ABS']
         ]);
 
         if (empty($aReturn[0])) {
@@ -178,18 +178,5 @@ class AuthenticationModel
         ]);
 
         return true;
-    }
-
-    public static function generatePassword()
-    {
-        $length = rand(50, 70);
-        $chars = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrstuvwxyz!@$%^*_=+,.?';
-        $count = mb_strlen($chars);
-        for ($i = 0, $password = ''; $i < $length; $i++) {
-            $index = rand(0, $count - 1);
-            $password .= mb_substr($chars, $index, 1);
-        }
-
-        return $password;
     }
 }
