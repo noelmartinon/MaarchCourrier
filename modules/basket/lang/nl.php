@@ -393,9 +393,6 @@ if (!defined('_FORWARD_IN_THE_WF')) {
 if (!defined('_BACK_IN_THE_WF')) {
     define('_BACK_IN_THE_WF', 'Gaat achteruit in de workflow');
 }
-if (!defined('_ITS_NOT_MY_TURN_IN_THE_WF')) {
-    define('_ITS_NOT_MY_TURN_IN_THE_WF', 'Het is niet mijn beurt om te behandelen in de workflow');
-}
 if (!defined('_COMBINATED_ACTION')) {
     define('_COMBINATED_ACTION', 'Gecombineerde actie');
 }

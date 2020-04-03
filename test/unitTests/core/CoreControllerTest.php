@@ -57,16 +57,33 @@ class CoreControllerTest extends TestCase
         $this->assertIsArray($responseBody->user->entities);
     }
 
-    public function testrenderJnlp()
+    public function testGetLanguage()
     {
-        $coreController = new \ContentManagement\controllers\JnlpController();
+        $this->assertFileExists("src/core/lang/lang-en.php");
+        $this->assertStringNotEqualsFile("src/core/lang/lang-en.php", '');
+        include("src/core/lang/lang-en.php");
+        $this->assertFileExists("src/core/lang/lang-nl.php");
+        $this->assertStringNotEqualsFile("src/core/lang/lang-nl.php", '');
+        include("src/core/lang/lang-nl.php");
+
+        $language = \SrcCore\models\CoreConfigModel::getLanguage();
+        $this->assertFileExists("src/core/lang/lang-{$language}.php");
+        $this->assertStringNotEqualsFile("src/core/lang/lang-{$language}.php", '');
+        include("src/core/lang/lang-{$language}.php");
+        
+        $this->assertFileNotExists("src/core/lang/lang-zh.php");
+    }
+
+    public function testGetExternalConnectionsEnabled()
+    {
+        $coreController = new \SrcCore\controllers\CoreController();
 
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request = \Slim\Http\Request::createFromEnvironment($environment);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $response     = $coreController->renderJnlp($request, new \Slim\Http\Response(), ['jnlpUniqueId' => 'superadmin_maarchCM_12345.js']);
-        $responseBody = json_decode((string)$response->getBody());
-
-        $this->assertSame('File extension forbidden', $responseBody->errors);
+        $response     = $coreController->externalConnectionsEnabled($request, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertIsBool($responseBody['connection']['maarchParapheur']);
+        $this->assertSame(true, $responseBody['connection']['maarchParapheur']);
     }
 }

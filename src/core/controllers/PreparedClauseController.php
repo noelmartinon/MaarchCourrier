@@ -40,7 +40,8 @@ class PreparedClauseController
             $clause = str_replace('@email', "'{$user['mail']}'", $clause);
         }
         if (preg_match('/@my_entities/', $clause)) {
-            $entities = EntityModel::getByLogin(['login' => $aArgs['login'], 'select' => ['entity_id']]);
+            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
+            $entities = EntityModel::getByUserId(['userId' => $user['id'], 'select' => ['entity_id']]);
 
             $myEntitiesClause = '';
             foreach ($entities as $key => $entity) {
@@ -56,7 +57,8 @@ class PreparedClauseController
             $clause = str_replace('@my_entities', $myEntitiesClause, $clause);
         }
         if (preg_match('/@my_primary_entity/', $clause)) {
-            $entity = UserModel::getPrimaryEntityByUserId(['userId' => $aArgs['login']]);
+            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id', 'firstname', 'lastname']]);
+            $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_id']]);
 
             if (empty($entity)) {
                 $primaryEntity = "''";

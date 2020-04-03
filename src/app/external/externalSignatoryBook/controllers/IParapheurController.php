@@ -22,6 +22,9 @@ use Resource\models\ResModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
 
+/**
+    * @codeCoverageIgnore
+*/
 class IParapheurController
 {
     public static function returnCurl($xmlPostString, $config)

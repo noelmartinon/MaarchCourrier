@@ -21,6 +21,9 @@ use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 
+/**
+  * @codeCoverageIgnore
+*/
 class IxbusController
 {
     public static function createSession($config)

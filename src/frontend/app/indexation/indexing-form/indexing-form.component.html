@@ -53,7 +53,7 @@
                                     <mat-form-field class="input-form"
                                         [floatLabel]="appService.getViewMode() ? '' : 'never'">
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
-                                        <textarea matInput matTextareaAutosize
+                                        <textarea [id]="field.identifier" matInput matTextareaAutosize
                                              [formControl]="arrFormControl[field.identifier]"
                                             [placeholder]="!adminMode ? lang.typeValue : lang.defaultValue"
                                              class="subject"></textarea>
@@ -63,13 +63,13 @@
                                     <mat-form-field class="input-form"
                                         [floatLabel]="appService.getViewMode() ? '' : 'never'">
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
-                                        <input type="number" matInput [formControl]="arrFormControl[field.identifier]"
+                                        <input [id]="field.identifier" type="number" matInput [formControl]="arrFormControl[field.identifier]"
                                             [placeholder]="!adminMode ? lang.typeValue : lang.defaultValue" min="0"
                                             step="0.1">
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'select'">
-                                    <plugin-select-search [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
+                                    <plugin-select-search [id]="field.identifier" [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
                                         [placeholderLabel]="!adminMode ? lang.chooseValue : lang.defaultValue"
                                         [formControlSelect]="arrFormControl[field.identifier]" [datas]="field.values"
                                         (afterSelected)="launchEvent($event, field)" style="width:100%;">
@@ -87,7 +87,7 @@
                                         [floatLabel]="appService.getViewMode() ? '' : 'never'" (click)="picker.open()"
                                         style="cursor:pointer;">
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
-                                        <input [formControl]="arrFormControl[field.identifier]" matInput
+                                        <input [id]="field.identifier" [formControl]="arrFormControl[field.identifier]" matInput
                                             [matDatepicker]="picker"
                                             [placeholder]="!adminMode ? lang.chooseDate : lang.defaultValue"
                                             [min]="getMinDate(field.startDate)" [max]="getMaxDate(field.endDate)"
@@ -143,7 +143,7 @@
                                     </plugin-autocomplete>
                                 </ng-container>-->
                                 <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
-                                    <app-contact-autocomplete [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                    <app-contact-autocomplete [id]="field.identifier" [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'folders'">

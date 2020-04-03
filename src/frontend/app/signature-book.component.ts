@@ -7,7 +7,7 @@ import { NotificationService } from './notification.service';
 import { tap, catchError, filter } from 'rxjs/operators';
 import { of, Subscription } from 'rxjs';
 import { PrivilegeService } from '../service/privileges.service';
-import { MatDialogRef, MatDialog } from '@angular/material';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
 import { FunctionsService } from '../service/functions.service';
 import { AttachmentPageComponent } from './attachments/attachments-page/attachment-page.component';

@@ -4,7 +4,7 @@ import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
 import { tap, finalize, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { AttachmentPageComponent } from './attachments-page/attachment-page.component';
 import { AttachmentCreateComponent } from './attachment-create/attachment-create.component';

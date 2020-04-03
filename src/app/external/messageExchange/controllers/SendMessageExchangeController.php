@@ -40,7 +40,7 @@ class SendMessageExchangeController
         $rawEntities = EntityModel::getWithUserEntities([
             'select' => ['entities.id', 'entities.entity_label', 'entities.business_id'],
             'where' => ['users_entities.user_id = ?', 'business_id is not null', 'business_id != ?'],
-            'data'  => [$GLOBALS['userId'], '']
+            'data'  => [$GLOBALS['id'], '']
         ]);
 
         $entities = [];
@@ -138,7 +138,7 @@ class SendMessageExchangeController
         }
 
         /***************** GET MAIL INFOS *****************/
-        $AllUserEntities = EntityModel::getWithUserEntities(['where' => ['user_id = ?', 'business_id != \'\''], 'data' => [$GLOBALS['userId']]]);
+        $AllUserEntities = EntityModel::getWithUserEntities(['where' => ['user_id = ?', 'business_id != \'\''], 'data' => [$GLOBALS['id']]]);
 
         foreach ($AllUserEntities as $value) {
             if ($value['id'] == $body['senderEmail']) {

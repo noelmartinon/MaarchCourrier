@@ -23,6 +23,54 @@ class AuthenticationControllerTest extends TestCase
         $this->assertSame('superadmin', $response);
     }
 
+    public function testAuthenticate()
+    {
+        $authenticationController = new \SrcCore\controllers\AuthenticationController();
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $args = [
+            'login'     => 'bbain',
+            'password'  => 'maarch'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+        $response     = $authenticationController->authenticate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(204, $response->getStatusCode());
+
+        //  ERRORS
+        $args = [
+            'login'     => 'bbain',
+            'password'  => 'maarche'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+        $response     = $authenticationController->authenticate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(401, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame('Authentication Failed', $responseBody->errors);
+
+        $args = [
+            'logi'     => 'bbain',
+            'password'  => 'maarche'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+        $response     = $authenticationController->authenticate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame('Bad Request', $responseBody->errors);
+
+        // MUST CONNECT WITH SUPERADMIN
+        $args = [
+            'login'     => 'superadmin',
+            'password'  => 'superadmin'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+        $response     = $authenticationController->authenticate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(204, $response->getStatusCode());
+    }
+
     public function testIsRouteAvailable()
     {
         $response = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['login' => 'superadmin', 'currentRoute' => '/actions']);

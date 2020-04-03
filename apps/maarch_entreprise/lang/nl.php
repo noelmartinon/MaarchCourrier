@@ -813,25 +813,6 @@ if (!defined('_CHOOSE_TITLE')) { define('_CHOOSE_TITLE', 'Kies een aanspreking')
 if (!defined('_INDEXING_STATUSES')) { define('_INDEXING_STATUSES', 'Indexeren naar de statussen');}
 if (!defined('_UNCHANGED')) { define('_UNCHANGED', 'Ongewijzigd');}
 if (!defined('_PARAM_AVAILABLE_STATUS_ON_GROUP_BASKETS')) { define('_PARAM_AVAILABLE_STATUS_ON_GROUP_BASKETS', 'Instelling van de indexeringsstatussen');}
-if (!defined('_USERS_LOGS')) { define('_USERS_LOGS', 'Lijst van toegangen tot de applicatie per agent');}
-if (!defined('_USERS_LOGS_DESC')) { define('_USERS_LOGS_DESC', 'Lijst van toegangen tot de applicatie per agent');}
-if (!defined('_PROCESS_DELAY_REPORT')) { define('_PROCESS_DELAY_REPORT', 'Gemiddelde verwerkingstermijn per typologie');}
-if (!defined('_PROCESS_DELAY_REPORT_DESC')) { define('_PROCESS_DELAY_REPORT_DESC', 'Om de termijn (in dagen) weer te geven van de aanmaak tot de afsluiting van een brief.');}
-if (!defined('_MAIL_TYPOLOGY_REPORT')) { define('_MAIL_TYPOLOGY_REPORT', 'Briefvolume per typologie');}
-if (!defined('_MAIL_TYPOLOGY_REPORT_DESC')) { define('_MAIL_TYPOLOGY_REPORT_DESC', 'Om het aantal brieven weer te geven dat per documenttype bewaard wordt.');}
-if (!defined('_MAIL_VOL_BY_CAT_REPORT')) { define('_MAIL_VOL_BY_CAT_REPORT', 'Briefvolume per categorie');}
-if (!defined('_MAIL_VOL_BY_CAT_REPORT_DESC')) { define('_MAIL_VOL_BY_CAT_REPORT_DESC', 'Om het aantal brieven weer te geven dat per categorie (inkomend, uitgaand enz.) bewaard wordt.');}
-if (!defined('_SHOW_FORM_RESULT')) { define('_SHOW_FORM_RESULT', 'Het resultaat weergeven in de vorm van een');}
-if (!defined('_GRAPH')) { define('_GRAPH', 'Grafiek');}
-if (!defined('_ARRAY')) { define('_ARRAY', 'Tabel');}
-if (!defined('_SHOW_YEAR_GRAPH')) { define('_SHOW_YEAR_GRAPH', 'Het resultaat weergeven voor het jaar');}
-if (!defined('_SHOW_GRAPH_MONTH')) { define('_SHOW_GRAPH_MONTH', 'Het resultaat weergeven voor de maand');}
-if (!defined('_OF_THIS_YEAR')) { define('_OF_THIS_YEAR', 'van dit jaar');}
-if (!defined('_NB_MAILS1')) { define('_NB_MAILS1', 'Aantal bewaarde brieven');}
-if (!defined('_FOR_YEAR')) { define('_FOR_YEAR', 'voor het jaar');}
-if (!defined('_FOR_MONTH')) { define('_FOR_MONTH', 'voor de maand');}
-if (!defined('_N_DAYS')) { define('_N_DAYS', 'AANT DAGEN');}
-if (!defined('_INCLUDE_SUB_ENTITIES')) { define('_INCLUDE_SUB_ENTITIES', 'De subeenheden insluiten');}
 if (!defined('_PROJECT')) { define('_PROJECT', 'Map');}
 if (!defined('_MARKET')) { define('_MARKET', 'Submap');}
 if (!defined('_DAYS')) { define('_DAYS', 'dagen');}
@@ -1241,7 +1222,6 @@ if (!defined('_CAS_SAML_NOT_SUPPORTED')) { define('_CAS_SAML_NOT_SUPPORTED', 'He
 if (!defined('_PROTOCOL_NOT_SUPPORTED')) { define('_PROTOCOL_NOT_SUPPORTED', 'Er wordt geen rekening gehouden met dit CAS protocol.');}
 if (!defined('_USER_NOT_EXIST')) { define('_USER_NOT_EXIST', 'Deze gebruiker bestaat niet in de applicatie.');}
 if (!defined('_VISIBLE_BY')) { define('_VISIBLE_BY', 'Zichtbaar door');}
-if (!defined('_TRACE_ACT')) { define('_TRACE_ACT', 'De actie traceren is niet correct');}
 if (!defined('_FINAL_DISPOSITION')) { define('_FINAL_DISPOSITION', 'Uiteindelijke lot');}
 if (!defined('_CHOOSE_FINAL_DISPOSITION')) { define('_CHOOSE_FINAL_DISPOSITION', 'Keuze van het uiteindelijke lot');}
 if (!defined('_DESTROY')) { define('_DESTROY', 'Vernietiging');}

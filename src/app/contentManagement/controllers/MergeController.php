@@ -215,9 +215,9 @@ class MergeController
                 'orderBy'   => ['listinstance_id']
             ]);
             foreach ($visaWorkflow as $value) {
-                $labelledUser = UserModel::getLabelledUserById(['login' => $value['item_id']]);
-                $primaryentity = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']]);
-                $visas .= "{$labelledUser} ({$primaryentity})\n";
+                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                $primaryentity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                $visas .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})\n";
             }
         }
 
@@ -231,9 +231,9 @@ class MergeController
                 'orderBy'   => ['listinstance_id']
             ]);
             foreach ($opinionWorkflow as $value) {
-                $labelledUser = UserModel::getLabelledUserById(['login' => $value['item_id']]);
-                $primaryentity = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']]);
-                $opinions .= "{$labelledUser} ({$primaryentity})\n";
+                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                $primaryentity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})\n";
             }
         }
 
@@ -248,9 +248,9 @@ class MergeController
             ]);
             foreach ($copyWorkflow as $value) {
                 if ($value['item_type'] == 'user_id') {
-                    $labelledUser  = UserModel::getLabelledUserById(['login' => $value['item_id']]);
-                    $primaryentity = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']]);
-                    $label         = "{$labelledUser} ({$primaryentity})";
+                    $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                    $primaryentity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                    $label = "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})";
                 } else {
                     $entity = EntityModel::getByEntityId(['entityId' => $value['item_id'], 'select' => ['entity_label']]);
                     $label = $entity['entity_label'];

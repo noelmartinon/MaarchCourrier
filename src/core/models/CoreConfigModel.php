@@ -237,6 +237,9 @@ class CoreConfigModel
         return $xmlfile;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function initAngularStructure()
     {
         $lang = CoreConfigModel::getLanguage();
@@ -258,12 +261,10 @@ class CoreConfigModel
 
         /* SCRIPS PARTS */
         $structure .= "<script src='../../node_modules/jquery/dist/jquery.min.js'></script>";
-        $structure .= "<script src='../../node_modules/core-js/client/shim.js'></script>";
         $structure .= "<script src='../../node_modules/zone.js/dist/zone.min.js'></script>";
         $structure .= "<script src='../../node_modules/bootstrap/dist/js/bootstrap.min.js'></script>";
-        $structure .= "<script src='../../node_modules/chart.js/Chart.min.js'></script>";
         $structure .= "<script src='../../node_modules/tinymce/tinymce.min.js'></script>";
-        $structure .= "<script src='../../node_modules/jquery.nicescroll/jquery.nicescroll.min.js'></script>";
+        $structure .= "<script src='../../node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js'></script>";
         $structure .= "<script src='../../node_modules/tooltipster/dist/js/tooltipster.bundle.min.js'></script>";
         $structure .= "<script src='../../node_modules/jquery-typeahead/dist/jquery.typeahead.min.js'></script> ";
         $structure .= "<script src='../../node_modules/chosen-js/chosen.jquery.min.js'></script>";

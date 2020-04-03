@@ -219,7 +219,7 @@ class FolderPrintController
                         'orderBy' => ['creation_date desc']
                     ]);
 
-                    $userEntities = EntityModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['entity_id']]);
+                    $userEntities = EntityModel::getByUserId(['userId' => $GLOBALS['id'], 'select' => ['entity_id']]);
                     $userEntities = array_column($userEntities, 'entity_id');
 
                     $notes = [];
@@ -592,7 +592,7 @@ class FolderPrintController
 
     private static function getAttachmentSeparator(array $args)
     {
-        ValidatorModel::notEmpty($args, ['attachment', 'chronoResource']);
+        ValidatorModel::notEmpty($args, ['attachment']);
         ValidatorModel::arrayType($args, ['attachment']);
         ValidatorModel::stringType($args, ['chronoResource']);
 

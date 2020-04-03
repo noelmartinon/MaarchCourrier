@@ -27,6 +27,13 @@ class PrivilegeController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
+        if (!Validator::intVal()->notEmpty()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route id is empty or not an integer']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($args['privilegeId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route privilegeId is empty or not an integer']);
+        }
+
         $group = GroupModel::getById(['id' => $args['id']]);
         if (empty($group)) {
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
@@ -56,6 +63,13 @@ class PrivilegeController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
+        if (!Validator::intVal()->notEmpty()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route id is empty or not an integer']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($args['privilegeId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route privilegeId is empty or not an integer']);
+        }
+
         $group = GroupModel::getById(['id' => $args['id']]);
         if (empty($group)) {
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
@@ -74,6 +88,13 @@ class PrivilegeController
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_groups', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        if (!Validator::intVal()->notEmpty()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route id is empty or not an integer']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($args['privilegeId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route privilegeId is empty or not an integer']);
         }
 
         $group = GroupModel::getById(['id' => $args['id']]);
@@ -96,6 +117,13 @@ class PrivilegeController
 
     public static function getParameters(Request $request, Response $response, array $args)
     {
+        if (!Validator::intVal()->notEmpty()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route id is empty or not an integer']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($args['privilegeId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route privilegeId is empty or not an integer']);
+        }
+
         $group = GroupModel::getById(['id' => $args['id']]);
         if (empty($group)) {
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);

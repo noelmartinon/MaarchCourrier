@@ -4,7 +4,7 @@ import { LANG } from '../../translate.component';
 import { catchError, tap, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '../../notification.service';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';

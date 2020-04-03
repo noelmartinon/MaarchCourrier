@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../app/translate.component';
 import { tap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 import { FoldersService } from '../app/folder/folders.service';
 import { DomPortalHost, TemplatePortal } from '@angular/cdk/portal';
 

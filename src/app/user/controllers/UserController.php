@@ -49,6 +49,7 @@ use SrcCore\models\DatabaseModel;
 use SrcCore\models\PasswordModel;
 use Template\models\TemplateModel;
 use User\models\UserBasketPreferenceModel;
+use User\models\UserEmailSignatureModel;
 use User\models\UserEntityModel;
 use User\models\UserGroupModel;
 use User\models\UserModel;
@@ -117,7 +118,7 @@ class UserController
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
             $user['signatures'] = UserSignatureModel::getByUserSerialId(['userSerialid' => $aArgs['id']]);
-            $user['emailSignatures'] = UserModel::getEmailSignaturesById(['userId' => $user['user_id']]);
+            $user['emailSignatures'] = UserEmailSignatureModel::getByUserId(['userId' => $user['id']]);
         } else {
             $user['signatures'] = [];
             $user['emailSignatures'] = [];
@@ -126,7 +127,7 @@ class UserController
 
         $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
         $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['id']]);
-        $user['entities']           = UserModel::getEntitiesByLogin(['login' => $user['user_id']]);
+        $user['entities']           = UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
         $user['allEntities']        = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
@@ -477,10 +478,9 @@ class UserController
             'data'  => [$aArgs['id']]
         ]);
 
-        // Delete from entities
         UserEntityModel::delete([
             'where' => ['user_id = ?'],
-            'data'  => [$user['user_id']]
+            'data'  => [$aArgs['id']]
         ]);
 
         UserModel::delete(['id' => $aArgs['id']]);
@@ -502,9 +502,9 @@ class UserController
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['preferences']        = json_decode($user['preferences'], true);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
-        $user['emailSignatures']    = UserModel::getEmailSignaturesById(['userId' => $user['user_id']]);
+        $user['emailSignatures']    = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
         $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
-        $user['entities']           = UserModel::getEntitiesByLogin(['login' => $user['user_id']]);
+        $user['entities']           = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
         $user['redirectedBaskets']  = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
@@ -633,7 +633,7 @@ class UserController
 
         if ($body['newPassword'] != $body['reNewPassword']) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
-        } elseif (!AuthenticationModel::authentication(['userId' => $user['user_id'], 'password' => $body['currentPassword']])) {
+        } elseif (!AuthenticationModel::authentication(['login' => $user['user_id'], 'password' => $body['currentPassword']])) {
             return $response->withStatus(401)->withJson(['errors' => _WRONG_PSW]);
         } elseif (!PasswordController::isPasswordValid(['password' => $body['newPassword']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Password does not match security criteria']);
@@ -1021,14 +1021,14 @@ class UserController
             return $response->withJson(['errors' => 'Bad Request']);
         }
 
-        UserModel::createEmailSignature([
-            'userId'    => $GLOBALS['userId'],
+        UserEmailSignatureModel::create([
+            'userId'    => $GLOBALS['id'],
             'title'     => $data['title'],
             'htmlBody'  => $data['htmlBody']
         ]);
 
         return $response->withJson([
-            'emailSignatures' => UserModel::getEmailSignaturesById(['userId' => $GLOBALS['userId']])
+            'emailSignatures' => UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']])
         ]);
     }
 
@@ -1040,26 +1040,26 @@ class UserController
             return $response->withJson(['errors' => 'Bad Request']);
         }
 
-        UserModel::updateEmailSignature([
+        UserEmailSignatureModel::update([
             'id'        => $aArgs['id'],
-            'userId'    => $GLOBALS['userId'],
+            'userId'    => $GLOBALS['id'],
             'title'     => $data['title'],
             'htmlBody'  => $data['htmlBody']
         ]);
 
         return $response->withJson([
-            'emailSignature' => UserModel::getEmailSignatureWithSignatureIdById(['userId' => $GLOBALS['userId'], 'signatureId' => $aArgs['id']])
+            'emailSignature' => UserEmailSignatureModel::getById(['id' => $aArgs['id']])
         ]);
     }
 
     public function deleteCurrentUserEmailSignature(Request $request, Response $response, array $aArgs)
     {
-        UserModel::deleteEmailSignature([
+        UserEmailSignatureModel::delete([
             'id'        => $aArgs['id'],
-            'userId'    => $GLOBALS['userId']
+            'userId'    => $GLOBALS['id']
         ]);
 
-        return $response->withJson(['emailSignatures' => UserModel::getEmailSignaturesById(['userId' => $GLOBALS['userId']])]);
+        return $response->withJson(['emailSignatures' => UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']])]);
     }
 
     public function addGroup(Request $request, Response $response, array $aArgs)
@@ -1202,7 +1202,7 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
 
-        $entities = UserModel::getEntitiesByLogin(['login' => $user['user_id']]);
+        $entities = UserModel::getEntitiesById(['id' => $args['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
 
         return $response->withJson(['entities' => $entities]);
     }
@@ -1227,7 +1227,7 @@ class UserController
             $data['role'] = '';
         }
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
-        $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $user['user_id']]);
+        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $aArgs['id'], 'select' => [1]]);
         $pEntity = 'N';
         if (empty($primaryEntity)) {
             $pEntity = 'Y';
@@ -1244,7 +1244,7 @@ class UserController
         ]);
 
         return $response->withJson([
-            'entities'      => UserModel::getEntitiesByLogin(['login' => $user['user_id']]),
+            'entities'      => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]),
             'allEntities'   => EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']])
         ]);
     }
@@ -1287,10 +1287,9 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         UserEntityModel::updateUserPrimaryEntity(['id' => $aArgs['id'], 'entityId' => $aArgs['entityId']]);
 
-        return $response->withJson(['entities' => UserModel::getEntitiesByLogin(['login' => $user['user_id']])]);
+        return $response->withJson(['entities' => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']])]);
     }
 
     public function deleteEntity(Request $request, Response $response, array $aArgs)
@@ -1375,11 +1374,11 @@ class UserController
             }
         }
 
-        $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $user['user_id']]);
+        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $aArgs['id'], 'select' => ['entities.entity_label']]);
         UserEntityModel::deleteUserEntity(['id' => $aArgs['id'], 'entityId' => $aArgs['entityId']]);
 
         if (!empty($primaryEntity['entity_id']) && $primaryEntity['entity_id'] == $aArgs['entityId']) {
-            UserEntityModel::reassignUserPrimaryEntity(['userId' => $user['user_id']]);
+            UserEntityModel::reassignUserPrimaryEntity(['userId' => $aArgs['id']]);
         }
 
         HistoryController::add([
@@ -1392,7 +1391,7 @@ class UserController
         ]);
 
         return $response->withJson([
-            'entities'      => UserModel::getEntitiesByLogin(['login' => $user['user_id']]),
+            'entities'      => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]),
             'allEntities'   => EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']])
         ]);
     }
@@ -1494,7 +1493,7 @@ class UserController
     {
         $queryParams = $request->getQueryParams();
 
-        $entities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+        $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
         $entities = array_column($entities, 'entity_id');
         if (empty($entities)) {
             $entities = [0];
@@ -1737,7 +1736,7 @@ class UserController
 
     public static function getCurrentUserEmailSignatures(Request $request, Response $response)
     {
-        $signatureModels = UserModel::getEmailSignaturesById(['userId' => $GLOBALS['userId']]);
+        $signatureModels = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
 
         $signatures = [];
 
@@ -1757,16 +1756,15 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Body param id is empty or not an integer']);
         }
 
-        $signatureModels = UserModel::getEmailSignatureWithSignatureIdById(['userId' => $GLOBALS['userId'], 'signatureId' => $args['id']]);
-
-        if (empty($signatureModels)) {
+        $signature = UserEmailSignatureModel::getById(['id' => $args['id']]);
+        if (empty($signature) || $signature['userId'] != $GLOBALS['id']) {
             return $response->withStatus(404)->withJson(['errors' => 'Signature not found']);
         }
 
         $signature = [
-            'id'      => $signatureModels['id'],
-            'label'   => $signatureModels['title'],
-            'content' => $signatureModels['html_body']
+            'id'      => $signature['id'],
+            'label'   => $signature['title'],
+            'content' => $signature['html_body']
         ];
 
         return $response->withJson(['emailSignature' => $signature]);

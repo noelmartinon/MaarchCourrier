@@ -34,9 +34,12 @@ class HistoryControllerTest extends TestCase
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
+        $userInfo = \User\models\UserModel::getByLogin(['login' => 'superadmin', 'select' => ['id']]);
+
         $aArgs = [
             'startDate' => date('Y-m-d H:i:s', 1521100000),
-            'endDate'   => date('Y-m-d H:i:s', time())
+            'endDate'   => date('Y-m-d H:i:s', time()),
+            'users'     => [$userInfo['id']]
         ];
         $fullRequest = $request->withQueryParams($aArgs);
 
@@ -69,13 +72,45 @@ class HistoryControllerTest extends TestCase
         $this->assertNotNull($responseBody['history']);
     }
 
+    public function testGetBatchAvailableFilters()
+    {
+        $batchHistory = new \History\controllers\BatchHistoryController();
+
+        //  GET
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response = $batchHistory->getAvailableFilters($request, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsArray($responseBody['modules']);
+    }
+
+    public function testGetAvailableFilters()
+    {
+        $historyController = new \History\controllers\HistoryController();
+
+        //  GET
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response = $historyController->getAvailableFilters($request, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsArray($responseBody['actions']);
+        $this->assertIsArray($responseBody['systemActions']);
+        $this->assertIsArray($responseBody['users']);
+    }
+
     public function testRealDelete()
     {
+        $userInfo = \User\models\UserModel::getByLogin(['login' => 'bbain', 'select' => ['id']]);
+
         $aResId = DatabaseModel::select([
             'select'    => ['res_id'],
             'table'     => ['res_letterbox'],
             'where'     => ['subject like ?','typist = ?', 'dest_user = ?'],
-            'data'      => ['%Superman is alive - PHP unit', 19, 'bbain'],
+            'data'      => ['%Superman is alive - PHP unit', 19, $userInfo['id']],
             'order_by'  => ['res_id DESC']
         ]);
 

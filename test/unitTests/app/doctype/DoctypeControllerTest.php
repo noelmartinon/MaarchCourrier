@@ -18,6 +18,34 @@ class DoctypeControllerTest extends TestCase
     private static $secondLevelId = null;
     private static $doctypeId     = null;
 
+    public function testGet()
+    {
+        //  READ
+        $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request      = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $doctypeController = new \Doctype\controllers\DoctypeController();
+        $response          = $doctypeController->get($request, new \Slim\Http\Response());
+        $responseBody      = json_decode((string)$response->getBody());
+
+        $this->assertNotNull($responseBody->doctypes);
+        foreach ($responseBody->doctypes as $value) {
+            $this->assertNotNull($value->coll_id);
+            $this->assertIsInt($value->type_id);
+            $this->assertNotNull($value->description);
+            $this->assertNotNull($value->enabled);
+            $this->assertIsInt($value->doctypes_first_level_id);
+            $this->assertIsInt($value->doctypes_second_level_id);
+            $this->assertNotNull($value->retention_final_disposition);
+            $this->assertNotNull($value->retention_rule);
+            $this->assertIsInt($value->duration_current_use);
+            $this->assertIsInt($value->process_delay);
+            $this->assertIsInt($value->delay1);
+            $this->assertIsInt($value->delay2);
+            $this->assertNotNull($value->process_mode);
+        }
+    }
+
     public function testReadList()
     {
         //  READ LIST

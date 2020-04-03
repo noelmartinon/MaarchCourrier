@@ -64,41 +64,23 @@ class TextFormatModel
         return $string;
     }
 
-    public static function htmlWasher($html, $mode = 'unicode')
+    public static function htmlWasher($html)
     {
-        if ($mode == 'unicode') {
-            $html = str_replace("<br/>", "\\n", $html);
-            $html = str_replace("<br />", "\\n", $html);
-            $html = str_replace("<br/>", "\\n", $html);
-            $html = str_replace("&nbsp;", " ", $html);
-            $html = str_replace("&eacute;", "\u00e9", $html);
-            $html = str_replace("&egrave;", "\u00e8", $html);
-            $html = str_replace("&ecirc;", "\00ea", $html);
-            $html = str_replace("&agrave;", "\u00e0", $html);
-            $html = str_replace("&acirc;", "\u00e2", $html);
-            $html = str_replace("&icirc;", "\u00ee", $html);
-            $html = str_replace("&ocirc;", "\u00f4", $html);
-            $html = str_replace("&ucirc;", "\u00fb", $html);
-            $html = str_replace("&acute;", "\u0027", $html);
-            $html = str_replace("&deg;", "\u00b0", $html);
-            $html = str_replace("&rsquo;", "\u2019", $html);
-        } else {
-            $html = str_replace("<br/>", "\\n", $html);
-            $html = str_replace("<br />", "\\n", $html);
-            $html = str_replace("<br/>", "\\n", $html);
-            $html = str_replace("&nbsp;", " ", $html);
-            $html = str_replace("&eacute;", "é", $html);
-            $html = str_replace("&egrave;", "è", $html);
-            $html = str_replace("&ecirc;", "ê", $html);
-            $html = str_replace("&agrave;", "à", $html);
-            $html = str_replace("&acirc;", "â", $html);
-            $html = str_replace("&icirc;", "î", $html);
-            $html = str_replace("&ocirc;", "ô", $html);
-            $html = str_replace("&ucirc;", "û", $html);
-            $html = str_replace("&acute;", "", $html);
-            $html = str_replace("&deg;", "°", $html);
-            $html = str_replace("&rsquo;", "'", $html);
-        }
+        $html = str_replace("<br/>", "\\n", $html);
+        $html = str_replace("<br />", "\\n", $html);
+        $html = str_replace("<br/>", "\\n", $html);
+        $html = str_replace("&nbsp;", " ", $html);
+        $html = str_replace("&eacute;", "\u00e9", $html);
+        $html = str_replace("&egrave;", "\u00e8", $html);
+        $html = str_replace("&ecirc;", "\00ea", $html);
+        $html = str_replace("&agrave;", "\u00e0", $html);
+        $html = str_replace("&acirc;", "\u00e2", $html);
+        $html = str_replace("&icirc;", "\u00ee", $html);
+        $html = str_replace("&ocirc;", "\u00f4", $html);
+        $html = str_replace("&ucirc;", "\u00fb", $html);
+        $html = str_replace("&acute;", "\u0027", $html);
+        $html = str_replace("&deg;", "\u00b0", $html);
+        $html = str_replace("&rsquo;", "\u2019", $html);
 
         return $html;
     }

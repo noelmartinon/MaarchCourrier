@@ -10,7 +10,7 @@ import { finalize, tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '../../../service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: "tag-administration.component.html",

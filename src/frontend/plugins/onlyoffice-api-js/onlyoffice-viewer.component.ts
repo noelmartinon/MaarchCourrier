@@ -13,7 +13,7 @@ import { Subject, of } from 'rxjs';
 import { catchError, tap, filter } from 'rxjs/operators';
 import { LANG } from '../../app/translate.component';
 import { ConfirmComponent } from '../modal/confirm.component';
-import { MatDialogRef, MatDialog } from '@angular/material';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { NotificationService } from '../../app/notification.service';
 import { HeaderService } from '../../service/header.service';
 

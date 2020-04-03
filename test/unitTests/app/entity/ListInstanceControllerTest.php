@@ -63,7 +63,7 @@ class ListInstanceControllerTest extends TestCase
                 [
                     'resId'  => self::$resourceId,
                     'listInstances' => [
-                        ["item_id" => 19, "requested_signature" => false],
+                        ["item_id" => 17, "requested_signature" => false],
                         ["item_id" => 18, "requested_signature" => true]
                     ]
                 ],
@@ -88,14 +88,14 @@ class ListInstanceControllerTest extends TestCase
 
         $responseBody   = json_decode((string)$response->getBody(), true);
 
-        $this->assertSame(19, $responseBody[0]['item_id']);
-        $this->assertSame('user', $responseBody[0]['item_type']);
-        $this->assertSame(false, $responseBody[0]['requested_signature']);
-        $this->assertNotEmpty($responseBody[0]['labelToDisplay']);
-        $this->assertSame(18, $responseBody[1]['item_id']);
-        $this->assertSame('user', $responseBody[1]['item_type']);
-        $this->assertSame(true, $responseBody[1]['requested_signature']);
-        $this->assertNotEmpty($responseBody[1]['labelToDisplay']);
+        $this->assertSame(17, $responseBody['circuit'][0]['item_id']);
+        $this->assertSame('user', $responseBody['circuit'][0]['item_type']);
+        $this->assertSame(false, $responseBody['circuit'][0]['requested_signature']);
+        $this->assertNotEmpty($responseBody['circuit'][0]['labelToDisplay']);
+        $this->assertSame(18, $responseBody['circuit'][1]['item_id']);
+        $this->assertSame('user', $responseBody['circuit'][1]['item_type']);
+        $this->assertSame(true, $responseBody['circuit'][1]['requested_signature']);
+        $this->assertNotEmpty($responseBody['circuit'][1]['labelToDisplay']);
 
         \SrcCore\models\DatabaseModel::delete([
             'table' => 'res_letterbox',

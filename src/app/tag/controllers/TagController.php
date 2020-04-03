@@ -416,7 +416,7 @@ class TagController
         foreach ($body['links'] as $value) {
             HistoryController::add([
                 'tableName' => 'tags',
-                'recordId'  => $args['resId'],
+                'recordId'  => $args['id'],
                 'eventType' => 'UP',
                 'info'      => _LINK_ADDED_TAG . " : {$linkedTagsInfo[$value]}",
                 'eventId'   => 'tagModification'

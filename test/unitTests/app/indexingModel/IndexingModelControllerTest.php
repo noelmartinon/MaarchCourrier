@@ -354,7 +354,27 @@ class IndexingModelControllerTest extends TestCase
         $this->assertNotEmpty($responseBody->indexingModels);
     }
 
-    public function testEnabled() {
+    public function testGetEntities()
+    {
+        $indexingModelController = new \IndexingModel\controllers\IndexingModelController();
+
+        //  GET
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $indexingModelController->getEntities($request, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertNotEmpty($responseBody->entities);
+        foreach ($responseBody->entities as $value) {
+            $this->assertIsInt($value->id);
+            $this->assertNotEmpty($value->entity_label);
+            $this->assertNotEmpty($value->entity_id);
+        }
+    }
+
+    public function testEnabled()
+    {
         $indexingModelController = new \IndexingModel\controllers\IndexingModelController();
 
         // GET BY ID

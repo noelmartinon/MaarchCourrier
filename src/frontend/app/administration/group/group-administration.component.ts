@@ -12,7 +12,7 @@ import { AppService } from '../../../service/app.service';
 import { PrivilegeService } from '../../../service/privileges.service';
 import { tap, catchError, exhaustMap, map, finalize, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 
 declare function $j(selector: any): any;

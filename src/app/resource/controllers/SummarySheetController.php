@@ -623,13 +623,13 @@ class SummarySheetController
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
                         $item = '';
                         if ($listInstance['item_type'] == 'user_id') {
-                            $user = UserModel::getLabelledUserById(['login' => $listInstance['item_id']]);
-                            $entity = UserModel::getPrimaryEntityByUserId(['userId' => $listInstance['item_id']]);
+                            $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                            $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
 
                             if ($listInstance['item_mode'] == 'dest') {
-                                $item = $user;
+                                $item = $user['firstname'] . ' ' . $user['lastname'];
                             } else {
-                                $item = $user . " (" . $entity['entity_label'] . ")";
+                                $item = "{$user['firstname']} {$user['lastname']} ({$entity['entity_label']})";
                             }
                         } elseif ($listInstance['item_type'] == 'entity_id') {
                             $item = $listInstance['item_id'];
@@ -739,9 +739,10 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        $user = UserModel::getLabelledUserById(['login' => $listInstance['item_id']]);
-                        $entity = UserModel::getPrimaryEntityByUserId(['userId' => $listInstance['item_id']]);
-                        $userLabel = $user . " (" . $entity['entity_label'] . ")";
+                        $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                        $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+
+                        $userLabel = $user['firstname'] . ' ' .$user['lastname'] . " (" . $entity['entity_label'] . ")";
                         $users[] = [
                             'user'  => $userLabel,
                             'date'  => TextFormatModel::formatDate($listInstance['process_date']),
@@ -856,7 +857,7 @@ class SummarySheetController
                     'data'     => [$tmpIds],
                     'order_by' => ['identifier']]);
 
-                $userEntities = EntityModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['entity_id']]);
+                $userEntities = EntityModel::getByUserId(['userId' => $GLOBALS['id'], 'select' => ['entity_id']]);
                 $data['userEntities'] = [];
                 foreach ($userEntities as $userEntity) {
                     $data['userEntities'][] = $userEntity['entity_id'];

@@ -7,7 +7,7 @@ import { AppService } from '../../service/app.service';
 import { tap, catchError, filter, map, exhaustMap } from 'rxjs/operators';
 import { of, Subject } from 'rxjs';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import { MatDialogRef, MatDialog } from '@angular/material';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../../plugins/modal/alert.component';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { PluginSelectSearchComponent } from '../../plugins/select-search/select-search.component';

@@ -8,6 +8,7 @@
 */
 
 use PHPUnit\Framework\TestCase;
+use SrcCore\models\DatabaseModel;
 
 class IndexingControllerTest extends TestCase
 {
@@ -75,6 +76,125 @@ class IndexingControllerTest extends TestCase
         $response = $indexingController->getIndexingActions($request, new \Slim\Http\Response(), ['groupId' => 99999]);
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('This user is not in this group', $responseBody->errors);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testGetProcessLimitDate()
+    {
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $indexingController = new \Resource\controllers\IndexingController();
+
+        //  GET BY DOCTYPE
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            "doctype" => 101
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+        $response     = $indexingController->getProcessLimitDate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertNotEmpty($responseBody->processLimitDate);
+
+        //  GET BY PRIORITY
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $priorities = DatabaseModel::select([
+            'select'    => ['id'],
+            'table'     => ['priorities'],
+            'limit'     => 1
+        ]);
+
+        $aArgs = [
+            "priority" => $priorities[0]['id']
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+        $response     = $indexingController->getProcessLimitDate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertNotEmpty($responseBody->processLimitDate);
+
+        // ERROR
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            "priority" => "12635"
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+        $response     = $indexingController->getProcessLimitDate($fullRequest, new \Slim\Http\Response());
+
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Delay is not a numeric value', $responseBody->errors);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testGetFileInformations()
+    {
+        $indexingController = new \Resource\controllers\IndexingController();
+
+        //  GET
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $indexingController->getFileInformations($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertNotEmpty($responseBody->informations);
+        $this->assertNotEmpty($responseBody->informations->maximumSize);
+        $this->assertNotEmpty($responseBody->informations->maximumSizeLabel);
+        $this->assertNotEmpty($responseBody->informations->allowedFiles);
+        foreach ($responseBody->informations->allowedFiles as $value) {
+            $this->assertNotEmpty($value->extension);
+            $this->assertNotEmpty($value->mimeType);
+            $this->assertIsBool($value->canConvert);
+        }
+    }
+
+    public function testGetPriorityWithProcessLimitDate()
+    {
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $indexingController = new \Resource\controllers\IndexingController();
+
+        // GET
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            "processLimitDate" => 'Fri Dec 16 2044'
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+        $response     = $indexingController->getPriorityWithProcessLimitDate($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertNotEmpty($responseBody->priority);
+
+        // ERROR
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $indexingController->getPriorityWithProcessLimitDate($request, new \Slim\Http\Response());
+
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Query params processLimitDate is empty', $responseBody->errors);
 
         $GLOBALS['userId'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);

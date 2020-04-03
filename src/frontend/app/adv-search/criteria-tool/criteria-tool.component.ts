@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { MatExpansionPanel } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
 @Component({
     selector: 'app-criteria-tool',

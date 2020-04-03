@@ -7,7 +7,7 @@ import { FormControl } from '@angular/forms';
 import { catchError, map, tap, elementAt } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AlertComponent } from '../../plugins/modal/alert.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '../../service/functions.service';
 
 @Component({

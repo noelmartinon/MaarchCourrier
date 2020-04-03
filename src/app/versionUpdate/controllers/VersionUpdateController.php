@@ -101,6 +101,9 @@ class VersionUpdateController
         ]);
     }
 
+    /**
+        * @codeCoverageIgnore
+    */
     public function update(Request $request, Response $response)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_update_control', 'userId' => $GLOBALS['id']])) {

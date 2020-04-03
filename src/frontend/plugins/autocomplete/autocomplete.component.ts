@@ -8,7 +8,7 @@ import { LANG } from '../../app/translate.component';
 import { HttpClient } from '@angular/common/http';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { NotificationService } from '../../app/notification.service';
-import { MatDialog, MatDialogRef } from '@angular/material';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'plugin-autocomplete',

@@ -3,13 +3,15 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "baseUrl": "../../apps/maarch_entreprise/",
-    "module": "es2015",
     "types": []
   },
-  "exclude": [
-    "**/*.spec.ts"
-  ],
   "angularCompilerOptions": {
     "enableIvy": false
-  }
+  },
+  "files": [
+    "main.ts"
+  ],
+  "include": [
+    "src/frontend/**/*.d.ts"
+  ]
 }

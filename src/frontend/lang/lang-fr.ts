@@ -1292,8 +1292,6 @@ export const LANG_FR = {
     "removeUserRedirectInformations":              "<em>L'utilisateur sera supprimé des listes de diffusion des courriers et du modèle de l'entité <b>sauf dans le cas où il est attributaire</b></em>",
     "removedFromFolder":                           "Courrier(s) retiré(s)",
     "renewPsw":                                    "Retaper le mot de passe",
-    "reports":                                     "Statistiques",
-    "reportsAdmin":                                "Administration des statistiques",
     "requestSentByEmail":                          "La demande vous a été envoyée par courriel.",
     "requiredField":                               "Champ requis",
     "resId":                                       "Identifiant GED",

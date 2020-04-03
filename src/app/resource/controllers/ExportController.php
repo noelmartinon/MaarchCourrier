@@ -257,7 +257,7 @@ class ExportController
                     } elseif ($value['value'] == 'getTypist') {
                         $csvContent[] = UserModel::getLabelledUserById(['id' => $resource['typist']]);
                     } elseif ($value['value'] == 'getAssignee') {
-                        $csvContent[] = UserModel::getLabelledUserById(['login' => $resource['dest_user']]);
+                        $csvContent[] = UserModel::getLabelledUserById(['id' => $resource['dest_user']]);
                     } elseif ($value['value'] == 'getTags') {
                         $tags = ExportController::getTags(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $csvContent[] = empty($tags[$resource['res_id']]) ? '' : $tags[$resource['res_id']];
@@ -369,7 +369,7 @@ class ExportController
                     } elseif ($value['value'] == 'getTypist') {
                         $content[] = UserModel::getLabelledUserById(['id' => $resource['typist']]);
                     } elseif ($value['value'] == 'getAssignee') {
-                        $content[] = UserModel::getLabelledUserById(['login' => $resource['dest_user']]);
+                        $content[] = UserModel::getLabelledUserById(['id' => $resource['dest_user']]);
                     } elseif ($value['value'] == 'getTags') {
                         $tags = ExportController::getTags(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($tags[$resource['res_id']]) ? '' : $tags[$resource['res_id']];

@@ -83,7 +83,7 @@ class ResourceControlController
             }
 
             if (!empty($body['initiator'])) {
-                $userEntities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+                $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
                 $userEntities = array_column($userEntities, 'id');
                 if (!in_array($body['initiator'], $userEntities)) {
                     return ['errors' => "Body initiator does not belong to your entities"];
@@ -177,7 +177,7 @@ class ResourceControlController
                 return ['errors' => "Body initiator does not exist"];
             }
             if ($resource['initiator'] != $entity['entity_id']) {
-                $userEntities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+                $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
                 $userEntities = array_column($userEntities, 'id');
                 if (!in_array($body['initiator'], $userEntities)) {
                     return ['errors' => "Body initiator does not belong to your entities"];

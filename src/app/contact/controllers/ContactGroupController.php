@@ -77,7 +77,7 @@ class ContactGroupController
         if ($GLOBALS['userId'] = 'superadmin') {
             $entityOwner = 'superadmin';
         } else {
-            $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $GLOBALS['userId']]);
+            $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.entity_id']]);
             if (empty($primaryEntity)) {
                 return $response->withStatus(400)->withJson(['errors' => 'User has no entities']);
             }

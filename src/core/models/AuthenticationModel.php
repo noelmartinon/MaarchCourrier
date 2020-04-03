@@ -23,14 +23,14 @@ class AuthenticationModel
 
     public static function authentication(array $args)
     {
-        ValidatorModel::notEmpty($args, ['userId', 'password']);
-        ValidatorModel::stringType($args, ['userId', 'password']);
+        ValidatorModel::notEmpty($args, ['login', 'password']);
+        ValidatorModel::stringType($args, ['login', 'password']);
 
         $aReturn = DatabaseModel::select([
             'select'    => ['password'],
             'table'     => ['users'],
             'where'     => ['lower(user_id) = lower(?)', 'status = ?', '(locked_until is null OR locked_until < CURRENT_TIMESTAMP)'],
-            'data'      => [$args['userId'], 'OK']
+            'data'      => [$args['login'], 'OK']
         ]);
 
         if (empty($aReturn[0])) {

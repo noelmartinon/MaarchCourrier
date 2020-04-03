@@ -23,6 +23,9 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
 
+/**
+    * @codeCoverageIgnore
+*/
 class FastParapheurController
 {
     public static function retrieveSignedMails($aArgs)

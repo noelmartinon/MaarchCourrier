@@ -333,32 +333,11 @@ if (!defined('_LISTMODELS_OCCURS_LINKED_TO')) {
 if (!defined('_CHOOSE_REPLACEMENT_DEPARTMENT')) {
     define('_CHOOSE_REPLACEMENT_DEPARTMENT', 'Kies een vervangende dienst');
 }
-if (!defined('_ENTITY_VOL_STAT')) {
-    define('_ENTITY_VOL_STAT', 'Briefvolume per eenheid');
-}
-if (!defined('_ENTITY_VOL_STAT_DESC')) {
-    define('_ENTITY_VOL_STAT_DESC', 'Om het aantal brieven weer te geven dat per dienst bewaard wordt.');
-}
 if (!defined('_NO_DATA_MESSAGE')) {
     define('_NO_DATA_MESSAGE', 'Onvoldoende gegevens');
 }
-if (!defined('_MAIL_VOL_BY_ENT_REPORT')) {
-    define('_MAIL_VOL_BY_ENT_REPORT', 'Briefvolume per dienst');
-}
 if (!defined('_WRONG_DATE_FORMAT')) {
     define('_WRONG_DATE_FORMAT', 'Fout datumformaat');
-}
-if (!defined('_ENTITY_PROCESS_DELAY')) {
-    define('_ENTITY_PROCESS_DELAY', 'Gemiddelde verwerkingstermijn per eenheid');
-}
-if (!defined('_ENTITY_PROCESS_DELAY_DESC')) {
-    define('_ENTITY_PROCESS_DELAY_DESC', 'Om de termijn (in dagen) weer te geven van de aanmaak tot de afsluiting van een brief.');
-}
-if (!defined('_ENTITY_LATE_MAIL')) {
-    define('_ENTITY_LATE_MAIL', 'Briefvolume te laat per eenheid');
-}
-if (!defined('_ENTITY_LATE_MAIL_DESC')) {
-    define('_ENTITY_LATE_MAIL_DESC', 'Om het aantal brieven weer te geven dat niet afgesloten werd en waarvan de verwerkingsdeadline overschreden werd.');
 }
 if (!defined('_ALL_LIST')) {
     define('_ALL_LIST', 'De volledige lijst weergeven');
@@ -447,12 +426,6 @@ if (!defined('_SELECT_OBJECT_TYPE_AND_ID')) {
 if (!defined('_SAVE_LISTMODEL')) {
     define('_SAVE_LISTMODEL', 'Valideren');
 }
-if (!defined('_OBJECT_ID_IS_NOT_VALID_ID')) {
-    define('_OBJECT_ID_IS_NOT_VALID_ID', 'Gebruikersnaam ongeldig: hij mag slechts alfabetische, numerieke karakters of underscores bevatten (A-Z a-z 0-9 _)');
-}
-if (!defined('_LISTMODEL_ID_ALREADY_USED')) {
-    define('_LISTMODEL_ID_ALREADY_USED', 'Deze gebruikersnaam wordt reeds gebruikt!');
-}
 if (!defined('_CONFIRM_LISTMODEL_SAVE')) {
     define('_CONFIRM_LISTMODEL_SAVE', 'De lijst opslaan?');
 }
@@ -461,12 +434,6 @@ if (!defined('_ENTER_DESCRIPTION')) {
 }
 if (!defined('_ENTER_TITLE')) {
     define('_ENTER_TITLE', 'Verplichte titel');
-}
-if (!defined('_PARAM_AVAILABLE_LISTMODELS_ON_GROUP_BASKETS')) {
-    define('_PARAM_AVAILABLE_LISTMODELS_ON_GROUP_BASKETS', 'De modeltypes van de verdelingslijst voor de indexering instellen');
-}
-if (!defined('_INDEXING_DIFFLIST_TYPES')) {
-    define('_INDEXING_DIFFLIST_TYPES', 'Types verdelingslijst');
 }
 if (!defined('_ADMIN_DIFFLIST_TYPES')) {
     define('_ADMIN_DIFFLIST_TYPES', 'Types verdelingslijst (Administratie)');
@@ -483,21 +450,6 @@ if (!defined('_ADMIN_LISTMODELS_DESC')) {
 if (!defined('_STANDARD')) {
     define('_STANDARD', 'Standaard');
 }
-if (!defined('_5_ARCHIVAL')) {
-    define('_5_ARCHIVAL', '5 Archiefonderzoek ');
-}
-if (!defined('_51_IDENTIFICATION')) {
-    define('_51_IDENTIFICATION', '5.1 Identificatie');
-}
-if (!defined('_52_DESCRIPTION')) {
-    define('_52_DESCRIPTION', '5.2 Beschrijving');
-}
-if (!defined('_53_RELATIONS')) {
-    define('_53_RELATIONS', '5.3 Relaties');
-}
-if (!defined('_54_CONTROL')) {
-    define('_54_CONTROL', '5.4 Controle');
-}
 if (!defined('_VISIBLE')) {
     define('_VISIBLE', 'Actief');
 }
@@ -509,12 +461,6 @@ if (!defined('_TARGET_STATUS')) {
 }
 if (!defined('_TARGET_ROLE')) {
     define('_TARGET_ROLE', 'Rol die vooruit moet gaan in de workflow');
-}
-if (!defined('_ITS_NOT_MY_TURN_IN_THE_WF')) {
-    define('_ITS_NOT_MY_TURN_IN_THE_WF', 'Het is niet mijn beurt om te behandelen in de workflow');
-}
-if (!defined('_NO_AVAILABLE_ROLE_FOR_ME_IN_THE_WF')) {
-    define('_NO_AVAILABLE_ROLE_FOR_ME_IN_THE_WF', 'Er is geen rol voor mij bepaald in de workflow');
 }
 if (!defined('_NO_FILTER')) {
     define('_NO_FILTER', 'De filters wissen');
@@ -548,15 +494,6 @@ if (!defined('_ADD_USER_LISTDIFF')) {
 }
 if (!defined('_ADD_ENTITY_LISTDIFF')) {
     define('_ADD_ENTITY_LISTDIFF', 'De eenheid aan de verdelingslijst toevoegen');
-}
-if (!defined('_RESPONSE_RATE')) {
-    define('_RESPONSE_RATE', 'Antwoordpercentage');
-}
-if (!defined('_RESPONSE_RATE_BY_ENTITIES')) {
-    define('_RESPONSE_RATE_BY_ENTITIES', 'Antwoordpercentage per eenheid');
-}
-if (!defined('_RESPONSE_RATE_BY_ENTITIES_DESC')) {
-    define('_RESPONSE_RATE_BY_ENTITIES_DESC', 'Om het percentage brieven weer te geven waarop er antwoord werd gegeven. Deze statistiek baseert zich op het aantal brieven waarvan er een vertrekdatum ingeschreven werd (het veld custom_d1 moet gebruikt worden)');
 }
 if (!defined('_ARCHIVAL_AGREEMENT')) {
     define('_ARCHIVAL_AGREEMENT', 'Archiveringsconventie');
@@ -596,12 +533,6 @@ if (!defined('_HELP_KEYWORD_EXEMPLE_TITLE')) {
 }
 if (!defined('_CHOOSE_REPLACEMENT_DEPARTMENT')) {
     define('_CHOOSE_REPLACEMENT_DEPARTMENT', 'Kies een vervangende eenheid');
-}
-if (!defined('_ENTITY_VOL_STAT_DESC')) {
-    define('_ENTITY_VOL_STAT_DESC', 'Om het aantal brieven weer te geven dat per eenheid bewaard wordt.');
-}
-if (!defined('_MAIL_VOL_BY_ENT_REPORT')) {
-    define('_MAIL_VOL_BY_ENT_REPORT', 'Briefvolume per eenheid');
 }
 if (!defined('_ALLOW_ENTITIES')) {
     define('_ALLOW_ENTITIES', 'De eenheden toelaten');

@@ -4,7 +4,7 @@ import { LANG } from '../translate.component';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../service/app.service';
 import { tap, finalize, catchError } from 'rxjs/operators';
-import { MatExpansionPanel } from '@angular/material';
+import { MatExpansionPanel } from '@angular/material/expansion';
 import { of, Subscription } from 'rxjs';
 import { NotificationService } from '../notification.service';
 import { HeaderService } from '../../service/header.service';

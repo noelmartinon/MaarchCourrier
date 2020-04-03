@@ -26,7 +26,6 @@
             "Notification\\"            : "src/app/notification/",
             "Parameter\\"               : "src/app/parameter/",
             "Priority\\"                : "src/app/priority/",
-            "Report\\"                  : "src/app/report/",
             "Resource\\"                : "src/app/resource/",
             "SignatureBook\\"           : "src/app/signatureBook/",
             "Search\\"                  : "src/app/search/",

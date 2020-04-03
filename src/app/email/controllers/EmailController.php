@@ -442,7 +442,7 @@ class EmailController
         }
 
         $notes = [];
-        $userEntities = EntityModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['entity_id']]);
+        $userEntities = EntityModel::getByUserId(['userId' => $GLOBALS['id'], 'select' => ['entity_id']]);
         $userEntities = array_column($userEntities, 'entity_id');
         $rawNotes = NoteModel::get(['select' => ['id', 'note_text', 'user_id'], 'where' => ['identifier = ?'], 'data' => [$args['resId']]]);
         foreach ($rawNotes as $rawNote) {
@@ -688,7 +688,7 @@ class EmailController
             $entities = EntityModel::getWithUserEntities([
                 'select' => ['entities.entity_label', 'entities.email', 'entities.entity_id', 'entities.id'],
                 'where'  => ['users_entities.user_id = ?'],
-                'data'   => [$currentUser['user_id']]
+                'data'   => [$args['userId']]
             ]);
 
             foreach ($entities as $entity) {
@@ -770,8 +770,6 @@ class EmailController
             }
         }
 
-        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-
         if (!empty($args['data']['document'] && !empty($args['data']['document']['id']))) {
             $check = Validator::intVal()->notEmpty()->validate($args['data']['document']['id']);
             $check = $check && Validator::boolType()->validate($args['data']['document']['isLinked']);
@@ -812,7 +810,7 @@ class EmailController
                     } elseif ($checkNote['user_id'] == $args['userId']) {
                         continue;
                     }
-                    $rawUserEntities = EntityModel::getByLogin(['login' => $user['user_id'], 'select' => ['entity_id']]);
+                    $rawUserEntities = EntityModel::getByUserId(['userId' => $args['userId'], 'select' => ['entity_id']]);
                     $userEntities = [];
                     foreach ($rawUserEntities as $rawUserEntity) {
                         $userEntities[] = $rawUserEntity['entity_id'];

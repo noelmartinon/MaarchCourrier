@@ -184,7 +184,7 @@ class EntityController
 
         if (empty($data['parent_entity_id']) && $GLOBALS['userId'] != 'superadmin') {
             $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
-            $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $GLOBALS['userId']]);
+            $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
             $pEntity = 'N';
             if (empty($primaryEntity)) {
                 $pEntity = 'Y';
@@ -259,14 +259,13 @@ class EntityController
         if (empty($data['parent_entity_id']) && $GLOBALS['userId'] != 'superadmin') {
             $hasEntity = UserEntityModel::get(['select' => [1], 'where' => ['user_id = ?', 'entity_id = ?'], 'data' => [$GLOBALS['userId'], $aArgs['id']]]);
             if (empty($hasEntity)) {
-                $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
-                $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $GLOBALS['userId']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
                 $pEntity = 'N';
                 if (empty($primaryEntity)) {
                     $pEntity = 'Y';
                 }
 
-                UserEntityModel::addUserEntity(['id' => $user['id'], 'entityId' => $aArgs['id'], 'role' => '', 'primaryEntity' => $pEntity]);
+                UserEntityModel::addUserEntity(['id' => $GLOBALS['id'], 'entityId' => $aArgs['id'], 'role' => '', 'primaryEntity' => $pEntity]);
                 HistoryController::add([
                     'tableName' => 'users',
                     'recordId'  => $GLOBALS['userId'],
@@ -510,7 +509,7 @@ class EntityController
 
         foreach ($users as $key => $user) {
             $users[$key]['labelToDisplay'] = "{$user['firstname']} {$user['lastname']}";
-            $users[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityByUserId(['userId' => $user['user_id']])['entity_label'];
+            $users[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']])['entity_label'];
         }
 
         return $response->withJson(['users' => $users]);

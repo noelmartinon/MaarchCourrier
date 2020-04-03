@@ -357,6 +357,9 @@ class GroupController
         return $groupsClause;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function arraySort($aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['data', 'on']);

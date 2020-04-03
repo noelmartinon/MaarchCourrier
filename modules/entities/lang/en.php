@@ -350,30 +350,9 @@ if (!defined('_LISTMODELS_OCCURS_LINKED_TO')) {
 if (!defined('_CHOOSE_REPLACEMENT_DEPARTMENT')) {
     define('_CHOOSE_REPLACEMENT_DEPARTMENT', 'Choose a replacing department');
 }
-
-/******************** For reports ************/
-if (!defined('_ENTITY_VOL_STAT')) {
-    define('_ENTITY_VOL_STAT', 'Mails volume by department');
-}
-if (!defined('_ENTITY_VOL_STAT_DESC')) {
-    define('_ENTITY_VOL_STAT_DESC', 'Mails volume by department');
-}
-if (!defined('_NO_DATA_MESSAGE')) {
-    define('_NO_DATA_MESSAGE', 'No datas enough');
-}
-if (!defined('_MAIL_VOL_BY_ENT_REPORT')) {
-    define('_MAIL_VOL_BY_ENT_REPORT', 'Mail volume by department');
-}
 if (!defined('_WRONG_DATE_FORMAT')) {
     define('_WRONG_DATE_FORMAT', 'Wrong date format');
 }
-if (!defined('_ENTITY_PROCESS_DELAY')) {
-    define('_ENTITY_PROCESS_DELAY', 'Medium handling time by department');
-}
-if (!defined('_ENTITY_LATE_MAIL')) {
-    define('_ENTITY_LATE_MAIL', 'Late mail volume by department');
-}
-
 /******************** Action put in copy ************/
 if (!defined('_ALL_LIST')) {
     define('_ALL_LIST', 'Display all the list');
@@ -468,12 +447,6 @@ if (!defined('_SELECT_OBJECT_TYPE_AND_ID')) {
 if (!defined('_SAVE_LISTMODEL')) {
     define('_SAVE_LISTMODEL', 'Validate');
 }
-if (!defined('_OBJECT_ID_IS_NOT_VALID_ID')) {
-    define('_OBJECT_ID_IS_NOT_VALID_ID', 'Unavailable ID : they only could contain alphabetical characters, numbers or dashes (A-Z, a-z, 0-9, _)');
-}
-if (!defined('_LISTMODEL_ID_ALREADY_USED')) {
-    define('_LISTMODEL_ID_ALREADY_USED', 'This ID is already used!');
-}
 if (!defined('_CONFIRM_LISTMODEL_SAVE')) {
     define('_CONFIRM_LISTMODEL_SAVE', 'Save the liste ?');
 }
@@ -484,14 +457,6 @@ if (!defined('_ENTER_DESCRIPTION')) {
 if (!defined('_ENTER_TITLE')) {
     define('_ENTER_TITLE', 'Mandatory title');
 }
-
-if (!defined('_PARAM_AVAILABLE_LISTMODELS_ON_GROUP_BASKETS')) {
-    define('_PARAM_AVAILABLE_LISTMODELS_ON_GROUP_BASKETS', 'Configure the model types of diffusion list for the indexation');
-}
-if (!defined('_INDEXING_DIFFLIST_TYPES')) {
-    define('_INDEXING_DIFFLIST_TYPES', 'Diffusion list types');
-}
-
 if (!defined('_ADMIN_DIFFLIST_TYPES')) {
     define('_ADMIN_DIFFLIST_TYPES', 'Diffusion list types (Administration)');
 }
@@ -509,21 +474,6 @@ if (!defined('_ADMIN_LISTMODELS_DESC')) {
 if (!defined('_STANDARD')) {
     define('_STANDARD', 'Standard');
 }
-if (!defined('_5_ARCHIVAL')) {
-    define('_5_ARCHIVAL', '5 Archival');
-}
-if (!defined('_51_IDENTIFICATION')) {
-    define('_51_IDENTIFICATION', '5.1 Identification');
-}
-if (!defined('_52_DESCRIPTION')) {
-    define('_52_DESCRIPTION', '5.2 Description');
-}
-if (!defined('_53_RELATIONS')) {
-    define('_53_RELATIONS', '5.3 Connections');
-}
-if (!defined('_54_CONTROL')) {
-    define('_54_CONTROL', '5.4 Control');
-}
 
 if (!defined('_VISIBLE')) {
     define('_VISIBLE', 'Active');
@@ -539,13 +489,6 @@ if (!defined('_TARGET_STATUS')) {
 if (!defined('_TARGET_ROLE')) {
     define('_TARGET_ROLE', 'Rôle à faire avancer dans le workflow');
 }
-if (!defined('_ITS_NOT_MY_TURN_IN_THE_WF')) {
-    define('_ITS_NOT_MY_TURN_IN_THE_WF', 'That is not my turn to process on the workflow');
-}
-if (!defined('_NO_AVAILABLE_ROLE_FOR_ME_IN_THE_WF')) {
-    define('_NO_AVAILABLE_ROLE_FOR_ME_IN_THE_WF', "There isn't defined role for me in the workflow");
-}
-
 if (!defined('_NO_FILTER')) {
     define('_NO_FILTER', 'Remove filters');
 }

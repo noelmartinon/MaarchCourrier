@@ -26,20 +26,20 @@ class LinkControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-
         $aArgs = [
-            'modelId'       => 1,
-            'status'        => 'NEW',
+            'modelId'           => 1,
+            'status'            => 'NEW',
             'confidentiality'   => false,
-            'documentDate'  => '2019-01-01 17:18:47',
-            'arrivalDate'   => '2019-01-01 17:18:47',
+            'documentDate'      => '2019-01-01 17:18:47',
+            'arrivalDate'       => '2019-01-01 17:18:47',
             'processLimitDate'  => '2029-01-01',
-            'doctype'       => 102,
-            'destination'   => 15,
-            'initiator'     => 15,
-            'subject'       => 'Lorsque l\'on se cogne la tête contre un pot et que cela sonne creux, ça n\'est pas forcément le pot qui est vide.',
-            'typist'        => 19,
-            'priority'      => 'poiuytre1357nbvc'
+            'doctype'           => 102,
+            'destination'       => 15,
+            'initiator'         => 15,
+            'subject'           => 'Lorsque l\'on se cogne la tête contre un pot et que cela sonne creux, ça n\'est pas forcément le pot qui est vide.',
+            'typist'            => 19,
+            'priority'          => 'poiuytre1357nbvc',
+            'senders'           => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
         ];
 
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);

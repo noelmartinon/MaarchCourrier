@@ -70,7 +70,7 @@ class AutoCompleteController
 
         $data = [];
         foreach ($users as $value) {
-            $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $value['user_id']]);
+            $primaryEntity = UserModel::getPrimaryEntityById(['id' => $value['id'], 'select' => ['entities.entity_label']]);
             $data[] = [
                 'type'                  => 'user',
                 'id'                    => $value['user_id'],
@@ -356,7 +356,7 @@ class AutoCompleteController
                 'search'        => $data['search'],
                 'fields'        => $fields,
                 'where'         => [
-                    'users.user_id = users_entities.user_id',
+                    'users.id = users_entities.user_id',
                     'users_entities.entity_id in (?)',
                     'users.status not in (?)'
                 ],
@@ -391,7 +391,7 @@ class AutoCompleteController
                 $usersNoEntities = DatabaseModel::select([
                     'select'    => ['users.id', 'users.user_id', 'users.firstname', 'users.lastname'],
                     'table'     => ['users', 'users_entities'],
-                    'left_join' => ['users.user_id = users_entities.user_id'],
+                    'left_join' => ['users.id = users_entities.user_id'],
                     'where'     => $requestData['where'],
                     'data'      => $requestData['data'],
                     'limit'     => (self::LIMIT - count($users))

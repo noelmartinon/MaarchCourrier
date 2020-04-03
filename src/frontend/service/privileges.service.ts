@@ -248,16 +248,6 @@ export class PrivilegeService {
             "hasParams" : false
         },
         {
-            "id": "admin_reports",
-            "label": this.lang.reports,
-            "comment": this.lang.reportsAdmin,
-            "route": "/administration/reports",
-            "unit": "supervision",
-            "style": "fa fa-chart-area",
-            "angular" : true,
-            "hasParams" : false
-        },
-        {
             "id": "view_history",
             "label": this.lang.history,
             "comment": this.lang.viewHistoryDesc,
@@ -495,16 +485,6 @@ export class PrivilegeService {
             "style": "fa fa-print",
             "unit": "entities",
             "angular": true,
-            'shortcut' : false
-        },
-        {
-            "id": "reports",
-            "label": this.lang.reports,
-            "comment": this.lang.reports,
-            "route": "index.php?page=reports&module=reports",
-            "style": "fa fa-chart-area",
-            "unit": "reports",
-            "angular": false,
             'shortcut' : false
         },
         {

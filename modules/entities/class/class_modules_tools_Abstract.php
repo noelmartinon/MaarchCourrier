@@ -87,32 +87,32 @@ abstract class entities_Abstract extends functions
         if (isset($userData['UserId'])) {
             $type = 'root';
             $db = new Database();
-            $stmt = $db->query(
-                'SELECT ue.entity_id, ue.user_role, ue.primary_entity, '
-                . 'e.entity_label, e.short_label, e.entity_type FROM '
-                . ENT_USERS_ENTITIES . ' ue, ' . $_SESSION['tablename']['users']
-                . ' u,'. ENT_ENTITIES ." e WHERE ue.user_id = u.user_id and "
-                . " ue.entity_id = e.entity_id and e.enabled = 'Y' "
-                . " and ue.user_id = ? ",
-                array(trim($userData['UserId']))
-            );
+//            $stmt = $db->query(
+//                'SELECT ue.entity_id, ue.user_role, ue.primary_entity, '
+//                . 'e.entity_label, e.short_label, e.entity_type FROM '
+//                . ENT_USERS_ENTITIES . ' ue, ' . $_SESSION['tablename']['users']
+//                . ' u,'. ENT_ENTITIES ." e WHERE ue.user_id = u.user_id and "
+//                . " ue.entity_id = e.entity_id and e.enabled = 'Y' "
+//                . " and ue.user_id = ? ",
+//                array(trim($userData['UserId']))
+//            );
         }
-        while ($line = $stmt->fetchObject()) {
-            array_push(
-                $_SESSION['user']['entities'],
-                array(
-                    'ENTITY_ID'	   => $line -> entity_id,
-                    'ENTITY_LABEL' => $line -> entity_label,
-                    'SHORT_LABEL'  => $line -> short_label,
-                    'ROLE'         => $line -> user_role,
-                    'ENTITY_TYPE'  => $line -> entity_type
-                )
-            );
-
-            if ($line->primary_entity == 'Y') {
-                $_SESSION['user']['primaryentity']['id'] = $line->entity_id;
-            }
-        }
+//        while ($line = $stmt->fetchObject()) {
+//            array_push(
+//                $_SESSION['user']['entities'],
+//                array(
+//                    'ENTITY_ID'	   => $line -> entity_id,
+//                    'ENTITY_LABEL' => $line -> entity_label,
+//                    'SHORT_LABEL'  => $line -> short_label,
+//                    'ROLE'         => $line -> user_role,
+//                    'ENTITY_TYPE'  => $line -> entity_type
+//                )
+//            );
+//
+//            if ($line->primary_entity == 'Y') {
+//                $_SESSION['user']['primaryentity']['id'] = $line->entity_id;
+//            }
+//        }
         if (file_exists(
             $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
@@ -244,10 +244,11 @@ abstract class entities_Abstract extends functions
         $obj = new entity();
         if (preg_match('/@my_entities/', $where)) {
             $entities = '';
+            $user = \User\models\UserModel::getByLogin(['login' => $userId, 'select' => ['id']]);
             $stmt = $db->query(
                 "select entity_id from " . ENT_USERS_ENTITIES
                 . " where user_id = ? ",
-                array(trim($userId))
+                array(trim($user['id']))
             );
             while ($res = $stmt->fetchObject()) {
                 $entities .= "'"  . $res->entity_id . "', ";
@@ -280,12 +281,13 @@ abstract class entities_Abstract extends functions
                 $primEntity = "'" . $_SESSION['user']['primary_entity']['id']
                             . "'";
             } else {
+                $user = \User\models\UserModel::getByLogin(['login' => $userId, 'select' => ['id']]);
                 $stmt = $db->query(
                     "select entity_id from " . ENT_USERS_ENTITIES
                     . " where user_id = ? and primary_entity = 'Y'",
-                    array(trim($userId))
+                    array(trim($user['id']))
                 );
-                //$db->show();
+                //$db->show();$userId
                 $res = $stmt->fetchObject();
                 if (isset($res->entity_id)) {
                     $primEntity = "'" . $res->entity_id . "'";

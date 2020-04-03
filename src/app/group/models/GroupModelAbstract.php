@@ -143,11 +143,6 @@ abstract class GroupModelAbstract
             'data'      => [$aArgs['id']]
         ]);
         DatabaseModel::delete([
-            'table'     => 'usergroups_reports',
-            'where'     => ['group_id = ?'],
-            'data'      => [$group['group_id']]
-        ]);
-        DatabaseModel::delete([
             'table'     => 'usergroups_services',
             'where'     => ['group_id = ?'],
             'data'      => [$group['group_id']]

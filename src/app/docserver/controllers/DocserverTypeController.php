@@ -29,19 +29,4 @@ class DocserverTypeController
 
         return $response->withJson(['docserverTypes' => DocserverTypeModel::get(['orderBy' => ['docserver_type_label']])]);
     }
-
-    public function getById(Request $request, Response $response, array $aArgs)
-    {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_docservers', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
-        $docserverType = DocserverTypeModel::getById(['id' => $aArgs['id']]);
-
-        if(empty($docserverType)){
-            return $response->withStatus(400)->withJson(['errors' => 'Docserver Type not found']);
-        }
-
-        return $response->withJson($docserverType);
-    }
 }

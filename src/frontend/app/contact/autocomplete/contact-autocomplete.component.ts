@@ -18,7 +18,7 @@ import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     selector: 'app-contact-autocomplete',
-    templateUrl: "contact-autocomplete.component.html",
+    templateUrl: 'contact-autocomplete.component.html',
     styleUrls: [
         'contact-autocomplete.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -55,10 +55,11 @@ export class ContactAutocompleteComponent implements OnInit {
      */
     @Input('control') controlAutocomplete: FormControl;
 
-    @Input('singleMode') singleMode: boolean = false;
+    @Input() id: string = 'contact-autocomplete';
 
+    @Input() singleMode: boolean = false;
 
-    @Output('retrieveDocumentEvent') retrieveDocumentEvent = new EventEmitter<string>();
+    @Output() retrieveDocumentEvent = new EventEmitter<string>();
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -97,19 +98,19 @@ export class ContactAutocompleteComponent implements OnInit {
                 }),
                 debounceTime(300),
                 filter(value => value.length > 2),
-                //distinctUntilChanged(),
+                // distinctUntilChanged(),
                 tap(() => this.loading = true),
                 switchMap((data: any) => this.getDatas(data)),
                 map((data: any) => {
                     data = data.filter((contact: any) => !this.singleMode || (contact.type !== 'contactGroup' && this.singleMode));
-                      
+
                     data = data.map((contact: any) => {
                         return {
                             ...contact,
                             civility: this.contactService.formatCivilityObject(contact.civility),
                             fillingRate: this.contactService.formatFillingObject(contact.fillingRate),
                             customFields: contact.customFields !== undefined ? this.formatCustomField(contact.customFields) : [],
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -129,24 +130,24 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     getCustomFields() {
-        this.http.get("../../rest/contactsCustomFields").pipe(
+        this.http.get('../../rest/contactsCustomFields').pipe(
             tap((data: any) => {
                 this.customFields = data.customFields.map((custom: any) => {
                     return {
                         id: custom.id,
                         label: custom.label
-                    }
-                })
+                    };
+                });
             })
         ).subscribe();
     }
 
     formatCustomField(data: any) {
-        let arrCustomFields: any[] = [];
+        const arrCustomFields: any[] = [];
 
         Object.keys(data).forEach(element => {
             arrCustomFields.push({
-                label: this.customFields.filter(custom => custom.id == element)[0].label,
+                label: this.customFields.filter(custom => custom.id === element)[0].label,
                 value: data[element]
             });
         });
@@ -155,7 +156,7 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../../rest/autocomplete/correspondents', { params: { "search": data } });
+        return this.http.get('../../rest/autocomplete/correspondents', { params: { 'search': data } });
     }
 
     selectOpt(ev: any) {
@@ -246,7 +247,7 @@ export class ContactAutocompleteComponent implements OnInit {
                             fillingRate: !this.functions.empty(contact.thresholdLevel) ? {
                                 color: this.contactService.getFillingColor(contact.thresholdLevel)
                             } : ''
-                        }
+                        };
                     });
                     return contacts;
                 }),
@@ -269,7 +270,7 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     setContact(contact: any) {
-        if (this.controlAutocomplete.value.map((contact: any) => contact.id).indexOf(contact['id']) === -1) {
+        if (this.controlAutocomplete.value.map((contactItem: any) => contactItem.id).indexOf(contact['id']) === -1) {
             let arrvalue = [];
             if (this.controlAutocomplete.value !== null) {
                 arrvalue = this.controlAutocomplete.value;
@@ -310,13 +311,13 @@ export class ContactAutocompleteComponent implements OnInit {
     removeItem(index: number) {
 
         if (this.newIds.indexOf(this.controlAutocomplete.value[index]) === -1) {
-            let arrValue = this.controlAutocomplete.value;
+            const arrValue = this.controlAutocomplete.value;
             this.controlAutocomplete.value.splice(index, 1);
             this.controlAutocomplete.setValue(arrValue);
         } else {
             this.http.delete('../../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
                 tap((data: any) => {
-                    let arrValue = this.controlAutocomplete.value;
+                    const arrValue = this.controlAutocomplete.value;
                     this.controlAutocomplete.value.splice(index, 1);
                     this.controlAutocomplete.setValue(arrValue);
                 }),
@@ -330,16 +331,28 @@ export class ContactAutocompleteComponent implements OnInit {
 
     openContact(contact: any = null) {
         this.retrieveDocumentEvent.emit();
-        const dialogRef = this.dialog.open(ContactModalComponent, { maxWidth: '100vw', width: contact === null ? '99vw' : 'auto', panelClass: contact === null ? 'maarch-full-height-modal' : 'maarch-modal', disableClose: true, data: { editMode: this.canUpdate, contactId: contact !== null ? contact.id : null, contactType: contact !== null ? contact.type : null } });
+        const dialogRef = this.dialog.open(
+            ContactModalComponent,
+            {
+                maxWidth: '100vw',
+                width: contact === null ? '99vw' : 'auto',
+                panelClass: contact === null ? 'maarch-full-height-modal' : 'maarch-modal',
+                disableClose: true,
+                data: {
+                    editMode: this.canUpdate,
+                    contactId: contact !== null ? contact.id : null,
+                    contactType: contact !== null ? contact.type : null }
+            }
+        );
 
         dialogRef.afterClosed().pipe(
             filter((data: number) => data !== undefined),
             tap((contactId: number) => {
-                const contact = {
+                const newContact = {
                     type: 'contact',
                     id: contactId
                 };
-                this.setFormValue(contact);
+                this.setFormValue(newContact);
                 this.initFormValue();
             }),
             catchError((err: any) => {

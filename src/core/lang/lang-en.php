@@ -81,7 +81,6 @@ define('_PRIORITY_MODIFICATION', 'Priority updated');
 define('_PRIORITY_SUPPRESSION', 'Priority deleted');
 define('_PRIORITY_SORT_MODIFICATION', 'Priorities order updated');
 define('_QUOTA_EXCEEDED', 'Quota exceeded');
-define('_REPORT_MODIFICATION', 'Report modification');
 define('_STATUS_ADDED', 'Status added');
 define('_STATUS_DELETED', 'Status deleted');
 define('_STATUS_NOT_FOUND', 'Status not found');
@@ -160,6 +159,7 @@ define('_DOCUMENT_SIGNED', 'Document signed');
 define('_DOCUMENT_UNSIGNED', 'Document unsigned');
 define('_LINK_ADDED_TAG', 'Tag link added');
 define('_LINK_DELETED_TAG', 'Tag link deleted');
+define('_LOGIN', 'User connection');
 
 // ADMINISTRATION
 define('_USERS', 'Users');
@@ -169,7 +169,6 @@ define('_DOCTYPES', 'File plan');
 define('_FOLDERTYPES', 'Types of folders');
 define('_TAGS', 'Tags');
 define('_DOCSERVERS', 'Storage zones');
-define('_REPORTS', 'Statistiques');
 define('_ACTIONS', 'Actions');
 define('_CONTACTS', 'Contacts');
 define('_ADMIN_CONTACTS_DESC', 'Administration of contacts');
@@ -193,7 +192,6 @@ define('_ENTITIES_COMMENT', 'Departments');
 define('_NOTES_COMMENT', 'Notes');
 define('_NOTIFICATIONS_COMMENT', 'Notifications');
 define('_TEMPLATES_COMMENT', 'Templates');
-define('_REPORTS_COMMENT', 'States and editions');
 define('_LIFE_CYCLE_COMMENT', 'Life cycle management');
 define('_CONTENT_MANAGEMENT_COMMENT', 'Management of document versions');
 define('_TAGS_COMMENT', 'Tags');
@@ -279,24 +277,6 @@ define('_FOR_ENTITY', 'for this entity:');
 define('_NO_ENTITY', 'No entity associated with the mail');
 define('_RECONCILE_RESOURCE', 'Reconcile a document');
 define('_RECONCILE_RESOURCE_DESC', "Add the main document file to another document");
-
-// REPORTS
-define('_FOLDER_VIEW_STAT', 'Number of read folders');
-define('_ENTITY_VOL_STAT', 'Mails volume by department');
-define('_ENTITY_VOL_STAT_DESC', 'Mails volume by department');
-define('_RESPONSE_RATE_BY_ENTITIES', 'Response rate by entity');
-define('_RESPONSE_RATE_BY_ENTITIES_DESC', 'Displays the percentage of mail that has been answered. This statistic is based on the number of mails for which a departure date has been entered (use the field departure_date)');
-define('_ENTITY_LATE_MAIL', 'Late mail volume by department');
-define('_ENTITY_PROCESS_DELAY', 'Average handling time by department');
-define('_USERS_LOGS', 'Access list to the application by agent');
-define('_PROCESS_DELAY_REPORT', 'Average process period by mail type');
-define('_PROCESS_DELAY_REPORT_DESC', 'Average process period by mail type');
-define('_PROCESS_DELAY_GENERIC_EVALUATION_REPORT', 'Average handling time');
-define('_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_DESC', 'Displays the time (in days) of the creation until the closing of a mail.');
-define('_MAIL_TYPOLOGY_REPORT', 'Mails typology by period');
-define('_MAIL_TYPOLOGY_REPORT_DESC', 'Mails typology by period');
-define('_MAIL_VOL_BY_CAT_REPORT', 'Mails volume by category, by period');
-define('_MAIL_VOL_BY_CAT_REPORT_DESC', 'Mails volume by category, by period');
 
 //ATTACHMENT TYPES
 define("_RESPONSE_PROJECT", "Response project");

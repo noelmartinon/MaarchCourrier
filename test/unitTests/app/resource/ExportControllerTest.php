@@ -85,6 +85,76 @@ class ExportControllerTest extends TestCase
                     "label" => "Catégorie",
                     "isFunction" => true
                 ],
+                [
+                    "value" => "getCopies",
+                    "label" => "Utilisateurs en copie",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getSenders",
+                    "label" => "Expéditeurs",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getRecipients",
+                    "label" => "Destinataires",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getTypist",
+                    "label" => "Créateurs",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getAssignee",
+                    "label" => "Attributaire",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getTags",
+                    "label" => "Mots-clés",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getSignatories",
+                    "label" => "Signataires",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getSignatureDates",
+                    "label" => "Date de signature",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getDepartment",
+                    "label" => "Département de l'expéditeur",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getAcknowledgementSendDate",
+                    "label" => "Date d'accusé de réception",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getParentFolder",
+                    "label" => "Dossiers parent",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "getFolder",
+                    "label" => "Dossiers",
+                    "isFunction" => true
+                ],
+                [
+                    "value" => "doc_date",
+                    "label" => "Date du courrier",
+                    "isFunction" => false
+                ],
+                [
+                    "value" => "custom_4",
+                    "label" => "Champ personnalisé",
+                    "isFunction" => true
+                ],
             ]
         ];
 

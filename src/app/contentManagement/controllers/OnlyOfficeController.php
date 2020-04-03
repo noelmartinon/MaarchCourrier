@@ -59,8 +59,8 @@ class OnlyOfficeController
         }
 
         if ($body['objectType'] == 'templateCreation') {
-            $path = null;
-            $fileContent = null;
+            $path = $body['objectId'];
+            $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'templateModification') {
             $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
             $template = TemplateModel::getById(['id' => $body['objectId'], 'select' => ['template_path', 'template_file_name']]);

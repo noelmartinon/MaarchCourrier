@@ -81,7 +81,6 @@ define('_PRIORITY_MODIFICATION', 'Modification priorité');
 define('_PRIORITY_SUPPRESSION', 'Suppression priorité');
 define('_PRIORITY_SORT_MODIFICATION', 'Modification ordre priorités');
 define('_QUOTA_EXCEEDED', 'Quota dépassé');
-define('_REPORT_MODIFICATION', 'Modification états et édition');
 define('_STATUS_ADDED', 'Statut ajouté');
 define('_STATUS_DELETED', 'Statut supprimé');
 define('_STATUS_NOT_FOUND', 'Statut introuvable');
@@ -160,6 +159,7 @@ define('_DOCUMENT_SIGNED', 'Document signé');
 define('_DOCUMENT_UNSIGNED', 'Document dé-signé');
 define('_LINK_ADDED_TAG', 'Liaison de mot-clé ajoutée');
 define('_LINK_DELETED_TAG', 'Liaison de mot-clé supprimée');
+define('_LOGIN', 'Connexion de l\'utilisateur');
 
 // ADMINISTRATION
 define('_USERS', 'Utilisateurs');
@@ -169,7 +169,6 @@ define('_DOCTYPES', 'Typologies de courriers');
 define('_FOLDERTYPES', 'Types de dossier');
 define('_TAGS', 'Mots-clés');
 define('_DOCSERVERS', 'Zones de stockage');
-define('_REPORTS', 'Statistiques');
 define('_ACTIONS', 'Actions');
 define('_CONTACTS', 'Contacts');
 define('_ADMIN_CONTACTS_DESC', 'Administration des contacts');
@@ -193,7 +192,6 @@ define('_ENTITIES_COMMENT', 'Entités');
 define('_NOTES_COMMENT', 'Annotations');
 define('_NOTIFICATIONS_COMMENT', 'Notifications');
 define('_TEMPLATES_COMMENT', 'Modèles de document');
-define('_REPORTS_COMMENT', 'Statistiques');
 define('_LIFE_CYCLE_COMMENT', 'Gestion du cycle de vie');
 define('_CONTENT_MANAGEMENT_COMMENT', 'Gestion des Versions de document');
 define('_TAGS_COMMENT', 'Mots-clés');
@@ -279,24 +277,6 @@ define('_FOR_ENTITY', 'pour l\'entité :');
 define('_NO_ENTITY', 'Pas d\'entité associée au courrier');
 define('_RECONCILE_RESOURCE', 'Réconcilier un courrier');
 define('_RECONCILE_RESOURCE_DESC', "Ajoute le fichier principal du courrier à un autre courrier");
-
-// REPORTS
-define('_FOLDER_VIEW_STAT', 'Nombre de dossiers consultés');
-define('_ENTITY_VOL_STAT', 'Volume des courriers par entité');
-define('_ENTITY_VOL_STAT_DESC', 'Permet d\'afficher le nombre de courriers enregistrés par service.');
-define('_RESPONSE_RATE_BY_ENTITIES', 'Taux de réponse par entité');
-define('_RESPONSE_RATE_BY_ENTITIES_DESC', 'Permet d\'afficher le pourcentage de courrier dont une réponse a été effectuée. Cette statistique se base sur le nombre de courriers dont une date de départ a été inscrite (utilise le champ departure_date)');
-define('_ENTITY_LATE_MAIL', 'Volume de courriers en retard par entité');
-define('_ENTITY_PROCESS_DELAY', 'Délai moyen de traitement par entité');
-define('_USERS_LOGS', 'Liste des accès à l\'application par agent');
-define('_PROCESS_DELAY_REPORT', 'Délai moyen de traitement par typologie');
-define('_PROCESS_DELAY_REPORT_DESC', 'Permet d\'afficher le délai (en jour) de la création jusqu\'à la clôture d\'un courrier.');
-define('_PROCESS_DELAY_GENERIC_EVALUATION_REPORT', 'Délai moyen de traitement par période');
-define('_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_DESC', 'Permet d\'afficher le délai (en jour) de la création jusqu\'à la clôture d\'un courrier.');
-define('_MAIL_TYPOLOGY_REPORT', 'Volume de courriers par typologie');
-define('_MAIL_TYPOLOGY_REPORT_DESC', 'Permet d\'afficher le nombre de courriers enregistrés par type de courrier.');
-define('_MAIL_VOL_BY_CAT_REPORT', 'Volume de courriers par catégorie');
-define('_MAIL_VOL_BY_CAT_REPORT_DESC', 'Permet d\'afficher le nombre de courriers enregistrés par catégorie (arrivé, départ, etc.).');
 
 //ATTACHMENT TYPES
 define("_RESPONSE_PROJECT", "Projet de réponse");

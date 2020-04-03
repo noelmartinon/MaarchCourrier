@@ -213,4 +213,22 @@ class DocserverControllerTest extends TestCase
 
         rmdir(self::$pathTemplate);
     }
+
+    public function testGetDocserverTypes()
+    {
+        $docserverTypeController = new \Docserver\controllers\DocserverTypeController();
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $docserverTypeController->get($request, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertNotEmpty($responseBody->docserverTypes);
+        foreach ($responseBody->docserverTypes as $docserverType) {
+            $this->assertNotEmpty($docserverType->docserver_type_id);
+            $this->assertNotEmpty($docserverType->docserver_type_label);
+            $this->assertNotEmpty($docserverType->enabled);
+        }
+    }
 }

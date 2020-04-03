@@ -17,6 +17,10 @@ namespace SrcCore\controllers;
 use Configuration\models\ConfigurationModel;
 use Email\controllers\EmailController;
 use Firebase\JWT\JWT;
+use History\controllers\HistoryController;
+use Respect\Validation\Validator;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
@@ -25,11 +29,16 @@ use User\models\UserModel;
 
 class AuthenticationController
 {
+    const MAX_DURATION_TOKEN = 30; //Minutes
+    const ROUTES_WITHOUT_AUTHENTICATION = [
+        'GET/jnlp/{jnlpUniqueId}', 'POST/password', 'PUT/password', 'GET/passwordRules', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback'
+    ];
+
     public static function authentication()
     {
         $userId = null;
         if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
-            if (AuthenticationModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
+            if (AuthenticationModel::authentication(['login' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
                 $loginMethod = CoreConfigModel::getLoggingMethod();
                 if ($loginMethod['id'] != 'standard') {
                     $user = UserModel::getByLogin(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
@@ -46,6 +55,26 @@ class AuthenticationController
                 AuthenticationModel::setCookieAuth(['userId' => $cookie['userId']]);
                 $userId = $cookie['userId'];
             }
+
+//            if (!empty($authorizationHeaders)) {
+//                $token = null;
+//                foreach ($authorizationHeaders as $authorizationHeader) {
+//                    if (strpos($authorizationHeader, 'Bearer') === 0) {
+//                        $token = str_replace('Bearer ', '', $authorizationHeader);
+//                    }
+//                }
+//                if (!empty($token)) {
+//                    try {
+//                        $jwt = (array)JWT::decode($token, CoreConfigModel::getEncryptKey(), ['HS256']);
+//                    } catch (\Exception $e) {
+//                        return null;
+//                    }
+//                    $jwt['user'] = (array)$jwt['user'];
+//                    if (!empty($jwt) && !empty($jwt['user']['id'])) {
+//                        $id = $jwt['user']['id'];
+//                    }
+//                }
+//            }
         }
 
         if (!empty($userId)) {
@@ -125,6 +154,139 @@ class AuthenticationController
         }
 
         return _BAD_LOGIN_OR_PSW;
+    }
+
+    public function authenticate(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        $check = Validator::stringType()->notEmpty()->validate($body['login']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['password']);
+        if (!$check) {
+            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        }
+
+        $login = strtolower($body['login']);
+        $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $body['password']]);
+        if (empty($authenticated)) {
+            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+        }
+
+        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'loginmode', 'refresh_token']]);
+        if (empty($user) || $user['loginmode'] == 'restMode') {
+            return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+        }
+
+        $GLOBALS['id'] = $user['id'];
+
+        $user['refresh_token'] = json_decode($user['refresh_token'], true);
+        foreach ($user['refresh_token'] as $key => $refreshToken) {
+            try {
+                JWT::decode($refreshToken, CoreConfigModel::getEncryptKey(), ['HS256']);
+            } catch (\Exception $e) {
+                unset($user['refresh_token'][$key]);
+            }
+        }
+        $user['refresh_token'] = array_values($user['refresh_token']);
+        if (count($user['refresh_token']) > 10) {
+            array_shift($user['refresh_token']);
+        }
+
+        $refreshToken = AuthenticationController::getRefreshJWT();
+        $user['refresh_token'][] = $refreshToken;
+        UserModel::update([
+            'set'   => ['reset_token' => null, 'refresh_token' => json_encode($user['refresh_token'])],
+            'where' => ['id = ?'],
+            'data'  => [$user['id']]
+        ]);
+        $response = $response->withHeader('Token', AuthenticationController::getJWT());
+        $response = $response->withHeader('Refresh-Token', $refreshToken);
+
+        HistoryController::add([
+            'tableName' => 'users',
+            'recordId'  => $user['id'],
+            'eventType' => 'LOGIN',
+            'info'      => _LOGIN . ' : ' . $login,
+            'moduleId'  => 'authentication',
+            'eventId'   => 'login'
+        ]);
+
+        return $response->withStatus(204);
+    }
+
+    public function getRefreshedToken(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['refreshToken'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Refresh Token is empty']);
+        }
+
+        try {
+            $jwt = JWT::decode($queryParams['refreshToken'], CoreConfigModel::getEncryptKey(), ['HS256']);
+        } catch (\Exception $e) {
+            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+        }
+
+        $user = UserModel::getById(['select' => ['id', 'refresh_token'], 'id' => $jwt->user->id]);
+        if (empty($user['refresh_token'])) {
+            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+        }
+
+        $user['refresh_token'] = json_decode($user['refresh_token'], true);
+        if (!in_array($queryParams['refreshToken'], $user['refresh_token'])) {
+            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+        }
+
+        $GLOBALS['id'] = $user['id'];
+
+        return $response->withJson(['token' => AuthenticationController::getJWT()]);
+    }
+
+    public static function getJWT()
+    {
+        $sessionTime = AuthenticationController::MAX_DURATION_TOKEN;
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        if ($loadedXml) {
+            if (!empty($loadedXml->CONFIG->CookieTime)) {
+                if ($sessionTime > (int)$loadedXml->CONFIG->CookieTime) {
+                    $sessionTime = (int)$loadedXml->CONFIG->CookieTime;
+                }
+            }
+        }
+
+        $token = [
+            'exp'   => time() + 60 * $sessionTime,
+            'user'  => [
+                'id' => $GLOBALS['id']
+            ]
+        ];
+
+        $jwt = JWT::encode($token, CoreConfigModel::getEncryptKey());
+
+        return $jwt;
+    }
+
+    public static function getRefreshJWT()
+    {
+        $sessionTime = AuthenticationController::MAX_DURATION_TOKEN;
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        if ($loadedXml) {
+            $sessionTime = (int)$loadedXml->CONFIG->CookieTime;
+        }
+
+        $token = [
+            'exp'   => time() + 60 * $sessionTime,
+            'user'  => [
+                'id' => $GLOBALS['id']
+            ]
+        ];
+
+        $jwt = JWT::encode($token, CoreConfigModel::getEncryptKey());
+
+        return $jwt;
     }
 
     public static function getResetJWT($args = [])

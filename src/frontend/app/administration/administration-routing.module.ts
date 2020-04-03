@@ -20,7 +20,6 @@ import { ParameterAdministrationComponent }             from './parameter/parame
 import { ParametersAdministrationComponent }            from './parameter/parameters-administration.component';
 import { PrioritiesAdministrationComponent }            from './priority/priorities-administration.component';
 import { PriorityAdministrationComponent }              from './priority/priority-administration.component';
-import { ReportsAdministrationComponent }               from './report/reports-administration.component';
 import { NotificationsAdministrationComponent }         from './notification/notifications-administration.component';
 import { NotificationAdministrationComponent }          from './notification/notification-administration.component';
 import { HistoryAdministrationComponent }               from './history/history-administration.component';
@@ -72,7 +71,6 @@ import { TagAdministrationComponent } from './tag/tag-administration.component';
             { path: 'administration/parameters', canActivate: [AppGuard], component: ParametersAdministrationComponent },
             { path: 'administration/parameters/new', canActivate: [AppGuard], component: ParameterAdministrationComponent },
             { path: 'administration/parameters/:id', canActivate: [AppGuard], component: ParameterAdministrationComponent },
-            { path: 'administration/reports', canActivate: [AppGuard], component : ReportsAdministrationComponent},
             { path: 'administration/priorities', canActivate: [AppGuard], component : PrioritiesAdministrationComponent },
             { path: 'administration/priorities/new', canActivate: [AppGuard], component : PriorityAdministrationComponent },
             { path: 'administration/priorities/:id', canActivate: [AppGuard], component : PriorityAdministrationComponent },

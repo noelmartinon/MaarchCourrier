@@ -471,29 +471,4 @@ class DocserverController
 
         return true;
     }
-
-    private static function directoryWasher(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['path']);
-        ValidatorModel::stringType($aArgs, ['path']);
-
-        if (!is_dir($aArgs['path'])) {
-            return ['errors' => '[directoryWasher] Path does not exist'];
-        }
-
-        $aFiles = scandir($aArgs['path']);
-        foreach ($aFiles as $file) {
-            if ($file != '.' && $file != '..') {
-                if (filetype($aArgs['path'] . '/' . $file) == 'dir') {
-                    DocserverController::directoryWasher(['path' => $aArgs['path'] . '/' . $file]);
-                } else {
-                    unlink($aArgs['path'] . '/' . $file);
-                }
-            }
-        }
-
-        reset($aFiles);
-
-        return true;
-    }
 }

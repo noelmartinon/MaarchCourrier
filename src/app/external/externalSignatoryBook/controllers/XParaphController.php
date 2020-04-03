@@ -28,6 +28,9 @@ use User\models\UserModel;
 
 include_once('vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.php');
 
+/**
+    * @codeCoverageIgnore
+*/
 class XParaphController
 {
     public static function sendDatas($aArgs)

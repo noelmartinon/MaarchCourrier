@@ -316,17 +316,4 @@ class DatabaseModel
 
         return $db->rollbackTransaction();
     }
-
-    /**
-     * Database Copy from Array
-     *
-     * @return bool
-     * @throws \Exception
-     */
-    public static function pgsqlCopyFromArray(array $args)
-    {
-        $db = new DatabasePDO();
-
-        return $db->pgsqlCopyFromArray($args['table'], $args['rows'], $args['delimiter'], $args['nullAs'], $args['fields']);
-    }
 }

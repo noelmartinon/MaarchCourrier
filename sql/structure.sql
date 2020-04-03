@@ -222,6 +222,7 @@ CREATE TABLE users
   loginmode character varying(50) DEFAULT NULL::character varying,
   cookie_key character varying(255) DEFAULT NULL::character varying,
   cookie_date timestamp without time zone,
+  refresh_token jsonb NOT NULL DEFAULT '[]',
   reset_token text,
   failed_authentication INTEGER DEFAULT 0,
   locked_until TIMESTAMP without time zone,
@@ -329,7 +330,7 @@ WITH (OIDS=FALSE);
 CREATE TABLE basket_persistent_mode
 (
   res_id bigint,
-  user_id character varying(128),
+  user_id INTEGER not null,
   is_persistent character varying(1)
 )
 WITH (
@@ -339,7 +340,7 @@ WITH (
 CREATE TABLE res_mark_as_read
 (
   res_id bigint,
-  user_id character varying(128),
+  user_id INTEGER NOT NULL,
   basket_id character varying(32)
 )
 WITH (
@@ -444,7 +445,7 @@ WITH (
 
 CREATE TABLE users_entities
 (
-  user_id character varying(128) NOT NULL,
+  user_id INTEGER NOT NULL,
   entity_id character varying(32) NOT NULL,
   user_role character varying(255),
   primary_entity character(1) NOT NULL DEFAULT 'N'::bpchar,
@@ -472,24 +473,15 @@ CREATE TABLE groupbasket_redirect
 )
 WITH (OIDS=FALSE);
 
-CREATE SEQUENCE email_signatures_id_seq
-  INCREMENT 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  START 7
-  CACHE 1;
-
 CREATE TABLE users_email_signatures
 (
-  id bigint NOT NULL DEFAULT nextval('email_signatures_id_seq'::regclass),
-  user_id character varying(255) NOT NULL,
+  id serial NOT NULL,
+  user_id INTEGER NOT NULL,
   html_body text NOT NULL,
   title character varying NOT NULL,
   CONSTRAINT email_signatures_pkey PRIMARY KEY (id)
 )
-WITH (
-  OIDS=FALSE
-);
+WITH (OIDS=FALSE);
 
 /* FOLDERS */
 CREATE TABLE folders
@@ -707,20 +699,7 @@ WITH (
   OIDS=FALSE
 );
 
-
--- modules/reports/sql/structure/reports.postgresql.sql
-
-CREATE TABLE usergroups_reports
-(
-  group_id character varying(32) NOT NULL,
-  report_id character varying(50) NOT NULL,
-  CONSTRAINT usergroups_reports_pkey PRIMARY KEY (group_id, report_id)
-)
-WITH (OIDS=FALSE);
-
-
 -- modules/templates/sql/structure/templates.postgresql.sql
-
 
 CREATE SEQUENCE templates_seq
   INCREMENT 1
@@ -929,7 +908,7 @@ CREATE TABLE res_letterbox
   policy_id character varying(32) DEFAULT NULL::character varying,
   cycle_id character varying(32) DEFAULT NULL::character varying,
   initiator character varying(50) DEFAULT NULL::character varying,
-  dest_user character varying(128) DEFAULT NULL::character varying,
+  dest_user INTEGER,
   locker_user_id INTEGER DEFAULT NULL,
   locker_time timestamp without time zone,
   confidentiality character(1),

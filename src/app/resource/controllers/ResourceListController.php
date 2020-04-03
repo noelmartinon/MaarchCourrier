@@ -730,9 +730,7 @@ class ResourceListController
         ValidatorModel::notEmpty($args, ['resId', 'userId']);
         ValidatorModel::intVal($args, ['resId', 'userId']);
 
-        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-
-        $entities = UserModel::getEntitiesByLogin(['login' => $user['user_id']]);
+        $entities = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['entities.id']]);
         $entities = array_column($entities, 'id');
 
         if (empty($entities)) {
@@ -1152,7 +1150,7 @@ class ResourceListController
             $userEntities = EntityModel::getWithUserEntities([
                 'select' => ['entities.id'],
                 'where'  => ['users_entities.user_id = ?'],
-                'data'   => [$GLOBALS['userId']]
+                'data'   => [$GLOBALS['id']]
             ]);
             $userEntities = array_column($userEntities, 'id');
     

@@ -621,7 +621,7 @@ class AttachmentController
         return $response->withHeader('Content-Type', $mimeType);
     }
 
-    public function getByChrono(Request $request, Response $response, array $args)
+    public function getByChrono(Request $request, Response $response)
     {
         $queryParams = $request->getQueryParams();
         if (empty($queryParams['chrono'])) {

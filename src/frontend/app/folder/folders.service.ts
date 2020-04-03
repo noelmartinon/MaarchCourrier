@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../app/translate.component';
 import { Subject, Observable, of } from 'rxjs';
 import { NotificationService } from '../notification.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { map, tap, filter, exhaustMap, catchError, finalize } from 'rxjs/operators';
 

@@ -66,7 +66,6 @@ define('_PRIORITY_CREATION', 'Aanmaak prioriteit');
 define('_PRIORITY_MODIFICATION', 'Wijziging prioriteit');
 define('_PRIORITY_SUPPRESSION', 'Verwijdering prioriteit');
 define('_PRIORITY_SORT_MODIFICATION', 'Wijziging volgorde prioriteiten');
-define('_REPORT_MODIFICATION', 'Wijziging staten en bewerking');
 define('_STATUS_ADDED', 'Status toegevoegd');
 define('_STATUS_DELETED', 'Status verwijderd');
 define('_STATUS_NOT_FOUND', 'Status onvindbaar');
@@ -159,6 +158,7 @@ define('_DOCUMENT_SIGNED', 'Document signed');//TRANSLATE
 define('_DOCUMENT_UNSIGNED', 'Document unsigned');//TRANSLATE
 define('_LINK_ADDED_TAG', 'Tag link added');//TRANSLATE
 define('_LINK_DELETED_TAG', 'Tag link deleted');//TRANSLATE
+define('_LOGIN', 'User connection');
 
 // ADMINISTRATION
 define('_USERS', 'Gebruikers');
@@ -166,7 +166,6 @@ define('_GROUPS', 'Gebruikersgroepen');
 define('_ENTITIES', 'Eenheden');
 define('_TAGS', 'Sleutelwoorden');
 define('_DOCSERVERS', 'Opslagruimtes');
-define('_REPORTS', 'Statistieken');
 define('_ACTIONS', 'Acties');
 define('_CONTACTS', 'Contacten');
 define('_ADMIN_CONTACTS_DESC', 'Contactenbeheer');
@@ -190,7 +189,6 @@ define('_ENTITIES_COMMENT', 'Eenheden');
 define('_NOTES_COMMENT', 'Opmerkingen');
 define('_NOTIFICATIONS_COMMENT', 'Meldingen');
 define('_TEMPLATES_COMMENT', 'Documentmodellen');
-define('_REPORTS_COMMENT', 'Statistieken');
 define('_LIFE_CYCLE_COMMENT', 'Beheer van de levenscyclus');
 define('_CONTENT_MANAGEMENT_COMMENT', 'Beheer van de Documentversies');
 define('_TAGS_COMMENT', 'Sleutelwoorden');
@@ -276,24 +274,6 @@ define('_FOR_ENTITY', 'voor deze entiteit :');
 define('_NO_ENTITY', 'Geen enkele entiteit geassocieerd met de post');
 define('_RECONCILE_RESOURCE', 'Reconcile a document');
 define('_RECONCILE_RESOURCE_DESC', "Add the document main file to another document");
-
-// REPORTS
-define('_FOLDER_VIEW_STAT', 'Aantal geraadpleegde mappen');
-define('_ENTITY_VOL_STAT', 'Briefvolume per eenheid');
-define('_ENTITY_VOL_STAT_DESC', 'Om het aantal brieven weer te geven dat per dienst bewaard wordt.');
-define('_RESPONSE_RATE_BY_ENTITIES', 'Antwoordpercentage per eenheid');
-define('_RESPONSE_RATE_BY_ENTITIES_DESC', 'Om het percentage brieven weer te geven waarop er antwoord werd gegeven. Deze statistiek baseert zich op het aantal brieven waarvan er een vertrekdatum ingeschreven werd (gebruikt het veld departure_date)');
-define('_ENTITY_LATE_MAIL', 'Briefvolume te laat per eenheid');
-define('_ENTITY_PROCESS_DELAY', 'Gemiddelde verwerkingstermijn per eenheid');
-define('_USERS_LOGS', 'Lijst van toegangen tot de applicatie per agent');
-define('_PROCESS_DELAY_REPORT', 'Gemiddelde verwerkingstermijn per typologie');
-define('_PROCESS_DELAY_REPORT_DESC', 'Om de termijn (in dagen) weer te geven van de aanmaak tot aan de afsluiting van een brief.');
-define('_PROCESS_DELAY_GENERIC_EVALUATION_REPORT', 'Gemiddelde verwerkingstermijn per periode');
-define('_PROCESS_DELAY_GENERIC_EVALUATION_REPORT_DESC', 'Om de termijn (in dagen) weer te geven van de aanmaak tot aan de afsluiting van een brief.');
-define('_MAIL_TYPOLOGY_REPORT', 'Briefvolume per typologie');
-define('_MAIL_TYPOLOGY_REPORT_DESC', 'Om het aantal brieven weer te geven dat per documenttype bewaard wordt.');
-define('_MAIL_VOL_BY_CAT_REPORT', 'Briefvolume per categorie');
-define('_MAIL_VOL_BY_CAT_REPORT_DESC', 'Om het aantal brieven weer te geven dat per categorie (inkomend, uitgaand enz.) bewaard wordt.');
 
 //ATTACHMENT TYPES
 define('_RESPONSE_PROJECT', 'Antwoordontwerp');

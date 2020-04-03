@@ -217,9 +217,4 @@ class DatabasePDO
     {
         return self::$pdo->rollBack();
     }
-
-    public function pgsqlCopyFromArray(string $table_name, array $rows, string $delimiter = '\t', string $null_as = "\\\\N", string $fields)
-    {
-        return self::$pdo->pgsqlCopyFromArray($table_name, $rows, $delimiter, $null_as, $fields);
-    }
 }

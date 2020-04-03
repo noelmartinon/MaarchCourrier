@@ -48,7 +48,7 @@ class StatusControllerTest extends TestCase
         ];
 
         $aCompare = json_decode(json_encode($compare), false);
-        $this->assertEquals($aCompare, $responseBody->status, "\$canonicalize = true", 0.0, 10, true);
+        $this->assertEqualsCanonicalizing($aCompare, $responseBody->status);
 
         ########## CREATE FAIL ##########
         $request = \Slim\Http\Request::createFromEnvironment($environment);
@@ -133,7 +133,7 @@ class StatusControllerTest extends TestCase
         ];
 
         $aCompare = json_decode(json_encode($compare), false);
-        $this->assertEquals($aCompare, $responseBody->status[0], "\$canonicalize = true", 0.0, 10, true);
+        $this->assertEqualsCanonicalizing($aCompare, $responseBody->status[0]);
 
         ########## GETBYIDENTIFIER FAIL ##########
         $response     = $status->getByIdentifier($request, new \Slim\Http\Response(), ['identifier' => -1]);
@@ -170,7 +170,7 @@ class StatusControllerTest extends TestCase
 
         $aCompare = json_decode(json_encode($compare), false);
 
-        $this->assertEquals($aCompare, $responseBody->status, "\$canonicalize = true", 0.0, 10, true);
+        $this->assertEqualsCanonicalizing($aCompare, $responseBody->status);
 
         ########## UPDATE FAIL ##########
         $request = \Slim\Http\Request::createFromEnvironment($environment);

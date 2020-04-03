@@ -3,11 +3,11 @@
     <mat-form-field floatLabel="never" class="input-form"
         *ngIf="(!controlAutocomplete.disabled && !singleMode) || (singleMode && controlAutocomplete.value.length === 0 && !controlAutocomplete.disabled)">
         <mat-icon color="primary" class="fa fa-search" matPrefix style="padding-left: 20px;font-size: 15px;"></mat-icon>
-        <input type="text" #autoCompleteInput [placeholder]="lang.searchContact" matInput [formControl]="myControl"
+        <input [id]="id" type="text" #autoCompleteInput [placeholder]="lang.searchContact" matInput [formControl]="myControl"
             [matAutocomplete]="auto" (click)="$event.stopPropagation();noResultFound = null;" maxlength="128">
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectOpt($event)">
             <ng-container *ngIf="options.length > 0 && !loading">
-                <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+                <mat-option [id]="id + '-' + option.id" *ngFor="let option of filteredOptions | async" [value]="option">
                     <mat-card>
                         <mat-card-header class="contact-header">
                             <div mat-card-avatar class="contact-header-image fa"

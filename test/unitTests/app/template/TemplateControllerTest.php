@@ -12,7 +12,9 @@ use PHPUnit\Framework\TestCase;
 class TemplateControllerTest extends TestCase
 {
     private static $id = null;
+    private static $id2 = null;
     private static $idDuplicated = null;
+    private static $idDuplicated2 = null;
     private static $idAcknowledgementReceipt = null;
 
 
@@ -37,10 +39,12 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         self::$id = $responseBody->template;
         $this->assertIsInt(self::$id);
+
 
         ########## CREATE FAIL ##########
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
@@ -57,6 +61,7 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Bad Request', $responseBody->errors);
@@ -78,6 +83,7 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->entities);
@@ -100,10 +106,79 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         self::$idAcknowledgementReceipt = $responseBody->template;
         $this->assertIsInt(self::$idAcknowledgementReceipt);
+
+        $fileContent = file_get_contents('modules/templates/templates/styles/AR_Masse_Simple.docx');
+        $encodedFile = base64_encode($fileContent);
+
+        $aArgs = [
+            'template_label'           => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'          => 'OFFICE',
+            'template_attachment_type' => 'ARsimple',
+            'template_type'            => 'OFFICE',
+            'template_datasource'      => 'letterbox_attachment',
+            'entities'                 => ['TST', 'BAD'],
+            'uploadedFile'             => [
+                'name'   => 'test_template.docx',
+                'base64' => $encodedFile
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsInt($responseBody['template']);
+        self::$id2 = $responseBody['template'];
+
+        ########## CREATE FAIL ##########
+        $fileContent = file_get_contents('test/unitTests/samples/test.txt');
+        $encodedFile = base64_encode($fileContent);
+
+        $aArgs = [
+            'template_label'           => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'          => 'OFFICE',
+            'template_attachment_type' => 'ARsimple',
+            'template_type'            => 'OFFICE',
+            'template_datasource'      => 'letterbox_attachment',
+            'entities'                 => ['TST', 'BAD'],
+            'uploadedFile'             => [
+                'name'   => 'test_template.txt',
+                'base64' => $encodedFile
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(_WRONG_FILE_TYPE, $responseBody['errors']);
+
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            'template_label'            => '',
+            'template_comment'          => '',
+            'template_target'           => 'sendmail',
+            'template_attachment_type'  => 'all',
+            'template_type'             => 'HTML',
+            'template_content'          => 'Content of this template',
+            'template_datasource'       => 'letterbox_attachment'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame('Bad Request', $responseBody->errors);
 
         ########## CREATE FAIL ACKNOLEDGEMENT RECEIPT - entity already associated ##########
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
@@ -121,6 +196,7 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->checkEntities);
@@ -141,9 +217,62 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame("You must complete at least one of the two templates", $responseBody->errors);
+
+        // File missing
+        $aArgs = [
+            'template_label'            => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'           => 'OFFICE',
+            'template_attachment_type'  => 'ARsimple',
+            'template_type'             => 'OFFICE',
+            'template_datasource'       => 'letterbox_attachment',
+            'entities'                  => ['TST', 'BAD'],
+            'uploadedFile'              => ''
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame("Template file is missing", $responseBody['errors']);
+
+        $aArgs = [
+            'template_label'            => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'           => 'OFFICE',
+            'template_attachment_type'  => 'ARsimple',
+            'template_type'             => 'OFFICE',
+            'template_datasource'       => 'letterbox_attachment',
+            'entities'                  => ['TST', 'BAD'],
+            'uploadedFile'              => 'missing base64 + name'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame("Uploaded file is missing", $responseBody['errors']);
+
+        // Fail
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testRead()
@@ -154,6 +283,7 @@ class TemplateControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $templates->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertIsInt($responseBody->template->template_id);
@@ -184,8 +314,23 @@ class TemplateControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $templates->getDetailledById($request, new \Slim\Http\Response(), ['id' => '11119999']);
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
         $this->assertSame('Template does not exist', $responseBody->errors);
+
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response       = $templates->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testUpdate()
@@ -204,11 +349,12 @@ class TemplateControllerTest extends TestCase
             'template_type'             => 'HTML',
             'template_content'          => 'Content of this template',
             'template_datasource'       => 'letterbox_attachment',
-            'entities'                  => []
+            'entities'                  => ['TST_AR']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame("success", $responseBody->success);
@@ -217,6 +363,7 @@ class TemplateControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $templates->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertIsInt($responseBody->template->template_id);
@@ -228,9 +375,34 @@ class TemplateControllerTest extends TestCase
         $this->assertSame('Content of this template', $responseBody->template->template_content);
         $this->assertSame('letterbox_attachment', $responseBody->template->template_datasource);
 
-        ########## UPDATE FAIL MISSING PARAMETERS ##########
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $fileContent = file_get_contents('modules/templates/templates/styles/AR_Masse_Simple.docx');
+        $encodedFile = base64_encode($fileContent);
+
+        $aArgs = [
+            'template_label'           => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'          => 'OFFICE',
+            'template_attachment_type' => 'ARsimple',
+            'template_type'            => 'OFFICE',
+            'template_datasource'      => 'letterbox_attachment',
+            'entities'                 => ['TST', 'BAD'],
+            'uploadedFile'             => [
+                'name'   => 'test_template.docx',
+                'base64' => $encodedFile
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame("success", $responseBody['success']);
+
+        ########## UPDATE FAIL MISSING PARAMETERS ##########
 
         $aArgs = [
             'template_label'            => '',
@@ -245,6 +417,7 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame("Bad Request", $responseBody->errors);
@@ -266,9 +439,66 @@ class TemplateControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => '1235789']);
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Template does not exist', $responseBody->errors);
+
+        $aArgs = [
+            'template_label'            => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'           => 'OFFICE',
+            'template_attachment_type'  => 'ARsimple',
+            'template_type'             => 'OFFICE',
+            'template_datasource'       => 'letterbox_attachment',
+            'entities'                  => ['TST', 'BAD'],
+            'uploadedFile'              => 'missing base64 + name'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame("Uploaded file is missing", $responseBody['errors']);
+
+        $fileContent = file_get_contents('test/unitTests/samples/test.txt');
+        $encodedFile = base64_encode($fileContent);
+
+        $aArgs = [
+            'template_label'           => 'TEST TEMPLATE AR OFFICE',
+            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_target'          => 'OFFICE',
+            'template_attachment_type' => 'ARsimple',
+            'template_type'            => 'OFFICE',
+            'template_datasource'      => 'letterbox_attachment',
+            'entities'                 => ['TST', 'BAD'],
+            'uploadedFile'             => [
+                'name'   => 'test_template.txt',
+                'base64' => $encodedFile
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(_WRONG_FILE_TYPE, $responseBody['errors']);
+
+        // Fail
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDuplicate()
@@ -280,15 +510,24 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $response     = $templates->duplicate($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
+        $this->assertIsInt($responseBody->id);
         self::$idDuplicated = $responseBody->id;
-        $this->assertIsInt(self::$idDuplicated);
+
+        $response     = $templates->duplicate($request, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsInt($responseBody->id);
+        self::$idDuplicated2 = $responseBody->id;
 
         //  READ
         $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request      = \Slim\Http\Request::createFromEnvironment($environment);
         $response     = $templates->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$idDuplicated]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertIsInt($responseBody->template->template_id);
@@ -305,9 +544,32 @@ class TemplateControllerTest extends TestCase
         $request      = \Slim\Http\Request::createFromEnvironment($environment);
 
         $response     = $templates->duplicate($request, new \Slim\Http\Response(), ['id' => 139875323456]);
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Template not found', $responseBody->errors);
+
+
+        $response     = $templates->duplicate($request, new \Slim\Http\Response(), ['id' => self::$idAcknowledgementReceipt]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame('Forbidden duplication', $responseBody->errors);
+
+        // Fail
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $templates->duplicate($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetList()
@@ -318,6 +580,7 @@ class TemplateControllerTest extends TestCase
         $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request      = \Slim\Http\Request::createFromEnvironment($environment);
         $response     = $templates->get($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $idFound = false;
@@ -338,6 +601,21 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame(true, $idFound);
         $this->assertSame(true, $idDuplicatedFound);
+
+        // Fail
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $templates->get($request, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDelete()
@@ -349,15 +627,26 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame("success", $responseBody->success);
+
+        $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame("success", $responseBody->success);
 
         ########## DELETE DUPLICATED ##########
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-
         $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$idDuplicated]);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame("success", $responseBody->success);
+
+        $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$idDuplicated2]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame("success", $responseBody->success);
@@ -367,6 +656,7 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$idAcknowledgementReceipt]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame("success", $responseBody->success);
@@ -375,12 +665,13 @@ class TemplateControllerTest extends TestCase
         \SrcCore\models\DatabaseModel::delete([
             'table' => 'users_entities',
             'where' => ['user_id = ?', 'entity_id = ?'],
-            'data'  => ['bbain', 'TST_AR']
+            'data'  => [19, 'TST_AR']
         ]);
         $entityController = new \Entity\controllers\EntityController();
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->delete($request, new \Slim\Http\Response(), ['id' => 'TST_AR']);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->entities);
@@ -391,9 +682,25 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => '8928191923']);
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Template does not exist', $responseBody->errors);
+
+        // Fail
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testInitTemplate()
@@ -403,6 +710,7 @@ class TemplateControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $templates->initTemplates($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->templatesModels);
@@ -420,5 +728,20 @@ class TemplateControllerTest extends TestCase
         $this->assertNotNull($responseBody->entities);
         $this->assertNotNull($responseBody->entities[0]->entity_id);
         $this->assertNotNull($responseBody->entities[0]->entity_label);
+
+        // Fail
+        $GLOBALS['userId'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response       = $templates->initTemplates($request, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 }

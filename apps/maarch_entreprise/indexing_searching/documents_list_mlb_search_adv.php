@@ -299,9 +299,6 @@ if ($mode == 'normal') {
         $whereFolders = 'res_id in (select res_id from resources_folders, folders, entities_folders ';
         $whereFolders .= 'where folders.id = entities_folders.folder_id AND folders.id = resources_folders.folder_id AND (user_id = :userSerialId OR entity_id in (:userEntitiesId)))';
         $user = \User\models\UserModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['id']]);
-        $entities = \User\models\UserModel::getEntitiesByLogin(['login' => $_SESSION['user']['UserId']]);
-        $entities = array_column($entities, 'id');
-
         $arrayPDO[':userSerialId'] = $user['id'];
         $arrayPDO[':userEntitiesId'] = $entities;
         if (count($where_tab) != 0) {

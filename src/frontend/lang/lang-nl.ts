@@ -794,7 +794,6 @@ export const LANG_NL = {
     "removeUserRedirect"                    : "Verwijder de gebruiker van de mailinglijsten",
     "removeUserRedirectInformations"        : "<em>De gebruiker wordt verwijderd uit de mailinglijsten en sjabloon van de entiteit <b>behalve in het geval dat het wordt toegekend</b></em>", //_TO_TRANSLATE
     "renewPsw"                              : "Wachtwoord opnieuw intypen",
-    "reports"                               : "Statistieken",
     "requiredField"                         : "Vereist veld",
     "resetColor"                            : "De kleur resetten",
     "resId"                                 : "GED gebruikersnaam",
@@ -1261,7 +1260,6 @@ export const LANG_NL = {
     "mailevaAdmin" : "Maileva shipping admin", //_TO_TRANSLATE
     "mailevaAdminDesc" : "Configure mailing templates for Maileva", //_TO_TRANSLATE
     "infoMailevaAccount": "Indicate here your username and the INITIAL password communicated by Maileva when opening your account", //_TO_TRANSLATE
-    "reportsAdmin" : "Administratie van de statistieken",
     "historyBatchAdmin" : "De geschiedenis van de batches raadplegen",
     "updateControl" : "Controle van de bijwerking",
     "mailsSent" : "Resource(s) sent", //_TO_TRANSLATE

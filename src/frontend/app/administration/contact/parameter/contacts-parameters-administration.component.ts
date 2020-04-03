@@ -4,7 +4,9 @@ import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
 import { HeaderService }        from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 declare function $j(selector: any): any;
 

@@ -345,7 +345,7 @@ abstract class BasketModelAbstract
 
     public static function getWithPreferences(array $args)
     {
-        ValidatorModel::arrayType($args, ['select', 'where', 'data']);
+        ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy']);
 
         $where = ['(baskets.basket_id = users_baskets_preferences.basket_id AND users_baskets_preferences.group_serial_id = usergroups.id)'];
         if (!empty($args['where'])) {
@@ -356,7 +356,8 @@ abstract class BasketModelAbstract
             'select'    => empty($args['select']) ? ['*'] : $args['select'],
             'table'     => ['baskets, users_baskets_preferences, usergroups'],
             'where'     => $where,
-            'data'      => empty($args['data']) ? [] : $args['data']
+            'data'      => empty($args['data']) ? [] : $args['data'],
+            'order_by'  => $args['orderBy'] ?? [],
         ]);
 
         return $baskets;

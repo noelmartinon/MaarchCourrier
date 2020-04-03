@@ -490,7 +490,7 @@ class IndexingModelController
         return $response->withStatus(204);
     }
 
-    public function getEntities(Request $request, Response $response, array $aArgs)
+    public function getEntities(Request $request, Response $response)
     {
         $entitiesTmp = EntityModel::get([
             'select'   => ['id', 'entity_label', 'entity_id'],

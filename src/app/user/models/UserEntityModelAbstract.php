@@ -72,7 +72,7 @@ abstract class UserEntityModelAbstract
         $aUsersEntities = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users', 'users_entities'],
-            'left_join' => ['users.user_id = users_entities.user_id'],
+            'left_join' => ['users.id = users_entities.user_id'],
             'where'     => ['users_entities IS NULL', 'users.user_id not in (?)', 'status != ?'],
             'data'      => [$excludedUsers, 'DEL']
         ]);
@@ -80,40 +80,38 @@ abstract class UserEntityModelAbstract
         return $aUsersEntities;
     }
 
-    public static function addUserEntity(array $aArgs)
+    public static function addUserEntity(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['id', 'entityId', 'primaryEntity']);
-        ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::stringType($aArgs, ['entityId', 'role', 'primaryEntity']);
+        ValidatorModel::notEmpty($args, ['id', 'entityId', 'primaryEntity']);
+        ValidatorModel::intVal($args, ['id']);
+        ValidatorModel::stringType($args, ['entityId', 'role', 'primaryEntity']);
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         DatabaseModel::insert([
             'table'         => 'users_entities',
             'columnsValues' => [
-                'user_id'           => $user['user_id'],
-                'entity_id'         => $aArgs['entityId'],
-                'user_role'         => $aArgs['role'],
-                'primary_entity'    => $aArgs['primaryEntity']
+                'user_id'           => $args['id'],
+                'entity_id'         => $args['entityId'],
+                'user_role'         => $args['role'],
+                'primary_entity'    => $args['primaryEntity']
             ]
         ]);
 
         return true;
     }
 
-    public static function updateUserEntity(array $aArgs)
+    public static function updateUserEntity(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['id', 'entityId']);
-        ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::stringType($aArgs, ['entityId', 'role']);
+        ValidatorModel::notEmpty($args, ['id', 'entityId']);
+        ValidatorModel::intVal($args, ['id']);
+        ValidatorModel::stringType($args, ['entityId', 'role']);
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         DatabaseModel::update([
             'table'     => 'users_entities',
             'set'       => [
-                'user_role' => $aArgs['role']
+                'user_role' => $args['role']
             ],
             'where'     => ['user_id = ?', 'entity_id = ?'],
-            'data'      => [$user['user_id'], $aArgs['entityId']]
+            'data'      => [$args['id'], $args['entityId']]
         ]);
 
         return true;
@@ -125,8 +123,7 @@ abstract class UserEntityModelAbstract
         ValidatorModel::intVal($aArgs, ['id']);
         ValidatorModel::stringType($aArgs, ['entityId']);
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
-        $entities = EntityModel::getByLogin(['login' => $user['user_id']]);
+        $entities = EntityModel::getByUserId(['userId' => $aArgs['id']]);
         foreach ($entities as $entity) {
             if ($entity['primary_entity'] == 'Y') {
                 DatabaseModel::update([
@@ -135,7 +132,7 @@ abstract class UserEntityModelAbstract
                         'primary_entity'    => 'N'
                     ],
                     'where'     => ['user_id = ?', 'entity_id = ?'],
-                    'data'      => [$user['user_id'], $entity['entity_id']]
+                    'data'      => [$aArgs['id'], $entity['entity_id']]
                 ]);
             }
         }
@@ -146,7 +143,7 @@ abstract class UserEntityModelAbstract
                 'primary_entity'    => 'Y'
             ],
             'where'     => ['user_id = ?', 'entity_id = ?'],
-            'data'      => [$user['user_id'], $aArgs['entityId']]
+            'data'      => [$aArgs['id'], $aArgs['entityId']]
         ]);
 
         return true;
@@ -155,9 +152,9 @@ abstract class UserEntityModelAbstract
     public static function reassignUserPrimaryEntity(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::intVal($aArgs, ['userId']);
 
-        $entities = EntityModel::getByLogin(['login' => $aArgs['userId']]);
+        $entities = EntityModel::getByUserId(['userId' => $aArgs['userId'], 'select' => ['entity_id']]);
         if (!empty($entities[0])) {
             DatabaseModel::update([
                 'table'     => 'users_entities',
@@ -178,11 +175,10 @@ abstract class UserEntityModelAbstract
         ValidatorModel::intVal($aArgs, ['id']);
         ValidatorModel::stringType($aArgs, ['entityId']);
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         DatabaseModel::delete([
             'table'     => 'users_entities',
             'where'     => ['entity_id = ?', 'user_id = ?'],
-            'data'      => [$aArgs['entityId'], $user['user_id']]
+            'data'      => [$aArgs['entityId'], $aArgs['id']]
         ]);
 
         return true;
@@ -197,7 +193,7 @@ abstract class UserEntityModelAbstract
         $users = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users', 'users_entities'],
-            'left_join' => ['users.user_id = users_entities.user_id'],
+            'left_join' => ['users.id = users_entities.user_id'],
             'where'     => empty($aArgs['where']) ? [] : $aArgs['where'],
             'data'      => empty($aArgs['data']) ? [] : $aArgs['data'],
             'order_by'  => empty($aArgs['orderBy']) ? [] : $aArgs['orderBy'],

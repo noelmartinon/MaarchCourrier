@@ -69,7 +69,6 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         array (
             'Respect\\Validation\\' => 19,
             'Resource\\' => 9,
-            'Report\\' => 7,
         ),
         'P' => 
         array (
@@ -256,10 +255,6 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         'Resource\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/app/resource',
-        ),
-        'Report\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src/app/report',
         ),
         'Psr\\Http\\Message\\' => 
         array (

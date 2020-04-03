@@ -6,7 +6,8 @@ import {
     Output
 } from '@angular/core';
 import { ControlValueAccessor, FormControl } from '@angular/forms';
-import { MatOption, MatSelect } from '@angular/material';
+import { MatOption } from '@angular/material/core';
+import { MatSelect } from '@angular/material/select';
 import { take, takeUntil, startWith, map } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
@@ -24,48 +25,41 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     /** Label of the search placeholder */
     @Input() placeholderLabel = this.lang.chooseValue;
 
-    @Input('formControlSelect') formControlSelect: FormControl = new FormControl();
+    @Input() formControlSelect: FormControl = new FormControl();
 
-    @Input('datas') datas: any = [];
+    @Input() datas: any = [];
 
-    @Input('returnValue') returnValue: 'id' | 'object' = 'id';
+    @Input() returnValue: 'id' | 'object' = 'id';
 
-    @Input('label') label: string;
+    @Input() label: string;
 
-    @Input('showResetOption') showResetOption: boolean;
+    @Input() id: string = '';
 
-    @Input('showLabel') showLabel: boolean = false;
+    @Input() showResetOption: boolean;
 
-    @Input('required') required: boolean = false;
+    @Input() showLabel: boolean = false;
 
-    @Input('hideErrorDesc') hideErrorDesc: boolean = true;
+    @Input() required: boolean = false;
+
+    @Input() hideErrorDesc: boolean = true;
 
     /**
      * ex : {class:'fa-circle', color:'#fffff', title: 'foo'}
      */
-    @Input('suffixIcon') suffixIcon: any = null;
+    @Input() suffixIcon: any = null;
 
-    @Input('class') class: string = "input-form";
+    @Input() class: string = 'input-form';
 
     /**
      * Catch external event after select an element in autocomplete
      */
-    @Output('afterSelected') afterSelected = new EventEmitter();
-    @Output('afterOpened') afterOpened = new EventEmitter();
+    @Output() afterSelected = new EventEmitter();
+    @Output() afterOpened = new EventEmitter();
 
     /** Reference to the search input field */
     @ViewChild('searchSelectInput', { read: ElementRef, static: true }) searchSelectInput: ElementRef;
 
     @ViewChild('test', { static: true }) matSelect: MatSelect;
-
-    /** Current search value */
-    get value(): string {
-        return this._value;
-    }
-    private _value: string;
-
-    onChange: Function = (_: any) => { };
-    onTouched: Function = (_: any) => { };
 
     public filteredDatas: Observable<string[]>;
 
@@ -88,13 +82,24 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     formControlSearch = new FormControl();
 
-
-    constructor(private latinisePipe: LatinisePipe, private changeDetectorRef: ChangeDetectorRef, private renderer: Renderer2, public appService: AppService) {
-
-
+    /** Current search value */
+    get value(): string {
+        return this._value;
     }
+    private _value: string;
+
+    onChange: Function = (_: any) => { };
+    onTouched: Function = (_: any) => { };
+
+    constructor(
+        private latinisePipe: LatinisePipe,
+        private changeDetectorRef: ChangeDetectorRef,
+        private renderer: Renderer2,
+        public appService: AppService) { }
 
     ngOnInit() {
+        console.log(this.formControlSelect);
+
         // set custom panel class
         const panelClass = 'mat-select-search-panel';
         if (this.matSelect.panelClass) {
@@ -115,12 +120,12 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             .subscribe((opened) => {
                 if (opened) {
                     // focus the search field when opening
-                    if(!this.appService.getViewMode()) {
+                    if (!this.appService.getViewMode()) {
                         this._focus();
                     }
                 } else {
                     // clear it when closing
-                    //this._reset();
+                    // this._reset();
                     this.formControlSearch.reset();
                 }
             });
@@ -144,10 +149,6 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                     });
             });
 
-
-        /*setTimeout(() => {
-            
-        }, 800);*/
         this.filteredDatas = this.formControlSearch.valueChanges
             .pipe(
                 startWith(''),

@@ -46,12 +46,10 @@ class MergedJsAbstract
 
         //Dependencies
         readfile('node_modules/jquery/dist/jquery.min.js');
-        readfile('node_modules/core-js/client/shim.js'); //V2 - Angular
         readfile('node_modules/zone.js/dist/zone.min.js'); //V2 - Angular
         readfile('node_modules/bootstrap/dist/js/bootstrap.min.js'); //V2
-        readfile('node_modules/chart.js/Chart.min.js');
         readfile('node_modules/tinymce/tinymce.min.js');
-        readfile('node_modules/jquery.nicescroll/jquery.nicescroll.min.js'); //V2
+        readfile('node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js'); //V2
         readfile('node_modules/tooltipster/dist/js/tooltipster.bundle.min.js'); //V2
         readfile('node_modules/jquery-typeahead/dist/jquery.typeahead.min.js'); //V2
         readfile('node_modules/chosen-js/chosen.jquery.min.js');

@@ -196,25 +196,6 @@
       <parameter name="id"/>
     </requestDefinition>
 
-    <!-- reports -->
-    <requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="report_user" >
-      <parameter name="page" value="get_user_logs_stats_val"/>
-      <parameter name="display" value="true"/>
-      <parameter name="dir" value="reports"/>
-    </requestDefinition>
-    
-    <requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="get_report_by_period_val" >
-      <parameter name="page" value="get_report_by_period_val"/>
-      <parameter name="display" value="true"/>
-      <parameter name="dir" value="reports"/>
-    </requestDefinition>
-
-    <requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="report_val" >
-      <parameter name="page" value="report_by_period"/>
-      <parameter name="display" value="true"/>
-      <parameter name="dir" value="reports"/>
-    </requestDefinition>
-
     <!-- login  -->
     <requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="login" >
       <parameter name="page" value="log"/>
@@ -291,7 +272,6 @@
     <xi:include href="../../../../modules/life_cycle/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/notes/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/notifications/xml/IVS/requests_definitions.xml"/>
-    <xi:include href="../../../../modules/reports/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/sendmail/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/tags/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/templates/xml/IVS/requests_definitions.xml"/>
@@ -317,7 +297,6 @@
     <xi:include href="../../../../modules/life_cycle/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/notes/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/notifications/xml/IVS/validation_rules.xml"/>
-    <xi:include href="../../../../modules/reports/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/sendmail/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/tags/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/templates/xml/IVS/validation_rules.xml"/>
@@ -343,7 +322,6 @@
     <xi:include href="../../../../modules/life_cycle/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/notes/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/notifications/xml/IVS/data_types.xml"/>
-    <xi:include href="../../../../modules/reports/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/sendmail/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/tags/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/templates/xml/IVS/data_types.xml"/>

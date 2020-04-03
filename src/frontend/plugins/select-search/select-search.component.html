@@ -1,6 +1,6 @@
 <mat-form-field [class]="class + ' search-select'" [floatLabel]="appService.getViewMode() || showLabel ? '' : 'never'">
   <mat-label *ngIf="appService.getViewMode() || showLabel">{{label}}</mat-label>
-  <mat-select [formControl]="formControlSelect" [placeholder]="placeholderLabel" #test
+  <mat-select [id]="id" [formControl]="formControlSelect" [placeholder]="placeholderLabel" #test
     (selectionChange)="launchEvent($event)" [required]="required">
     <input *ngIf="datas.length > 5" matInput class="mat-select-search-input mat-select-search-hidden" />
 

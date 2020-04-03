@@ -29,7 +29,6 @@ return array(
     'Search\\' => array($baseDir . '/src/app/search'),
     'Respect\\Validation\\' => array($vendorDir . '/respect/validation/library'),
     'Resource\\' => array($baseDir . '/src/app/resource'),
-    'Report\\' => array($baseDir . '/src/app/report'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-message/src'),
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'Priority\\' => array($baseDir . '/src/app/priority'),

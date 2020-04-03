@@ -28,6 +28,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "1mb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,

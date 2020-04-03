@@ -119,11 +119,11 @@ class PreProcessActionController
 
                     foreach ($users as $key => $user) {
                         $users[$key]['labelToDisplay'] = "{$user['firstname']} {$user['lastname']}";
-                        $users[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityByUserId(['userId' => $user['user_id']])['entity_label'];
+                        $users[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']])['entity_label'];
                     }
                 }
             } elseif ($mode == 'ENTITY') {
-                $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $GLOBALS['userId']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.entity_label']]);
 
                 $allEntities = EntityModel::get(['select' => ['id', 'entity_id', 'entity_label', 'parent_entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y'], 'orderBy' => ['parent_entity_id']]);
                 foreach ($allEntities as $key => $value) {

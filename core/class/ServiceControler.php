@@ -114,7 +114,7 @@ class ServiceControler
 		if($user_id == "superadmin")
 		{
 //			$services = self::getAllServices();
-			return ['adv_search_mlb' => true, 'reports' => true];
+			return ['adv_search_mlb' => true];
 		}
 		/*else
 		{
@@ -145,14 +145,11 @@ class ServiceControler
 			}
 		}*/
 
-		$services = ['adv_search_mlb' => false, 'reports' => false];
+		$services = ['adv_search_mlb' => false];
 		$userUse = \User\models\UserModel::getByLogin(['login' => $user_id, 'select' => ['id']]);
 
 		if (PrivilegeController::hasPrivilege(['privilegeId' => 'adv_search_mlb', 'userId' => $userUse['id']])) {
 			$services['adv_search_mlb'] = true;
-		}
-		if (PrivilegeController::hasPrivilege(['privilegeId' => 'reports', 'userId' => $userUse['id']])) {
-			$services['reports'] = true;
 		}
 
 		return $services;

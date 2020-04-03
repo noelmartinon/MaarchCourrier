@@ -6,7 +6,7 @@ import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../../service/app.service';
 import { Observable, of} from 'rxjs';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';

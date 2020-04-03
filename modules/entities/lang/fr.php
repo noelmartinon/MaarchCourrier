@@ -350,36 +350,9 @@ if (!defined('_LISTMODELS_OCCURS_LINKED_TO')) {
 if (!defined('_CHOOSE_REPLACEMENT_DEPARTMENT')) {
     define('_CHOOSE_REPLACEMENT_DEPARTMENT', 'Choisissez une entité remplaçante');
 }
-
-/******************** For reports ************/
-if (!defined('_ENTITY_VOL_STAT')) {
-    define('_ENTITY_VOL_STAT', 'Volume des courriers par entité');
-}
-if (!defined('_ENTITY_VOL_STAT_DESC')) {
-    define('_ENTITY_VOL_STAT_DESC', "Permet d'afficher le nombre de courriers enregistrés par entité.");
-}
-if (!defined('_NO_DATA_MESSAGE')) {
-    define('_NO_DATA_MESSAGE', 'Pas assez de données');
-}
-if (!defined('_MAIL_VOL_BY_ENT_REPORT')) {
-    define('_MAIL_VOL_BY_ENT_REPORT', 'Volume de courriers par entité');
-}
 if (!defined('_WRONG_DATE_FORMAT')) {
     define('_WRONG_DATE_FORMAT', 'Format de date incorrect');
 }
-if (!defined('_ENTITY_PROCESS_DELAY')) {
-    define('_ENTITY_PROCESS_DELAY', 'Délai moyen de traitement par entité');
-}
-if (!defined('_ENTITY_PROCESS_DELAY_DESC')) {
-    define('_ENTITY_PROCESS_DELAY_DESC', "Permet d'afficher le délai (en jour) de la création jusqu'à la clôture d'un courrier.");
-}
-if (!defined('_ENTITY_LATE_MAIL')) {
-    define('_ENTITY_LATE_MAIL', 'Volume de courriers en retard par entité');
-}
-if (!defined('_ENTITY_LATE_MAIL_DESC')) {
-    define('_ENTITY_LATE_MAIL_DESC', "Permet d'afficher le nombre de courriers qui n'ont pas été cloturés et dont la date limite de traitement a été dépassée.");
-}
-
 /******************** Action put in copy ************/
 if (!defined('_ALL_LIST')) {
     define('_ALL_LIST', 'Afficher toute la liste');
@@ -475,30 +448,15 @@ if (!defined('_SELECT_OBJECT_TYPE_AND_ID')) {
 if (!defined('_SAVE_LISTMODEL')) {
     define('_SAVE_LISTMODEL', 'Valider');
 }
-if (!defined('_OBJECT_ID_IS_NOT_VALID_ID')) {
-    define('_OBJECT_ID_IS_NOT_VALID_ID', 'Identifiant invalide: il ne doit contenir que des caractères alphabétiques, numériques ou des tiret bas (A-Z, a-z, 0-9, _)');
-}
-if (!defined('_LISTMODEL_ID_ALREADY_USED')) {
-    define('_LISTMODEL_ID_ALREADY_USED', 'Cet identifiant est déjà utilisé!');
-}
 if (!defined('_CONFIRM_LISTMODEL_SAVE')) {
     define('_CONFIRM_LISTMODEL_SAVE', 'Sauvegarder la liste ?');
 }
-
 if (!defined('_ENTER_DESCRIPTION')) {
     define('_ENTER_DESCRIPTION', 'Description obligatoire');
 }
 if (!defined('_ENTER_TITLE')) {
     define('_ENTER_TITLE', 'Titre obligatoire');
 }
-
-if (!defined('_PARAM_AVAILABLE_LISTMODELS_ON_GROUP_BASKETS')) {
-    define('_PARAM_AVAILABLE_LISTMODELS_ON_GROUP_BASKETS', "Paramétrer les types de modèle de liste de diffusion pour l'indexation");
-}
-if (!defined('_INDEXING_DIFFLIST_TYPES')) {
-    define('_INDEXING_DIFFLIST_TYPES', 'Types de liste de diffusion');
-}
-
 if (!defined('_ADMIN_DIFFLIST_TYPES')) {
     define('_ADMIN_DIFFLIST_TYPES', 'Types de liste de diffusion (Administration)');
 }
@@ -516,21 +474,6 @@ if (!defined('_ADMIN_LISTMODELS_DESC')) {
 if (!defined('_STANDARD')) {
     define('_STANDARD', 'Standard');
 }
-if (!defined('_5_ARCHIVAL')) {
-    define('_5_ARCHIVAL', '5 Archivistique');
-}
-if (!defined('_51_IDENTIFICATION')) {
-    define('_51_IDENTIFICATION', '5.1 Identification');
-}
-if (!defined('_52_DESCRIPTION')) {
-    define('_52_DESCRIPTION', '5.2 Description');
-}
-if (!defined('_53_RELATIONS')) {
-    define('_53_RELATIONS', '5.3 Relations');
-}
-if (!defined('_54_CONTROL')) {
-    define('_54_CONTROL', '5.4 Contrôle');
-}
 
 if (!defined('_VISIBLE')) {
     define('_VISIBLE', 'Actif');
@@ -545,12 +488,6 @@ if (!defined('_TARGET_STATUS')) {
 }
 if (!defined('_TARGET_ROLE')) {
     define('_TARGET_ROLE', 'Rôle à faire avancer dans le workflow');
-}
-if (!defined('_ITS_NOT_MY_TURN_IN_THE_WF')) {
-    define('_ITS_NOT_MY_TURN_IN_THE_WF', "Ce n'est pas mon tour de traiter dans le workflow");
-}
-if (!defined('_NO_AVAILABLE_ROLE_FOR_ME_IN_THE_WF')) {
-    define('_NO_AVAILABLE_ROLE_FOR_ME_IN_THE_WF', "Il n'y a pas de rôle défini pour moi dans le workflow");
 }
 
 if (!defined('_NO_FILTER')) {
@@ -595,18 +532,6 @@ if (!defined('_ADD_USER_LISTDIFF')) {
 
 if (!defined('_ADD_ENTITY_LISTDIFF')) {
     define('_ADD_ENTITY_LISTDIFF', "Ajouter l'entité à la liste de diffusion");
-}
-
-if (!defined('_RESPONSE_RATE')) {
-    define('_RESPONSE_RATE', 'Taux de réponse');
-}
-
-if (!defined('_RESPONSE_RATE_BY_ENTITIES')) {
-    define('_RESPONSE_RATE_BY_ENTITIES', 'Taux de réponse par entité');
-}
-
-if (!defined('_RESPONSE_RATE_BY_ENTITIES_DESC')) {
-    define('_RESPONSE_RATE_BY_ENTITIES_DESC', "Permet d'afficher le pourcentage de courrier dont une réponse a été effectuée. Cette statistique se base sur le nombre de courriers dont une date de départ a été inscrite (il faut utiliser le champ custom_d1)");
 }
 
 // SEDA

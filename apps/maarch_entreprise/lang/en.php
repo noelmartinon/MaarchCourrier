@@ -247,12 +247,6 @@ if (!defined('_SAVED_ALREADY_EXIST')) {
 if (!defined('_OK_FOR_CONFIRM')) {
     define('_OK_FOR_CONFIRM', 'Do you confirm the recording?');
 }
-if (!defined('_TRACE_ACT')) {
-    define('_TRACE_ACT', 'Follow the history is incorrect ');
-}
-if (!defined('_INCLUDE_SUB_ENTITIES')) {
-    define('_INCLUDE_SUB_ENTITIES', 'Include sub-entities');
-}
 
 /************** Forms And lists **************/
 if (!defined('_ID')) {
@@ -2547,62 +2541,6 @@ if (!defined('_UNCHANGED')) {
 }
 if (!defined('_PARAM_AVAILABLE_STATUS_ON_GROUP_BASKETS')) {
     define('_PARAM_AVAILABLE_STATUS_ON_GROUP_BASKETS', 'Indexation status configuration');
-}
-
-/************** Reports ***************/
-if (!defined('_USERS_LOGS')) {
-    define('_USERS_LOGS', 'Access list to the application by agent');
-}
-if (!defined('_USERS_LOGS_DESC')) {
-    define('_USERS_LOGS_DESC', 'Access list to the application by agent');
-}
-if (!defined('_PROCESS_DELAY_REPORT')) {
-    define('_PROCESS_DELAY_REPORT', 'Average process period by mail type');
-}
-if (!defined('_PROCESS_DELAY_REPORT_DESC')) {
-    define('_PROCESS_DELAY_REPORT_DESC', 'Average process period by mail type');
-}
-if (!defined('_MAIL_TYPOLOGY_REPORT')) {
-    define('_MAIL_TYPOLOGY_REPORT', 'Mails typology by period');
-}
-if (!defined('_MAIL_TYPOLOGY_REPORT_DESC')) {
-    define('_MAIL_TYPOLOGY_REPORT_DESC', 'Mails typology by period');
-}
-if (!defined('_MAIL_VOL_BY_CAT_REPORT')) {
-    define('_MAIL_VOL_BY_CAT_REPORT', 'Mails volume by category, by period');
-}
-if (!defined('_MAIL_VOL_BY_CAT_REPORT_DESC')) {
-    define('_MAIL_VOL_BY_CAT_REPORT_DESC', 'Mails volume by category, by period');
-}
-if (!defined('_SHOW_FORM_RESULT')) {
-    define('_SHOW_FORM_RESULT', 'Display the result in the form of ');
-}
-if (!defined('_GRAPH')) {
-    define('_GRAPH', 'Graph');
-}
-if (!defined('_ARRAY')) {
-    define('_ARRAY', 'Table');
-}
-if (!defined('_SHOW_YEAR_GRAPH')) {
-    define('_SHOW_YEAR_GRAPH', 'Display the result for the year');
-}
-if (!defined('_SHOW_GRAPH_MONTH')) {
-    define('_SHOW_GRAPH_MONTH', 'Display the result for the months of');
-}
-if (!defined('_OF_THIS_YEAR')) {
-    define('_OF_THIS_YEAR', 'Of this year');
-}
-if (!defined('_NB_MAILS1')) {
-    define('_NB_MAILS1', 'Number of recorded mails');
-}
-if (!defined('_FOR_YEAR')) {
-    define('_FOR_YEAR', 'For the year');
-}
-if (!defined('_FOR_MONTH')) {
-    define('_FOR_MONTH', 'For the months of');
-}
-if (!defined('_N_DAYS')) {
-    define('_N_DAYS', 'Number of days');
 }
 
 /******************** Specific ************/

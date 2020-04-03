@@ -49,8 +49,8 @@ class NoteController
         $notes = NoteModel::getByUserIdForResource(['select' => ['*'], 'resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'limit' => (int)$queryParams['limit']]);
         
         foreach ($notes as $key => $note) {
-            $user = UserModel::getById(['select' => ['firstname', 'lastname', 'user_id'], 'id' => $note['user_id']]);
-            $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $user['user_id']]);
+            $user = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $note['user_id']]);
+            $primaryEntity = UserModel::getPrimaryEntityById(['id' => $note['user_id'], 'select' => ['entities.entity_label']]);
             $notes[$key]['firstname']    = $user['firstname'];
             $notes[$key]['lastname']     = $user['lastname'];
             $notes[$key]['entity_label'] = $primaryEntity['entity_label'];
@@ -319,8 +319,7 @@ class NoteController
             return true;
         }
 
-        $user = UserModel::getById(['select' => ['user_id'], 'id' => $args['userId']]);
-        $userEntities = EntityModel::getByLogin(['login' => $user['user_id'], 'select' => ['entity_id']]);
+        $userEntities = EntityModel::getByUserId(['userId' => $args['userId'], 'select' => ['entity_id']]);
         $userEntities = array_column($userEntities, 'entity_id');
         if (empty($userEntities)) {
             return false;

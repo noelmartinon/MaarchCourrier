@@ -111,7 +111,7 @@ class MaarchParapheurController
                     'data'     => [$tmpIds],
                     'order_by' => ['identifier']]);
 
-                $userEntities = EntityModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['entity_id']]);
+                $userEntities = EntityModel::getByUserId(['userId' => $GLOBALS['id'], 'select' => ['entity_id']]);
                 $data['userEntities'] = [];
                 foreach ($userEntities as $userEntity) {
                     $data['userEntities'][] = $userEntity['entity_id'];
@@ -187,8 +187,8 @@ class MaarchParapheurController
         if (!empty($mainResource[0]['priority'])) {
             $priority = PriorityModel::getById(['select' => ['label'], 'id' => $mainResource[0]['priority']]);
         }
-        $sender              = UserModel::getByLogin(['select' => ['firstname', 'lastname'], 'login' => $aArgs['userId']]);
-        $senderPrimaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $aArgs['userId']]);
+        $sender              = UserModel::getByLogin(['select' => ['id', 'firstname', 'lastname'], 'login' => $aArgs['userId']]);
+        $senderPrimaryEntity = UserModel::getPrimaryEntityById(['id' => $sender['id'], 'select' => ['entities.entity_label']]);
 
         if ($aArgs['objectSent'] == 'attachment') {
             if (!empty($aArgs['steps'])) {

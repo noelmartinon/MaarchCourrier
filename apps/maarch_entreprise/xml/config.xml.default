@@ -14,7 +14,7 @@
         <adminmail>support@maarch.fr</adminmail>
         <adminname>maarch</adminname>
         <debug>false</debug>
-        <applicationname>MAARCH COURRIER 20.03</applicationname>
+        <applicationname>MAARCH COURRIER 20.1X</applicationname>
         <defaultPage>welcome</defaultPage>
         <CookieTime>20</CookieTime> <!-- minutes -->
         <timezone>Europe/Paris</timezone>
@@ -187,10 +187,6 @@
         <comment>_TEMPLATES_COMMENT</comment>
     </MODULES>
     <MODULES>
-        <moduleid>reports</moduleid>
-        <comment>_REPORTS_COMMENT</comment>
-    </MODULES>
-    <MODULES>
         <moduleid>life_cycle</moduleid>
         <comment>_LIFE_CYCLE_COMMENT</comment>
     </MODULES>
@@ -217,9 +213,5 @@
     <MODULES>
         <moduleid>export_seda</moduleid>
         <comment>_EXPORT_SEDA_COMMENT</comment>
-    </MODULES>
-    <MODULES>
-        <moduleid>convert</moduleid>
-        <comment>_CONVERT_COMMENT</comment>
     </MODULES>
 </ROOT>

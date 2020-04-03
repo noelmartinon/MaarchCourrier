@@ -178,20 +178,20 @@ abstract class EntityModelAbstract
         return $aReturn;
     }
 
-    public static function getByLogin(array $aArgs)
+    public static function getByUserId(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['login']);
-        ValidatorModel::stringType($aArgs, ['login']);
+        ValidatorModel::notEmpty($aArgs, ['userId']);
+        ValidatorModel::intVal($aArgs, ['userId']);
         ValidatorModel::arrayType($aArgs, ['select']);
 
-        $aEntities = DatabaseModel::select([
+        $entities = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users_entities'],
             'where'     => ['user_id = ?'],
-            'data'      => [$aArgs['login']]
+            'data'      => [$aArgs['userId']]
         ]);
 
-        return $aEntities;
+        return $entities;
     }
 
     public static function getWithUserEntities(array $args = [])
@@ -277,7 +277,8 @@ abstract class EntityModelAbstract
             return $entities;
         }
 
-        $aReturn = UserModel::getEntitiesByLogin(['login' => $aArgs['userId']]);
+        $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
+        $aReturn = UserModel::getEntitiesById(['id' => $user['id'], 'select' => ['users_entities.entity_id']]);
         foreach ($aReturn as $value) {
             $entities = array_merge($entities, EntityModel::getEntityChildren(['entityId' => $value['entity_id']]));
         }
@@ -300,7 +301,8 @@ abstract class EntityModelAbstract
             $entitiesAllowedForAdministrator = EntityModel::getAllEntitiesByUserId(['userId' => $aArgs['administratorUserId']]);
         }
 
-        $rawUserEntities = EntityModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['entity_id']]);
+        $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
+        $rawUserEntities = EntityModel::getByUserId(['userId' => $user['id'], 'select' => ['entity_id']]);
 
         $userEntities = [];
         foreach ($rawUserEntities as $value) {
@@ -377,7 +379,7 @@ abstract class EntityModelAbstract
         $aUsers = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users_entities, users'],
-            'where'     => ['users_entities.entity_id = ?', 'users_entities.user_id = users.user_id', 'users.status != ?'],
+            'where'     => ['users_entities.entity_id = ?', 'users_entities.user_id = users.id', 'users.status != ?'],
             'data'      => [$aArgs['id'], 'DEL']
         ]);
 

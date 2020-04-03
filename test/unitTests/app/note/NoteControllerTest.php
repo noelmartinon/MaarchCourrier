@@ -18,7 +18,7 @@ class NoteControllerTest extends TestCase
 
     public function testCreate()
     {
-        //get last notes
+        // GET LAST MAIL
         $getResId = DatabaseModel::select([
             'select'    => ['res_id'],
             'table'     => ['res_letterbox'],
@@ -126,6 +126,10 @@ class NoteControllerTest extends TestCase
 
     public function testGetById()
     {
+        $GLOBALS['userId'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id']     = $userInfo['id'];
+
         $noteController = new \Note\controllers\NoteController();
 
         //  READ
@@ -148,16 +152,24 @@ class NoteControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Note out of perimeter', $responseBody->errors);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id']     = $userInfo['id'];
     }
 
     public function testGetByResId()
     {
+        $GLOBALS['userId'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id']     = $userInfo['id'];
+
         $noteController = new \Note\controllers\NoteController();
 
         //  READ
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response     = $noteController->getByResId($request, new \Slim\Http\Response(), ['resId' => self::$resId]);
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+        $response    = $noteController->getByResId($request, new \Slim\Http\Response(), ['resId' => self::$resId]);
 
         $this->assertSame(200, $response->getStatusCode());
 
@@ -177,6 +189,71 @@ class NoteControllerTest extends TestCase
             $this->assertIsString($value->lastname);
             $this->assertNotEmpty($value->lastname);
         }
+
+        // ERROR
+        $response    = $noteController->getByResId($request, new \Slim\Http\Response(), ['resId' => 1234859]);
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Document out of perimeter', $responseBody->errors);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id']     = $userInfo['id'];
+    }
+
+    public function testGetTemplates()
+    {
+        $GLOBALS['userId'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id']     = $userInfo['id'];
+
+        $noteController = new \Note\controllers\NoteController();
+
+        //  GET
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            "resId" => self::$resId
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+        $response    = $noteController->getTemplates($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody->templates);
+
+        foreach ($responseBody->templates as $value) {
+            $this->assertNotEmpty($value->template_label);
+            $this->assertNotEmpty($value->template_content);
+        }
+
+        // GET
+        $response = $noteController->getTemplates($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody->templates);
+
+        foreach ($responseBody->templates as $value) {
+            $this->assertNotEmpty($value->template_label);
+            $this->assertNotEmpty($value->template_content);
+        }
+
+        //  ERROR
+        $aArgs = [
+            "resId" => 19287
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+        $response     = $noteController->getTemplates($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame('Document out of perimeter', $responseBody->errors);
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id']     = $userInfo['id'];
     }
 
     public function testDelete()
@@ -191,8 +268,8 @@ class NoteControllerTest extends TestCase
         $this->assertSame(204, $response->getStatusCode());
 
         //  READ
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request      = \Slim\Http\Request::createFromEnvironment($environment);
         $response     = $noteController->getById($request, new \Slim\Http\Response(), ['id' => self::$noteId]);
 
         $this->assertSame(403, $response->getStatusCode());

@@ -179,7 +179,8 @@ class UserFollowedResourceController
         $baskets = BasketModel::getWithPreferences([
             'select'    => ['baskets.id', 'baskets.basket_name', 'baskets.basket_clause', 'users_baskets_preferences.group_serial_id', 'usergroups.group_desc'],
             'where'     => ['users_baskets_preferences.user_serial_id = ?'],
-            'data'      => [$GLOBALS['id']]
+            'data'      => [$GLOBALS['id']],
+            'orderBy'   => ['baskets.id']
         ]);
         $groupsBaskets = [];
         $inCheckedBaskets = [];
@@ -204,20 +205,28 @@ class UserFollowedResourceController
         return $response->withJson(['groupsBaskets' => $groupsBaskets]);
     }
 
-    public function getFilters(Request $request, Response $response, array $args)
+    public function getFilters(Request $request, Response $response)
     {
         $followedResources = UserFollowedResourceModel::get(['select' => ['res_id'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']]]);
         $followedResources = array_column($followedResources, 'res_id');
 
         if (empty($followedResources)) {
-            return $response->withJson(['entities' => [], 'priorities' => [], 'categories' => [], 'statuses' => [], 'entitiesChildren' => []]);
+            return $response->withJson([
+                'entities'         => [],
+                'priorities'       => [],
+                'categories'       => [],
+                'statuses'         => [],
+                'entitiesChildren' => [],
+                'doctypes'         => [],
+                'folders'          => []
+            ]);
         }
 
-        $where = ['(res_id in (?))'];
-        $queryData = [$followedResources];
-        $queryParams = $request->getQueryParams();
-
-        $filters = ResourceListController::getFormattedFilters(['where' => $where, 'queryData' => $queryData, 'queryParams' => $queryParams]);
+        $filters = ResourceListController::getFormattedFilters([
+            'where'       => ['(res_id in (?))'],
+            'queryData'   => [$followedResources],
+            'queryParams' => $request->getQueryParams()
+        ]);
 
         return $response->withJson($filters);
     }

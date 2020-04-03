@@ -4,7 +4,7 @@ import { LANG } from '../../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { PrivilegeService } from '../../../../service/privileges.service';
 import { HeaderService } from '../../../../service/header.service';
-import { MatSidenav } from '@angular/material';
+import { MatSidenav } from '@angular/material/sidenav';
 
 declare function $j(selector: any): any;
 

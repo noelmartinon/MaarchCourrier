@@ -26,7 +26,6 @@ import { ParametersAdministrationComponent }            from './parameter/parame
 import { ParameterAdministrationComponent }             from './parameter/parameter-administration.component';
 import { PrioritiesAdministrationComponent }            from './priority/priorities-administration.component';
 import { PriorityAdministrationComponent }              from './priority/priority-administration.component';
-import { ReportsAdministrationComponent }               from './report/reports-administration.component';
 import { HistoryAdministrationComponent }               from './history/history-administration.component';
 import { HistoryBatchAdministrationComponent }               from './history/batch/history-batch-administration.component';
 import { UpdateStatusAdministrationComponent }          from './updateStatus/update-status-administration.component';
@@ -79,7 +78,6 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         ParameterAdministrationComponent,
         PrioritiesAdministrationComponent,
         PriorityAdministrationComponent,
-        ReportsAdministrationComponent,
         HistoryAdministrationComponent,
         HistoryBatchAdministrationComponent,
         UpdateStatusAdministrationComponent,

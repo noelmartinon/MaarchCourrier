@@ -23,25 +23,6 @@ require_once 'apps/maarch_entreprise/tools/log4php/Logger.php'; //TODO composer
 
 class LogsController
 {
-    /*
-    timestart : timestamp Debut
-    timeend : timestamp Fin
-    level : level log4php
-    message : message dans les logs
-    */
-    public function executionTimeLog($timestart, $timeend, $level, $message)
-    {
-        if (empty($timeend)) {
-            $timeend = microtime(true);
-        }
-        $time = $timeend - $timestart;
-
-        //TODO : USE NEW METHOD
-        // self::$level(
-        //     ['message' => $message.'. Done in ' . number_format($time, 3) . ' secondes.']
-        // );
-    }
-
     public static function buildLoggingMethod()
     {
         $loggingMethods = [];

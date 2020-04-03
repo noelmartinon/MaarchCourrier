@@ -71,65 +71,6 @@
 		<parameter name="allow_entities" type="string" />
 		<parameter name="mode" type="mode" />
     </validationRule>
-    <validationRule name="check_user_entities" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="form_values" type="string" />
-    </validationRule>
-    <validationRule name="entity_late_mail" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="arguments" type="ajax_ids_2" />
-    </validationRule>
-    <validationRule name="entity_process_delay" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="arguments" type="ajax_ids_2" />
-		<parameter name="period_type" type="identifier" />
-    </validationRule>
-    <validationRule name="get_entity_process_delay" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="date_fin" type="datefr" />
-		<parameter name="date_start" type="datefr" />
-		<parameter name="entities_chosen" type="string" />
-		<parameter name="status_chosen" type="string" />
-		<parameter name="priority_chosen" type="string" />
-		<parameter name="sub_entities" type="string" />
-		<parameter name="id_report" type="string" />
-		<parameter name="period_type" type="identifier" />
-		<parameter name="report_type" type="identifier" />
-		<parameter name="the_month" type="mois" />
-		<parameter name="the_year" type="annee" />
-    </validationRule>
-    <validationRule name="get_entity_vol" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="date_fin" type="datefr" />
-		<parameter name="date_start" type="datefr" />
-		<parameter name="entities_chosen" type="string" />
-        <parameter name="status_chosen" type="string" />
-        <parameter name="priority_chosen" type="string" />
-		<parameter name="id_report" type="string" />
-		<parameter name="period_type" type="identifier" />
-		<parameter name="report_type" type="identifier" />
-		<parameter name="the_month" type="mois" />
-		<parameter name="the_year" type="annee" />
-        <parameter name="sub_entities" type="string" />
-    </validationRule>
-    <validationRule name="get_entity_late_mail" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="date_fin" type="datefr" />
-		<parameter name="date_start" type="datefr" />
-		<parameter name="entities_chosen" type="string" />
-		<parameter name="status_chosen" type="string" />
-		<parameter name="priority_chosen" type="string" />
-		<parameter name="id_report" type="string" />
-		<parameter name="period_type" type="identifier" />
-		<parameter name="report_type" type="identifier" />
-		<parameter name="the_month" type="mois" />
-		<parameter name="the_year" type="annee" />
-		<parameter name="sub_entities" type="string" />		
-    </validationRule>
-    <validationRule name="entity_vol_stat" extends="standardForm" mode="error">
-		<parameter name="module" type="identifier" />
-		<parameter name="arguments" type="ajax_ids_2" />
-    </validationRule>
     <validationRule name="entity_up" extends="standardForm" mode="error">
 		<parameter name="module" type="identifier" />
 		<parameter name="id" type="identifier" />

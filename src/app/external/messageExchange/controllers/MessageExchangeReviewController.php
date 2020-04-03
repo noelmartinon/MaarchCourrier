@@ -61,7 +61,8 @@ class MessageExchangeReviewController
             $reviewObject = new \stdClass();
             $reviewObject->Comment = array();
             $reviewObject->Comment[0] = new \stdClass();
-            $primaryEntity = UserModel::getPrimaryEntityByUserId(['userId' => $aArgs['userId']]);
+            $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
+            $primaryEntity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
             $reviewObject->Comment[0]->value = '['.date('d/m/Y H:i:s').'] "'.$actionInfo['label_action'].'" '._M2M_ACTION_DONE.' '.$primaryEntity['entity_label'].'. '._M2M_ENTITY_DESTINATION.' : '.$messageExchangeData['entity_label'];
 
             $date = new \DateTime();

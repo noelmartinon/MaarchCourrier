@@ -123,7 +123,7 @@ class security extends Database
             $params = [];
         }
 
-        $check = \SrcCore\models\AuthenticationModel::authentication(['userId' => $s_login, 'password' => $pass]);
+        $check = \SrcCore\models\AuthenticationModel::authentication(['login' => $s_login, 'password' => $pass]);
         if ($check || (in_array($method, ['ldap', 'shibboleth', 'cas', 'sso']) && $standardConnect == 'false')) {
             $user = $uc->getWithComp($s_login, $comp, $params);
         }

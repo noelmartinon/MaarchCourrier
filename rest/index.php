@@ -29,11 +29,10 @@ $app = new \Slim\App(['settings' => ['displayErrorDetails' => true, 'determineRo
 
 //Authentication
 $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, callable $next) {
-    $routesWithoutAuthentication = ['GET/jnlp/{jnlpUniqueId}', 'POST/password', 'PUT/password', 'GET/passwordRules', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback'];
     $route = $request->getAttribute('route');
     $currentMethod = empty($route) ? '' : $route->getMethods()[0];
     $currentRoute = empty($route) ? '' : $route->getPattern();
-    if (!in_array($currentMethod.$currentRoute, $routesWithoutAuthentication)) {
+    if (!in_array($currentMethod.$currentRoute, \SrcCore\controllers\AuthenticationController::ROUTES_WITHOUT_AUTHENTICATION)) {
         $login = \SrcCore\controllers\AuthenticationController::authentication();
         if (!empty($login)) {
             \SrcCore\controllers\CoreController::setGlobals(['login' => $login]);
@@ -50,6 +49,10 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
     $response = $next($request, $response);
     return $response;
 });
+
+//Authentication
+$app->post('/authenticate', \SrcCore\controllers\AuthenticationController::class . ':authenticate');
+$app->get('/authenticate/token', \SrcCore\controllers\AuthenticationController::class . ':getRefreshedToken');
 
 //Initialize
 $app->get('/initialize', \SrcCore\controllers\CoreController::class . ':initialize');
@@ -185,7 +188,6 @@ $app->delete('/docservers/{id}', \Docserver\controllers\DocserverController::cla
 
 //DocserverTypes
 $app->get('/docserverTypes', \Docserver\controllers\DocserverTypeController::class . ':get');
-$app->get('/docserverTypes/{id}', \Docserver\controllers\DocserverTypeController::class . ':getById');
 
 //doctypes
 $app->get('/doctypes', \Doctype\controllers\FirstLevelController::class . ':getTree');
@@ -342,11 +344,6 @@ $app->put('/priorities/{id}', \Priority\controllers\PriorityController::class . 
 $app->delete('/priorities/{id}', \Priority\controllers\PriorityController::class . ':delete');
 $app->get('/sortedPriorities', \Priority\controllers\PriorityController::class . ':getSorted');
 $app->put('/sortedPriorities', \Priority\controllers\PriorityController::class . ':updateSort');
-
-//Reports
-$app->get('/reports/groups', \Report\controllers\ReportController::class . ':getGroups');
-$app->get('/reports/groups/{groupId}', \Report\controllers\ReportController::class . ':getByGroupId');
-$app->put('/reports/groups/{groupId}', \Report\controllers\ReportController::class . ':updateForGroupId');
 
 //Resources
 $app->post('/resources', \Resource\controllers\ResController::class . ':create');

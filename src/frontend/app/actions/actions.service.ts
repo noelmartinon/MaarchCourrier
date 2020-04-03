@@ -5,7 +5,7 @@ import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
 import { of, Subject, Observable } from 'rxjs';
 import { NotificationService } from '../notification.service';
 import { ConfirmActionComponent } from './confirm-action/confirm-action.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { CloseMailActionComponent } from './close-mail-action/close-mail-action.component';
 import { RejectVisaBackToPrevousActionComponent } from './visa-reject-back-to-previous-action/reject-visa-back-to-previous-action.component';
 import { ResetVisaActionComponent } from './visa-reset-action/reset-visa-action.component';

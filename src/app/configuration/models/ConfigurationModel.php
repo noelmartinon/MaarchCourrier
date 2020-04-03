@@ -19,18 +19,6 @@ use SrcCore\models\ValidatorModel;
 
 class ConfigurationModel
 {
-    public static function get(array $aArgs = [])
-    {
-        ValidatorModel::arrayType($aArgs, ['select']);
-
-        $configurations = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['configurations']
-        ]);
-
-        return $configurations;
-    }
-
     public static function getByService(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['service']);

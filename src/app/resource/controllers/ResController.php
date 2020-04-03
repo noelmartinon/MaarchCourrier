@@ -212,7 +212,7 @@ class ResController extends ResourceControlController
             $entities = EntityModel::getWithUserEntities([
                 'select' => ['entities.id'],
                 'where'  => ['user_id = ?'],
-                'data'   => [$GLOBALS['userId']]
+                'data'   => [$GLOBALS['id']]
             ]);
             $entities = array_column($entities, 'id');
             $folders = [];
@@ -967,7 +967,7 @@ class ResController extends ResourceControlController
 
         $whereClause = '(res_id in (select res_id from users_followed_resources where user_id = ?))';
 
-        $entities = UserModel::getEntitiesByLogin(['login' => $user['user_id'], 'select' => ['id']]);
+        $entities = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['entities.id']]);
         $entities = array_column($entities, 'id');
         if (empty($entities)) {
             $entities = [0];
@@ -1045,7 +1045,8 @@ class ResController extends ResourceControlController
                 }
 
                 if ($diffusion['mode'] == 'dest') {
-                    ResModel::update(['set' => ['dest_user' => $diffusion['id']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+                    $destUser = UserModel::getByLogin(['login' => $diffusion['id'], 'select' => ['id']]);
+                    ResModel::update(['set' => ['dest_user' => $destUser['id']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
                 }
                 ListInstanceModel::create([
                     'res_id'            => $args['resId'],
@@ -1093,7 +1094,7 @@ class ResController extends ResourceControlController
         $entities = EntityModel::getWithUserEntities([
             'select' => ['entities.id'],
             'where'  => ['user_id = ?'],
-            'data'   => [$GLOBALS['userId']]
+            'data'   => [$GLOBALS['id']]
         ]);
         $entities = array_column($entities, 'id');
         if (empty($entities)) {

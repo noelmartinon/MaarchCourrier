@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry } from '@angular/material';
+import { MatIconRegistry } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../notification.service';
 import { finalize } from 'rxjs/operators';

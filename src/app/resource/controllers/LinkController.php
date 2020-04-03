@@ -60,7 +60,7 @@ class LinkController
                 }
 
                 if (!empty($value['destUser'])) {
-                    $linkedResources[$key]['destUserLabel'] = UserModel::getLabelledUserById(['login' => $value['destUser']]);
+                    $linkedResources[$key]['destUserLabel'] = UserModel::getLabelledUserById(['id' => $value['destUser']]);
                 }
                 if (!empty($value['destination'])) {
                     $linkedResources[$key]['destinationLabel'] = EntityModel::getByEntityId(['entityId' => $value['destination'], 'select' => ['short_label']])['short_label'];

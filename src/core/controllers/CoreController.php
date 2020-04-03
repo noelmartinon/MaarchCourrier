@@ -83,11 +83,9 @@ class CoreController
     {
         $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
         $user['groups'] = UserModel::getGroupsByLogin(['login' => $GLOBALS['userId']]);
-        $user['entities'] = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+        $user['entities'] = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
 
-        return $response->withJson([
-            'user'      => $user
-        ]);
+        return $response->withJson(['user' => $user]);
     }
 
     public static function setGlobals(array $args)

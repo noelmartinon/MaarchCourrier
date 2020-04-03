@@ -397,7 +397,7 @@ class TemplateController
         if (!empty($resource['destination'])) {
             $entities = [$resource['destination']];
         } else {
-            $entities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+            $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
             $entities = array_column($entities, 'entity_id');
             if (empty($entities)) {
                 $entities = [0];
@@ -448,7 +448,7 @@ class TemplateController
         if (!empty($resource['destination'])) {
             $entities = [$resource['destination']];
         } else {
-            $entities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+            $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
             $entities = array_column($entities, 'entity_id');
             if (empty($entities)) {
                 $entities = [0];
@@ -480,7 +480,7 @@ class TemplateController
             return $response->withStatus(400)->withJson(['errors' => 'Route param id is not an integer']);
         }
 
-        $entities = UserModel::getEntitiesByLogin(['login' => $GLOBALS['userId']]);
+        $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
         $entities = array_column($entities, 'entity_id');
         if (empty($entities)) {
             $entities = [0];

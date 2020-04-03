@@ -12,16 +12,17 @@ import { Overlay } from '@angular/cdk/overlay';
 import { AppService } from '../../service/app.service';
 import { IndexingFormComponent } from './indexing-form/indexing-form.component';
 import { tap, finalize, catchError, map, filter, exhaustMap, take } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { AddPrivateIndexingModelModalComponent } from './private-indexing-model/add-private-indexing-model-modal.component';
 import { ActionsService } from '../actions/actions.service';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { FunctionsService } from '../../service/functions.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
-    templateUrl: "indexation.component.html",
+    templateUrl: 'indexation.component.html',
     styleUrls: [
         'indexation.component.scss',
         'indexing-form/indexing-form.component.scss'
@@ -80,7 +81,7 @@ export class IndexationComponent implements OnInit {
             params => this.tmpFilename = params.tmpfilename
         );
 
-        // Event after process action 
+        // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(resIds => {
             const param = this.isMailing ? {
                 isMailing: true
@@ -117,7 +118,7 @@ export class IndexationComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             this.currentGroupId = params['groupId'];
-            this.http.get("../../rest/indexingModels").pipe(
+            this.http.get('../../rest/indexingModels').pipe(
                 tap((data: any) => {
                     this.indexingModels = data.indexingModels;
                     if (this.indexingModels.length > 0) {
@@ -141,7 +142,7 @@ export class IndexationComponent implements OnInit {
                     return of(false);
                 })
             ).subscribe();
-            this.http.get("../../rest/indexing/groups/" + this.currentGroupId + "/actions").pipe(
+            this.http.get('../../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
                 map((data: any) => {
                     data.actions = data.actions.map((action: any, index: number) => {
                         return {
@@ -151,7 +152,7 @@ export class IndexationComponent implements OnInit {
                             enabled: action.enabled,
                             default: index === 0 ? true : false,
                             categoryUse: action.categories
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -172,8 +173,8 @@ export class IndexationComponent implements OnInit {
     }
 
     loadIndexingModelsList() {
-        let tmpIndexingModels: any[] = this.sortPipe.transform(this.indexingModels.filter(elem => elem.master === null), 'label');
-        let privateTmpIndexingModels: any[] = this.sortPipe.transform(this.indexingModels.filter(elem => elem.master !== null), 'label');
+        const tmpIndexingModels: any[] = this.sortPipe.transform(this.indexingModels.filter(elem => elem.master === null), 'label');
+        const privateTmpIndexingModels: any[] = this.sortPipe.transform(this.indexingModels.filter(elem => elem.master !== null), 'label');
         this.indexingModels = [];
         tmpIndexingModels.forEach(indexingModel => {
             this.indexingModels.push(indexingModel);
@@ -202,17 +203,31 @@ export class IndexationComponent implements OnInit {
                     this.isMailing = !this.functions.empty(formatdatas.recipients) && formatdatas.recipients.length > 0 && this.currentIndexingModel.category === 'outgoing' && formatdatas['encodedFile'] === null;
 
                     if (formatdatas['encodedFile'] === null) {
-                        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.noFile, msg: this.lang.noFileMsg } });
+                        this.dialogRef = this.dialog.open(
+                            ConfirmComponent, {
+                                panelClass: 'maarch-modal',
+                                autoFocus: false,
+                                disableClose: true,
+                                data: {
+                                    title: this.lang.noFile,
+                                    msg: this.lang.noFileMsg
+                                }
+                            }
+                        );
 
                         this.dialogRef.afterClosed().pipe(
-                            tap((data: string) => {
-                                if (data !== 'ok') {
+                            tap((result: string) => {
+                                if (result !== 'ok') {
                                     this.actionService.loading = false;
                                 }
                             }),
-                            filter((data: string) => data === 'ok'),
+                            filter((result: string) => result === 'ok'),
                             tap(() => {
-                                this.actionService.launchIndexingAction(this.selectedAction, this.headerService.user.id, this.currentGroupId, formatdatas);
+                                this.actionService.launchIndexingAction(
+                                    this.selectedAction,
+                                    this.headerService.user.id,
+                                    this.currentGroupId, formatdatas
+                                );
                             }),
                             catchError((err: any) => {
                                 this.notify.handleErrors(err);
@@ -220,7 +235,11 @@ export class IndexationComponent implements OnInit {
                             })
                         ).subscribe();
                     } else {
-                        this.actionService.launchIndexingAction(this.selectedAction, this.headerService.user.id, this.currentGroupId, formatdatas);
+                        this.actionService.launchIndexingAction(
+                            this.selectedAction,
+                            this.headerService.user.id,
+                            this.currentGroupId, formatdatas
+                        );
                     }
                 })
             ).subscribe();
@@ -230,7 +249,7 @@ export class IndexationComponent implements OnInit {
     }
 
     formatDatas(datas: any) {
-        let formatData: any = {};
+        const formatData: any = {};
         const regex = /indexingCustomField_[.]*/g;
 
         formatData['customFields'] = {};
@@ -258,7 +277,7 @@ export class IndexationComponent implements OnInit {
     }
 
     savePrivateIndexingModel() {
-        let fields = JSON.parse(JSON.stringify(this.indexingForm.getDatas()));
+        const fields = JSON.parse(JSON.stringify(this.indexingForm.getDatas()));
         fields.forEach((element: any, key: any) => {
             delete fields[key].event;
             delete fields[key].label;
@@ -274,10 +293,21 @@ export class IndexationComponent implements OnInit {
             private: true,
             fields: fields,
             master: this.currentIndexingModel.master !== null ? this.currentIndexingModel.master : this.currentIndexingModel.id
-        }
+        };
 
         const masterIndexingModel = this.indexingModels.filter((indexingModel) => indexingModel.id === privateIndexingModel.master)[0];
-        this.dialogRef = this.dialog.open(AddPrivateIndexingModelModalComponent, { panelClass: 'maarch-modal', autoFocus: true, disableClose: true, data: { indexingModel: privateIndexingModel, masterIndexingModel: masterIndexingModel } });
+        this.dialogRef = this.dialog.open(
+            AddPrivateIndexingModelModalComponent,
+            {
+                panelClass: 'maarch-modal',
+                autoFocus: true,
+                disableClose: true,
+                data: {
+                    indexingModel: privateIndexingModel,
+                    masterIndexingModel: masterIndexingModel
+                }
+            }
+        );
 
         this.dialogRef.afterClosed().pipe(
             filter((data: any) => data !== undefined),
@@ -294,7 +324,18 @@ export class IndexationComponent implements OnInit {
     }
 
     deletePrivateIndexingModel(id: number, index: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(
+            ConfirmComponent,
+            {
+                panelClass: 'maarch-modal',
+                autoFocus: false,
+                disableClose: true,
+                data: {
+                    title: this.lang.delete,
+                    msg: this.lang.confirmAction
+                }
+            }
+        );
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -318,9 +359,9 @@ export class IndexationComponent implements OnInit {
     showActionInCurrentCategory(action: any) {
 
         if (this.selectedAction.categoryUse.indexOf(this.indexingForm.getCategory()) === -1) {
-            const newAction = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
+            const newAction = this.actionsList.filter(actionList => actionList.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
             if (newAction !== undefined) {
-                this.selectedAction = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
+                this.selectedAction = this.actionsList.filter(actionList => actionList.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
             } else {
                 this.selectedAction = {
                     id: 0,

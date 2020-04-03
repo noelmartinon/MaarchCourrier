@@ -40,6 +40,46 @@ class AutocompleteControllerTest extends TestCase
         }
     }
 
+    public function testGetMaarchParapheurUsers()
+    {
+        $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
+
+        //  GET (EMPTY BECAUSE USER ALREADY LINKED)
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            'search' => 'manfred',
+            'exludeAlreadyConnected' => 'true'
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $autocompleteController->getMaarchParapheurUsers($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody);
+        $this->assertEmpty($responseBody);
+
+        $aArgs = [
+            'search' => 'jane'
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $autocompleteController->getMaarchParapheurUsers($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody);
+        foreach ($responseBody as $user) {
+            $this->assertIsInt($user->id);
+            $this->assertNotEmpty($user->firstname);
+            $this->assertNotEmpty($user->lastname);
+            $this->assertNotEmpty($user->email);
+            $this->assertIsBool($user->substitute);
+            $this->assertNotEmpty($user->idToDisplay);
+            $this->assertIsInt($user->externalId->maarchParapheur);
+        }
+    }
+
     public function testGetCorrespondents()
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
@@ -59,12 +99,8 @@ class AutocompleteControllerTest extends TestCase
 
         foreach ($responseBody as $value) {
             $this->assertIsInt($value->id);
-            // $this->assertIsString($value->idToDisplay);
-            // $this->assertIsString($value->otherInfo);
             $this->assertNotEmpty($value->type);
             $this->assertNotEmpty($value->id);
-            // $this->assertNotEmpty($value->idToDisplay);
-            // $this->assertNotEmpty($value->otherInfo);
             if ($value->type == 'contact') {
                 $this->assertNotEmpty($value->fillingRate->rate);
                 $this->assertNotEmpty($value->fillingRate->thresholdLevel);
@@ -105,7 +141,7 @@ class AutocompleteControllerTest extends TestCase
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
 
-        //  CREATE
+        //  GET
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
@@ -127,13 +163,41 @@ class AutocompleteControllerTest extends TestCase
             $this->assertIsString($value->idToDisplay);
             $this->assertNotEmpty($value->idToDisplay);
         }
+
+        // TEST WITH BBLIER
+        $GLOBALS['userId'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $aArgs = [
+            'search'    => 'blier',
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $autocompleteController->getUsersForAdministration($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody);
+        $this->assertNotEmpty($responseBody);
+
+        foreach ($responseBody as $value) {
+            $this->assertSame('user', $value->type);
+            $this->assertIsInt($value->id);
+            $this->assertNotEmpty($value->id);
+            $this->assertIsString($value->idToDisplay);
+            $this->assertNotEmpty($value->idToDisplay);
+        }
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetUsersForCircuit()
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
 
-        //  CREATE
+        //  GET
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
@@ -158,11 +222,42 @@ class AutocompleteControllerTest extends TestCase
         }
     }
 
+    public function testGetContactsCompany()
+    {
+        $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
+
+        //  GET
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            'search' => 'maar',
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $autocompleteController->getContactsCompany($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody);
+        $this->assertNotEmpty($responseBody);
+
+        $contact = $responseBody[0];
+        $this->assertIsInt($contact->id);
+        $this->assertNotEmpty($contact->company);
+        $this->assertIsNumeric($contact->addressNumber);
+        $this->assertNotEmpty($contact->addressStreet);
+        $this->assertEmpty($contact->addressAdditional1);
+        $this->assertEmpty($contact->addressAdditional2);
+        $this->assertNotEmpty($contact->addressPostcode);
+        $this->assertNotEmpty($contact->addressTown);
+        $this->assertNotEmpty($contact->addressCountry);
+    }
+
     public function testGetEntities()
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
 
-        //  CREATE
+        //  GET
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
@@ -191,7 +286,7 @@ class AutocompleteControllerTest extends TestCase
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
 
-        //  CREATE
+        //  GET
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
@@ -215,7 +310,7 @@ class AutocompleteControllerTest extends TestCase
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
 
-        //  CREATE
+        //  GET
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 
@@ -264,11 +359,72 @@ class AutocompleteControllerTest extends TestCase
         $this->assertSame('Bad Request', $responseBody->errors);
     }
 
+    public function testGetAvailableContactsForM2M()
+    {
+        $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
+
+        //  GET
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            'search' => 'Préfecture',
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $autocompleteController->getAvailableContactsForM2M($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody);
+        $this->assertNotEmpty($responseBody);
+
+        foreach ($responseBody as $contact) {
+            $this->assertIsInt($contact->id);
+            $this->assertNotEmpty($contact->m2m);
+            $this->assertNotEmpty($contact->communicationMeans);
+        }
+    }
+
+    public function testGetFolders()
+    {
+        $GLOBALS['userId'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
+
+        //  GET
+        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request     = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            'search' => 'vie'
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $autocompleteController->getFolders($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody);
+        $this->assertNotEmpty($responseBody);
+
+        foreach ($responseBody as $value) {
+            $this->assertIsInt($value->id);
+            $this->assertNotEmpty($value->idToDisplay);
+            $this->assertIsBool($value->isPublic);
+            $this->assertEmpty($value->otherInfo);
+        }
+
+        $GLOBALS['userId'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
     public function testGetTags()
     {
         $autocompleteController = new \SrcCore\controllers\AutoCompleteController();
 
-        //  CREATE
+        //  GET
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
 

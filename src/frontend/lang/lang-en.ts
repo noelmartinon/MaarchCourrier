@@ -1292,8 +1292,6 @@ export const LANG_EN = {
     "removeUserRedirectInformations":              "<em>The user will be removed from the mails and entity's diffusion lists <b>except in the case where it is assignee</b></em>",
     "removedFromFolder":                           "Mail(s) removed",
     "renewPsw":                                    "Enter the password again",
-    "reports":                                     "Reports",
-    "reportsAdmin":                                "Reports administration",
     "requestSentByEmail":                          "The request has been sent to you by email.",
     "requiredField":                               "Required field",
     "resId":                                       "EDM Identifier",

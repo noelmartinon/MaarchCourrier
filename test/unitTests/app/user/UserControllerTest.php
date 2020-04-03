@@ -380,12 +380,12 @@ class UserControllerTest extends TestCase
 
         $this->assertSame(self::$id, $responseBody->id);
         $this->assertIsArray($responseBody->entities);
-        $this->assertSame('FIN', $responseBody->entities[0]->entity_id);
-        $this->assertSame('Hunter', $responseBody->entities[0]->user_role);
-        $this->assertSame('Y', $responseBody->entities[0]->primary_entity);
-        $this->assertSame('DGS', $responseBody->entities[1]->entity_id);
-        $this->assertSame('Rogue', $responseBody->entities[1]->user_role);
-        $this->assertSame('N', $responseBody->entities[1]->primary_entity);
+        $this->assertSame('DGS', $responseBody->entities[0]->entity_id);
+        $this->assertSame('Rogue', $responseBody->entities[0]->user_role);
+        $this->assertSame('N', $responseBody->entities[0]->primary_entity);
+        $this->assertSame('FIN', $responseBody->entities[1]->entity_id);
+        $this->assertSame('Hunter', $responseBody->entities[1]->user_role);
+        $this->assertSame('Y', $responseBody->entities[1]->primary_entity);
     }
 
     public function testDeleteEntity()
@@ -684,7 +684,7 @@ class UserControllerTest extends TestCase
 
         $this->assertSame('success', $responseBody->success);
 
-        $checkPassword = \SrcCore\models\AuthenticationModel::authentication(['userId' => $GLOBALS['userId'], 'password' => 'hcraam']);
+        $checkPassword = \SrcCore\models\AuthenticationModel::authentication(['login' => $GLOBALS['userId'], 'password' => 'hcraam']);
 
         $this->assertSame(true, $checkPassword);
 
@@ -703,7 +703,7 @@ class UserControllerTest extends TestCase
 
         $this->assertSame('success', $responseBody->success);
 
-        $checkPassword = \SrcCore\models\AuthenticationModel::authentication(['userId' => $GLOBALS['userId'], 'password' => 'superadmin']);
+        $checkPassword = \SrcCore\models\AuthenticationModel::authentication(['login' => $GLOBALS['userId'], 'password' => 'superadmin']);
 
         $this->assertSame(true, $checkPassword);
     }

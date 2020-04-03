@@ -123,7 +123,7 @@ class NoteModel
             'select'    => ['entity_id'],
             'table'     => ['users_entities'],
             'where'     => ['user_id = ?'],
-            'data'      => [$aArgs['login']]
+            'data'      => [$aArgs['userId']]
         ]);
 
         foreach ($aEntities as $value) {
@@ -162,8 +162,7 @@ class NoteModel
         ValidatorModel::intVal($aArgs, ['userId', 'resId', 'limit']);
         ValidatorModel::arrayType($aArgs, ['select']);
 
-        $user = UserModel::getById(['select' => ['user_id'], 'id' => $aArgs['userId']]);
-        $rawUserEntities = EntityModel::getByLogin(['login' => $user['user_id'], 'select' => ['entity_id']]);
+        $rawUserEntities = EntityModel::getByUserId(['userId' => $aArgs['userId'], 'select' => ['entity_id']]);
 
         $userEntities = array_column($rawUserEntities, 'entity_id');
 
