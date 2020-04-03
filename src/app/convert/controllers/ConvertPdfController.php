@@ -28,6 +28,24 @@ use SrcCore\models\ValidatorModel;
 
 class ConvertPdfController
 {
+    public static function convertInPdf(array $aArgs)
+    {
+        $tmpPath = CoreConfigModel::getTmpPath();
+        $extension = pathinfo($aArgs['fullFilename'], PATHINFO_EXTENSION);
+        if (strtolower($extension) == 'html') {
+            $pdfFilepath = str_replace('.'.$extension, '', $aArgs['fullFilename']) . '.pdf';
+            $command = "wkhtmltopdf -B 10mm -L 10mm -R 10mm -T 10mm --load-error-handling ignore --load-media-error-handling ignore ".$aArgs['fullFilename']." ".$pdfFilepath;
+    
+            exec('export DISPLAY=:0 && '.$command.' 2>&1', $output, $return);
+        } else {
+            ConvertPdfController::addBom($aArgs['fullFilename']);
+            $command = "timeout 30 unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
+    
+            exec('export HOME=' . $tmpPath . ' && '.$command.' 2>&1', $output, $return);
+        }
+
+        return ['output' => $output, 'return' => $return];
+    }
     public static function tmpConvert(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['fullFilename']);
@@ -36,17 +54,12 @@ class ConvertPdfController
             return ['errors' => '[ConvertPdf] Document '.$aArgs['fullFilename'].' does not exist'];
         }
 
+        $convertedFile = ConvertPdfController::convertInPdf(['fullFilename' => $aArgs['fullFilename']]);
+        
         $docInfo = pathinfo($aArgs['fullFilename']);
-
         $tmpPath = CoreConfigModel::getTmpPath();
-
-        ConvertPdfController::addBom($aArgs['fullFilename']);
-        $command = "timeout 30 unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
-
-        exec('export HOME=' . $tmpPath . ' && '.$command.' 2>&1', $output, $return);
-
         if (!file_exists($tmpPath.$docInfo["filename"].'.pdf')) {
-            return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $output)];
+            return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $convertedFile['output'])];
         } else {
             return ['fullFilename' => $tmpPath.$docInfo["filename"].'.pdf'];
         }
@@ -95,12 +108,10 @@ class ConvertPdfController
         copy($pathToDocument, $tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
 
         if (strtolower($docInfo["extension"]) != 'pdf') {
-            ConvertPdfController::addBom($tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
-            $command = "timeout 30 unoconv -f pdf " . escapeshellarg($tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
-            exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
+            $convertedFile = ConvertPdfController::convertInPdf(['fullFilename' => $tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]]);
 
             if (!file_exists($tmpPath.$fileNameOnTmp.'.pdf')) {
-                return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $output)];
+                return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $convertedFile['output'])];
             }
         }
 
@@ -148,14 +159,11 @@ class ConvertPdfController
         $tmpPath = CoreConfigModel::getTmpPath();
         $tmpFilename = 'converting' . rand() . '_' . rand();
 
-        file_put_contents($tmpPath . $tmpFilename, base64_decode($aArgs['encodedResource']));
-
-        ConvertPdfController::addBom($tmpPath.$tmpFilename);
-        $command = "timeout 30 unoconv -f pdf {$tmpPath}{$tmpFilename}";
-        exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
+        file_put_contents($tmpPath.$tmpFilename . '.' . $aArgs['extension'], base64_decode($aArgs['encodedResource']));
+        $convertedFile = ConvertPdfController::convertInPdf(['fullFilename' => $tmpPath.$tmpFilename . '.' . $aArgs['extension']]);
 
         if (!file_exists($tmpPath.$tmpFilename.'.pdf')) {
-            return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $output)];
+            return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $convertedFile['output'])];
         }
 
         unlink("{$tmpPath}{$tmpFilename}");
@@ -281,7 +289,7 @@ class ConvertPdfController
                 return $response->withStatus(400)->withJson(['errors' => 'File accepted but can not be converted in pdf']);
             }
     
-            $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $body['base64'], 'context' => $body['context']]);
+            $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $body['base64'], 'context' => $body['context'], 'extension' => $ext]);
             if (empty($convertion['errors'])) {
                 return $response->withJson($convertion);
             } else {
@@ -310,11 +318,10 @@ class ConvertPdfController
         $encodedFiles['type'] = $mimeType;
         $encodedFiles['extension'] = $extension;
         
-
         $queryParams = $request->getQueryParams();
         if (!empty($queryParams['convert'])) {
             if (ConvertPdfController::canConvert(['extension' => $extension])) {
-                $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $encodedResource]);
+                $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $encodedResource, 'extension' => $extension]);
                 if (!empty($convertion['errors'])) {
                     $encodedFiles['convertedResourceErrors'] = $convertion['errors'];
                 } else {
@@ -340,7 +347,7 @@ class ConvertPdfController
             return $response->withStatus(400)->withJson(['errors' => 'Format can not be converted']);
         }
 
-        $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $body['encodedFile']]);
+        $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $body['encodedFile'], 'extension' => $body['format']]);
         if (!empty($convertion['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $convertion['errors']]);
         }

@@ -131,9 +131,11 @@ trait AcknowledgementReceiptTrait
                         'path' => $pathToDocument,
                         'data' => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $currentUser['id']]
                     ]);
-                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $mergedDocument['encodedDocument']]);
+
+                    $extension = pathinfo($pathToDocument, PATHINFO_EXTENSION);
+                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $mergedDocument['encodedDocument'], 'extension' => $extension]);
                 } else {
-                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => base64_encode($contentToSend)]);
+                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => base64_encode($contentToSend), 'extension' => 'txt']);
                 }
                 $mergedDocument['encodedDocument'] = $encodedDocument["encodedResource"];
                 $format = 'pdf';
