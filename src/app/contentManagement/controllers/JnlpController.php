@@ -210,6 +210,16 @@ class JnlpController
                 $ext = $explodeFile[count($explodeFile) - 1];
                 $newFileOnTmp = "tmp_file_{$GLOBALS['userId']}_{$aArgs['jnlpUniqueId']}.{$ext}";
 
+                $customId = CoreConfigModel::getCustomId();
+                if (!empty($customId) && is_dir("custom/{$customId}/modules/templates/templates/styles/")) {
+                    $stylesPath = "custom/{$customId}/modules/templates/templates/styles/";
+                } else {
+                    $stylesPath = 'modules/templates/templates/styles/';
+                }
+                if (strpos($data['objectId'], $stylesPath) !== 0 || substr_count($data['objectId'], '.') != 1) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Template path is not valid']);
+                }
+
                 $pathToCopy = $data['objectId'];
             } elseif ($data['objectType'] == 'templateModification') {
                 $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
