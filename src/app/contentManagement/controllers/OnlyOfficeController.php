@@ -59,8 +59,18 @@ class OnlyOfficeController
         }
 
         if ($body['objectType'] == 'templateCreation') {
-            $path = null;
-            $fileContent = null;
+            $customId = CoreConfigModel::getCustomId();
+            if (!empty($customId) && is_dir("custom/{$customId}/modules/templates/templates/styles/")) {
+                $stylesPath = "custom/{$customId}/modules/templates/templates/styles/";
+            } else {
+                $stylesPath = 'modules/templates/templates/styles/';
+            }
+            if (strpos($body['objectId'], $stylesPath) !== 0 || substr_count($body['objectId'], '.') != 1) {
+                return $response->withStatus(400)->withJson(['errors' => 'Template path is not valid']);
+            }
+
+            $path = $body['objectId'];
+            $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'templateModification') {
             $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
             $template = TemplateModel::getById(['id' => $body['objectId'], 'select' => ['template_path', 'template_file_name']]);
