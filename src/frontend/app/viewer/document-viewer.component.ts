@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
+import {Component, OnInit, Input, ViewChild, EventEmitter, Output, ElementRef} from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
@@ -131,6 +131,7 @@ export class DocumentViewerComponent implements OnInit {
 
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('docToUpload', { static: false }) docToUpload: ElementRef<HTMLInputElement>;
 
     constructor(
         public http: HttpClient,
@@ -442,6 +443,7 @@ export class DocumentViewerComponent implements OnInit {
                     content: null,
                     src: null
                 };
+                this.docToUpload.nativeElement.value = "";
                 this.triggerEvent.emit('cleanFile');
             }),
             catchError((err: any) => {
