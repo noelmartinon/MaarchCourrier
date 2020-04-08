@@ -301,4 +301,37 @@ class CoreConfigModel
 
         return $uniqueId;
     }
+
+    public static function getKeycloakConfiguration(array $aArgs = [])
+    {
+        ValidatorModel::stringType($aArgs, ['customId']);
+
+        $customId = CoreConfigModel::getCustomId();
+        if (!empty($aArgs['customId'])) {
+            $customId = $aArgs['customId'];
+        }
+
+        if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/keycloakConfig.xml")) {
+            $path = "custom/{$customId}/apps/maarch_entreprise/xml/keycloakConfig.xml";
+        } else {
+            $path = 'apps/maarch_entreprise/xml/keycloakConfig.xml';
+        }
+
+        $keycloakConfig = [];
+        if (file_exists($path)) {
+            $loadedXml = simplexml_load_file($path);
+            if ($loadedXml) {
+                $keycloakConfig['authServerUrl']       = (string)$loadedXml->AUTH_SERVER_URL;
+                $keycloakConfig['realm']               = (string)$loadedXml->REALM;
+                $keycloakConfig['clientId']            = (string)$loadedXml->CLIENT_ID;
+                $keycloakConfig['clientSecret']        = (string)$loadedXml->CLIENT_SECRET;
+                $keycloakConfig['redirectUri']         = (string)$loadedXml->REDIRECT_URI;
+                $keycloakConfig['encryptionAlgorithm'] = (string)$loadedXml->ENCRYPTION_ALGORITHM;
+                $keycloakConfig['encryptionKeyPath']   = (string)$loadedXml->ENCRYPTION_KEY_PATH;
+                $keycloakConfig['encryptionKey']       = (string)$loadedXml->ENCRYPTION_KEY;
+            }
+        }
+
+        return $keycloakConfig;
+    }
 }

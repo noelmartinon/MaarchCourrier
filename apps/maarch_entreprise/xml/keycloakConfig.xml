@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>
-    <INSTANCE_URI></INSTANCE_URI>
-    <INSTANTIATION_SECRET></INSTANTIATION_SECRET>
-    <DESTRUCTION_SECRET></DESTRUCTION_SECRET>
-    <URI></URI>
+    <AUTH_SERVER_URL></AUTH_SERVER_URL>
+    <REALM></REALM>
     <CLIENT_ID></CLIENT_ID>
     <CLIENT_SECRET></CLIENT_SECRET>
-    <ENTITY_ID>VILLE</ENTITY_ID>
-    <GROUP_ID>AGENT</GROUP_ID>
+    <REDIRECT_URI>http://demo.maarchcourrier.com/apps/maarch_entreprise/index.php?display=true&amp;page=login</REDIRECT_URI> <!-- Should be the url of Maarch Courrier's login page -->
+    <ENCRYPTION_ALGORITHM></ENCRYPTION_ALGORITHM>
+    <ENCRYPTION_KEY_PATH></ENCRYPTION_KEY_PATH>
+    <ENCRYPTION_KEY></ENCRYPTION_KEY>
 </ROOT>

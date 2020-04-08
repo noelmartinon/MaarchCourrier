@@ -4414,3 +4414,12 @@ if (!defined('_STATUS_NOT_EXISTS')) {
 if (!defined('_FORGOT_PASSWORD')) {
     define('_FORGOT_PASSWORD', 'Mot de passe oublié ?');
 }
+
+if (!defined('_USER_NOT_IN_APP')) {
+    define('_USER_NOT_IN_APP', 'Vous n\'êtes pas un utilisateur de cette application');
+}
+if (!defined('_MISSING_KEYCLOAK_CONFIG')) {
+    define('_MISSING_KEYCLOAK_CONFIG', 'Configuration manquante pour Keycloak');
+}
+
+

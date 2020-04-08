@@ -77,6 +77,10 @@ if (isset($_SESSION['web_sso_url'])) {
     $webSSOurl = $_SESSION['web_cas_url'];
 }
 
+if (!empty($_SESSION['keycloak']['accessToken'])) {
+    $accessToken = $_SESSION['keycloak']['accessToken'];
+}
+
 session_unset();
 session_destroy(); // Suppression physique de la session
 unset($_SESSION['sessionName']);
@@ -96,6 +100,14 @@ if (isset($_GET['logout']) && $_GET['logout']) {
 if (isset($webSSOurl) && $webSSOurl <> '') {
     header("location: " . $webSSOurl);
     exit();
+} elseif (!empty($accessToken)) {
+    $keycloakConfig = \SrcCore\models\CoreConfigModel::getKeycloakConfiguration();
+
+    $provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak($keycloakConfig);
+
+    $url = $provider->getLogoutUrl(['client_id' => $keycloakConfig['clientId'], 'refresh_token' => $accessToken]);
+
+    header("location: " . $url);
 } else {
     header(
      "location: " . $appUrl . "index.php?display=true&page=login"

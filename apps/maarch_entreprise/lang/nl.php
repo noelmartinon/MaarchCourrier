@@ -1476,3 +1476,9 @@ if (!defined('_STATUS_NOT_EXISTS')) {
 if (!defined('_FORGOT_PASSWORD')) {
     define('_FORGOT_PASSWORD', 'Forgot password ?_TO_TRANSLATE');
 }
+if (!defined('_USER_NOT_IN_APP')) {
+    define('_USER_NOT_IN_APP', 'You are not a user of this app_TO_TRANSLATE');
+}
+if (!defined('_MISSING_KEYCLOAK_CONFIG')) {
+    define('_MISSING_KEYCLOAK_CONFIG', 'Missing Keycloak configuration');
+}

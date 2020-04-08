@@ -11,10 +11,11 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
         'ddc0a4d7e61c0286f0f8593b1903e894' => __DIR__ . '/..' . '/clue/stream-filter/src/functions.php',
-        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '8cff32064859f4559445b89279f3199c' => __DIR__ . '/..' . '/php-http/message/src/filters.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         'a9ed0d27b5a698798a89181429f162c5' => __DIR__ . '/..' . '/khanamiryan/qrcode-detector-decoder/lib/Common/customFunctions.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
     );
@@ -57,6 +58,7 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
             'Symfony\\Component\\PropertyAccess\\' => 33,
             'Symfony\\Component\\OptionsResolver\\' => 34,
             'Symfony\\Component\\Inflector\\' => 28,
+            'Stevenmaguire\\OAuth2\\Client\\' => 28,
             'Status\\' => 7,
             'SrcCore\\' => 8,
             'Slim\\' => 5,
@@ -93,6 +95,7 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         'L' => 
         array (
             'Link\\' => 5,
+            'League\\OAuth2\\Client\\' => 21,
         ),
         'I' => 
         array (
@@ -221,6 +224,10 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         array (
             0 => __DIR__ . '/..' . '/symfony/inflector',
         ),
+        'Stevenmaguire\\OAuth2\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/sdaoudi/oauth2-keycloak/src',
+        ),
         'Status\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/app/status',
@@ -304,6 +311,10 @@ class ComposerStaticInitf21aebccfa6df888200dcb099aa69fbd
         'Link\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/app/link',
+        ),
+        'League\\OAuth2\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/oauth2-client/src',
         ),
         'Interop\\Container\\' => 
         array (
