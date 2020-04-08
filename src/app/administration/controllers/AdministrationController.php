@@ -29,14 +29,14 @@ class AdministrationController
         $count = [];
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']])) {
-            if ($GLOBALS['userId'] == 'superadmin') {
+            if ($GLOBALS['login'] == 'superadmin') {
                 $users = UserModel::get([
                     'select'    => [1],
                     'where'     => ['status != ?'],
                     'data'      => ['DEL']
                 ]);
             } else {
-                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
                 $users = [];
                 if (!empty($entities)) {
                     $users = UserEntityModel::getWithUsers([

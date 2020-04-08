@@ -147,7 +147,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
         Object.keys(data).forEach(element => {
             arrCustomFields.push({
-                label: this.customFields.filter(custom => custom.id === element)[0].label,
+                label: this.customFields.filter(custom => custom.id == element)[0].label,
                 value: data[element]
             });
         });

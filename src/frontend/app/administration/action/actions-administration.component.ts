@@ -6,22 +6,20 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "actions-administration.component.html",
+    templateUrl: 'actions-administration.component.html',
     providers: [AppService]
 })
 
 export class ActionsAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-    
+
     lang: any = LANG;
     search: string = null;
 
@@ -42,18 +40,16 @@ export class ActionsAdministrationComponent implements OnInit {
             return this.functions.filterUnSensitive(template, filter, ['id', 'label_action']);
         };
     }
-    
+
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-        ) {
-            $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
@@ -79,7 +75,7 @@ export class ActionsAdministrationComponent implements OnInit {
     }
 
     deleteAction(action: any) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + action.label_action + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + action.label_action + ' »');
 
         if (r) {
             this.http.delete('../../rest/actions/' + action.id)

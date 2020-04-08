@@ -33,11 +33,12 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
     $currentMethod = empty($route) ? '' : $route->getMethods()[0];
     $currentRoute = empty($route) ? '' : $route->getPattern();
     if (!in_array($currentMethod.$currentRoute, \SrcCore\controllers\AuthenticationController::ROUTES_WITHOUT_AUTHENTICATION)) {
-        $login = \SrcCore\controllers\AuthenticationController::authentication();
-        if (!empty($login)) {
-            \SrcCore\controllers\CoreController::setGlobals(['login' => $login]);
+        $authorizationHeaders = $request->getHeader('Authorization');
+        $userId = \SrcCore\controllers\AuthenticationController::authentication($authorizationHeaders);
+        if (!empty($userId)) {
+            \SrcCore\controllers\CoreController::setGlobals(['userId' => $userId]);
             if (!empty($currentRoute)) {
-                $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['login' => $login, 'currentRoute' => $currentRoute]);
+                $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute]);
                 if (!$r['isRouteAvailable']) {
                     return $response->withStatus(405)->withJson(['errors' => $r['errors']]);
                 }
@@ -51,10 +52,12 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
 });
 
 //Authentication
+$app->get('/authenticationInformations', \SrcCore\controllers\AuthenticationController::class . ':getInformations');
 $app->post('/authenticate', \SrcCore\controllers\AuthenticationController::class . ':authenticate');
 $app->get('/authenticate/token', \SrcCore\controllers\AuthenticationController::class . ':getRefreshedToken');
 
 //Initialize
+$app->get('/images', \SrcCore\controllers\CoreController::class . ':getImages');
 $app->get('/initialize', \SrcCore\controllers\CoreController::class . ':initialize');
 
 //Acknowledgement Receipt
@@ -299,7 +302,6 @@ $app->put('/indexingModels/{id}/enable', \IndexingModel\controllers\IndexingMode
 $app->delete('/indexingModels/{id}', \IndexingModel\controllers\IndexingModelController::class . ':delete');
 
 //ListInstances
-$app->get('/listinstance/{id}', \Entity\controllers\ListInstanceController::class . ':getById');
 $app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');
 
 //ListTemplates

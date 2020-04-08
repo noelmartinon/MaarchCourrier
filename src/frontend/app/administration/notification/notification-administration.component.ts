@@ -3,20 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 
-declare var $j: any;
-
 @Component({
-    templateUrl: "notification-administration.component.html",
+    templateUrl: 'notification-administration.component.html',
     providers: [AppService]
 })
 export class NotificationAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-    
-    creationMode: boolean; 
+
+    creationMode: boolean;
     notification: any = {
         diffusionType_label: null
     };
@@ -24,16 +22,14 @@ export class NotificationAdministrationComponent implements OnInit {
     lang: any = LANG;
 
     constructor(
-        public http: HttpClient, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
@@ -42,9 +38,9 @@ export class NotificationAdministrationComponent implements OnInit {
 
         this.route.params.subscribe((params: any) => {
 
-            if (typeof params['identifier'] == "undefined") {
+            if (typeof params['identifier'] === 'undefined') {
                 this.headerService.setHeader(this.lang.notificationCreation);
-                
+
                 this.creationMode = true;
                 this.http.get('../../rest/administration/notifications/new')
                     .subscribe((data: any) => {
@@ -84,7 +80,7 @@ export class NotificationAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            this.notification.is_enabled = "Y";
+            this.notification.is_enabled = 'Y';
             this.http.post('../../rest/notifications', this.notification)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/notifications']);
@@ -104,10 +100,10 @@ export class NotificationAdministrationComponent implements OnInit {
     }
 
     toggleNotif() {
-        if (this.notification.is_enabled == "Y") {
-            this.notification.is_enabled = "N";
+        if (this.notification.is_enabled === 'Y') {
+            this.notification.is_enabled = 'N';
         } else {
-            this.notification.is_enabled = "Y";
+            this.notification.is_enabled = 'Y';
         }
         this.http.put('../../rest/notifications/' + this.notification.notification_sid, this.notification)
             .subscribe((data: any) => {
@@ -118,6 +114,6 @@ export class NotificationAdministrationComponent implements OnInit {
     }
 
     isNumber(val: any) {
-        return $j.isNumeric(val);
+        return $.isNumeric(val);
     }
 }

@@ -13,8 +13,8 @@ class SearchControllerTest extends TestCase
 {
     public function testGet()
     {
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
 
         $searchController = new \Search\controllers\SearchController();
@@ -73,8 +73,8 @@ class SearchControllerTest extends TestCase
             $this->assertIsInt($resource);
         }
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
 
         // GET WITH SUPERADMIN

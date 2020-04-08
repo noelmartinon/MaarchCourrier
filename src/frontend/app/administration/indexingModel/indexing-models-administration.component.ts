@@ -8,16 +8,14 @@ import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { tap, finalize, catchError, filter, exhaustMap, map } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
-    templateUrl: "indexing-models-administration.component.html",
+    templateUrl: 'indexing-models-administration.component.html',
     styleUrls: ['indexing-models-administration.component.scss'],
     providers: [AppService]
 })
@@ -46,8 +44,8 @@ export class IndexingModelsAdministrationComponent implements OnInit {
         filterValue = filterValue.trim(); // Remove whitespace
         filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
         this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['id', 'label']);
+        this.dataSource.filterPredicate = (template, filterTarget: string) => {
+            return this.functions.filterUnSensitive(template, filterTarget, ['id', 'label']);
         };
     }
 
@@ -62,12 +60,12 @@ export class IndexingModelsAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
-        this.http.get("../../rest/indexingModels?showDisabled=true").pipe(
+        this.http.get('../../rest/indexingModels?showDisabled=true').pipe(
             map((data: any) => {
                 return data.indexingModels.filter((info: any) => info.private === false);
             }),
@@ -101,7 +99,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
                 exhaustMap(() => this.http.delete('../../rest/indexingModels/' + indexingModel.id)),
                 tap(() => {
                     for (let i in this.indexingModels) {
-                        if (this.indexingModels[i].id == indexingModel.id) {
+                        if (this.indexingModels[i].id === indexingModel.id) {
                             this.indexingModels.splice(Number(i), 1);
                         }
                     }
@@ -127,8 +125,8 @@ export class IndexingModelsAdministrationComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('PUT', '../../rest/indexingModels/' + indexingModel.id + '/disable')),
             tap((data: any) => {
-                for (let i in this.indexingModels) {
-                    if (this.indexingModels[i].id == indexingModel.id) {
+                for (const i in this.indexingModels) {
+                    if (this.indexingModels[i].id === indexingModel.id) {
                         this.indexingModels[i].enabled = false;
                     }
                 }
@@ -149,7 +147,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
             exhaustMap(() => this.http.request('PUT', '../../rest/indexingModels/' + indexingModel.id + '/enable')),
             tap((data: any) => {
                 for (let i in this.indexingModels) {
-                    if (this.indexingModels[i].id == indexingModel.id) {
+                    if (this.indexingModels[i].id === indexingModel.id) {
                         this.indexingModels[i].enabled = true;
                     }
                 }

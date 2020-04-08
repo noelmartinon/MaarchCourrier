@@ -1661,4 +1661,7 @@ export const LANG_EN = {
     "workingDays":                                 "Working days",
     "yes":                                         "Yes",
     "zipcode":                                     "Zip code",
+    "forgotPassword":                              "Forgot password",
+    "wrongLoginPassword":                          "Wrong user name or wrong password",
+    "sessionExpired": "Session expired",
 };

@@ -1,5 +1,5 @@
 <div *ngIf="loading" style="display:block;padding: 10px;">{{lang.checkOnlyofficeServer}}...</div>
-<button class="onlyofficeButton_fullscreen" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
+<button *ngIf="!hideCloseEditor" class="onlyofficeButton_fullscreen" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
     [title]="lang.closeEditor" (click)="quit()">
     <mat-icon class="fa fa-times" style="height:auto;"></mat-icon>
 </button>

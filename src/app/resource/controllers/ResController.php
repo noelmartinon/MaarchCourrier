@@ -692,7 +692,7 @@ class ResController extends ResourceControlController
             $formattedData[$type] = $item['count'];
         }
 
-        $formattedData['notes'] = NoteModel::countByResId(['resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'login' => $GLOBALS['userId']]);
+        $formattedData['notes'] = NoteModel::countByResId(['resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'login' => $GLOBALS['login']]);
 
         $emails = EmailModel::get(['select' => ['count(1)'], 'where' => ["document->>'id' = ?", "(status != 'DRAFT' or (status = 'DRAFT' and user_id = ?))"], 'data' => [$args['resId'], $GLOBALS['id']]]);
         $acknowledgementReceipts = AcknowledgementReceiptModel::get([
@@ -1036,17 +1036,8 @@ class ResController extends ResourceControlController
 
         if (!empty($body['diffusionList'])) {
             foreach ($body['diffusionList'] as $diffusion) {
-                if ($diffusion['type'] == 'user') {
-                    $item = UserModel::getById(['id' => $diffusion['id'], 'select' => ['user_id']]);
-                    $diffusion['id'] = $item['user_id'];
-                } else {
-                    $item = EntityModel::getById(['id' => $diffusion['id'], 'select' => ['entity_id']]);
-                    $diffusion['id'] = $item['entity_id'];
-                }
-
                 if ($diffusion['mode'] == 'dest') {
-                    $destUser = UserModel::getByLogin(['login' => $diffusion['id'], 'select' => ['id']]);
-                    ResModel::update(['set' => ['dest_user' => $destUser['id']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+                    ResModel::update(['set' => ['dest_user' => $diffusion['id']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
                 }
                 ListInstanceModel::create([
                     'res_id'            => $args['resId'],
@@ -1054,7 +1045,7 @@ class ResController extends ResourceControlController
                     'item_id'           => $diffusion['id'],
                     'item_type'         => $diffusion['type'] == 'user' ? 'user_id' : 'entity_id',
                     'item_mode'         => $diffusion['mode'],
-                    'added_by_user'     => $GLOBALS['userId'],
+                    'added_by_user'     => $GLOBALS['id'],
                     'difflist_type'     => 'entity_id'
                 ]);
             }
@@ -1175,13 +1166,13 @@ class ResController extends ResourceControlController
             $select[] = 'res_id';
         }
 
-        if (!PreparedClauseController::isRequestValid(['select' => $select, 'clause' => $data['clause'], 'orderBy' => $data['orderBy'], 'limit' => $data['limit'], 'userId' => $GLOBALS['userId']])) {
+        if (!PreparedClauseController::isRequestValid(['select' => $select, 'clause' => $data['clause'], 'orderBy' => $data['orderBy'], 'limit' => $data['limit'], 'userId' => $GLOBALS['login']])) {
             return $response->withStatus(400)->withJson(['errors' => _INVALID_REQUEST]);
         }
 
         $where = [$data['clause']];
-        if ($GLOBALS['userId'] != 'superadmin') {
-            $groupsClause = GroupController::getGroupsClause(['userId' => $GLOBALS['userId']]);
+        if ($GLOBALS['login'] != 'superadmin') {
+            $groupsClause = GroupController::getGroupsClause(['userId' => $GLOBALS['login']]);
             if (empty($groupsClause)) {
                 return $response->withStatus(400)->withJson(['errors' => 'User has no groups']);
             }

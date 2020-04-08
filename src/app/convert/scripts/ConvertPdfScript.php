@@ -154,7 +154,7 @@ class ConvertPdfScript
 
         if (!empty($isConverted['errors'])) {
             $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-            $GLOBALS['userId'] = $currentUser['user_id'];
+            $GLOBALS['login'] = $currentUser['user_id'];
 
             LogsController::add([
                 'isTech'    => true,

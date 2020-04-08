@@ -254,7 +254,7 @@ class SendMessageExchangeController
             $filePath = SendMessageController::generateMessageFile(['messageObject' => $dataObject, 'type' => 'ArchiveTransfer']);
 
             /******** SAVE MESSAGE *********/
-            $messageExchangeReturn = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $args['resId'], 'file_path' => $filePath, 'type' => 'ArchiveTransfer', 'userId' => $GLOBALS['userId']]);
+            $messageExchangeReturn = self::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $args['resId'], 'file_path' => $filePath, 'type' => 'ArchiveTransfer', 'userId' => $GLOBALS['login']]);
             if (!empty($messageExchangeReturn['error'])) {
                 return $response->withStatus(400)->withJson(['errors' => $messageExchangeReturn['error']]);
             } else {
@@ -269,7 +269,7 @@ class SendMessageExchangeController
                 'eventId'   => 'resup',
                 'info'       => _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
                     . $args['resId'] . ' ('.$messageId.') : "' . TextFormatModel::cutString(['string' => $mainDocument[0]['Title'], 'max' => 254]),
-                'userId' => $GLOBALS['userId']
+                'userId' => $GLOBALS['login']
             ]);
 
             HistoryController::add([
@@ -278,7 +278,7 @@ class SendMessageExchangeController
                 'eventType' => 'ADD',
                 'eventId'   => 'messageexchangeadd',
                 'info'       => _NUMERIC_PACKAGE_ADDED . ' (' . $messageId . ')',
-                'userId' => $GLOBALS['userId']
+                'userId' => $GLOBALS['login']
             ]);
 
             /******** ENVOI *******/
@@ -378,7 +378,7 @@ class SendMessageExchangeController
         $messageObject->Date    = $date->format(\DateTime::ATOM);
 
         $messageObject->MessageIdentifier = new \stdClass();
-        $messageObject->MessageIdentifier->value = 'ArchiveTransfer_'.date("Ymd_His").'_'.$GLOBALS['userId'];
+        $messageObject->MessageIdentifier->value = 'ArchiveTransfer_'.date("Ymd_His").'_'.$GLOBALS['login'];
 
         /********* BINARY DATA OBJECT PACKAGE *********/
         $messageObject->DataObjectPackage                   = new \stdClass();
@@ -567,7 +567,7 @@ class SendMessageExchangeController
         $entityRoot = EntityModel::getEntityRootById(['entityId' => $aArgs['TransferringAgency']['EntitiesInformations']['entity_id']]);
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->LegalClassification = $entityRoot['entity_label'];
         $TransferringAgencyObject->OrganizationDescriptiveMetadata->Name                = $aArgs['TransferringAgency']['EntitiesInformations']['entity_label'];
-        $TransferringAgencyObject->OrganizationDescriptiveMetadata->UserIdentifier      = $GLOBALS['userId'];
+        $TransferringAgencyObject->OrganizationDescriptiveMetadata->UserIdentifier      = $GLOBALS['login'];
 
         $traCommunicationObject = new \stdClass();
 

@@ -61,13 +61,13 @@ class NotificationController
 
         $data = [];
 
-        $data['event'] = NotificationModel::getEvents();
-        $data['template'] = NotificationModel::getTemplate();
+        $data['event']         = NotificationModel::getEvents();
+        $data['template']      = NotificationModel::getTemplate();
         $data['diffusionType'] = NotificationModel::getDiffusionType();
-        $data['groups'] = NotificationModel::getDiffusionTypeGroups();
-        $data['users'] = NotificationModel::getDiffusionTypesUsers();
-        $data['entities'] = NotificationModel::getDiffusionTypeEntities();
-        $data['status'] = NotificationModel::getDiffusionTypeStatus();
+        $data['groups']        = NotificationModel::getDiffusionTypeGroups();
+        $data['users']         = NotificationModel::getDiffusionTypesUsers();
+        $data['entities']      = NotificationModel::getDiffusionTypeEntities();
+        $data['status']        = NotificationModel::getDiffusionTypeStatus();
 
         $notification['event_id'] = (string)$notification['event_id'];
         $notification['data'] = $data;
@@ -137,10 +137,10 @@ class NotificationController
 
             HistoryController::add([
                 'tableName' => 'notifications',
-                'recordId' => $data['notification_id'],
+                'recordId'  => $data['notification_id'],
                 'eventType' => 'ADD',
-                'eventId' => 'notificationsadd',
-                'info' => _ADD_NOTIFICATIONS.' : '.$data['notification_id'],
+                'eventId'   => 'notificationsadd',
+                'info'      => _ADD_NOTIFICATIONS.' : '.$data['notification_id'],
             ]);
 
             return $response->withJson(NotificationModel::getByNotificationId(['notificationId' => $data['notification_id']]));
@@ -178,10 +178,10 @@ class NotificationController
 
         HistoryController::add([
             'tableName' => 'notifications',
-            'recordId' => $data['notification_sid'],
+            'recordId'  => $data['notification_sid'],
             'eventType' => 'UP',
-            'eventId' => 'notificationsup',
-            'info' => _MODIFY_NOTIFICATIONS.' : '.$data['notification_sid'],
+            'eventId'   => 'notificationsup',
+            'info'      => _MODIFY_NOTIFICATIONS.' : '.$data['notification_sid'],
         ]);
 
         return $response->withJson(['notification' => $notification]);
@@ -203,10 +203,10 @@ class NotificationController
 
         HistoryController::add([
                 'tableName' => 'notifications',
-                'recordId' => $aArgs['id'],
+                'recordId'  => $aArgs['id'],
                 'eventType' => 'DEL',
-                'eventId' => 'notificationsdel',
-                'info' => _DELETE_NOTIFICATIONS.' : '.$aArgs['id'],
+                'eventId'   => 'notificationsdel',
+                'info'      => _DELETE_NOTIFICATIONS.' : '.$aArgs['id'],
             ]);
 
         if (PHP_OS == 'Linux') {
@@ -303,13 +303,13 @@ class NotificationController
         $notification['attachfor_properties'] = [];
         $data = [];
 
-        $data['event'] = NotificationModel::getEvents();
-        $data['template'] = NotificationModel::getTemplate();
+        $data['event']         = NotificationModel::getEvents();
+        $data['template']      = NotificationModel::getTemplate();
         $data['diffusionType'] = NotificationModel::getDiffusionType();
-        $data['groups'] = NotificationModel::getDiffusionTypeGroups();
-        $data['users'] = NotificationModel::getDiffusionTypesUsers();
-        $data['entities'] = NotificationModel::getDiffusionTypeEntities();
-        $data['status'] = NotificationModel::getDiffusionTypeStatus();
+        $data['groups']        = NotificationModel::getDiffusionTypeGroups();
+        $data['users']         = NotificationModel::getDiffusionTypesUsers();
+        $data['entities']      = NotificationModel::getDiffusionTypeEntities();
+        $data['status']        = NotificationModel::getDiffusionTypeStatus();
 
         $notification['data'] = $data;
 

@@ -1,14 +1,11 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
 import { HttpClient } from '@angular/common/http';
 import { VisaWorkflowComponent } from '../../../visa/visa-workflow.component';
 
-declare function $j(selector: any): any;
-
 @Component({
     selector: 'app-maarch-paraph',
-    templateUrl: "maarch-paraph.component.html",
+    templateUrl: 'maarch-paraph.component.html',
     styleUrls: ['maarch-paraph.component.scss'],
 })
 export class MaarchParaphComponent implements OnInit {
@@ -23,24 +20,24 @@ export class MaarchParaphComponent implements OnInit {
         resId: 0,
         editable: true
     };
-   
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
-    
-    @Input('additionalsInfos') additionalsInfos: any;
-    @Input('externalSignatoryBookDatas') externalSignatoryBookDatas: any;
 
-    constructor(public http: HttpClient, private notify: NotificationService) { }
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
+
+    constructor(public http: HttpClient) { }
 
     ngOnInit(): void {
-        if (typeof this.additionalsInfos.destinationId !== "undefined" && this.additionalsInfos.destinationId !== '') {
+        if (typeof this.additionalsInfos.destinationId !== 'undefined' && this.additionalsInfos.destinationId !== '') {
             setTimeout(() => {
-                this.appVisaWorkflow.loadListModel(this.additionalsInfos.destinationId);  
+                this.appVisaWorkflow.loadListModel(this.additionalsInfos.destinationId);
             }, 0);
         }
     }
 
     isValidParaph() {
-        if (this.additionalsInfos.attachments.length == 0 || this.appVisaWorkflow.getWorkflow().length === 0 || this.appVisaWorkflow.checkExternalSignatoryBook().length > 0) {
+        if (this.additionalsInfos.attachments.length === 0 || this.appVisaWorkflow.getWorkflow().length === 0 || this.appVisaWorkflow.checkExternalSignatoryBook().length > 0) {
             return false;
         } else {
             return true;
@@ -48,17 +45,17 @@ export class MaarchParaphComponent implements OnInit {
     }
 
     getRessources() {
-        return this.additionalsInfos.attachments.map((e: any) => { return e.res_id; });
+        return this.additionalsInfos.attachments.map((e: any) => e.res_id);
     }
 
     getDatas() {
         const workflow = this.appVisaWorkflow.getWorkflow();
 
-        workflow.forEach((element:any) => {
+        workflow.forEach((element: any) => {
             this.externalSignatoryBookDatas.steps.push(
                 {
-                    'externalId' : element.externalId.maarchParapheur,
-                    'action' : element.requested_signature ? 'sign' : 'visa',
+                    'externalId': element.externalId.maarchParapheur,
+                    'action': element.requested_signature ? 'sign' : 'visa',
                 }
             );
         });

@@ -13,10 +13,26 @@ DROP VIEW IF EXISTS res_view_letterbox;
 DROP TABLE IF EXISTS usergroups_reports;
 DELETE FROM usergroups_services WHERE service_id IN ('reports', 'admin_reports');
 
+/*NOTIF_EMAIL_STACK*/
+ALTER TABLE notif_email_stack DROP COLUMN IF EXISTS sender;
+ALTER TABLE notif_email_stack DROP COLUMN IF EXISTS charset;
+ALTER TABLE notif_email_stack DROP COLUMN IF EXISTS text_body;
+ALTER TABLE notif_email_stack DROP COLUMN IF EXISTS module;
+
 /* USERS */
 ALTER TABLE users DROP COLUMN IF EXISTS refresh_token;
 ALTER TABLE users ADD COLUMN refresh_token jsonb NOT NULL DEFAULT '[]';
 
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'notif_event_stack' and column_name = 'user_id' and data_type != 'integer') THEN
+        ALTER TABLE notif_event_stack ADD COLUMN user_id_tmp INTEGER;
+        UPDATE notif_event_stack set user_id_tmp = (select id FROM users where users.user_id = notif_event_stack.user_id);
+        DELETE FROM notif_event_stack WHERE user_id_tmp IS NULL;
+        ALTER TABLE notif_event_stack ALTER COLUMN user_id_tmp set not null;
+        ALTER TABLE notif_event_stack DROP COLUMN IF EXISTS user_id;
+        ALTER TABLE notif_event_stack RENAME COLUMN user_id_tmp TO user_id;
+    END IF;
+END$$;
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'users_email_signatures' and column_name = 'user_id' and data_type != 'integer') THEN
         ALTER TABLE users_email_signatures ADD COLUMN user_id_tmp INTEGER;
@@ -44,6 +60,8 @@ DO $$ BEGIN
         ALTER TABLE res_letterbox DROP COLUMN IF EXISTS dest_user;
         ALTER TABLE res_letterbox RENAME COLUMN dest_user_tmp TO dest_user;
         UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'dest_user(\s*)=(\s*)@user', 'dest_user = @user_id', 'gmi');
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'dest_user(\s*)=(\s*)''', 'dest_user is null', 'gmi');
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'dest_user(\s*)=(\s*)""', 'dest_user is null', 'gmi');
         UPDATE security SET where_clause = REGEXP_REPLACE(where_clause, 'dest_user(\s*)=(\s*)@user', 'dest_user = @user_id', 'gmi');
     END IF;
 END$$;
@@ -66,6 +84,53 @@ DO $$ BEGIN
         ALTER TABLE res_mark_as_read DROP COLUMN IF EXISTS user_id;
         ALTER TABLE res_mark_as_read RENAME COLUMN user_id_tmp TO user_id;
         UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'from res_mark_as_read WHERE user_id(\s*)=(\s*)@user', 'from res_mark_as_read WHERE user_id = @user_id', 'gmi');
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'res_attachments' and column_name = 'typist' and data_type != 'integer') THEN
+        ALTER TABLE res_attachments ADD COLUMN typist_tmp INTEGER;
+        UPDATE res_attachments set typist_tmp = (select id FROM users where users.user_id = res_attachments.typist);
+        ALTER TABLE res_attachments DROP COLUMN IF EXISTS typist;
+        ALTER TABLE res_attachments RENAME COLUMN typist_tmp TO typist;
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'listinstance_history_details' and column_name = 'item_id' and data_type != 'integer') THEN
+        ALTER TABLE listinstance_history_details ADD COLUMN item_id_tmp INTEGER;
+        UPDATE listinstance_history_details set item_id_tmp = (select id FROM users where users.user_id = listinstance_history_details.item_id) WHERE item_type = 'user_id';
+        UPDATE listinstance_history_details set item_id_tmp = (select id FROM entities where entities.entity_id = listinstance_history_details.item_id) WHERE item_type = 'entity_id';
+        ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS item_id;
+        ALTER TABLE listinstance_history_details RENAME COLUMN item_id_tmp TO item_id;
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'listinstance_history_details' and column_name = 'added_by_user' and data_type != 'integer') THEN
+        ALTER TABLE listinstance_history_details ADD COLUMN added_by_user_tmp INTEGER;
+        UPDATE listinstance_history_details set added_by_user_tmp = (select id FROM users where users.user_id = listinstance_history_details.added_by_user);
+        ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS added_by_user;
+        ALTER TABLE listinstance_history_details RENAME COLUMN added_by_user_tmp TO added_by_user;
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'listinstance' and column_name = 'item_id' and data_type != 'integer') THEN
+        ALTER TABLE listinstance ADD COLUMN item_id_tmp INTEGER;
+        UPDATE listinstance set item_id_tmp = (select id FROM users where users.user_id = listinstance.item_id) WHERE item_type = 'user_id';
+        UPDATE listinstance set item_id_tmp = (select id FROM entities where entities.entity_id = listinstance.item_id) WHERE item_type = 'entity_id';
+        ALTER TABLE listinstance DROP COLUMN IF EXISTS item_id;
+        ALTER TABLE listinstance RENAME COLUMN item_id_tmp TO item_id;
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'item_id(\s*)=(\s*)@user ', 'item_id = @user_id ', 'gmi');
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'item_id(\s*)in(\s*)\(@my_entities\)', 'item_id in (@my_entities_id)', 'gmi');
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'item_id(\s*)in(\s*)\(@my_primary_entity\)', 'item_id in (@my_primary_entity_id)', 'gmi');
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, '\(res_id, @user\)', '(res_id, @user_id)', 'gmi');
+        UPDATE security SET where_clause = REGEXP_REPLACE(where_clause, 'item_id(\s*)=(\s*)@user ', 'item_id = @user_id ', 'gmi');
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'listinstance' and column_name = 'added_by_user' and data_type != 'integer') THEN
+        ALTER TABLE listinstance ADD COLUMN added_by_user_tmp INTEGER;
+        UPDATE listinstance set added_by_user_tmp = (select id FROM users where users.user_id = listinstance.added_by_user);
+        ALTER TABLE listinstance DROP COLUMN IF EXISTS added_by_user;
+        ALTER TABLE listinstance RENAME COLUMN added_by_user_tmp TO added_by_user;
     END IF;
 END$$;
 

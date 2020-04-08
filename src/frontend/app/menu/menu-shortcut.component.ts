@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
@@ -7,12 +7,10 @@ import { AppService } from '../../service/app.service';
 import { PrivilegeService } from '../../service/privileges.service';
 import { HeaderService } from '../../service/header.service';
 
-declare function $j(selector: any): any;
-
 @Component({
     selector: 'menu-shortcut',
     styleUrls: ['menu-shortcut.component.scss'],
-    templateUrl: "menu-shortcut.component.html",
+    templateUrl: 'menu-shortcut.component.html',
 })
 export class MenuShortcutComponent implements OnInit {
 
@@ -30,7 +28,7 @@ export class MenuShortcutComponent implements OnInit {
         public dialog: MatDialog,
         public appService: AppService,
         public privilegeService: PrivilegeService,
-        private headerService: HeaderService,
+        public headerService: HeaderService
     ) {
         this.router = _router;
     }
@@ -53,8 +51,8 @@ export class MenuShortcutComponent implements OnInit {
     }
 }
 @Component({
-    templateUrl: "indexing-group-modal.component.html",
-    styles: [".mat-dialog-content{max-height: 65vh;width:600px;}"]
+    templateUrl: 'indexing-group-modal.component.html',
+    styles: ['.mat-dialog-content{max-height: 65vh;width:600px;}']
 })
 export class IndexingGroupModalComponent {
     lang: any = LANG;
@@ -62,7 +60,7 @@ export class IndexingGroupModalComponent {
     constructor(
         public http: HttpClient,
         private router: Router,
-        @Inject(MAT_DIALOG_DATA) public data: any, 
+        @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<IndexingGroupModalComponent>) {
 
     }

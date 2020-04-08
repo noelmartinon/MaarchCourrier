@@ -150,7 +150,7 @@ class HistoryController
         LogsController::add($aArgs);
 
         if (empty($aArgs['userId'])) {
-            $aArgs['userId'] = $GLOBALS['userId'];
+            $aArgs['userId'] = $GLOBALS['login'];
         }
 
         HistoryModel::create([
@@ -167,7 +167,7 @@ class HistoryController
             "eventId"   => $aArgs['eventId'],
             "tableName" => $aArgs['tableName'],
             "recordId"  => $aArgs['recordId'],
-            "userId"    => $aArgs['userId'],
+            "userId"    => $GLOBALS['id'],
             "info"      => $aArgs['info'],
         ]);
     }
@@ -175,7 +175,7 @@ class HistoryController
     public function getByUserId(Request $request, Response $response, array $aArgs)
     {
         $user = UserModel::getById(['id' => $aArgs['userSerialId'], 'select' => ['user_id']]);
-        if ($user['user_id'] != $GLOBALS['userId'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_history', 'userId' => $GLOBALS['id']])) {
+        if ($user['user_id'] != $GLOBALS['login'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_history', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 

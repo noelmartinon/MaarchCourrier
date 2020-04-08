@@ -41,8 +41,7 @@ try {
 /**
  * Class for controling docservers objects from database
  */
-abstract class diffusion_type_controler_Abstract
-    extends ObjectControler 
+abstract class diffusion_type_controler_Abstract extends ObjectControler
     //implements ObjectControlerIF
 {
     /**
@@ -51,22 +50,21 @@ abstract class diffusion_type_controler_Abstract
      * @param $id Id of event to get
      * @return event
      */
-    public function getAllDiffusion() {
+    public function getAllDiffusion()
+    {
         core_tools::load_lang();
         $return = array();
         $xmlfile = 'modules/notifications/xml/diffusion_type.xml';
-        $xmlfileCustom = $_SESSION['config']['corepath'] 
+        $xmlfileCustom = $_SESSION['config']['corepath']
             . 'custom/' . $_SESSION['custom_override_id'] . '/' . $xmlfile;
         if (file_exists($xmlfileCustom)) {
             $xmlfile = $xmlfileCustom;
         }
         $xmldiffusion = simplexml_load_file($xmlfile);
-        foreach($xmldiffusion->diffusion_type as $diffusion) {
-            //<id> <label> <script> 
-            
+        foreach ($xmldiffusion->diffusion_type as $diffusion) {
             $diffusion_type = new diffusion_type();
             
-            if(@constant((string) $diffusion->label)) {
+            if (@constant((string) $diffusion->label)) {
                 $label = constant((string)$diffusion->label);
             } else {
                 $label = (string) $diffusion->label;
@@ -86,45 +84,17 @@ abstract class diffusion_type_controler_Abstract
         }
     }
   
-    public function get($type_id) {
+    public function get($type_id)
+    {
         if ($type_id <> '') {
             $fulllist = array();
             $fulllist = $this->getAllDiffusion();
-            foreach ($fulllist as $dt_id => $dt)
-            {
-                if ($type_id == $dt_id){
+            foreach ($fulllist as $dt_id => $dt) {
+                if ($type_id == $dt_id) {
                     return $dt;
                 }
             }
         }
         return null;
     }
-   
-    public function getRecipients($notification, $event) 
-    {
-        $diffusionType = $this->get($notification->diffusion_type);
-        $request = 'recipients';
-        require($diffusionType->script);
-        return $recipients;
-    }
-    
-    public function getAttachFor($notification, $user_id) {
-        // No attachment defined
-        if($notification->attachfor_type == '') {
-            return false;
-        }
-        $attachforType = $this->get($notification->attachfor_type);
-        $request = 'attach';
-        require($attachforType->script);
-        return $attach;
-    }
-    
-    public function getResId($notification, $event) {
-        $diffusionType = $this->get($notification->diffusion_type);
-        $request = 'res_id';
-        require($diffusionType->script);
-        return $res_id;
-    }
-
 }
-

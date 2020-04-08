@@ -7,10 +7,8 @@ import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { NgForm } from '@angular/forms';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "sendmail-administration.component.html",
+    templateUrl: 'sendmail-administration.component.html',
     styleUrls: ['sendmail-administration.component.scss'],
     providers: [AppService]
 })
@@ -30,7 +28,7 @@ export class SendmailAdministrationComponent implements OnInit {
         'auth': true,
         'user': '',
         'password': '',
-        'secure': 'ssl', //tls, ssl, starttls
+        'secure': 'ssl', // tls, ssl, starttls
         'port': '465',
         'charset': 'utf-8',
         'from': '',
@@ -56,16 +54,16 @@ export class SendmailAdministrationComponent implements OnInit {
     ];
     smtpSecList = [
         {
-            id : '',
-            label : this.lang.none
+            id: '',
+            label: this.lang.none
         },
         {
-            id : 'ssl',
-            label : 'ssl'
+            id: 'ssl',
+            label: 'ssl'
         },
         {
-            id : 'tls',
-            label : 'tls'
+            id: 'tls',
+            label: 'tls'
         }
     ];
     sendmailClone: any = {};
@@ -75,7 +73,7 @@ export class SendmailAdministrationComponent implements OnInit {
     emailSendResult = {
         icon: '',
         msg: '',
-        debug : ''
+        debug: ''
     };
     currentUser: any = {};
     recipientTest: string = '';
@@ -84,27 +82,25 @@ export class SendmailAdministrationComponent implements OnInit {
 
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.sendmailShort);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
         this.http.get('../../rest/configurations/admin_email_server')
             .subscribe((data: any) => {
-                this.sendmail = data.configuration.value
+                this.sendmail = data.configuration.value;
                 this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
-                
+
                 this.loading = false;
             }, (err) => {
                 this.notify.handleErrors(err);
@@ -117,7 +113,7 @@ export class SendmailAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.sendmailFormCpt.invalid) {
-            this.notify.handleErrors({'error': {'errors': this.lang.notSavedBecauseInvalid}});
+            this.notify.handleErrors({ 'error': { 'errors': this.lang.notSavedBecauseInvalid } });
         } else {
             this.http.put('../../rest/configurations/admin_email_server', this.sendmail)
                 .subscribe((data: any) => {
@@ -157,13 +153,13 @@ export class SendmailAdministrationComponent implements OnInit {
             msg: this.lang.emailSendInProgress,
             debug: ''
         };
-        let email = {
-            "sender": { "email": this.currentUser.mail },
-            "recipients": [this.recipientTest],
-            "object": "[" + this.lang.doNotReply +"] " + this.lang.emailSendTest,
-            "status": "EXPRESS",
-            "body": this.lang.emailSendTest,
-            "isHtml": false
+        const email = {
+            'sender': { 'email': this.currentUser.mail },
+            'recipients': [this.recipientTest],
+            'object': '[' + this.lang.doNotReply + '] ' + this.lang.emailSendTest,
+            'status': 'EXPRESS',
+            'body': this.lang.emailSendTest,
+            'isHtml': false
         };
         this.emailSendLoading = true;
 

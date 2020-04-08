@@ -39,6 +39,27 @@ class PreparedClauseController
             $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['mail']]);
             $clause = str_replace('@email', "'{$user['mail']}'", $clause);
         }
+        if (preg_match('/@my_entities_id/', $clause)) {
+            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
+            $entities = EntityModel::getByUserId(['userId' => $user['id'], 'select' => ['entity_id']]);
+            $entities = array_column($entities, 'entity_id');
+            if (!empty($entities)) {
+                $entities = EntityModel::get(['select' => ['id'], 'where' => ['entity_id in (?)'], 'data' => [$entities]]);
+            }
+
+            $myEntitiesClause = '';
+            foreach ($entities as $key => $entity) {
+                if ($key > 0) {
+                    $myEntitiesClause .= ", ";
+                }
+                $myEntitiesClause .= $entity['id'];
+            }
+            if (empty($myEntitiesClause)) {
+                $myEntitiesClause = 0;
+            }
+
+            $clause = str_replace('@my_entities_id', $myEntitiesClause, $clause);
+        }
         if (preg_match('/@my_entities/', $clause)) {
             $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
             $entities = EntityModel::getByUserId(['userId' => $user['id'], 'select' => ['entity_id']]);
@@ -56,8 +77,20 @@ class PreparedClauseController
 
             $clause = str_replace('@my_entities', $myEntitiesClause, $clause);
         }
-        if (preg_match('/@my_primary_entity/', $clause)) {
+        if (preg_match('/@my_primary_entity_id/', $clause)) {
             $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id', 'firstname', 'lastname']]);
+            $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.id']]);
+
+            if (empty($entity)) {
+                $primaryEntity = 0;
+            } else {
+                $primaryEntity = $entity['id'];
+            }
+
+            $clause = str_replace('@my_primary_entity_id', $primaryEntity, $clause);
+        }
+        if (preg_match('/@my_primary_entity/', $clause)) {
+            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
             $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_id']]);
 
             if (empty($entity)) {

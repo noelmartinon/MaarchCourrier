@@ -1,9 +1,7 @@
-import { COMMA } from '@angular/cdk/keycodes';
 import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { Observable, of } from 'rxjs';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
@@ -14,9 +12,9 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { PrivilegeService } from '../../../service/privileges.service';
 import { HeaderService } from '../../../service/header.service';
 import { StripTagsPipe, ReversePipe } from 'ngx-pipes';
-
-declare var angularGlobals: any;
-declare function $j(selector: any): any;
+import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-sent-numeric-package-page',
@@ -70,19 +68,19 @@ export class SentNumericPackagePageComponent implements OnInit {
 
     numericPackage: any = {
         mainExchangeDoc: null,
-        "object": '',
-        "contacts": [],
-        "joinFile": [],
-        "joinAttachment": [],
-        "notes": [],
-        "content": "",
-        "senderEmail": null
-    }
+        'object': '',
+        'contacts': [],
+        'joinFile': [],
+        'joinAttachment': [],
+        'notes': [],
+        'content': '',
+        'senderEmail': null
+    };
 
     reference: string = null;
     messageReview: any[] = [];
 
-    maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${angularGlobals.applicationVersion.split('.')[0] + '.' + angularGlobals.applicationVersion.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
+    maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
 
     @ViewChild('recipientsInput', { static: true }) recipientsInput: ElementRef<HTMLInputElement>;
 
@@ -143,7 +141,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
         this.http.post(`../../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resId } }).pipe(
             tap((data: any) => {
-                var textArea = document.createElement('textarea');
+                const textArea = document.createElement('textarea');
                 textArea.innerHTML = data.mergedDocument;
                 this.numericPackage.content += this.stringPipe.transform(textArea.value);
             }),
@@ -160,7 +158,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
         this.http.get(`../../rest/currentUser/emailSignatures/${templateId}`).pipe(
             tap((data: any) => {
-                var textArea = document.createElement('textarea');
+                const textArea = document.createElement('textarea');
                 textArea.innerHTML = data.emailSignature.content;
                 this.numericPackage.content += this.stringPipe.transform(textArea.value);
             }),
@@ -200,7 +198,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                         return {
                             date: this.functions.formatFrenchDateToObjectDate(item.substring(1, 19), '/'),
                             content: item.substring(21),
-                        }
+                        };
                     });
                     this.messageReview = this.reversePipe.transform(this.messageReview);
 
@@ -209,15 +207,15 @@ export class SentNumericPackagePageComponent implements OnInit {
                             ...this.numericPackageAttachTool['document'].list[0],
                             typeLabel: this.lang.mainDocument,
                             type: 'document'
-                        }
-                        
+                        };
+
                         this.numericPackageAttach = this.numericPackageAttach.concat(this.numericPackageAttachTool['attachments'].list.filter((item: any) => data.attachments.indexOf(item.id.toString()) > -1));
                     } else {
                         this.numericPackage.mainExchangeDoc = {
-                            ...this.numericPackageAttachTool['attachments'].list.filter((item: any) => item.id == data.disposition.res_id)[0],
+                            ...this.numericPackageAttachTool['attachments'].list.filter((item: any) => item.id === data.disposition.res_id)[0],
                             type: 'attachments'
-                        }
-                        this.numericPackageAttach = this.numericPackageAttach.concat(this.numericPackageAttachTool['attachments'].list.filter((item: any) => data.attachments.indexOf(item.id.toString()) > -1 && item.id != data.disposition.res_id));
+                        };
+                        this.numericPackageAttach = this.numericPackageAttach.concat(this.numericPackageAttachTool['attachments'].list.filter((item: any) => data.attachments.indexOf(item.id.toString()) > -1 && item.id !== data.disposition.res_id));
 
                     }
 
@@ -275,10 +273,10 @@ export class SentNumericPackagePageComponent implements OnInit {
                         {
                             label: this.contactService.formatContact(data),
                             email: data.email,
-                            m2m : data.externalId['m2m'],
-                            communicationMeans : data.communicationMeans
+                            m2m: data.externalId['m2m'],
+                            communicationMeans: data.communicationMeans
                         }
-                    )
+                    );
                 }
             }),
             catchError((err) => {
@@ -293,7 +291,7 @@ export class SentNumericPackagePageComponent implements OnInit {
             this.http.get('../../rest/messageExchangesInitialization').pipe(
                 tap((data: any) => {
                     this.availableSenders = data.entities;
-                    this.currentSender = this.availableSenders[0]
+                    this.currentSender = this.availableSenders[0];
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -321,7 +319,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                                     ...item,
                                     original: item.original !== undefined ? item.original : true,
                                     title: item.chrono !== undefined ? `${item.chrono} - ${item.label} (${item.typeLabel})` : `${item.label} (${item.typeLabel})`
-                                }
+                                };
                             });
                         }
                     });
@@ -347,14 +345,14 @@ export class SentNumericPackagePageComponent implements OnInit {
             }),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/contacts/m2m', { params: { "search": data } })),
+            switchMap(data => this.http.get('../../rest/autocomplete/contacts/m2m', { params: { 'search': data } })),
             tap((data: any) => {
                 data = data.map((contact: any) => {
                     return {
                         ...contact,
                         address: this.contactService.formatContact(contact),
                         label: this.contactService.formatContact(contact)
-                    }
+                    };
                 });
                 this.filteredEmails = of(data);
             }),
@@ -472,7 +470,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                 ...item,
                 typeLabel: item.typeLabel !== undefined ? item.typeLabel : this.lang.mainDocument,
                 type: type
-            }
+            };
         } else {
             this.numericPackageAttach.push({
                 ...item,
@@ -496,7 +494,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                 typeDoc = 'notes';
             }
             numericPackage.joinFile = [parseInt(this.numericPackage.mainExchangeDoc.id)];
-            numericPackage.mainExchangeDoc = `${typeDoc}__${this.numericPackage.mainExchangeDoc.id}`
+            numericPackage.mainExchangeDoc = `${typeDoc}__${this.numericPackage.mainExchangeDoc.id}`;
         }
         numericPackage.object = this.numericPackage.object;
         numericPackage.content = this.numericPackage.content;
@@ -531,9 +529,9 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     saveNumericPackageFile() {
-        this.http.get(`../../rest/messageExchanges/${this.data.emailId}/archiveContent`, { responseType: "blob" }).pipe(
+        this.http.get(`../../rest/messageExchanges/${this.data.emailId}/archiveContent`, { responseType: 'blob' }).pipe(
             tap((data: any) => {
-                let downloadLink = document.createElement('a');
+                const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
 
                 let today: any;
@@ -553,7 +551,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                     mm = '0' + mm;
                 }
                 today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', this.lang.summarySheetsAlt + "_" + today + ".pdf");
+                downloadLink.setAttribute('download', this.lang.summarySheetsAlt + '_' + today + '.pdf');
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),

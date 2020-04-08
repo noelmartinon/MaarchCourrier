@@ -2,15 +2,16 @@ import { Component, OnInit, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
-import { Observable } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { startWith, map } from 'rxjs/operators';
+import { Observable } from 'rxjs/internal/Observable';
 
-declare function $j(selector: any): any;
+declare var $: any;
+
 @Component({
     selector: 'list-administration',
-    templateUrl: "list-administration.component.html",
+    templateUrl: 'list-administration.component.html',
     styleUrls: ['list-administration.component.scss'],
 })
 export class ListAdministrationComponent implements OnInit {
@@ -32,7 +33,8 @@ export class ListAdministrationComponent implements OnInit {
             'sample': this.lang.objectSample,
             'cssClasses': ['longData'],
             'icon': ''
-        },];
+        }
+    ];
 
     availableData: any = [
         {
@@ -139,11 +141,11 @@ export class ListAdministrationComponent implements OnInit {
         {
             id: 'detailDoc',
             value: 'documentDetails'
-        },        
+        },
         {
             id: 'eventVisaMail',
             value: 'signatureBookAction'
-        },        
+        },
         {
             id: 'eventProcessDoc',
             value: 'processDocument'
@@ -209,8 +211,8 @@ export class ListAdministrationComponent implements OnInit {
         }
     ];
     selectedProcessTool: any = {
-        defaultTab : null,
-        canUpdate: false, 
+        defaultTab: null,
+        canUpdate: false,
     };
     selectedProcessToolClone: string = null;
 
@@ -229,7 +231,7 @@ export class ListAdministrationComponent implements OnInit {
         this.displayedSecondaryData = [];
         let indexData: number = 0;
         this.basketGroup.list_display.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => { return e.value; }).indexOf(element.value);
+            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
             this.availableData[indexData].cssClasses = element.cssClasses;
             this.displayedSecondaryData.push(this.availableData[indexData]);
             this.availableData.splice(indexData, 1);
@@ -241,7 +243,7 @@ export class ListAdministrationComponent implements OnInit {
             this.selectedProcessTool.defaultTab = this.basketGroup.list_event_data === null ? 'dashboard' : this.basketGroup.list_event_data.defaultTab;
             this.selectedProcessTool.canUpdate = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdate;
         }
-       
+
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
         this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
     }
@@ -249,7 +251,7 @@ export class ListAdministrationComponent implements OnInit {
     toggleData() {
         this.dataControl.disabled ? this.dataControl.enable() : this.dataControl.disable();
 
-        if (this.displayMode == 'label') {
+        if (this.displayMode === 'label') {
             this.displayMode = 'sample';
         } else {
             this.displayMode = 'label';
@@ -258,16 +260,16 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     setStyle(item: any, value: string) {
-        let typeFont = value.split('_');
+        const typeFont = value.split('_');
 
-        if(typeFont.length == 2) {
-            item.cssClasses.forEach((element: any, index: number) => {
-                if (element.includes(typeFont[0]) && element != value) {
-                    item.cssClasses.splice(index, 1);
+        if (typeFont.length === 2) {
+            item.cssClasses.forEach((element: any, it: number) => {
+                if (element.includes(typeFont[0]) && element !== value) {
+                    item.cssClasses.splice(it, 1);
                 }
             });
         }
-        
+
         const index = item.cssClasses.indexOf(value);
 
         if (index === -1) {
@@ -282,10 +284,10 @@ export class ListAdministrationComponent implements OnInit {
             this.dataControl.setValue('');
             alert(this.lang.warnMaxDataList);
         } else {
-            let i = this.availableData.map((e: any) => { return e.value; }).indexOf(event.option.value.value);
+            const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
             this.displayedSecondaryData.push(event.option.value);
             this.availableData.splice(i, 1);
-            $j('#availableData').blur();
+            $('#availableData').blur();
             this.dataControl.setValue('');
         }
     }
@@ -309,7 +311,7 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     saveTemplate() {
-        let template: any = [];
+        const template: any = [];
         this.displayedSecondaryData.forEach((element: any) => {
             template.push(
                 {
@@ -320,7 +322,7 @@ export class ListAdministrationComponent implements OnInit {
             );
         });
 
-        this.http.put("../../rest/baskets/" + this.basketGroup.basket_id + "/groups/" + this.basketGroup.group_id, { 'list_display': template, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
+        this.http.put('../../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': template, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
                 this.basketGroup.list_display = template;
@@ -344,11 +346,11 @@ export class ListAdministrationComponent implements OnInit {
         return this.availableData.filter((option: any) => option.label.toLowerCase().includes(filterValue));
     }
 
-    checkModif() { 
+    checkModif() {
         if (JSON.stringify(this.displayedSecondaryData) === JSON.stringify(this.displayedSecondaryDataClone) && this.selectedListEvent === this.selectedListEventClone && JSON.stringify(this.selectedProcessTool) === JSON.stringify(this.selectedProcessToolClone)) {
-            return true 
+            return true;
         } else {
-           return false;
+            return false;
         }
     }
 
@@ -357,10 +359,10 @@ export class ListAdministrationComponent implements OnInit {
         this.selectedListEvent = this.selectedListEventClone;
         this.selectedProcessTool = this.selectedProcessToolClone;
         this.availableData = JSON.parse(JSON.stringify(this.availableDataClone));
-        
+
         let indexData: number = 0;
         this.displayedSecondaryData.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => { return e.value; }).indexOf(element.value);
+            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
             this.availableData.splice(indexData, 1);
         });
         this.dataControl.setValue('');
@@ -368,7 +370,7 @@ export class ListAdministrationComponent implements OnInit {
 
     hasFolder() {
         if (this.displayedSecondaryData.map((data: any) => data.value).indexOf('getFolders') > -1) {
-            return true
+            return true;
         } else {
             return false;
         }

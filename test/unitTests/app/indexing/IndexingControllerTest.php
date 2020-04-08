@@ -14,8 +14,8 @@ class IndexingControllerTest extends TestCase
 {
     public function testGetIndexingActions()
     {
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $indexingController = new \Resource\controllers\IndexingController();
@@ -42,15 +42,15 @@ class IndexingControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('This user is not in this group', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetIndexingEntities()
     {
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $indexingController = new \Resource\controllers\IndexingController();
@@ -77,15 +77,15 @@ class IndexingControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('This user is not in this group', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetProcessLimitDate()
     {
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $indexingController = new \Resource\controllers\IndexingController();
@@ -137,8 +137,8 @@ class IndexingControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Delay is not a numeric value', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -167,8 +167,8 @@ class IndexingControllerTest extends TestCase
 
     public function testGetPriorityWithProcessLimitDate()
     {
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $indexingController = new \Resource\controllers\IndexingController();
@@ -196,8 +196,8 @@ class IndexingControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Query params processLimitDate is empty', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 }

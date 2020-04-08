@@ -2,15 +2,15 @@ import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { NotificationService } from '../../notification.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FunctionsService } from '../../../service/functions.service';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "folder-update.component.html",
+    templateUrl: 'folder-update.component.html',
     styleUrls: ['folder-update.component.scss'],
 })
 export class FolderUpdateComponent implements OnInit {
@@ -27,7 +27,7 @@ export class FolderUpdateComponent implements OnInit {
         sharing: {
             entities: []
         }
-    }
+    };
 
     sharingFolderCLone: any[] = [];
 
@@ -58,14 +58,14 @@ export class FolderUpdateComponent implements OnInit {
             tap((data: any) => this.folder = data.folder),
             exhaustMap(() => this.http.get('../../rest/entities')),
             map((data: any) => {
-                let keywordEntities = {
+                const keywordEntities = {
                     serialId: 'ALL_ENTITIES',
                     keyword: 'ALL_ENTITIES',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
                     text: this.lang.allEntities,
-                    state: { "opened": false, "selected": false },
+                    state: { 'opened': false, 'selected': false },
                     parent_entity_id: '',
                     id: 'ALL_ENTITIES',
                     entity_label: this.lang.allEntities
@@ -74,8 +74,8 @@ export class FolderUpdateComponent implements OnInit {
 
                 this.entities = data.entities;
                 data.entities.forEach((element: any) => {
-                    if (this.folder.sharing.entities.map((data: any) => data.entity_id).indexOf(element.serialId) > -1
-                        || this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(element.serialId) > -1) {
+                    if (this.folder.sharing.entities.map((entity: any) => entity.entity_id).indexOf(element.serialId) > -1
+                        || this.folder.sharing.entities.map((entity: any) => entity.keyword).indexOf(element.serialId) > -1) {
                         element.state.selected = true;
                     }
                     element.state.allowed = true;
@@ -92,7 +92,7 @@ export class FolderUpdateComponent implements OnInit {
                 data.folders.forEach((element: any) => {
                     element['state'] = {
                         opened: true
-                    }
+                    };
                     if (element.parent_id === null) {
                         element.parent_id = '#';
                     }
@@ -124,10 +124,10 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     initFoldersTree(folders: any) {
-        $j('#jstreeFolders').jstree({
-            "checkbox": {
+        $('#jstreeFolders').jstree({
+            'checkbox': {
                 'deselect_all': true,
-                "three_state": false //no cascade selection
+                'three_state': false // no cascade selection
             },
             'core': {
                 force_text: true,
@@ -138,9 +138,9 @@ export class FolderUpdateComponent implements OnInit {
                 'multiple': false,
                 'data': folders
             },
-            "plugins": ["checkbox", "search"]
+            'plugins': ['checkbox', 'search']
         });
-        $j('#jstreeFolders')
+        $('#jstreeFolders')
             // listen for event
             .on('select_node.jstree', (e: any, data: any) => {
                 this.folder.parent_id = data.node.original.id;
@@ -150,20 +150,20 @@ export class FolderUpdateComponent implements OnInit {
             })
             // create the instance
             .jstree();
-        var to: any = false;
-        $j('#jstree_searchFolders').keyup(function () {
+        let to: any = false;
+        $('#jstree_searchFolders').keyup(function () {
             if (to) { clearTimeout(to); }
             to = setTimeout(function () {
-                var v = $j('#jstree_searchFolders').val();
-                $j('#jstreeFolders').jstree(true).search(v);
+                const v: any = $('#jstree_searchFolders').val();
+                $('#jstreeFolders').jstree(true).search(v);
             }, 250);
         });
     }
 
     initEntitiesTree(entities: any) {
-        $j('#jstree').jstree({
-            "checkbox": {
-                "three_state": false //no cascade selection
+        $('#jstree').jstree({
+            'checkbox': {
+                'three_state': false // no cascade selection
             },
             'core': {
                 force_text: true,
@@ -173,9 +173,9 @@ export class FolderUpdateComponent implements OnInit {
                 },
                 'data': entities
             },
-            "plugins": ["checkbox", "search"]
+            'plugins': ['checkbox', 'search']
         });
-        $j('#jstree')
+        $('#jstree')
             // listen for event
             .on('select_node.jstree', (e: any, data: any) => {
                 this.selectEntity(data.node.original);
@@ -185,19 +185,19 @@ export class FolderUpdateComponent implements OnInit {
             })
             // create the instance
             .jstree();
-        var to: any = false;
-        $j('#jstree_search').keyup(function () {
+        let to: any = false;
+        $('#jstree_search').keyup(function () {
             if (to) { clearTimeout(to); }
             to = setTimeout(function () {
-                var v = $j('#jstree_search').val();
-                $j('#jstree').jstree(true).search(v);
+                const v: any = $('#jstree_search').val();
+                $('#jstree').jstree(true).search(v);
             }, 250);
         });
     }
 
     selectEntity(newEntity: any) {
         if (this.holdShift) {
-            $j('#jstree').jstree('deselect_all');
+            $('#jstree').jstree('deselect_all');
             this.folder.sharing.entities = [];
         } else {
             if (!this.functions.empty(newEntity.keyword)) {
@@ -223,7 +223,7 @@ export class FolderUpdateComponent implements OnInit {
         if (index > -1) {
             this.folder.sharing.entities.splice(index, 1);
         } else {
-            index = this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(entity.serialId)
+            index = this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(entity.serialId);
             if (index > -1) {
                 this.folder.sharing.entities.splice(index, 1);
             }
@@ -234,7 +234,7 @@ export class FolderUpdateComponent implements OnInit {
         this.http.put('../../rest/folders/' + this.folder.id, this.folder).pipe(
             exhaustMap(() => {
                 if (JSON.stringify(this.sharingFolderCLone) !== JSON.stringify(this.folder.sharing.entities)) {
-                    return this.http.put('../../rest/folders/' + this.folder.id + '/sharing', { public: this.folder.sharing.entities.length > 0, sharing: this.folder.sharing })
+                    return this.http.put('../../rest/folders/' + this.folder.id + '/sharing', { public: this.folder.sharing.entities.length > 0, sharing: this.folder.sharing });
                 } else {
                     return of(false);
                 }
@@ -260,7 +260,7 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     initService(ev: any) {
-        if (ev.index == 1) {
+        if (ev.index === 1) {
             this.initEntitiesTree(this.entities);
         }
     }
@@ -270,7 +270,7 @@ export class FolderUpdateComponent implements OnInit {
         if (index > -1) {
             this.folder.sharing.entities[index].edition = ev.checked;
         } else {
-            index = this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(entity.serialId)
+            index = this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(entity.serialId);
             if (index > -1) {
                 this.folder.sharing.entities[index].edition = ev.checked;
             }
@@ -282,7 +282,7 @@ export class FolderUpdateComponent implements OnInit {
         if (index > -1) {
             return this.folder.sharing.entities[index].edition;
         } else {
-            index = this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(entity.serialId)
+            index = this.folder.sharing.entities.map((data: any) => data.keyword).indexOf(entity.serialId);
             if (index > -1) {
                 return this.folder.sharing.entities[index].edition;
             }

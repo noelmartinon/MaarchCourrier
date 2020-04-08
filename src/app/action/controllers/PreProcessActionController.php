@@ -51,7 +51,7 @@ class PreProcessActionController
 {
     public static function getRedirectInformations(Request $request, Response $response, array $args)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
         if (!empty($errors['errors'])) {
@@ -178,7 +178,7 @@ class PreProcessActionController
             $currentMode = 'auto';
         }
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
         if (!empty($errors['errors'])) {
@@ -380,7 +380,7 @@ class PreProcessActionController
 
     public function checkExternalSignatoryBook(Request $request, Response $response, array $aArgs)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
         if (!empty($errors['errors'])) {
@@ -511,7 +511,7 @@ class PreProcessActionController
                     }
                 }
             } elseif ($signatureBookEnabled == 'xParaph') {
-                $userInfos  = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['external_id']]);
+                $userInfos  = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id']]);
                 $externalId = json_decode($userInfos['external_id'], true);
                 $additionalsInfos['accounts'] = [];
                 if (!empty($externalId['xParaph'])) {
@@ -572,7 +572,7 @@ class PreProcessActionController
 
     public function checkExternalNoteBook(Request $request, Response $response, array $aArgs)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
         if (!empty($errors['errors'])) {
@@ -846,7 +846,7 @@ class PreProcessActionController
 
     public function checkInitiatorEntity(Request $request, Response $response, array $args)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
         if (!empty($errors['errors'])) {
@@ -885,7 +885,7 @@ class PreProcessActionController
 
     public function checkAttachmentsAndNotes(Request $request, Response $response, array $args)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
         if (!empty($errors['errors'])) {
@@ -1237,8 +1237,6 @@ class PreProcessActionController
         }
         $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
 
-        $currentUser = UserModel::getById(['select' => ['user_id'], 'id' => $GLOBALS['id']]);
-
         $resourcesInformation = [];
         foreach ($body['resources'] as $resId) {
             $resource = ResModel::getById(['resId' => $resId, 'select' => ['alt_identifier', 'opinion_limit_date']]);
@@ -1274,7 +1272,7 @@ class PreProcessActionController
             $isInCircuit = ListInstanceModel::get([
                 'select'  => [1],
                 'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date is null', 'item_id = ?', 'item_mode = ?'],
-                'data'    => [$resId, 'entity_id', $currentUser['user_id'], 'avis']
+                'data'    => [$resId, 'entity_id', $GLOBALS['id'], 'avis']
             ]);
             if (empty($isInCircuit)) {
                 $resourcesInformation['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'userNotInDiffusionList'];

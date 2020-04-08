@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { MatSidenav } from '@angular/material/sidenav';
-import { HeaderService } from "../../../service/header.service";
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { PrivilegeService } from '../../../service/privileges.service';
 import { Observable, of } from 'rxjs';
@@ -11,10 +11,10 @@ import { FormControl } from '@angular/forms';
 import { startWith, map, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { NotificationService } from '../../notification.service';
-import {FunctionsService} from "../../../service/functions.service";
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "administration.component.html",
+    templateUrl: 'administration.component.html',
     styleUrls: ['administration.component.scss'],
     providers: [AppService]
 })
@@ -50,7 +50,7 @@ export class AdministrationComponent implements OnInit {
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration);
 
-        //this.loading = true;
+        // this.loading = true;
 
         this.organisationServices = this.privilegeService.getCurrentUserAdministrationsByUnit('organisation');
         this.productionServices = this.privilegeService.getCurrentUserAdministrationsByUnit('production');
@@ -58,16 +58,16 @@ export class AdministrationComponent implements OnInit {
         this.supervisionServices = this.privilegeService.getCurrentUserAdministrationsByUnit('supervision');
 
         this.administrations = this.organisationServices.concat(this.productionServices).concat(this.classementServices).concat(this.supervisionServices);
-        
+
         this.shortcutsAdmin = this.administrations.filter(admin => ['admin_users', 'admin_groups', 'manage_entities'].indexOf(admin.id) > -1).map(admin => {
             return {
                 ...admin,
-                count : 0
-            }
+                count: 0
+            };
         });
 
         this.getNbShortcuts();
-        
+
         this.filteredAdministrations = this.searchService.valueChanges
             .pipe(
                 startWith(''),

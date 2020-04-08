@@ -37,13 +37,6 @@ class ListInstanceController
             'opinionCircuit'    => 'AVIS_CIRCUIT'
     ];
 
-    public function getById(Request $request, Response $response, array $aArgs)
-    {
-        $listinstance = ListInstanceModel::getById(['id' => $aArgs['id']]);
-
-        return $response->withJson($listinstance);
-    }
-
     public function getByResId(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
@@ -53,15 +46,17 @@ class ListInstanceController
         $listInstances = ListInstanceModel::get(['select' => ['*'], 'where' => ['res_id = ?', 'difflist_type = ?'], 'data' => [$args['resId'], 'entity_id']]);
         foreach ($listInstances as $key => $value) {
             if ($value['item_type'] == 'entity_id') {
-                $entity = Entitymodel::getByEntityId(['entityId' => $value['item_id'], 'select' => ['entity_label', 'id']]);
-                $listInstances[$key]['itemSerialId'] = $entity['id'];
+                $entity = Entitymodel::getById(['id' => $value['item_id'], 'select' => ['entity_label', 'entity_id']]);
+                $listInstances[$key]['item_id'] = $entity['entity_id'];
+                $listInstances[$key]['itemSerialId'] = $value['item_id'];
                 $listInstances[$key]['labelToDisplay'] = $entity['entity_label'];
                 $listInstances[$key]['descriptionToDisplay'] = '';
             } else {
-                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id']]);
-                $listInstances[$key]['itemSerialId'] = $user['id'];
-                $listInstances[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['login' => $value['item_id']]);
-                $listInstances[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']])['entity_label'];
+                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['user_id']]);
+                $listInstances[$key]['item_id'] = $user['user_id'];
+                $listInstances[$key]['itemSerialId'] = $value['item_id'];
+                $listInstances[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['id' => $value['item_id']]);
+                $listInstances[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']])['entity_label'];
             }
         }
 
@@ -74,14 +69,13 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'users.id', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
-            $listInstances[$key]['item_id'] = $listInstances[$key]['id'];
             $listInstances[$key]['item_type'] = 'user';
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
 
             $listInstances[$key]['hasPrivilege'] = true;
-            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['id']])) {
+            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['item_id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['item_id']])) {
                 $listInstances[$key]['hasPrivilege'] = false;
             }
         }
@@ -95,14 +89,13 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'users.id', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
-            $listInstances[$key]['item_id'] = $listInstances[$key]['id'];
             $listInstances[$key]['item_type'] = 'user';
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
 
             $listInstances[$key]['hasPrivilege'] = true;
-            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['id']])) {
+            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['item_id']])) {
                 $listInstances[$key]['hasPrivilege'] = false;
             }
         }
@@ -116,14 +109,13 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getParallelOpinionByResId(['select' => ['listinstance_id', 'sequence', 'item_mode', 'item_id', 'item_type', 'users.id', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getParallelOpinionByResId(['select' => ['listinstance_id', 'sequence', 'item_mode', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
-            $listInstances[$key]['item_id'] = $listInstances[$key]['id'];
             $listInstances[$key]['item_type'] = 'user';
             $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
 
             $listInstances[$key]['hasPrivilege'] = true;
-            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['id']])) {
+            if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['item_id']])) {
                 $listInstances[$key]['hasPrivilege'] = false;
             }
         }
@@ -177,8 +169,6 @@ class ListInstanceController
         ValidatorModel::arrayType($args, ['data']);
         ValidatorModel::intVal($args, ['userId']);
 
-        $currentUser = UserModel::getById(['select' => ['user_id'], 'id' => $args['userId']]);
-
         DatabaseModel::beginTransaction();
 
         foreach ($args['data'] as $ListInstanceByRes) {
@@ -227,26 +217,25 @@ class ListInstanceController
                 }
 
                 if (in_array($instance['item_type'], ['user_id', 'user'])) {
-                    if ($instance['item_type'] == 'user_id') {
+                    if (!is_numeric($instance['item_id'])) {
                         $user = UserModel::getByLogin(['login' => $instance['item_id'], 'select' => ['id']]);
+                        $instance['item_id'] = $user['id'] ?? null;
                     } else {
-                        $user = UserModel::getById(['id' => $instance['item_id'], 'select' => ['id', 'user_id']]);
-                        $instance['item_id'] = $user['user_id'] ?? null;
-                        $instance['item_type'] = 'user_id';
+                        $user = UserModel::getById(['id' => $instance['item_id'], 'select' => [1]]);
                     }
+                    $instance['item_type'] = 'user_id';
                     if (empty($user)) {
                         DatabaseModel::rollbackTransaction();
                         return ['errors' => 'User not found', 'code' => 400];
                     }
                 } elseif (in_array($instance['item_type'], ['entity_id', 'entity'])) {
                     if ($instance['item_type'] == 'entity_id') {
-                        $entity = EntityModel::getByEntityId(['entityId' => $instance['item_id'], 'select' => ['enabled']]);
+                        $entity = EntityModel::getByEntityId(['entityId' => $instance['item_id'], 'select' => ['id', 'enabled']]);
+                        $instance['item_id'] = $entity['id'] ?? null;
                     } else {
-                        $entity = EntityModel::getById(['id' => $instance['item_id'], 'select' => ['enabled', 'entity_id']]);
-                        $instance['item_id'] = $entity['entity_id'] ?? null;
+                        $entity = EntityModel::getById(['id' => $instance['item_id'], 'select' => ['enabled']]);
                         $instance['item_type'] = 'entity_id';
                     }
-
                     if (empty($entity) || $entity['enabled'] != 'Y') {
                         DatabaseModel::rollbackTransaction();
                         return ['errors' => 'Entity not found or not active', 'code' => 400];
@@ -278,7 +267,7 @@ class ListInstanceController
                     'item_id'               => $instance['item_id'],
                     'item_type'             => $instance['item_type'],
                     'item_mode'             => $instance['item_mode'],
-                    'added_by_user'         => $currentUser['user_id'],
+                    'added_by_user'         => $args['userId'],
                     'difflist_type'         => 'entity_id',
                     'process_date'          => null,
                     'process_comment'       => null,
@@ -287,9 +276,9 @@ class ListInstanceController
                 ]);
 
                 if ($instance['item_mode'] == 'dest') {
-                    $set = ['dest_user' => $user['id']];
+                    $set = ['dest_user' => $instance['item_id']];
                     $changeDestination = true;
-                    $entities = UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$user['id']]]);
+                    $entities = UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$instance['item_id']]]);
                     $resource = ResModel::getById(['select' => ['destination'], 'resId' => $ListInstanceByRes['resId']]);
                     foreach ($entities as $entity) {
                         if ($entity['entity_id'] == $resource['destination']) {
@@ -362,8 +351,6 @@ class ListInstanceController
                 'data'    => [$resource['resId'], self::MAPPING_TYPES[$args['type']]],
                 'orderBy' => ['sequence']
             ]);
-
-
             $newListSequenceOrdered = array_column($resource['listInstances'], null, 'sequence');
 
             ListInstanceModel::delete([
@@ -399,13 +386,13 @@ class ListInstanceController
                     return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances[{$key}] sequence is before already processed users"]);
                 }
 
-                if ($listInstance['item_type'] == 'user_id') {
+                if (!is_numeric($listInstance['item_id'])) {
                     $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['id'], 'noDeleted' => true]);
+                    $listInstance['item_id'] = $user['id'] ?? null;
                 } else {
-                    $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'user_id'], 'noDeleted' => true]);
-                    $listInstance['item_id'] = $user['user_id'] ?? null;
-                    $listInstance['item_type'] = 'user_id';
+                    $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id'], 'noDeleted' => true]);
                 }
+                $listInstance['item_type'] = 'user_id';
                 if (empty($user)) {
                     DatabaseModel::rollbackTransaction();
                     return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances[{$key}] item_id does not exist"]);
@@ -441,7 +428,7 @@ class ListInstanceController
                     'item_id'               => $listInstance['item_id'],
                     'item_type'             => $listInstance['item_type'],
                     'item_mode'             => $listInstance['item_mode'],
-                    'added_by_user'         => $GLOBALS['userId'],
+                    'added_by_user'         => $GLOBALS['id'],
                     'difflist_type'         => $args['type'] == 'visaCircuit' ? 'VISA_CIRCUIT' : 'AVIS_CIRCUIT',
                     'process_date'          => $listInstance['process_date'],
                     'process_comment'       => $listInstance['process_comment'],

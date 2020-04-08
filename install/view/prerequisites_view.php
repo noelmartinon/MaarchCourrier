@@ -280,19 +280,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="voyantPrerequisites">
-                        <?php echo $Class_Install->checkPrerequisites(
-                            $Class_Install->isPearRequirements(
-                                'Maarch_CLITools/FileHandler.php'
-                            ),
-                            true
-                        );?>
-                    </td>
-                    <td>
-                        <?php echo _CLITOOLS;?>
-                    </td>
-                </tr>
-                <tr>
                     <td>&nbsp;
 
                     </td>

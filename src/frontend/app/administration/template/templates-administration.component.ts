@@ -7,12 +7,10 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "templates-administration.component.html",
+    templateUrl: 'templates-administration.component.html',
     providers: [AppService]
 })
 
@@ -48,13 +46,11 @@ export class TemplatesAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.templates);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -77,13 +73,13 @@ export class TemplatesAdministrationComponent implements OnInit {
     }
 
     deleteTemplate(template: any) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + template.template_label + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + template.template_label + ' »');
 
         if (r) {
             this.http.delete('../../rest/templates/' + template.template_id)
                 .subscribe(() => {
-                    for (let i in this.templates) {
-                        if (this.templates[i].template_id == template.template_id) {
+                    for (const i in this.templates) {
+                        if (this.templates[i].template_id === template.template_id) {
                             this.templates.splice(Number(i), 1);
                         }
                     }

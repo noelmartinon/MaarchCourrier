@@ -38,31 +38,11 @@ abstract class ListInstanceModelAbstract
         return $listInstances;
     }
 
-    public static function getById(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['id']);
-        ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::arrayType($aArgs, ['select']);
-
-        $aListinstance = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['listinstance'],
-            'where'     => ['listinstance_id = ?'],
-            'data'      => [$aArgs['id']],
-        ]);
-
-        if (empty($aListinstance[0])) {
-            return [];
-        }
-
-        return $aListinstance[0];
-    }
-
     public static function create(array $args)
     {
         ValidatorModel::notEmpty($args, ['res_id', 'item_id', 'item_type', 'item_mode', 'added_by_user', 'difflist_type']);
-        ValidatorModel::intVal($args, ['res_id', 'sequence', 'viewed']);
-        ValidatorModel::stringType($args, ['item_type', 'item_id', 'item_mode', 'added_by_user', 'difflist_type', 'process_date', 'process_comment']);
+        ValidatorModel::intVal($args, ['res_id', 'sequence', 'viewed', 'item_id', 'added_by_user']);
+        ValidatorModel::stringType($args, ['item_type', 'item_mode', 'difflist_type', 'process_date', 'process_comment']);
 
         DatabaseModel::insert([
             'table'         => 'listinstance',
@@ -123,7 +103,7 @@ abstract class ListInstanceModelAbstract
         $aListinstance = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['listinstance', 'users', 'users_entities', 'entities'],
-            'left_join' => ['listinstance.item_id = users.user_id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
+            'left_join' => ['listinstance.item_id = users.id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
             'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?', 'primary_entity = ?'],
             'data'      => [$aArgs['id'], 'user_id', 'VISA_CIRCUIT', 'Y'],
             'order_by'  => ['listinstance_id ASC'],
@@ -141,7 +121,7 @@ abstract class ListInstanceModelAbstract
         $aListinstance = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['listinstance', 'users', 'users_entities', 'entities'],
-            'left_join' => ['listinstance.item_id = users.user_id', 'users_entities.user_id = users.user_id', 'entities.entity_id = users_entities.entity_id'],
+            'left_join' => ['listinstance.item_id = users.id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
             'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?', 'primary_entity = ?'],
             'data'      => [$aArgs['id'], 'user_id', 'AVIS_CIRCUIT', 'Y'],
             'order_by'  => ['listinstance_id ASC'],
@@ -159,7 +139,7 @@ abstract class ListInstanceModelAbstract
         $aListinstance = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['listinstance', 'users', 'users_entities', 'entities'],
-            'left_join' => ['listinstance.item_id = users.user_id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
+            'left_join' => ['listinstance.item_id = users.id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
             'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?', 'primary_entity = ?', 'item_mode in (?)'],
             'data'      => [$aArgs['id'], 'user_id', 'entity_id', 'Y', ['avis', 'avis_copy', 'avis_info']],
             'order_by'  => ['listinstance_id ASC'],
@@ -190,26 +170,27 @@ abstract class ListInstanceModelAbstract
         return $aListinstance[0];
     }
 
-    public static function getWithConfidentiality(array $aArgs)
+    public static function getWithConfidentiality(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['entityId', 'userId']);
-        ValidatorModel::stringType($aArgs, ['entityId', 'userId']);
-        ValidatorModel::arrayType($aArgs, ['select']);
+        ValidatorModel::notEmpty($args, ['entityId', 'userId']);
+        ValidatorModel::stringType($args, ['entityId', 'userId']);
+        ValidatorModel::arrayType($args, ['select']);
 
         $aListInstances = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
             'table'     => ['listinstance, res_letterbox'],
             'where'     => ['listinstance.res_id = res_letterbox.res_id', 'confidentiality = ?', 'destination = ?', 'item_id = ?', 'closing_date is null'],
-            'data'      => ['Y', $aArgs['entityId'], $aArgs['userId']]
+            'data'      => ['Y', $args['entityId'], $args['userId']]
         ]);
 
         return $aListInstances;
     }
 
-    public static function getWhenOpenMailsByLogin(array $aArgs)
+    public static function getWhenOpenMailsByUserId(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['login', 'itemMode']);
-        ValidatorModel::stringType($aArgs, ['login', 'itemMode']);
+        ValidatorModel::notEmpty($aArgs, ['userId', 'itemMode']);
+        ValidatorModel::stringType($aArgs, ['itemMode']);
+        ValidatorModel::intVal($aArgs, ['userId']);
         ValidatorModel::arrayType($aArgs, ['select']);
 
         $listInstances = DatabaseModel::select([
@@ -217,7 +198,7 @@ abstract class ListInstanceModelAbstract
             'table'     => ['listinstance', 'res_letterbox'],
             'left_join' => ['listinstance.res_id = res_letterbox.res_id'],
             'where'     => ['listinstance.item_id = ?', 'listinstance.difflist_type = ?', 'listinstance.item_type = ?', 'listinstance.item_mode = ?', 'res_letterbox.closing_date is null', 'res_letterbox.status != ?'],
-            'data'      => [$aArgs['login'], 'entity_id', 'user_id', $aArgs['itemMode'], 'DEL']
+            'data'      => [$aArgs['userId'], 'entity_id', 'user_id', $aArgs['itemMode'], 'DEL']
         ]);
 
         return $listInstances;

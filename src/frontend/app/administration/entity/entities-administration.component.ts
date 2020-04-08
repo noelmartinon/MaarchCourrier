@@ -12,16 +12,15 @@ import { Router } from '@angular/router';
 import { AppService } from '../../../service/app.service';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { FunctionsService } from '../../../service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
-
+declare var $: any;
 @Component({
-    templateUrl: "entities-administration.component.html",
+    templateUrl: 'entities-administration.component.html',
     styleUrls: ['entities-administration.component.css'],
     providers: [AppService]
 })
@@ -87,7 +86,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.entities);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -104,10 +103,10 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     initEntitiesTree() {
         setTimeout(() => {
-            $j('#jstree').jstree({
-                "checkbox": {
+            $('#jstree').jstree({
+                'checkbox': {
                     'deselect_all': true,
-                    "three_state": false //no cascade selection
+                    'three_state': false // no cascade selection
                 },
                 'core': {
                     force_text: true,
@@ -117,9 +116,9 @@ export class EntitiesAdministrationComponent implements OnInit {
                     },
                     'multiple': false,
                     'data': this.entities,
-                    "check_callback": function (operation: any, node: any, node_parent: any, node_position: any, more: any) {
-                        if (operation == 'move_node') {
-                            if (node_parent.id == '#') {
+                    'check_callback': function (operation: any, node: any, node_parent: any, node_position: any, more: any) {
+                        if (operation === 'move_node') {
+                            if (node_parent.id === '#') {
                                 return false;
                             } else if (!node_parent.original.allowed) {
                                 return false;
@@ -129,10 +128,10 @@ export class EntitiesAdministrationComponent implements OnInit {
                         }
                     }
                 },
-                "dnd": {
+                'dnd': {
                     is_draggable: function (nodes: any) {
-                        var i = 0;
-                        var j = nodes.length;
+                        let i = 0;
+                        const j = nodes.length;
                         for (; i < j; i++) {
                             if (!nodes[i].original.allowed) {
                                 return false;
@@ -141,27 +140,27 @@ export class EntitiesAdministrationComponent implements OnInit {
                         return true;
                     }
                 },
-                "plugins": ["checkbox", "search", "dnd", "sort"]
+                'plugins': ['checkbox', 'search', 'dnd', 'sort']
             });
-            $j('#jstree').jstree('select_node', this.entities[0]);
-            var to: any = false;
-            $j('#jstree_search').keyup(function () {
+            $('#jstree').jstree('select_node', this.entities[0]);
+            let to: any = false;
+            $('#jstree_search').keyup(function () {
                 if (to) { clearTimeout(to); }
                 to = setTimeout(function () {
-                    var v = $j('#jstree_search').val();
-                    $j('#jstree').jstree(true).search(v);
+                    const v: any = $('#jstree_search').val();
+                    $('#jstree').jstree(true).search(v);
                 }, 250);
             });
-            $j('#jstree')
+            $('#jstree')
                 // listen for event
                 .on('select_node.jstree', (e: any, data: any) => {
-                    if (this.sidenavRight.opened == false) {
+                    if (this.sidenavRight.opened === false) {
                         this.sidenavRight.open();
                     }
-                    if (this.creationMode == true) {
+                    if (this.creationMode === true) {
                         this.currentEntity.parent_entity_id = data.node.id;
                     } else {
-                        if (this.newEntity == true) {
+                        if (this.newEntity === true) {
                             this.loadEntity(this.currentEntity.entity_id);
                             this.newEntity = false;
                         } else {
@@ -175,8 +174,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
                 }).on('move_node.jstree', (e: any, data: any) => {
 
-
-                    if (this.currentEntity.parent_entity_id != this.currentEntity.entity_id) {
+                    if (this.currentEntity.parent_entity_id !== this.currentEntity.entity_id) {
                         this.currentEntity.parent_entity_id = data.parent;
                     }
                     this.moveEntity();
@@ -184,9 +182,9 @@ export class EntitiesAdministrationComponent implements OnInit {
                 // create the instance
                 .jstree();
 
-            $j(document).on('dnd_start.vakata', (e: any, data: any) => {
-                $j('#jstree').jstree('deselect_all');
-                $j('#jstree').jstree('select_node', data.data.nodes[0]);
+            $(document).on('dnd_start.vakata', (e: any, data: any) => {
+                $('#jstree').jstree('deselect_all');
+                $('#jstree').jstree('select_node', data.data.nodes[0]);
             });
         }, 0);
     }
@@ -219,7 +217,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         });
-       
+
     }
 
     getEntities() {
@@ -235,13 +233,13 @@ export class EntitiesAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         });
-       
+
     }
 
     loadEntity(entity_id: any) {
         this.visaCircuitModified = false;
         this.opinionCircuitModified = false;
-        this.http.get("../../rest/entities/" + entity_id + '/details')
+        this.http.get('../../rest/entities/' + entity_id + '/details')
             .subscribe((data: any) => {
                 this.currentEntity = data['entity'];
 
@@ -282,12 +280,12 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     addElemListModelVisa(element: any) {
         this.visaCircuitModified = true;
-        let newElemListModel = {
-            "id": element.id,
-            "type": 'user',
-            "mode": "sign",
-            "idToDisplay": element.idToDisplay,
-            "descriptionToDisplay": element.otherInfo
+        const newElemListModel = {
+            'id': element.id,
+            'type': 'user',
+            'mode': 'sign',
+            'idToDisplay': element.idToDisplay,
+            'descriptionToDisplay': element.otherInfo
         };
 
         if (!this.currentEntity.visaCircuit.items) {
@@ -301,12 +299,12 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     addElemListModelOpinion(element: any) {
         this.opinionCircuitModified = true;
-        let newElemListModel = {
-            "id": element.id,
-            "type": 'user',
-            "mode": "avis",
-            "idToDisplay": element.idToDisplay,
-            "descriptionToDisplay": element.otherInfo
+        const newElemListModel = {
+            'id': element.id,
+            'type': 'user',
+            'mode': 'avis',
+            'idToDisplay': element.idToDisplay,
+            'descriptionToDisplay': element.otherInfo
         };
 
         if (!this.currentEntity.opinionCircuit.items) {
@@ -316,40 +314,40 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     saveEntity() {
-        if (this.currentEntity.parent_entity_id == '#') {
+        if (this.currentEntity.parent_entity_id === '#') {
             this.currentEntity.parent_entity_id = '';
         }
 
-        var r = true;
-        if (this.currentEntity.parent_entity_id == '') {
+        let r = true;
+        if (this.currentEntity.parent_entity_id === '') {
             r = confirm(this.lang.entityWithoutParentMessage);
         }
 
         if (r) {
             if (this.creationMode) {
-                this.http.post("../../rest/entities", this.currentEntity)
+                this.http.post('../../rest/entities', this.currentEntity)
                     .subscribe((data: any) => {
                         this.currentEntity.listTemplate = [];
                         this.entities = data['entities'];
                         this.creationMode = false;
                         this.newEntity = true;
-                        $j('#jstree').jstree(true).settings.core.data = this.entities;
-                        $j('#jstree').jstree(true).settings.select_node = this.currentEntity;
-                        $j('#jstree').jstree(true).refresh();
-                        $j('#jstree').on("refresh.jstree", (e: any) => {
-                            $j('#jstree').jstree('deselect_all');
-                            $j('#jstree').jstree('select_node', this.currentEntity.entity_id);
+                        $('#jstree').jstree(true).settings.core.data = this.entities;
+                        // $('#jstree').jstree(true).settings.select_node = this.currentEntity;
+                        $('#jstree').jstree(true).refresh();
+                        $('#jstree').on('refresh.jstree', (e: any) => {
+                            $('#jstree').jstree('deselect_all');
+                            $('#jstree').jstree('select_node', this.currentEntity.entity_id);
                         });
                         this.notify.success(this.lang.entityAdded);
                     }, (err) => {
                         this.notify.error(err.error.errors);
                     });
             } else {
-                this.http.put("../../rest/entities/" + this.currentEntity.entity_id, this.currentEntity)
+                this.http.put('../../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
                     .subscribe((data: any) => {
                         this.entities = data['entities'];
-                        $j('#jstree').jstree(true).settings.core.data = this.entities;
-                        $j('#jstree').jstree("refresh");
+                        $('#jstree').jstree(true).settings.core.data = this.entities;
+                        $('#jstree').jstree('refresh');
                         this.notify.success(this.lang.entityUpdated);
                     }, (err) => {
                         this.notify.error(err.error.errors);
@@ -359,7 +357,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     moveEntity() {
-        this.http.put("../../rest/entities/" + this.currentEntity.entity_id, this.currentEntity)
+        this.http.put('../../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
             .subscribe(() => {
                 this.notify.success(this.lang.entityUpdated);
             }, (err) => {
@@ -370,11 +368,11 @@ export class EntitiesAdministrationComponent implements OnInit {
     readMode() {
         this.creationMode = false;
         this.isDraggable = true;
-        $j('#jstree').jstree('deselect_all');
+        $('#jstree').jstree('deselect_all');
         if (this.currentEntity.parent_entity_id) {
             for (let i = 0; i < this.entities.length; i++) {
-                if (this.entities[i].entity_id == this.currentEntity.parent_entity_id) {
-                    $j('#jstree').jstree('select_node', this.entities[i]);
+                if (this.entities[i].entity_id === this.currentEntity.parent_entity_id) {
+                    $('#jstree').jstree('select_node', this.entities[i]);
                     break;
                 }
             }
@@ -385,8 +383,8 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     selectParentEntity(entity_id: any) {
         if (this.creationMode) {
-            $j('#jstree').jstree('deselect_all');
-            $j('#jstree').jstree('select_node', entity_id);
+            $('#jstree').jstree('deselect_all');
+            $('#jstree').jstree('select_node', entity_id);
         }
     }
 
@@ -397,12 +395,12 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.dialogRef.afterClosed().subscribe((result: any) => {
                 if (result) {
                     if (this.currentEntity.listTemplate.id) {
-                        this.http.delete("../../rest/listTemplates/" + this.currentEntity.listTemplate.id)
+                        this.http.delete('../../rest/listTemplates/' + this.currentEntity.listTemplate.id)
                             .subscribe((data: any) => {
                                 this.currentEntity.listTemplate.id = data.id;
-                                this.http.get("../../rest/listTemplates/types/entity_id/roles")
-                                    .subscribe((data: any) => {
-                                        this.listTemplateRoles = data['roles'];
+                                this.http.get('../../rest/listTemplates/types/entity_id/roles')
+                                    .subscribe((dataTemplates: any) => {
+                                        this.listTemplateRoles = dataTemplates['roles'];
                                     }, (err) => {
                                         this.notify.error(err.error.errors);
                                     });
@@ -412,7 +410,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                     }
 
                     if (this.idVisaCircuit) {
-                        this.http.delete("../../rest/listTemplates/" + this.idVisaCircuit)
+                        this.http.delete('../../rest/listTemplates/' + this.idVisaCircuit)
                             .subscribe(() => {
                                 this.idVisaCircuit = null;
                             }, (err) => {
@@ -420,14 +418,14 @@ export class EntitiesAdministrationComponent implements OnInit {
                             });
                     }
 
-                    this.http.put("../../rest/entities/" + result.entity_id + "/reassign/" + result.redirectEntity, {})
+                    this.http.put('../../rest/entities/' + result.entity_id + '/reassign/' + result.redirectEntity, {})
                         .subscribe((data: any) => {
                             this.entities = data['entities'];
-                            $j('#jstree').jstree(true).settings.core.data = this.entities;
-                            $j('#jstree').jstree("refresh");
+                            $('#jstree').jstree(true).settings.core.data = this.entities;
+                            $('#jstree').jstree('refresh');
                             this.sidenavRight.close();
 
-                            if (typeof data['deleted'] !== "undefined" && !data['deleted']) {
+                            if (typeof data['deleted'] !== 'undefined' && !data['deleted']) {
                                 this.notify.success(this.lang.entityDeletedButAnnuaryUnreachable);
                             } else {
                                 this.notify.success(this.lang.entityDeleted);
@@ -439,16 +437,16 @@ export class EntitiesAdministrationComponent implements OnInit {
                 this.dialogRef = null;
             });
         } else {
-            let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentEntity.entity_label + ' »');
+            const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentEntity.entity_label + ' »');
 
             if (r) {
                 if (this.currentEntity.listTemplate.id) {
-                    this.http.delete("../../rest/listTemplates/" + this.currentEntity.listTemplate.id)
+                    this.http.delete('../../rest/listTemplates/' + this.currentEntity.listTemplate.id)
                         .subscribe((data: any) => {
                             this.currentEntity.listTemplate.id = data.id;
-                            this.http.get("../../rest/listTemplates/types/entity_id/roles")
-                                .subscribe((data: any) => {
-                                    this.listTemplateRoles = data['roles'];
+                            this.http.get('../../rest/listTemplates/types/entity_id/roles')
+                                .subscribe((dataTemplates: any) => {
+                                    this.listTemplateRoles = dataTemplates['roles'];
                                 }, (err) => {
                                     this.notify.error(err.error.errors);
                                 });
@@ -458,7 +456,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 }
 
                 if (this.idVisaCircuit) {
-                    this.http.delete("../../rest/listTemplates/" + this.idVisaCircuit)
+                    this.http.delete('../../rest/listTemplates/' + this.idVisaCircuit)
                         .subscribe(() => {
                             this.idVisaCircuit = null;
                         }, (err) => {
@@ -466,13 +464,13 @@ export class EntitiesAdministrationComponent implements OnInit {
                         });
                 }
 
-                this.http.delete("../../rest/entities/" + this.currentEntity.entity_id)
+                this.http.delete('../../rest/entities/' + this.currentEntity.entity_id)
                     .subscribe((data: any) => {
                         this.entities = data['entities'];
-                        $j('#jstree').jstree(true).settings.core.data = this.entities;
-                        $j('#jstree').jstree("refresh");
+                        $('#jstree').jstree(true).settings.core.data = this.entities;
+                        $('#jstree').jstree('refresh');
                         this.sidenavRight.close();
-                        if (typeof data['deleted'] !== "undefined" && !data['deleted']) {
+                        if (typeof data['deleted'] !== 'undefined' && !data['deleted']) {
                             this.notify.success(this.lang.entityDeletedButAnnuaryUnreachable);
                         } else {
                             this.notify.success(this.lang.entityDeleted);
@@ -490,19 +488,19 @@ export class EntitiesAdministrationComponent implements OnInit {
         this.isDraggable = false;
         if (this.currentEntity.entity_id) {
             for (let i = 0; i < this.entities.length; i++) {
-                if (this.entities[i].entity_id == this.currentEntity.entity_id) {
-                    this.currentEntity = { "entity_type": this.entityTypeList[0].id };
+                if (this.entities[i].entity_id === this.currentEntity.entity_id) {
+                    this.currentEntity = { 'entity_type': this.entityTypeList[0].id };
                     this.currentEntity.parent_entity_id = this.entities[i].entity_id;
                     break;
                 }
             }
         } else {
-            this.currentEntity = { "entity_type": this.entityTypeList[0].id };
-            $j('#jstree').jstree('deselect_all');
+            this.currentEntity = { 'entity_type': this.entityTypeList[0].id };
+            $('#jstree').jstree('deselect_all');
             this.sidenavRight.open();
             /*for (let i = 0; i < this.entities.length; i++) {
                 if (this.entities[i].allowed == true) {
-                    $j('#jstree').jstree('select_node', this.entities[i]);
+                    $('#jstree').jstree('select_node', this.entities[i]);
                     break;
                 }
             }*/
@@ -510,26 +508,26 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     updateStatus(entity: any, method: string) {
-        this.http.put("../../rest/entities/" + entity['entity_id'] + "/status", { "method": method })
+        this.http.put('../../rest/entities/' + entity['entity_id'] + '/status', { 'method': method })
             .subscribe((data: any) => {
-                this.notify.success("");
+                this.notify.success('');
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
     saveDiffList() {
-        var newDiffList = {
-            "title": this.currentEntity.entity_id,
-            "description": this.currentEntity.entity_id,
-            "type": "diffusionList",
-            "entityId": this.currentEntity.id,
-            "items": this.appDiffusionsList.getCurrentListinstance().map((item: any) => {
+        const newDiffList = {
+            'title': this.currentEntity.entity_id,
+            'description': this.currentEntity.entity_id,
+            'type': 'diffusionList',
+            'entityId': this.currentEntity.id,
+            'items': this.appDiffusionsList.getCurrentListinstance().map((item: any) => {
                 return {
-                    "id": item.item_id,
-                    "type": item.item_type,
-                    "mode": item.item_mode
-                }
+                    'id': item.item_id,
+                    'type': item.item_type,
+                    'mode': item.item_mode
+                };
             })
         };
 
@@ -578,17 +576,17 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     saveDiffListVisa() {
         const newDiffList = {
-            "title": this.currentEntity.entity_id,
-            "description": this.currentEntity.entity_id,
-            "type": "visaCircuit",
-            "entityId": this.currentEntity.id,
-            "items": this.appVisaWorkflow.getWorkflow().map((item: any, index : number) => {
+            'title': this.currentEntity.entity_id,
+            'description': this.currentEntity.entity_id,
+            'type': 'visaCircuit',
+            'entityId': this.currentEntity.id,
+            'items': this.appVisaWorkflow.getWorkflow().map((item: any, index: number) => {
                 return {
-                    "id": item.item_id,
-                    "type": item.item_type,
-                    "mode": item.requested_signature ? 'sign' : 'visa',
-                    "sequence": index
-                }
+                    'id': item.item_id,
+                    'type': item.item_type,
+                    'mode': item.requested_signature ? 'sign' : 'visa',
+                    'sequence': index
+                };
             })
         };
         if (!this.appVisaWorkflow.isValidWorkflow()) {
@@ -630,22 +628,22 @@ export class EntitiesAdministrationComponent implements OnInit {
                     })
                 ).subscribe();
             }
-        }   
+        }
     }
 
     saveDiffListOpinion() {
         const newDiffList = {
-            "title": this.currentEntity.entity_id,
-            "description": this.currentEntity.entity_id,
-            "type": "opinionCircuit",
-            "entityId": this.currentEntity.id,
-            "items": this.appAvisWorkflow.getWorkflow().map((item: any, index : number) => {
+            'title': this.currentEntity.entity_id,
+            'description': this.currentEntity.entity_id,
+            'type': 'opinionCircuit',
+            'entityId': this.currentEntity.id,
+            'items': this.appAvisWorkflow.getWorkflow().map((item: any, index: number) => {
                 return {
-                    "id": item.item_id,
-                    "type": item.item_type,
-                    "mode": 'avis',
-                    "sequence": index
-                }
+                    'id': item.item_id,
+                    'type': item.item_type,
+                    'mode': 'avis',
+                    'sequence': index
+                };
             })
         };
 
@@ -694,12 +692,12 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     toggleRole(role: any) {
         if (role.usedIn.length > 0) {
-            let dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { title: this.lang.confirmAction, msg: this.lang.roleUsedInTemplateInfo + " : <b>" + role.usedIn.join(', ') + '</b><br/>' + this.lang.roleUsedInTemplateInfo2 } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { title: this.lang.confirmAction, msg: this.lang.roleUsedInTemplateInfo + ' : <b>' + role.usedIn.join(', ') + '</b><br/>' + this.lang.roleUsedInTemplateInfo2 } });
 
             dialogRef.afterClosed().subscribe(result => {
-                if (result === "ok") {
+                if (result === 'ok') {
                     role.available = !role.available;
-                    this.http.put("../../rest/listTemplates/types/entity_id/roles", { "roles": this.listTemplateRoles })
+                    this.http.put('../../rest/listTemplates/types/entity_id/roles', { 'roles': this.listTemplateRoles })
                         .subscribe(() => {
                             role.usedIn = [];
                             if (this.currentEntity.listTemplate) {
@@ -713,11 +711,11 @@ export class EntitiesAdministrationComponent implements OnInit {
             });
         } else {
             role.available = !role.available;
-            this.http.put("../../rest/listTemplates/types/entity_id/roles", { "roles": this.listTemplateRoles })
+            this.http.put('../../rest/listTemplates/types/entity_id/roles', { 'roles': this.listTemplateRoles })
                 .subscribe(() => {
                     if (this.currentEntity.listTemplate) {
                         this.currentEntity.listTemplate.items[role.id] = [];
-                        this.http.get("../../rest/listTemplates/types/entity_id/roles")
+                        this.http.get('../../rest/listTemplates/types/entity_id/roles')
                             .subscribe((data: any) => {
                                 this.listTemplateRoles = data['roles'];
                             }, (err) => {
@@ -732,15 +730,15 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     linkUser(newUser: any) {
-        let entity = {
-            "entityId": this.currentEntity.entity_id,
-            "role": ''
+        const entity = {
+            'entityId': this.currentEntity.entity_id,
+            'role': ''
         };
 
-        this.http.post("../../rest/users/" + newUser.id + "/entities", entity)
+        this.http.post('../../rest/users/' + newUser.id + '/entities', entity)
             .subscribe((data: any) => {
-                var displayName = newUser.idToDisplay.split(" ");
-                var user = {
+                const displayName = newUser.idToDisplay.split(' ');
+                const user = {
                     id: newUser.id,
                     user_id: newUser.otherInfo,
                     firstname: displayName[0],
@@ -763,10 +761,10 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     addEntityToAnnuary() {
-        this.http.put("../../rest/entities/" + this.currentEntity.id + "/annuaries", this.currentEntity)
+        this.http.put('../../rest/entities/' + this.currentEntity.id + '/annuaries', this.currentEntity)
             .subscribe((data: any) => {
                 this.currentEntity.business_id = data['entitySiret'];
-                if (typeof data['synchronized'] === "undefined") {
+                if (typeof data['synchronized'] === 'undefined') {
                     this.notify.success(this.lang.siretGenerated);
                 } else {
                     if (data['synchronized']) {
@@ -781,9 +779,9 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 }
 @Component({
-    templateUrl: "entities-administration-redirect-modal.component.html",
+    templateUrl: 'entities-administration-redirect-modal.component.html',
     styles: [
-        ".alert-message { max-width: inherit; }"
+        '.alert-message { max-width: inherit; }'
     ]
 })
 export class EntitiesAdministrationRedirectModalComponent {

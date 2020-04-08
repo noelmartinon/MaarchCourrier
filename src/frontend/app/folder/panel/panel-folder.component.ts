@@ -1,35 +1,31 @@
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { FolderTreeComponent } from '../folder-tree.component';
 import { FoldersService } from '../folders.service';
-import { HeaderService } from '../../../service/header.service';
 import { ActionsService } from '../../actions/actions.service';
-import { Subscription } from 'rxjs';
-
-declare function $j(selector: any): any;
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'panel-folder',
-    templateUrl: "panel-folder.component.html",
+    templateUrl: 'panel-folder.component.html',
     styleUrls: ['panel-folder.component.scss'],
 })
-export class PanelFolderComponent implements OnInit {
+export class PanelFolderComponent implements OnInit, OnDestroy {
 
     lang: any = LANG;
 
-    @Input('selectedId') id: number;
-    
+    @Input() selectedId: number;
+
     @ViewChild('folderTree', { static: false }) folderTree: FolderTreeComponent;
-    
-    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
+
+    @Output() refreshEvent = new EventEmitter<string>();
 
     subscription: Subscription;
-    
+
     constructor(
         public foldersService: FoldersService,
-        public actionService: ActionsService,
-        private changeDetectorRef: ChangeDetectorRef
-        ) {
+        public actionService: ActionsService
+    ) {
         this.subscription = this.actionService.catchAction().subscribe(message => {
 
             this.refreshFoldersTree();
@@ -46,7 +42,7 @@ export class PanelFolderComponent implements OnInit {
     }
 
     initTree() {
-        this.folderTree.openTree(this.id);
+        this.folderTree.openTree(this.selectedId);
     }
 
     refreshDocList() {

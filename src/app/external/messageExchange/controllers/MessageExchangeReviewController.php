@@ -114,7 +114,7 @@ class MessageExchangeReviewController
 
     public function saveMessageExchangeReview(Request $request, Response $response)
     {
-        if (empty($GLOBALS['userId'])) {
+        if (empty($GLOBALS['login'])) {
             return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
         }
 
@@ -142,7 +142,7 @@ class MessageExchangeReviewController
             MessageExchangeModel::updateOperationDateMessage(['operation_date' => $dataObject->Date, 'message_id' => $messageExchange['message_id']]);
         }
 
-        $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange['res_id_master'], 'type' => 'ArchiveModificationNotification', 'userId' => $GLOBALS['userId']]);
+        $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange['res_id_master'], 'type' => 'ArchiveModificationNotification', 'userId' => $GLOBALS['login']]);
 
         return $response->withJson([
             'messageId' => $messageExchangeSaved['messageId'],

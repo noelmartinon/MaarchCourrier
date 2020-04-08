@@ -5,7 +5,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from './translate.component';
 import { NotificationService } from './notification.service';
 import { tap, catchError, filter } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
 import { PrivilegeService } from '../service/privileges.service';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
@@ -15,10 +14,10 @@ import { VisaWorkflowComponent } from './visa/visa-workflow.component';
 import { ActionsService } from './actions/actions.service';
 import { HeaderService } from '../service/header.service';
 import { AppService } from '../service/app.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: string): any;
-
-declare var angularGlobals: any;
+declare var $: any;
 
 
 @Pipe({ name: 'safeUrl' })
@@ -30,9 +29,8 @@ export class SafeUrlPipe implements PipeTransform {
 }
 
 @Component({
-    templateUrl: "signature-book.component.html",
+    templateUrl: 'signature-book.component.html',
     styleUrls: ['signature-book.component.scss'],
-    providers: [NotificationService]
 })
 export class SignatureBookComponent implements OnInit {
 
@@ -44,7 +42,7 @@ export class SignatureBookComponent implements OnInit {
     lang: any = LANG;
 
     signatureBook: any = {
-        consigne: "",
+        consigne: '',
         documents: [],
         attachments: [],
         resList: [],
@@ -54,9 +52,9 @@ export class SignatureBookComponent implements OnInit {
 
     rightSelectedThumbnail: number = 0;
     leftSelectedThumbnail: number = 0;
-    rightViewerLink: string = "";
-    leftViewerLink: string = "";
-    headerTab: string = "document";
+    rightViewerLink: string = '';
+    leftViewerLink: string = '';
+    headerTab: string = 'document';
     showTopRightPanel: boolean = false;
     showTopLeftPanel: boolean = false;
     showResLeftPanel: boolean = true;
@@ -70,8 +68,8 @@ export class SignatureBookComponent implements OnInit {
     subscription: Subscription;
     currentResourceLock: any = null;
 
-    leftContentWidth: string = "44%";
-    rightContentWidth: string = "44%";
+    leftContentWidth: string = '44%';
+    rightContentWidth: string = '44%';
     dialogRef: MatDialogRef<any>;
 
     processTool: any[] = [
@@ -118,7 +116,7 @@ export class SignatureBookComponent implements OnInit {
     ) {
         (<any>window).pdfWorkerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.min.js';
 
-        // Event after process action 
+        // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(message => {
             clearInterval(this.currentResourceLock);
             this.processAfterAction();
@@ -126,8 +124,6 @@ export class SignatureBookComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.coreUrl = angularGlobals.coreUrl;
-
         this.loading = true;
 
         this.route.params.subscribe(params => {
@@ -138,20 +134,20 @@ export class SignatureBookComponent implements OnInit {
 
             this.signatureBook.resList = []; // This line is added because of manage action behaviour (processAfterAction is called twice)
             this.lockResource();
-            this.http.get("../../rest/signatureBook/users/" + this.userId + "/groups/" + this.groupId + "/baskets/" + this.basketId + "/resources/" + this.resId)
+            this.http.get('../../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + this.resId)
                 .subscribe((data: any) => {
                     if (data.error) {
-                        location.hash = "";
-                        location.search = "";
+                        location.hash = '';
+                        location.search = '';
                         return;
                     }
                     this.signatureBook = data;
 
-                    this.headerTab = "document";
+                    this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;
                     this.rightSelectedThumbnail = 0;
-                    this.leftViewerLink = "";
-                    this.rightViewerLink = "";
+                    this.leftViewerLink = '';
+                    this.rightViewerLink = '';
                     this.showLeftPanel = true;
                     this.showRightPanel = true;
                     this.showResLeftPanel = true;
@@ -159,27 +155,27 @@ export class SignatureBookComponent implements OnInit {
                     this.showTopRightPanel = false;
                     this.showAttachmentPanel = false;
 
-                    this.leftContentWidth = "44%";
-                    this.rightContentWidth = "44%";
+                    this.leftContentWidth = '44%';
+                    this.rightContentWidth = '44%';
                     if (this.signatureBook.documents[0]) {
                         this.leftViewerLink = this.signatureBook.documents[0].viewerLink;
                         if (this.signatureBook.documents[0].inSignatureBook) {
-                            this.headerTab = "visaCircuit";
+                            this.headerTab = 'visaCircuit';
                         }
                     }
                     if (this.signatureBook.attachments[0]) {
                         this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
                     }
 
-                    this.signatureBook.resListIndex = this.signatureBook.resList.map((e: any) => { return e.res_id; }).indexOf(this.resId);
+                    this.signatureBook.resListIndex = this.signatureBook.resList.map((e: any) => e.res_id).indexOf(this.resId);
 
-                    this.displayPanel("RESLEFT");
+                    this.displayPanel('RESLEFT');
                     this.loading = false;
 
                     setTimeout(() => {
-                        $j("#rightPanelContent").niceScroll({ touchbehavior: false, cursorcolor: "#666", cursoropacitymax: 0.6, cursorwidth: 4 });
-                        if ($j(".tooltipstered").length == 0) {
-                            $j("#obsVersion").tooltipster({
+                        $('#rightPanelContent').niceScroll({ touchbehavior: false, cursorcolor: '#666', cursoropacitymax: 0.6, cursorwidth: '4' });
+                        if ($('.tooltipstered').length == 0) {
+                            $('#obsVersion').tooltipster({
                                 interactive: true
                             });
                         }
@@ -229,7 +225,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     loadActions() {
-        this.http.get("../../rest/resourcesList/users/" + this.userId + "/groups/" + this.groupId + "/baskets/" + this.basketId + "/actions?resId=" + this.resId)
+        this.http.get('../../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
                 this.signatureBook.actions = data.actions;
             }, (err) => {
@@ -238,11 +234,11 @@ export class SignatureBookComponent implements OnInit {
     }
 
     processAfterAction() {
-        var idToGo = -1;
-        var c = this.signatureBook.resList.length;
+        let idToGo = -1;
+        const c = this.signatureBook.resList.length;
 
         for (let i = 0; i < c; i++) {
-            if (this.signatureBook.resList[i].res_id == this.resId) {
+            if (this.signatureBook.resList[i].res_id === this.resId) {
                 if (this.signatureBook.resList[i + 1]) {
                     idToGo = this.signatureBook.resList[i + 1].res_id;
                 } else if (i > 0) {
@@ -253,10 +249,10 @@ export class SignatureBookComponent implements OnInit {
 
         if (c > 0) { // This (if)line is added because of manage action behaviour (processAfterAction is called twice)
             if (idToGo >= 0) {
-                $j("#send").removeAttr("disabled");
-                $j("#send").css("opacity", "1");
-                
-                this.changeLocation(idToGo, "action");
+                $('#send').removeAttr('disabled');
+                $('#send').css('opacity', '1');
+
+                this.changeLocation(idToGo, 'action');
             } else {
                 this.backToBasket();
             }
@@ -273,7 +269,7 @@ export class SignatureBookComponent implements OnInit {
         if (this.signatureBook.attachments[index]) {
             this.rightViewerLink = this.signatureBook.attachments[index].viewerLink;
         } else {
-            this.rightViewerLink = "";
+            this.rightViewerLink = '';
         }
         this.rightSelectedThumbnail = index;
     }
@@ -284,31 +280,31 @@ export class SignatureBookComponent implements OnInit {
     }
 
     displayPanel(panel: string) {
-        if (panel == "TOPRIGHT") {
+        if (panel === 'TOPRIGHT') {
             this.showTopRightPanel = !this.showTopRightPanel;
-        } else if (panel == "TOPLEFT") {
+        } else if (panel === 'TOPLEFT') {
             this.showTopLeftPanel = !this.showTopLeftPanel;
-        } else if (panel == "LEFT") {
+        } else if (panel === 'LEFT') {
             this.showLeftPanel = !this.showLeftPanel;
             this.showResLeftPanel = false;
             if (!this.showLeftPanel) {
-                this.rightContentWidth = "96%";
-                $j("#hideLeftContent").css('background', 'none');
+                this.rightContentWidth = '96%';
+                $('#hideLeftContent').css('background', 'none');
             } else {
-                this.rightContentWidth = "48%";
-                this.leftContentWidth = "48%";
-                $j("#hideLeftContent").css('background', '#fbfbfb');
+                this.rightContentWidth = '48%';
+                this.leftContentWidth = '48%';
+                $('#hideLeftContent').css('background', '#fbfbfb');
             }
-        } else if (panel == "RESLEFT") {
+        } else if (panel === 'RESLEFT') {
             this.showResLeftPanel = !this.showResLeftPanel;
             if (!this.showResLeftPanel) {
-                this.rightContentWidth = "48%";
-                this.leftContentWidth = "48%";
+                this.rightContentWidth = '48%';
+                this.leftContentWidth = '48%';
             } else {
-                this.rightContentWidth = "44%";
-                this.leftContentWidth = "44%";
-                if (this.signatureBook.resList.length == 0 || typeof this.signatureBook.resList[0].creation_date === 'undefined') {
-                    this.http.get("../../rest/signatureBook/users/" + this.userId + "/groups/" + this.groupId + "/baskets/" + this.basketId + "/resources")
+                this.rightContentWidth = '44%';
+                this.leftContentWidth = '44%';
+                if (this.signatureBook.resList.length === 0 || typeof this.signatureBook.resList[0].creation_date === 'undefined') {
+                    this.http.get('../../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources')
                         .subscribe((data: any) => {
                             this.signatureBook.resList = data.resources;
                             this.signatureBook.resList.forEach((value: any, index: number) => {
@@ -317,23 +313,23 @@ export class SignatureBookComponent implements OnInit {
                                 }
                             });
                             setTimeout(() => {
-                                $j("#resListContent").niceScroll({ touchbehavior: false, cursorcolor: "#666", cursoropacitymax: 0.6, cursorwidth: 4 });
-                                $j("#resListContent").scrollTop(0);
-                                $j("#resListContent").scrollTop($j(".resListContentFrameSelected").offset().top - 42);
+                                $('#resListContent').niceScroll({ touchbehavior: false, cursorcolor: '#666', cursoropacitymax: 0.6, cursorwidth: '4' });
+                                $('#resListContent').scrollTop(0);
+                                $('#resListContent').scrollTop($('.resListContentFrameSelected').offset().top - 42);
                             }, 0);
                         });
                 }
             }
-        } else if (panel == "MIDDLE") {
+        } else if (panel === 'MIDDLE') {
             this.showRightPanel = !this.showRightPanel;
             this.showResLeftPanel = false;
             if (!this.showRightPanel) {
-                this.leftContentWidth = "96%";
-                $j("#contentLeft").css('border-right', 'none');
+                this.leftContentWidth = '96%';
+                $('#contentLeft').css('border-right', 'none');
             } else {
-                this.rightContentWidth = "48%";
-                this.leftContentWidth = "48%";
-                $j("#contentLeft").css('border-right', 'solid 1px');
+                this.rightContentWidth = '48%';
+                this.leftContentWidth = '48%';
+                $('#contentLeft').css('border-right', 'solid 1px');
             }
         }
     }
@@ -347,17 +343,17 @@ export class SignatureBookComponent implements OnInit {
     }
 
     refreshAttachments(mode: string) {
-        if (mode == "rightContent") {
-            this.http.get(this.coreUrl + 'rest/signatureBook/' + this.resId + '/incomingMailAttachments')
+        if (mode === 'rightContent') {
+            this.http.get('../../rest/signatureBook/' + this.resId + '/incomingMailAttachments')
                 .subscribe((data: any) => {
                     this.signatureBook.documents = data;
                 });
 
         } else {
-            this.http.get(this.coreUrl + 'rest/signatureBook/' + this.resId + '/attachments')
+            this.http.get('../../rest/signatureBook/' + this.resId + '/attachments')
                 .subscribe((data: any) => {
                     var i = 0;
-                    if (mode == "add") {
+                    if (mode === 'add') {
                         var found = false;
                         data.forEach((elem: any, index: number) => {
                             if (!found && (!this.signatureBook.attachments[index] || elem.res_id != this.signatureBook.attachments[index].res_id)) {
@@ -365,7 +361,7 @@ export class SignatureBookComponent implements OnInit {
                                 found = true;
                             }
                         });
-                    } else if (mode == "edit") {
+                    } else if (mode === 'edit') {
                         var id = this.signatureBook.attachments[this.rightSelectedThumbnail].res_id;
                         data.forEach((elem: any, index: number) => {
                             if (elem.res_id == id) {
@@ -376,9 +372,9 @@ export class SignatureBookComponent implements OnInit {
 
                     this.signatureBook.attachments = data;
 
-                    if (mode == "add" || mode == "edit") {
+                    if (mode === 'add' || mode === 'edit') {
                         this.changeRightViewer(i);
-                    } else if (mode == "del") {
+                    } else if (mode === 'del') {
                         this.changeRightViewer(0);
                     }
                 });
@@ -413,11 +409,11 @@ export class SignatureBookComponent implements OnInit {
             this.http.put(route, { 'signatureId': signature.id })
                 .subscribe((data: any) => {
                     if (!attachment.isResource) {
-                        this.rightViewerLink = "../../rest/attachments/" + data.id + "/content";
+                        this.rightViewerLink = '../../rest/attachments/' + data.id + '/content';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'SIGN';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = data.new_id;
                     } else {
-                        this.rightViewerLink += "?tsp=" + Math.floor(Math.random() * 100);
+                        this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
                         this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'SIGN';
                     }
                     this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
@@ -443,33 +439,33 @@ export class SignatureBookComponent implements OnInit {
         if (attachment.isResource) {
             this.http.put('../../rest/resources/' + attachment.res_id + '/unsign', {})
                 .subscribe(() => {
-                    this.rightViewerLink += "?tsp=" + Math.floor(Math.random() * 100);
+                    this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
 
                     if (this.signatureBook.resList.length > 0) {
                         this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
                     }
-                    if (this.headerTab == "visaCircuit") {
-                        this.changeSignatureBookLeftContent("document");
+                    if (this.headerTab === 'visaCircuit') {
+                        this.changeSignatureBookLeftContent('document');
                         setTimeout(() => {
-                            this.changeSignatureBookLeftContent("visaCircuit");
+                            this.changeSignatureBookLeftContent('visaCircuit');
                         }, 0);
                     }
                 });
         } else {
             this.http.put('../../rest/attachments/' + attachment.res_id + '/unsign', {})
                 .subscribe(() => {
-                    this.rightViewerLink = "../../rest/attachments/" + attachment.res_id + "/content";
+                    this.rightViewerLink = '../../rest/attachments/' + attachment.res_id + '/content';
                     this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
                     this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = attachment.res_id;
                     if (this.signatureBook.resList.length > 0) {
                         this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
                     }
-                    if (this.headerTab == "visaCircuit") {
-                        this.changeSignatureBookLeftContent("document");
+                    if (this.headerTab === 'visaCircuit') {
+                        this.changeSignatureBookLeftContent('document');
                         setTimeout(() => {
-                            this.changeSignatureBookLeftContent("visaCircuit");
+                            this.changeSignatureBookLeftContent('visaCircuit');
                         }, 0);
                     }
 
@@ -502,7 +498,7 @@ export class SignatureBookComponent implements OnInit {
                 if (data.countLockedResources > 0) {
                     alert(data.countLockedResources + ' ' + this.lang.warnLockRes + '.');
                 } else {
-                    let path = "signatureBook/users/" + this.userId + "/groups/" + this.groupId + "/baskets/" + this.basketId + "/resources/" + resId;
+                    let path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
                     this.router.navigate([path]);
                 }
             }, (err: any) => {
@@ -511,18 +507,18 @@ export class SignatureBookComponent implements OnInit {
     }
 
     validForm() {
-        if ($j("#signatureBookActions option:selected")[0].value != "") {
+        if ($('#signatureBookActions option:selected').val() !== '') {
             this.processAction();
         } else {
-            alert("Aucune action choisie");
+            alert('Aucune action choisie');
         }
     }
 
     processAction() {
         this.http.get(`../../rest/resources/${this.resId}?light=true`).pipe(
             tap((data: any) => {
-                let actionId = $j("#signatureBookActions option:selected")[0].value;
-                let selectedAction = this.signatureBook.actions.filter((action: any) => action.id == actionId)[0];
+                const actionId = $('#signatureBookActions option:selected').val();
+                const selectedAction = this.signatureBook.actions.filter((action: any) => action.id == actionId)[0];
                 this.actionService.launchAction(selectedAction, this.userId, this.groupId, this.basketId, [this.resId], data, false);
             }),
             catchError((err: any) => {
@@ -566,7 +562,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     showAttachment(attachment: any) {
-        if (attachment.canModify && attachment.status != "SIGN") {
+        if (attachment.canModify && attachment.status !== 'SIGN') {
             this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'attachment-modal-container', disableClose: true, data: { resId: attachment.res_id } });
 
             this.dialogRef.afterClosed().pipe(

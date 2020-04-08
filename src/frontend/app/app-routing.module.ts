@@ -17,10 +17,12 @@ import { ForgotPasswordComponent }          from './login/forgotPassword/forgotP
 import { UpdatePasswordComponent }          from './login/updatePassword/updatePassword.component';
 import { ProcessComponent }                 from './process/process.component';
 import { FollowedDocumentListComponent }    from "./home/followed-list/followed-document-list.component";
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
     imports: [
         RouterModule.forRoot([
+            { path: 'login', component: LoginComponent},
             { path: 'activate-user', component: ActivateUserComponent},
             { path: 'password-modification', component: PasswordModificationComponent },
             { path: 'profile', canActivate: [AppGuard], component: ProfileComponent },
@@ -37,7 +39,7 @@ import { FollowedDocumentListComponent }    from "./home/followed-list/followed-
             { path: 'update-password', component: UpdatePasswordComponent },
             { path: 'followed', canActivate: [AppGuard], component: FollowedDocumentListComponent },
             { path: 'resources/:detailResId', canActivate: [AppGuard], canDeactivate: [AfterProcessGuard], component: ProcessComponent },
-            { path: '**',  redirectTo: 'home', pathMatch: 'full' },
+            { path: '**',  redirectTo: 'login', pathMatch: 'full' },
         ], { useHash: true }),
     ],
     exports: [

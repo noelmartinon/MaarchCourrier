@@ -9,11 +9,12 @@ import { Router } from '@angular/router';
 import { AppService } from '../../service/app.service';
 import { PrivilegeService } from '../../service/privileges.service';
 import { FunctionsService } from '../../service/functions.service';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
     selector: 'header-right',
     styleUrls: ['header-right.component.scss'],
-    templateUrl: "header-right.component.html",
+    templateUrl: 'header-right.component.html',
 })
 export class HeaderRightComponent implements OnInit {
 
@@ -31,6 +32,7 @@ export class HeaderRightComponent implements OnInit {
         public http: HttpClient,
         private router: Router,
         public dialog: MatDialog,
+        public authService: AuthService,
         public appService: AppService,
         public headerService: HeaderService,
         public functions: FunctionsService,
@@ -41,7 +43,7 @@ export class HeaderRightComponent implements OnInit {
     }
 
     gotToMenu(shortcut: any) {
-        if (shortcut.id == 'indexing' && shortcut.groups.length > 1) {
+        if (shortcut.id === 'indexing' && shortcut.groups.length > 1) {
             this.config = { panelClass: 'maarch-modal', data: { indexingGroups: shortcut.groups, link: shortcut.route } };
             this.dialogRef = this.dialog.open(IndexingGroupModalComponent, this.config);
         } else if (shortcut.angular === true) {

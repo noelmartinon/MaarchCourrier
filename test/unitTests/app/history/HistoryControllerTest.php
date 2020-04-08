@@ -18,7 +18,7 @@ class HistoryControllerTest extends TestCase
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
         $history     = new \History\controllers\HistoryController();
 
-        $currentUser = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $currentUser = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $response = $history->getByUserId($request, new \Slim\Http\Response(), ['userSerialId' => $currentUser['id']]);
 
         $responseBody = json_decode((string)$response->getBody());

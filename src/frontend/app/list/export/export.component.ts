@@ -5,15 +5,15 @@ import { NotificationService } from '../../notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SortPipe } from '../../../plugins/sorting.pipe';
-import {catchError, map, tap, finalize} from "rxjs/operators";
-import {of} from "rxjs";
+import { catchError, map, tap, finalize } from 'rxjs/operators';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "export.component.html",
+    templateUrl: 'export.component.html',
     styleUrls: ['export.component.scss'],
-    providers: [NotificationService, SortPipe],
+    providers: [SortPipe],
 })
 export class ExportComponent implements OnInit {
 
@@ -219,7 +219,7 @@ export class ExportComponent implements OnInit {
 
     ngOnInit(): void {
         this.dataAvailableClone = JSON.parse(JSON.stringify(this.dataAvailable));
-        
+
         this.http.get('../../rest/resourcesList/exportTemplate')
             .subscribe((data: any) => {
                 this.exportModel.resources = this.data.selectedRes;
@@ -229,7 +229,7 @@ export class ExportComponent implements OnInit {
                 this.exportModel.data = data.templates.csv.data;
                 this.exportModel.data.forEach((value: any) => {
                     this.dataAvailable.forEach((availableValue: any, index: number) => {
-                        if (value.value == availableValue.value) {
+                        if (value.value === availableValue.value) {
                             this.dataAvailable.splice(index, 1);
                         }
                     });
@@ -239,14 +239,14 @@ export class ExportComponent implements OnInit {
                 this.notify.handleErrors(err);
             });
 
-        this.http.get("../../rest/customFields").pipe(
+        this.http.get('../../rest/customFields').pipe(
             map((data: any) => {
                 data.customFields = data.customFields.map((custom: any) => {
                     return {
                         value: 'custom_' + custom.id,
                         label: custom.label,
                         isFunction: true
-                    }
+                    };
                 });
                 return data;
             }),
@@ -266,10 +266,10 @@ export class ExportComponent implements OnInit {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
         } else {
             let realIndex = event.previousIndex;
-            if (event.container.id == 'selectedElements') {
+            if (event.container.id === 'selectedElements') {
                 realIndex = 0;
-                if ($j('.available-data .columns')[event.previousIndex] !== undefined) {
-                    const fakeIndex = $j('.available-data .columns')[event.previousIndex].id;
+                if ($('.available-data .columns')[event.previousIndex] !== undefined) {
+                    const fakeIndex = $('.available-data .columns')[event.previousIndex].id;
                     realIndex = this.dataAvailable.map((dataAv: any) => (dataAv.value)).indexOf(fakeIndex);
                 }
             }
@@ -289,21 +289,21 @@ export class ExportComponent implements OnInit {
 
     exportData() {
         this.loadingExport = true;
-        this.http.put('../../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/exports', this.exportModel, { responseType: "blob" }).pipe(
+        this.http.put('../../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/exports', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 if (data.type !== 'text/html') {
-                    let downloadLink = document.createElement('a');
+                    const downloadLink = document.createElement('a');
                     downloadLink.href = window.URL.createObjectURL(data);
                     let today: any;
                     let dd: any;
                     let mm: any;
                     let yyyy: any;
-    
+
                     today = new Date();
                     dd = today.getDate();
                     mm = today.getMonth() + 1;
                     yyyy = today.getFullYear();
-    
+
                     if (dd < 10) {
                         dd = '0' + dd;
                     }
@@ -311,13 +311,13 @@ export class ExportComponent implements OnInit {
                         mm = '0' + mm;
                     }
                     today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', "export_maarch_" + today + "." + this.exportModel.format.toLowerCase());
+                    downloadLink.setAttribute('download', 'export_maarch_' + today + '.' + this.exportModel.format.toLowerCase());
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                     this.exportModelList[this.exportModel.format.toLowerCase()].data = this.exportModel.data;
                 } else {
                     alert(this.lang.tooMuchDatas);
-                }                
+                }
             }),
             finalize(() => this.loadingExport = false),
             catchError((err: any) => {
@@ -328,10 +328,10 @@ export class ExportComponent implements OnInit {
     }
 
     addData(item: any) {
-        var realIndex = 0;
+        let realIndex = 0;
 
         this.dataAvailable.forEach((value: any, index: number) => {
-            if (value.value == item.value) {
+            if (value.value === item.value) {
                 realIndex = index;
             }
         });
@@ -356,7 +356,7 @@ export class ExportComponent implements OnInit {
 
     addAllData() {
         this.exportModel.data = this.exportModel.data.concat(this.dataAvailable);
-        while(this.dataAvailable.length > 0) {
+        while (this.dataAvailable.length > 0) {
             this.dataAvailable.pop();
         }
         this.listFilter.nativeElement.value = '';
@@ -368,7 +368,7 @@ export class ExportComponent implements OnInit {
         this.exportModel.data = this.exportModelList[event.value].data;
         this.exportModel.data.forEach((value: any) => {
             this.dataAvailable.forEach((availableValue: any, index: number) => {
-                if (value.value == availableValue.value) {
+                if (value.value === availableValue.value) {
                     this.dataAvailable.splice(index, 1);
                 }
             });

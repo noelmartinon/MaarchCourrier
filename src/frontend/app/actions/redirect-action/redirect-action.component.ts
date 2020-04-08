@@ -5,15 +5,16 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FormControl } from '@angular/forms';
-import { Observable, of } from 'rxjs';
 import { startWith } from 'rxjs/internal/operators/startWith';
 import { map, tap, finalize, catchError } from 'rxjs/operators';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
+import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "redirect-action.component.html",
+    templateUrl: 'redirect-action.component.html',
     styleUrls: ['redirect-action.component.scss'],
 })
 export class RedirectActionComponent implements OnInit {
@@ -50,7 +51,7 @@ export class RedirectActionComponent implements OnInit {
     ngOnInit(): void {
         let noEntity = true;
         this.loading = true;
-        this.http.get("../../rest/resourcesList/users/" + this.data.userId + "/groups/" + this.data.groupId + "/baskets/" + this.data.basketId + "/actions/" + this.data.action.id + "/getRedirect")
+        this.http.get('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/getRedirect')
             .subscribe((data: any) => {
                 this.entities = data['entities'];
                 this.userListRedirect = data.users;
@@ -66,10 +67,10 @@ export class RedirectActionComponent implements OnInit {
                     }
                 });
 
-                if (this.userListRedirect.length == 0 && noEntity) {
+                if (this.userListRedirect.length === 0 && noEntity) {
                     this.redirectMode = 'none';
                     this.loading = false;
-                } else if (this.userListRedirect.length == 0 && !noEntity) {
+                } else if (this.userListRedirect.length === 0 && !noEntity) {
                     this.loadEntities();
                 } else if (this.userListRedirect.length > 0 && noEntity) {
                     this.loadDestUser();
@@ -84,15 +85,15 @@ export class RedirectActionComponent implements OnInit {
 
     loadEntities() {
         this.redirectMode = 'entity';
-        if (this.data.resIds.length == 1) {
+        if (this.data.resIds.length === 1) {
             this.injectDatasParam.resId = this.data.resIds[0];
         }
         this.loading = false;
         setTimeout(() => {
-            $j('#jstree').jstree({
-                "checkbox": {
+            $('#jstree').jstree({
+                'checkbox': {
                     'deselect_all': true,
-                    "three_state": false //no cascade selection
+                    'three_state': false // no cascade selection
                 },
                 'core': {
                     force_text: true,
@@ -103,29 +104,29 @@ export class RedirectActionComponent implements OnInit {
                     'multiple': false,
                     'data': this.entities,
                 },
-                "plugins": ["checkbox", "search", "sort"]
+                'plugins': ['checkbox', 'search', 'sort']
             });
-            var to: any = false;
-            $j('#jstree_search').keyup(function () {
+            let to: any = false;
+            $('#jstree_search').keyup(function () {
                 if (to) { clearTimeout(to); }
                 to = setTimeout(function () {
-                    var v = $j('#jstree_search').val();
-                    $j('#jstree').jstree(true).search(v);
+                    const v: any = $('#jstree_search').val();
+                    $('#jstree').jstree(true).search(v);
                 }, 250);
             });
-            $j('#jstree')
+            $('#jstree')
                 // listen for event
                 .on('select_node.jstree', (e: any, data: any) => {
                     this.selectEntity(data.node.original);
 
                 }).on('deselect_node.jstree', (e: any, data: any) => {
-                    $j('#jstree').jstree('select_node', data.node.original);
+                    $('#jstree').jstree('select_node', data.node.original);
                 })
                 // create the instance
                 .jstree();
         }, 0);
         setTimeout(() => {
-            $j('#jstree').jstree('select_node', this.currentEntity);
+            $('#jstree').jstree('select_node', this.currentEntity);
             this.selectEntity(this.currentEntity);
 
         }, 200);
@@ -140,43 +141,42 @@ export class RedirectActionComponent implements OnInit {
             );
 
         this.loading = false;
-        if (this.data.resIds.length == 1) {
-            this.http.get("../../rest/resources/" + this.data.resIds[0] + "/listInstance").subscribe((data: any) => {
+        if (this.data.resIds.length === 1) {
+            this.http.get('../../rest/resources/' + this.data.resIds[0] + '/listInstance').subscribe((data: any) => {
                 this.diffusionListDestRedirect = data.listInstance;
                 Object.keys(data).forEach(diffusionRole => {
                     data[diffusionRole].forEach((line: any) => {
-                        if (line.item_mode == 'dest') {
+                        if (line.item_mode === 'dest') {
                             this.oldUser = line;
                         }
                     });
                 });
-                $j('.searchUserRedirect').click();
+                $('.searchUserRedirect').click();
             }, (err: any) => {
                 this.notify.handleErrors(err);
             });
         } else {
             this.keepDestForRedirection = false;
             setTimeout(() => {
-                $j('.searchUserRedirect').click();
+                $('.searchUserRedirect').click();
             }, 200);
         }
     }
 
     changeDest(event: any) {
-        this.currentDiffusionListDestRedirect = this.diffusionListDestRedirect
-        let user = event.option.value;
-
+        this.currentDiffusionListDestRedirect = this.diffusionListDestRedirect;
+        const user = event.option.value;
 
         this.destUser = {
-            difflist_type: "entity_id",
-            item_mode: "dest",
-            item_type: "user_id",
+            difflist_type: 'entity_id',
+            item_mode: 'dest',
+            item_type: 'user_id',
             item_id: user.user_id,
             labelToDisplay: user.labelToDisplay,
             descriptionToDisplay: user.descriptionToDisplay
         };
 
-        if (this.data.resIds.length == 1) {
+        if (this.data.resIds.length === 1) {
             this.isDestinationChanging = false;
             this.http.get('../../rest/resources/' + this.data.resIds[0] + '/users/' + user.id + '/isDestinationChanging')
                 .subscribe((data: any) => {
@@ -189,7 +189,7 @@ export class RedirectActionComponent implements OnInit {
                 let isInCopy = false;
                 let newCopy = null;
                 this.currentDiffusionListDestRedirect.forEach((element: any) => {
-                    if (element.item_mode == 'cc' && element.item_id == this.oldUser.item_id) {
+                    if (element.item_mode === 'cc' && element.item_id === this.oldUser.item_id) {
                         isInCopy = true;
                     }
                 });
@@ -200,14 +200,14 @@ export class RedirectActionComponent implements OnInit {
                     this.currentDiffusionListDestRedirect.push(newCopy);
                 }
             }
-            this.currentDiffusionListDestRedirect.splice(this.currentDiffusionListDestRedirect.map((e: any) => { return e.item_mode; }).indexOf('dest'), 1);
+            this.currentDiffusionListDestRedirect.splice(this.currentDiffusionListDestRedirect.map((e: any) => e.item_mode).indexOf('dest'), 1);
         } else {
             this.isDestinationChanging = true;
         }
         this.currentDiffusionListDestRedirect.push(this.destUser);
 
         this.userRedirectCtrl.reset();
-        $j('.searchUserRedirect').blur();
+        $('.searchUserRedirect').blur();
     }
 
     private _filterUserRedirect(value: string): any[] {
@@ -230,7 +230,7 @@ export class RedirectActionComponent implements OnInit {
     }
 
     executeAction() {
-        if (this.redirectMode == 'user') {
+        if (this.redirectMode === 'user') {
             this.http.put(this.data.processActionRoute, { resources: this.data.resIds, data: { onlyRedirectDest: true, listInstances: this.currentDiffusionListDestRedirect }, note: this.noteEditor.getNote() }).pipe(
                 tap((data: any) => {
                     if (data && data.errors != null) {
@@ -263,9 +263,9 @@ export class RedirectActionComponent implements OnInit {
     }
 
     checkValidity() {
-        if (this.redirectMode == 'entity' && this.appDiffusionsList && this.appDiffusionsList.getDestUser().length > 0 && this.currentEntity.serialId > 0 && !this.loading) {
+        if (this.redirectMode === 'entity' && this.appDiffusionsList && this.appDiffusionsList.getDestUser().length > 0 && this.currentEntity.serialId > 0 && !this.loading) {
             return false;
-        } if (this.redirectMode == 'user' && this.currentDiffusionListDestRedirect.length > 0 && this.destUser != null && !this.loading) {
+        } if (this.redirectMode === 'user' && this.currentDiffusionListDestRedirect.length > 0 && this.destUser != null && !this.loading) {
             return false;
         } else {
             return true;

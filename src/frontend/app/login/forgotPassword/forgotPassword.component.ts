@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../notification.service';
 import { finalize } from 'rxjs/operators';
 import { LANG } from '../../translate.component';
 import { HeaderService } from '../../../service/header.service';
-
-declare function $j(selector: any): any;
+import { Router } from '@angular/router';
 
 @Component({
     templateUrl: 'forgotPassword.component.html',
@@ -25,12 +22,10 @@ export class ForgotPasswordComponent implements OnInit {
 
     constructor(
         public http: HttpClient,
-        iconReg: MatIconRegistry,
-        sanitizer: DomSanitizer,
+        private router: Router,
         public notificationService: NotificationService,
         private headerService: HeaderService
     ) {
-        iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('static.php?filename=logo_white.svg'));
     }
 
     ngOnInit(): void {
@@ -51,13 +46,13 @@ export class ForgotPasswordComponent implements OnInit {
             .subscribe((data: any) => {
                 this.loadingForm = true;
                 this.notificationService.success(this.lang.requestSentByEmail);
-                location.href = 'index.php?display=true&page=login';
+                this.router.navigate(['/login']);
             }, (err: any) => {
                 this.notificationService.handleErrors(err);
             });
     }
 
     cancel() {
-        location.href = 'index.php?display=true&page=login';
+        this.router.navigate(['/login']);
     }
 }

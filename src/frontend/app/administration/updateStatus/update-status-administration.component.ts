@@ -1,66 +1,61 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { AppService } from '../../../service/app.service';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "update-status-administration.component.html",
+    templateUrl: 'update-status-administration.component.html',
     styleUrls: ['update-status-administration.component.css'],
     providers: [AppService]
 })
 export class UpdateStatusAdministrationComponent implements OnInit {
 
-    lang                            : any       = LANG;
-    loading                         : boolean   = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    statuses                        : any[]     = [];
-    statusId                        : string    = "";
-    resId                           : string    = "";
-    chrono                          : string    = "";
-    resIdList                       : string[]  = [];
-    chronoList                      : string[]  = [];
+    statuses: any[] = [];
+    statusId: string = '';
+    resId: string = '';
+    chrono: string = '';
+    resIdList: string[] = [];
+    chronoList: string[] = [];
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.updateStatus);
-        
+
         this.loading = true;
 
         this.http.get('../../rest/autocomplete/statuses').pipe(
-            tap((data : any) => this.statuses = data),
+            tap((data: any) => this.statuses = data),
             tap(() => this.loading = false)
         ).subscribe();
     }
 
     onSubmit() {
-        var body = {
-            "status": this.statusId
+        const body = {
+            'status': this.statusId
         };
         if (this.resIdList.length > 0) {
-            body["resId"] = this.resIdList;
+            body['resId'] = this.resIdList;
         } else if (this.chronoList.length > 0) {
-            body["chrono"] = this.chronoList;
-        }        
+            body['chrono'] = this.chronoList;
+        }
 
-        this.http.put("../../rest/res/resource/status", body)
+        this.http.put('../../rest/res/resource/status', body)
             .subscribe(() => {
-                this.resId = "";
-                this.chrono = "";
-                this.statusId = "";
+                this.resId = '';
+                this.chrono = '';
+                this.statusId = '';
                 this.resIdList = [];
                 this.chronoList = [];
                 this.notify.success(this.lang.modificationSaved);
@@ -69,39 +64,39 @@ export class UpdateStatusAdministrationComponent implements OnInit {
             });
     }
 
-    addResId()  :void {
-        if(this.resIdList.indexOf(this.resId) == -1){
+    addResId(): void {
+        if (this.resIdList.indexOf(this.resId) === -1) {
             this.resIdList.push(this.resId);
-        }        
-        this.resId = ""
+        }
+        this.resId = '';
     }
 
-    addChrono() :void { 
-        if(this.chronoList.indexOf(this.chrono) == -1){
+    addChrono(): void {
+        if (this.chronoList.indexOf(this.chrono) === -1) {
             this.chronoList.push(this.chrono);
         }
-        this.chrono = "";
+        this.chrono = '';
     }
 
     setStatus(status: any) {
         this.statusId = status.id;
     }
 
-    removeResId(resId: string) :void {
-        var resIdIndex = this.resIdList.indexOf(resId);
-        this.resIdList.splice(resIdIndex,1);
+    removeResId(resId: string): void {
+        const resIdIndex = this.resIdList.indexOf(resId);
+        this.resIdList.splice(resIdIndex, 1);
     }
 
-    removeChrono(chrono: string)  :void {
-        var chronoIndex = this.chronoList.indexOf(chrono);
-        this.chronoList.splice(chronoIndex,1);
+    removeChrono(chrono: string): void {
+        const chronoIndex = this.chronoList.indexOf(chrono);
+        this.chronoList.splice(chronoIndex, 1);
     }
 
     resetInput(e: any) {
-        if (e.index == 0) {
-            this.resId = "";
+        if (e.index === 0) {
+            this.resId = '';
         } else {
-            this.chrono = "";
+            this.chrono = '';
         }
     }
 }

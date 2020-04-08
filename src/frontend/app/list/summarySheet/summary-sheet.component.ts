@@ -6,10 +6,8 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionsService } from '../../../service/functions.service';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "summary-sheet.component.html",
+    templateUrl: 'summary-sheet.component.html',
     styleUrls: ['summary-sheet.component.scss']
 })
 export class SummarySheetComponent implements OnInit {
@@ -112,13 +110,13 @@ export class SummarySheetComponent implements OnInit {
     ];
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         public dialogRef: MatDialogRef<SummarySheetComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService) { }
 
-    ngOnInit(): void { 
+    ngOnInit(): void {
         this.paramMode = !this.functions.empty(this.data.paramMode);
     }
 
@@ -130,12 +128,12 @@ export class SummarySheetComponent implements OnInit {
 
     genSummarySheets() {
         this.loading = true;
-        
 
-        this.http.post('../../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/summarySheets', { units: this.formatSummarySheet(), resources: this.data.selectedRes }, { responseType: "blob" })
+
+        this.http.post('../../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/summarySheets', { units: this.formatSummarySheet(), resources: this.data.selectedRes }, { responseType: 'blob' })
             .subscribe((data) => {
                 if (data.type !== 'text/html') {
-                    let downloadLink = document.createElement('a');
+                    const downloadLink = document.createElement('a');
                     downloadLink.href = window.URL.createObjectURL(data);
 
                     let today: any;
@@ -155,7 +153,7 @@ export class SummarySheetComponent implements OnInit {
                         mm = '0' + mm;
                     }
                     today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', this.lang.summarySheetsAlt + "_" + today + ".pdf");
+                    downloadLink.setAttribute('download', this.lang.summarySheetsAlt + '_' + today + '.pdf');
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 } else {
@@ -169,7 +167,7 @@ export class SummarySheetComponent implements OnInit {
     }
 
     formatSummarySheet() {
-        let currElemData: any[] = [];
+        const currElemData: any[] = [];
 
         if (this.withQrcode) {
             currElemData.push({

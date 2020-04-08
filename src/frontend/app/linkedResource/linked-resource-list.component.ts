@@ -6,20 +6,19 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { AppService } from '../../service/app.service';
-import { tap, catchError, finalize, map, filter, exhaustMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { tap, catchError, finalize, filter, exhaustMap } from 'rxjs/operators';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { LinkResourceModalComponent } from './linkResourceModal/link-resource-modal.component';
 import { FunctionsService } from '../../service/functions.service';
 import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
-import { PrivilegeService } from '../../service/privileges.service';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
     selector: 'app-linked-resource-list',
-    templateUrl: "linked-resource-list.component.html",
+    templateUrl: 'linked-resource-list.component.html',
     styleUrls: ['linked-resource-list.component.scss'],
     providers: [AppService]
 })
@@ -34,7 +33,7 @@ export class LinkedResourceListComponent implements OnInit {
 
     thumbnailUrl: string = '';
 
-    @Input('resId') resId: number;
+    @Input() resId: number;
     @Output() reloadBadgeLinkedResources = new EventEmitter<string>();
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -46,7 +45,6 @@ export class LinkedResourceListComponent implements OnInit {
         public appService: AppService,
         public dialog: MatDialog,
         public functions: FunctionsService,
-        private privilegeService: PrivilegeService
     ) { }
 
     ngOnInit(): void {
@@ -68,7 +66,7 @@ export class LinkedResourceListComponent implements OnInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err)
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -78,12 +76,12 @@ export class LinkedResourceListComponent implements OnInit {
 
         data.forEach((linkeRes: any) => {
             Object.keys(linkeRes).forEach((key) => {
-                if (key == 'statusImage' && this.functions.empty(linkeRes[key])) {
+                if (key === 'statusImage' && this.functions.empty(linkeRes[key])) {
                     linkeRes[key] = 'fa-question undefined';
                 } else if (this.functions.empty(linkeRes[key]) && ['senders', 'recipients', 'attachments', 'hasDocument', 'confidentiality', 'visaCircuit'].indexOf(key) === -1) {
                     linkeRes[key] = this.lang.undefined;
                 }
-                
+
                 if (key === 'senders' && linkeRes[key].length > 1) {
                     if (linkeRes[key].length > 1) {
                         linkeRes[key] = linkeRes[key].length + ' ' + this.lang.contactsAlt;
@@ -93,7 +91,7 @@ export class LinkedResourceListComponent implements OnInit {
                 }
             });
         });
-        
+
         return data;
     }
 
@@ -103,7 +101,7 @@ export class LinkedResourceListComponent implements OnInit {
         } else {
             return '';
         }
-        
+
     }
 
     unlinkResource(row: any) {
@@ -130,16 +128,16 @@ export class LinkedResourceListComponent implements OnInit {
     viewThumbnail(row: any) {
         if (row.hasDocument) {
             this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
-            $j('#viewThumbnail').show();
+            $('#viewThumbnail').show();
         }
     }
 
     closeThumbnail() {
-        $j('#viewThumbnail').hide();
+        $('#viewThumbnail').hide();
     }
 
     openSearchResourceModal() {
-        const dialogRef =  this.dialog.open(LinkResourceModalComponent, { panelClass: 'maarch-full-height-modal', minWidth: '80%',data: { resId: this.resId, currentLinkedRes : this.linkedResources.map(res => res.resId) } });
+        const dialogRef = this.dialog.open(LinkResourceModalComponent, { panelClass: 'maarch-full-height-modal', minWidth: '80%', data: { resId: this.resId, currentLinkedRes: this.linkedResources.map(res => res.resId) } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),
             tap(() => {

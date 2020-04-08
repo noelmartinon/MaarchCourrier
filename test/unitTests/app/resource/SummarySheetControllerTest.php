@@ -13,8 +13,8 @@ class SummarySheetControllerTest extends TestCase
 {
     public function testCreateList()
     {
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
         $myBasket = \Basket\models\BasketModel::getByBasketId(['basketId' => 'MyBasket', 'select' => ['id']]);
 
@@ -56,8 +56,8 @@ class SummarySheetControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Resources is not set or empty', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 }

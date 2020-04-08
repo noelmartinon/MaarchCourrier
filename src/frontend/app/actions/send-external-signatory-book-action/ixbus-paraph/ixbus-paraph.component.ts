@@ -4,11 +4,9 @@ import { NotificationService } from '../../../notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 
-declare function $j(selector: any): any;
-
 @Component({
     selector: 'app-ixbus-paraph',
-    templateUrl: "ixbus-paraph.component.html",
+    templateUrl: 'ixbus-paraph.component.html',
     styleUrls: ['ixbus-paraph.component.scss'],
 })
 export class IxbusParaphComponent implements OnInit {
@@ -35,9 +33,9 @@ export class IxbusParaphComponent implements OnInit {
 
     selectNature = new FormControl();
     selectWorkflow = new FormControl();
-       
-    @Input('additionalsInfos') additionalsInfos: any;
-    @Input('externalSignatoryBookDatas') externalSignatoryBookDatas: any;
+
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
 
     constructor(public http: HttpClient, private notify: NotificationService) { }
 
@@ -52,13 +50,13 @@ export class IxbusParaphComponent implements OnInit {
             return {
                 id: element,
                 label: element
-            }
+            };
         });
-        this.loading=false
+        this.loading = false;
     }
 
     isValidParaph() {
-        if (this.additionalsInfos.attachments.length == 0 || this.natures.length == 0 || this.messagesModel.length == 0 || !this.ixbusDatas.nature 
+        if (this.additionalsInfos.attachments.length === 0 || this.natures.length === 0 || this.messagesModel.length === 0 || !this.ixbusDatas.nature
             || !this.ixbusDatas.messageModel || !this.ixbusDatas.login || !this.ixbusDatas.password) {
             return false;
         } else {
@@ -67,14 +65,13 @@ export class IxbusParaphComponent implements OnInit {
     }
 
     getRessources() {
-        return this.additionalsInfos.attachments.map((e: any) => { return e.res_id; });
+        return this.additionalsInfos.attachments.map((e: any) => e.res_id);
     }
 
     getDatas() {
-        this.externalSignatoryBookDatas =
-        {
-            "ixbus": this.ixbusDatas,
-            "steps": []
+        this.externalSignatoryBookDatas = {
+            'ixbus': this.ixbusDatas,
+            'steps': []
         };
         return this.externalSignatoryBookDatas;
     }

@@ -1,7 +1,7 @@
 <mat-sidenav-container autosize class="maarch-container">
     <mat-sidenav-content>
         <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;"><img
-                style="max-height: 100vh;" src="{{thumbnailUrl}}" />
+                style="max-height: 100vh;" [src]="thumbnailUrl | secureUrl | async" />
         </mat-card>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">

@@ -30,8 +30,8 @@ class CoreController
         $aInit['applicationName']    = CoreConfigModel::getApplicationName();
         $aInit['applicationVersion'] = CoreConfigModel::getApplicationVersion();
         $aInit['lang']               = CoreConfigModel::getLanguage();
-        if (!empty($GLOBALS['userId'])) {
-            $aInit['user']               = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
+        if (!empty($GLOBALS['login'])) {
+            $aInit['user']               = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
         }
         $aInit['customLanguage']     = CoreConfigModel::getCustomLanguage(['lang' => $aInit['lang']]);
 
@@ -81,8 +81,8 @@ class CoreController
 
     public function getHeader(Request $request, Response $response)
     {
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
-        $user['groups'] = UserModel::getGroupsByLogin(['login' => $GLOBALS['userId']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
+        $user['groups'] = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
         $user['entities'] = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
 
         return $response->withJson(['user' => $user]);
@@ -90,12 +90,12 @@ class CoreController
 
     public static function setGlobals(array $args)
     {
-        ValidatorModel::notEmpty($args, ['login']);
-        ValidatorModel::stringType($args, ['login']);
+        ValidatorModel::notEmpty($args, ['userId']);
+        ValidatorModel::intVal($args, ['userId']);
 
-        $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['id']]);
-        $GLOBALS['userId'] = $args['login'];
-        $GLOBALS['id'] = $user['id'];
+        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
+        $GLOBALS['login'] = $user['user_id'];
+        $GLOBALS['id'] = $args['userId'];
     }
 
     public function externalConnectionsEnabled(Request $request, Response $response)
@@ -111,6 +111,46 @@ class CoreController
         }
 
         return $response->withJson(['connection' => $connections]);
+    }
+
+    public function getImages(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        $customId = CoreConfigModel::getCustomId();
+
+        if ($queryParams['image'] == 'loginPage') {
+            $path = 'apps/maarch_entreprise/img/bodylogin.jpg';
+            if (!empty($customId) && is_file("custom/{$customId}/{$path}")) {
+                $path = "custom/{$customId}/{$path}";
+            }
+        } elseif ($queryParams['image'] == 'logo') {
+            $path = 'apps/maarch_entreprise/img/logo.svg';
+            if (!empty($customId) && is_file("custom/{$customId}/{$path}")) {
+                $path = "custom/{$customId}/{$path}";
+            }
+        } elseif ($queryParams['image'] == 'onlyLogo') {
+            $path = 'apps/maarch_entreprise/img/logo_only.svg';
+            if (!empty($customId) && is_file("custom/{$customId}/{$path}")) {
+                $path = "custom/{$customId}/{$path}";
+            }
+        } else {
+            return $response->withStatus(404)->withJson(['errors' => 'QueryParams image is empty or not valid']);
+        }
+
+        $fileContent = file_get_contents($path);
+        if ($fileContent === false) {
+            return $response->withStatus(400)->withJson(['errors' => 'Image not found']);
+        }
+
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
+        $pathInfo = pathinfo($path);
+
+        $response->write($fileContent);
+        $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
+
+        return $response->withHeader('Content-Type', $mimeType);
     }
 
     public static function getMaximumAllowedSizeFromPhpIni()

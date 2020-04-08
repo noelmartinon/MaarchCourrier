@@ -100,8 +100,8 @@ class GroupControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame(_INVALID_CLAUSE, $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->create($fullRequest, new \Slim\Http\Response());
@@ -110,8 +110,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -198,8 +198,8 @@ class GroupControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame(_INVALID_CLAUSE, $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -208,8 +208,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -235,8 +235,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Group not found', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -245,8 +245,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -270,8 +270,8 @@ class GroupControllerTest extends TestCase
         }
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->get($request, new \Slim\Http\Response());
@@ -280,8 +280,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -306,8 +306,8 @@ class GroupControllerTest extends TestCase
         $this->assertSame(true, $responseBody['group']['canAdminUsers']);
         $this->assertSame(true, $responseBody['group']['canAdminBaskets']);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -328,8 +328,8 @@ class GroupControllerTest extends TestCase
         $this->assertEmpty($responseBody['group']['privileges']);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -338,8 +338,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -370,8 +370,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Group not found', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->getIndexingInformationsById($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -380,8 +380,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -442,8 +442,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Body entities contains invalid entities', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->updateIndexingInformations($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -452,8 +452,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -487,8 +487,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Group not found', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->reassignUsers($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -497,8 +497,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -533,8 +533,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Group not found', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $groupController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -543,8 +543,8 @@ class GroupControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 }

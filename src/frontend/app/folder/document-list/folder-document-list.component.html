@@ -1,7 +1,7 @@
 <mat-sidenav-container class="maarch-container">
     <mat-sidenav-content>
         <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;">
-            <img style="max-height: 100vh;" src="{{thumbnailUrl}}" />
+            <img style="max-height: 100vh;" [src]="thumbnailUrl | secureUrl | async" />
         </mat-card>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
@@ -38,7 +38,7 @@
             </div>
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
                 <app-filters-tool style="flex:1;overflow-x: auto;overflow-y: hidden;" #filtersTool
-                    [listProperties]="this.listProperties" [snavR]="snav2" [totalRes]="allResInBasket.length"
+                    [listProperties]="this.listProperties" [totalRes]="allResInBasket.length"
                     [selectedRes]="selectedRes" [routeDatas]="'/rest/folders/' + folderInfo.id + '/filters'"
                     (toggleAllRes)="toggleAllRes($event)" (refreshEventAfterAction)="refreshDaoAfterAction()"
                     (refreshEvent)="refreshDao()" [title]="lang.searchMailInFolder">

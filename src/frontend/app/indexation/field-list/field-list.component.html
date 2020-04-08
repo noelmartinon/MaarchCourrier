@@ -1,7 +1,7 @@
-<div *ngIf="availableCustomFields !== undefined" class="content" cdkDropList id="customFieldsList"
+<div *ngIf="dataCustomFields !== undefined" class="content" cdkDropList id="customFieldsList"
     [cdkDropListConnectedTo]="['indexingModelsCustomFieldsList_mail','indexingModelsCustomFieldsList_contact','indexingModelsCustomFieldsList_process','indexingModelsCustomFieldsList_classifying']"
-    [cdkDropListData]="availableCustomFields" (cdkDropListDropped)="drop($event)">
-    <div class="customFieldRow" *ngFor="let field of availableCustomFields | sortBy: 'label'" cdkDrag [cdkDragData]="field">
+    [cdkDropListData]="dataCustomFields" (cdkDropListDropped)="drop($event)">
+    <div class="customFieldRow" *ngFor="let field of dataCustomFields | sortBy: 'label'" cdkDrag [cdkDragData]="field">
         <div class="customFieldDrag">
             <i color="primary" class="fas fa-arrows-alt fa-2x" cdkDragHandle></i>
         </div>
@@ -68,10 +68,10 @@
         </div>
     </div>
 </div>
-<div *ngIf="availableFields !== undefined" class="content" cdkDropList id="fieldsList"
+<div *ngIf="dataFields !== undefined" class="content" cdkDropList id="fieldsList"
     [cdkDropListConnectedTo]="['indexingModelsCustomFieldsList_mail','indexingModelsCustomFieldsList_contact','indexingModelsCustomFieldsList_process','indexingModelsCustomFieldsList_classifying']"
-    [cdkDropListData]="availableFields" (cdkDropListDropped)="drop($event)">
-    <div class="customFieldRow" *ngFor="let field of availableFields | sortBy: 'label'" cdkDrag [cdkDragData]="field">
+    [cdkDropListData]="dataFields" (cdkDropListDropped)="drop($event)">
+    <div class="customFieldRow" *ngFor="let field of dataFields | sortBy: 'label'" cdkDrag [cdkDragData]="field">
         <div class="customFieldDrag" cdkDragHandle>
             <i color="primary" class="fas fa-arrows-alt fa-2x"></i>
         </div>

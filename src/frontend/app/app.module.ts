@@ -8,6 +8,7 @@ import { AppComponent }                         from './app.component';
 import { AppRoutingModule }                     from './app-routing.module';
 import { AdministrationModule }                 from './administration/administration.module';
 
+import { LoginComponent }                       from './login/login.component';
 import { ProfileComponent }                     from './profile.component';
 import { AboutUsComponent }                     from './about-us.component';
 import { HomeComponent }                        from './home/home.component';
@@ -123,6 +124,7 @@ import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-
     ],
     declarations: [
         AppComponent,
+        LoginComponent,
         ProfileComponent,
         AboutUsComponent,
         HomeComponent,

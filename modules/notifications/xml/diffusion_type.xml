@@ -5,7 +5,6 @@
         <label>Groupe</label>
         <script>modules/notifications/diffusion_types/group.php</script>
         <use_email>true</use_email>
-        <use_rss>true</use_rss>
         <use_attachment>true</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -13,7 +12,6 @@
         <label>Entité</label>
         <script>modules/notifications/diffusion_types/entity.php</script>
         <use_email>true</use_email>
-        <use_rss>true</use_rss>
         <use_attachment>true</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -21,7 +19,6 @@
         <label>Service de l'utilisateur destinataire</label>
         <script>modules/notifications/diffusion_types/dest_entity.php</script>
         <use_email>true</use_email>
-        <use_rss>false</use_rss>
         <use_attachment>false</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -29,7 +26,6 @@
         <label>Utilisateur désigné</label>
         <script>modules/notifications/diffusion_types/user.php</script>
         <use_email>true</use_email>
-        <use_rss>true</use_rss>
         <use_attachment>true</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -37,7 +33,6 @@
         <label>Liste de diffusion du document</label>
         <script>modules/notifications/diffusion_types/dest_user.php</script>
         <use_email>true</use_email>
-        <use_rss>false</use_rss>
         <use_attachment>false</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -45,7 +40,6 @@
         <label>Liste de diffusion du document</label>
         <script>modules/notifications/diffusion_types/copy_list.php</script>
         <use_email>true</use_email>
-        <use_rss>false</use_rss>
         <use_attachment>false</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -53,7 +47,6 @@
         <label>Contact du document</label>
         <script>modules/notifications/diffusion_types/contact.php</script>
         <use_email>true</use_email>
-        <use_rss>false</use_rss>
         <use_attachment>false</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -61,7 +54,6 @@
         <label>Viseur actuel du document</label>
         <script>modules/notifications/diffusion_types/dest_user_visa.php</script>
         <use_email>true</use_email>
-        <use_rss>false</use_rss>
         <use_attachment>false</use_attachment>
     </diffusion_type>
     <diffusion_type>
@@ -69,7 +61,6 @@
         <label>Signataire actuel du document</label>
         <script>modules/notifications/diffusion_types/dest_user_sign.php</script>
         <use_email>true</use_email>
-        <use_rss>false</use_rss>
         <use_attachment>false</use_attachment>
     </diffusion_type>
 </root>

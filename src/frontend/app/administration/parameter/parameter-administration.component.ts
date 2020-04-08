@@ -3,42 +3,38 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "parameter-administration.component.html",
+    templateUrl: 'parameter-administration.component.html',
     providers: [AppService]
 })
 export class ParameterAdministrationComponent implements OnInit {
 
-    lang                            : any       = LANG;
-    loading                         : boolean   = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    parameter                       : any       = {};
-    type                            : string;
-    creationMode                    : boolean;
+    parameter: any = {};
+    type: string;
+    creationMode: boolean;
 
 
     constructor(
-        public http: HttpClient, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
 
         this.route.params.subscribe((params) => {
 
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
                 this.headerService.setHeader(this.lang.parameterCreation);
 
                 this.creationMode = true;
@@ -46,16 +42,16 @@ export class ParameterAdministrationComponent implements OnInit {
             } else {
 
                 this.creationMode = false;
-                this.http.get("../../rest/parameters/" + params['id'])
+                this.http.get('../../rest/parameters/' + params['id'])
                     .subscribe((data: any) => {
                         this.parameter = data.parameter;
                         this.headerService.setHeader(this.lang.parameterModification, this.parameter.id);
-                        if (typeof (this.parameter.param_value_int) == "number") {
-                            this.type = "int";
+                        if (typeof (this.parameter.param_value_int) === 'number') {
+                            this.type = 'int';
                         } else if (this.parameter.param_value_date) {
-                            this.type = "date";
+                            this.type = 'date';
                         } else {
-                            this.type = "string";
+                            this.type = 'string';
                         }
 
                         this.loading = false;
@@ -67,20 +63,22 @@ export class ParameterAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.type == 'date') {
+        if (this.type === 'date') {
             this.parameter.param_value_int = null;
             this.parameter.param_value_string = null;
-        }
-        else if (this.type == 'int') {
+
+        } else if (this.type === 'int') {
+
             this.parameter.param_value_date = null;
             this.parameter.param_value_string = null;
-        }
-        else if (this.type == 'string') {
+
+        } else if (this.type === 'string') {
+
             this.parameter.param_value_date = null;
             this.parameter.param_value_int = null;
         }
 
-        if (this.creationMode == true) {
+        if (this.creationMode === true) {
             this.http.post('../../rest/parameters', this.parameter)
                 .subscribe(() => {
                     this.router.navigate(['administration/parameters']);
@@ -88,7 +86,7 @@ export class ParameterAdministrationComponent implements OnInit {
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
-        } else if (this.creationMode == false) {
+        } else if (this.creationMode === false) {
             this.http.put('../../rest/parameters/' + this.parameter.id, this.parameter)
                 .subscribe(() => {
                     this.router.navigate(['administration/parameters']);

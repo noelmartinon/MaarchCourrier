@@ -8,26 +8,24 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "priorities-administration.component.html",
+    templateUrl: 'priorities-administration.component.html',
     providers: [AppService]
 })
 export class PrioritiesAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang            : any       = LANG;
-    loading         : boolean   = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    priorities      : any[]     = [];
-    prioritiesOrder : any[]     = [];
-    dataSource      : any;
-    displayedColumns            = ['id', 'label', 'delays', 'actions'];
+    priorities: any[] = [];
+    prioritiesOrder: any[] = [];
+    dataSource: any;
+    displayedColumns = ['id', 'label', 'delays', 'actions'];
 
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -42,30 +40,28 @@ export class PrioritiesAdministrationComponent implements OnInit {
     }
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.prioritiesAlt);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
         this.http.get('../../rest/priorities')
             .subscribe((data: any) => {
-                this.priorities = data["priorities"];
+                this.priorities = data['priorities'];
                 this.loading = false;
-                this.http.get("../../rest/sortedPriorities")
-                    .subscribe((data: any) => {
-                        this.prioritiesOrder = data['priorities'];
+                this.http.get('../../rest/sortedPriorities')
+                    .subscribe((dataPriorities: any) => {
+                        this.prioritiesOrder = dataPriorities['priorities'];
                     }, (err) => {
                         this.notify.handleErrors(err);
                     });
@@ -79,28 +75,28 @@ export class PrioritiesAdministrationComponent implements OnInit {
                 }, 0);
             }, (err) => {
                 this.notify.handleErrors(err);
-            })
+            });
     }
 
     deletePriority(id: string) {
-        let r = confirm(this.lang.deleteMsg);
+        const r = confirm(this.lang.deleteMsg);
 
         if (r) {
-            this.http.delete("../../rest/priorities/" + id)
+            this.http.delete('../../rest/priorities/' + id)
                 .subscribe((data: any) => {
-                    this.priorities = data["priorities"];
+                    this.priorities = data['priorities'];
                     this.dataSource = new MatTableDataSource(this.priorities);
                     this.dataSource.paginator = this.paginator;
                     this.dataSource.sort = this.sort;
                     this.notify.success(this.lang.priorityDeleted);
                 }, (err) => {
                     this.notify.error(err.error.errors);
-                })
+                });
         }
     }
 
     updatePrioritiesOrder() {
-        this.http.put("../../rest/sortedPriorities", this.prioritiesOrder)
+        this.http.put('../../rest/sortedPriorities', this.prioritiesOrder)
             .subscribe((data: any) => {
                 this.prioritiesOrder = data['priorities'];
                 this.notify.success(this.lang.modificationSaved);

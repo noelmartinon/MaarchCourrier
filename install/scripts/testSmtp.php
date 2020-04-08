@@ -40,26 +40,6 @@
      $maarchUrl = rtrim($chemin, "install");
      $maarchUrl = $maarchUrl . 'cs_'.$_SESSION['config']['databasename'].'/';
      $CONFIG->MaarchUrl = $maarchUrl;
-     $CONFIG->MaarchApps = 'maarch_entreprise';
-     $CONFIG->TmpDirectory = realpath('.').'/modules/notifications/batch/tmp/';
-
-     $MAILER = $xmlconfig->MAILER;
-     $MAILER->type          = $type;
-     $MAILER->smtp_port     = $port;
-     $MAILER->smtp_host     = $host;
-     $MAILER->smtp_user     = $user;
-     $MAILER->smtp_password = $pass;
-     $MAILER->mailfrom      = $mailfrom;
-     $MAILER->domains       = $smtpDomains;
-     if ($auth == 1) {
-         $MAILER->smtp_auth = "true";
-     } else {
-         $MAILER->smtp_auth = "false";
-     }
-
-     $LOG4PHP = $xmlconfig->LOG4PHP;
-     $LOG4PHP->Log4PhpConfigPath = realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/apps/maarch_entreprise/xml/log4php.xml';
-
 
      $res = $xmlconfig->asXML();
      $fp = @fopen(realpath('.')."/custom/cs_".$_SESSION['config']['databasename']."/modules/notifications/batch/config/config.xml", "w+");

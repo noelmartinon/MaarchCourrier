@@ -1,18 +1,15 @@
-import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { merge, Observable, of as observableOf, Subject, of, Subscription } from 'rxjs';
 import { NotificationService } from '../../notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { startWith, switchMap, map, catchError, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../../service/header.service';
-
 import { Overlay } from '@angular/cdk/overlay';
 import { PanelListComponent } from '../../list/panel/panel-list.component';
 import { AppService } from '../../../service/app.service';
@@ -21,16 +18,20 @@ import { FolderActionListComponent } from '../folder-action-list/folder-action-l
 import { FiltersListService } from '../../../service/filtersList.service';
 import { FoldersService } from '../folders.service';
 import { FunctionsService } from '../../../service/functions.service';
+import { Subject } from 'rxjs/internal/Subject';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { merge } from 'rxjs/internal/observable/merge';
+import { of } from 'rxjs/internal/observable/of';
+import { Observable } from 'rxjs/internal/Observable';
 
-
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "folder-document-list.component.html",
+    templateUrl: 'folder-document-list.component.html',
     styleUrls: ['folder-document-list.component.scss'],
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
-export class FolderDocumentListComponent implements OnInit {
+export class FolderDocumentListComponent implements OnInit, OnDestroy {
 
     lang: any = LANG;
 
@@ -117,13 +118,11 @@ export class FolderDocumentListComponent implements OnInit {
         public foldersService: FoldersService,
         public functions: FunctionsService) {
 
-        $j("link[href='merged_css.php']").remove();
-
-        // Event after process action 
+        // Event after process action
         this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
-            
+
             if (result.type === 'refreshFolderInformations') {
-                if(result.content.id == this.folderInfo.id) {
+                if (result.content.id == this.folderInfo.id) {
                     this.refreshFolderInformations();
                 }
             }
@@ -146,23 +145,22 @@ export class FolderDocumentListComponent implements OnInit {
 
             this.http.get('../../rest/folders/' + params['folderId'])
                 .subscribe((data: any) => {
-                    let keywordEntities = [{
+                    const keywordEntities = [{
                         keyword: 'ALL_ENTITIES',
                         text: this.lang.allEntities,
                     }];
-                    this.folderInfo =
-                        {
-                            'id': params['folderId'],
-                            'label': data.folder.label,
-                            'ownerDisplayName': data.folder.ownerDisplayName,
-                            'entitiesSharing': data.folder.sharing.entities.map((entity: any) => {
-                                if (!this.functions.empty(entity.label)) {
-                                    return entity.label;
-                                } else {
-                                    return keywordEntities.filter((element: any) => element.keyword == entity.keyword)[0].text
-                                }
-                            }),
-                        };
+                    this.folderInfo = {
+                        'id': params['folderId'],
+                        'label': data.folder.label,
+                        'ownerDisplayName': data.folder.ownerDisplayName,
+                        'entitiesSharing': data.folder.sharing.entities.map((entity: any) => {
+                            if (!this.functions.empty(entity.label)) {
+                                return entity.label;
+                            } else {
+                                return keywordEntities.filter((element: any) => element.keyword === entity.keyword)[0].text;
+                            }
+                        }),
+                    };
                     this.foldersService.setFolder(this.folderInfo);
                     this.headerService.setHeader(this.folderInfo.label, '', 'fa fa-folder-open');
 
@@ -207,34 +205,34 @@ export class FolderDocumentListComponent implements OnInit {
                     return this.resultListDatabase!.getRepoIssues(
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters(), this.paginator.pageSize);
                 }),
-                map(data => {
+                map((data: any) => {
                     // Flip flag to show that loading has finished.
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
                     this.resultsLength = data.countResources;
                     this.allResInBasket = data.allResources;
-                    //this.headerService.setHeader('Dossier : ' + this.folderInfo.label);
+                    // this.headerService.setHeader('Dossier : ' + this.folderInfo.label);
                     return data.resources;
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
                     this.router.navigate(['/home']);
                     this.isLoadingResults = false;
-                    return observableOf([]);
+                    return of(false);
                 })
             ).subscribe(data => this.data = data);
     }
 
     goTo(row: any) {
         this.filtersListService.filterMode = false;
-        if (this.docUrl == '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
+        if (this.docUrl === '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
             this.sidenavRight.close();
         } else {
             this.docUrl = '../../rest/resources/' + row.resId + '/content';
             this.currentChrono = row.chrono;
             this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
-                "<iframe style='height:100%;width:100%;' src='" + this.docUrl + "' class='embed-responsive-item'>" +
-                "</iframe>");
+                '<iframe style=\'height:100%;width:100%;\' src=\'' + this.docUrl + '\' class=\'embed-responsive-item\'>' +
+                '</iframe>');
             this.sidenavRight.open();
         }
     }
@@ -244,13 +242,13 @@ export class FolderDocumentListComponent implements OnInit {
     }
 
     togglePanel(mode: string, row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         row.checked = true;
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
 
-        if (this.currentResource.resId == row.resId && this.sidenavRight.opened && this.currentMode == mode) {
+        if (this.currentResource.resId === row.resId && this.sidenavRight.opened && this.currentMode === mode) {
             this.sidenavRight.close();
         } else {
             this.currentMode = mode;
@@ -267,23 +265,22 @@ export class FolderDocumentListComponent implements OnInit {
     refreshFolderInformations() {
         this.http.get('../../rest/folders/' + this.folderInfo.id)
             .subscribe((data: any) => {
-                let keywordEntities = [{
+                const keywordEntities = [{
                     keyword: 'ALL_ENTITIES',
                     text: this.lang.allEntities,
                 }];
-                this.folderInfo =
-                    {
-                        'id': data.folder.id,
-                        'label': data.folder.label,
-                        'ownerDisplayName': data.folder.ownerDisplayName,
-                        'entitiesSharing': data.folder.sharing.entities.map((entity: any) => {
-                            if (!this.functions.empty(entity.label)) {
-                                return entity.label;
-                            } else {
-                                return keywordEntities.filter((element: any) => element.keyword == entity.keyword)[0].text
-                            }
-                        }),
-                    };
+                this.folderInfo = {
+                    'id': data.folder.id,
+                    'label': data.folder.label,
+                    'ownerDisplayName': data.folder.ownerDisplayName,
+                    'entitiesSharing': data.folder.sharing.entities.map((entity: any) => {
+                        if (!this.functions.empty(entity.label)) {
+                            return entity.label;
+                        } else {
+                            return keywordEntities.filter((element: any) => element.keyword === entity.keyword)[0].text;
+                        }
+                    }),
+                };
                 this.headerService.setHeader(this.folderInfo.label, '', 'fa fa-folder-open');
             });
     }
@@ -307,23 +304,23 @@ export class FolderDocumentListComponent implements OnInit {
     viewThumbnail(row: any) {
         if (row.hasDocument) {
             this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
-            $j('#viewThumbnail').show();
-            $j('#listContent').css({"overflow": "hidden"});
+            $('#viewThumbnail').show();
+            $('#listContent').css({ 'overflow': 'hidden' });
         }
     }
 
     closeThumbnail() {
-        $j('#viewThumbnail').hide();
-        $j('#listContent').css({ "overflow": "auto" });
+        $('#viewThumbnail').hide();
+        $('#listContent').css({ 'overflow': 'auto' });
     }
 
     processPostData(data: any) {
         data.resources.forEach((element: any) => {
             // Process main datas
             Object.keys(element).forEach((key) => {
-                if (key == 'statusImage' && element[key] == null) {
+                if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
-                } else if ((element[key] == null || element[key] == '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument'].indexOf(key) === -1) {
+                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument'].indexOf(key) === -1) {
                     element[key] = this.lang.undefined;
                 }
             });
@@ -341,7 +338,7 @@ export class FolderDocumentListComponent implements OnInit {
                 row.checked = true;
             }
         } else {
-            let index = this.selectedRes.indexOf(row.resId);
+            const index = this.selectedRes.indexOf(row.resId);
             this.selectedRes.splice(index, 1);
             row.checked = false;
         }
@@ -362,8 +359,8 @@ export class FolderDocumentListComponent implements OnInit {
     }
 
     selectSpecificRes(row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
 
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
@@ -371,14 +368,14 @@ export class FolderDocumentListComponent implements OnInit {
 
     open({ x, y }: MouseEvent, row: any) {
 
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         if (row.checked === false) {
             row.checked = true;
             this.toggleAllRes(thisDeselect);
             this.toggleRes(thisSelect, row);
         }
-        this.actionsList.open(x, y, row)
+        this.actionsList.open(x, y, row);
 
         // prevents default
         return false;
@@ -390,7 +387,7 @@ export class FolderDocumentListComponent implements OnInit {
 
     toggleMailTracking(row: any) {
         if (!row.mailTracking) {
-            this.http.post('../../rest/resources/follow', {resources: [row.resId]}).pipe(
+            this.http.post('../../rest/resources/follow', { resources: [row.resId] }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed++),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -410,7 +407,14 @@ export class FolderDocumentListComponent implements OnInit {
     }
 
     viewDocument(row: any) {
-        window.open("../../rest/resources/" + row.resId + "/content?mode=view", "_blank");
+        this.http.get(`../../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
+            .subscribe((data: any) => {
+                const file = new Blob([data], { type: 'application/pdf' });
+                const fileURL = URL.createObjectURL(file);
+                const newWindow = window.open();
+                newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
+                newWindow.document.title = row.chrono;
+            });
     }
 }
 export interface BasketList {
@@ -427,7 +431,7 @@ export class ResultListHttpDao {
     getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number): Observable<BasketList> {
         this.filtersListService.updateListsPropertiesPage(page);
         this.filtersListService.updateListsPropertiesPageSize(pageSize);
-        let offset = page * pageSize;
+        const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}${filters}`;
 
         return this.http.get<BasketList>(requestUrl);

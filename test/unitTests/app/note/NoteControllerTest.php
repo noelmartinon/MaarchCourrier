@@ -126,8 +126,8 @@ class NoteControllerTest extends TestCase
 
     public function testGetById()
     {
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
 
         $noteController = new \Note\controllers\NoteController();
@@ -153,15 +153,15 @@ class NoteControllerTest extends TestCase
 
         $this->assertSame('Note out of perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
     }
 
     public function testGetByResId()
     {
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
 
         $noteController = new \Note\controllers\NoteController();
@@ -195,15 +195,15 @@ class NoteControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Document out of perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
     }
 
     public function testGetTemplates()
     {
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
 
         $noteController = new \Note\controllers\NoteController();
@@ -251,8 +251,8 @@ class NoteControllerTest extends TestCase
 
         $this->assertSame('Document out of perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id']     = $userInfo['id'];
     }
 

@@ -178,9 +178,6 @@ if (!defined('_PEAR')) {
 if (!defined('_MIMETYPE')) {
     define('_MIMETYPE', 'MIME-TYPE');
 }
-if (!defined('_CLITOOLS')) {
-    define('_CLITOOLS', 'CLITools');
-}
 if (!defined('_ERROR_REPORTING')) {
     define('_ERROR_REPORTING', 'error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT');
 }

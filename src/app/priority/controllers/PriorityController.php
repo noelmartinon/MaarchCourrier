@@ -160,7 +160,7 @@ class PriorityController
 
         HistoryController::add([
             'tableName' => 'priorities',
-            'recordId'  => $GLOBALS['userId'],
+            'recordId'  => $GLOBALS['login'],
             'eventType' => 'UP',
             'info'      => _PRIORITY_SORT_MODIFICATION,
             'moduleId'  => 'priority',

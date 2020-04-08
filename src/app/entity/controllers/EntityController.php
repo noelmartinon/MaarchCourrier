@@ -37,7 +37,7 @@ class EntityController
 {
     public function get(Request $request, Response $response)
     {
-        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']])]);
+        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']])]);
     }
 
     public function getById(Request $request, Response $response, array $aArgs)
@@ -61,7 +61,7 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
 
-        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
             if ($aEntity['entity_id'] == $aArgs['id'] && $aEntity['allowed'] == false) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
@@ -136,7 +136,7 @@ class EntityController
         $entity['hasChildren'] = count($children) > 0;
         $documents = ResModel::get(['select' => [1], 'where' => ['destination = ?'], 'data' => [$aArgs['id']]]);
         $entity['documents'] = count($documents);
-        $instances = ListInstanceModel::get(['select' => [1], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$aArgs['id'], 'entity_id']]);
+        $instances = ListInstanceModel::get(['select' => [1], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$entity['id'], 'entity_id']]);
         $entity['instances'] = count($instances);
         $redirects = GroupBasketRedirectModel::get(['select' => [1], 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
         $entity['redirects'] = count($redirects);
@@ -182,8 +182,8 @@ class EntityController
             'eventId'   => 'entityCreation',
         ]);
 
-        if (empty($data['parent_entity_id']) && $GLOBALS['userId'] != 'superadmin') {
-            $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        if (empty($data['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
+            $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
             $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
             $pEntity = 'N';
             if (empty($primaryEntity)) {
@@ -193,15 +193,15 @@ class EntityController
             UserEntityModel::addUserEntity(['id' => $user['id'], 'entityId' => $data['entity_id'], 'role' => '', 'primaryEntity' => $pEntity]);
             HistoryController::add([
                 'tableName' => 'users',
-                'recordId'  => $GLOBALS['userId'],
+                'recordId'  => $GLOBALS['login'],
                 'eventType' => 'UP',
-                'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['userId']} {$data['entity_id']}",
+                'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['login']} {$data['entity_id']}",
                 'moduleId'  => 'user',
                 'eventId'   => 'userModification',
             ]);
         }
 
-        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']])]);
+        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']])]);
     }
 
     public function update(Request $request, Response $response, array $aArgs)
@@ -215,7 +215,7 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
 
-        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
             if ($aEntity['entity_id'] == $aArgs['id'] && $aEntity['allowed'] == false) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
@@ -256,8 +256,8 @@ class EntityController
             'eventId'   => 'entityModification',
         ]);
 
-        if (empty($data['parent_entity_id']) && $GLOBALS['userId'] != 'superadmin') {
-            $hasEntity = UserEntityModel::get(['select' => [1], 'where' => ['user_id = ?', 'entity_id = ?'], 'data' => [$GLOBALS['userId'], $aArgs['id']]]);
+        if (empty($data['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
+            $hasEntity = UserEntityModel::get(['select' => [1], 'where' => ['user_id = ?', 'entity_id = ?'], 'data' => [$GLOBALS['login'], $aArgs['id']]]);
             if (empty($hasEntity)) {
                 $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
                 $pEntity = 'N';
@@ -268,16 +268,16 @@ class EntityController
                 UserEntityModel::addUserEntity(['id' => $GLOBALS['id'], 'entityId' => $aArgs['id'], 'role' => '', 'primaryEntity' => $pEntity]);
                 HistoryController::add([
                     'tableName' => 'users',
-                    'recordId'  => $GLOBALS['userId'],
+                    'recordId'  => $GLOBALS['login'],
                     'eventType' => 'UP',
-                    'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['userId']} {$aArgs['id']}",
+                    'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['login']} {$aArgs['id']}",
                     'moduleId'  => 'user',
                     'eventId'   => 'userModification',
                 ]);
             }
         }
 
-        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']])]);
+        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']])]);
     }
 
     public function delete(Request $request, Response $response, array $aArgs)
@@ -291,7 +291,7 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
 
-        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
             if ($aEntity['entity_id'] == $aArgs['id'] && $aEntity['allowed'] == false) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
@@ -302,7 +302,7 @@ class EntityController
         $documents = ResModel::get(['select' => [1], 'where' => ['destination = ?'], 'data' => [$aArgs['id']]]);
         $users     = EntityModel::getUsersById(['select' => [1], 'id' => $aArgs['id']]);
         $templates = TemplateAssociationModel::get(['select' => [1], 'where' => ['value_field = ?'], 'data' => [$aArgs['id']]]);
-        $instances = ListInstanceModel::get(['select' => [1], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$aArgs['id'], 'entity_id']]);
+        $instances = ListInstanceModel::get(['select' => [1], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$entity['id'], 'entity_id']]);
         $redirects = GroupBasketRedirectModel::get(['select' => [1], 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
 
         $allowedCount = count($children) + count($documents) + count($users) + count($templates) + count($instances) + count($redirects);
@@ -346,7 +346,7 @@ class EntityController
             'eventId'   => 'entitySuppression',
         ]);
 
-        $entities['entities'] = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $entities['entities'] = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         return $response->withJson($entities);
     }
 
@@ -357,11 +357,11 @@ class EntityController
         }
 
         $dyingEntity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => ['id', 'parent_entity_id', 'business_id']]);
-        $successorEntity = EntityModel::getByEntityId(['entityId' => $aArgs['newEntityId'], 'select' => [1]]);
+        $successorEntity = EntityModel::getByEntityId(['entityId' => $aArgs['newEntityId'], 'select' => ['id']]);
         if (empty($dyingEntity) || empty($successorEntity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity does not exist']);
         }
-        $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($entities as $entity) {
             if (($entity['entity_id'] == $aArgs['id'] && $entity['allowed'] == false) || ($entity['entity_id'] == $aArgs['newEntityId'] && $entity['allowed'] == false)) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
@@ -414,7 +414,7 @@ class EntityController
         //Baskets
         GroupBasketRedirectModel::update(['set' => ['entity_id' => $aArgs['newEntityId']], 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
         //ListInstances
-        ListInstanceModel::update(['set' => ['item_id' => $aArgs['newEntityId']], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$aArgs['id'], 'entity_id']]);
+        ListInstanceModel::update(['set' => ['item_id' => $successorEntity['id']], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$dyingEntity['id'], 'entity_id']]);
         //ListTemplates
         $templateLists = ListTemplateModel::get(['select' => ['id'], 'where' => ['entity_id = ?'], 'data' => [$dyingEntity['id']]]);
         if (!empty($templateLists)) {
@@ -445,7 +445,7 @@ class EntityController
             'eventId'   => 'entitySuppression',
         ]);
 
-        $entities['entities'] = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $entities['entities'] = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         return $response->withJson($entities);
     }
 
@@ -460,7 +460,7 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
 
-        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
             if ($aEntity['entity_id'] == $aArgs['id'] && $aEntity['allowed'] == false) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);

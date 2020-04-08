@@ -796,7 +796,7 @@ class FolderPrintController
         SummarySheetController::createSummarySheet($pdf, [
             'resource'         => $resource,
             'units'            => $units,
-            'login'            => $GLOBALS['userId'],
+            'login'            => $GLOBALS['login'],
             'data'             => $data,
             'fieldsIdentifier' => $fieldsIdentifier
         ]);

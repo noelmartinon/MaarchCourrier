@@ -7,14 +7,13 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { FunctionsService } from '../../../service/functions.service';
 import { FormControl } from '@angular/forms';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
 
 @Component({
-    templateUrl: "action-administration.component.html",
+    templateUrl: 'action-administration.component.html',
     providers: [AppService]
 })
 export class ActionAdministrationComponent implements OnInit {
@@ -54,7 +53,7 @@ export class ActionAdministrationComponent implements OnInit {
 
         this.route.params.subscribe(params => {
 
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
 
                 this.creationMode = true;
 
@@ -68,7 +67,7 @@ export class ActionAdministrationComponent implements OnInit {
                             return {
                                 id: status.id,
                                 label: status.label_status
-                            }
+                            };
                         });
 
                         this.actionPages = data['actionPages'];
@@ -76,8 +75,7 @@ export class ActionAdministrationComponent implements OnInit {
                         this.headerService.setHeader(this.lang.actionCreation);
                         this.loading = false;
                     });
-            }
-            else {
+            } else {
 
                 this.creationMode = false;
 
@@ -91,14 +89,14 @@ export class ActionAdministrationComponent implements OnInit {
                             return {
                                 id: status.id,
                                 label: status.label_status
-                            }
+                            };
                         });
                         this.actionPages = data['actionPages'];
                         this.keywordsList = data.keywordsList;
                         this.headerService.setHeader(this.lang.actionCreation, data.action.label_action);
                         await this.getCustomFields();
                         this.loading = false;
-                        if (this.action.actionPageId == 'close_mail') {
+                        if (this.action.actionPageId === 'close_mail') {
                             this.customFieldsFormControl = new FormControl({ value: this.action.parameters.requiredFields, disabled: false });
                             this.selectedFieldsId = [];
                             if (this.action.parameters.requiredFields) {
@@ -106,12 +104,12 @@ export class ActionAdministrationComponent implements OnInit {
                             }
                             this.selectedFieldsId.forEach((element: any) => {
                                 this.availableCustomFields.forEach((availableElement: any) => {
-                                    if (availableElement.id == element) {
+                                    if (availableElement.id === element) {
                                         this.selectedFieldsValue.push(availableElement.label);
                                     }
                                 });
                             });
-                        } else if (this.action.actionPageId == 'create_acknowledgement_receipt') {
+                        } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
                         }
                     });
@@ -122,7 +120,7 @@ export class ActionAdministrationComponent implements OnInit {
     getCustomFields() {
         this.action.actionPageId = this.selectActionPageId.value;
         return new Promise((resolve, reject) => {
-            if (this.action.actionPageId == 'close_mail' && this.functions.empty(this.availableCustomFields)) {
+            if (this.action.actionPageId === 'close_mail' && this.functions.empty(this.availableCustomFields)) {
                 this.http.get('../../rest/customFields').pipe(
                     tap((data: any) => {
                         this.availableCustomFields = data.customFields.map((info: any) => {
@@ -144,7 +142,7 @@ export class ActionAdministrationComponent implements OnInit {
 
     getSelectedFields() {
         this.availableCustomFields.forEach((element: any) => {
-            if (element.id == this.customFieldsFormControl.value) {
+            if (element.id === this.customFieldsFormControl.value) {
                 this.selectedValue = element;
             }
         });
@@ -161,9 +159,9 @@ export class ActionAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.action.actionPageId == 'close_mail') {
+        if (this.action.actionPageId === 'close_mail') {
             this.action.parameters = { requiredFields: this.selectedFieldsId };
-        } else if (this.action.actionPageId == 'create_acknowledgement_receipt') {
+        } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
             this.action.parameters = { mode: this.arMode };
         }
         if (this.creationMode) {

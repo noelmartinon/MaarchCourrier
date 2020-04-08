@@ -1,19 +1,13 @@
-import { Component, OnInit, Input, ViewChild, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
 import { FiltersListService } from '../../../service/filtersList.service';
-import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatInput } from '@angular/material/input';
-import { MatSelectionList } from '@angular/material/list';
-
-declare function $j(selector: any): any;
 
 @Component({
     selector: 'app-filters-list',
     templateUrl: 'filters-list.component.html',
     styleUrls: ['filters-list.component.scss'],
-    providers: [NotificationService],
     encapsulation: ViewEncapsulation.None
 })
 export class FiltersListComponent implements OnInit {
@@ -27,16 +21,16 @@ export class FiltersListComponent implements OnInit {
 
     loading: boolean = false;
 
-    @Input('listProperties') listProperties: any;
+    @Input() listProperties: any;
 
-    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
+    @Output() refreshEvent = new EventEmitter<string>();
 
 
     constructor(public http: HttpClient, private filtersListService: FiltersListService) { }
 
     ngOnInit(): void {
         this.loading = true;
-        this.http.get("../../rest/priorities")
+        this.http.get('../../rest/priorities')
             .subscribe((data: any) => {
                 this.priorities = data.priorities;
                 this.priorities.forEach((element) => {
@@ -48,9 +42,9 @@ export class FiltersListComponent implements OnInit {
                     });
                 });
 
-                this.http.get("../../rest/categories")
-                    .subscribe((data: any) => {
-                        this.categories = data.categories;
+                this.http.get('../../rest/categories')
+                    .subscribe((dataCat: any) => {
+                        this.categories = dataCat.categories;
                         this.categories.forEach(element => {
                             element.selected = false;
                             this.listProperties.categories.forEach((listPropertyCat: any) => {
@@ -60,9 +54,9 @@ export class FiltersListComponent implements OnInit {
                             });
                         });
 
-                        this.http.get("../../rest/statuses")
-                            .subscribe((data: any) => {
-                                this.statuses = data.statuses;
+                        this.http.get('../../rest/statuses')
+                            .subscribe((dataStat: any) => {
+                                this.statuses = dataStat.statuses;
                                 this.statuses.forEach(element => {
                                     element.selected = false;
                                     this.listProperties.statuses.forEach((listPropertyStatus: any) => {
@@ -71,9 +65,9 @@ export class FiltersListComponent implements OnInit {
                                         }
                                     });
                                 });
-                                this.http.get("../../rest/doctypes/types")
-                                    .subscribe((data: any) => {
-                                        this.doctypes = data.doctypes;
+                                this.http.get('../../rest/doctypes/types')
+                                    .subscribe((dataDoct: any) => {
+                                        this.doctypes = dataDoct.doctypes;
                                         this.doctypes.forEach(element => {
                                             element.selected = false;
                                             this.listProperties.doctypes.forEach((listPropertyDoctype: any) => {

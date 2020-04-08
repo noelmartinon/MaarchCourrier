@@ -6,11 +6,11 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { NotesListComponent } from '../../notes/notes.component';
 import { AttachmentsListComponent } from '../../attachments/attachments-list.component';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
     selector: 'app-panel-list',
-    templateUrl: "panel-list.component.html",
+    templateUrl: 'panel-list.component.html',
     styleUrls: ['panel-list.component.scss'],
 })
 export class PanelListComponent implements OnInit {
@@ -29,8 +29,8 @@ export class PanelListComponent implements OnInit {
     icon: string;
     currentResource: any = {};
 
-    @Output('refreshBadgeNotes') refreshBadgeNotes = new EventEmitter<string>();
-    @Output('refreshBadgeAttachments') refreshBadgeAttachments = new EventEmitter<string>();
+    @Output() refreshBadgeNotes = new EventEmitter<string>();
+    @Output() refreshBadgeAttachments = new EventEmitter<string>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
@@ -49,7 +49,7 @@ export class PanelListComponent implements OnInit {
 
         this.injectDatasParam.resId = this.currentResource.resId;
 
-        if (mode == 'diffusion') {
+        if (mode === 'diffusion') {
             setTimeout(() => {
                 this.icon = 'fa-sitemap';
                 this.selectedDiffusionTab = 0;
@@ -59,16 +59,16 @@ export class PanelListComponent implements OnInit {
                 this.appAvisWorkflow.loadWorkflow(this.currentResource.resId);
             }, 0);
 
-        } else if (mode == 'note') {
+        } else if (mode === 'note') {
             setTimeout(() => {
                 this.icon = 'fa-comments';
                 this.appNotesList.loadNotes(this.currentResource.resId);
             }, 0);
 
             setTimeout(() => {
-                $j('textarea').focus();
+                $('textarea').focus();
             }, 200);
-        } else if (mode == 'attachment') {
+        } else if (mode === 'attachment') {
             setTimeout(() => {
                 this.icon = 'fa-paperclip';
                 this.appAttachmentsList.loadAttachments(this.currentResource.resId);
@@ -76,11 +76,11 @@ export class PanelListComponent implements OnInit {
         }
     }
 
-    reloadBadgeNotes(nb:any) {
+    reloadBadgeNotes(nb: any) {
         this.refreshBadgeNotes.emit(nb);
     }
 
-    reloadBadgeAttachments(nb:any) {
+    reloadBadgeAttachments(nb: any) {
         this.refreshBadgeAttachments.emit(nb);
     }
 }

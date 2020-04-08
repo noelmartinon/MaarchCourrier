@@ -260,8 +260,8 @@ class TemplateControllerTest extends TestCase
         $this->assertSame("Uploaded file is missing", $responseBody['errors']);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
@@ -270,8 +270,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -318,8 +318,8 @@ class TemplateControllerTest extends TestCase
         $responseBody   = json_decode((string)$response->getBody());
         $this->assertSame('Template does not exist', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response       = $templates->getDetailledById($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -328,8 +328,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -486,8 +486,8 @@ class TemplateControllerTest extends TestCase
         $this->assertSame(_WRONG_FILE_TYPE, $responseBody['errors']);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
@@ -496,8 +496,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -557,8 +557,8 @@ class TemplateControllerTest extends TestCase
         $this->assertSame('Forbidden duplication', $responseBody->errors);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $templates->duplicate($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -567,8 +567,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -603,8 +603,8 @@ class TemplateControllerTest extends TestCase
         $this->assertSame(true, $idDuplicatedFound);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $templates->get($request, new \Slim\Http\Response());
@@ -613,8 +613,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -688,8 +688,8 @@ class TemplateControllerTest extends TestCase
         $this->assertSame('Template does not exist', $responseBody->errors);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $templates->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -698,8 +698,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -730,8 +730,8 @@ class TemplateControllerTest extends TestCase
         $this->assertNotNull($responseBody->entities[0]->entity_label);
 
         // Fail
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response       = $templates->initTemplates($request, new \Slim\Http\Response());
@@ -740,8 +740,8 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 }

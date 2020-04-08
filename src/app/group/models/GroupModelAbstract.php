@@ -197,7 +197,7 @@ abstract class GroupModelAbstract
 
         $allGroups = GroupModel::get(['select' => ['group_id', 'group_desc'], 'orderBy' => ['group_desc']]);
 
-        if ($GLOBALS['userId'] == 'superadmin') {
+        if ($GLOBALS['login'] == 'superadmin') {
             $assignableGroups = GroupModel::get(['select' => ['group_id'], 'orderBy' => ['group_desc']]);
         } else {
             $assignableGroups = PrivilegeController::getAssignableGroups(['userId' => $GLOBALS['id']]);

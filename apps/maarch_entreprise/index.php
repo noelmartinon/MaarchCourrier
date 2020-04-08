@@ -94,7 +94,7 @@ if (isset($_SESSION['config']['corepath'])) {
 }
 
 if (!empty($_SESSION['user']['UserId'])) {
-    $GLOBALS['userId'] = $_SESSION['user']['UserId'];
+    $GLOBALS['login'] = $_SESSION['user']['UserId'];
 }
 
 if (!isset($_SESSION['user']['UserId'])

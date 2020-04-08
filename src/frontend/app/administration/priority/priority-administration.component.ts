@@ -6,41 +6,37 @@ import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "priority-administration.component.html",
+    templateUrl: 'priority-administration.component.html',
     providers: [AppService]
 })
 export class PriorityAdministrationComponent implements OnInit {
-    
-    id              : string;
-    creationMode    : boolean;
-    lang            : any       = LANG;
-    loading         : boolean   = false;
 
-    priority        : any       = {
-        color           : "#135f7f",
-        delays          : "0",
+    id: string;
+    creationMode: boolean;
+    lang: any = LANG;
+    loading: boolean = false;
+
+    priority: any = {
+        color: '#135f7f',
+        delays: '0',
     };
 
-    constructor( 
-        public http: HttpClient, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private notify: NotificationService, 
+    constructor(
+        public http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
 
         this.route.params.subscribe((params) => {
 
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
                 this.headerService.setHeader(this.lang.priorityCreation);
 
                 this.creationMode = true;
@@ -49,7 +45,7 @@ export class PriorityAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
                 this.id = params['id'];
-                this.http.get("../../rest/priorities/" + this.id)
+                this.http.get('../../rest/priorities/' + this.id)
                     .subscribe((data: any) => {
                         this.priority = data.priority;
                         this.headerService.setHeader(this.lang.priorityModification, this.priority.label);
@@ -63,18 +59,18 @@ export class PriorityAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            this.http.post("../../rest/priorities", this.priority)
+            this.http.post('../../rest/priorities', this.priority)
                 .subscribe(() => {
                     this.notify.success(this.lang.priorityAdded);
-                    this.router.navigate(["/administration/priorities"]);
+                    this.router.navigate(['/administration/priorities']);
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put("../../rest/priorities/" + this.id, this.priority)
+            this.http.put('../../rest/priorities/' + this.id, this.priority)
                 .subscribe(() => {
                     this.notify.success(this.lang.priorityUpdated);
-                    this.router.navigate(["/administration/priorities"]);
+                    this.router.navigate(['/administration/priorities']);
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });

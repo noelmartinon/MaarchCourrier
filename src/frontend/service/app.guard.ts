@@ -7,32 +7,83 @@ import { map, tap, catchError } from 'rxjs/operators';
 import { HeaderService } from './header.service';
 import { ProcessComponent } from '../app/process/process.component';
 import { PrivilegeService } from './privileges.service';
+import { AuthService } from './auth.service';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppGuard implements CanActivate {
 
-    constructor(public http: HttpClient,
+    constructor(
+        public http: HttpClient,
         private router: Router,
+        private authService: AuthService,
+        private localStorage: LocalStorageService,
         public headerService: HeaderService,
-        private privilegeService: PrivilegeService) { }
+        private privilegeService: PrivilegeService
+    ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-        // TO DO : CAN BE REMOVE AFTER FULL V2
-        localStorage.setItem('PreviousV2Route', state.url);
         this.headerService.resetSideNavSelection();
-        if (route.url.filter((url: any) => url == 'signatureBook').length > 0) {
+
+        if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
             this.headerService.hideSideBar = true;
-        } else {       
+        } else {
             this.headerService.hideSideBar = false;
         }
-        if (route.url.filter((url: any) => url == 'administration').length > 0 || route.url.filter((url: any) => url == 'profile').length > 0) { 
+        if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
             this.headerService.sideBarAdmin = true;
         } else {
             this.headerService.sideBarAdmin = false;
         }
-        
+
+        let tokenInfo = this.authService.getToken();
+
+        if (tokenInfo !== null) {
+            if (this.headerService.user.id === undefined) {
+                return this.http.get('../../rest/currentUser/profile')
+                    .pipe(
+                        map((data: any) => {
+                            this.headerService.user = {
+                                id: data.id,
+                                userId: data.user_id,
+                                firstname: data.firstname,
+                                lastname: data.lastname,
+                                entities: data.entities,
+                                groups: data.groups,
+                                preferences: data.preferences,
+                                privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : data.privileges
+                            };
+
+                            this.headerService.nbResourcesFollowed = data.nbFollowedResources;
+                            this.privilegeService.resfreshUserShortcuts();
+                            return true;
+                        })
+                    );
+            } else {
+                return true;
+            }
+        } else {
+            return this.http.get('../rest/authenticationInformations')
+                .pipe(
+                    map((data: any) => {
+                        this.authService.authMode = data.connection;
+                        this.authService.changeKey = data.changeKey;
+                        this.localStorage.setAppSession(data.instanceId);
+                        tokenInfo = this.authService.getToken();
+
+                        if (tokenInfo !== null) {
+                            this.authService.user = JSON.parse(atob(tokenInfo.split('.')[1])).user;
+                            return true;
+                        } else {
+                            this.authService.logout();
+                            return false;
+                        }
+                    })
+                );
+
+        }
         if (this.headerService.user.id === undefined) {
             return this.http.get('../../rest/currentUser/profile')
                 .pipe(
@@ -47,7 +98,7 @@ export class AppGuard implements CanActivate {
                             preferences: data.preferences,
                             privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : data.privileges
                         };
-                        
+
                         this.headerService.nbResourcesFollowed = data.nbFollowedResources;
                         this.privilegeService.resfreshUserShortcuts();
                         return true;

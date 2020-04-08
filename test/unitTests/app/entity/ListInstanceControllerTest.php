@@ -15,8 +15,8 @@ class ListInstanceControllerTest extends TestCase
 
     public function testUpdateCircuits()
     {
-        $GLOBALS['userId'] = 'cchaplin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'cchaplin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $resController = new \Resource\controllers\ResController();
@@ -48,8 +48,8 @@ class ListInstanceControllerTest extends TestCase
         self::$resourceId = $responseBody['resId'];
         $this->assertIsInt(self::$resourceId);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $listInstanceController = new \Entity\controllers\ListInstanceController();

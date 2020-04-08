@@ -385,13 +385,14 @@ abstract class UserModelAbstract
     {
         ValidatorModel::notEmpty($args, ['id', 'select']);
         ValidatorModel::intVal($args, ['id']);
-        ValidatorModel::arrayType($args, ['select']);
+        ValidatorModel::arrayType($args, ['select', 'orderBy']);
 
         $entities = DatabaseModel::select([
             'select'    => $args['select'],
             'table'     => ['users, users_entities, entities'],
             'where'     => ['users.id = users_entities.user_id', 'users_entities.entity_id = entities.entity_id', 'users.id = ?'],
-            'data'      => [$args['id']]
+            'data'      => [$args['id']],
+            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
         ]);
 
         return $entities;

@@ -697,7 +697,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_CREATED_IN_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"
@@ -777,7 +777,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_LINKED_TO_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"
@@ -803,7 +803,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_UNLINKED_TO_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"

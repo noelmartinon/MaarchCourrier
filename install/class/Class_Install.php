@@ -806,18 +806,6 @@ class Install extends functions
         $maarchUrl = $maarchUrl.'cs_'.$_SESSION['config']['databasename'].'/';
         $CONFIG->MaarchUrl    = $maarchUrl;
         $CONFIG->customID     = 'cs_'.$_SESSION['config']['databasename'];
-        $CONFIG->MaarchApps   = 'maarch_entreprise';
-        $CONFIG->TmpDirectory = realpath('.').'/modules/notifications/batch/tmp/';
-
-        $CONFIG_BASE = $xmlconfig->CONFIG_BASE;
-        $CONFIG_BASE->databaseserver     = $_SESSION['config']['databaseserver'];
-        $CONFIG_BASE->databaseserverport = $_SESSION['config']['databaseserverport'];
-        $CONFIG_BASE->databasename       = $_SESSION['config']['databasename'];
-        $CONFIG_BASE->databaseuser       = $_SESSION['config']['databaseuser'];
-        $CONFIG_BASE->databasepassword   = $_SESSION['config']['databasepassword'];
-
-        $LOG4PHP = $xmlconfig->LOG4PHP;
-        $LOG4PHP->Log4PhpConfigPath = realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/apps/maarch_entreprise/xml/log4php.xml';
 
         $res = $xmlconfig->asXML();
         $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml', 'w+');

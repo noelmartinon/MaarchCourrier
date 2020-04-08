@@ -18,6 +18,7 @@ use Configuration\models\ConfigurationModel;
 use Email\controllers\EmailController;
 use Firebase\JWT\JWT;
 use History\controllers\HistoryController;
+use Parameter\models\ParameterModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -31,56 +32,62 @@ class AuthenticationController
 {
     const MAX_DURATION_TOKEN = 30; //Minutes
     const ROUTES_WITHOUT_AUTHENTICATION = [
-        'GET/jnlp/{jnlpUniqueId}', 'POST/password', 'PUT/password', 'GET/passwordRules', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback'
+        'GET/authenticationInformations', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
+        'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate'
     ];
 
-    public static function authentication()
+    public function getInformations(Request $request, Response $response)
+    {
+//        $path = CoreConfigModel::getConfigPath();
+//        $hashedPath = md5($path);
+
+        $appName = CoreConfigModel::getApplicationName();
+        $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
+
+        return $response->withJson(['instanceId' => null, 'applicationName' => $appName, 'loginMessage' => $parameter['param_value_string'] ?? null]);
+    }
+
+    public static function authentication($authorizationHeaders = [])
     {
         $userId = null;
         if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
             if (AuthenticationModel::authentication(['login' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
                 $loginMethod = CoreConfigModel::getLoggingMethod();
+                $user = UserModel::getByLogin(['select' => ['id', 'loginmode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
                 if ($loginMethod['id'] != 'standard') {
-                    $user = UserModel::getByLogin(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
                     if ($user['loginmode'] == 'restMode') {
-                        $userId = $_SERVER['PHP_AUTH_USER'];
+                        $userId = $user['id'];
                     }
                 } else {
-                    $userId = $_SERVER['PHP_AUTH_USER'];
+                    $userId = $user['id'];
                 }
             }
         } else {
-            $cookie = AuthenticationModel::getCookieAuth();
-            if (!empty($cookie) && AuthenticationModel::cookieAuthentication($cookie)) {
-                AuthenticationModel::setCookieAuth(['userId' => $cookie['userId']]);
-                $userId = $cookie['userId'];
-            }
-
-//            if (!empty($authorizationHeaders)) {
-//                $token = null;
-//                foreach ($authorizationHeaders as $authorizationHeader) {
-//                    if (strpos($authorizationHeader, 'Bearer') === 0) {
-//                        $token = str_replace('Bearer ', '', $authorizationHeader);
-//                    }
-//                }
-//                if (!empty($token)) {
-//                    try {
-//                        $jwt = (array)JWT::decode($token, CoreConfigModel::getEncryptKey(), ['HS256']);
-//                    } catch (\Exception $e) {
-//                        return null;
-//                    }
-//                    $jwt['user'] = (array)$jwt['user'];
-//                    if (!empty($jwt) && !empty($jwt['user']['id'])) {
-//                        $id = $jwt['user']['id'];
-//                    }
-//                }
-//            }
+           if (!empty($authorizationHeaders)) {
+               $token = null;
+               foreach ($authorizationHeaders as $authorizationHeader) {
+                   if (strpos($authorizationHeader, 'Bearer') === 0) {
+                       $token = str_replace('Bearer ', '', $authorizationHeader);
+                   }
+               }
+               if (!empty($token)) {
+                   try {
+                       $jwt = (array)JWT::decode($token, CoreConfigModel::getEncryptKey(), ['HS256']);
+                   } catch (\Exception $e) {
+                       return null;
+                   }
+                   $jwt['user'] = (array)$jwt['user'];
+                   if (!empty($jwt) && !empty($jwt['user']['id'])) {
+                       $userId = $jwt['user']['id'];
+                   }
+               }
+           }
         }
 
         if (!empty($userId)) {
             UserModel::update([
                 'set'   => ['reset_token' => null],
-                'where' => ['user_id = ?'],
+                'where' => ['id = ?'],
                 'data'  => [$userId]
             ]);
         }
@@ -88,19 +95,20 @@ class AuthenticationController
         return $userId;
     }
 
-    public static function isRouteAvailable(array $aArgs)
+    public static function isRouteAvailable(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['login', 'currentRoute']);
-        ValidatorModel::stringType($aArgs, ['login', 'currentRoute']);
+        ValidatorModel::notEmpty($args, ['userId', 'currentRoute']);
+        ValidatorModel::intVal($args, ['userId']);
+        ValidatorModel::stringType($args, ['currentRoute']);
 
-        if ($aArgs['currentRoute'] != '/initialize') {
-            $user = UserModel::getByLogin(['select' => ['status'], 'login' => $aArgs['login']]);
+        if ($args['currentRoute'] != '/initialize') {
+            $user = UserModel::getById(['select' => ['status'], 'id' => $args['userId']]);
 
-            if ($user['status'] == 'ABS' && !in_array($aArgs['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
+            if ($user['status'] == 'ABS' && !in_array($args['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
                 return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
             }
 
-            if (!in_array($aArgs['currentRoute'], ['/passwordRules', '/users/{id}/password'])) {
+            if (!in_array($args['currentRoute'], ['/passwordRules', '/users/{id}/password'])) {
                 $loggingMethod = CoreConfigModel::getLoggingMethod();
 
                 if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'])) {
@@ -165,7 +173,7 @@ class AuthenticationController
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
-
+        var_dump('ttotoi');
         $login = strtolower($body['login']);
         $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $body['password']]);
         if (empty($authenticated)) {
@@ -202,14 +210,14 @@ class AuthenticationController
         $response = $response->withHeader('Token', AuthenticationController::getJWT());
         $response = $response->withHeader('Refresh-Token', $refreshToken);
 
-        HistoryController::add([
+        /* HistoryController::add([
             'tableName' => 'users',
             'recordId'  => $user['id'],
             'eventType' => 'LOGIN',
             'info'      => _LOGIN . ' : ' . $login,
             'moduleId'  => 'authentication',
             'eventId'   => 'login'
-        ]);
+        ]); */
 
         return $response->withStatus(204);
     }

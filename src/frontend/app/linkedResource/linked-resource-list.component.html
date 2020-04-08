@@ -6,7 +6,7 @@
 <ng-template #elseLoading>
     <mat-card id="viewThumbnail"
         style="display:none;position: fixed;z-index: 2;margin-left: 1px;left: 50%;transform: translate(-50%,-50%);top: 50%;">
-        <img style="max-height: 100vh;" src="{{thumbnailUrl}}" /></mat-card>
+        <img style="max-height: 100vh;" [src]="thumbnailUrl | secureUrl | async" /></mat-card>
     <div class="row" style="margin: 0px;">
         <div class="col-md-12">
             <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="10">

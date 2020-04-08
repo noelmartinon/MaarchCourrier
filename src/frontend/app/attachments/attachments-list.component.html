@@ -16,7 +16,7 @@
             </mat-button-toggle>
         </mat-button-toggle-group>
         <mat-card *ngFor="let attachment of attachments | filterList:currentFilter:'type'"
-            [class.signed]="attachment.status==='SIGN'" [style.background-image]="'url('+attachment.thumbnailUrl+')'"
+            [class.signed]="attachment.status==='SIGN'" [style.background-image]="'url('+(attachment.thumbnailUrl | secureUrl | async)+')'"
             style="padding:0;margin: 30px;min-height: 300px;background-size: cover;overflow: hidden;"
             (mouseover)="$event.stopPropagation();toggleInfo(attachment,true)">
             <div class="layout" *ngIf="attachment.hideMainInfo" [@myAnimation] (click)="showAttachment(attachment)">

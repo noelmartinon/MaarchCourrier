@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild, Input, Renderer2, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Renderer2, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { map, tap, catchError, filter, exhaustMap, finalize } from 'rxjs/operators';
+import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { BehaviorSubject, of, Subscription } from 'rxjs';
 import { NotificationService } from '../notification.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { Router } from '@angular/router';
@@ -18,8 +17,10 @@ import { PluginAutocomplete } from '../../plugins/autocomplete/autocomplete.comp
 import { HeaderService } from '../../service/header.service';
 import { FolderCreateModalComponent } from './folder-create-modal/folder-create-modal.component';
 import { FunctionsService } from '../../service/functions.service';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
 /**
  * Node for to-do item
  */
@@ -46,43 +47,48 @@ export class ItemFlatNode {
 }
 @Component({
     selector: 'folder-tree',
-    templateUrl: "folder-tree.component.html",
+    templateUrl: 'folder-tree.component.html',
     styleUrls: ['folder-tree.component.scss'],
-    providers: [NotificationService],
     animations: [
         trigger('hideShow', [
             transition(
                 ':enter', [
-                    style({ height: '0px' }),
-                    animate('200ms', style({ 'height': '30px' }))
-                ]
+                style({ height: '0px' }),
+                animate('200ms', style({ 'height': '30px' }))
+            ]
             ),
             transition(
                 ':leave', [
-                    style({ height: '30px' }),
-                    animate('200ms', style({ 'height': '0px' }))
-                ]
+                style({ height: '30px' }),
+                animate('200ms', style({ 'height': '0px' }))
+            ]
             )
         ]),
     ],
 })
-export class FolderTreeComponent implements OnInit {
+export class FolderTreeComponent implements OnInit, OnDestroy {
 
     lang: any = LANG;
     loading: boolean = true;
 
     searchTerm: FormControl = new FormControl();
-    
+
     TREE_DATA: any[] = [];
     dialogRef: MatDialogRef<any>;
     createRootNode: boolean = false;
     createItemNode: boolean = false;
     dataChange = new BehaviorSubject<ItemNode[]>([]);
 
-    @Input('selectedId') seletedId: number;
+    @Input() selectedId: number;
     @ViewChild('itemValue', { static: true }) itemValue: MatInput;
     @ViewChild('autocomplete', { static: false }) autocomplete: PluginAutocomplete;
 
+    subscription: Subscription;
+
+    @ViewChild('tree', { static: true }) tree: any;
+
+    @Output() refreshDocList = new EventEmitter<string>();
+    @Output() refreshFolderList = new EventEmitter<string>();
 
     get data(): ItemNode[] { return this.dataChange.value; }
 
@@ -118,13 +124,6 @@ export class FolderTreeComponent implements OnInit {
 
     dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-    subscription: Subscription;
-    
-    @ViewChild('tree', { static: true }) tree: any;
-    
-    @Output('refreshDocList') refreshDocList = new EventEmitter<string>();
-    @Output('refreshFolderList') refreshFolderList = new EventEmitter<string>();
-
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -136,7 +135,7 @@ export class FolderTreeComponent implements OnInit {
         private functions: FunctionsService,
     ) {
         // Event after process action 
-        this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {   
+        this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
             if (result.type === 'initTree') {
                 const folders = this.flatToNestedObject(this.foldersService.getList());
                 if (folders.length > 0) {
@@ -153,7 +152,7 @@ export class FolderTreeComponent implements OnInit {
                     this.openTree(this.foldersService.getCurrentFolder().id);
                 }
             }
-        }); 
+        });
     }
 
     ngOnInit(): void {
@@ -167,17 +166,17 @@ export class FolderTreeComponent implements OnInit {
 
     initTree(data: any) {
         this.dataChange.next(data);
-        this.dataChange.subscribe(data => {
-            this.dataSource.data = data;
+        this.dataChange.subscribe(info => {
+            this.dataSource.data = info;
         });
     }
 
     openTree(id: any) {
         let indexSelectedFolder = this.treeControl.dataNodes.map((folder: any) => folder.id).indexOf(parseInt(id));
 
-        while (indexSelectedFolder != -1) {
+        while (indexSelectedFolder !== -1) {
             indexSelectedFolder = this.treeControl.dataNodes.map((folder: any) => folder.id).indexOf(this.treeControl.dataNodes[indexSelectedFolder].parent_id);
-            if (indexSelectedFolder != -1) {
+            if (indexSelectedFolder !== -1) {
                 this.treeControl.expand(this.treeControl.dataNodes[indexSelectedFolder]);
             }
         }
@@ -206,17 +205,16 @@ export class FolderTreeComponent implements OnInit {
                 }
                 delete value.parent_id;
                 value.root = true;
-                initial.nested.push(value)
-            }
-            else {
-                let parentFound = this.findParent(initial.nested, value);
+                initial.nested.push(value);
+            } else {
+                const parentFound = this.findParent(initial.nested, value);
                 if (parentFound) {
                     this.checkLeftOvers(initial.left, value);
                 } else {
                     initial.left.push(value);
                 }
             }
-            return index < original.length - 1 ? initial : initial.nested
+            return index < original.length - 1 ? initial : initial.nested;
         }, { nested: [], left: [] });
         return nested;
     }
@@ -238,14 +236,14 @@ export class FolderTreeComponent implements OnInit {
         for (let i = 0; i < possibleParents.length; i++) {
             if (possibleParents[i].id === possibleChild.parent_id) {
                 found = true;
-                //delete possibleChild.parent_id;
+                // delete possibleChild.parent_id;
                 if (possibleParents[i].children) {
                     possibleParents[i].children.push(possibleChild);
                 } else {
                     possibleParents[i].children = [possibleChild];
                 }
                 possibleParents[i].count = possibleParents[i].children.length;
-                return true
+                return true;
             } else if (possibleParents[i].children) {
                 found = this.findParent(possibleParents[i].children, possibleChild);
             }
@@ -259,7 +257,7 @@ export class FolderTreeComponent implements OnInit {
         if (currentNode.children === undefined) {
             currentNode['children'] = [];
         }
-        currentNode.children.push({ label: '', parent_id: currentNode.id, public : currentNode.public } as ItemNode);
+        currentNode.children.push({ label: '', parent_id: currentNode.id, public: currentNode.public } as ItemNode);
         this.dataChange.next(this.data);
 
         this.treeControl.expand(node);
@@ -267,7 +265,7 @@ export class FolderTreeComponent implements OnInit {
     }
 
     saveNode(node: any, value: any) {
-        this.http.post("../../rest/folders", { label: value, parent_id: node.parent_id }).pipe(
+        this.http.post('../../rest/folders', { label: value, parent_id: node.parent_id }).pipe(
             tap((data: any) => {
                 const nestedNode = this.flatNodeMap.get(node);
                 nestedNode.label = value;
@@ -289,12 +287,12 @@ export class FolderTreeComponent implements OnInit {
 
     removeTemporaryNode(node: any) {
         const parentNode = this.getParentNode(node);
-        const index = parentNode.children.map(node => node.id).indexOf(node.id);
+        const index = parentNode.children.map(nodeItem => nodeItem.id).indexOf(node.id);
 
         if (index !== -1) {
             parentNode.children.splice(index, 1);
         }
-        
+
         this.flatNodeMap.delete(node);
         this.dataChange.next(this.data);
         this.createItemNode = false;
@@ -322,18 +320,18 @@ export class FolderTreeComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete("../../rest/folders/" + node.id)),
+            exhaustMap(() => this.http.delete('../../rest/folders/' + node.id)),
             tap(() => {
                 const parentNode = this.getParentNode(node);
 
                 if (parentNode !== null) {
-                    const index = parentNode.children.map(node => node.id).indexOf(node.id);
+                    const index = parentNode.children.map(nodeItem => nodeItem.id).indexOf(node.id);
 
                     if (index !== -1) {
                         parentNode.children.splice(index, 1);
                     }
                 } else {
-                    const index = this.data.map(node => node.id).indexOf(node.id);
+                    const index = this.data.map(nodeItem => nodeItem.id).indexOf(node.id);
                     if (index !== -1) {
                         this.data.splice(index, 1);
                     }
@@ -384,7 +382,7 @@ export class FolderTreeComponent implements OnInit {
                 if (data !== undefined) {
                     this.getFolders();
                     this.foldersService.getPinnedFolders();
-                    this.foldersService.setEvent({type:'refreshFolderInformations', content: node});
+                    this.foldersService.setEvent({ type: 'refreshFolderInformations', content: node });
                 }
             })
         ).subscribe();
@@ -427,9 +425,9 @@ export class FolderTreeComponent implements OnInit {
     }
 
     goTo(folder: any) {
-        this.seletedId = folder.id;
+        this.selectedId = folder.id;
         this.getFolders();
-        this.router.navigate(["/folders/" + folder.id]);
+        this.router.navigate(['/folders/' + folder.id]);
     }
 
     togglePinFolder(folder: any) {

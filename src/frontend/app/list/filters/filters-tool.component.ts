@@ -3,15 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSidenav } from '@angular/material/sidenav';
 import { FiltersListService } from '../../../service/filtersList.service';
-import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
+import { Observable } from 'rxjs/internal/Observable';
 
-
-declare function $j(selector: any): any;
+declare var $: any;
 
 export interface StateGroup {
     letter: string;
@@ -58,17 +56,15 @@ export class FiltersToolComponent implements OnInit {
 
     isLoading: boolean = false;
 
-    @Input('listProperties') listProperties: any;
+    @Input() listProperties: any;
+    @Input() title: string;
+    @Input() routeDatas: string;
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
 
-    @Input('title') title: string;
-    @Input('routeDatas') routeDatas: string;
-    @Input('snavR') sidenavRight: MatSidenav;
-    @Input('selectedRes') selectedRes: any;
-    @Input('totalRes') totalRes: number;
-
-    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
-    @Output('refreshEventAfterAction') refreshEventAfterAction = new EventEmitter<string>();
-    @Output('toggleAllRes') toggleAllRes = new EventEmitter<string>();
+    @Output() refreshEvent = new EventEmitter<string>();
+    @Output() refreshEventAfterAction = new EventEmitter<string>();
+    @Output() toggleAllRes = new EventEmitter<string>();
 
     constructor(public http: HttpClient, private filtersListService: FiltersListService, private fb: FormBuilder, private latinisePipe: LatinisePipe, public dialog: MatDialog) { }
 
@@ -81,9 +77,9 @@ export class FiltersToolComponent implements OnInit {
         if (typeof value === 'string') {
             const filterValue = value.toLowerCase();
 
-            return opt.filter(item => this.latinisePipe.transform(item['label'].toLowerCase()).indexOf(this.latinisePipe.transform(filterValue)) != -1);
+            return opt.filter(item => this.latinisePipe.transform(item['label'].toLowerCase()).indexOf(this.latinisePipe.transform(filterValue)) !== -1);
         }
-    };
+    }
 
     private _filterGroup(value: string): StateGroup[] {
         if (value && typeof value === 'string') {
@@ -96,7 +92,7 @@ export class FiltersToolComponent implements OnInit {
     }
 
     changeOrderDir() {
-        if (this.listProperties.orderDir == 'ASC') {
+        if (this.listProperties.orderDir === 'ASC') {
             this.listProperties.orderDir = 'DESC';
         } else {
             this.listProperties.orderDir = 'ASC';
@@ -127,14 +123,14 @@ export class FiltersToolComponent implements OnInit {
             'id': e.option.value.value,
             'label': e.option.value.label
         });
-        $j('.metaSearch').blur();
+        $('.metaSearch').blur();
         this.stateForm.controls['stateGroup'].reset();
         this.updateFilters();
     }
 
     metaSearch(e: any) {
         this.listProperties.search = e.target.value;
-        $j('.metaSearch').blur();
+        $('.metaSearch').blur();
         this.stateForm.controls['stateGroup'].reset();
         this.autocomplete.closePanel();
         this.updateFilters();
@@ -149,7 +145,7 @@ export class FiltersToolComponent implements OnInit {
         Object.keys(this.listProperties).forEach((key) => {
             if (Array.isArray(this.listProperties[key])) {
                 this.listProperties[key] = [];
-            } else if (key == 'search') {
+            } else if (key === 'search') {
                 this.listProperties[key] = '';
             }
         });
@@ -159,7 +155,7 @@ export class FiltersToolComponent implements OnInit {
     haveFilters() {
         let state = false;
         Object.keys(this.listProperties).forEach((key) => {
-            if ((Array.isArray(this.listProperties[key]) && this.listProperties[key].length > 0) || (key == 'search' && this.listProperties[key] != '')) {
+            if ((Array.isArray(this.listProperties[key]) && this.listProperties[key].length > 0) || (key === 'search' && this.listProperties[key] !== '')) {
                 state = true;
             }
         });
@@ -167,7 +163,7 @@ export class FiltersToolComponent implements OnInit {
     }
 
     setInputSearch(value: string) {
-        $j('.metaSearch').focus();
+        $('.metaSearch').focus();
         this.metaSearchInput = value;
     }
 
@@ -217,7 +213,7 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.id !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
                 });
                 data.priorities.forEach((element: any) => {
@@ -229,7 +225,7 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.id !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
                 });
                 data.statuses.forEach((element: any) => {
@@ -241,13 +237,13 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.id !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
 
                 });
 
                 data.entities.forEach((element: any) => {
-                    if (this.listProperties.entities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.subEntities == 0) {
+                    if (this.listProperties.entities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.subEntities === 0) {
                         this.stateGroups[3].names.push(
                             {
                                 id: 'entities',
@@ -255,13 +251,13 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.entityId !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
 
                 });
 
                 data.entitiesChildren.forEach((element: any) => {
-                    if (this.listProperties.subEntities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.entities == 0) {
+                    if (this.listProperties.subEntities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.entities === 0) {
                         this.stateGroups[4].names.push(
                             {
                                 id: 'subEntities',
@@ -269,7 +265,7 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.entityId !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
                 });
 
@@ -282,7 +278,7 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.id !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
                 });
 
@@ -295,7 +291,7 @@ export class FiltersToolComponent implements OnInit {
                                 label: (element.id !== null ? element.label : this.lang.undefined),
                                 count: element.count
                             }
-                        )
+                        );
                     }
                 });
                 this.isLoading = false;

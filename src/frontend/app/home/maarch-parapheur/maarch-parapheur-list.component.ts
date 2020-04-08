@@ -1,9 +1,7 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -17,15 +15,12 @@ export interface MPDocument {
     owner: boolean;
 }
 
-declare function $j(selector: any): any;
-
 @Component({
     selector: 'app-maarch-parapheur-list',
-    templateUrl: "maarch-parapheur-list.component.html",
+    templateUrl: 'maarch-parapheur-list.component.html',
     styleUrls: ['maarch-parapheur-list.component.scss'],
-    providers: [NotificationService]
 })
-export class MaarchParapheurListComponent implements OnInit {
+export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
     lang: any = LANG;
     loading: boolean = true;
@@ -38,7 +33,7 @@ export class MaarchParapheurListComponent implements OnInit {
     maarchParapheurUrl: string = '';
 
     @Output() triggerEvent = new EventEmitter<string>();
-    
+
     constructor(public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, private headerService: HeaderService) {
         this.dataSource = new MatTableDataSource(this.userList);
     }
@@ -48,7 +43,7 @@ export class MaarchParapheurListComponent implements OnInit {
     }
 
     ngAfterViewInit(): void {
-        this.http.get("../../rest/home/maarchParapheurDocuments")
+        this.http.get('../../rest/home/maarchParapheurDocuments')
             .pipe(
                 finalize(() => this.loading = false)
             )

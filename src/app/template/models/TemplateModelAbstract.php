@@ -179,6 +179,7 @@ abstract class TemplateModelAbstract
                         'script'    => (string)$value['script'],
                         'target'    => (string)$value['target'],
                     ];
+                    break;
                 }
             }
         }

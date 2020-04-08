@@ -8,12 +8,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import { FunctionsService } from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "baskets-administration.component.html",
+    templateUrl: 'baskets-administration.component.html',
     providers: [AppService]
 })
 export class BasketsAdministrationComponent implements OnInit {
@@ -48,9 +46,7 @@ export class BasketsAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
@@ -58,14 +54,14 @@ export class BasketsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get("../../rest/baskets")
+        this.http.get('../../rest/baskets')
             .subscribe((data: any) => {
                 this.baskets = data['baskets'];
                 this.loading = false;
                 setTimeout(() => {
-                    this.http.get("../../rest/sortedBaskets")
-                        .subscribe((data: any) => {
-                            this.basketsOrder = data['baskets'];
+                    this.http.get('../../rest/sortedBaskets')
+                        .subscribe((dataSort: any) => {
+                            this.basketsOrder = dataSort['baskets'];
                         }, (err) => {
                             this.notify.handleErrors(err);
                         });
@@ -82,19 +78,19 @@ export class BasketsAdministrationComponent implements OnInit {
     }
 
     delete(basket: any) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + basket['basket_name'] + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + basket['basket_name'] + ' »');
 
         if (r) {
-            this.http.delete("../../rest/baskets/" + basket['basket_id'])
+            this.http.delete('../../rest/baskets/' + basket['basket_id'])
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.basketDeleted);
                     this.baskets = data['baskets'];
                     this.dataSource = new MatTableDataSource(this.baskets);
                     this.dataSource.paginator = this.paginator;
                     this.dataSource.sort = this.sort;
-                    this.http.get("../../rest/sortedBaskets")
-                        .subscribe((data: any) => {
-                            this.basketsOrder = data['baskets'];
+                    this.http.get('../../rest/sortedBaskets')
+                        .subscribe((dataSort: any) => {
+                            this.basketsOrder = dataSort['baskets'];
                         }, (err) => {
                             this.notify.handleErrors(err);
                         });
@@ -105,7 +101,7 @@ export class BasketsAdministrationComponent implements OnInit {
     }
 
     updateBasketOrder(currentBasket: any) {
-        this.http.put("../../rest/sortedBaskets/" + currentBasket.basket_id, this.basketsOrder)
+        this.http.put('../../rest/sortedBaskets/' + currentBasket.basket_id, this.basketsOrder)
             .subscribe((data: any) => {
                 this.baskets = data['baskets'];
                 this.notify.success(this.lang.modificationSaved);

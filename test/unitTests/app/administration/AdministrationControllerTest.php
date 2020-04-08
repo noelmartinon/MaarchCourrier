@@ -15,8 +15,8 @@ class AdministrationControllerTest extends TestCase
 {
     public function testGetDetails()
     {
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
@@ -31,8 +31,8 @@ class AdministrationControllerTest extends TestCase
         $this->assertIsInt($responseBody->count->groups);
         $this->assertIsInt($responseBody->count->entities);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 }

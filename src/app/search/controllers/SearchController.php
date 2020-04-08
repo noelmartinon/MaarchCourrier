@@ -38,7 +38,7 @@ class SearchController
     {
         $queryParams = $request->getQueryParams();
 
-        if ($GLOBALS['userId'] == 'superadmin') {
+        if ($GLOBALS['login'] == 'superadmin') {
             $whereClause = '1=1';
             $dataClause = [];
         } else {
@@ -52,11 +52,11 @@ class SearchController
             $whereClause = "(res_id in (select res_id from users_followed_resources where user_id = ?)) OR ({$foldersClause})";
             $dataClause = [$GLOBALS['id'], $entities, $GLOBALS['id']];
 
-            $groups = UserModel::getGroupsByLogin(['login' => $GLOBALS['userId'], 'select' => ['where_clause']]);
+            $groups = UserModel::getGroupsByLogin(['login' => $GLOBALS['login'], 'select' => ['where_clause']]);
             $groupsClause = '';
             foreach ($groups as $key => $group) {
                 if (!empty($group['where_clause'])) {
-                    $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $GLOBALS['userId']]);
+                    $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $GLOBALS['login']]);
                     if ($key > 0) {
                         $groupsClause .= ' or ';
                     }
@@ -67,11 +67,11 @@ class SearchController
                 $whereClause .= " OR ({$groupsClause})";
             }
 
-            $baskets = BasketModel::getBasketsByLogin(['login' => $GLOBALS['userId']]);
+            $baskets = BasketModel::getBasketsByLogin(['login' => $GLOBALS['login']]);
             $basketsClause = '';
             foreach ($baskets as $basket) {
                 if (!empty($basket['basket_clause'])) {
-                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['userId']]);
+                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['login']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';
                     }

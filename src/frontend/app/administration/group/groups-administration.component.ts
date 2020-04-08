@@ -9,31 +9,29 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "groups-administration.component.html",
+    templateUrl: 'groups-administration.component.html',
     providers: [AppService]
 })
 export class GroupsAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-    
-    dialogRef                       : MatDialogRef<any>;
 
-    lang                            : any       = LANG;
-    loading                         : boolean   = false;
+    dialogRef: MatDialogRef<any>;
 
-    config                          : any       = {};
-    groups                          : any[]     = [];
-    groupsForAssign                 : any[]     = [];
+    lang: any = LANG;
+    loading: boolean = false;
+
+    config: any = {};
+    groups: any[] = [];
+    groupsForAssign: any[] = [];
 
 
-    displayedColumns    = ['group_id', 'group_desc', 'actions'];
-    dataSource          = new MatTableDataSource(this.groups);
+    displayedColumns = ['group_id', 'group_desc', 'actions'];
+    dataSource = new MatTableDataSource(this.groups);
 
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -48,16 +46,14 @@ export class GroupsAdministrationComponent implements OnInit {
     }
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialog: MatDialog, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.groups);
@@ -66,7 +62,7 @@ export class GroupsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get("../../rest/groups")
+        this.http.get('../../rest/groups')
             .subscribe((data: any) => {
                 this.groups = data['groups'];
                 this.loading = false;
@@ -84,8 +80,8 @@ export class GroupsAdministrationComponent implements OnInit {
     }
 
     preDelete(group: any) {
-        if (group.users.length == 0) {
-            let r = confirm(this.lang.reallyWantToDeleteThisGroup);
+        if (group.users.length === 0) {
+            const r = confirm(this.lang.reallyWantToDeleteThisGroup);
 
             if (r) {
                 this.deleteGroup(group);
@@ -93,7 +89,7 @@ export class GroupsAdministrationComponent implements OnInit {
         } else {
             this.groupsForAssign = [];
             this.groups.forEach((tmpGroup) => {
-                if (group.group_id != tmpGroup.group_id) {
+                if (group.group_id !== tmpGroup.group_id) {
                     this.groupsForAssign.push(tmpGroup);
                 }
             });
@@ -101,10 +97,10 @@ export class GroupsAdministrationComponent implements OnInit {
             this.dialogRef = this.dialog.open(GroupsAdministrationRedirectModalComponent, this.config);
             this.dialogRef.afterClosed().subscribe((result: string) => {
                 if (result) {
-                    if (result == "_NO_REPLACEMENT") {
+                    if (result === '_NO_REPLACEMENT') {
                         this.deleteGroup(group);
                     } else {
-                        this.http.put("../../rest/groups/" + group.id + "/reassign/" + result, {})
+                        this.http.put('../../rest/groups/' + group.id + '/reassign/' + result, {})
                             .subscribe((data: any) => {
                                 this.deleteGroup(group);
                             }, (err) => {
@@ -119,7 +115,7 @@ export class GroupsAdministrationComponent implements OnInit {
     }
 
     deleteGroup(group: any) {
-        this.http.delete("../../rest/groups/" + group['id'])
+        this.http.delete('../../rest/groups/' + group['id'])
             .subscribe((data: any) => {
                 setTimeout(() => {
                     this.groups = data['groups'];
@@ -136,7 +132,7 @@ export class GroupsAdministrationComponent implements OnInit {
 }
 
 @Component({
-    templateUrl: "groups-administration-redirect-modal.component.html"
+    templateUrl: 'groups-administration-redirect-modal.component.html'
 })
 export class GroupsAdministrationRedirectModalComponent {
     lang: any = LANG;

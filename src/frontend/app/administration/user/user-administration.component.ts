@@ -10,16 +10,15 @@ import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { AccountLinkComponent } from './account-link/account-link.component';
 import { AppService } from '../../../service/app.service';
 import { PrivilegeService } from '../../../service/privileges.service';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "user-administration.component.html",
+    templateUrl: 'user-administration.component.html',
     styleUrls: ['user-administration.component.scss'],
     providers: [AppService]
 })
@@ -40,21 +39,21 @@ export class UserAdministrationComponent implements OnInit {
     creationMode: boolean;
 
     signatureModel: any = {
-        base64: "",
-        base64ForJs: "",
-        name: "",
-        type: "",
+        base64: '',
+        base64ForJs: '',
+        name: '',
+        type: '',
         size: 0,
-        label: "",
+        label: '',
     };
     userAbsenceModel: any[] = [];
     userList: any[] = [];
     maarchParapheurLink: any = {
         login: '',
         picture: ''
-    }
+    };
     selectedSignature: number = -1;
-    selectedSignatureLabel: string = "";
+    selectedSignatureLabel: string = '';
     loadingSign: boolean = false;
     data: any[] = [];
     CurrentYear: number = new Date().getFullYear();
@@ -67,9 +66,9 @@ export class UserAdministrationComponent implements OnInit {
     showPassword: boolean = false;
     hidePassword: boolean = true;
     passwordModel: any = {
-        currentPassword: "",
-        newPassword: "",
-        reNewPassword: ""
+        currentPassword: '',
+        newPassword: '',
+        reNewPassword: ''
     };
     passwordRules: any = {
         minLength: { enabled: false, value: 0 },
@@ -90,14 +89,16 @@ export class UserAdministrationComponent implements OnInit {
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
+
+    // Redirect Baskets
+    selectionBaskets = new SelectionModel<Element>(true, []);
+
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim();
         filterValue = filterValue.toLowerCase();
         this.dataSource.filter = filterValue;
     }
 
-    //Redirect Baskets
-    selectionBaskets = new SelectionModel<Element>(true, []);
     masterToggleBaskets(event: any) {
         if (event.checked) {
             this.user.baskets.forEach((basket: any) => {
@@ -112,19 +113,18 @@ export class UserAdministrationComponent implements OnInit {
 
 
     constructor(
-        public http: HttpClient, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private zone: NgZone, 
-        private notify: NotificationService, 
-        public dialog: MatDialog, 
-        private headerService: HeaderService, 
+        public http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+        private zone: NgZone,
+        private notify: NotificationService,
+        public dialog: MatDialog,
+        private headerService: HeaderService,
         private _formBuilder: FormBuilder,
         public appService: AppService,
         private privilegeService: PrivilegeService,
         private viewContainerRef: ViewContainerRef
     ) {
-        $j("link[href='merged_css.php']").remove();
         window['angularUserAdministrationComponent'] = {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
         };
@@ -138,7 +138,7 @@ export class UserAdministrationComponent implements OnInit {
 
         this.route.params.subscribe((params: any) => {
 
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
 
                 this.headerService.setHeader(this.lang.userCreation);
                 this.creationMode = true;
@@ -149,7 +149,7 @@ export class UserAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
                 this.serialId = params['id'];
-                this.http.get("../../rest/users/" + this.serialId + "/details")
+                this.http.get('../../rest/users/' + this.serialId + '/details')
                     .subscribe((data: any) => {
                         this.user = data;
 
@@ -160,7 +160,7 @@ export class UserAdministrationComponent implements OnInit {
                             this.canViewPersonalDatas = this.privilegeService.hasCurrentUserPrivilege('view_personal_data');
                             this.canManagePersonalDatas = this.privilegeService.hasCurrentUserPrivilege('manage_personal_data');
                         }
-                        
+
                         if (this.canManagePersonalDatas) {
                             this.canViewPersonalDatas = true;
                         }
@@ -170,7 +170,7 @@ export class UserAdministrationComponent implements OnInit {
                         this.data = data.history;
                         this.userId = data.user_id;
                         this.minDate = new Date(this.CurrentYear + '-' + this.currentMonth + '-01');
-                        this.headerService.setHeader(this.lang.userModification, data.firstname + " " + data.lastname);
+                        this.headerService.setHeader(this.lang.userModification, data.firstname + ' ' + data.lastname);
 
                         if (this.user.external_id.maarchParapheur !== undefined) {
                             this.checkInfoMaarchParapheurAccount();
@@ -190,7 +190,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     checkInfoMaarchParapheurAccount() {
-        this.http.get("../../rest/users/" + this.serialId + "/statusInMaarchParapheur")
+        this.http.get('../../rest/users/' + this.serialId + '/statusInMaarchParapheur')
             .subscribe((data: any) => {
                 this.maarchParapheurLink.login = data.link;
                 this.loading = false;
@@ -217,7 +217,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     linkAccountToMaarchParahpeur(externalId: number) {
-        this.http.put("../../rest/users/" + this.serialId + "/linkToMaarchParapheur", { maarchParapheurUserId: externalId })
+        this.http.put('../../rest/users/' + this.serialId + '/linkToMaarchParapheur', { maarchParapheurUserId: externalId })
             .subscribe(() => {
                 this.user.canCreateMaarchParapheurUser = false;
                 this.user.external_id['maarchParapheur'] = externalId;
@@ -229,22 +229,22 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     createAccountToMaarchParahpeur(id: number, login: string) {
-        this.http.put("../../rest/users/" + id + "/createInMaarchParapheur", { login: login })
+        this.http.put('../../rest/users/' + id + '/createInMaarchParapheur', { login: login })
             .subscribe((data: any) => {
                 this.user.canCreateMaarchParapheurUser = false;
                 this.user.external_id['maarchParapheur'] = data.externalId;
                 this.checkInfoMaarchParapheurAccount();
                 this.notify.success(this.lang.accountAdded);
             }, (err) => {
-                if (err.error.errors == 'Login already exists') {
-                    err.error.errors = this.lang.loginAlreadyExistsInMaarchParapheur
+                if (err.error.errors === 'Login already exists') {
+                    err.error.errors = this.lang.loginAlreadyExistsInMaarchParapheur;
                 }
                 this.notify.error(err.error.errors);
             });
     }
 
     loadAvatarMaarchParapheur(externalId: number) {
-        this.http.get("../../rest/maarchParapheur/user/" + externalId + "/picture")
+        this.http.get('../../rest/maarchParapheur/user/' + externalId + '/picture')
             .subscribe((data: any) => {
                 this.maarchParapheurLink.picture = data.picture;
 
@@ -254,10 +254,10 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     unlinkMaarchParapheurAccount() {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.unlinkAccount);
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.unlinkAccount);
 
         if (r) {
-            this.http.put("../../rest/users/" + this.serialId + "/unlinkToMaarchParapheur", {})
+            this.http.put('../../rest/users/' + this.serialId + '/unlinkToMaarchParapheur', {})
                 .subscribe(() => {
                     this.user.canCreateMaarchParapheurUser = true;
                     this.maarchParapheurLink.login = '';
@@ -271,11 +271,11 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     toogleRedirect(basket: any) {
-        $j('#redirectUser_' + basket.group_id + '_' + basket.basket_id).toggle();
+        $('#redirectUser_' + basket.group_id + '_' + basket.basket_id).toggle();
 
         this.http.get('../../rest/users')
             .subscribe((data: any) => {
-                //this.userList = data['users'];
+                // this.userList = data['users'];
 
             }, (err) => {
                 this.notify.handleErrors(err);
@@ -283,25 +283,25 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     initService() {
-        if ($j('.jstree-container-ul').length == 0) {
-            $j('#jstree').jstree({
-                "checkbox": {
-                    "three_state": false //no cascade selection
+        if ($('.jstree-container-ul').length === 0) {
+            $('#jstree').jstree({
+                'checkbox': {
+                    'three_state': false // no cascade selection
                 },
                 'core': {
-                    force_text : true,
+                    force_text: true,
                     'themes': {
                         'name': 'proton',
                         'responsive': true
                     },
                     'data': this.user.allEntities
                 },
-                "plugins": ["checkbox", "search"]
+                'plugins': ['checkbox', 'search']
             });
-            $j('#jstree')
+            $('#jstree')
                 // listen for event
                 .on('select_node.jstree', (e: any, data: any) => {
-                    if (this.mode == '') {
+                    if (this.mode === '') {
                         this.addEntity(data.node.id);
                     }
                 }).on('deselect_node.jstree', (e: any, data: any) => {
@@ -310,12 +310,12 @@ export class UserAdministrationComponent implements OnInit {
                 // create the instance
                 .jstree();
 
-            var to: any = false;
-            $j('#jstree_search').keyup(function () {
+            let to: any = false;
+            $('#jstree_search').keyup(function () {
                 if (to) { clearTimeout(to); }
                 to = setTimeout(function () {
-                    var v = $j('#jstree_search').val();
-                    $j('#jstree').jstree(true).search(v);
+                    const v: any = $('#jstree_search').val();
+                    $('#jstree').jstree(true).search(v);
                 }, 250);
             });
         }
@@ -327,31 +327,31 @@ export class UserAdministrationComponent implements OnInit {
 
     resfreshUpload(b64Content: any) {
         if (this.signatureModel.size <= 2000000) {
-            this.signatureModel.base64 = b64Content.replace(/^data:.*?;base64,/, "");
+            this.signatureModel.base64 = b64Content.replace(/^data:.*?;base64,/, '');
             this.signatureModel.base64ForJs = b64Content;
         } else {
-            this.signatureModel.name = "";
+            this.signatureModel.name = '';
             this.signatureModel.size = 0;
-            this.signatureModel.type = "";
-            this.signatureModel.base64 = "";
-            this.signatureModel.base64ForJs = "";
+            this.signatureModel.type = '';
+            this.signatureModel.base64 = '';
+            this.signatureModel.base64ForJs = '';
 
-            this.notify.error("Taille maximum de fichier dépassée (2 MB)");
+            this.notify.error('Taille maximum de fichier dépassée (2 MB)');
         }
     }
 
     clickOnUploader(id: string) {
-        $j('#' + id).click();
+        $('#' + id).click();
     }
 
     uploadSignatureTrigger(fileInput: any) {
         if (fileInput.target.files && fileInput.target.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
 
             this.signatureModel.name = fileInput.target.files[0].name;
             this.signatureModel.size = fileInput.target.files[0].size;
             this.signatureModel.type = fileInput.target.files[0].type;
-            if (this.signatureModel.label == "") {
+            if (this.signatureModel.label === '') {
                 this.signatureModel.label = this.signatureModel.name;
             }
 
@@ -373,7 +373,7 @@ export class UserAdministrationComponent implements OnInit {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.sendActivationNotification);
 
         if (r) {
-            this.http.put("../../rest/users/" + this.serialId + "/accountActivationNotification", {})
+            this.http.put('../../rest/users/' + this.serialId + '/accountActivationNotification', {})
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.activationNotificationSend);
                 }, (err) => {
@@ -383,12 +383,12 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     toggleGroup(group: any) {
-        if ($j('#' + group.group_id + '-input').is(':checked') == true) {
-            var groupReq = {
-                "groupId": group.group_id,
-                "role": group.role
+        if ($('#' + group.group_id + '-input').is(':checked') === true) {
+            const groupReq = {
+                'groupId': group.group_id,
+                'role': group.role
             };
-            this.http.post("../../rest/users/" + this.serialId + "/groups", groupReq)
+            this.http.post('../../rest/users/' + this.serialId + '/groups', groupReq)
                 .subscribe(async (data: any) => {
                     this.user.groups = data.groups;
                     this.user.baskets = data.baskets;
@@ -401,7 +401,7 @@ export class UserAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.delete("../../rest/users/" + this.serialId + "/groups/" + group.group_id)
+            this.http.delete('../../rest/users/' + this.serialId + '/groups/' + group.group_id)
                 .subscribe(async (data: any) => {
                     this.user.groups = data.groups;
                     this.user.baskets = data.baskets;
@@ -418,7 +418,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updateGroup(group: any) {
-        this.http.put("../../rest/users/" + this.serialId + "/groups/" + group.group_id, group)
+        this.http.put('../../rest/users/' + this.serialId + '/groups/' + group.group_id, group)
             .subscribe((data: any) => {
                 this.notify.success(this.lang.groupUpdated);
             }, (err) => {
@@ -427,12 +427,12 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     addEntity(entiyId: any) {
-        let entity = {
-            "entityId": entiyId,
-            "role": ''
+        const entity = {
+            'entityId': entiyId,
+            'role': ''
         };
 
-        this.http.post("../../rest/users/" + this.serialId + "/entities", entity)
+        this.http.post('../../rest/users/' + this.serialId + '/entities', entity)
             .subscribe((data: any) => {
                 this.user.entities = data.entities;
                 this.user.allEntities = data.allEntities;
@@ -446,7 +446,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updateEntity(entity: any) {
-        this.http.put("../../rest/users/" + this.serialId + "/entities/" + entity.entity_id, entity)
+        this.http.put('../../rest/users/' + this.serialId + '/entities/' + entity.entity_id, entity)
             .subscribe(() => {
                 this.notify.success(this.lang.entityUpdated);
             }, (err) => {
@@ -455,7 +455,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updatePrimaryEntity(entity: any) {
-        this.http.put("../../rest/users/" + this.serialId + "/entities/" + entity.entity_id + "/primaryEntity", {})
+        this.http.put('../../rest/users/' + this.serialId + '/entities/' + entity.entity_id + '/primaryEntity', {})
             .subscribe((data: any) => {
                 this.user['entities'] = data.entities;
                 this.notify.success(this.lang.entityTooglePrimary + ' « ' + entity.entity_id + ' »');
@@ -466,14 +466,14 @@ export class UserAdministrationComponent implements OnInit {
 
     deleteEntity(entityId: any) {
 
-        //first check confidential state
-        this.http.get("../../rest/users/" + this.serialId + "/entities/" + entityId)
+        // first check confidential state
+        this.http.get('../../rest/users/' + this.serialId + '/entities/' + entityId)
             .subscribe((data: any) => {
                 if (!data['hasConfidentialityInstances'] && !data['hasListTemplates']) {
-                    this.http.delete("../../rest/users/" + this.serialId + "/entities/" + entityId)
-                        .subscribe((data: any) => {
-                            this.user.entities = data.entities;
-                            this.user.allEntities = data.allEntities;
+                    this.http.delete('../../rest/users/' + this.serialId + '/entities/' + entityId)
+                        .subscribe((dataEntities: any) => {
+                            this.user.entities = dataEntities.entities;
+                            this.user.allEntities = dataEntities.allEntities;
                             if (this.headerService.user.id == this.serialId) {
                                 this.headerService.resfreshCurrentUser();
                             }
@@ -488,10 +488,10 @@ export class UserAdministrationComponent implements OnInit {
                         this.mode = 'delete';
                         if (result) {
                             this.mode = result.processMode;
-                            this.http.request('DELETE', "../../rest/users/" + this.serialId + "/entities/" + entityId, { body: { "mode": this.mode, "newUser": result.newUser } })
-                                .subscribe((data: any) => {
-                                    this.user.entities = data.entities;
-                                    this.user.allEntities = data.allEntities;
+                            this.http.request('DELETE', '../../rest/users/' + this.serialId + '/entities/' + entityId, { body: { 'mode': this.mode, 'newUser': result.newUser } })
+                                .subscribe((dataEntities: any) => {
+                                    this.user.entities = dataEntities.entities;
+                                    this.user.allEntities = dataEntities.allEntities;
                                     if (this.headerService.user.id == this.serialId) {
                                         this.headerService.resfreshCurrentUser();
                                     }
@@ -500,7 +500,7 @@ export class UserAdministrationComponent implements OnInit {
                                     this.notify.error(err.error.errors);
                                 });
                         } else {
-                            $j('#jstree').jstree('select_node', entityId);
+                            $('#jstree').jstree('select_node', entityId);
                             this.mode = '';
                         }
                         this.dialogRef = null;
@@ -513,17 +513,17 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     submitSignature() {
-        this.http.post("../../rest/users/" + this.serialId + "/signatures", this.signatureModel)
+        this.http.post('../../rest/users/' + this.serialId + '/signatures', this.signatureModel)
             .subscribe((data: any) => {
                 this.user.signatures = data.signatures;
                 this.notify.success(this.lang.signAdded);
                 this.signatureModel = {
-                    base64: "",
-                    base64ForJs: "",
-                    name: "",
-                    type: "",
+                    base64: '',
+                    base64ForJs: '',
+                    name: '',
+                    type: '',
                     size: 0,
-                    label: "",
+                    label: '',
                 };
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -531,10 +531,10 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updateSignature(selectedSignature: any) {
-        var id = this.user.signatures[selectedSignature].id;
-        var label = this.user.signatures[selectedSignature].signature_label;
+        const id = this.user.signatures[selectedSignature].id;
+        const label = this.user.signatures[selectedSignature].signature_label;
 
-        this.http.put("../../rest/users/" + this.serialId + "/signatures/" + id, { "label": label })
+        this.http.put('../../rest/users/' + this.serialId + '/signatures/' + id, { 'label': label })
             .subscribe((data: any) => {
                 this.user.signatures[selectedSignature].signature_label = data.signature.signature_label;
                 this.notify.success(this.lang.signUpdated);
@@ -544,10 +544,10 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     deleteSignature(signature: any) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + signature.signature_label + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + signature.signature_label + ' »');
 
         if (r) {
-            this.http.delete("../../rest/users/" + this.serialId + "/signatures/" + signature.id)
+            this.http.delete('../../rest/users/' + this.serialId + '/signatures/' + signature.id)
                 .subscribe((data: any) => {
                     this.user.signatures = data.signatures;
                     this.notify.success(this.lang.signDeleted);
@@ -559,12 +559,12 @@ export class UserAdministrationComponent implements OnInit {
 
     test(event: any) {
         if (event.mouseEvent.dataTransfer.files && event.mouseEvent.dataTransfer.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
 
             this.signatureModel.name = event.mouseEvent.dataTransfer.files[0].name;
             this.signatureModel.size = event.mouseEvent.dataTransfer.files[0].size;
             this.signatureModel.type = event.mouseEvent.dataTransfer.files[0].type;
-            if (this.signatureModel.label == "") {
+            if (this.signatureModel.label === '') {
                 this.signatureModel.label = this.signatureModel.name;
             }
 
@@ -578,7 +578,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     addBasketRedirection(newUser: any) {
-        let basketsRedirect: any[] = [];
+        const basketsRedirect: any[] = [];
 
         this.selectionBaskets.selected.forEach((elem: any) => {
             basketsRedirect.push(
@@ -588,16 +588,16 @@ export class UserAdministrationComponent implements OnInit {
                     group_id: elem.groupSerialId,
                     originalOwner: null
                 }
-            )
+            );
         });
 
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post("../../rest/users/" + this.serialId + "/redirectedBaskets", basketsRedirect)
+            this.http.post('../../rest/users/' + this.serialId + '/redirectedBaskets', basketsRedirect)
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
-                    this.user.redirectedBaskets = data["redirectedBaskets"];
+                    this.user.baskets = data['baskets'];
+                    this.user.redirectedBaskets = data['redirectedBaskets'];
                     this.selectionBaskets.clear();
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -607,19 +607,19 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     reassignBasketRedirection(newUser: any, basket: any, i: number) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post("../../rest/users/" + this.serialId + "/redirectedBaskets", [
+            this.http.post('../../rest/users/' + this.serialId + '/redirectedBaskets', [
                 {
-                    "actual_user_id": newUser.serialId,
-                    "basket_id": basket.basket_id,
-                    "group_id": basket.group_id,
-                    "originalOwner": basket.owner_user_id,
+                    'actual_user_id': newUser.serialId,
+                    'basket_id': basket.basket_id,
+                    'group_id': basket.group_id,
+                    'originalOwner': basket.owner_user_id,
                 }
             ])
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
+                    this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -629,12 +629,12 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     delBasketRedirection(basket: any, i: number) {
-        let r = confirm(this.lang.confirmAction);
+        const r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete("../../rest/users/" + this.serialId + "/redirectedBaskets?redirectedBasketIds[]=" + basket.id)
+            this.http.delete('../../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
+                    this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets.splice(i, 1);
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -644,12 +644,12 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        let r = confirm(this.lang.confirmAction);
+        const r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete("../../rest/users/" + this.serialId + "/redirectedBaskets?redirectedBasketIds[]=" + basket.id)
+            this.http.delete('../../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
+                    this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -659,17 +659,17 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     toggleBasket(state: boolean) {
-        let basketsDisable: any = [];
+        const basketsDisable: any = [];
         this.user.baskets.forEach((elem: any) => {
             this.selectionBaskets.selected.forEach((selected: any) => {
-                if (elem.basket_id == selected.basket_id && elem.group_id == selected.group_id && elem.allowed != state) {
+                if (elem.basket_id === selected.basket_id && elem.group_id === selected.group_id && elem.allowed !== state) {
                     elem.allowed = state;
-                    basketsDisable.push({ "basketId": elem.basket_id, "groupSerialId": elem.groupSerialId, "allowed": state });
+                    basketsDisable.push({ 'basketId': elem.basket_id, 'groupSerialId': elem.groupSerialId, 'allowed': state });
                 }
             });
         });
         if (basketsDisable.length > 0) {
-            this.http.put("../../rest/users/" + this.serialId + "/baskets", { "baskets": basketsDisable })
+            this.http.put('../../rest/users/' + this.serialId + '/baskets', { 'baskets': basketsDisable })
                 .subscribe((data: any) => {
                     this.selectionBaskets.clear();
                     this.notify.success(this.lang.basketsUpdated);
@@ -680,7 +680,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     activateAbsence() {
-        this.http.put("../../rest/users/" + this.serialId + "/status", { "status": "ABS" })
+        this.http.put('../../rest/users/' + this.serialId + '/status', { 'status': 'ABS' })
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
                 this.userAbsenceModel = [];
@@ -691,7 +691,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     desactivateAbsence() {
-        this.http.put("../../rest/users/" + this.serialId + "/status", { "status": "OK" })
+        this.http.put('../../rest/users/' + this.serialId + '/status', { 'status': 'OK' })
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
                 this.notify.success(this.lang.absOff);
@@ -701,7 +701,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     getErrorMessage() {
-        if (this.firstFormGroup.controls['newPasswordCtrl'].value != this.firstFormGroup.controls['retypePasswordCtrl'].value) {
+        if (this.firstFormGroup.controls['newPasswordCtrl'].value !== this.firstFormGroup.controls['retypePasswordCtrl'].value) {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
         } else {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
@@ -729,7 +729,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     matchValidator(group: FormGroup) {
-        if (group.controls['newPasswordCtrl'].value == group.controls['retypePasswordCtrl'].value) {
+        if (group.controls['newPasswordCtrl'].value === group.controls['retypePasswordCtrl'].value) {
             return false;
         } else {
             group.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
@@ -750,14 +750,14 @@ export class UserAdministrationComponent implements OnInit {
     changePasswd() {
         this.http.get('../../rest/passwordRules')
             .subscribe((data: any) => {
-                let valArr: ValidatorFn[] = [];
-                let ruleTextArr: String[] = [];
-                let otherRuleTextArr: String[] = [];
+                const valArr: ValidatorFn[] = [];
+                const ruleTextArr: String[] = [];
+                const otherRuleTextArr: String[] = [];
 
                 valArr.push(Validators.required);
 
                 data.rules.forEach((rule: any) => {
-                    if (rule.label == 'minLength') {
+                    if (rule.label === 'minLength') {
                         this.passwordRules.minLength.enabled = rule.enabled;
                         this.passwordRules.minLength.value = rule.value;
                         if (rule.enabled) {
@@ -766,7 +766,7 @@ export class UserAdministrationComponent implements OnInit {
                         }
 
 
-                    } else if (rule.label == 'complexityUpper') {
+                    } else if (rule.label === 'complexityUpper') {
                         this.passwordRules.complexityUpper.enabled = rule.enabled;
                         this.passwordRules.complexityUpper.value = rule.value;
                         if (rule.enabled) {
@@ -775,7 +775,7 @@ export class UserAdministrationComponent implements OnInit {
                         }
 
 
-                    } else if (rule.label == 'complexityNumber') {
+                    } else if (rule.label === 'complexityNumber') {
                         this.passwordRules.complexityNumber.enabled = rule.enabled;
                         this.passwordRules.complexityNumber.value = rule.value;
                         if (rule.enabled) {
@@ -784,20 +784,20 @@ export class UserAdministrationComponent implements OnInit {
                         }
 
 
-                    } else if (rule.label == 'complexitySpecial') {
+                    } else if (rule.label === 'complexitySpecial') {
                         this.passwordRules.complexitySpecial.enabled = rule.enabled;
                         this.passwordRules.complexitySpecial.value = rule.value;
                         if (rule.enabled) {
                             valArr.push(this.regexValidator(new RegExp('[^A-Za-z0-9]'), { 'complexitySpecial': '' }));
                             ruleTextArr.push(this.lang['password' + rule.label]);
                         }
-                    } else if (rule.label == 'renewal') {
+                    } else if (rule.label === 'renewal') {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
                             otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
                         }
-                    } else if (rule.label == 'historyLastUse') {
+                    } else if (rule.label === 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
                         this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
@@ -808,7 +808,7 @@ export class UserAdministrationComponent implements OnInit {
                 });
                 this.ruleText = ruleTextArr.join(', ');
                 this.otherRuleText = otherRuleTextArr.join('<br/>');
-                this.firstFormGroup.controls["newPasswordCtrl"].setValidators(valArr);
+                this.firstFormGroup.controls['newPasswordCtrl'].setValidators(valArr);
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
@@ -826,8 +826,8 @@ export class UserAdministrationComponent implements OnInit {
                 Validators.compose([Validators.required])
             ]
         }, {
-                validator: this.matchValidator
-            });
+            validator: this.matchValidator
+        });
 
         this.validPassword = false;
         this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null);
@@ -845,9 +845,9 @@ export class UserAdministrationComponent implements OnInit {
             .subscribe(() => {
                 this.showPassword = false;
                 this.passwordModel = {
-                    currentPassword: "",
-                    newPassword: "",
-                    reNewPassword: "",
+                    currentPassword: '',
+                    newPassword: '',
+                    reNewPassword: '',
                 };
                 this.notify.success(this.lang.passwordUpdated);
             }, (err: any) => {
@@ -857,24 +857,24 @@ export class UserAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            var r = true;
+            let r = true;
 
-            this.http.get("../../rest/users/" + this.user.userId + "/status")
+            this.http.get('../../rest/users/' + this.user.userId + '/status')
                 .subscribe((data: any) => {
-                    var deletedUser = false;
-                    if (data.status && data.status == 'DEL') {
+                    let deletedUser = false;
+                    if (data.status && data.status === 'DEL') {
                         r = confirm(this.lang.reactivateUserDeleted);
                         deletedUser = true;
                     }
                     if (r) {
-                        this.http.post("../../rest/users", this.user)
-                            .subscribe((data: any) => {
+                        this.http.post('../../rest/users', this.user)
+                            .subscribe((result: any) => {
                                 if (deletedUser) {
                                     this.notify.success(this.lang.userUpdated);
                                 } else {
                                     this.notify.success(this.lang.userAdded);
                                 }
-                                this.router.navigate(["/administration/users/" + data.id]);
+                                this.router.navigate(['/administration/users/' + result.id]);
                             }, (err: any) => {
                                 this.notify.error(err.error.errors);
                             });
@@ -883,7 +883,7 @@ export class UserAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put("../../rest/users/" + this.serialId, this.user)
+            this.http.put('../../rest/users/' + this.serialId, this.user)
                 .subscribe((data: any) => {
                     if (this.headerService.user.id == this.serialId) {
                         this.headerService.resfreshCurrentUser();
@@ -897,17 +897,17 @@ export class UserAdministrationComponent implements OnInit {
 
     setUserModeLogin(event: any) {
         if (event.checked) {
-            this.user.loginmode = "restMode";
+            this.user.loginmode = 'restMode';
         } else {
-            this.user.loginmode = "standard";
+            this.user.loginmode = 'standard';
         }
     }
 
     sendToMaarchParapheur() {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.createUserInMaarchParapheur);
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.createUserInMaarchParapheur);
 
         if (r) {
-            this.http.put("../../rest/users/" + this.serialId + '/maarchParapheur', '')
+            this.http.put('../../rest/users/' + this.serialId + '/maarchParapheur', '')
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.userCreatedInMaarchParapheur);
                     this.user.external_id['maarchParapheur'] = data.externalId;
@@ -937,8 +937,8 @@ export class UserAdministrationComponent implements OnInit {
 }
 
 @Component({
-    templateUrl: "user-administration-redirect-modal.component.html",
-    styles: [".mat-dialog-content{max-height: 65vh;width:600px;}"]
+    templateUrl: 'user-administration-redirect-modal.component.html',
+    styles: ['.mat-dialog-content{max-height: 65vh;width:600px;}']
 })
 export class UserAdministrationRedirectModalComponent {
     lang: any = LANG;

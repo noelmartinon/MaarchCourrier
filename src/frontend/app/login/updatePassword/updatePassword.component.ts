@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationService } from '../../notification.service';
 import { LANG } from '../../translate.component';
 import { finalize } from 'rxjs/operators';
-
-declare function $j(selector: any) : any;
 
 @Component({
     templateUrl: 'updatePassword.component.html',
@@ -49,16 +45,14 @@ export class UpdatePasswordComponent implements OnInit {
     otherRuleText = '';
 
 
-    constructor(private router: Router, private route: ActivatedRoute, public http: HttpClient, iconReg: MatIconRegistry, sanitizer: DomSanitizer, public notificationService: NotificationService) {
-        iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('static.php?filename=logo_white.svg'));
+    constructor(private router: Router, private route: ActivatedRoute, public http: HttpClient, public notificationService: NotificationService) {
         this.route.queryParams
             .subscribe(params => {
                 this.token = params.token;
             });
-        $j('main-header').remove();
     }
 
-    ngOnInit(): void { 
+    ngOnInit(): void {
         this.getPassRules();
     }
 
@@ -76,7 +70,7 @@ export class UpdatePasswordComponent implements OnInit {
             .subscribe((data: any) => {
                 this.loadingForm = true;
                 this.notificationService.success(this.lang.passwordChanged);
-                location.href = 'index.php?display=true&page=login';
+                this.router.navigate(['/login']);
             }, (err: any) => {
                 this.notificationService.error(this.lang[err.error.lang]);
             });
@@ -114,7 +108,7 @@ export class UpdatePasswordComponent implements OnInit {
                         this.passwordRules.minLength.value = rule.value;
                         if (rule.enabled) {
                             ruleTextArr.push(rule.value + ' ' + this.lang['password' + rule.label]);
-                            
+
                         }
 
                     } else if (rule.label === 'complexityUpper') {
@@ -141,14 +135,14 @@ export class UpdatePasswordComponent implements OnInit {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label]+'.');
-                            
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
+
                         }
                     } else if (rule.label === 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
                         this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2']+'.');
+                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2'] + '.');
                         }
                     }
                 });
@@ -168,6 +162,6 @@ export class UpdatePasswordComponent implements OnInit {
     }
 
     cancel() {
-        location.href = 'index.php?display=true&page=login';
+        this.router.navigate(['/login']);
     }
 }

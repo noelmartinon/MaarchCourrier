@@ -104,8 +104,7 @@ class AttachmentController
         if ($attachment['modificationDate'] == $attachment['creationDate']) {
             $attachment['modificationDate'] = null;
         }
-        $typist = UserModel::getByLogin(['login' => $attachment['typist'], 'select' => ['id', 'firstname', 'lastname']]);
-        $attachment['typist'] = $typist['id'];
+        $typist = UserModel::getById(['id' => $attachment['typist'], 'select' => ['firstname', 'lastname']]);
         $attachment['typistLabel'] = $typist['firstname']. ' ' .$typist['lastname'];
         $attachment['modifiedBy'] = UserModel::getLabelledUserById(['id' => $attachment['modifiedBy']]);
 
@@ -118,8 +117,8 @@ class AttachmentController
         if (!empty($attachment['originId'])) {
             $oldVersions = AttachmentModel::get([
                 'select'    => ['res_id as "resId"', 'relation'],
-                'where'     => ['(origin_id = ? OR res_id = ?)', 'res_id != ?', 'status not in (?)', 'attachment_type not in (?)'],
-                'data'      => [$attachment['originId'], $attachment['originId'], $args['id'], ['DEL'], $excludeAttachmentTypes],
+                'where'     => ['(origin_id = ? OR res_id = ?)', 'res_id != ?', 'status not in (?)'],
+                'data'      => [$attachment['originId'], $attachment['originId'], $args['id'], ['DEL']],
                 'orderBy'   => ['relation DESC']
             ]);
         }
@@ -133,7 +132,7 @@ class AttachmentController
             ]);
             if (!empty($signedResponse[0])) {
                 $attachment['signedResponse'] = $signedResponse[0]['res_id'];
-                $attachment['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
+                $attachment['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['typist']]);
                 $attachment['signDate'] = $signedResponse[0]['creation_date'];
             }
         }
@@ -150,7 +149,7 @@ class AttachmentController
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Attachment out of perimeter']);
         }
-        if ($GLOBALS['userId'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']])) {
+        if ($GLOBALS['id'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Attachment out of perimeter']);
         }
 
@@ -231,7 +230,7 @@ class AttachmentController
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
-        if ($GLOBALS['userId'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']])) {
+        if ($GLOBALS['id'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -294,8 +293,7 @@ class AttachmentController
             if ($attachment['modificationDate'] == $attachment['creationDate']) {
                 $attachments[$key]['modificationDate'] = null;
             }
-            $typist = UserModel::getByLogin(['login' => $attachment['typist'], 'select' => ['id', 'firstname', 'lastname']]);
-            $attachments[$key]['typist'] = $typist['id'];
+            $typist = UserModel::getById(['id' => $attachment['typist'], 'select' => ['firstname', 'lastname']]);
             $attachments[$key]['typistLabel'] = $typist['firstname']. ' ' .$typist['lastname'];
             $attachments[$key]['modifiedBy'] = UserModel::getLabelledUserById(['id' => $attachment['modifiedBy']]);
 
@@ -310,7 +308,7 @@ class AttachmentController
                     'data'      => ["{$attachment['resId']},res_attachments", ['DEL']]
                 ]);
                 if (!empty($signedResponse[0])) {
-                    $attachments[$key]['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
+                    $attachments[$key]['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['typist']]);
                     $attachments[$key]['signDate'] = $signedResponse[0]['creation_date'];
                 }
             }

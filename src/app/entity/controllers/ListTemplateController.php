@@ -137,7 +137,7 @@ class ListTemplateController
             if (!empty($listTemplate)) {
                 return $response->withStatus(400)->withJson(['errors' => 'Entity is already linked to this type of template']);
             }
-            $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+            $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
             foreach ($entities as $entity) {
                 if ($entity['serialId'] == $body['entityId'] && $entity['allowed'] == false) {
                     return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
@@ -203,7 +203,7 @@ class ListTemplateController
         }
 
         if (!empty($listTemplate['entity_id'])) {
-            $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+            $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
             foreach ($entities as $entity) {
                 if ($entity['serialId'] == $listTemplate['entity_id'] && $entity['allowed'] == false) {
                     return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
@@ -267,7 +267,7 @@ class ListTemplateController
         }
 
         if (!empty($listTemplate['entityId'])) {
-            $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+            $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
             foreach ($entities as $entity) {
                 if ($entity['serialId'] == $listTemplate['entityId'] && $entity['allowed'] == false) {
                     return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);

@@ -346,8 +346,8 @@ class AutoCompleteController
 
         $excludedUsers = ['superadmin'];
 
-        if ($GLOBALS['userId'] != 'superadmin') {
-            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        if ($GLOBALS['login'] != 'superadmin') {
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
 
             $fields = ['users.firstname', 'users.lastname'];
             $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
@@ -861,7 +861,7 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Query params search is empty']);
         }
 
-        $scopedFolders = FolderController::getScopeFolders(['login' => $GLOBALS['userId']]);
+        $scopedFolders = FolderController::getScopeFolders(['login' => $GLOBALS['login']]);
         if (empty($scopedFolders)) {
             return $response->withJson([]);
         }

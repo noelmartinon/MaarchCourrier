@@ -18,8 +18,8 @@ class UserFollowedResourceControllerTest extends TestCase
 
     public function testCreate()
     {
-        $GLOBALS['userId'] = 'cchaplin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'cchaplin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $resController = new \Resource\controllers\ResController();
@@ -112,15 +112,15 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertNotNull($res['destination']);
         $this->assertNotNull($res['initiator']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testUnFollow()
     {
-        $GLOBALS['userId'] = 'cchaplin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'cchaplin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $usersFollowedResourcesController = new \Resource\controllers\UserFollowedResourceController();
@@ -142,8 +142,8 @@ class UserFollowedResourceControllerTest extends TestCase
 
         $this->assertSame(3, $responseBody['unFollowed']);
 
-        $GLOBALS['userId'] = 'ccharles';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'ccharles';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $usersFollowedResourcesController->unFollow($fullRequest, new \Slim\Http\Response());
@@ -152,15 +152,15 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertSame(403, $response->getStatusCode());
         $this->assertSame('Document out of perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testFollow()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $usersFollowedResourcesController = new \Resource\controllers\UserFollowedResourceController();
@@ -177,8 +177,8 @@ class UserFollowedResourceControllerTest extends TestCase
 
         $this->assertSame(204, $response->getStatusCode());
 
-        $GLOBALS['userId'] = 'ccharles';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'ccharles';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $usersFollowedResourcesController->follow($fullRequest, new \Slim\Http\Response());
@@ -187,15 +187,15 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertSame(403, $response->getStatusCode());
         $this->assertSame('Document out of perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetList()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $userFollowedResourceController = new \Resource\controllers\UserFollowedResourceController();
@@ -217,8 +217,8 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertIsInt($responseBody->resources[0]->resId);
         $this->assertSame('Breaking News : Superman is alive - PHP unit FOLLOW / UNFOLLOW', $responseBody->resources[0]->subject);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         //  GET
@@ -231,15 +231,15 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertIsInt($responseBody->countResources);
         $this->assertSame(0, $responseBody->countResources);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetFilters()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $userFollowedResourceController = new \Resource\controllers\UserFollowedResourceController();
@@ -281,8 +281,8 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertIsArray($responseBody['folders']);
         $this->assertEmpty($responseBody['folders']);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         //  GET
@@ -311,15 +311,15 @@ class UserFollowedResourceControllerTest extends TestCase
         $this->assertIsArray($responseBody['folders']);
         $this->assertEmpty($responseBody['folders']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetBaskets()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $userFollowedResourceController = new \Resource\controllers\UserFollowedResourceController();
@@ -348,16 +348,16 @@ class UserFollowedResourceControllerTest extends TestCase
 
         $this->assertSame(2, $responseBody['groupsBaskets'][0]['groupId']);
         $this->assertSame('Utilisateur', $responseBody['groupsBaskets'][0]['groupName']);
-        $this->assertSame(4, $responseBody['groupsBaskets'][0]['basketId']);
-        $this->assertSame('Courriers à traiter', $responseBody['groupsBaskets'][0]['basketName']);
+        $this->assertSame(6, $responseBody['groupsBaskets'][0]['basketId']);
+        $this->assertSame('AR en masse : non envoyés', $responseBody['groupsBaskets'][0]['basketName']);
 
         $this->assertSame(2, $responseBody['groupsBaskets'][1]['groupId']);
         $this->assertSame('Utilisateur', $responseBody['groupsBaskets'][1]['groupName']);
-        $this->assertSame(6, $responseBody['groupsBaskets'][1]['basketId']);
-        $this->assertSame('AR en masse : non envoyés', $responseBody['groupsBaskets'][1]['basketName']);
+        $this->assertSame(4, $responseBody['groupsBaskets'][1]['basketId']);
+        $this->assertSame('Courriers à traiter', $responseBody['groupsBaskets'][1]['basketName']);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         //  GET
@@ -370,15 +370,15 @@ class UserFollowedResourceControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Resource out of perimeter', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDelete()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         //  DELETE
@@ -400,8 +400,8 @@ class UserFollowedResourceControllerTest extends TestCase
             'resId' => self::$idThird
         ]);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         //  READ

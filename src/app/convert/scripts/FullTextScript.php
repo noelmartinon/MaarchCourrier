@@ -86,7 +86,7 @@ class FullTextScript
         new DatabasePDO(['customId' => $args['customId']]);
 
         $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-        $GLOBALS['userId'] = $currentUser['user_id'];
+        $GLOBALS['login'] = $currentUser['user_id'];
 
         $isIndexed = FullTextController::indexDocument(['resId' => $args['resId'], 'collId' => $args['collId']]);
 
@@ -123,7 +123,7 @@ class FullTextScript
 
         $currentUser = UserModel::getByLogin(['login' => $args['userId'], 'select' => ['id']]);
 
-        $GLOBALS['userId'] = $args['userId'];
+        $GLOBALS['login'] = $args['userId'];
 
         $resIdsToReindex = FullTextController::getFailedIndexes(['collId' => $args['collId']]);
        

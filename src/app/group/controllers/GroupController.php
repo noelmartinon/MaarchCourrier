@@ -68,7 +68,7 @@ class GroupController
             return $response->withStatus(400)->withJson(['errors' => _ID. ' ' . _ALREADY_EXISTS]);
         }
 
-        if (!PreparedClauseController::isRequestValid(['clause' => $data['security']['where_clause'], 'userId' => $GLOBALS['userId']])) {
+        if (!PreparedClauseController::isRequestValid(['clause' => $data['security']['where_clause'], 'userId' => $GLOBALS['login']])) {
             return $response->withStatus(400)->withJson(['errors' => _INVALID_CLAUSE]);
         }
 
@@ -100,7 +100,7 @@ class GroupController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        if (!PreparedClauseController::isRequestValid(['clause' => $data['security']['where_clause'], 'userId' => $GLOBALS['userId']])) {
+        if (!PreparedClauseController::isRequestValid(['clause' => $data['security']['where_clause'], 'userId' => $GLOBALS['login']])) {
             return $response->withStatus(400)->withJson(['errors' => _INVALID_CLAUSE]);
         }
 
@@ -158,7 +158,7 @@ class GroupController
 
         $group['privileges']         = PrivilegeModel::getPrivilegesByGroupId(['groupId' => $args['id']]);
 
-        if ($GLOBALS['userId'] == 'superadmin') {
+        if ($GLOBALS['login'] == 'superadmin') {
             $allowedUsers = UserModel::get([
                 'select'    => ['id'],
                 'where'     => ['user_id != ?', 'status != ?'],
@@ -166,7 +166,7 @@ class GroupController
             ]);
             $allowedUsers = array_column($allowedUsers, 'id');
         } else {
-            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
             $allowedUsers = [];
             if (!empty($entities)) {
                 $allowedUsers = UserEntityModel::getWithUsers([
@@ -355,46 +355,5 @@ class GroupController
         }
 
         return $groupsClause;
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function arraySort($aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['data', 'on']);
-        ValidatorModel::arrayType($aArgs, ['data']);
-        ValidatorModel::stringType($aArgs, ['on']);
-
-        $order = SORT_ASC;
-        $sortableArray = [];
-
-        foreach ($aArgs['data'] as $k => $v) {
-            if (is_array($v)) {
-                foreach ($v as $k2 => $v2) {
-                    if ($k2 == $aArgs['on']) {
-                        $sortableArray[$k] = $v2;
-                    }
-                }
-            } else {
-                $sortableArray[$k] = $v;
-            }
-        }
-
-        switch ($order) {
-            case SORT_ASC:
-                asort($sortableArray);
-                break;
-            case SORT_DESC:
-                arsort($sortableArray);
-                break;
-        }
-
-        $newArray = [];
-        foreach ($sortableArray as $k => $v) {
-            $newArray[] = $aArgs['data'][$k];
-        }
-
-        return $newArray;
     }
 }

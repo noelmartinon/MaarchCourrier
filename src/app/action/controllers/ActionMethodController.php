@@ -128,7 +128,7 @@ class ActionMethodController
                     'info'      => $info
                 ]);
 
-                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['userId']]);
+                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
             }
         }
 
@@ -284,14 +284,13 @@ class ActionMethodController
                         'where' => ['item_mode = ?', 'res_id = ?'],
                         'data'  => ['dest', $args['resId']]
                     ]);
-                    $userInfo = UserModel::getById(['select' => ['user_id'], 'id' => $destUser[0]['item_id']]);
                     ListInstanceModel::create([
                         'res_id'          => $args['resId'],
                         'sequence'        => 0,
-                        'item_id'         => $userInfo['user_id'],
+                        'item_id'         => $destUser[0]['item_id'],
                         'item_type'       => 'user_id',
                         'item_mode'       => 'dest',
-                        'added_by_user'   => $GLOBALS['userId'],
+                        'added_by_user'   => $GLOBALS['id'],
                         'viewed'          => 0,
                         'difflist_type'   => 'entity_id'
                     ]);
@@ -436,7 +435,7 @@ class ActionMethodController
                 'resIdMaster'     => $args['resId'],
                 'processingUser'  => $args['data']['processingUser'],
                 'objectSent'      => 'mail',
-                'userId'          => $GLOBALS['userId'],
+                'userId'          => $GLOBALS['login'],
                 'note'            => $args['note']['content'] ?? null
             ]);
             if (!empty($sentInfo['error'])) {
@@ -657,10 +656,7 @@ class ActionMethodController
 
         foreach ($args['data']['opinionCircuit'] as $key => $instance) {
             if (in_array($instance['item_type'], ['user_id', 'user'])) {
-                $user = UserModel::getById(['id' => $instance['item_id'], 'select' => ['id', 'user_id']]);
-                $instance['item_id']   = $user['user_id'] ?? null;
-                $instance['item_type'] = 'user_id';
-                
+                $user = UserModel::getById(['id' => $instance['item_id'], 'select' => [1]]);
                 if (empty($user)) {
                     DatabaseModel::rollbackTransaction();
                     return ['errors' => ['User not found']];
@@ -674,9 +670,9 @@ class ActionMethodController
                 'res_id'                => $args['resId'],
                 'sequence'              => $key,
                 'item_id'               => $instance['item_id'],
-                'item_type'             => $instance['item_type'],
+                'item_type'             => 'user_id',
                 'item_mode'             => $instance['item_mode'],
-                'added_by_user'         => $GLOBALS['userId'],
+                'added_by_user'         => $GLOBALS['id'],
                 'difflist_type'         => 'entity_id',
                 'process_date'          => null,
                 'process_comment'       => null,
@@ -715,11 +711,11 @@ class ActionMethodController
         $currentStep = $currentStep[0];
 
         $message = null;
-        if ($currentStep['item_id'] != $GLOBALS['userId']) {
+        if ($currentStep['item_id'] != $GLOBALS['id']) {
             $currentUser = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $GLOBALS['id']]);
             $stepUser = UserModel::get([
                 'select' => ['firstname', 'lastname'],
-                'where' => ['user_id = ?'],
+                'where' => ['id = ?'],
                 'data' => [$currentStep['item_id']]
             ]);
             $stepUser = $stepUser[0];
@@ -751,9 +747,9 @@ class ActionMethodController
         ValidatorModel::intVal($args, ['resId']);
 
         $currentStep = ListInstanceModel::get([
-            'select'  => ['listinstance_id', 'item_id'],
+            'select'  => ['listinstance_id'],
             'where'   => ['res_id = ?', 'difflist_type = ?', 'item_id = ?', 'item_mode in (?)'],
-            'data'    => [$args['resId'], 'entity_id', $GLOBALS['userId'], ['avis', 'avis_copy', 'avis_info']],
+            'data'    => [$args['resId'], 'entity_id', $GLOBALS['id'], ['avis', 'avis_copy', 'avis_info']],
             'limit'   => 1
         ]);
 
@@ -850,10 +846,7 @@ class ActionMethodController
 
             foreach ($args['data']['opinionWorkflow'] as $key => $instance) {
                 if (in_array($instance['item_type'], ['user_id', 'user'])) {
-                    $user = UserModel::getById(['id' => $instance['item_id'], 'select' => ['id', 'user_id']]);
-                    $instance['item_id']   = $user['user_id'] ?? null;
-                    $instance['item_type'] = 'user_id';
-
+                    $user = UserModel::getById(['id' => $instance['item_id'], 'select' => [1]]);
                     if (empty($user)) {
                         DatabaseModel::rollbackTransaction();
                         return ['errors' => ['User not found']];
@@ -867,9 +860,9 @@ class ActionMethodController
                     'res_id'              => $args['resId'],
                     'sequence'            => $key,
                     'item_id'             => $instance['item_id'],
-                    'item_type'           => $instance['item_type'],
+                    'item_type'           => 'user_id',
                     'item_mode'           => $instance['item_mode'],
-                    'added_by_user'       => $GLOBALS['userId'],
+                    'added_by_user'       => $GLOBALS['id'],
                     'difflist_type'       => 'entity_id',
                     'process_date'        => null,
                     'process_comment'     => null,

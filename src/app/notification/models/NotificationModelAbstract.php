@@ -115,7 +115,7 @@ abstract class NotificationModelAbstract
         ValidatorModel::notEmpty($aArgs, ['notification_sid']);
         ValidatorModel::intVal($aArgs, ['notification_sid']);
 
-        $notification_sid = $aArgs['notification_sid'];
+        $notificationSid = $aArgs['notification_sid'];
         unset($aArgs['data']);
         unset($aArgs['notification_sid']);
 
@@ -123,7 +123,7 @@ abstract class NotificationModelAbstract
             'table' => 'notifications',
             'set'   => $aArgs,
             'where' => ['notification_sid = ?'],
-            'data'  => [$notification_sid],
+            'data'  => [$notificationSid],
         ]);
 
         return $aReturn;
@@ -172,48 +172,57 @@ abstract class NotificationModelAbstract
             'id'             => 'group',
             'label'          => 'Groupe',
             'add_attachment' => 'true',
+            'function'       => 'getRecipientsByGroup'
         );
         $diffusionTypes[] = array(
             'id'             => 'entity',
             'label'          => 'Entité',
             'add_attachment' => 'true',
+            'function'       => 'getRecipientsByEntity'
         );
         $diffusionTypes[] = array(
             'id'             => 'dest_entity',
             'label'          => 'Service de l\'utilisateur destinataire',
             'add_attachment' => 'false',
+            'function'       => 'getRecipientsByDestEntity'
         );
         $diffusionTypes[] = array(
             'id'             => 'dest_user',
             'label'          => 'Liste de diffusion du document',
             'add_attachment' => 'false',
+            'function'       => 'getRecipientsByDestUser'
         );
         $diffusionTypes[] = array(
             'id'             => 'dest_user_visa',
             'label'          => 'Viseur actuel du document',
             'add_attachment' => 'true',
+            'function'       => 'getRecipientsByDestUserVisa'
         );
         $diffusionTypes[] = array(
             'id'             => 'dest_user_sign',
             'label'          => 'Signataire actuel du document',
             'add_attachment' => 'true',
+            'function'       => 'getRecipientsByDestUserSign'
         );
         $diffusionTypes[] = array(
             'id'             => 'user',
             'label'          => 'Utilisateur désigné',
             'add_attachment' => 'true',
+            'function'       => 'getRecipientsByUser'
         );
 
         $diffusionTypes[] = array(
             'id'             => 'copy_list',
             'label'          => 'Liste de diffusion du document',
             'add_attachment' => 'false',
+            'function'       => 'getRecipientsByCopie'
         );
 
         $diffusionTypes[] = array(
             'id'             => 'contact',
             'label'          => 'Contact du document',
-            'add_attachment' => 'true'
+            'add_attachment' => 'true',
+            'function'       => 'getRecipientsByContact'
         );
 
         return $diffusionTypes;

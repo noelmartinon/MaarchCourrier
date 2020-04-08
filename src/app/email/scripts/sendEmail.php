@@ -39,7 +39,7 @@ class EmailScript
         new DatabasePDO(['customId' => $args['customId']]);
 
         $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-        $GLOBALS['userId'] = $currentUser['user_id'];
+        $GLOBALS['login'] = $currentUser['user_id'];
         $_SERVER['MAARCH_ENCRYPT_KEY'] = $args['encryptKey'];
 
         $isSent = EmailController::sendEmail(['emailId' => $args['emailId'], 'userId' => $args['userId']]);

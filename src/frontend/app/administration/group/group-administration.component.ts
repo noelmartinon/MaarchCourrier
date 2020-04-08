@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -11,14 +11,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { AppService } from '../../../service/app.service';
 import { PrivilegeService } from '../../../service/privileges.service';
 import { tap, catchError, exhaustMap, map, finalize, filter } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-
-declare function $j(selector: any): any;
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
-    templateUrl: "group-administration.component.html",
+    templateUrl: 'group-administration.component.html',
     styleUrls: ['group-administration.component.scss'],
     providers: [AppService]
 })
@@ -74,26 +72,21 @@ export class GroupAdministrationComponent implements OnInit {
         public appService: AppService,
         private privilegeService: PrivilegeService,
         private dialog: MatDialog
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
 
         this.route.params.subscribe(params => {
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
 
                 this.headerService.setHeader(this.lang.groupCreation);
 
                 this.creationMode = true;
                 this.loading = false;
             } else {
-                
-                
-
                 this.creationMode = false;
-                this.http.get("../../rest/groups/" + params['id'] + "/details")
+                this.http.get('../../rest/groups/' + params['id'] + '/details')
                     .subscribe((data: any) => {
                         this.group = data['group'];
 
@@ -102,8 +95,8 @@ export class GroupAdministrationComponent implements OnInit {
                         this.administrationPrivileges = this.administrationPrivileges.map(admin => {
                             return {
                                 ...admin,
-                                checked : this.group.privileges.indexOf(admin.id) > -1
-                            }
+                                checked: this.group.privileges.indexOf(admin.id) > -1
+                            };
                         });
 
                         this.privilegeService.getUnitsPrivileges().forEach(element => {
@@ -112,37 +105,37 @@ export class GroupAdministrationComponent implements OnInit {
                             if (element === 'diffusionList') {
                                 services = [
                                     {
-                                        "id": "indexing_diffList",
-                                        "label": this.lang.diffListPrivilegeMsgIndexing,
-                                        "current": this.group.privileges.filter((priv: any) => ['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'].indexOf(priv) > -1)[0] : '',
-                                        "services": this.privilegeService.getPrivileges(['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'])
+                                        'id': 'indexing_diffList',
+                                        'label': this.lang.diffListPrivilegeMsgIndexing,
+                                        'current': this.group.privileges.filter((priv: any) => ['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'].indexOf(priv) > -1)[0] : '',
+                                        'services': this.privilegeService.getPrivileges(['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'])
                                     },
                                     {
-                                        "id": "process_diffList",
-                                        "label": this.lang.diffListPrivilegeMsgProcess,
-                                        "current": this.group.privileges.filter((priv: any) => ['update_diffusion_process', 'update_diffusion_except_recipient_process'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_process', 'update_diffusion_except_recipient_process'].indexOf(priv) > -1)[0] : '',
-                                        "services": this.privilegeService.getPrivileges(['update_diffusion_process', 'update_diffusion_except_recipient_process'])
+                                        'id': 'process_diffList',
+                                        'label': this.lang.diffListPrivilegeMsgProcess,
+                                        'current': this.group.privileges.filter((priv: any) => ['update_diffusion_process', 'update_diffusion_except_recipient_process'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_process', 'update_diffusion_except_recipient_process'].indexOf(priv) > -1)[0] : '',
+                                        'services': this.privilegeService.getPrivileges(['update_diffusion_process', 'update_diffusion_except_recipient_process'])
                                     },
                                     {
-                                        "id": "details_diffList",
-                                        "label": this.lang.diffListPrivilegeMsgDetails,
-                                        "current": this.group.privileges.filter((priv: any) => ['update_diffusion_details', 'update_diffusion_except_recipient_details'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_details', 'update_diffusion_except_recipient_details'].indexOf(priv) > -1)[0] : '',
-                                        "services": this.privilegeService.getPrivileges(['update_diffusion_details', 'update_diffusion_except_recipient_details'])
+                                        'id': 'details_diffList',
+                                        'label': this.lang.diffListPrivilegeMsgDetails,
+                                        'current': this.group.privileges.filter((priv: any) => ['update_diffusion_details', 'update_diffusion_except_recipient_details'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_details', 'update_diffusion_except_recipient_details'].indexOf(priv) > -1)[0] : '',
+                                        'services': this.privilegeService.getPrivileges(['update_diffusion_details', 'update_diffusion_except_recipient_details'])
                                     }
                                 ];
                             } else if (element === 'confidentialityAndSecurity') {
                                 let priv = '';
-                                if (this.group.privileges.filter((priv: any) => priv === 'manage_personal_data')[0]) {
+                                if (this.group.privileges.filter((privGroup: any) => privGroup === 'manage_personal_data')[0]) {
                                     priv = 'manage_personal_data';
-                                } else if (this.group.privileges.filter((priv: any) => priv === 'view_personal_data')[0]) {
+                                } else if (this.group.privileges.filter((privGroup: any) => privGroup === 'view_personal_data')[0]) {
                                     priv = 'view_personal_data';
                                 }
                                 services = [
                                     {
-                                        "id": "confidentialityAndSecurity_personal_data",
-                                        "label": this.lang.personalDataMsg,
-                                        "current": priv,
-                                        "services": this.privilegeService.getPrivileges(['view_personal_data', 'manage_personal_data'])
+                                        'id': 'confidentialityAndSecurity_personal_data',
+                                        'label': this.lang.personalDataMsg,
+                                        'current': priv,
+                                        'services': this.privilegeService.getPrivileges(['view_personal_data', 'manage_personal_data'])
                                     }
                                 ];
                             }
@@ -151,7 +144,7 @@ export class GroupAdministrationComponent implements OnInit {
                                 id: element,
                                 label: this.lang[element],
                                 services: services
-                            })
+                            });
                         });
                         this.headerService.setHeader(this.lang.groupModification, this.group['group_desc']);
 
@@ -282,15 +275,15 @@ export class GroupAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            this.http.post("../../rest/groups", this.group)
+            this.http.post('../../rest/groups', this.group)
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.groupAdded);
-                    this.router.navigate(["/administration/groups/" + data.group]);
+                    this.router.navigate(['/administration/groups/' + data.group]);
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put("../../rest/groups/" + this.group['id'], { "description": this.group['group_desc'], "security": this.group['security'] })
+            this.http.put('../../rest/groups/' + this.group['id'], { 'description': this.group['group_desc'], 'security': this.group['security'] })
                 .subscribe(() => {
                     this.notify.success(this.lang.groupUpdated);
                 }, (err) => {
@@ -358,14 +351,14 @@ export class GroupAdministrationComponent implements OnInit {
     }
 
     linkUser(newUser: any) {
-        var groupReq = {
-            "groupId": this.group.group_id,
-            "role": this.group.role
+        const groupReq = {
+            'groupId': this.group.group_id,
+            'role': this.group.role
         };
-        this.http.post("../../rest/users/" + newUser.serialId + "/groups", groupReq)
+        this.http.post('../../rest/users/' + newUser.serialId + '/groups', groupReq)
             .subscribe(() => {
-                var displayName = newUser.idToDisplay.split(" ");
-                var user = {
+                const displayName = newUser.idToDisplay.split(' ');
+                const user = {
                     id: newUser.id,
                     user_id: newUser.otherInfo,
                     firstname: displayName[0],
@@ -394,7 +387,7 @@ export class GroupAdministrationComponent implements OnInit {
                         return {
                             id: group.id,
                             label: group.group_desc
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -422,7 +415,7 @@ export class GroupAdministrationComponent implements OnInit {
         if (this.panelMode === 'admin_users') {
             obj = {
                 groups: paramList.map((param: any) => param.value)
-            }
+            };
         }
         this.http.put(`../../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters`, { parameters: obj }).pipe(
             tap(() => {
@@ -437,7 +430,7 @@ export class GroupAdministrationComponent implements OnInit {
 
     goToUserAdmin(user: any) {
         if (user.allowed) {
-            this.router.navigate(["/administration/users/" + user.id]);
+            this.router.navigate(['/administration/users/' + user.id]);
         }
     }
 }

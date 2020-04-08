@@ -51,7 +51,7 @@ abstract class BatchHistoryModelAbstract
                 'event_date'        => 'CURRENT_TIMESTAMP',
                 'info'              => $args['info'],
                 'total_processed'   => $args['total_processed'] ?? 0,
-                'total_errors'      => $args['total_processed'] ?? 0,
+                'total_errors'      => $args['total_errors'] ?? 0,
             ]
         ]);
 

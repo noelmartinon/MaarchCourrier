@@ -93,7 +93,7 @@ class LinkController
 
                 $linkedResources[$key]['visaCircuit'] = ListInstanceModel::get(['select' => ['item_id', 'item_mode'], 'where' => ['res_id = ?', 'difflist_type = ?'], 'data' => [$value['resId'], 'VISA_CIRCUIT']]);
                 foreach ($linkedResources[$key]['visaCircuit'] as $keyCircuit => $valueCircuit) {
-                    $linkedResources[$key]['visaCircuit'][$keyCircuit]['userLabel'] = UserModel::getLabelledUserById(['login' => $valueCircuit['item_id']]);
+                    $linkedResources[$key]['visaCircuit'][$keyCircuit]['userLabel'] = UserModel::getLabelledUserById(['id' => $valueCircuit['item_id']]);
                 }
             }
         }

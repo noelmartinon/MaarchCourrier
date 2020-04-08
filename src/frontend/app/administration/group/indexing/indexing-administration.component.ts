@@ -1,23 +1,20 @@
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { map, catchError, filter, exhaustMap, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
-import { HeaderService } from '../../../../service/header.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { MenuShortcutComponent } from '../../../menu/menu-shortcut.component';
+import { of } from 'rxjs/internal/observable/of';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
     selector: 'app-indexing-administration',
     templateUrl: 'indexing-administration.component.html',
     styleUrls: ['indexing-administration.component.scss'],
-    providers: [NotificationService]
 })
 export class IndexingAdministrationComponent implements OnInit {
 
@@ -26,8 +23,8 @@ export class IndexingAdministrationComponent implements OnInit {
     lang: any = LANG;
     loading: boolean = true;
 
-    @Input('groupId') groupId: number;
-    @Output('resfreshShortcut') resfreshShortcut = new EventEmitter<string>();
+    @Input() groupId: number;
+    @Output() resfreshShortcut = new EventEmitter<string>();
 
     keywordEntities: any[] = [];
     actionList: any[] = [];
@@ -40,9 +37,9 @@ export class IndexingAdministrationComponent implements OnInit {
     };
     dialogRef: MatDialogRef<any>;
 
-    constructor(public http: HttpClient,
+    constructor(
+        public http: HttpClient,
         private notify: NotificationService,
-        private headerService: HeaderService,
         private dialog: MatDialog,
     ) {
 
@@ -118,9 +115,9 @@ export class IndexingAdministrationComponent implements OnInit {
     }
 
     initEntitiesTree(entities: any) {
-        $j('#jstree').jstree({
-            "checkbox": {
-                "three_state": false //no cascade selection
+        $('#jstree').jstree({
+            'checkbox': {
+                'three_state': false // no cascade selection
             },
             'core': {
                 force_text: true,
@@ -130,20 +127,20 @@ export class IndexingAdministrationComponent implements OnInit {
                 },
                 'data': entities
             },
-            "plugins": ["checkbox", "search"]
+            'plugins': ['checkbox', 'search']
         });
 
         let to: any = false;
-        $j('#jstree_search').keyup(function () {
+        $('#jstree_search').keyup(function () {
             if (to) { clearTimeout(to); }
             to = setTimeout(function () {
-                const v = $j('#jstree_search').val();
-                $j('#jstree').jstree(true).search(v);
+                const v: any = $('#jstree_search').val();
+                $('#jstree').jstree(true).search(v);
             }, 250);
         });
 
 
-        $j('#jstree')
+        $('#jstree')
             // listen for event
             .on('select_node.jstree', (e: any, data: any) => {
                 if (isNaN(data.node.id)) {
@@ -166,9 +163,9 @@ export class IndexingAdministrationComponent implements OnInit {
     getEntities(data: any) {
         this.keywordEntities.forEach((entity: any) => {
             if (data.group.indexationParameters.keywords.indexOf(entity.id) > -1) {
-                entity.state = { "opened": true, "selected": true };
+                entity.state = { 'opened': true, 'selected': true };
             } else {
-                entity.state = { "opened": true, "selected": false };
+                entity.state = { 'opened': true, 'selected': false };
             }
         });
         data.entities = this.keywordEntities.concat(data.entities);
@@ -219,7 +216,7 @@ export class IndexingAdministrationComponent implements OnInit {
 
     removeEntity(entityId: number) {
         const index = this.indexingInfo.entities.indexOf(entityId);
-        let newEntityList = [...this.indexingInfo.entities];
+        const newEntityList = [...this.indexingInfo.entities];
         newEntityList.splice(index, 1);
 
         this.http.put('../../rest/groups/' + this.groupId + '/indexing', { entities: newEntityList }).pipe(
@@ -255,7 +252,7 @@ export class IndexingAdministrationComponent implements OnInit {
 
     removeKeyword(keyword: string) {
         const index = this.indexingInfo.keywords.indexOf(keyword);
-        let newKeywordList = [...this.indexingInfo.keywords];
+        const newKeywordList = [...this.indexingInfo.keywords];
         newKeywordList.splice(index, 1);
 
         this.http.put('../../rest/groups/' + this.groupId + '/indexing', { keywords: newKeywordList }).pipe(
@@ -299,7 +296,7 @@ export class IndexingAdministrationComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             map(() => {
                 this.dialogRef = null;
-                let newActionList = [...this.indexingInfo.actions];
+                const newActionList = [...this.indexingInfo.actions];
                 newActionList.splice(index, 1);
                 return newActionList.map((action: any) => action.id);
             }),

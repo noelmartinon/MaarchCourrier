@@ -20,7 +20,7 @@ class AuthenticationControllerTest extends TestCase
         $response = \SrcCore\controllers\AuthenticationController::authentication();
 
         $this->assertNotEmpty($response);
-        $this->assertSame('superadmin', $response);
+        $this->assertSame(23, $response);
     }
 
     public function testAuthenticate()
@@ -73,7 +73,7 @@ class AuthenticationControllerTest extends TestCase
 
     public function testIsRouteAvailable()
     {
-        $response = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['login' => 'superadmin', 'currentRoute' => '/actions']);
+        $response = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => 23, 'currentRoute' => '/actions']);
         $this->assertSame(true, $response['isRouteAvailable']);
     }
 

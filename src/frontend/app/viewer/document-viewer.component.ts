@@ -155,7 +155,7 @@ export class DocumentViewerComponent implements OnInit {
                         extension: '.' + ext.extension.toLowerCase(),
                         mimeType: ext.mimeType,
                         canConvert: ext.canConvert
-                    }
+                    };
                 });
                 this.allowedExtensions = this.sortPipe.transform(this.allowedExtensions, 'extension');
 
@@ -184,7 +184,7 @@ export class DocumentViewerComponent implements OnInit {
 
         if (!this.functions.empty(this.base64)) {
             this.loadFileFromBase64();
-        } else if (this.tmpFilename != '' && this.tmpFilename !== undefined) {
+        } else if (this.tmpFilename !== '' && this.tmpFilename !== undefined) {
             this.http.get('../../rest/convertedFile/' + this.tmpFilename).pipe(
                 tap((data: any) => {
                     this.file = {

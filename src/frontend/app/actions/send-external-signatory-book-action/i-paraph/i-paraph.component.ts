@@ -3,11 +3,9 @@ import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
 import { HttpClient } from '@angular/common/http';
 
-declare function $j(selector: any): any;
-
 @Component({
     selector: 'app-i-paraph',
-    templateUrl: "i-paraph.component.html",
+    templateUrl: 'i-paraph.component.html',
     styleUrls: ['i-paraph.component.scss'],
 })
 export class IParaphComponent implements OnInit {
@@ -22,9 +20,9 @@ export class IParaphComponent implements OnInit {
         resId: 0,
         editable: true
     };
-       
-    @Input('additionalsInfos') additionalsInfos: any;
-    @Input('externalSignatoryBookDatas') externalSignatoryBookDatas: any;
+
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
 
     constructor(public http: HttpClient, private notify: NotificationService) { }
 
@@ -32,7 +30,7 @@ export class IParaphComponent implements OnInit {
     }
 
     isValidParaph() {
-        if (this.additionalsInfos.attachments.length == 0) {
+        if (this.additionalsInfos.attachments.length === 0) {
             return false;
         } else {
             return true;
@@ -40,7 +38,7 @@ export class IParaphComponent implements OnInit {
     }
 
     getRessources() {
-        return this.additionalsInfos.attachments.map((e: any) => { return e.res_id; });
+        return this.additionalsInfos.attachments.map((e: any) => e.res_id);
     }
 
     getDatas() {

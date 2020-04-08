@@ -113,11 +113,11 @@ class ReceiveMessageExchangeController
         ]);
 
         $basketRedirection = null;
-        $userBaskets = BasketModel::getBasketsByLogin(['login' => $GLOBALS['userId']]);
+        $userBaskets = BasketModel::getBasketsByLogin(['login' => $GLOBALS['login']]);
         if (!empty($userBaskets)) {
             foreach ($userBaskets as $value) {
                 if ($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]) {
-                    $userGroups = UserModel::getGroupsByLogin(['login' => $GLOBALS['userId']]);
+                    $userGroups = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
                     $basketRedirection = 'index.php#/basketList/users/'.$GLOBALS['id'].'/groups/'.$userGroups[0]['id'].'/baskets/'.$value['id'];
                     $resource = ResModel::getById(['id' => $resLetterboxReturn]);
                     if (!empty($resource['alt_identifier'])) {
@@ -132,7 +132,7 @@ class ReceiveMessageExchangeController
             $basketRedirection = 'index.php';
         }
 
-        self::sendReply(['dataObject' => $sDataObject, 'Comment' => self::$aComments, 'replyCode' => '000 : OK', 'res_id_master' => $resLetterboxReturn, 'userId' => $GLOBALS['userId']]);
+        self::sendReply(['dataObject' => $sDataObject, 'Comment' => self::$aComments, 'replyCode' => '000 : OK', 'res_id_master' => $resLetterboxReturn, 'userId' => $GLOBALS['login']]);
 
         return $response->withJson([
             "resId"             => $resLetterboxReturn,
@@ -162,7 +162,7 @@ class ReceiveMessageExchangeController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($file);
         $ext      = $aArgs['extension'];
-        $tmpName  = 'tmp_file_' .$GLOBALS['userId']. '_ArchiveTransfer_' .rand(). '.' . $ext;
+        $tmpName  = 'tmp_file_' .$GLOBALS['login']. '_ArchiveTransfer_' .rand(). '.' . $ext;
 
         if (!in_array(strtolower($ext), ['zip', 'tar'])) {
             return ["errors" => 'Only zip file is allowed'];
@@ -383,12 +383,13 @@ class ReceiveMessageExchangeController
                 $BinaryDataObjectInfo = self::getBinaryDataObjectInfo(["binaryDataObject" => $dataObjectPackage->BinaryDataObject, "binaryDataObjectId" => $attachmentDataObjectId]);
                 $filename             = $BinaryDataObjectInfo->Attachment->filename;
                 $fileFormat           = substr($filename, strrpos($filename, '.') + 1);
-                
+
+                $user = UserModel::getByLogin(['login' => 'superadmin', 'select' => ['id']]);
                 $allDatas = [
                     'title'        => $attachmentContent->Title[0],
                     'encodedFile'  => $BinaryDataObjectInfo->Attachment->value,
                     'format'       => $fileFormat,
-                    'typist'       => 'superadmin',
+                    'typist'       => $user['id'],
                     'resIdMaster'  => $resIdMaster,
                     'type'         => $defaultConfig['attachment_type']
                 ];
@@ -444,10 +445,10 @@ class ReceiveMessageExchangeController
         $acknowledgementObject->ArchivalAgency = $acknowledgementObject->Receiver;
         $acknowledgementObject->TransferringAgency = $acknowledgementObject->Sender;
 
-        $acknowledgementObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $GLOBALS['userId'];
+        $acknowledgementObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $GLOBALS['login'];
 
         $acknowledgementObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_AckSent';
-        $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'Acknowledgement', 'file_path' => $filePath, 'userId' => $GLOBALS['userId']]);
+        $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $acknowledgementObject, 'res_id_master' => 0, 'type' => 'Acknowledgement', 'file_path' => $filePath, 'userId' => $GLOBALS['login']]);
 
         $acknowledgementObject->DataObjectPackage = new \stdClass();
         $acknowledgementObject->DataObjectPackage->DescriptiveMetadata = new \stdClass();
@@ -479,7 +480,7 @@ class ReceiveMessageExchangeController
         $replyObject->MessageRequestIdentifier->value = $dataObject->MessageIdentifier->value;
 
         $replyObject->TransferringAgency                = $dataObject->ArchivalAgency;
-        $replyObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $GLOBALS['userId'];
+        $replyObject->TransferringAgency->OrganizationDescriptiveMetadata->UserIdentifier = $GLOBALS['login'];
         $replyObject->ArchivalAgency                    = $dataObject->TransferringAgency;
 
         $replyObject->MessageIdentifier->value          = $dataObject->MessageIdentifier->value . '_Reply';
@@ -503,7 +504,7 @@ class ReceiveMessageExchangeController
 
     public function saveMessageExchangeReturn(Request $request, Response $response)
     {
-        if (empty($GLOBALS['userId'])) {
+        if (empty($GLOBALS['login'])) {
             return $response->withStatus(401)->withJson(['errors' => 'User Not Connected']);
         }
 
@@ -531,7 +532,7 @@ class ReceiveMessageExchangeController
             $messageExchange = MessageExchangeModel::getMessageByReference(['select' => ['message_id', 'res_id_master'], 'reference' => $dataObject->MessageRequestIdentifier->value]);
         }
 
-        $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange['res_id_master'], 'type' => $data['type'], 'userId' => $GLOBALS['userId']]);
+        $messageExchangeSaved = SendMessageExchangeController::saveMessageExchange(['dataObject' => $dataObject, 'res_id_master' => $messageExchange['res_id_master'], 'type' => $data['type'], 'userId' => $GLOBALS['login']]);
         if (!empty($messageExchangeSaved['error'])) {
             return $response->withStatus(400)->withJson(['errors' => $messageExchangeSaved['error']]);
         }

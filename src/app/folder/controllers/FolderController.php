@@ -40,7 +40,7 @@ class FolderController
 {
     public function get(Request $request, Response $response)
     {
-        $folders = FolderController::getScopeFolders(['login' => $GLOBALS['userId']]);
+        $folders = FolderController::getScopeFolders(['login' => $GLOBALS['login']]);
 
         $userEntities = EntityModel::getWithUserEntities(['select'  => ['entities.id'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']]]);
 
@@ -71,7 +71,7 @@ class FolderController
                 ])
             );
 
-            $folderScope = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $folder['id'], 'edition' => true]);
+            $folderScope = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $folder['id'], 'edition' => true]);
 
             $insert = [
                 'name'           => $folder['label'],
@@ -113,7 +113,7 @@ class FolderController
             return $response->withStatus(400)->withJson(['errors' => 'Route id is not an integer']);
         }
 
-        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['id']]);
+        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $args['id']]);
         if (empty($folder[0])) {
             return $response->withStatus(400)->withJson(['errors' => 'Folder not found or out of your perimeter']);
         }
@@ -132,16 +132,15 @@ class FolderController
         $folder['sharing']['entities'] = [];
         if ($folder['public']) {
             $entitiesFolder = EntityFolderModel::getEntitiesByFolderId(['folder_id' => $args['id'], 'select' => ['entities_folders.entity_id', 'entities_folders.edition', 'entities.entity_label']]);
+            $canDeleteWithChildren = FolderController::areChildrenInPerimeter(['folderId' => $args['id'], 'entities' => $userEntities]);
             foreach ($entitiesFolder as $value) {
-                $canDelete = FolderController::areChildrenInPerimeter(['folderId' => $args['id'], 'entities' => $userEntities]);
-                $canDelete = $canDelete && $value['edition'] == true;
+                $canDelete = $canDeleteWithChildren && $value['edition'] == true;
                 $folder['sharing']['entities'][] = ['entity_id' => $value['entity_id'], 'edition' => $value['edition'], 'canDelete' => $canDelete, 'label' => $value['entity_label']];
             }
 
             $keywordsFolder = EntityFolderModel::getKeywordsByFolderId(['folder_id' => $args['id'], 'select' => ['edition', 'keyword']]);
             foreach ($keywordsFolder as $value) {
-                $canDelete = FolderController::areChildrenInPerimeter(['folderId' => $args['id'], 'entities' => $userEntities]);
-                $canDelete = $canDelete && $value['edition'] == true;
+                $canDelete = $canDeleteWithChildren && $value['edition'] == true;
                 $folder['sharing']['entities'][] = ['keyword' => $value['keyword'], 'edition' => $value['edition'], 'canDelete' => $canDelete];
             }
         }
@@ -173,7 +172,7 @@ class FolderController
             $public = false;
             $level  = 0;
         } else {
-            $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $data['parent_id'], 'edition' => true]);
+            $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $data['parent_id'], 'edition' => true]);
             if (empty($folder[0])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Parent Folder not found or out of your perimeter']);
             }
@@ -255,7 +254,7 @@ class FolderController
             return $response->withStatus(400)->withJson(['errors' => 'parent_id does not exist or Id is a parent of parent_id']);
         }
 
-        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['id'], 'edition' => true]);
+        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $args['id'], 'edition' => true]);
         if (empty($folder[0])) {
             return $response->withStatus(400)->withJson(['errors' => 'Folder not found or out of your perimeter']);
         }
@@ -265,7 +264,7 @@ class FolderController
             $data['parent_id'] = null;
             $level = 0;
         } else {
-            $folderParent = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $data['parent_id'], 'edition' => true]);
+            $folderParent = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $data['parent_id'], 'edition' => true]);
             if (empty($folderParent[0])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Parent Folder not found or out of your perimeter']);
             }
@@ -440,7 +439,7 @@ class FolderController
 
     public function folderSharing($args = [])
     {
-        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['folderId'], 'edition' => true]);
+        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $args['folderId'], 'edition' => true]);
         if (empty($folder[0])) {
             return false;
         }
@@ -572,7 +571,7 @@ class FolderController
             return $response->withStatus(400)->withJson(['errors' => 'Cannot delete because at least one folder is out of your perimeter']);
         }
 
-        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $aArgs['id'], 'edition' => true]);
+        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $aArgs['id'], 'edition' => true]);
         
         DatabaseModel::beginTransaction();
         $deletion = FolderController::folderDeletion(['folderId' => $aArgs['id']]);
@@ -596,7 +595,7 @@ class FolderController
 
     public static function folderDeletion(array $args = [])
     {
-        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['folderId'], 'edition' => true]);
+        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $args['folderId'], 'edition' => true]);
         if (empty($folder[0])) {
             return false;
         }
@@ -620,36 +619,40 @@ class FolderController
 
     public static function areChildrenInPerimeter(array $args = [])
     {
-        ValidatorModel::notEmpty($args, ['folderId']);
+        ValidatorModel::notEmpty($args, ['folderId', 'entities']);
         ValidatorModel::intVal($args, ['folderId']);
         ValidatorModel::arrayType($args, ['entities']);
 
-        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['folderId'], 'edition' => true]);
+        $folder = FolderController::getScopeFolders(['login' => $GLOBALS['login'], 'folderId' => $args['folderId'], 'edition' => true]);
         if (empty($folder[0])) {
             return false;
         }
 
-        $where = ['parent_id = ?'];
-        $data = [$args['folderId']];
+        $folder = $folder[0];
+
+        // All sub-folders of a folders have the same owner user -> if user is owner of folder, all children are in perimeter
+        if ($folder['user_id'] == $GLOBALS['id']) {
+            return true;
+        }
 
         $children = FolderModel::getWithEntities([
-            'select' => ['distinct (folders.id)', 'edition', 'user_id', 'keyword', 'entity_id'],
-            'where'  => $where,
-            'data'   => $data
+            'select' => ['distinct (folders.id)', 'edition', 'user_id', 'keyword', 'entity_id', 'parent_id'],
+            'where'  => ['parent_id = ?', '(entity_id in (?) OR entity_id is null)'],
+            'data'   => [$args['folderId'], $args['entities']]
         ]);
 
-        $allEntitiesCanDelete = false;
+        $allEntitiesCanDelete = true;
         foreach ($children as $key => $child) {
-            if ($child['keyword'] == 'ALL_ENTITIES' && $child['edition'] == true) {
-                $allEntitiesCanDelete = true;
+            if (!($child['keyword'] == 'ALL_ENTITIES' && $child['edition'] == true)) {
+                $allEntitiesCanDelete = false;
+                break;
             }
         }
 
 
         if (!empty($children)) {
             foreach ($children as $child) {
-                if ($child['user_id'] != $GLOBALS['id'] && ($child['edition'] == false || $child['edition'] == null)
-                    && (($child['entity_id'] != null && !in_array($child['entity_id'], $args['entities'])) || !$allEntitiesCanDelete)) {
+                if (($child['edition'] == null || $child['edition'] == false) && (!$allEntitiesCanDelete)) {
                     return false;
                 }
                 if (!FolderController::areChildrenInPerimeter(['folderId' => $child['id'], 'entities' => $args['entities']])) {
@@ -882,10 +885,10 @@ class FolderController
         }
 
         $baskets = BasketModel::getWithPreferences([
-            'select'    => ['baskets.id', 'baskets.basket_name', 'baskets.basket_clause', 'users_baskets_preferences.group_serial_id', 'usergroups.group_desc'],
-            'where'     => ['users_baskets_preferences.user_serial_id = ?'],
-            'data'      => [$GLOBALS['id']],
-            'orderBy'    => ['baskets.id']
+            'select'  => ['baskets.id', 'baskets.basket_name', 'baskets.basket_clause', 'users_baskets_preferences.group_serial_id', 'usergroups.group_desc'],
+            'where'   => ['users_baskets_preferences.user_serial_id = ?'],
+            'data'    => [$GLOBALS['id']],
+            'orderBy' => ['baskets.basket_name']
         ]);
         $groupsBaskets = [];
         $inCheckedBaskets = [];
@@ -895,7 +898,7 @@ class FolderController
                 continue;
             } else {
                 if (!in_array($basket['id'], $inCheckedBaskets)) {
-                    $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['userId']]);
+                    $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['login']]);
                     $resource = ResModel::getOnView(['select' => [1], 'where' => ['res_id = ?', "({$preparedClause})"], 'data' => [$args['resId']]]);
                     if (empty($resource)) {
                         $outCheckedBaskets[] = $basket['id'];

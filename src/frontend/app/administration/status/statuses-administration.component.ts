@@ -5,24 +5,22 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "statuses-administration.component.html",
+    templateUrl: 'statuses-administration.component.html',
     providers: [AppService]
 })
 export class StatusesAdministrationComponent implements OnInit {
 
-    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;    
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang        : any = LANG;
-    loading     : boolean = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    statuses    : Status[] = [];
+    statuses: Status[] = [];
 
     displayedColumns = ['img_filename', 'id', 'label_status', 'identifier'];
     dataSource = new MatTableDataSource(this.statuses);
@@ -39,15 +37,13 @@ export class StatusesAdministrationComponent implements OnInit {
     }
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.statuses);
@@ -75,7 +71,7 @@ export class StatusesAdministrationComponent implements OnInit {
     }
 
     deleteStatus(status: any) {
-        var resp = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + status.id + ' »');
+        const resp = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + status.id + ' »');
         if (resp) {
             this.http.delete('../../rest/statuses/' + status.identifier)
                 .subscribe((data: any) => {

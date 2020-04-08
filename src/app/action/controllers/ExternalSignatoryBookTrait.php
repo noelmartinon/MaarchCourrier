@@ -87,7 +87,7 @@ trait ExternalSignatoryBookTrait
                     'config'      => $config,
                     'resIdMaster' => $args['resId'],
                     'objectSent'  => 'attachment',
-                    'userId'      => $GLOBALS['userId'],
+                    'userId'      => $GLOBALS['login'],
                     'steps'       => $args['data']['steps'],
                     'note'        => $args['note']['content'] ?? null
                 ]);

@@ -13,14 +13,27 @@
           "options": {
             "outputPath": "dist",
             "index": "src/frontend/index.html",
+            "polyfills": "src/frontend/polyfills.ts",
             "main": "src/frontend/main.ts",
             "tsConfig": "src/frontend/tsconfig.app.json",
-            "styles": [],
+            "styles": [
+              "./node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "./src/frontend/css/font-awesome-maarch/css/font-maarch.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/jstree-bootstrap-theme/dist/themes/proton/style.min.css",
+              "./src/frontend/css/maarch-material.css",
+              "./src/frontend/css/engine.scss",
+              "./src/frontend/css/engine_2.scss",
+              "./node_modules/ng2-dnd/bundles/style.css"
+            ],
             "scripts": [
-              "node_modules/tinymce/tinymce.min.js",
-              "node_modules/hammerjs/hammer.js"
+              "./node_modules/jquery/dist/jquery.min.js",
+              "./node_modules/jstree-bootstrap-theme/dist/jstree.min.js",
+              "./node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js",
+              "node_modules/tinymce/tinymce.min.js"
             ],
             "assets": [
+              "./src/frontend/assets",
               { "glob": "**/*", "input": "node_modules/tinymce/skins", "output": "/tinymce/skins/" },
               { "glob": "**/*", "input": "node_modules/tinymce/themes", "output": "/tinymce/themes/" },
               { "glob": "**/*", "input": "node_modules/tinymce/plugins", "output": "/tinymce/plugins/" }
@@ -28,6 +41,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "./src/frontend/environments/environment.ts",
+                  "with": "./src/frontend/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "anyComponentStyle",
@@ -63,7 +82,9 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [],
-            "exclude": []
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }

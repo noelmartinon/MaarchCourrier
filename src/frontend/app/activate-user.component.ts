@@ -1,18 +1,18 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
 import { NotificationService } from './notification.service';
 import { Router } from '@angular/router';
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { AppService } from '../service/app.service';
+import { HeaderService } from '../service/header.service';
+import { AuthService } from '../service/auth.service';
 
-declare var angularGlobals: any;
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "activate-user.component.html",
-    providers: [NotificationService, AppService],
+    templateUrl: 'activate-user.component.html',
+    providers: [AppService],
 })
 
 export class ActivateUserComponent implements OnInit {
@@ -22,20 +22,20 @@ export class ActivateUserComponent implements OnInit {
     user: any = {
         baskets: []
     };
-    
+
     userAbsenceModel: any[] = [];
     basketsToRedirect: string[] = [];
 
     loading: boolean = false;
     selectedIndex: number = 0;
 
-    //Redirect Baskets
+    // Redirect Baskets
     selectionBaskets = new SelectionModel<Element>(true, []);
     myBasketExpansionPanel: boolean = false;
     masterToggleBaskets(event: any) {
-        if (event.checked) {  
+        if (event.checked) {
             this.user.redirectedBaskets.forEach((basket: any) => {
-                this.selectionBaskets.select(basket);   
+                this.selectionBaskets.select(basket);
             });
         } else {
             this.selectionBaskets.clear();
@@ -43,12 +43,13 @@ export class ActivateUserComponent implements OnInit {
     }
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private authService: AuthService,
+        private headerService: HeaderService,
+        private notify: NotificationService,
         private router: Router,
-        public appService: AppService) {
-            $j("link[href='merged_css.php']").remove();
-    }
+        public appService: AppService
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
@@ -67,55 +68,55 @@ export class ActivateUserComponent implements OnInit {
                 });
                 this.loading = false;
             });
-    }   
-
-    showActions(basket:any){
-        $j('#'+basket.basket_id+'_'+basket.group_id).show();
     }
 
-    hideActions(basket:any){
-        $j('#'+basket.basket_id+'_'+basket.group_id).hide();
+    showActions(basket: any) {
+        $('#' + basket.basket_id + '_' + basket.group_id).show();
     }
 
-    //action on user
-    activateUser() : void {
+    hideActions(basket: any) {
+        $('#' + basket.basket_id + '_' + basket.group_id).hide();
+    }
 
-        this.http.put('../../rest/users/' + angularGlobals.user.id + '/status', {'status' : 'OK'})
-        .subscribe(() => {
-        
-            let basketsRedirectedIds:any = "";
-            
-            this.user.redirectedBaskets.forEach((elem: any) => {
-                if (this.selectionBaskets.selected.map((e:any) => { return e.basket_id; }).indexOf(elem.basket_id) != -1 
-                && this.selectionBaskets.selected.map((e:any) => { return e.group_id; }).indexOf(elem.group_id) != -1) {
-                    if(basketsRedirectedIds != "") {
-                        basketsRedirectedIds = basketsRedirectedIds + "&redirectedBasketIds[]=";
+    // action on user
+    activateUser(): void {
+
+        this.http.put('../../rest/users/' + this.headerService.user.id + '/status', { 'status': 'OK' })
+            .subscribe(() => {
+
+                let basketsRedirectedIds: any = '';
+
+                this.user.redirectedBaskets.forEach((elem: any) => {
+                    if (this.selectionBaskets.selected.map((e: any) => e.basket_id).indexOf(elem.basket_id) !== -1
+                        && this.selectionBaskets.selected.map((e: any) => e.group_id).indexOf(elem.group_id) !== -1) {
+                        if (basketsRedirectedIds !== '') {
+                            basketsRedirectedIds = basketsRedirectedIds + '&redirectedBasketIds[]=';
+                        }
+                        basketsRedirectedIds = basketsRedirectedIds + elem.id;
                     }
-                    basketsRedirectedIds = basketsRedirectedIds + elem.id;
-                }
-            });
+                });
 
-            if(basketsRedirectedIds != "") {
-                this.http.delete("../../rest/users/" + angularGlobals.user.id + "/redirectedBaskets?redirectedBasketIds[]=" + basketsRedirectedIds)
-                .subscribe((data: any) => {
+                if (basketsRedirectedIds !== '') {
+                    this.http.delete('../../rest/users/' + this.headerService.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basketsRedirectedIds)
+                        .subscribe((data: any) => {
+                            this.router.navigate(['/home']);
+                            this.notify.success(this.lang.absOff);
+                        }, (err) => {
+                            this.notify.error(err.error.errors);
+                        });
+                } else {
                     this.router.navigate(['/home']);
                     this.notify.success(this.lang.absOff);
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-            } else {
-                this.router.navigate(['/home']);
-                this.notify.success(this.lang.absOff);
-            }
+                }
 
 
-        }, (err : any) => {
-            this.notify.error(err.error.errors);
-        });
-        
+            }, (err: any) => {
+                this.notify.error(err.error.errors);
+            });
+
     }
 
     logout() {
-        location.href = "index.php?display=true&page=logout&logout=true";
+        this.authService.logout();
     }
 }

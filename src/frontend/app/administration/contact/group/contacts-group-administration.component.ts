@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
-import { HeaderService }        from '../../../../service/header.service';
+import { HeaderService } from '../../../../service/header.service';
 import { FormControl } from '@angular/forms';
 import { debounceTime, switchMap, distinctUntilChanged, filter } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
@@ -13,10 +13,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AppService } from '../../../../service/app.service';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
-    templateUrl: "contacts-group-administration.component.html",
+    templateUrl: 'contacts-group-administration.component.html',
     styleUrls: [
         'contacts-group-administration.component.scss'
     ],
@@ -24,41 +24,41 @@ declare function $j(selector: any): any;
 })
 export class ContactsGroupAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     lang: any = LANG;
 
-    subMenus:any [] = [
+    subMenus: any[] = [
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label : this.lang.contactsList,
+            label: this.lang.contactsList,
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label : this.lang.customFieldsAdmin,
+            label: this.lang.customFieldsAdmin,
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label : this.lang.contactsParameters,
+            label: this.lang.contactsParameters,
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label : this.lang.contactsGroups,
+            label: this.lang.contactsGroups,
             current: false
         },
     ];
 
     creationMode: boolean;
     contactsGroup: any = {};
-    nbContact   : number;
+    nbContact: number;
 
     loading: boolean = false;
     initAutoCompleteContact = true;
@@ -72,11 +72,15 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     dataSourceAdded: any;
     selection = new SelectionModel<Element>(true, []);
 
+    @ViewChild('paginatorContactList', { static: true }) paginator: MatPaginator;
+    @ViewChild('paginatorAdded', { static: true }) paginatorAdded: MatPaginator;
+    @ViewChild('tableAdded', { static: true }) sortAdded: MatSort;
+
     /** Selects all rows if they are not all selected; otherwise clear selection. */
     masterToggle(event: any) {
         if (event.checked) {
             this.dataSource.data.forEach((row: any) => {
-                if (!$j("#check_" + row.id + '-input').is(":disabled")) {
+                if (!$('#check_' + row.id + '-input').is(':disabled')) {
                     this.selection.select(row.id);
                 }
             });
@@ -85,11 +89,6 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         }
     }
 
-    @ViewChild('paginatorContactList', { static: true }) paginator: MatPaginator;
-    //@ViewChild('tableContactList', { static: true }) sortContactList: MatSort;
-
-    @ViewChild('paginatorAdded', { static: true }) paginatorAdded: MatPaginator;
-    @ViewChild('tableAdded', { static: true }) sortAdded: MatSort;
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim();
         filterValue = filterValue.toLowerCase();
@@ -97,27 +96,25 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     constructor(
-        public http: HttpClient, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private route: ActivatedRoute,
+        private router: Router,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef
     ) {
-        $j("link[href='merged_css.php']").remove();
-
         this.searchTerm.valueChanges.pipe(
             debounceTime(500),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/contacts', { params: { "search": data } }))
+            switchMap(data => this.http.get('../../rest/autocomplete/contacts', { params: { 'search': data } }))
         ).subscribe((response: any) => {
             this.searchResult = response;
             this.dataSource = new MatTableDataSource(this.searchResult);
             this.dataSource.paginator = this.paginator;
-            //this.dataSource.sort      = this.sortContactList;
-        });  
+            // this.dataSource.sort      = this.sortContactList;
+        });
     }
 
     ngOnInit(): void {
@@ -126,18 +123,18 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.route.params.subscribe(params => {
 
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
                 this.headerService.setHeader(this.lang.contactGroupCreation);
-                
+
                 this.creationMode = true;
                 this.contactsGroup.public = false;
                 this.loading = false;
             } else {
-                
+
                 this.creationMode = false;
 
                 this.http.get('../../rest/contactsGroups/' + params['id'])
-                .subscribe((data: any) => {
+                    .subscribe((data: any) => {
                         this.contactsGroup = data.contactsGroup;
                         this.headerService.setHeader(this.lang.contactsGroupModification, this.contactsGroup.label);
                         this.nbContact = this.contactsGroup.nbContacts;
@@ -203,9 +200,9 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     removeContact(contact: any, row: any) {
-        this.http.delete("../../rest/contactsGroups/" + this.contactsGroup.id + "/contacts/" + contact['id'])
+        this.http.delete('../../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
             .subscribe(() => {
-                var lastElement = this.contactsGroup.contacts.length - 1;
+                const lastElement = this.contactsGroup.contacts.length - 1;
                 this.contactsGroup.contacts[row] = this.contactsGroup.contacts[lastElement];
                 this.contactsGroup.contacts[row].position = row;
                 this.contactsGroup.contacts.splice(lastElement, 1);
@@ -236,9 +233,9 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         return isInGrp;
     }
 
-    selectContact(id:any) {
-        if (!$j("#check_" + id + '-input').is(":disabled")) {
+    selectContact(id: any) {
+        if (!$('#check_' + id + '-input').is(':disabled')) {
             this.selection.toggle(id);
-        }    
+        }
     }
 }

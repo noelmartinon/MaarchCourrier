@@ -482,7 +482,7 @@ class RequestSeda
         if (!empty($_SESSION['user']['UserId'])) {
             $userId = $_SESSION['user']['UserId'];
         } else {
-            $userId = $GLOBALS['userId'];
+            $userId = $GLOBALS['login'];
         }
 
         if (empty($messageObject->messageId)) {

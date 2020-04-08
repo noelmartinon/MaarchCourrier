@@ -2,13 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { LANG } from './translate.component';
 import { HeaderService } from '../service/header.service';
 import { AppService } from '../service/app.service';
-
-declare function $j(selector: any): any;
-
-declare var angularGlobals: any;
+import { environment } from '../environments/environment';
 
 @Component({
-    templateUrl: "about-us.component.html",
+    templateUrl: 'about-us.component.html',
     styleUrls: ['about-us.component.css'],
     providers: [AppService]
 })
@@ -21,14 +18,12 @@ export class AboutUsComponent implements OnInit {
 
     constructor(
         private headerService: HeaderService,
-        public appService: AppService) {
-        $j("link[href='merged_css.php']").remove();
-    }
+        public appService: AppService) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.aboutUs);
 
-        this.applicationVersion = angularGlobals.applicationVersion;
+        this.applicationVersion = environment.VERSION;
         this.loading = false;
     }
 }

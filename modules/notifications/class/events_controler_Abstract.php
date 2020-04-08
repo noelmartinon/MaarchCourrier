@@ -45,20 +45,6 @@ try {
  */
 abstract class events_controler_Abstract extends ObjectControler
 {
-    public function getEventsByNotificationSid($notification_sid) 
-    {
-        $query = "SELECT * FROM " . _NOTIF_EVENT_STACK_TABLE_NAME
-            . " WHERE exec_date is NULL "
-            . " AND notification_sid = ?";
-        $dbConn = new Database();
-        $stmt = $dbConn->query($query, array($notification_sid));
-        $events = array();
-        while ($eventRecordset = $stmt->fetchObject()) {
-            $events[] = $eventRecordset;
-        }
-        return $events;
-    }
-    
   
     function wildcard_match($pattern, $str)
     {
@@ -114,15 +100,5 @@ abstract class events_controler_Abstract extends ObjectControler
                 )
             );
         }
-    }
-    
-    public function commitEvent($eventId, $result) {
-        $dbConn = new Database();
-        $query = "UPDATE " . _NOTIF_EVENT_STACK_TABLE_NAME 
-            . " SET exec_date = CURRENT_TIMESTAMP, exec_result = ?" 
-            . " WHERE event_stack_sid = ?";
-        $dbConn->query($query, array($result, $eventId));
-    }
-    
-    
+    }  
 }

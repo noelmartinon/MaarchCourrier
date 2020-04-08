@@ -6,15 +6,13 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { NotificationService } from '../../notification.service';
-import { of } from 'rxjs';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { AppService } from '../../../service/app.service';
-
-declare function $j(selector: any): any;
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
-    templateUrl: "versions-update-administration.component.html",
+    templateUrl: 'versions-update-administration.component.html',
     styleUrls: ['versions-update-administration.component.scss'],
     providers: [AppService],
 })
@@ -30,18 +28,16 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
     versions: any = {};
 
     constructor(
-        public http: HttpClient, 
-        private headerService: HeaderService, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private headerService: HeaderService,
+        private notify: NotificationService,
         public dialog: MatDialog,
         public appService: AppService
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.updateVersionControl);
-        
+
         this.loading = true;
 
         this.http.get('../../rest/versionsUpdate').pipe(
@@ -60,18 +56,18 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
 
     updateVersionAccess() {
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', data: { title: this.lang.confirm + ' ?', msg: this.lang.updateInfo  } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', data: { title: this.lang.confirm + ' ?', msg: this.lang.updateInfo } });
         this.dialogRef.afterClosed().pipe(
             filter((data) => {
                 this.dialogRef = null;
-                
+
                 if (data === 'ok') {
                     this.updateInprogress = true;
                     return true;
                 } else {
                     this.updateInprogress = false;
                     return false;
-                }    
+                }
             }),
             exhaustMap(() => this.http.put('../../rest/versionsUpdate', {})),
             tap(() => {
@@ -91,6 +87,6 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
             }),
 
         ).subscribe();
-        
+
     }
 }

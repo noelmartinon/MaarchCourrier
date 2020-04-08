@@ -2,23 +2,21 @@ import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } f
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { HeaderService }        from '../../../service/header.service';
+import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { AppService } from '../../../service/app.service';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "doctypes-administration.component.html",
+    templateUrl: 'doctypes-administration.component.html',
     providers: [AppService]
 })
 
 export class DoctypesAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     dialogRef: MatDialogRef<any>;
@@ -39,60 +37,58 @@ export class DoctypesAdministrationComponent implements OnInit {
     newSecondLevel: any = false;
     newFirstLevel: any = false;
 
-    displayedColumns = ['label','use', 'mandatory', 'column'];
+    displayedColumns = ['label', 'use', 'mandatory', 'column'];
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialog: MatDialog, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.documentTypes);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
 
-        this.http.get("../../rest/doctypes")
+        this.http.get('../../rest/doctypes')
             .subscribe((data: any) => {
                 this.doctypes = data['structure'];
                 setTimeout(() => {
-                    $j('#jstree').jstree({
-                        "checkbox": {
-                            "three_state": false //no cascade selection
+                    $('#jstree').jstree({
+                        'checkbox': {
+                            'three_state': false // no cascade selection
                         },
                         'core': {
-                            force_text : true,
+                            force_text: true,
                             'themes': {
                                 'name': 'proton',
                                 'responsive': true
                             },
                             'multiple': false,
                             'data': this.doctypes,
-                            "check_callback": function (operation: any, node: any, node_parent: any, node_position: any, more: any) {
-                                if (operation == 'move_node') {
-                                    if(typeof more.ref == "undefined"){
+                            'check_callback': function (operation: any, node: any, node_parent: any, node_position: any, more: any) {
+                                if (operation === 'move_node') {
+                                    if (typeof more.ref === 'undefined') {
                                         return true;
                                     }
-                                    if(!isNaN(parseFloat(node.id)) && isFinite(node.id) && more.ref.id.indexOf("secondlevel_")==0){
+                                    if (!isNaN(parseFloat(node.id)) && isFinite(node.id) && more.ref.id.indexOf('secondlevel_') === 0) {
                                         // Doctype in secondLevel
-                                        if(more.ref.children.indexOf(node.id) >-1){
+                                        if (more.ref.children.indexOf(node.id) > -1) {
                                             // same secondLevel
                                             return false;
                                         } else {
                                             return true;
                                         }
-                                    } else if(node.id.indexOf("secondlevel_")==0 && more.ref.id.indexOf("firstlevel_")==0){
+                                    } else if (node.id.indexOf('secondlevel_') === 0 && more.ref.id.indexOf('firstlevel_') === 0) {
                                         // SecondLevel in FirstLevel
-                                        if(more.ref.children.indexOf(node.id) >-1){
+                                        if (more.ref.children.indexOf(node.id) > -1) {
                                             // same FirstLevel
                                             return false;
                                         } else {
@@ -104,67 +100,67 @@ export class DoctypesAdministrationComponent implements OnInit {
                                 }
                             }
                         },
-                        "dnd": {
+                        'dnd': {
                             is_draggable: function (nodes: any) {
-                                this.secondLevelSelected = nodes[0].id.replace("secondlevel_", "");
-                                if((!isNaN(parseFloat(this.secondLevelSelected)) && isFinite(this.secondLevelSelected)) ||
-                                    (!isNaN(parseFloat(nodes[0].id)) && isFinite(nodes[0].id))){
+                                this.secondLevelSelected = nodes[0].id.replace('secondlevel_', '');
+                                if ((!isNaN(parseFloat(this.secondLevelSelected)) && isFinite(this.secondLevelSelected)) ||
+                                    (!isNaN(parseFloat(nodes[0].id)) && isFinite(nodes[0].id))) {
                                     return true;
                                 } else {
                                     return false;
                                 }
                             }
                         },
-                        "plugins": ["search", "dnd", "contextmenu"],
+                        'plugins': ['search', 'dnd', 'contextmenu'],
                     });
-                    var to: any = false;
-                    $j('#jstree_search').keyup(function () {
+                    let to: any = false;
+                    $('#jstree_search').keyup(function () {
                         if (to) { clearTimeout(to); }
                         to = setTimeout(function () {
-                            var v = $j('#jstree_search').val();
-                            $j('#jstree').jstree(true).search(v);
+                            const v: any = $('#jstree_search').val();
+                            $('#jstree').jstree(true).search(v);
                         }, 250);
                     });
-                    $j('#jstree')
+                    $('#jstree')
                         // listen for event
-                        .on('select_node.jstree', (e: any, data: any) => {
-                            if (this.sidenavRight.opened == false) {
+                        .on('select_node.jstree', (e: any, item: any) => {
+                            if (this.sidenavRight.opened === false) {
                                 this.sidenavRight.open();
                             }
-                            this.loadDoctype(data, false);
+                            this.loadDoctype(item, false);
 
-                        }).on('move_node.jstree', (e: any, data: any) => {
-                            this.loadDoctype(data, true);
+                        }).on('move_node.jstree', (e: any, item: any) => {
+                            this.loadDoctype(item, true);
                         })
                         // create the instance
                         .jstree();
                 }, 0);
-                $j('#jstree').jstree('select_node', this.doctypes[0]);
+                $('#jstree').jstree('select_node', this.doctypes[0]);
                 this.loading = false;
             }, (err) => {
                 this.notify.handleErrors(err);
             });
     }
 
-    loadDoctype(data: any, move:boolean) {
+    loadDoctype(data: any, move: boolean) {
         this.creationMode = false;
 
         // Doctype
-        if(data.node.original.type_id){
-            this.currentFirstLevel  = false;
+        if (data.node.original.type_id) {
+            this.currentFirstLevel = false;
             this.currentSecondLevel = false;
-            this.http.get("../../rest/doctypes/types/" + data.node.original.type_id )
+            this.http.get('../../rest/doctypes/types/' + data.node.original.type_id)
                 .subscribe((dataValue: any) => {
-                    this.currentType  = dataValue['doctype'];
+                    this.currentType = dataValue['doctype'];
                     this.secondLevels = dataValue['secondLevel'];
                     this.processModes = ['NORMAL', 'SVA', 'SVR'];
 
-                    if(move){
-                        if(this.currentType){
-                            this.newSecondLevel = data.parent.replace("secondlevel_", "");
+                    if (move) {
+                        if (this.currentType) {
+                            this.newSecondLevel = data.parent.replace('secondlevel_', '');
                             // Is integer
-                            if(!isNaN(parseFloat(this.newSecondLevel)) && isFinite(this.newSecondLevel)){
-                                if (this.currentType.doctypes_second_level_id != this.newSecondLevel) {
+                            if (!isNaN(parseFloat(this.newSecondLevel)) && isFinite(this.newSecondLevel)) {
+                                if (this.currentType.doctypes_second_level_id !== this.newSecondLevel) {
                                     this.currentType.doctypes_second_level_id = this.newSecondLevel;
                                     this.saveType();
                                 }
@@ -180,21 +176,21 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
 
-        // Second level
-        } else if(data.node.original.doctypes_second_level_id) {
-            this.currentFirstLevel  = false;
-            this.currentType        = false;
-            this.http.get("../../rest/doctypes/secondLevel/" + data.node.original.doctypes_second_level_id )
+            // Second level
+        } else if (data.node.original.doctypes_second_level_id) {
+            this.currentFirstLevel = false;
+            this.currentType = false;
+            this.http.get('../../rest/doctypes/secondLevel/' + data.node.original.doctypes_second_level_id)
                 .subscribe((dataValue: any) => {
                     this.currentSecondLevel = dataValue['secondLevel'];
-                    this.firstLevels        = dataValue['firstLevel'];
+                    this.firstLevels = dataValue['firstLevel'];
 
-                    if(move){
-                        if(this.currentSecondLevel){
-                            this.newFirstLevel = data.parent.replace("firstlevel_", "");
+                    if (move) {
+                        if (this.currentSecondLevel) {
+                            this.newFirstLevel = data.parent.replace('firstlevel_', '');
                             // Is integer
-                            if(!isNaN(parseFloat(this.newFirstLevel)) && isFinite(this.newFirstLevel)){
-                                if (this.currentSecondLevel.doctypes_first_level_id != this.newFirstLevel) {
+                            if (!isNaN(parseFloat(this.newFirstLevel)) && isFinite(this.newFirstLevel)) {
+                                if (this.currentSecondLevel.doctypes_first_level_id !== this.newFirstLevel) {
                                     this.currentSecondLevel.doctypes_first_level_id = this.newFirstLevel;
                                     this.saveSecondLevel();
                                 }
@@ -210,33 +206,33 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
 
-        // First level
+            // First level
         } else {
             this.currentSecondLevel = false;
-            this.currentType        = false;
-            this.http.get("../../rest/doctypes/firstLevel/" + data.node.original.doctypes_first_level_id )
-                .subscribe((data: any) => {
-                    this.currentFirstLevel  = data['firstLevel'];
+            this.currentType = false;
+            this.http.get('../../rest/doctypes/firstLevel/' + data.node.original.doctypes_first_level_id)
+                .subscribe((dataDoctypes: any) => {
+                    this.currentFirstLevel = dataDoctypes['firstLevel'];
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
         }
     }
-    
+
     resetDatas() {
-        this.currentFirstLevel  = false;
+        this.currentFirstLevel = false;
         this.currentSecondLevel = false;
-        this.currentType        = false;       
+        this.currentType = false;
     }
 
-    refreshTree(){
-        $j('#jstree').jstree(true).settings.core.data = this.doctypes;
-        $j('#jstree').jstree("refresh");
+    refreshTree() {
+        $('#jstree').jstree(true).settings.core.data = this.doctypes;
+        $('#jstree').jstree('refresh');
     }
 
     saveFirstLevel() {
         if (this.creationMode) {
-            this.http.post("../../rest/doctypes/firstLevel", this.currentFirstLevel)
+            this.http.post('../../rest/doctypes/firstLevel', this.currentFirstLevel)
                 .subscribe((data: any) => {
                     this.resetDatas();
                     this.readMode();
@@ -247,7 +243,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put("../../rest/doctypes/firstLevel/" + this.currentFirstLevel.doctypes_first_level_id, this.currentFirstLevel)
+            this.http.put('../../rest/doctypes/firstLevel/' + this.currentFirstLevel.doctypes_first_level_id, this.currentFirstLevel)
                 .subscribe((data: any) => {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
@@ -260,7 +256,7 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     saveSecondLevel() {
         if (this.creationMode) {
-            this.http.post("../../rest/doctypes/secondLevel", this.currentSecondLevel)
+            this.http.post('../../rest/doctypes/secondLevel', this.currentSecondLevel)
                 .subscribe((data: any) => {
                     this.resetDatas();
                     this.readMode();
@@ -271,7 +267,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put("../../rest/doctypes/secondLevel/" + this.currentSecondLevel.doctypes_second_level_id, this.currentSecondLevel)
+            this.http.put('../../rest/doctypes/secondLevel/' + this.currentSecondLevel.doctypes_second_level_id, this.currentSecondLevel)
                 .subscribe((data: any) => {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
@@ -284,7 +280,7 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     saveType() {
         if (this.creationMode) {
-            this.http.post("../../rest/doctypes/types", this.currentType)
+            this.http.post('../../rest/doctypes/types', this.currentType)
                 .subscribe((data: any) => {
                     this.resetDatas();
                     this.readMode();
@@ -295,7 +291,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put("../../rest/doctypes/types/" + this.currentType.type_id, this.currentType)
+            this.http.put('../../rest/doctypes/types/' + this.currentType.type_id, this.currentType)
                 .subscribe((data: any) => {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
@@ -308,23 +304,23 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     readMode() {
         this.creationMode = false;
-        $j('#jstree').jstree('deselect_all');
-        $j('#jstree').jstree('select_node', this.doctypes[0]);
+        $('#jstree').jstree('deselect_all');
+        $('#jstree').jstree('select_node', this.doctypes[0]);
     }
 
     removeFirstLevel() {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentFirstLevel.doctypes_first_level_label + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentFirstLevel.doctypes_first_level_label + ' »');
 
         if (r) {
-            this.http.delete("../../rest/doctypes/firstLevel/" + this.currentFirstLevel.doctypes_first_level_id)
+            this.http.delete('../../rest/doctypes/firstLevel/' + this.currentFirstLevel.doctypes_first_level_id)
                 .subscribe((data: any) => {
                     this.resetDatas();
                     this.readMode();
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    if(this.doctypes[0]){
-                        $j('#jstree').jstree('select_node', this.doctypes[0]);
-                    } else if (this.sidenavRight.opened == true) {
+                    if (this.doctypes[0]) {
+                        $('#jstree').jstree('select_node', this.doctypes[0]);
+                    } else if (this.sidenavRight.opened === true) {
                         this.sidenavRight.close();
                     }
                     this.notify.success(this.lang.firstLevelDeleted);
@@ -335,16 +331,16 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     removeSecondLevel() {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentSecondLevel.doctypes_second_level_label + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentSecondLevel.doctypes_second_level_label + ' »');
 
         if (r) {
-            this.http.delete("../../rest/doctypes/secondLevel/" + this.currentSecondLevel.doctypes_second_level_id)
+            this.http.delete('../../rest/doctypes/secondLevel/' + this.currentSecondLevel.doctypes_second_level_id)
                 .subscribe((data: any) => {
                     this.resetDatas();
                     this.readMode();
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    $j('#jstree').jstree('select_node', this.doctypes[0]);
+                    $('#jstree').jstree('select_node', this.doctypes[0]);
                     this.notify.success(this.lang.secondLevelDeleted);
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -353,36 +349,36 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     removeType() {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentType.description + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentType.description + ' »');
 
         if (r) {
-            this.http.delete("../../rest/doctypes/types/" + this.currentType.type_id)
+            this.http.delete('../../rest/doctypes/types/' + this.currentType.type_id)
                 .subscribe((data: any) => {
-                    if(data.deleted == 0){
+                    if (data.deleted === 0) {
                         this.resetDatas();
                         this.readMode();
                         this.doctypes = data['doctypeTree'];
                         this.refreshTree();
-                        $j('#jstree').jstree('select_node', this.doctypes[0]);
+                        $('#jstree').jstree('select_node', this.doctypes[0]);
                         this.notify.success(this.lang.documentTypeDeleted);
                     } else {
-                        this.config = { panelClass: 'maarch-modal', data: {count: data.deleted, types: data.doctypes} };
+                        this.config = { panelClass: 'maarch-modal', data: { count: data.deleted, types: data.doctypes } };
                         this.dialogRef = this.dialog.open(DoctypesAdministrationRedirectModalComponent, this.config);
                         this.dialogRef.afterClosed().subscribe((result: any) => {
-                        if (result) {
-                            this.http.put("../../rest/doctypes/types/" + this.currentType.type_id + "/redirect", result)
-                                .subscribe((data: any) => {
-                                    this.resetDatas();
-                                    this.readMode();
-                                    this.doctypes = data['doctypeTree'];
-                                    this.refreshTree();
-                                    $j('#jstree').jstree('select_node', this.doctypes[0]);
-                                    this.notify.success(this.lang.documentTypeDeleted);
-                                }, (err) => {
-                                    this.notify.error(err.error.errors);
-                                });
-                        }
-                        this.dialogRef = null;
+                            if (result) {
+                                this.http.put('../../rest/doctypes/types/' + this.currentType.type_id + '/redirect', result)
+                                    .subscribe((dataDoctypes: any) => {
+                                        this.resetDatas();
+                                        this.readMode();
+                                        this.doctypes = dataDoctypes['doctypeTree'];
+                                        this.refreshTree();
+                                        $('#jstree').jstree('select_node', this.doctypes[0]);
+                                        this.notify.success(this.lang.documentTypeDeleted);
+                                    }, (err) => {
+                                        this.notify.error(err.error.errors);
+                                    });
+                            }
+                            this.dialogRef = null;
                         });
                     }
 
@@ -393,25 +389,25 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     prepareDoctypeAdd(mode: any) {
-        this.currentFirstLevel  = false;
+        this.currentFirstLevel = false;
         this.currentSecondLevel = false;
-        this.currentType        = false;
-        if(mode == 'firstLevel'){
-            this.currentFirstLevel  = {};
+        this.currentType = false;
+        if (mode === 'firstLevel') {
+            this.currentFirstLevel = {};
         }
-        if(mode == 'secondLevel'){
-            this.currentSecondLevel  = {};
+        if (mode === 'secondLevel') {
+            this.currentSecondLevel = {};
         }
-        if(mode == 'doctype'){
-            this.currentType  = {};
+        if (mode === 'doctype') {
+            this.currentType = {};
         }
-        if (this.sidenavRight.opened == false) {
+        if (this.sidenavRight.opened === false) {
             this.sidenavRight.open();
         }
-        $j('#jstree').jstree('deselect_all');
-        this.http.get("../../rest/administration/doctypes/new")
+        $('#jstree').jstree('deselect_all');
+        this.http.get('../../rest/administration/doctypes/new')
             .subscribe((data: any) => {
-                this.firstLevels  = data['firstLevel'];
+                this.firstLevels = data['firstLevel'];
                 this.secondLevels = data['secondLevel'];
                 this.processModes = ['NORMAL', 'SVA', 'SVR'];
             }, (err) => {
@@ -421,7 +417,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 }
 @Component({
-    templateUrl: "doctypes-administration-redirect-modal.component.html"
+    templateUrl: 'doctypes-administration-redirect-modal.component.html'
 })
 export class DoctypesAdministrationRedirectModalComponent {
     lang: any = LANG;

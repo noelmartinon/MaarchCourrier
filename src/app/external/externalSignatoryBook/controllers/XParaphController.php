@@ -238,7 +238,7 @@ class XParaphController
             }
 
             $tmpPath = CoreConfigModel::getTmpPath();
-            $filename = $tmpPath . $GLOBALS['userId'] . '_' . rand() . '_xParaphSignature.';
+            $filename = $tmpPath . $GLOBALS['login'] . '_' . rand() . '_xParaphSignature.';
             $pathFilename = $filename . $extension;
             file_put_contents($pathFilename, $tbs->Source);
 
@@ -601,7 +601,7 @@ class XParaphController
             }
         }
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User not found']);
         }
@@ -617,7 +617,7 @@ class XParaphController
                 $accountFound = true;
                 HistoryController::add([
                     'tableName'    => 'users',
-                    'recordId'     => $GLOBALS['userId'],
+                    'recordId'     => $GLOBALS['login'],
                     'eventType'    => 'UP',
                     'eventId'      => 'userModification',
                     'info'         => _USER_UPDATED . " {$user['firstname']} {$user['lastname']}. " . _XPARAPH_ACCOUNT_CREATED
@@ -643,7 +643,7 @@ class XParaphController
             }
         }
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User not found']);
         }
@@ -655,7 +655,7 @@ class XParaphController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$user['firstname']} {$user['lastname']}. " . _XPARAPH_ACCOUNT_DELETED

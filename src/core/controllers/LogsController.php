@@ -137,7 +137,7 @@ class LogsController
             'WHERE'     => $aArgs['tableName'],
             'ID'        => $aArgs['recordId'],
             'HOW'       => $aArgs['eventType'],
-            'USER'      => $GLOBALS['userId'],
+            'USER'      => $GLOBALS['login'],
             'WHAT'      => $aArgs['eventId'],
             'ID_MODULE' => $aArgs['moduleId'],
             'REMOTE_IP' => $_SERVER['REMOTE_ADDR'],

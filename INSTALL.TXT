@@ -1,2 +1,2 @@
 Documentation d'installation :
- https://docs.maarch.org/gitbook/html/MaarchCourrier/20.03/guat/guat_installation/debian.html
+ https://docs.maarch.org/gitbook/html/MaarchCourrier/develop/guat/guat_installation/debian.html

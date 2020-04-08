@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild, Renderer2 } from '@angular/core';
+import { Component, Inject, ViewChild, Renderer2, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LANG } from '../../../translate.component';
 import { HttpClient } from '@angular/common/http';
@@ -6,13 +6,13 @@ import { PrivilegeService } from '../../../../service/privileges.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
     templateUrl: 'contact-modal.component.html',
     styleUrls: ['contact-modal.component.scss'],
 })
-export class ContactModalComponent {
+export class ContactModalComponent implements OnInit{
     lang: any = LANG;
     creationMode: boolean = true;
     canUpdate: boolean = false;
@@ -42,8 +42,8 @@ export class ContactModalComponent {
             this.creationMode = true;
             this.mode = 'update';
             if (this.mode === 'update') {
-                $j('.maarch-modal').css({'height' : '99vh'});
-                $j('.maarch-modal').css({'width' : '99vw'});
+                $('.maarch-modal').css({ 'height': '99vh' });
+                $('.maarch-modal').css({ 'width': '99vw' });
             }
             if (this.headerService.getLastLoadedFile() !== null) {
                 this.drawer.toggle();
@@ -58,8 +58,8 @@ export class ContactModalComponent {
     switchMode() {
         this.mode = this.mode === 'read' ? 'update' : 'read';
         if (this.mode === 'update') {
-            $j('.maarch-modal').css({'height' : '99vh'});
-            $j('.maarch-modal').css({'width' : '99vw'});
+            $('.maarch-modal').css({ 'height': '99vh' });
+            $('.maarch-modal').css({ 'width': '99vw' });
         }
 
         if (this.headerService.getLastLoadedFile() !== null) {

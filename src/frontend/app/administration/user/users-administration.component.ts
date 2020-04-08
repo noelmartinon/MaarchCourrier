@@ -8,14 +8,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
-import {FunctionsService} from "../../../service/functions.service";
-
-declare function $j(selector: any): any;
-
-declare var angularGlobals: any;
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "users-administration.component.html",
+    templateUrl: 'users-administration.component.html',
     styleUrls: ['users-administration.component.scss'],
     providers: [AppService]
 })
@@ -23,26 +19,26 @@ export class UsersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    dialogRef                               : MatDialogRef<any>;
+    dialogRef: MatDialogRef<any>;
 
-    lang                                    : any                   = LANG;
-    loading                                 : boolean               = false;
-    updateListModel                         : boolean               = true;
-    updateListInstance                      : boolean               = true;
+    lang: any = LANG;
+    loading: boolean = false;
+    updateListModel: boolean = true;
+    updateListInstance: boolean = true;
 
-    data                                    : any[]                 = [];
-    config                                  : any                   = {};
-    userDestRedirect                        : any                   = {};
-    userDestRedirectModels                  : any[]                 = [];
-    listinstances                           : any[]                 = [];
-    quota                                   : any                   = {};
-    user                                    : any                   = {};
-    withWebserviceAccount                   : boolean               = false;
-    webserviceAccounts                      : any[]                 = [];
-    noWebserviceAccounts                    : any[]                 = [];
+    data: any[] = [];
+    config: any = {};
+    userDestRedirect: any = {};
+    userDestRedirectModels: any[] = [];
+    listinstances: any[] = [];
+    quota: any = {};
+    user: any = {};
+    withWebserviceAccount: boolean = false;
+    webserviceAccounts: any[] = [];
+    noWebserviceAccounts: any[] = [];
 
-    dataSource          = new MatTableDataSource(this.data);
-    displayedColumns    = ['id', 'user_id', 'lastname', 'firstname', 'status', 'mail', 'actions'];
+    dataSource = new MatTableDataSource(this.data);
+    displayedColumns = ['id', 'user_id', 'lastname', 'firstname', 'status', 'mail', 'actions'];
 
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -57,31 +53,29 @@ export class UsersAdministrationComponent implements OnInit {
     }
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialog: MatDialog, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.users);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
-        this.user = angularGlobals.user;
+        this.user = this.headerService.user;
         this.loading = true;
 
         this.http.get('../../rest/users')
             .subscribe((data: any) => {
                 this.data = data['users'];
                 this.data.forEach(element => {
-                    element.statusLabel = this.lang['user'+element.status];
-                    if (element.loginmode == 'restMode') {
+                    element.statusLabel = this.lang['user' + element.status];
+                    if (element.loginmode === 'restMode') {
                         this.webserviceAccounts.push(element);
                     } else {
                         this.noWebserviceAccounts.push(element);
@@ -112,7 +106,7 @@ export class UsersAdministrationComponent implements OnInit {
     }
 
     activateUser(user: any) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.authorize + ' « ' + user.user_id + ' »');
+        const r = confirm(this.lang.confirmAction + ' ' + this.lang.authorize + ' « ' + user.user_id + ' »');
 
         if (r) {
             user.status = 'OK';
@@ -166,7 +160,7 @@ export class UsersAdministrationComponent implements OnInit {
 
                     }
 
-                    //open modale
+                    // open modale
                     this.dialogRef = this.dialog.open(UsersAdministrationRedirectModalComponent, this.config);
                     this.dialogRef.afterClosed().subscribe((result: any) => {
 
@@ -183,7 +177,7 @@ export class UsersAdministrationComponent implements OnInit {
 
                                 result.redirectListInstances.forEach((list: any) => {
                                     list.listInstances.forEach((element: any) => {
-                                        if (element.item_mode == 'dest' && element.item_id == user.user_id) {
+                                        if (element.item_mode === 'dest' && element.item_id === user.user_id) {
                                             element.item_id = user.redirectDestResUserId;
                                         }
                                     });
@@ -192,9 +186,9 @@ export class UsersAdministrationComponent implements OnInit {
                                 user.redirectListInstances = result.redirectListInstances;
                             }
 
-                            if (user.inDiffListDest && user.isResDestUser) { //user is inDiffListDest and isResDestUser
+                            if (user.inDiffListDest && user.isResDestUser) { // user is inDiffListDest and isResDestUser
 
-                                //update listModels
+                                // update listModels
                                 this.http.put('../../rest/listTemplates/entityDest/itemId/' + user.id, user)
                                     .subscribe(() => {
                                         this.http.put('../../rest/listinstances', user.redirectListInstances)
@@ -203,31 +197,31 @@ export class UsersAdministrationComponent implements OnInit {
                                                     this.notify.error(data.errors);
                                                 } else {
 
-                                                    //delete user
-                                                    if (user.mode == 'delete') {
+                                                    // delete user
+                                                    if (user.mode === 'delete') {
                                                         this.http.delete('../../rest/users/' + user.id)
                                                             .subscribe(() => {
-                                                                for (let i in this.data) {
+                                                                for (const i in this.data) {
                                                                     if (this.data[i].id == user.id) {
                                                                         this.data.splice(Number(i), 1);
                                                                     }
                                                                 }
                                                                 this.setDatasource();
 
-                                                                if (this.quota.userQuota && user.status != 'SPD') {
+                                                                if (this.quota.userQuota && user.status !== 'SPD') {
                                                                     this.quota.actives--;
-                                                                } else if (this.quota.userQuota && user.status == 'SPD') {
+                                                                } else if (this.quota.userQuota && user.status === 'SPD') {
                                                                     this.quota.inactives--;
                                                                 }
 
                                                                 this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
 
-                                                                //end delete user
+                                                                // end delete user
                                                             }, (err) => {
                                                                 this.notify.error(err.error.errors);
                                                             });
-                                                        //suspend user
-                                                    } else if (user.mode == 'suspend') {
+                                                        // suspend user
+                                                    } else if (user.mode === 'suspend') {
                                                         this.http.put('../../rest/users/' + user.id + '/suspend', user)
                                                             .subscribe(() => {
                                                                 user.status = 'SPD';
@@ -243,7 +237,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                             });
                                                     }
                                                 }
-                                                //end update listInstances
+                                                // end update listInstances
                                             }, (err) => {
                                                 this.notify.error(err.error.errors);
                                             });
@@ -251,35 +245,35 @@ export class UsersAdministrationComponent implements OnInit {
                                         this.notify.error(err.error.errors);
                                     });
 
-                            } else if (user.inDiffListDest && !user.isResDestUser) { //user is inDiffListDest
-                                //update listModels
+                            } else if (user.inDiffListDest && !user.isResDestUser) { // user is inDiffListDest
+                                // update listModels
                                 this.http.put('../../rest/listTemplates/entityDest/itemId/' + user.id, user)
                                     .subscribe(() => {
-                                        //delete user
-                                        if (user.mode == 'delete') {
+                                        // delete user
+                                        if (user.mode === 'delete') {
                                             this.http.delete('../../rest/users/' + user.id)
                                                 .subscribe(() => {
-                                                    for (let i in this.data) {
+                                                    for (const i in this.data) {
                                                         if (this.data[i].id == user.id) {
                                                             this.data.splice(Number(i), 1);
                                                         }
                                                     }
                                                     this.setDatasource();
 
-                                                    if (this.quota.userQuota && user.status == 'OK') {
+                                                    if (this.quota.userQuota && user.status === 'OK') {
                                                         this.quota.actives--;
-                                                    } else if (this.quota.userQuota && user.status == 'SPD') {
+                                                    } else if (this.quota.userQuota && user.status === 'SPD') {
                                                         this.quota.inactives--;
                                                     }
 
                                                     this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
 
-                                                    //end delete user
+                                                    // end delete user
                                                 }, (err) => {
                                                     this.notify.error(err.error.errors);
                                                 });
-                                            //suspend user
-                                        } else if (user.mode == 'suspend') {
+                                            // suspend user
+                                        } else if (user.mode === 'suspend') {
                                             this.http.put('../../rest/users/' + user.id + '/suspend', user)
                                                 .subscribe(() => {
                                                     user.status = 'SPD';
@@ -298,39 +292,39 @@ export class UsersAdministrationComponent implements OnInit {
                                         this.notify.error(err.error.errors);
                                     });
 
-                            } else if (!user.inDiffListDest && user.isResDestUser) { //user isResDestUser
-                                //update listInstances
+                            } else if (!user.inDiffListDest && user.isResDestUser) { // user isResDestUser
+                                // update listInstances
                                 this.http.put('../../rest/listinstances', user.redirectListInstances)
                                     .subscribe((data: any) => {
                                         if (data && data.hasOwnProperty('errors')) {
                                             this.notify.error(data.errors);
                                         } else {
 
-                                            //delete user
-                                            if (user.mode == 'delete') {
+                                            // delete user
+                                            if (user.mode === 'delete') {
                                                 this.http.delete('../../rest/users/' + user.id)
                                                     .subscribe(() => {
-                                                        for (let i in this.data) {
-                                                            if (this.data[i].id == user.id) {
+                                                        for (const i in this.data) {
+                                                            if (this.data[i].id === user.id) {
                                                                 this.data.splice(Number(i), 1);
                                                             }
                                                         }
                                                         this.setDatasource();
 
-                                                        if (this.quota.userQuota && user.status == 'OK') {
+                                                        if (this.quota.userQuota && user.status === 'OK') {
                                                             this.quota.actives--;
-                                                        } else if (this.quota.userQuota && user.status == 'SPD') {
+                                                        } else if (this.quota.userQuota && user.status === 'SPD') {
                                                             this.quota.inactives--;
                                                         }
 
                                                         this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
 
-                                                        //end delete user
+                                                        // end delete user
                                                     }, (err) => {
                                                         this.notify.error(err.error.errors);
                                                     });
-                                                //suspend user
-                                            } else if (user.mode == 'suspend') {
+                                                // suspend user
+                                            } else if (user.mode === 'suspend') {
                                                 this.http.put('../../rest/users/' + user.id + '/suspend', user)
                                                     .subscribe(() => {
                                                         user.status = 'SPD';
@@ -346,38 +340,38 @@ export class UsersAdministrationComponent implements OnInit {
                                                     });
                                             }
                                         }
-                                        //end update listInstances
+                                        // end update listInstances
                                     }, (err) => {
                                         this.notify.error(err.error.errors);
                                     });
 
-                            } else if (!user.inDiffListDest && !user.isResDestUser) { //user is not inDiffListDest and is not isResDestUser
+                            } else if (!user.inDiffListDest && !user.isResDestUser) { // user is not inDiffListDest and is not isResDestUser
 
-                                //delete user
-                                if (user.mode == 'delete') {
+                                // delete user
+                                if (user.mode === 'delete') {
                                     this.http.delete('../../rest/users/' + user.id)
                                         .subscribe(() => {
-                                            for (let i in this.data) {
+                                            for (const i in this.data) {
                                                 if (this.data[i].id == user.id) {
                                                     this.data.splice(Number(i), 1);
                                                 }
                                             }
                                             this.setDatasource();
 
-                                            if (this.quota.userQuota && user.status == 'OK') {
+                                            if (this.quota.userQuota && user.status === 'OK') {
                                                 this.quota.actives--;
-                                            } else if (this.quota.userQuota && user.status == 'SPD') {
+                                            } else if (this.quota.userQuota && user.status === 'SPD') {
                                                 this.quota.inactives--;
                                             }
 
                                             this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
 
-                                            //end delete user
+                                            // end delete user
                                         }, (err) => {
                                             this.notify.error(err.error.errors);
                                         });
-                                    //suspend user
-                                } else if (user.mode == 'suspend') {
+                                    // suspend user
+                                } else if (user.mode === 'suspend') {
                                     this.http.put('../../rest/users/' + user.id + '/suspend', user)
                                         .subscribe(() => {
                                             user.status = 'SPD';
@@ -395,16 +389,16 @@ export class UsersAdministrationComponent implements OnInit {
                             }
                         }
 
-                        //close modale
+                        // close modale
                     });
                 }
-                //end isDeletable
+                // end isDeletable
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
-    toggleWebserviceAccount () {
+    toggleWebserviceAccount() {
         this.withWebserviceAccount = !this.withWebserviceAccount;
         if (this.withWebserviceAccount) {
             this.data = this.webserviceAccounts;
@@ -416,18 +410,18 @@ export class UsersAdministrationComponent implements OnInit {
 
 }
 @Component({
-    templateUrl: "users-administration-redirect-modal.component.html",
+    templateUrl: 'users-administration-redirect-modal.component.html',
     styleUrls: ['users-administration-redirect-modal.scss'],
 })
-export class UsersAdministrationRedirectModalComponent {
-    lang: any               = LANG;
-    loadModel: boolean      = false;
-    loadInstance: boolean   = false;
-    modalTitle: string      = this.lang.confirmAction;
+export class UsersAdministrationRedirectModalComponent implements OnInit {
+    lang: any = LANG;
+    loadModel: boolean = false;
+    loadInstance: boolean = false;
+    modalTitle: string = this.lang.confirmAction;
 
     constructor(
-        public http: HttpClient, 
-        @Inject(MAT_DIALOG_DATA) public data: any, 
+        public http: HttpClient,
+        @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<UsersAdministrationRedirectModalComponent>,
         private notify: NotificationService) {
     }
@@ -435,55 +429,55 @@ export class UsersAdministrationRedirectModalComponent {
     ngOnInit(): void {
 
         if (this.data.isDeletable) {
-            //get listModel
+            // get listModel
             if (this.data.redirectListModels.length > 0) {
                 this.data.inDiffListDest = true;
             }
 
-            //get listInstances
+            // get listInstances
             if (this.data.redirectListInstances.length > 0) {
                 this.data.isResDestUser = true;
             }
         } else {
-            if (this.data.userDestRedirect.mode == 'delete') {
+            if (this.data.userDestRedirect.mode === 'delete') {
                 this.modalTitle = this.lang.unableToDelete;
             } else {
                 this.modalTitle = this.lang.unableToSuspend;
             }
-            //get listModel
+            // get listModel
             if (this.data.listTemplateEntities.length > 0) {
                 this.data.inTemplateList = true;
             }
 
-            //get listInstances
+            // get listInstances
             if (this.data.listInstanceEntities.length > 0) {
                 this.data.inInstanceList = true;
             }
         }
     }
 
-    setRedirectUserListModels(index:number, user: any) {
-        if(this.data.userDestRedirect.user_id != user.id) {
+    setRedirectUserListModels(index: number, user: any) {
+        if (this.data.userDestRedirect.user_id != user.id) {
             this.data.redirectListModels[index].redirectUserId = user.id;
         } else {
             this.data.redirectListModels[index].redirectUserId = null;
             this.notify.error(this.lang.userUnauthorized);
         }
-        
+
     }
 
     setRedirectUserRes(user: any) {
-        if(this.data.userDestRedirect.user_id != user.id) {
+        if (this.data.userDestRedirect.user_id != user.id) {
             this.data.redirectDestResUserId = user.id;
         } else {
             this.data.redirectDestResUserId = null;
             this.notify.error(this.lang.userUnauthorized);
         }
-        
+
     }
 
     sendFunction() {
-        var valid = true;
+        let valid = true;
 
         if (this.data.inDiffListDest) {
             this.data.redirectListModels.forEach((element: any) => {

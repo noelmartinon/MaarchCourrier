@@ -1648,4 +1648,7 @@ export const LANG_NL = {
     "reconcileMsg": "The mails will be converted into <b>signed version</b> and linked to selected new mail.", //_TO_TRANSLATE
     "reconcileMsg2": "If an <b>outgoing mail</b> is selected, only the <b>last mail</b> will be converted into signed version. The others will be <b>removed</b> !", //_TO_TRANSLATE
     "selectMailToReconcile": "Please, select a mail to reconcile", //_TO_TRANSLATE
+    "forgotPassword": "Forgot password", //_TO_TRANSLATE
+    "wrongLoginPassword": "Wrong user name or wrong password", //_TO_TRANSLATE
+    "sessionExpired": "Session expired", //_TO_TRANSLATE
 };

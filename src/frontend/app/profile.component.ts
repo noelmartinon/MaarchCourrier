@@ -10,20 +10,19 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl, FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
 import { AppService } from '../service/app.service';
 import { FunctionsService } from '../service/functions.service';
+import { AuthService } from '../service/auth.service';
+import { Router } from '@angular/router';
 
-declare function $j(selector: any): any;
-
+declare var $: any;
 declare var tinymce: any;
-declare var angularGlobals: any;
 
 
 @Component({
-    templateUrl: "profile.component.html",
+    templateUrl: 'profile.component.html',
     styleUrls: ['profile.component.css'],
     providers: [AppService]
 })
@@ -37,9 +36,9 @@ export class ProfileComponent implements OnInit {
     };
     histories: any[] = [];
     passwordModel: any = {
-        currentPassword: "",
-        newPassword: "",
-        reNewPassword: "",
+        currentPassword: '',
+        newPassword: '',
+        reNewPassword: '',
     };
     firstFormGroup: FormGroup;
     ruleText: string = '';
@@ -56,24 +55,24 @@ export class ProfileComponent implements OnInit {
         historyLastUse: { enabled: false, value: 0 },
     };
     signatureModel: any = {
-        base64: "",
-        base64ForJs: "",
-        name: "",
-        type: "",
+        base64: '',
+        base64ForJs: '',
+        name: '',
+        type: '',
         size: 0,
-        label: "",
+        label: '',
     };
     mailSignatureModel: any = {
         selected: -1,
-        htmlBody: "",
-        title: "",
+        htmlBody: '',
+        title: '',
     };
     userAbsenceModel: any[] = [];
     basketsToRedirect: string[] = [];
 
     showPassword: boolean = false;
     selectedSignature: number = -1;
-    selectedSignatureLabel: string = "";
+    selectedSignatureLabel: string = '';
     loading: boolean = false;
     selectedIndex: number = 0;
     selectedIndexContactsGrp: number = 0;
@@ -82,7 +81,7 @@ export class ProfileComponent implements OnInit {
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    //Redirect Baskets
+    // Redirect Baskets
     selectionBaskets = new SelectionModel<Element>(true, []);
     myBasketExpansionPanel: boolean = false;
     editorsList: any;
@@ -100,7 +99,7 @@ export class ProfileComponent implements OnInit {
 
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
 
-    //Groups contacts
+    // Groups contacts
     contactsGroups: any[] = [];
     displayedColumnsGroupsList: string[] = ['label', 'description', 'nbContacts', 'public', 'actions'];
     dataSourceGroupsList: any;
@@ -112,10 +111,10 @@ export class ProfileComponent implements OnInit {
         this.dataSourceGroupsList.filter = filterValue;
     }
 
-    //Group contacts
+    // Group contacts
     contactsGroup: any = { public: false };
 
-    //Group contacts List Autocomplete
+    // Group contacts List Autocomplete
     initAutoCompleteContact = true;
 
     searchTerm: FormControl = new FormControl();
@@ -127,7 +126,7 @@ export class ProfileComponent implements OnInit {
     masterToggle(event: any) {
         if (event.checked) {
             this.dataSourceContactsListAutocomplete.data.forEach((row: any) => {
-                if (!$j("#check_" + row.id + '-input').is(":disabled")) {
+                if (!$('#check_' + row.id + '-input').is(':disabled')) {
                     this.selection.select(row.id);
                 }
             });
@@ -137,7 +136,7 @@ export class ProfileComponent implements OnInit {
     }
 
 
-    //Group contacts List
+    // Group contacts List
     contactsListMode: boolean = false;
     contactsList: any[] = [];
     displayedColumnsContactsList: string[] = ['contact', 'address', 'actions'];
@@ -150,7 +149,7 @@ export class ProfileComponent implements OnInit {
         this.dataSourceContactsList.filter = filterValue;
     }
 
-    //History
+    // History
     displayedColumns = ['event_date', 'record_id', 'info'];
     dataSource: any;
     @ViewChild('paginatorHistory', { static: false }) paginatorHistory: MatPaginator;
@@ -168,12 +167,12 @@ export class ProfileComponent implements OnInit {
         private notify: NotificationService,
         public dialog: MatDialog,
         private _formBuilder: FormBuilder,
+        private authService: AuthService,
         private headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         private functions: FunctionsService
     ) {
-        $j("link[href='merged_css.php']").remove();
         window['angularProfileComponent'] = {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
         };
@@ -181,15 +180,15 @@ export class ProfileComponent implements OnInit {
             debounceTime(500),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/contacts', { params: { "search": data } }))
+            switchMap(data => this.http.get('../../rest/autocomplete/contacts', { params: { 'search': data } }))
         ).subscribe((response: any) => {
             this.searchResult = response;
             this.dataSourceContactsListAutocomplete = new MatTableDataSource(this.searchResult);
             this.dataSourceContactsListAutocomplete.paginator = this.paginatorGroupsListAutocomplete;
-            //this.dataSource.sort      = this.sortContactList;
+            // this.dataSource.sort      = this.sortContactList;
         });
 
-        this.http.get("../../rest/documentEditors").pipe(
+        this.http.get('../../rest/documentEditors').pipe(
             tap((data: any) => {
                 this.editorsList = data;
             })
@@ -226,31 +225,31 @@ export class ProfileComponent implements OnInit {
 
     initMce() {
         tinymce.remove('textarea');
-        //LOAD EDITOR TINYMCE for MAIL SIGN
-        tinymce.baseURL = "../../node_modules/tinymce";
+        // LOAD EDITOR TINYMCE for MAIL SIGN
+        tinymce.baseURL = '../../node_modules/tinymce';
         tinymce.suffix = '.min';
         tinymce.init({
-            selector: "textarea#emailSignature",
+            selector: 'textarea#emailSignature',
             statusbar: false,
             language: this.lang.langISO.replace('-', '_'),
             language_url: `../../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
-            height: "200",
+            height: '200',
             plugins: [
-                "textcolor"
+                'textcolor'
             ],
             external_plugins: {
-                'maarch_b64image': "../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js"
+                'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
             },
             menubar: false,
-            toolbar: "undo | bold italic underline | alignleft aligncenter alignright | maarch_b64image | forecolor",
-            theme_buttons1_add: "fontselect,fontsizeselect",
-            theme_buttons2_add_before: "cut,copy,paste,pastetext,pasteword,separator,search,replace,separator",
-            theme_buttons2_add: "separator,insertdate,inserttime,preview,separator,forecolor,backcolor",
-            theme_buttons3_add_before: "tablecontrols,separator",
-            theme_buttons3_add: "separator,print,separator,ltr,rtl,separator,fullscreen,separator,insertlayer,moveforward,movebackward,absolut",
-            theme_toolbar_align: "left",
-            theme_advanced_toolbar_location: "top",
-            theme_styles: "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1"
+            toolbar: 'undo | bold italic underline | alignleft aligncenter alignright | maarch_b64image | forecolor',
+            theme_buttons1_add: 'fontselect,fontsizeselect',
+            theme_buttons2_add_before: 'cut,copy,paste,pastetext,pasteword,separator,search,replace,separator',
+            theme_buttons2_add: 'separator,insertdate,inserttime,preview,separator,forecolor,backcolor',
+            theme_buttons3_add_before: 'tablecontrols,separator',
+            theme_buttons3_add: 'separator,print,separator,ltr,rtl,separator,fullscreen,separator,insertlayer,moveforward,movebackward,absolut',
+            theme_toolbar_align: 'left',
+            theme_advanced_toolbar_location: 'top',
+            theme_styles: 'Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1'
 
         });
     }
@@ -264,7 +263,7 @@ export class ProfileComponent implements OnInit {
                 this.contactsGroup = { public: false, contacts: [] };
                 let i = 0;
                 data['contactsGroups'].forEach((ct: any) => {
-                    if (ct.owner == angularGlobals.user.id) {
+                    if (ct.owner == this.headerService.user.id) {
                         ct.position = i;
                         this.contactsGroups.push(ct);
                         i++;
@@ -284,7 +283,7 @@ export class ProfileComponent implements OnInit {
         this.http.post('../../rest/contactsGroups', this.contactsGroup)
             .subscribe((data: any) => {
                 this.initGroupsContact();
-                //this.toggleAddGrp();
+                // this.toggleAddGrp();
                 this.notify.success(this.lang.contactsGroupAdded);
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -366,7 +365,7 @@ export class ProfileComponent implements OnInit {
     }
 
     removeContact(contact: any, row: any) {
-        this.http.delete("../../rest/contactsGroups/" + this.contactsGroup.id + "/contacts/" + contact['id'])
+        this.http.delete('../../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
             .subscribe(() => {
                 var lastElement = this.contactsGroup.contacts.length - 1;
                 this.contactsGroup.contacts[row] = this.contactsGroup.contacts[lastElement];
@@ -400,7 +399,7 @@ export class ProfileComponent implements OnInit {
     }
 
     selectContact(id: any) {
-        if (!$j("#check_" + id + '-input').is(":disabled")) {
+        if (!$('#check_' + id + '-input').is(':disabled')) {
             this.selection.toggle(id);
         }
     }
@@ -433,16 +432,16 @@ export class ProfileComponent implements OnInit {
 
     resfreshUpload(b64Content: any) {
         if (this.signatureModel.size <= 2000000) {
-            this.signatureModel.base64 = b64Content.replace(/^data:.*?;base64,/, "");
+            this.signatureModel.base64 = b64Content.replace(/^data:.*?;base64,/, '');
             this.signatureModel.base64ForJs = b64Content;
         } else {
-            this.signatureModel.name = "";
+            this.signatureModel.name = '';
             this.signatureModel.size = 0;
-            this.signatureModel.type = "";
-            this.signatureModel.base64 = "";
-            this.signatureModel.base64ForJs = "";
+            this.signatureModel.type = '';
+            this.signatureModel.base64 = '';
+            this.signatureModel.base64ForJs = '';
 
-            this.notify.error("Taille maximum de fichier dépassée (2 MB)");
+            this.notify.error('Taille maximum de fichier dépassée (2 MB)');
         }
     }
 
@@ -451,7 +450,7 @@ export class ProfileComponent implements OnInit {
     }
 
     clickOnUploader(id: string) {
-        $j('#' + id).click();
+        $('#' + id).click();
     }
 
     uploadSignatureTrigger(fileInput: any) {
@@ -461,7 +460,7 @@ export class ProfileComponent implements OnInit {
             this.signatureModel.name = fileInput.target.files[0].name;
             this.signatureModel.size = fileInput.target.files[0].size;
             this.signatureModel.type = fileInput.target.files[0].type;
-            if (this.signatureModel.label == "") {
+            if (this.signatureModel.label == '') {
                 this.signatureModel.label = this.signatureModel.name;
             }
 
@@ -482,7 +481,7 @@ export class ProfileComponent implements OnInit {
             this.signatureModel.name = event.mouseEvent.dataTransfer.files[0].name;
             this.signatureModel.size = event.mouseEvent.dataTransfer.files[0].size;
             this.signatureModel.type = event.mouseEvent.dataTransfer.files[0].type;
-            if (this.signatureModel.label == "") {
+            if (this.signatureModel.label == '') {
                 this.signatureModel.label = this.signatureModel.name;
             }
 
@@ -510,8 +509,8 @@ export class ProfileComponent implements OnInit {
     resetEmailSignature() {
         this.mailSignatureModel.selected = -1;
 
-        tinymce.get('emailSignature').setContent("");
-        this.mailSignatureModel.title = "";
+        tinymce.get('emailSignature').setContent('');
+        this.mailSignatureModel.title = '';
 
     }
 
@@ -532,10 +531,10 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post("../../rest/users/" + this.user.id + "/redirectedBaskets", basketsRedirect)
+            this.http.post('../../rest/users/' + this.user.id + '/redirectedBaskets', basketsRedirect)
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
-                    this.user.redirectedBaskets = data["redirectedBaskets"];
+                    this.user.baskets = data['baskets'];
+                    this.user.redirectedBaskets = data['redirectedBaskets'];
                     this.selectionBaskets.clear();
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -548,9 +547,9 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete("../../rest/users/" + this.user.id + "/redirectedBaskets?redirectedBasketIds[]=" + basket.id)
+            this.http.delete('../../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
+                    this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets.splice(i, 1);
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -563,9 +562,9 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete("../../rest/users/" + this.user.id + "/redirectedBaskets?redirectedBasketIds[]=" + basket.id)
+            this.http.delete('../../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
+                    this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -578,16 +577,16 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post("../../rest/users/" + this.user.id + "/redirectedBaskets", [
+            this.http.post('../../rest/users/' + this.user.id + '/redirectedBaskets', [
                 {
-                    "actual_user_id": newUser.serialId,
-                    "basket_id": basket.basket_id,
-                    "group_id": basket.group_id,
-                    "originalOwner": basket.owner_user_id,
+                    'actual_user_id': newUser.serialId,
+                    'basket_id': basket.basket_id,
+                    'group_id': basket.group_id,
+                    'originalOwner': basket.owner_user_id,
                 }
             ])
                 .subscribe((data: any) => {
-                    this.user.baskets = data["baskets"];
+                    this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
                     this.notify.success(this.lang.basketUpdated);
                 }, (err) => {
@@ -597,7 +596,7 @@ export class ProfileComponent implements OnInit {
     }
 
     updateBasketColor(i: number, y: number) {
-        this.http.put("../../rest/currentUser/groups/" + this.user.regroupedBaskets[i].groupSerialId + "/baskets/" + this.user.regroupedBaskets[i].baskets[y].basket_id, { "color": this.user.regroupedBaskets[i].baskets[y].color })
+        this.http.put('../../rest/currentUser/groups/' + this.user.regroupedBaskets[i].groupSerialId + '/baskets/' + this.user.regroupedBaskets[i].baskets[y].basket_id, { 'color': this.user.regroupedBaskets[i].baskets[y].color })
             .subscribe((data: any) => {
                 this.user.regroupedBaskets = data.userBaskets;
                 this.notify.success(this.lang.modificationSaved);
@@ -610,9 +609,9 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmToBeAbsent);
 
         if (r) {
-            this.http.put('../../rest/users/' + this.user.id + '/status', { "status": "ABS" })
+            this.http.put('../../rest/users/' + this.user.id + '/status', { 'status': 'ABS' })
                 .subscribe(() => {
-                    location.search = "?display=true&page=logout&logout=true";
+                    this.authService.logout();
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -641,9 +640,9 @@ export class ProfileComponent implements OnInit {
             .subscribe((data: any) => {
                 this.showPassword = false;
                 this.passwordModel = {
-                    currentPassword: "",
-                    newPassword: "",
-                    reNewPassword: "",
+                    currentPassword: '',
+                    newPassword: '',
+                    reNewPassword: '',
                 };
                 this.notify.success(this.lang.passwordUpdated);
             }, (err) => {
@@ -662,10 +661,10 @@ export class ProfileComponent implements OnInit {
                     this.user.emailSignatures = data.emailSignatures;
                     this.mailSignatureModel = {
                         selected: -1,
-                        htmlBody: "",
-                        title: "",
+                        htmlBody: '',
+                        title: '',
                     };
-                    tinymce.get('emailSignature').setContent("");
+                    tinymce.get('emailSignature').setContent('');
                     this.notify.success(this.lang.emailSignatureAdded);
                 }
             });
@@ -701,10 +700,10 @@ export class ProfileComponent implements OnInit {
                         this.user.emailSignatures = data.emailSignatures;
                         this.mailSignatureModel = {
                             selected: -1,
-                            htmlBody: "",
-                            title: "",
+                            htmlBody: '',
+                            title: '',
                         };
-                        tinymce.get('emailSignature').setContent("");
+                        tinymce.get('emailSignature').setContent('');
                         this.notify.success(this.lang.emailSignatureDeleted);
                     }
                 });
@@ -712,16 +711,16 @@ export class ProfileComponent implements OnInit {
     }
 
     submitSignature() {
-        this.http.post("../../rest/users/" + this.user.id + "/signatures", this.signatureModel)
+        this.http.post('../../rest/users/' + this.user.id + '/signatures', this.signatureModel)
             .subscribe((data: any) => {
                 this.user.signatures = data.signatures;
                 this.signatureModel = {
-                    base64: "",
-                    base64ForJs: "",
-                    name: "",
-                    type: "",
+                    base64: '',
+                    base64ForJs: '',
+                    name: '',
+                    type: '',
                     size: 0,
-                    label: "",
+                    label: '',
                 };
                 this.notify.success(this.lang.signatureAdded);
             }, (err) => {
@@ -730,7 +729,7 @@ export class ProfileComponent implements OnInit {
     }
 
     updateSignature(signature: any) {
-        this.http.put("../../rest/users/" + this.user.id + "/signatures/" + signature.id, { "label": signature.signature_label })
+        this.http.put('../../rest/users/' + this.user.id + '/signatures/' + signature.id, { 'label': signature.signature_label })
             .subscribe((data: any) => {
                 this.notify.success(this.lang.signatureUpdated);
             }, (err) => {
@@ -742,7 +741,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmDeleteSignature);
 
         if (r) {
-            this.http.delete("../../rest/users/" + this.user.id + "/signatures/" + id)
+            this.http.delete('../../rest/users/' + this.user.id + '/signatures/' + id)
                 .subscribe((data: any) => {
                     this.user.signatures = data.signatures;
                     this.notify.success(this.lang.signatureDeleted);
@@ -844,7 +843,7 @@ export class ProfileComponent implements OnInit {
                 });
                 this.ruleText = ruleTextArr.join(', ');
                 this.otherRuleText = otherRuleTextArr.join('<br/>');
-                this.firstFormGroup.controls["newPasswordCtrl"].setValidators(valArr);
+                this.firstFormGroup.controls['newPasswordCtrl'].setValidators(valArr);
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -912,21 +911,21 @@ export class ProfileComponent implements OnInit {
     }
 
     showActions(basket: any) {
-        $j('#' + basket.basket_id + '_' + basket.group_id).show();
+        $('#' + basket.basket_id + '_' + basket.group_id).show();
     }
 
     hideActions(basket: any) {
-        $j('#' + basket.basket_id + '_' + basket.group_id).hide();
+        $('#' + basket.basket_id + '_' + basket.group_id).hide();
     }
 
     toggleAddGrp() {
         this.initGroupsContact();
-        $j('#contactsGroupFormUp').toggle();
-        $j('#contactsGroupList').toggle();
+        $('#contactsGroupFormUp').toggle();
+        $('#contactsGroupList').toggle();
     }
     toggleAddContactGrp() {
-        $j('#contactsGroupFormAdd').toggle();
-        //$j('#contactsGroup').toggle();
+        $('#contactsGroupFormAdd').toggle();
+        // $('#contactsGroup').toggle();
     }
 
     changeTabContactGrp(event: any) {

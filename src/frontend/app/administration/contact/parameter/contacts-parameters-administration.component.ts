@@ -2,16 +2,14 @@ import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@an
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
-import { HeaderService }        from '../../../../service/header.service';
+import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl: "contacts-parameters-administration.component.html",
+    templateUrl: 'contacts-parameters-administration.component.html',
     styleUrls: ['contacts-parameters-administration.component.scss'],
     providers: [AppService]
 })
@@ -21,29 +19,29 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
     lang: any = LANG;
 
-    subMenus:any [] = [
+    subMenus: any[] = [
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label : this.lang.contactsList,
+            label: this.lang.contactsList,
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label : this.lang.customFieldsAdmin,
+            label: this.lang.customFieldsAdmin,
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label : this.lang.contactsParameters,
+            label: this.lang.contactsParameters,
             current: true
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label : this.lang.contactsGroups,
+            label: this.lang.contactsGroups,
             current: false
         },
     ];
@@ -72,13 +70,11 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        private viewContainerRef: ViewContainerRef) {
-            $j("link[href='merged_css.php']").remove();
-    }
+        private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {
 
@@ -114,7 +110,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         if (this.contactsFilling.first_threshold >= this.contactsFilling.second_threshold) {
             this.contactsFilling.second_threshold = this.contactsFilling.first_threshold + 1;
         }
-        this.http.put('../../rest/contactsParameters', {'contactsFilling': this.contactsFilling, 'contactsParameters': this.contactsParameters})
+        this.http.put('../../rest/contactsParameters', { 'contactsFilling': this.contactsFilling, 'contactsParameters': this.contactsParameters })
             .subscribe(() => {
                 this.notify.success(this.lang.parameterUpdated);
 
@@ -124,7 +120,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     }
 
     toggleFillingContact() {
-        this.contactsFilling.enable == true ? this.contactsFilling.enable = false : this.contactsFilling.enable = true;
+        this.contactsFilling.enable === true ? this.contactsFilling.enable = false : this.contactsFilling.enable = true;
         this.onSubmit();
     }
 }

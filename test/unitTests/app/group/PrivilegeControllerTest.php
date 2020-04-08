@@ -106,8 +106,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsString($responseBody->errors);
         $this->assertSame('Route privilegeId is empty or not an integer', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $privilegeController->addPrivilege($request, new \Slim\Http\Response(), $args);
@@ -116,8 +116,8 @@ class PrivilegeControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -191,8 +191,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsString($responseBody->errors);
         $this->assertSame('Route privilegeId is empty or not an integer', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $privilegeController->updateParameters($request, new \Slim\Http\Response(), $args);
@@ -201,8 +201,8 @@ class PrivilegeControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -295,8 +295,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertSame(1, count($response));
         $this->assertSame('ALL_PRIVILEGES', $response[0]);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::getPrivilegesByUser(['userId' => $GLOBALS['id']]);
@@ -304,8 +304,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsArray($response);
         $this->assertNotContains('ALL_PRIVILEGES', $response);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -318,8 +318,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsArray($response);
         $this->assertEmpty($response);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::getAssignableGroups(['userId' => $GLOBALS['id']]);
@@ -327,8 +327,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsArray($response);
         $this->assertNotEmpty($response);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -341,8 +341,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsBool($response);
         $this->assertSame(true, $response);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::canAssignGroup(['userId' => $GLOBALS['id'], 'groupId' => self::$id]);
@@ -350,15 +350,15 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsBool($response);
         $this->assertSame(false, $response);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testIsResourceInProcess()
     {
-        $GLOBALS['userId'] = 'cchaplin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'cchaplin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $resController = new \Resource\controllers\ResController();
@@ -404,8 +404,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsBool($response);
         $this->assertSame(false, $response);
 
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => self::$resId]);
@@ -413,8 +413,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsBool($response);
         $this->assertSame(true, $response);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => self::$resId]);
@@ -425,8 +425,8 @@ class PrivilegeControllerTest extends TestCase
 
     public function testCanUpdateResource()
     {
-        $GLOBALS['userId'] = 'cchaplin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'cchaplin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $privilegeController = new \Group\controllers\PrivilegeController();
@@ -436,8 +436,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsBool($response);
         $this->assertSame(false, $response);
 
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::canUpdateResource(['userId' => $GLOBALS['id'], 'resId' => self::$resId]);
@@ -445,8 +445,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsBool($response);
         $this->assertSame(false, $response);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response = $privilegeController::canUpdateResource(['userId' => $GLOBALS['id'], 'resId' => self::$resId]);
@@ -522,8 +522,8 @@ class PrivilegeControllerTest extends TestCase
         $this->assertIsString($responseBody->errors);
         $this->assertSame('Route privilegeId is empty or not an integer', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $privilegeController->removePrivilege($request, new \Slim\Http\Response(), $args);
@@ -532,8 +532,8 @@ class PrivilegeControllerTest extends TestCase
 
         $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 

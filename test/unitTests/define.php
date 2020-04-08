@@ -9,8 +9,8 @@
 
 require_once 'vendor/autoload.php';
 
-$userId = 'superadmin';
-$userInfo = \User\models\UserModel::getByLogin(['login' => $userId, 'select' => ['id']]);
+$login = 'superadmin';
+$userInfo = \User\models\UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
 $id = $userInfo['id'];
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 

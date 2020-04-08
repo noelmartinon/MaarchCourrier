@@ -23,8 +23,8 @@ class FolderControllerTest extends TestCase
 
     public function testCreate()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -97,15 +97,15 @@ class FolderControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Parent Folder not found or out of your perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testUpdate()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -185,15 +185,15 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame('Folder not found or out of your perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testSharing()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -227,8 +227,8 @@ class FolderControllerTest extends TestCase
         $this->assertSame('Body sharing/entities does not exists', $responseBody->errors);
 
         //  Success
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         // Test bblier cannot get folder
@@ -239,8 +239,8 @@ class FolderControllerTest extends TestCase
 
 
         // share folder with entity 13, which bblier is part of
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $body = [
@@ -261,8 +261,8 @@ class FolderControllerTest extends TestCase
         $this->assertSame(204, $response->getStatusCode());
 
         // check that bblier can now get folder
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $folderController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
@@ -277,8 +277,8 @@ class FolderControllerTest extends TestCase
 
 
         // Set different sharing for sub-folder
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $body = [
@@ -303,8 +303,8 @@ class FolderControllerTest extends TestCase
         $this->assertSame(204, $response->getStatusCode());
 
         // test that bblier can get sub-folder, but that he cannot edit/delete it
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $folderController->getById($request, new \Slim\Http\Response(), ['id' => self::$idSub]);
@@ -337,33 +337,6 @@ class FolderControllerTest extends TestCase
 
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Cannot share/unshare folder because at least one folder is out of your perimeter', $responseBody['errors']);
-
-        // test sharing with keyword
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-
-        $body = [
-            'public' => true,
-            'sharing' => [
-                'entities' => [
-                    [
-                        'keyword' => 'ALL_ENTITIES',
-                        'edition' => true
-                    ]
-                ]
-            ]
-        ];
-
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response     = $folderController->sharing($fullRequest, new \Slim\Http\Response(), ['id' => self::$idSub]);
-        $this->assertSame(204, $response->getStatusCode());
-
-        // bblier can pin folder
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $folderController->pinFolder($request, new \Slim\Http\Response(), ['id' => self::$id]);
         $this->assertSame(204, $response->getStatusCode());
@@ -400,14 +373,14 @@ class FolderControllerTest extends TestCase
         $this->assertSame(false, $responseBody['folder']['sharing']['entities'][0]['canDelete']);
 
         // test that bblier cannot share sub-folder
-        $response     = $folderController->getById($request, new \Slim\Http\Response(), ['id' => self::$idSub]);
+        $response     = $folderController->sharing($fullRequest, new \Slim\Http\Response(), ['id' => self::$idSub]);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Folder not found or out of your perimeter', $responseBody['errors']);
+        $this->assertSame('Cannot share/unshare folder because at least one folder is out of your perimeter', $responseBody['errors']);
 
         // test sub-folder creation, with keeping sharing rules from parent
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $body = [
@@ -426,9 +399,9 @@ class FolderControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertNotEmpty($responseBody['folder']['sharing']['entities']);
-        $this->assertSame(14, $responseBody['folder']['sharing']['entities'][0]['entity_id']);
-        $this->assertSame(true, $responseBody['folder']['sharing']['entities'][0]['edition']);
-        $this->assertSame(true, $responseBody['folder']['sharing']['entities'][0]['canDelete']);
+        $this->assertSame(13, $responseBody['folder']['sharing']['entities'][0]['entity_id']);
+        $this->assertSame(false, $responseBody['folder']['sharing']['entities'][0]['edition']);
+        $this->assertSame(false, $responseBody['folder']['sharing']['entities'][0]['canDelete']);
 
         // Make the folder private for next tests
         $body = [
@@ -444,15 +417,15 @@ class FolderControllerTest extends TestCase
         $response     = $folderController->sharing($fullRequest, new \Slim\Http\Response(), ['id' => self::$idSubSub]);
         $this->assertSame(204, $response->getStatusCode());
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testUpdateMoveToFolder()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -474,8 +447,8 @@ class FolderControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $this->assertSame('parent_id does not exist or Id is a parent of parent_id', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $body = [
@@ -502,8 +475,8 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame('Cannot move folder because at least one folder is out of your perimeter', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $body = [
@@ -529,15 +502,15 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode(), true);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetById()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -564,15 +537,15 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame('Folder not found or out of your perimeter', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGet()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -599,8 +572,8 @@ class FolderControllerTest extends TestCase
             $this->assertIsInt($value->countResources);
         }
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $response     = $folderController->get($request, new \Slim\Http\Response());
@@ -611,8 +584,8 @@ class FolderControllerTest extends TestCase
 
     public function testUnpinFolder()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -652,15 +625,15 @@ class FolderControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $this->assertSame('Route id not found or is not an integer', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testPinFolder()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -700,15 +673,15 @@ class FolderControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $this->assertSame('Route id not found or is not an integer', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetPinned()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -735,8 +708,8 @@ class FolderControllerTest extends TestCase
             $this->assertIsInt($value->countResources);
         }
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
@@ -744,8 +717,8 @@ class FolderControllerTest extends TestCase
     {
         // Create resources to add to folder
 
-        $GLOBALS['userId'] = 'cchaplin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'cchaplin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $resController = new \Resource\controllers\ResController();
@@ -826,8 +799,8 @@ class FolderControllerTest extends TestCase
         $this->assertIsInt(self::$idFirstResource);
 
         // Actual test
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -885,15 +858,15 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame('Resources out of perimeter', $responseBody['errors']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetResourceById()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -949,15 +922,15 @@ class FolderControllerTest extends TestCase
         $this->assertIsArray($responseBody['resources'][0]['display']);
         $this->assertEmpty($responseBody['resources'][0]['display']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetBaskets()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -995,24 +968,24 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame(2, $responseBody['groupsBaskets'][0]['groupId']);
         $this->assertSame('Utilisateur', $responseBody['groupsBaskets'][0]['groupName']);
-        $this->assertSame(4, $responseBody['groupsBaskets'][0]['basketId']);
-        $this->assertSame('Courriers à traiter', $responseBody['groupsBaskets'][0]['basketName']);
+        $this->assertSame(6, $responseBody['groupsBaskets'][0]['basketId']);
+        $this->assertSame('AR en masse : non envoyés', $responseBody['groupsBaskets'][0]['basketName']);
 
 
         $this->assertSame(2, $responseBody['groupsBaskets'][1]['groupId']);
         $this->assertSame('Utilisateur', $responseBody['groupsBaskets'][1]['groupName']);
-        $this->assertSame(6, $responseBody['groupsBaskets'][1]['basketId']);
-        $this->assertSame('AR en masse : non envoyés', $responseBody['groupsBaskets'][1]['basketName']);
+        $this->assertSame(4, $responseBody['groupsBaskets'][1]['basketId']);
+        $this->assertSame('Courriers à traiter', $responseBody['groupsBaskets'][1]['basketName']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetFilters()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -1091,15 +1064,15 @@ class FolderControllerTest extends TestCase
         $this->assertIsArray($responseBody['folders']);
         $this->assertEmpty($responseBody['folders']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testRemoveResourcesById()
     {
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -1147,15 +1120,15 @@ class FolderControllerTest extends TestCase
         $this->assertIsInt($responseBody['countResources']);
         $this->assertSame(1, $responseBody['countResources']);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDelete()
     {
-        $GLOBALS['userId'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         $folderController = new \Folder\controllers\FolderController();
@@ -1176,8 +1149,8 @@ class FolderControllerTest extends TestCase
 
         $this->assertSame('Query id is empty or not an integer', $responseBody->errors);
 
-        $GLOBALS['userId'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'aackermann';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
         //  DELETE
@@ -1211,8 +1184,8 @@ class FolderControllerTest extends TestCase
         $this->assertIsArray($res);
         $this->assertEmpty($res);
 
-        $GLOBALS['userId'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
     }
 }

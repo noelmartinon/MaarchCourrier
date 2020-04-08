@@ -25,10 +25,10 @@ export class HeaderService {
         basketId: ''
     };
     folderId: number = 0;
-    headerMessageIcon: string = "";
-    headerMessage: string = "";
-    subHeaderMessage: string = "";
-    user: any = { firstname: "", lastname: "", groups: [], privileges: [] };
+    headerMessageIcon: string = '';
+    headerMessage: string = '';
+    subHeaderMessage: string = '';
+    user: any = { firstname: '', lastname: '', groups: [], privileges: [] };
     lang: any = LANG;
     nbResourcesFollowed: number = 0;
     base64: string = null;
@@ -83,7 +83,7 @@ export class HeaderService {
 
     }
 
-    setUser(user: any) {
+    setUser(user: any = { firstname: '', lastname: '', groups: [], privileges: [] }) {
         this.user = user;
     }
 

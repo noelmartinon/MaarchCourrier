@@ -8,15 +8,13 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
-
-declare function $j(selector: any): any;
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
-    templateUrl: "custom-fields-administration.component.html",
+    templateUrl: 'custom-fields-administration.component.html',
     styleUrls: [
-        'custom-fields-administration.component.scss', 
+        'custom-fields-administration.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
     providers: [AppService, SortPipe]
@@ -65,7 +63,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     incrementCreation: number = 1;
 
-    sampleIncrement: number[] = [1,2,3,4];
+    sampleIncrement: number[] = [1, 2, 3, 4];
 
 
     dialogRef: MatDialogRef<any>;
@@ -83,15 +81,15 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFieldsAdmin);
-        
-        this.http.get("../../rest/customFields").pipe(
+
+        this.http.get('../../rest/customFields').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
                     element.values = element.values.map((info: any) => {
                         return {
                             label: info
-                        }
+                        };
                     });
 
                 });
@@ -122,11 +120,11 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     label: this.lang.newField + ' ' + this.incrementCreation,
                     type: customFieldType.type,
                     values: []
-                }
+                };
             }),
             exhaustMap((data) => this.http.post('../../rest/customFields', newCustomField)),
             tap((data: any) => {
-                newCustomField.id = data.customFieldId
+                newCustomField.id = data.customFieldId;
                 this.customFields.push(newCustomField);
                 this.notify.success(this.lang.customFieldAdded);
                 this.incrementCreation++;
@@ -169,14 +167,14 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     updateCustomField(customField: any, indexCustom: number) {
 
-        customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) == i);
+        customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
 
         // TO FIX DATA BINDING SIMPLE ARRAY VALUES
         const customFieldToUpdate = { ...customField };
-        
-        customFieldToUpdate.values = customField.values.map((data: any) => data.label)
 
-        const alreadyExists = this.customFields.filter(customField => customField.label == customFieldToUpdate.label );
+        customFieldToUpdate.values = customField.values.map((data: any) => data.label);
+
+        const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
         if (alreadyExists.length > 1) {
             this.notify.handleErrors(this.lang.customFieldAlreadyExists);
             return of(false);

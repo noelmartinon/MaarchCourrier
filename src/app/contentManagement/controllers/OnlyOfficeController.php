@@ -59,8 +59,22 @@ class OnlyOfficeController
         }
 
         if ($body['objectType'] == 'templateCreation') {
+            $customId = CoreConfigModel::getCustomId();
+            if (!empty($customId) && is_dir("custom/{$customId}/modules/templates/templates/styles/")) {
+                $stylesPath = "custom/{$customId}/modules/templates/templates/styles/";
+            } else {
+                $stylesPath = 'modules/templates/templates/styles/';
+            }
+            if (strpos($body['objectId'], $stylesPath) !== 0 || substr_count($body['objectId'], '.') != 1) {
+                return $response->withStatus(400)->withJson(['errors' => 'Template path is not valid']);
+            }
+
             $path = $body['objectId'];
-            $fileContent = file_get_contents($path);
+            
+            $fileContent = @file_get_contents($path);
+            if ($fileContent == false) {
+                return $response->withStatus(400)->withJson(['errors' => 'No content found']);
+            }
         } elseif ($body['objectType'] == 'templateModification') {
             $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
             $template = TemplateModel::getById(['id' => $body['objectId'], 'select' => ['template_path', 'template_file_name']]);
@@ -210,7 +224,7 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Netcat command not found', 'lang' => 'preRequisiteMissing']);
         }
 
-        $isAvailable = strpos($exec, 'succeeded!') !== false || strpos($exec, 'open') !== false;
+        $isAvailable = strpos($exec, 'succeeded!') !== false || strpos($exec, 'open') !== false || strpos($exec, 'Connected') !== false;
 
         return $response->withJson(['isAvailable' => $isAvailable]);
     }

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'header-panel',
     styleUrls: ['header-panel.component.scss'],
-    templateUrl: "header-panel.component.html",
+    templateUrl: 'header-panel.component.html',
 })
 export class HeaderPanelComponent implements OnInit {
 
@@ -20,8 +20,8 @@ export class HeaderPanelComponent implements OnInit {
     config: any = {};
 
 
-    @Input('navButton') navButton: any = null;
-    @Input('snavLeft') snavLeft: MatSidenav;
+    @Input() navButton: any = null;
+    @Input() snavLeft: MatSidenav;
 
     constructor(
         public headerService: HeaderService,
@@ -42,6 +42,6 @@ export class HeaderPanelComponent implements OnInit {
     }
 
     goToHome() {
-        this.router.navigate(['#']);
+        this.router.navigate(['/home']);
     }
 }

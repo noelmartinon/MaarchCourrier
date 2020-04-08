@@ -35,7 +35,7 @@ class HomeController
         $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['preferences', 'external_id']]);
 
         $redirectedBaskets = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $GLOBALS['id']]);
-        $groups = UserModel::getGroupsByLogin(['login' => $GLOBALS['userId']]);
+        $groups = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
 
         $preferences = json_decode($user['preferences'], true);
         if (!empty($preferences['homeGroups'])) {
@@ -146,7 +146,7 @@ class HomeController
                 'res_letterbox.filename'
             ],
             'limit'     => 5,
-            'userId'    => $GLOBALS['userId']
+            'userId'    => $GLOBALS['login']
         ]);
 
         if (!empty($lastResources)) {
@@ -168,7 +168,7 @@ class HomeController
 
     public function getMaarchParapheurDocuments(Request $request, Response $response)
     {
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['external_id']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id']]);
 
         $externalId = json_decode($user['external_id'], true);
         if (empty($externalId['maarchParapheur'])) {

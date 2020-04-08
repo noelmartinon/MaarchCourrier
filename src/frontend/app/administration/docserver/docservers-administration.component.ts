@@ -7,41 +7,37 @@ import { MatSort } from '@angular/material/sort';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 
-declare function $j(selector: any): any;
-
 @Component({
-    templateUrl : "docservers-administration.component.html",
-    providers   : [AppService]
+    templateUrl: 'docservers-administration.component.html',
+    providers: [AppService]
 })
 
 export class DocserversAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang                : any = LANG;
-    loading             : boolean = false;
-    dataSource          : any;
+    lang: any = LANG;
+    loading: boolean = false;
+    dataSource: any;
 
-    docservers          : any = [];
-    docserversClone     : any = [];
-    docserversTypes     : any = {};
+    docservers: any = [];
+    docserversClone: any = [];
+    docserversTypes: any = {};
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
-    
+
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-    }
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.docservers);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -67,13 +63,13 @@ export class DocserversAdministrationComponent implements OnInit {
     checkModif(docserver: any, docserversClone: any) {
         docserver.size_limit_number = docserver.limitSizeFormatted * 1000000000;
         if (JSON.stringify(docserver) === JSON.stringify(docserversClone)) {
-            return true 
+            return true;
         } else {
-            if (docserver.size_limit_number >= docserver.actual_size_number && docserver.limitSizeFormatted > 0 && /^[\d]*$/.test(docserver.limitSizeFormatted) ) {
+            if (docserver.size_limit_number >= docserver.actual_size_number && docserver.limitSizeFormatted > 0 && /^[\d]*$/.test(docserver.limitSizeFormatted)) {
                 return false;
             } else {
                 return true;
-            } 
+            }
         }
     }
 
@@ -91,20 +87,20 @@ export class DocserversAdministrationComponent implements OnInit {
 
     delete(docserver: any, i: number) {
         let r = null;
-        if (docserver.actual_size_number == 0) {
-            r = confirm(this.lang.delete+' ?');
+        if (docserver.actual_size_number === 0) {
+            r = confirm(this.lang.delete + ' ?');
         } else {
-            r = confirm(this.lang.docserverdeleteWarning);     
+            r = confirm(this.lang.docserverdeleteWarning);
         }
-        
+
         if (r) {
-            this.http.delete('../../rest/docservers/'+docserver.id)
-            .subscribe(() => {
-                this.docservers[docserver.docserver_type_id].splice(i, 1);
-                this.notify.success(this.lang.docserverDeleted);
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
+            this.http.delete('../../rest/docservers/' + docserver.id)
+                .subscribe(() => {
+                    this.docservers[docserver.docserver_type_id].splice(i, 1);
+                    this.notify.success(this.lang.docserverDeleted);
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
         }
     }
 }

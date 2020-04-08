@@ -65,14 +65,14 @@ class UserController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        if ($GLOBALS['userId'] == 'superadmin') {
+        if ($GLOBALS['login'] == 'superadmin') {
             $users = UserModel::get([
                 'select'    => ['id', 'user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode'],
                 'where'     => ['user_id != ?', 'status != ?'],
                 'data'      => ['superadmin', 'DEL']
             ]);
         } else {
-            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
             $users = [];
             if (!empty($entities)) {
                 $users = UserEntityModel::getWithUsers([
@@ -127,8 +127,8 @@ class UserController
 
         $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
         $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['id']]);
-        $user['entities']           = UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
-        $user['allEntities']        = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']]);
+        $user['entities']           = UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
+        $user['allEntities']        = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['login']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
         $user['redirectedBaskets']  = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
@@ -216,7 +216,7 @@ class UserController
         if (!empty($userQuota['param_value_int'])) {
             $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'user_id <> ?'], 'data' => ['OK', 'superadmin']]);
             if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
-                NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => 'superadmin', 'info' => _QUOTA_EXCEEDED]);
+                NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => $GLOBALS['id'], 'info' => _QUOTA_EXCEEDED]);
             }
         }
 
@@ -226,7 +226,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_CREATED . " {$data['userId']}"
@@ -286,14 +286,14 @@ class UserController
             if ($user['status'] == 'SPD' && $data['status'] == 'OK') {
                 $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'user_id != ?'], 'data' => ['OK', 'superadmin']]);
                 if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
-                    NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => 'superadmin', 'info' => _QUOTA_EXCEEDED]);
+                    NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => $GLOBALS['id'], 'info' => _QUOTA_EXCEEDED]);
                 }
             }
         }
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$data['firstname']} {$data['lastname']}"
@@ -316,7 +316,7 @@ class UserController
 
         $listInstanceEntities = [];
         $listInstanceResIds = [];
-        $listInstances = ListInstanceModel::getWhenOpenMailsByLogin(['select' => ['listinstance.res_id', 'res_letterbox.destination'], 'login' => $user['user_id'], 'itemMode' => 'dest']);
+        $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => ['listinstance.res_id', 'res_letterbox.destination'], 'userId' => $aArgs['id'], 'itemMode' => 'dest']);
         foreach ($listInstances as $listInstance) {
             if (!ResController::hasRightByResId(['resId' => [$listInstance['res_id']], 'userId' => $GLOBALS['id']])) {
                 $isListInstanceDeletable = false;
@@ -333,7 +333,7 @@ class UserController
             'where'     => ['item_id = ?', 'type = ?', 'item_mode = ?', 'item_type = ?', 'entity_id is not null'],
             'data'      => [$aArgs['id'], 'diffusionList', 'dest', 'user']
         ]);
-        $allEntities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+        $allEntities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
         if (!empty($allEntities)) {
             $allEntities = EntityModel::get(['select' => ['id'], 'where' => ['entity_id in (?)'], 'data' => [$allEntities]]);
             $allEntities = array_column($allEntities, 'id');
@@ -388,7 +388,7 @@ class UserController
 
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
 
-        $listInstances = ListInstanceModel::getWhenOpenMailsByLogin(['select' => [1], 'login' => $user['user_id'], 'itemMode' => 'dest']);
+        $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => [1], 'userId' => $aArgs['id'], 'itemMode' => 'dest']);
         if (!empty($listInstances)) {
             return $response->withStatus(403)->withJson(['errors' => 'User is still present in listInstances']);
         }
@@ -404,7 +404,7 @@ class UserController
 
         ListInstanceModel::delete([
             'where' => ['item_id = ?', 'difflist_type = ?', 'item_type = ?', 'item_mode != ?'],
-            'data'  => [$user['user_id'], 'entity_id', 'user_id', 'dest']
+            'data'  => [$aArgs['id'], 'entity_id', 'user_id', 'dest']
         ]);
         RedirectBasketModel::delete([
             'where' => ['owner_user_id = ? OR actual_user_id = ?'],
@@ -421,7 +421,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'DEL',
             'eventId'      => 'userSuppression',
             'info'         => _USER_SUSPENDED . " {$user['firstname']} {$user['lastname']}"
@@ -439,7 +439,7 @@ class UserController
 
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
 
-        $listInstances = ListInstanceModel::getWhenOpenMailsByLogin(['select' => [1], 'login' => $user['user_id'], 'itemMode' => 'dest']);
+        $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => [1], 'userId' => $aArgs['id'], 'itemMode' => 'dest']);
         if (!empty($listInstances)) {
             return $response->withStatus(403)->withJson(['errors' => 'User is still present in listInstances']);
         }
@@ -455,7 +455,7 @@ class UserController
 
         ListInstanceModel::delete([
             'where' => ['item_id = ?', 'difflist_type = ?', 'item_type = ?', 'item_mode != ?'],
-            'data'  => [$user['user_id'], 'entity_id', 'user_id', 'dest']
+            'data'  => [$aArgs['id'], 'entity_id', 'user_id', 'dest']
         ]);
         ListTemplateItemModel::delete([
             'where' => ['item_id = ?', 'item_type = ?'],
@@ -487,7 +487,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'DEL',
             'eventId'      => 'userSuppression',
             'info'         => _USER_DELETED . " {$user['firstname']} {$user['lastname']}"
@@ -504,7 +504,7 @@ class UserController
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
         $user['emailSignatures']    = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
         $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
-        $user['entities']           = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
+        $user['entities']           = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
         $user['redirectedBaskets']  = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
@@ -565,7 +565,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$body['firstname']} {$body['lastname']}"
@@ -601,7 +601,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['userId'],
+            'recordId'     => $GLOBALS['login'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_PREFERENCE_UPDATED . " {$user['firstname']} {$user['lastname']}"
@@ -627,7 +627,7 @@ class UserController
         }
 
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id', 'loginmode']]);
-        if ($user['loginmode'] != 'restMode' && $user['user_id'] != $GLOBALS['userId']) {
+        if ($user['loginmode'] != 'restMode' && $user['user_id'] != $GLOBALS['login']) {
             return $response->withStatus(403)->withJson(['errors' => 'Not allowed']);
         }
 
@@ -707,7 +707,7 @@ class UserController
                 ]);
                 HistoryController::add([
                     'tableName'    => 'redirected_baskets',
-                    'recordId'     => $GLOBALS['userId'],
+                    'recordId'     => $GLOBALS['login'],
                     'eventType'    => 'UP',
                     'eventId'      => 'basketRedirection',
                     'info'         => _BASKET_REDIRECTION . " {$value['basket_id']} {$value['actual_user_id']}"
@@ -726,7 +726,7 @@ class UserController
                 ]);
                 HistoryController::add([
                     'tableName'    => 'redirected_baskets',
-                    'recordId'     => $GLOBALS['userId'],
+                    'recordId'     => $GLOBALS['login'],
                     'eventType'    => 'UP',
                     'eventId'      => 'basketRedirection',
                     'info'         => _BASKET_REDIRECTION . " {$value['basket_id']} {$aArgs['id']} => {$value['actual_user_id']}"
@@ -740,7 +740,7 @@ class UserController
 
         $userBaskets = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
 
-        if ($GLOBALS['userId'] == $user['user_id']) {
+        if ($GLOBALS['login'] == $user['user_id']) {
             foreach ($userBaskets as $key => $basket) {
                 if (!$basket['allowed']) {
                     unset($userBaskets[$key]);
@@ -789,7 +789,7 @@ class UserController
 
             HistoryController::add([
                 'tableName'    => 'redirected_baskets',
-                'recordId'     => $GLOBALS['userId'],
+                'recordId'     => $GLOBALS['login'],
                 'eventType'    => 'DEL',
                 'eventId'      => 'basketRedirection',
                 'info'         => _BASKET_REDIRECTION_SUPPRESSION . " {$user['user_id']} : " . $redirectedBasket[0]['basket_id']
@@ -800,7 +800,7 @@ class UserController
 
         $userBaskets = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
 
-        if ($GLOBALS['userId'] == $user['user_id']) {
+        if ($GLOBALS['login'] == $user['user_id']) {
             foreach ($userBaskets as $key => $basket) {
                 if (!$basket['allowed']) {
                     unset($userBaskets[$key]);
@@ -1202,7 +1202,7 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
 
-        $entities = UserModel::getEntitiesById(['id' => $args['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
+        $entities = UserModel::getEntitiesById(['id' => $args['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
 
         return $response->withJson(['entities' => $entities]);
     }
@@ -1244,8 +1244,8 @@ class UserController
         ]);
 
         return $response->withJson([
-            'entities'      => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]),
-            'allEntities'   => EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']])
+            'entities'      => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]),
+            'allEntities'   => EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['login']])
         ]);
     }
 
@@ -1289,7 +1289,7 @@ class UserController
 
         UserEntityModel::updateUserPrimaryEntity(['id' => $aArgs['id'], 'entityId' => $aArgs['entityId']]);
 
-        return $response->withJson(['entities' => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']])]);
+        return $response->withJson(['entities' => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']])]);
     }
 
     public function deleteEntity(Request $request, Response $response, array $aArgs)
@@ -1315,16 +1315,17 @@ class UserController
             }
 
             if ($data['mode'] == 'reaffect') {
-                $listInstances = ListInstanceModel::getWithConfidentiality(['select' => ['listinstance.res_id'], 'entityId' => $aArgs['entityId'], 'userId' => $user['user_id']]);
+                $listInstances = ListInstanceModel::getWithConfidentiality(['select' => ['listinstance.res_id'], 'entityId' => $aArgs['entityId'], 'userId' => $aArgs['id']]);
                 $resIdsToReplace = [];
                 foreach ($listInstances as $listInstance) {
                     $resIdsToReplace[] = $listInstance['res_id'];
                 }
                 if (!empty($resIdsToReplace)) {
+                    $newUser = UserModel::getByLogin(['login' => $data['newUser'], 'select' => ['id']]);
                     ListInstanceModel::update([
-                        'set'   => ['item_id' => $data['newUser']],
+                        'set'   => ['item_id' => $newUser['id']],
                         'where' => ['res_id in (?)', 'item_id = ?', 'process_date is null'],
-                        'data'  => [$resIdsToReplace, $user['user_id']]
+                        'data'  => [$resIdsToReplace, $aArgs['id']]
                     ]);
                 }
             } else {
@@ -1337,7 +1338,7 @@ class UserController
                     $listInstanceId = ListInstanceModel::get([
                         'select'    => ['listinstance_id'],
                         'where'     => ['res_id = ?', 'item_id = ?', 'item_type = ?', 'difflist_type = ?', 'item_mode = ?', 'process_date is null'],
-                        'data'      => [$ressource['res_id'], $user['user_id'], 'user_id', 'VISA_CIRCUIT', 'sign']
+                        'data'      => [$ressource['res_id'], $aArgs['id'], 'user_id', 'VISA_CIRCUIT', 'sign']
                     ]);
 
                     if (!empty($listInstanceId)) {
@@ -1359,7 +1360,7 @@ class UserController
                     }
                 }
 
-                $listInstances = ListInstanceModel::getWithConfidentiality(['select' => ['listinstance.res_id', 'listinstance.difflist_type'], 'entityId' => $aArgs['entityId'], 'userId' => $user['user_id']]);
+                $listInstances = ListInstanceModel::getWithConfidentiality(['select' => ['listinstance.res_id', 'listinstance.difflist_type'], 'entityId' => $aArgs['entityId'], 'userId' => $aArgs['id']]);
                 $resIdsToReplace = [];
                 foreach ($listInstances as $listInstance) {
                     $resIdsToReplace[] = $listInstance['res_id'];
@@ -1368,7 +1369,7 @@ class UserController
                     ListInstanceModel::update([
                         'set'   => ['process_comment' => '[DEL] supprimé - changement d\'entité', 'process_date' => 'CURRENT_TIMESTAMP'],
                         'where' => ['res_id in (?)', 'item_id = ?'],
-                        'data'  => [$resIdsToReplace, $user['user_id']]
+                        'data'  => [$resIdsToReplace, $aArgs['id']]
                     ]);
                 }
             }
@@ -1391,8 +1392,8 @@ class UserController
         ]);
 
         return $response->withJson([
-            'entities'      => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]),
-            'allEntities'   => EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['userId']])
+            'entities'      => UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]),
+            'allEntities'   => EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['login']])
         ]);
     }
 
@@ -1407,8 +1408,7 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Entity does not exist']);
         }
 
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['user_id']]);
-        $listInstances = ListInstanceModel::getWithConfidentiality(['select' => [1], 'entityId' => $args['entityId'], 'userId' => $user['user_id']]);
+        $listInstances = ListInstanceModel::getWithConfidentiality(['select' => [1], 'entityId' => $args['entityId'], 'userId' => $args['id']]);
 
         $listTemplates = ListTemplateModel::getWithItems(['select' => [1], 'where' => ['entity_id = ?', 'item_type = ?', 'item_id = ?'], 'data' => [$entity['id'], 'user', $args['id']]]);
 
@@ -1539,7 +1539,7 @@ class UserController
     {
         $data = $request->getParams();
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
         if (isset($data['color']) && $data['color'] == '') {
             UserBasketPreferenceModel::update([
@@ -1556,7 +1556,7 @@ class UserController
         }
 
         return $response->withJson([
-            'userBaskets' => BasketModel::getRegroupedBasketsByUserId(['userId' => $GLOBALS['userId']])
+            'userBaskets' => BasketModel::getRegroupedBasketsByUserId(['userId' => $GLOBALS['login']])
         ]);
     }
 
@@ -1590,13 +1590,13 @@ class UserController
             return ['status' => 400, 'error' => 'User not found'];
         }
 
-        if (empty($args['himself']) || $GLOBALS['userId'] != $user['user_id']) {
+        if (empty($args['himself']) || $GLOBALS['login'] != $user['user_id']) {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']])) {
                 return ['status' => 403, 'error' => 'Service forbidden'];
             }
-            if ($GLOBALS['userId'] != 'superadmin') {
+            if ($GLOBALS['login'] != 'superadmin') {
                 $users = [];
-                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['userId']]);
+                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
                 if (!empty($entities)) {
                     $users = UserEntityModel::getWithUsers([
                         'select'    => ['users.id'],
@@ -1616,7 +1616,7 @@ class UserController
                     return ['status' => 403, 'error' => 'UserId out of perimeter'];
                 }
             }
-        } elseif ($args['delete'] && $GLOBALS['userId'] == $user['user_id']) {
+        } elseif ($args['delete'] && $GLOBALS['login'] == $user['user_id']) {
             return ['status' => 403, 'error' => 'Can not delete yourself'];
         }
 
@@ -1648,7 +1648,7 @@ class UserController
         }
 
         $GLOBALS['id'] = $user['id'];
-        $GLOBALS['userId'] = $body['login'];
+        $GLOBALS['login'] = $body['login'];
 
         $resetToken = AuthenticationController::getResetJWT(['id' => $user['id'], 'expirationTime' => 3600]); // 1 hour
         UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$user['id']]]);
@@ -1721,7 +1721,7 @@ class UserController
         UserModel::resetPassword(['password' => $body['password'], 'id'  => $user['id']]);
 
         $GLOBALS['id'] = $user['id'];
-        $GLOBALS['userId'] = $user['user_id'];
+        $GLOBALS['login'] = $user['user_id'];
 
         HistoryController::add([
             'tableName'    => 'users',

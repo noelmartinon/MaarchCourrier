@@ -5,7 +5,6 @@ import { NotificationService } from '../../../../notification.service';
 import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../../service/app.service';
-import { Observable, of} from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
@@ -13,27 +12,28 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ContactService } from '../../../../../service/contact.service';
 import { FunctionsService } from '../../../../../service/functions.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-
-declare var angularGlobals: any;
+import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'app-contact-form',
-    templateUrl: "contacts-form.component.html",
+    templateUrl: 'contacts-form.component.html',
     styleUrls: ['contacts-form.component.scss'],
     providers: [NotificationService, AppService, ContactService],
     animations: [
         trigger('hideShow', [
             transition(
                 ':enter', [
-                    style({ height: '0px'}),
-                    animate('200ms', style({ 'height': '30px' }))
-                ]
+                style({ height: '0px' }),
+                animate('200ms', style({ 'height': '30px' }))
+            ]
             ),
             transition(
                 ':leave', [
-                    style({ height: '30px' }),
-                    animate('200ms', style({ 'height': '0px' }))
-                ]
+                style({ height: '30px' }),
+                animate('200ms', style({ 'height': '0px' }))
+            ]
             )
         ]),
     ],
@@ -51,7 +51,7 @@ export class ContactsFormComponent implements OnInit {
 
     @Output() onSubmitEvent = new EventEmitter<number>();
 
-    maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${angularGlobals.applicationVersion.split('.')[0] + '.' + angularGlobals.applicationVersion.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
+    maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
 
     contactUnit = [
         {
@@ -316,17 +316,17 @@ export class ContactsFormComponent implements OnInit {
 
             this.creationMode = true;
 
-            this.http.get("../../rest/contactsParameters").pipe(
+            this.http.get('../../rest/contactsParameters').pipe(
                 tap((data: any) => {
                     this.fillingParameters = data.contactsFilling;
                     this.initElemForm(data);
                     this.annuaryEnabled = data.annuaryEnabled;
                 }),
-                exhaustMap(() => this.http.get("../../rest/civilities")),
+                exhaustMap(() => this.http.get('../../rest/civilities')),
                 tap((data: any) => {
                     this.initCivilities(data.civilities);
                 }),
-                exhaustMap(() => this.http.get("../../rest/contactsCustomFields")),
+                exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
                 tap((data: any) => {
                     this.initCustomElementForm(data);
                     this.initAutocompleteAddressBan();
@@ -346,26 +346,26 @@ export class ContactsFormComponent implements OnInit {
                 element.display = false;
             });
 
-            this.http.get("../../rest/contactsParameters").pipe(
+            this.http.get('../../rest/contactsParameters').pipe(
                 tap((data: any) => {
                     this.fillingParameters = data.contactsFilling;
                     this.initElemForm(data);
                     this.annuaryEnabled = data.annuaryEnabled;
                 }),
-                exhaustMap(() => this.http.get("../../rest/civilities")),
+                exhaustMap(() => this.http.get('../../rest/civilities')),
                 tap((data: any) => {
                     this.initCivilities(data.civilities);
                 }),
-                exhaustMap(() => this.http.get("../../rest/contactsCustomFields")),
+                exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
                 tap((data: any) => {
                     this.initCustomElementForm(data);
                     this.initAutocompleteAddressBan();
                     this.initAutocompleteCommunicationMeans();
                     this.initAutocompleteExternalIdM2M();
                 }),
-                exhaustMap(() => this.http.get("../../rest/contacts/" + this.contactId)),
+                exhaustMap(() => this.http.get('../../rest/contacts/' + this.contactId)),
                 map((data: any) => {
-                    //data.civility = this.contactService.formatCivilityObject(data.civility);
+                    // data.civility = this.contactService.formatCivilityObject(data.civility);
                     data.fillingRate = this.contactService.formatFillingObject(data.fillingRate);
                     return data;
                 }),
@@ -438,13 +438,13 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initCivilities(civilities: any) {
-        let formatedCivilities: any[] = [];
+        const formatedCivilities: any[] = [];
 
         Object.keys(civilities).forEach(element => {
             formatedCivilities.push({
                 id: element,
                 label: civilities[element].label
-            })
+            });
         });
 
         this.contactForm.filter(contact => contact.id === 'civility')[0].values = formatedCivilities;
@@ -462,7 +462,7 @@ export class ContactsFormComponent implements OnInit {
             if (field !== undefined) {
                 field.label = element.label;
                 field.type = element.type;
-                field.values = element.values.map((value: any) => { return { id: value, label: value } });
+                field.values = element.values.map((value: any) => ({ id: value, label: value }));
                 if (element.type === 'integer') {
                     valArr.push(Validators.pattern(/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/));
                     field.control.setValidators(valArr);
@@ -478,18 +478,18 @@ export class ContactsFormComponent implements OnInit {
             indexField = this.contactForm.map(field => field.id).indexOf(element);
 
             if (!this.isEmptyValue(data[element]) && indexField > -1) {
-                if (element == 'civility') {
+                if (element === 'civility') {
                     this.contactForm[indexField].control.setValue(data[element].id);
                 } else {
                     this.contactForm[indexField].control.setValue(data[element]);
                 }
 
-                if (element == 'company' && this.isEmptyValue(this.contactForm.filter(contact => contact.id === 'lastname')[0].control.value)) {
+                if (element === 'company' && this.isEmptyValue(this.contactForm.filter(contact => contact.id === 'lastname')[0].control.value)) {
                     this.contactForm.filter(contact => contact.id === 'lastname')[0].display = false;
-                } else if (element == 'lastname' && this.isEmptyValue(this.contactForm.filter(contact => contact.id === 'company')[0].control.value)) {
+                } else if (element === 'lastname' && this.isEmptyValue(this.contactForm.filter(contact => contact.id === 'company')[0].control.value)) {
                     this.contactForm.filter(contact => contact.id === 'company')[0].display = false;
                 }
-                
+
                 this.contactForm[indexField].display = true;
             }
         });
@@ -505,7 +505,7 @@ export class ContactsFormComponent implements OnInit {
 
         if (data.externalId !== undefined) {
             Object.keys(data.externalId).forEach(id => {
-               
+
                 if (!this.isEmptyValue(data.externalId[id])) {
                     if (id === 'm2m') {
                         this.contactForm.filter(contact => contact.id === 'externalId_m2m')[0].control.setValue(data.externalId[id]);
@@ -538,7 +538,7 @@ export class ContactsFormComponent implements OnInit {
                     }
                 }
             });
-        }        
+        }
     }
 
     setContactCustomData(data: any) {
@@ -558,7 +558,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initBanSearch() {
-        this.http.get("../../rest/ban/availableDepartments").pipe(
+        this.http.get('../../rest/ban/availableDepartments').pipe(
             tap((data: any) => {
                 if (data.default !== null && data.departments.indexOf(data.default.toString()) !== - 1) {
                     this.addressBANCurrentDepartment = data.default;
@@ -579,7 +579,7 @@ export class ContactsFormComponent implements OnInit {
             if (element.control.status !== 'DISABLED' && element.control.status !== 'VALID') {
                 state = false;
             }
-            element.control.markAsTouched()
+            element.control.markAsTouched();
         });
 
         return state;
@@ -602,7 +602,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     createContact() {
-        this.http.post("../../rest/contacts", this.formatContact()).pipe(
+        this.http.post('../../rest/contacts', this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(data.id);
                 this.notify.success(this.lang.contactAdded);
@@ -610,7 +610,7 @@ export class ContactsFormComponent implements OnInit {
                     this.notify.error(data.warning);
                 }
             }),
-            //finalize(() => this.loading = false),
+            // finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -627,7 +627,7 @@ export class ContactsFormComponent implements OnInit {
                     this.notify.error(data.warning);
                 }
             }),
-            //finalize(() => this.loading = false),
+            // finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -636,7 +636,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     formatContact() {
-        let contact: any = {};
+        const contact: any = {};
         contact['customFields'] = {};
         contact['externalId'] = {};
         const regex = /customField_[.]*/g;
@@ -714,9 +714,9 @@ export class ContactsFormComponent implements OnInit {
                     if (!this.functions.empty(data[0].addressNumber) || !this.functions.empty(data[0].addressStreet) || !this.functions.empty(data[0].addressPostcode) || !this.functions.empty(data[0].addressTown) || !this.functions.empty(data[0].addressCountry)) {
                         this.companyFound = data[0];
                     }
-                    
+
                 }),
-                //finalize(() => this.loading = false),
+                // finalize(() => this.loading = false),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
                     return of(false);
@@ -743,29 +743,29 @@ export class ContactsFormComponent implements OnInit {
     }
 
     canDelete(field: any) {
-        if (field.id === "company") {
+        if (field.id === 'company') {
             const lastname = this.contactForm.filter(contact => contact.id === 'lastname')[0];
             if (lastname.display && !this.isEmptyValue(lastname.control.value)) {
-                let valArr: ValidatorFn[] = [];
+                const valArr: ValidatorFn[] = [];
                 field.control.setValidators(valArr);
                 field.required = false;
                 return true;
             } else {
-                let valArr: ValidatorFn[] = [];
+                const valArr: ValidatorFn[] = [];
                 valArr.push(Validators.required);
                 field.control.setValidators(valArr);
                 field.required = true;
                 return false;
             }
-        } else if (field.id === "lastname") {
+        } else if (field.id === 'lastname') {
             const company = this.contactForm.filter(contact => contact.id === 'company')[0];
             if (company.display && !this.isEmptyValue(company.control.value)) {
-                let valArr: ValidatorFn[] = [];
+                const valArr: ValidatorFn[] = [];
                 field.control.setValidators(valArr);
                 field.required = false;
                 return true;
             } else {
-                let valArr: ValidatorFn[] = [];
+                const valArr: ValidatorFn[] = [];
                 valArr.push(Validators.required);
                 field.control.setValidators(valArr);
                 field.required = true;
@@ -781,8 +781,8 @@ export class ContactsFormComponent implements OnInit {
     removeField(field: any) {
         field.display = !field.display;
         field.control.reset();
-        if ((field.id == 'externalId_m2m' || field.id == 'communicationMeans') && !field.display) {
-            let indexFieldAnnuaryId = this.contactForm.map(field => field.id).indexOf('externalId_m2m_annuary_id');
+        if ((field.id === 'externalId_m2m' || field.id === 'communicationMeans') && !field.display) {
+            const indexFieldAnnuaryId = this.contactForm.map(item => item.id).indexOf('externalId_m2m_annuary_id');
             if (indexFieldAnnuaryId > -1) {
                 this.contactForm.splice(indexFieldAnnuaryId, 1);
             }
@@ -793,14 +793,14 @@ export class ContactsFormComponent implements OnInit {
     initAutocompleteCommunicationMeans() {
         this.communicationMeanInfo = this.lang.autocompleteInfo;
         this.communicationMeanResult = [];
-        let indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
+        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
         this.contactForm[indexFieldCommunicationMeans].control.valueChanges
             .pipe(
                 debounceTime(300),
                 filter((value: string) => value.length > 2),
                 distinctUntilChanged(),
                 tap(() => this.communicationMeanLoading = true),
-                switchMap((data: any) => this.http.get('../../rest/autocomplete/ouM2MAnnuary', { params: { "company": data } })),
+                switchMap((data: any) => this.http.get('../../rest/autocomplete/ouM2MAnnuary', { params: { 'company': data } })),
                 tap((data: any) => {
                     if (this.isEmptyValue(data)) {
                         this.communicationMeanInfo = this.lang.noAvailableValue;
@@ -820,28 +820,28 @@ export class ContactsFormComponent implements OnInit {
     }
 
     selectCommunicationMean(ev: any) {
-        let indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
+        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
         this.contactForm[indexFieldCommunicationMeans].control.setValue(ev.option.value.communicationValue);
-        
-        let indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
+
+        const indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
         this.contactForm[indexFieldExternalId].control.setValue(ev.option.value.businessIdValue + '/');
         this.contactForm[indexFieldExternalId].display = true;
 
-        let indexFieldDepartment = this.contactForm.map(field => field.id).indexOf('department');
+        const indexFieldDepartment = this.contactForm.map(field => field.id).indexOf('department');
         this.contactForm[indexFieldDepartment].display = true;
     }
 
     initAutocompleteExternalIdM2M() {
         this.externalId_m2mInfo = this.lang.autocompleteInfo;
         this.externalId_m2mResult = [];
-        let indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
-        let indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
+        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
+        const indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
         this.contactForm[indexFieldExternalId].control.valueChanges
             .pipe(
                 debounceTime(300),
                 distinctUntilChanged(),
                 tap(() => this.externalId_m2mLoading = true),
-                switchMap((data: any) => this.http.get('../../rest/autocomplete/businessIdM2MAnnuary', { params: { "query": data, "communicationValue": this.contactForm[indexFieldCommunicationMeans].control.value } })),
+                switchMap((data: any) => this.http.get('../../rest/autocomplete/businessIdM2MAnnuary', { params: { 'query': data, 'communicationValue': this.contactForm[indexFieldCommunicationMeans].control.value } })),
                 tap((data: any) => {
                     if (this.isEmptyValue(data)) {
                         this.externalId_m2mInfo = this.lang.noAvailableValue;
@@ -861,10 +861,10 @@ export class ContactsFormComponent implements OnInit {
     }
 
     selectExternalIdM2M(ev: any) {
-        let indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
+        const indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
         this.contactForm[indexFieldExternalId].control.setValue(ev.option.value.businessIdValue);
 
-        let indexFieldAnnuaryId = this.contactForm.map(field => field.id).indexOf('externalId_m2m_annuary_id');
+        const indexFieldAnnuaryId = this.contactForm.map(field => field.id).indexOf('externalId_m2m_annuary_id');
         this.contactForm[indexFieldAnnuaryId].control.setValue(ev.option.value.entryuuid);
     }
 
@@ -904,7 +904,7 @@ export class ContactsFormComponent implements OnInit {
                 filter(value => value.length > 2),
                 distinctUntilChanged(),
                 tap(() => this.addressBANLoading = true),
-                switchMap((data: any) => this.http.get('../../rest/autocomplete/banAddresses', { params: { "address": data, 'department': this.addressBANCurrentDepartment } })),
+                switchMap((data: any) => this.http.get('../../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
                 tap((data: any) => {
                     if (data.length === 0) {
                         this.addressBANInfo = this.lang.noAvailableValue;
@@ -924,7 +924,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     selectAddressBan(ev: any) {
-        let contact = {
+        const contact = {
             addressNumber: ev.option.value.number,
             addressStreet: ev.option.value.afnorName,
             addressPostcode: ev.option.value.postalCode,
@@ -957,17 +957,17 @@ export class ContactsFormComponent implements OnInit {
 
     goTo() {
         const contact = {
-            addressNumber: this.contactForm.filter(contact => contact.id === 'addressNumber')[0].control.value,
-            addressStreet: this.contactForm.filter(contact => contact.id === 'addressStreet')[0].control.value,
-            addressPostcode: this.contactForm.filter(contact => contact.id === 'addressPostcode')[0].control.value,
-            addressTown: this.contactForm.filter(contact => contact.id === 'addressTown')[0].control.value,
-            addressCountry: this.contactForm.filter(contact => contact.id === 'addressCountry')[0].control.value
+            addressNumber: this.contactForm.filter(field => field.id === 'addressNumber')[0].control.value,
+            addressStreet: this.contactForm.filter(field => field.id === 'addressStreet')[0].control.value,
+            addressPostcode: this.contactForm.filter(field => field.id === 'addressPostcode')[0].control.value,
+            addressTown: this.contactForm.filter(field => field.id === 'addressTown')[0].control.value,
+            addressCountry: this.contactForm.filter(field => field.id === 'addressCountry')[0].control.value
         };
-        window.open(`https://www.google.com/maps/search/${contact.addressNumber}+${contact.addressStreet},+${contact.addressPostcode}+${contact.addressTown},+${contact.addressCountry}`, '_blank')
+        window.open(`https://www.google.com/maps/search/${contact.addressNumber}+${contact.addressStreet},+${contact.addressPostcode}+${contact.addressTown},+${contact.addressCountry}`, '_blank');
     }
 
     switchAddressMode() {
-        let valArr: ValidatorFn[] = [];
+        const valArr: ValidatorFn[] = [];
         if (this.addressBANMode) {
 
             valArr.push(Validators.required);

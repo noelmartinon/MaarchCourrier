@@ -49,7 +49,7 @@ abstract class NotificationScheduleModelAbstract
 
         HistoryController::add([
             'tableName' => 'notifications',
-            'recordId'  => $GLOBALS['userId'],
+            'recordId'  => $GLOBALS['login'],
             'eventType' => 'UP',
             'eventId'   => 'notificationadd',
             'info'      => _NOTIFICATION_SCHEDULE_UPDATED,

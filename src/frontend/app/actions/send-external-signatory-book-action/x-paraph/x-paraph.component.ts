@@ -2,16 +2,16 @@ import { Component, OnInit, Input } from '@angular/core';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Observable } from 'rxjs/internal/Observable';
 
-declare function $j(selector: any): any;
+declare var $: any;
 
 @Component({
     selector: 'app-x-paraph',
-    templateUrl: "x-paraph.component.html",
+    templateUrl: 'x-paraph.component.html',
     styleUrls: ['x-paraph.component.scss'],
 })
 export class XParaphComponent implements OnInit {
@@ -23,14 +23,14 @@ export class XParaphComponent implements OnInit {
     currentAccount: any = null;
     usersWorkflowList: any[] = [];
     currentWorkflow: any[] = [];
-    contextList = ['FON','PER','SPH','DIR','DLP','EXE'];
+    contextList = ['FON', 'PER', 'SPH', 'DIR', 'DLP', 'EXE'];
     addAccountMode: boolean = false;
 
     usersCtrl = new FormControl();
     filteredUsers: Observable<any[]>;
 
-    @Input('additionalsInfos') additionalsInfos: any;
-    @Input('externalSignatoryBookDatas') externalSignatoryBookDatas: any;
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
 
     constructor(public http: HttpClient, private notify: NotificationService) { }
 
@@ -65,7 +65,7 @@ export class XParaphComponent implements OnInit {
                     element.currentContext = this.contextList[0];
                 });
                 setTimeout(() => {
-                    $j('#availableUsers').focus();
+                    $('#availableUsers').focus();
                 }, 0);
 
             }, (err: any) => {
@@ -84,7 +84,7 @@ export class XParaphComponent implements OnInit {
 
     addItem(event: any) {
         this.currentWorkflow.push(JSON.parse(JSON.stringify(event.option.value)));
-        $j('#availableUsers').blur();
+        $('#availableUsers').blur();
         this.usersCtrl.setValue('');
     }
 
@@ -96,12 +96,12 @@ export class XParaphComponent implements OnInit {
 
         if (typeof value === 'string') {
             const filterValue = value.toLowerCase();
-            return this.usersWorkflowList.filter(user => user.displayName.toLowerCase().indexOf(filterValue) != -1);
+            return this.usersWorkflowList.filter(user => user.displayName.toLowerCase().indexOf(filterValue) !== -1);
         }
     }
 
     isValidParaph() {
-        if (this.additionalsInfos.attachments.length > 0 && this.currentWorkflow.length > 0 && this.currentAccount.login != '' && this.currentAccount.siret != '') {
+        if (this.additionalsInfos.attachments.length > 0 && this.currentWorkflow.length > 0 && this.currentAccount.login !== '' && this.currentAccount.siret !== '') {
             return true;
         } else {
             return false;
@@ -109,24 +109,23 @@ export class XParaphComponent implements OnInit {
     }
 
     getRessources() {
-        return this.additionalsInfos.attachments.map((e: any) => { return e.res_id; });
+        return this.additionalsInfos.attachments.map((e: any) => e.res_id);
     }
 
     getDatas() {
-        this.externalSignatoryBookDatas =
-            {
-                "info": {
-                    "siret": this.currentAccount.siret,
-                    "login": this.currentAccount.login
-                },
-                "steps": []
-            };
+        this.externalSignatoryBookDatas = {
+            'info': {
+                'siret': this.currentAccount.siret,
+                'login': this.currentAccount.login
+            },
+            'steps': []
+        };
         this.currentWorkflow.forEach(element => {
             this.externalSignatoryBookDatas.steps.push({
-                "login": element.userId,
-                "action": element.currentRole == 'visa' ? '2' : '1',
-                "contexte": element.currentContext
-            })
+                'login': element.userId,
+                'action': element.currentRole === 'visa' ? '2' : '1',
+                'contexte': element.currentContext
+            });
         });
         return this.externalSignatoryBookDatas;
     }
@@ -134,11 +133,11 @@ export class XParaphComponent implements OnInit {
     addNewAccount() {
         this.loading = true;
 
-        this.http.post('../../rest/xParaphAccount', {login: this.newAccount.login,siret:this.newAccount.siret})
+        this.http.post('../../rest/xParaphAccount', { login: this.newAccount.login, siret: this.newAccount.siret })
             .subscribe((data: any) => {
                 this.additionalsInfos.accounts.push({
-                    "login": this.newAccount.login,
-                    "siret": this.newAccount.siret,
+                    'login': this.newAccount.login,
+                    'siret': this.newAccount.siret,
                 });
                 this.newAccount = {};
                 this.loading = false;
@@ -152,17 +151,17 @@ export class XParaphComponent implements OnInit {
     }
 
     removeAccount(index: number) {
-        let r = confirm(this.lang.confirmDeleteAccount);
+        const r = confirm(this.lang.confirmDeleteAccount);
 
         if (r) {
-            this.http.delete('../../rest/xParaphAccount?siret='+this.additionalsInfos.accounts[index].siret+'&login='+this.additionalsInfos.accounts[index].login)
-            .subscribe((data: any) => {
-                this.additionalsInfos.accounts.splice(index, 1);
-                this.notify.success(this.lang.accountDeleted);
-            }, (err: any) => {
-                this.notify.handleErrors(err);
-                this.loading = false;
-            });   
+            this.http.delete('../../rest/xParaphAccount?siret=' + this.additionalsInfos.accounts[index].siret + '&login=' + this.additionalsInfos.accounts[index].login)
+                .subscribe((data: any) => {
+                    this.additionalsInfos.accounts.splice(index, 1);
+                    this.notify.success(this.lang.accountDeleted);
+                }, (err: any) => {
+                    this.notify.handleErrors(err);
+                    this.loading = false;
+                });
         }
     }
 
@@ -173,7 +172,7 @@ export class XParaphComponent implements OnInit {
         this.currentAccount = null;
         this.addAccountMode = true;
         setTimeout(() => {
-            $j('#newAccountLogin').focus();
+            $('#newAccountLogin').focus();
         }, 0);
 
     }

@@ -26,6 +26,7 @@ use Resource\models\ResourceContactModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
+use Template\models\TemplateModel;
 use User\models\UserModel;
 
 include_once('vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.php');
@@ -215,8 +216,8 @@ class MergeController
                 'orderBy'   => ['listinstance_id']
             ]);
             foreach ($visaWorkflow as $value) {
-                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
-                $primaryentity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
+                $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
                 $visas .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})\n";
             }
         }
@@ -231,8 +232,8 @@ class MergeController
                 'orderBy'   => ['listinstance_id']
             ]);
             foreach ($opinionWorkflow as $value) {
-                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
-                $primaryentity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
+                $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
                 $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})\n";
             }
         }
@@ -248,11 +249,11 @@ class MergeController
             ]);
             foreach ($copyWorkflow as $value) {
                 if ($value['item_type'] == 'user_id') {
-                    $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
-                    $primaryentity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                    $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
+                    $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
                     $label = "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})";
                 } else {
-                    $entity = EntityModel::getByEntityId(['entityId' => $value['item_id'], 'select' => ['entity_label']]);
+                    $entity = EntityModel::getById(['id' => $value['item_id'], 'select' => ['entity_label']]);
                     $label = $entity['entity_label'];
                 }
                 $copies .= "{$label}\n";
@@ -394,6 +395,58 @@ class MergeController
         }
 
         return ['encodedDocument' => base64_encode($tbs->Source)];
+    }
+
+    /** Merge template with data
+    *
+    * @param string $templateId : templates identifier
+    * @param array $params : array of parameters for datasource retrieval
+    */
+    public static function mergeNotification(array $args)
+    {
+        $templateInfo = TemplateModel::getById(['id' => $args['templateId']]);
+        $templateInfo['template_content'] = str_replace('###', ';', $templateInfo['template_content']);
+        $templateInfo['template_content'] = str_replace('___', '--', $templateInfo['template_content']);
+        $tmpPath      = CoreConfigModel::getTmpPath();
+        $pathToTemplate = $tmpPath . 'tmp_template_' . rand()
+        . '_' . rand() . '.html';
+        $handle = fopen($pathToTemplate, 'w');
+        if (fwrite($handle, $templateInfo['template_content']) === false) {
+            return false;
+        }
+        fclose($handle);
+
+        $datasourceObj = TemplateModel::getDatasourceById(['id' => $templateInfo['template_datasource']]);
+ 
+        $datasources['datetime'][0]['date'] = date('d-m-Y');
+        $datasources['datetime'][0]['time'] = date('H:i:s.u');
+        $datasources['datetime'][0]['timestamp'] = time();
+        
+        // Make params array for datasource script
+        foreach ($args['params'] as $paramName => $paramValue) {
+            $$paramName = $paramValue;
+        }
+
+        if ($datasourceObj['script']) {
+            include $datasourceObj['script'];
+        }
+        
+        $TBS = new \clsTinyButStrong;
+        $TBS->NoErr = true;
+        $TBS->LoadTemplate($pathToTemplate);
+        
+        foreach ($datasources as $name => $datasource) {
+            if (!is_array($datasource)) {
+                $TBS->MergeField($name, $datasource);
+            } else {
+                $TBS->MergeBlock($name, 'array', $datasource);
+            }
+        }
+
+        $TBS->Show(TBS_NOTHING);
+        
+        $myContent = $TBS->Source;
+        return $myContent;
     }
 
     private static function formatPerson(array $args)

@@ -227,6 +227,12 @@ class StoreController
             'modification_date' => 'CURRENT_TIMESTAMP'
         ];
 
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination']]);
+
+        if (empty($resource['alt_identifier'])) {
+            $chrono = ChronoModel::getChrono(['id' => $resource['category_id'], 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $args['resId']]);
+            $preparedData['alt_identifier'] = $chrono;
+        }
         if (!empty($args['doctype'])) {
             $preparedData['type_id'] = $args['doctype'];
         }
@@ -242,7 +248,6 @@ class StoreController
         } else if (array_key_exists('initiator', $definedVars['args'])) {
             $preparedData['initiator'] = null;
         }
-
         if (isset($args['documentDate'])) {
             $preparedData['doc_date'] = $args['documentDate'];
         } else if (array_key_exists('documentDate', $definedVars['args'])) {
@@ -272,11 +277,9 @@ class StoreController
             $preparedData['priority'] = IndexingController::calculatePriorityWithProcessLimitDate(['processLimitDate' => $args['processLimitDate']]);
         }
         if (!empty($args['encodedFile'])) {
-            $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version']]);
             $preparedData['version'] = $resource['version'] + 1;
         }
         if (!empty($args['externalId']) && is_array($args['externalId'])) {
-            $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['external_id']]);
             $externalId = array_merge(json_decode($resource['external_id'], true), $args['externalId']);
             $externalId = json_encode($externalId);
             $preparedData['external_id'] = $externalId;
@@ -318,8 +321,8 @@ class StoreController
             AttachmentModel::update(['set' => ['status' => 'OBS'], 'where' => ['(origin_id = ? OR res_id = ?)'], 'data' => [$args['originId'], $args['originId']]]);
             $shouldBeInSignatureBook = $relations[0]['in_signature_book'];
         }
-        $typist = $GLOBALS['userId'];
-        if (!empty($args['typist']) && !is_numeric($args['typist'])) {
+        $typist = $GLOBALS['id'];
+        if (!empty($args['typist']) && is_numeric($args['typist'])) {
             $typist = $args['typist'];
         }
 

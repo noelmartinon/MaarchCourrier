@@ -15,7 +15,6 @@ namespace Group\models;
 
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
-use User\models\UserGroupModel;
 
 abstract class PrivilegeModelAbstract
 {
@@ -153,6 +152,5 @@ abstract class PrivilegeModelAbstract
         ]);
 
         return true;
-
     }
 }
