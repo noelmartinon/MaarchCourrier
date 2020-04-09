@@ -115,7 +115,7 @@ class UserController
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'loginmode', 'external_id']]);
         $user['external_id']        = json_decode($user['external_id'], true);
 
-        if (PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
+        if ($GLOBALS['id'] == $aArgs['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
             $user['signatures'] = UserSignatureModel::getByUserSerialId(['userSerialid' => $aArgs['id']]);
             $user['emailSignatures'] = UserModel::getEmailSignaturesById(['userId' => $user['user_id']]);
         } else {
