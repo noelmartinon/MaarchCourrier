@@ -30,7 +30,7 @@ export class FiltersListComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-        this.http.get('../../rest/priorities')
+        this.http.get('../rest/priorities')
             .subscribe((data: any) => {
                 this.priorities = data.priorities;
                 this.priorities.forEach((element) => {
@@ -42,7 +42,7 @@ export class FiltersListComponent implements OnInit {
                     });
                 });
 
-                this.http.get('../../rest/categories')
+                this.http.get('../rest/categories')
                     .subscribe((dataCat: any) => {
                         this.categories = dataCat.categories;
                         this.categories.forEach(element => {
@@ -54,7 +54,7 @@ export class FiltersListComponent implements OnInit {
                             });
                         });
 
-                        this.http.get('../../rest/statuses')
+                        this.http.get('../rest/statuses')
                             .subscribe((dataStat: any) => {
                                 this.statuses = dataStat.statuses;
                                 this.statuses.forEach(element => {
@@ -65,7 +65,7 @@ export class FiltersListComponent implements OnInit {
                                         }
                                     });
                                 });
-                                this.http.get('../../rest/doctypes/types')
+                                this.http.get('../rest/doctypes/types')
                                     .subscribe((dataDoct: any) => {
                                         this.doctypes = dataDoct.doctypes;
                                         this.doctypes.forEach(element => {

@@ -322,7 +322,7 @@ export class ListAdministrationComponent implements OnInit {
             );
         });
 
-        this.http.put('../../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': template, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
+        this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': template, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
                 this.basketGroup.list_display = template;

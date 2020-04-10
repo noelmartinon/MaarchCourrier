@@ -118,7 +118,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     }
 
     getEncodedDocument(data: any) {
-        this.http.get('../../rest/onlyOffice/encodedFile', { params: { url: data } }).pipe(
+        this.http.get('../rest/onlyOffice/encodedFile', { params: { url: data } }).pipe(
             tap((result: any) => {
                 this.file.content = result.encodedFile;
                 this.isSaving = false;
@@ -160,14 +160,14 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             return true;
         } else {
             this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format + '</b> ' + this.lang.onlyofficeEditDenied2);
-            this.closeEditor();
+            this.triggerCloseEditor.emit();
             return false;
         }
     }
 
     getServerConfiguration() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/onlyOffice/configuration`).pipe(
+            this.http.get(`../rest/onlyOffice/configuration`).pipe(
                 tap((data: any) => {
                     if (data.enabled) {
                         const protocol = data.serverSsl ? 'https://' : 'http://';
@@ -176,12 +176,12 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
                         this.appUrl = data.coreUrl;
                         resolve(true);
                     } else {
-                        this.closeEditor();
+                        this.triggerCloseEditor.emit();
                     }
                 }),
                 catchError((err) => {
                     this.notify.handleErrors(err);
-                    this.closeEditor();
+                    this.triggerCloseEditor.emit();
                     return of(false);
                 }),
             ).subscribe();
@@ -195,20 +195,20 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             const regex2 = /localhost/g;
             if (this.appUrl.match(regex) !== null || this.appUrl.match(regex2) !== null) {
                 this.notify.error(`${this.lang.errorOnlyoffice1}`);
-                this.closeEditor();
+                this.triggerCloseEditor.emit();
             } else {
-                this.http.get(`../../rest/onlyOffice/available`).pipe(
+                this.http.get(`../rest/onlyOffice/available`).pipe(
                     tap((data: any) => {
                         if (data.isAvailable) {
                             resolve(true);
                         } else {
                             this.notify.error(`${this.lang.errorOnlyoffice2} ${this.onlyOfficeUrl}`);
-                            this.closeEditor();
+                            this.triggerCloseEditor.emit();
                         }
                     }),
                     catchError((err) => {
                         this.notify.error(`${this.lang[err.error.lang]}`);
-                        this.closeEditor();
+                        this.triggerCloseEditor.emit();
                         return of(false);
                     }),
                 ).subscribe();
@@ -218,7 +218,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
 
     getMergedFileTemplate() {
         return new Promise((resolve, reject) => {
-            this.http.post(`../../${this.params.docUrl}`, { objectId: this.params.objectId, objectType: this.params.objectType, onlyOfficeKey: this.key, data: this.params.dataToMerge }).pipe(
+            this.http.post(`../${this.params.docUrl}`, { objectId: this.params.objectId, objectType: this.params.objectType, format: this.file.format, onlyOfficeKey: this.key, data: this.params.dataToMerge }).pipe(
                 tap((data: any) => {
                     this.tmpFilename = data.filename;
 

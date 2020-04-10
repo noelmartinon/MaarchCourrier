@@ -35,7 +35,7 @@ export class ContactsListAdministrationComponent implements OnInit {
     displayedColumnsContact: string[] = ['filling', 'firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
 
     isLoadingResults = true;
-    routeUrl: string = '../../rest/contacts';
+    routeUrl: string = '../rest/contacts';
     resultListDatabase: ContactListHttpDao | null;
     resultsLength = 0;
 
@@ -153,7 +153,7 @@ export class ContactsListAdministrationComponent implements OnInit {
                     if (result.processMode == 'reaffect') {
                         queryparams = '?redirect=' + result.contactId;
                     }
-                    this.http.request('DELETE', `../../rest/contacts/${contact.id}${queryparams}`)
+                    this.http.request('DELETE', `../rest/contacts/${contact.id}${queryparams}`)
                         .subscribe(() => {
                             this.refreshDao();
                             this.notify.success(this.lang.contactDeleted);
@@ -167,7 +167,7 @@ export class ContactsListAdministrationComponent implements OnInit {
             const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.delete(`../../rest/contacts/${contact.id}`)),
+                exhaustMap(() => this.http.delete(`../rest/contacts/${contact.id}`)),
                 tap((data: any) => {
                     this.refreshDao();
                     this.notify.success(this.lang.contactDeleted);
@@ -185,7 +185,7 @@ export class ContactsListAdministrationComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.put(`../../rest/contacts/${contact.id}/activation`, { enabled: !contact.enabled })),
+            exhaustMap(() => this.http.put(`../rest/contacts/${contact.id}/activation`, { enabled: !contact.enabled })),
             tap((data: any) => {
                 this.refreshDao();
                 if (!contact.enabled === true) {

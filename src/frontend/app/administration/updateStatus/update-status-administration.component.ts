@@ -35,7 +35,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/autocomplete/statuses').pipe(
+        this.http.get('../rest/autocomplete/statuses').pipe(
             tap((data: any) => this.statuses = data),
             tap(() => this.loading = false)
         ).subscribe();
@@ -51,7 +51,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
             body['chrono'] = this.chronoList;
         }
 
-        this.http.put('../../rest/res/resource/status', body)
+        this.http.put('../rest/res/resource/status', body)
             .subscribe(() => {
                 this.resId = '';
                 this.chrono = '';

@@ -85,7 +85,7 @@ export class BasketAdministrationComponent implements OnInit {
                 this.creationMode = false;
                 this.basketIdAvailable = true;
                 this.id = params['id'];
-                this.http.get('../../rest/baskets/' + this.id)
+                this.http.get('../rest/baskets/' + this.id)
                     .subscribe((data: any) => {
                         this.headerService.setHeader(this.lang.basketModification, data.basket.basket_name);
 
@@ -111,7 +111,7 @@ export class BasketAdministrationComponent implements OnInit {
 
                         this.basketClone = JSON.parse(JSON.stringify(this.basket));
 
-                        this.http.get('../../rest/baskets/' + this.id + '/groups')
+                        this.http.get('../rest/baskets/' + this.id + '/groups')
                             .subscribe((dataGroups: any) => {
                                 this.allGroups = dataGroups.allGroups;
 
@@ -149,7 +149,7 @@ export class BasketAdministrationComponent implements OnInit {
         this.dialogRef = this.dialog.open(BasketAdministrationSettingsModalComponent, this.config);
         this.dialogRef.afterClosed().subscribe((result: any) => {
             if (result) {
-                this.http.put('../../rest/baskets/' + this.id + '/groups/' + result.group.group_id + '/actions', { 'groupActions': result.group.groupActions })
+                this.http.put('../rest/baskets/' + this.id + '/groups/' + result.group.group_id + '/actions', { 'groupActions': result.group.groupActions })
                     .subscribe(() => {
                         this.dialogRef = null;
                         this.notify.success(this.lang.basketUpdated);
@@ -164,7 +164,7 @@ export class BasketAdministrationComponent implements OnInit {
 
     isAvailable() {
         if (this.basket.id) {
-            this.http.get('../../rest/baskets/' + this.basket.id)
+            this.http.get('../rest/baskets/' + this.basket.id)
                 .subscribe(() => {
                     this.basketIdAvailable = false;
                 }, (err) => {
@@ -189,7 +189,7 @@ export class BasketAdministrationComponent implements OnInit {
             this.basket.basket_res_order = '';
         }
         if (this.creationMode) {
-            this.http.post('../../rest/baskets', this.basket)
+            this.http.post('../rest/baskets', this.basket)
                 .subscribe(() => {
                     this.notify.success(this.lang.basketAdded);
                     this.router.navigate(['/administration/baskets/' + this.basket.id]);
@@ -197,7 +197,7 @@ export class BasketAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/baskets/' + this.id, this.basket)
+            this.http.put('../rest/baskets/' + this.id, this.basket)
                 .subscribe(() => {
                     this.notify.success(this.lang.basketUpdated);
                     this.router.navigate(['/administration/baskets']);
@@ -237,7 +237,7 @@ export class BasketAdministrationComponent implements OnInit {
         const r = confirm(this.lang.unlinkGroup + ' ?');
 
         if (r) {
-            this.http.delete('../../rest/baskets/' + this.id + '/groups/' + this.basketGroups[groupIndex].group_id)
+            this.http.delete('../rest/baskets/' + this.id + '/groups/' + this.basketGroups[groupIndex].group_id)
                 .subscribe(() => {
                     this.allGroups.forEach((tmpGroup: any) => {
                         if (tmpGroup.group_id === this.basketGroups[groupIndex].group_id) {
@@ -263,7 +263,7 @@ export class BasketAdministrationComponent implements OnInit {
                 } else {
                     result.list_display = [];
                 }
-                this.http.post('../../rest/baskets/' + this.id + '/groups', result)
+                this.http.post('../rest/baskets/' + this.id + '/groups', result)
                     .subscribe(() => {
                         this.basketGroups.push(result);
                         this.allGroups.forEach((tmpGroup: any) => {
@@ -282,7 +282,7 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     addAction(group: any) {
-        this.http.put('../../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
+        this.http.put('../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
             .subscribe(() => {
                 this.notify.success(this.lang.actionsGroupBasketUpdated);
             }, (err) => {
@@ -294,7 +294,7 @@ export class BasketAdministrationComponent implements OnInit {
         basket.isSearchBasket = !basket.isSearchBasket;
         this.basketClone.isSearchBasket = basket.isSearchBasket;
 
-        this.http.put('../../rest/baskets/' + this.id, this.basketClone)
+        this.http.put('../rest/baskets/' + this.id, this.basketClone)
             .subscribe(() => {
                 this.notify.success(this.lang.basketUpdated);
             }, (err) => {
@@ -306,7 +306,7 @@ export class BasketAdministrationComponent implements OnInit {
         basket.flagNotif = !basket.flagNotif;
         this.basketClone.flagNotif = basket.flagNotif;
 
-        this.http.put('../../rest/baskets/' + this.id, this.basketClone)
+        this.http.put('../rest/baskets/' + this.id, this.basketClone)
             .subscribe(() => {
                 this.notify.success(this.lang.basketUpdated);
             }, (err) => {
@@ -319,7 +319,7 @@ export class BasketAdministrationComponent implements OnInit {
 
         if (r) {
             action.checked = false;
-            this.http.put('../../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
+            this.http.put('../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
                 .subscribe(() => {
                     this.notify.success(this.lang.actionsGroupBasketUpdated);
                 }, (err) => {
@@ -348,7 +348,7 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
     @ViewChild('statusInput', { static: true }) statusInput: ElementRef;
 
     ngOnInit(): void {
-        this.http.get('../../rest/entities')
+        this.http.get('../rest/entities')
             .subscribe((entities: any) => {
                 const keywordEntities = [{
                     id: 'ALL_ENTITIES',
@@ -567,7 +567,7 @@ export class BasketAdministrationGroupListModalComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.http.get('../../rest/actions')
+        this.http.get('../rest/actions')
             .subscribe((data: any) => {
                 data.actions.forEach((tmpAction: any) => {
                     tmpAction.where_clause = '';

@@ -658,7 +658,7 @@ class EmailController
             $history = HistoryModel::get([
                 'select'    => ['info'],
                 'where'     => ['user_id = ?', 'event_id = ?', 'event_type = ?'],
-                'data'      => [$user['user_id'], 'sendEmail', 'ERROR'],
+                'data'      => [$args['userId'], 'sendEmail', 'ERROR'],
                 'orderBy'   => ['event_date DESC'],
                 'limit'     => 1
             ]);

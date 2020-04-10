@@ -43,7 +43,7 @@ export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.http.get('../../rest/home/maarchParapheurDocuments')
+        this.http.get('../rest/home/maarchParapheurDocuments')
             .pipe(
                 finalize(() => this.loading = false)
             )

@@ -69,7 +69,7 @@ export class AttachmentPageComponent implements OnInit {
 
     loadAttachmentTypes() {
         return new Promise((resolve, reject) => {
-            this.http.get('../../rest/attachmentsTypes').pipe(
+            this.http.get('../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
                         if (data.attachmentsTypes[templateType].show) {
@@ -93,7 +93,7 @@ export class AttachmentPageComponent implements OnInit {
 
     loadAttachment() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/attachments/${this.data.resId}`).pipe(
+            this.http.get(`../rest/attachments/${this.data.resId}`).pipe(
                 tap((data: any) => {
                     let contact: any = null;
 
@@ -159,7 +159,7 @@ export class AttachmentPageComponent implements OnInit {
                 }
             }),
             filter(() => !this.functions.empty(this.attachment.encodedFile.value)),
-            exhaustMap(() => this.http.post(`../../rest/attachments`, this.getAttachmentValues(true, mode))),
+            exhaustMap(() => this.http.post(`../rest/attachments`, this.getAttachmentValues(true, mode))),
             tap(async (data: any) => {
                 if (this.sendMassMode && mode === 'mailing') {
                     await this.generateMailling(data.id);
@@ -186,7 +186,7 @@ export class AttachmentPageComponent implements OnInit {
                 this.attachment.encodedFile.setValue(data.content);
                 this.attachment.format.setValue(data.format);
             }),
-            exhaustMap(() => this.http.put(`../../rest/attachments/${this.attachment.resId.value}`, this.getAttachmentValues(false, mode))),
+            exhaustMap(() => this.http.put(`../rest/attachments/${this.attachment.resId.value}`, this.getAttachmentValues(false, mode))),
             tap(async () => {
                 if (this.sendMassMode && mode === 'mailing') {
                     await this.generateMailling(this.attachment.resId.value);
@@ -207,7 +207,7 @@ export class AttachmentPageComponent implements OnInit {
 
     generateMailling(resId: number) {
         return new Promise((resolve, reject) => {
-            this.http.post(`../../rest/attachments/${resId}/mailing`, {}).pipe(
+            this.http.post(`../rest/attachments/${resId}/mailing`, {}).pipe(
                 tap(() => {
                     resolve(true);
                 }),
@@ -317,7 +317,7 @@ export class AttachmentPageComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.put(`../../rest/attachments/${this.attachment['resId'].value}/unsign`, {})),
+            exhaustMap(() => this.http.put(`../rest/attachments/${this.attachment['resId'].value}/unsign`, {})),
             tap(() => {
                 this.attachment.status.setValue('A_TRA');
                 this.attachment.signedResponse.setValue(null);

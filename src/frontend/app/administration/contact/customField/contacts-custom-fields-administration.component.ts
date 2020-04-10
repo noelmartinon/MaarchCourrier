@@ -109,7 +109,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
         
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
-        this.http.get("../../rest/contactsCustomFields").pipe(
+        this.http.get("../rest/contactsCustomFields").pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
@@ -149,7 +149,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
                     values: []
                 }
             }),
-            exhaustMap((data) => this.http.post('../../rest/contactsCustomFields', newCustomField)),
+            exhaustMap((data) => this.http.post('../rest/contactsCustomFields', newCustomField)),
             tap((data: any) => {
                 newCustomField.id = data.id
                 this.customFields.push(newCustomField);
@@ -180,7 +180,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete('../../rest/contactsCustomFields/' + this.customFields[indexCustom].id)),
+            exhaustMap(() => this.http.delete('../rest/contactsCustomFields/' + this.customFields[indexCustom].id)),
             tap(() => {
                 this.customFields.splice(indexCustom, 1);
                 this.notify.success(this.lang.customFieldDeleted);
@@ -207,7 +207,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
             return of(false);
         }
 
-        this.http.put('../../rest/contactsCustomFields/' + customField.id, customFieldToUpdate).pipe(
+        this.http.put('../rest/contactsCustomFields/' + customField.id, customFieldToUpdate).pipe(
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
                 this.notify.success(this.lang.customFieldUpdated);

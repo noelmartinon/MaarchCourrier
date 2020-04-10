@@ -42,7 +42,7 @@ export class ParameterAdministrationComponent implements OnInit {
             } else {
 
                 this.creationMode = false;
-                this.http.get('../../rest/parameters/' + params['id'])
+                this.http.get('../rest/parameters/' + params['id'])
                     .subscribe((data: any) => {
                         this.parameter = data.parameter;
                         this.headerService.setHeader(this.lang.parameterModification, this.parameter.id);
@@ -79,7 +79,7 @@ export class ParameterAdministrationComponent implements OnInit {
         }
 
         if (this.creationMode === true) {
-            this.http.post('../../rest/parameters', this.parameter)
+            this.http.post('../rest/parameters', this.parameter)
                 .subscribe(() => {
                     this.router.navigate(['administration/parameters']);
                     this.notify.success(this.lang.parameterAdded);
@@ -87,7 +87,7 @@ export class ParameterAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else if (this.creationMode === false) {
-            this.http.put('../../rest/parameters/' + this.parameter.id, this.parameter)
+            this.http.put('../rest/parameters/' + this.parameter.id, this.parameter)
                 .subscribe(() => {
                     this.router.navigate(['administration/parameters']);
                     this.notify.success(this.lang.parameterUpdated);

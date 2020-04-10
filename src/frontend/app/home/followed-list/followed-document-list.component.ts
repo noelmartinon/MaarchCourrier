@@ -138,11 +138,11 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
             this.dragInit = true;
             this.destroy$.next(true);
 
-            this.http.get('../../rest/followedResources')
+            this.http.get('../rest/followedResources')
                 .subscribe((data: any) => {
                     this.headerService.setHeader(this.lang.followedMail, '', 'fas fa-star');
                 });
-            this.basketUrl = '../../rest/followedResources';
+            this.basketUrl = '../rest/followedResources';
             this.filtersListService.filterMode = false;
             this.selectedRes = [];
 
@@ -200,10 +200,10 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
     goTo(row: any) {
         this.filtersListService.filterMode = false;
-        if (this.docUrl === '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
+        if (this.docUrl === '../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
             this.sidenavRight.close();
         } else {
-            this.docUrl = '../../rest/resources/' + row.resId + '/content';
+            this.docUrl = '../rest/resources/' + row.resId + '/content';
             this.currentChrono = row.chrono;
             this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
                 '<iframe style=\'height:100%;width:100%;\' src=\'' + this.docUrl + '\' class=\'embed-responsive-item\'>' +
@@ -255,7 +255,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
     viewThumbnail(row: any) {
         if (row.hasDocument) {
-            this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
+            this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail';
             $('#viewThumbnail').show();
             $('#listContent').css({ 'overflow': 'hidden' });
         }
@@ -341,7 +341,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/resources/unfollow', { body: { resources: [row.resId] } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: [row.resId] } })),
             tap((data: any) => {
                 this.headerService.nbResourcesFollowed--;
                 this.initResultList();
@@ -350,7 +350,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
+        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
             .subscribe((data: any) => {
                 const file = new Blob([data], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);

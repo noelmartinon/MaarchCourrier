@@ -29,7 +29,7 @@ export class FolderCreateModalComponent implements OnInit {
 
     onSubmit() {
         this.loading = true;
-        this.http.post("../../rest/folders", { label: this.folderName }).pipe(
+        this.http.post("../rest/folders", { label: this.folderName }).pipe(
             tap((data : any) => {
                 this.notify.success(this.lang.folderAdded);
                 this.dialogRef.close(data.folder);

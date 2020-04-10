@@ -57,7 +57,7 @@ export class XParaphComponent implements OnInit {
                 startWith(''),
                 map(state => state ? this._filterUsers(state) : this.usersWorkflowList.slice())
             );
-        this.http.get('../../rest/xParaphWorkflow?login=' + account.login + '&siret=' + account.siret)
+        this.http.get('../rest/xParaphWorkflow?login=' + account.login + '&siret=' + account.siret)
             .subscribe((data: any) => {
                 this.usersWorkflowList = data.workflow;
                 this.usersWorkflowList.forEach(element => {
@@ -133,7 +133,7 @@ export class XParaphComponent implements OnInit {
     addNewAccount() {
         this.loading = true;
 
-        this.http.post('../../rest/xParaphAccount', { login: this.newAccount.login, siret: this.newAccount.siret })
+        this.http.post('../rest/xParaphAccount', { login: this.newAccount.login, siret: this.newAccount.siret })
             .subscribe((data: any) => {
                 this.additionalsInfos.accounts.push({
                     'login': this.newAccount.login,
@@ -154,7 +154,7 @@ export class XParaphComponent implements OnInit {
         const r = confirm(this.lang.confirmDeleteAccount);
 
         if (r) {
-            this.http.delete('../../rest/xParaphAccount?siret=' + this.additionalsInfos.accounts[index].siret + '&login=' + this.additionalsInfos.accounts[index].login)
+            this.http.delete('../rest/xParaphAccount?siret=' + this.additionalsInfos.accounts[index].siret + '&login=' + this.additionalsInfos.accounts[index].login)
                 .subscribe((data: any) => {
                     this.additionalsInfos.accounts.splice(index, 1);
                     this.notify.success(this.lang.accountDeleted);

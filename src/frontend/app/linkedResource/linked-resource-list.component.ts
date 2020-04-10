@@ -53,7 +53,7 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     initLinkedResources() {
-        this.http.get(`../../rest/resources/${this.resId}/linkedResources`).pipe(
+        this.http.get(`../rest/resources/${this.resId}/linkedResources`).pipe(
             tap((data: any) => {
                 this.linkedResources = data.linkedResources;
                 this.reloadBadgeLinkedResources.emit(`${this.linkedResources.length}`);
@@ -109,7 +109,7 @@ export class LinkedResourceListComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/resources/${this.resId}/linkedResources/${row.resId}`)),
+            exhaustMap(() => this.http.delete(`../rest/resources/${this.resId}/linkedResources/${row.resId}`)),
             tap(() => {
                 this.linkedResources = this.linkedResources.filter(resource => resource.resId !== row.resId);
                 this.reloadBadgeLinkedResources.emit(`${this.linkedResources.length}`);
@@ -127,7 +127,7 @@ export class LinkedResourceListComponent implements OnInit {
 
     viewThumbnail(row: any) {
         if (row.hasDocument) {
-            this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
+            this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail';
             $('#viewThumbnail').show();
         }
     }

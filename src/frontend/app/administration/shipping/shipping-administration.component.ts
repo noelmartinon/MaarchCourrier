@@ -75,7 +75,7 @@ export class ShippingAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.http.get('../../rest/externalConnectionsEnabled').pipe(
+        this.http.get('../rest/externalConnectionsEnabled').pipe(
             tap((data: any) => {
                 this.shippingAvailable = data.connection.maileva === true;
             }),
@@ -91,7 +91,7 @@ export class ShippingAdministrationComponent implements OnInit {
 
                 this.creationMode = true;
 
-                this.http.get('../../rest/administration/shippings/new')
+                this.http.get('../rest/administration/shippings/new')
                     .subscribe((data: any) => {
                         this.entities = data['entities'];
                         this.entitiesClone = JSON.parse(JSON.stringify(this.entities));
@@ -111,7 +111,7 @@ export class ShippingAdministrationComponent implements OnInit {
                 this.headerService.setHeader(this.lang.shippingModification);
                 this.creationMode = false;
 
-                this.http.get('../../rest/administration/shippings/' + params['id'])
+                this.http.get('../rest/administration/shippings/' + params['id'])
                     .subscribe((data: any) => {
                         this.shipping = data['shipping'];
                         this.entities = data['entities'];
@@ -164,10 +164,10 @@ export class ShippingAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        this.shipping.entities = $('#jstree').jstree(true).get_checked([true]);
+        this.shipping.entities = $('#jstree').jstree('get_checked', null, true);
 
         if (this.creationMode) {
-            this.http.post('../../rest/administration/shippings', this.shipping)
+            this.http.post('../rest/administration/shippings', this.shipping)
                 .subscribe((data: any) => {
                     this.shippingClone = JSON.parse(JSON.stringify(this.shipping));
                     this.notify.success(this.lang.shippingAdded);
@@ -176,7 +176,7 @@ export class ShippingAdministrationComponent implements OnInit {
                     this.notify.handleErrors(err);
                 });
         } else {
-            this.http.put('../../rest/administration/shippings/' + this.shipping.id, this.shipping)
+            this.http.put('../rest/administration/shippings/' + this.shipping.id, this.shipping)
                 .subscribe((data: any) => {
                     this.shippingClone = JSON.parse(JSON.stringify(this.shipping));
                     this.notify.success(this.lang.shippingUpdated);

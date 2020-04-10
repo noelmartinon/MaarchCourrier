@@ -55,11 +55,11 @@ export class PrioritiesAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/priorities')
+        this.http.get('../rest/priorities')
             .subscribe((data: any) => {
                 this.priorities = data['priorities'];
                 this.loading = false;
-                this.http.get('../../rest/sortedPriorities')
+                this.http.get('../rest/sortedPriorities')
                     .subscribe((dataPriorities: any) => {
                         this.prioritiesOrder = dataPriorities['priorities'];
                     }, (err) => {
@@ -82,7 +82,7 @@ export class PrioritiesAdministrationComponent implements OnInit {
         const r = confirm(this.lang.deleteMsg);
 
         if (r) {
-            this.http.delete('../../rest/priorities/' + id)
+            this.http.delete('../rest/priorities/' + id)
                 .subscribe((data: any) => {
                     this.priorities = data['priorities'];
                     this.dataSource = new MatTableDataSource(this.priorities);
@@ -96,7 +96,7 @@ export class PrioritiesAdministrationComponent implements OnInit {
     }
 
     updatePrioritiesOrder() {
-        this.http.put('../../rest/sortedPriorities', this.prioritiesOrder)
+        this.http.put('../rest/sortedPriorities', this.prioritiesOrder)
             .subscribe((data: any) => {
                 this.prioritiesOrder = data['priorities'];
                 this.notify.success(this.lang.modificationSaved);

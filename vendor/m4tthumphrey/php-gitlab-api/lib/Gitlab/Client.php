@@ -11,6 +11,7 @@ use Http\Client\Common\HttpMethodsClient;
 use Http\Client\Common\Plugin\AddHostPlugin;
 use Http\Client\Common\Plugin\HeaderDefaultsPlugin;
 use Http\Client\Common\Plugin\HistoryPlugin;
+use Http\Client\Common\Plugin\RedirectPlugin;
 use Http\Client\HttpClient;
 use Http\Discovery\UriFactoryDiscovery;
 
@@ -81,10 +82,11 @@ class Client
 
         $this->httpClientBuilder->addPlugin(new GitlabExceptionThrower());
         $this->httpClientBuilder->addPlugin(new HistoryPlugin($this->responseHistory));
-        $this->httpClientBuilder->addPlugin(new ApiVersion());
         $this->httpClientBuilder->addPlugin(new HeaderDefaultsPlugin([
             'User-Agent' => 'php-gitlab-api (http://github.com/m4tthumphrey/php-gitlab-api)',
         ]));
+        $this->httpClientBuilder->addPlugin(new RedirectPlugin());
+        $this->httpClientBuilder->addPlugin(new ApiVersion());
 
         $this->setUrl('https://gitlab.com');
     }
@@ -135,6 +137,14 @@ class Client
     }
 
     /**
+     * @return Api\GroupsMilestones
+     */
+    public function groupsMilestones()
+    {
+        return new Api\GroupsMilestones($this);
+    }
+
+    /**
      * @return Api\Issues
      */
     public function issues()
@@ -149,6 +159,15 @@ class Client
     {
         return new Api\IssueBoards($this);
     }
+
+    /**
+     * @return Api\GroupsBoards
+     */
+    public function groupsBoards()
+    {
+        return new Api\GroupsBoards($this);
+    }
+
 
     /**
      * @return Api\IssueLinks
@@ -279,6 +298,22 @@ class Client
     }
 
     /**
+     * @return Api\Schedules
+     */
+    public function schedules()
+    {
+        return new Api\Schedules($this);
+    }
+
+    /**
+     * @return Api\IssuesStatistics
+     */
+    public function issuesStatistics()
+    {
+        return new Api\IssuesStatistics($this);
+    }
+
+    /**
      * @param string $name
      *
      * @return AbstractApi|mixed
@@ -293,6 +328,9 @@ class Client
 
             case 'groups':
                 return $this->groups();
+                
+            case 'groupsMilestones':
+                return $this->groupsMilestones();
 
             case 'issues':
                 return $this->issues();
@@ -300,6 +338,9 @@ class Client
             case 'board':
             case 'issue_boards':
                 return $this->issueBoards();
+
+            case 'group_boards':
+                return $this->groupsBoards();
 
             case 'issue_links':
                 return $this->issueLinks();
@@ -353,6 +394,13 @@ class Client
 
             case 'deployments':
                 return $this->deployments();
+
+            case 'schedules':
+                return $this->schedules();
+
+            case 'issues_statistics':
+                return $this->issuesStatistics();
+
 
             default:
                 throw new InvalidArgumentException('Invalid endpoint: "'.$name.'"');

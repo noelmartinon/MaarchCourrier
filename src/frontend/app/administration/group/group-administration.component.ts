@@ -86,7 +86,7 @@ export class GroupAdministrationComponent implements OnInit {
                 this.loading = false;
             } else {
                 this.creationMode = false;
-                this.http.get('../../rest/groups/' + params['id'] + '/details')
+                this.http.get('../rest/groups/' + params['id'] + '/details')
                     .subscribe((data: any) => {
                         this.group = data['group'];
 
@@ -197,11 +197,11 @@ export class GroupAdministrationComponent implements OnInit {
 
     manageServices(servicesId: any[], mode: string = null) {
         if (mode !== 'deleteAll') {
-            this.http.post(`../../rest/groups/${this.group.id}/privileges/${servicesId[0]}`, {}).pipe(
+            this.http.post(`../rest/groups/${this.group.id}/privileges/${servicesId[0]}`, {}).pipe(
                 tap(() => {
                     this.group.privileges.push(servicesId[0]);
                 }),
-                exhaustMap(() => this.http.delete(`../../rest/groups/${this.group.id}/privileges/${servicesId[1]}`)),
+                exhaustMap(() => this.http.delete(`../rest/groups/${this.group.id}/privileges/${servicesId[1]}`)),
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf(servicesId[1]), 1);
                     this.headerService.resfreshCurrentUser();
@@ -213,11 +213,11 @@ export class GroupAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.delete(`../../rest/groups/${this.group.id}/privileges/${servicesId[0]}`).pipe(
+            this.http.delete(`../rest/groups/${this.group.id}/privileges/${servicesId[0]}`).pipe(
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf(servicesId[0]), 1);
                 }),
-                exhaustMap(() => this.http.delete(`../../rest/groups/${this.group.id}/privileges/${servicesId[1]}`)),
+                exhaustMap(() => this.http.delete(`../rest/groups/${this.group.id}/privileges/${servicesId[1]}`)),
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf(servicesId[1]), 1);
                     this.headerService.resfreshCurrentUser();
@@ -238,11 +238,11 @@ export class GroupAdministrationComponent implements OnInit {
             this.manageServices(['view_personal_data', 'manage_personal_data']);
 
         } else if (ev.value === 'manage_personal_data') {
-            this.http.post(`../../rest/groups/${this.group.id}/privileges/view_personal_data`, {}).pipe(
+            this.http.post(`../rest/groups/${this.group.id}/privileges/view_personal_data`, {}).pipe(
                 tap(() => {
                     this.group.privileges.push('view_personal_data');
                 }),
-                exhaustMap(() => this.http.post(`../../rest/groups/${this.group.id}/privileges/manage_personal_data`, {})),
+                exhaustMap(() => this.http.post(`../rest/groups/${this.group.id}/privileges/manage_personal_data`, {})),
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf('manage_personal_data'), 1);
                     this.headerService.resfreshCurrentUser();
@@ -275,7 +275,7 @@ export class GroupAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            this.http.post('../../rest/groups', this.group)
+            this.http.post('../rest/groups', this.group)
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.groupAdded);
                     this.router.navigate(['/administration/groups/' + data.group]);
@@ -283,7 +283,7 @@ export class GroupAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/groups/' + this.group['id'], { 'description': this.group['group_desc'], 'security': this.group['security'] })
+            this.http.put('../rest/groups/' + this.group['id'], { 'description': this.group['group_desc'], 'security': this.group['security'] })
                 .subscribe(() => {
                     this.notify.success(this.lang.groupUpdated);
                 }, (err) => {
@@ -323,7 +323,7 @@ export class GroupAdministrationComponent implements OnInit {
     }
 
     addService(service: any) {
-        this.http.post(`../../rest/groups/${this.group.id}/privileges/${service.id}`, {}).pipe(
+        this.http.post(`../rest/groups/${this.group.id}/privileges/${service.id}`, {}).pipe(
             tap(() => {
                 this.group.privileges.push(service.id);
                 this.headerService.resfreshCurrentUser();
@@ -337,7 +337,7 @@ export class GroupAdministrationComponent implements OnInit {
     }
 
     removeService(service: any) {
-        this.http.delete(`../../rest/groups/${this.group.id}/privileges/${service.id}`).pipe(
+        this.http.delete(`../rest/groups/${this.group.id}/privileges/${service.id}`).pipe(
             tap(() => {
                 this.group.privileges.splice(this.group.privileges.indexOf(service.id), 1);
                 this.headerService.resfreshCurrentUser();
@@ -355,7 +355,7 @@ export class GroupAdministrationComponent implements OnInit {
             'groupId': this.group.group_id,
             'role': this.group.role
         };
-        this.http.post('../../rest/users/' + newUser.serialId + '/groups', groupReq)
+        this.http.post('../rest/users/' + newUser.serialId + '/groups', groupReq)
             .subscribe(() => {
                 const displayName = newUser.idToDisplay.split(' ');
                 const user = {
@@ -381,7 +381,7 @@ export class GroupAdministrationComponent implements OnInit {
         } else {
             this.panelMode = id;
             this.paramsLoading = true;
-            this.http.get(`../../rest/groups`).pipe(
+            this.http.get(`../rest/groups`).pipe(
                 map((data: any) => {
                     data.groups = data.groups.map((group: any) => {
                         return {
@@ -394,7 +394,7 @@ export class GroupAdministrationComponent implements OnInit {
                 tap((data: any) => {
                     this.authorizedGroupsUserParams = data.groups;
                 }),
-                exhaustMap(() => this.http.get(`../../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters?parameter=groups`)),
+                exhaustMap(() => this.http.get(`../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters?parameter=groups`)),
                 tap((data: any) => {
                     const allowedGroups: any[] = data;
                     this.authorizedGroupsUserParams.forEach(group => {
@@ -417,7 +417,7 @@ export class GroupAdministrationComponent implements OnInit {
                 groups: paramList.map((param: any) => param.value)
             };
         }
-        this.http.put(`../../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters`, { parameters: obj }).pipe(
+        this.http.put(`../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters`, { parameters: obj }).pipe(
             tap(() => {
                 this.notify.success(this.lang.parameterUpdated);
             }),

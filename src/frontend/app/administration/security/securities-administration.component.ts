@@ -41,7 +41,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/passwordRules')
+        this.http.get('../rest/passwordRules')
             .subscribe((data: any) => {
                 this.passwordRulesList = data.rules;
 
@@ -102,7 +102,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
             rule.enabled = this.passwordRules[rule.label].enabled;
             rule.value = this.passwordRules[rule.label].value;
         });
-        this.http.put('../../rest/passwordRules', { rules: this.passwordRulesList })
+        this.http.put('../rest/passwordRules', { rules: this.passwordRulesList })
             .subscribe((data: any) => {
                 this.passwordRulesClone = JSON.parse(JSON.stringify(this.passwordRules));
                 this.notify.success(this.lang.passwordRulesUpdated);

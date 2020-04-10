@@ -80,7 +80,7 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
 
     getListemplates() {
         return new Promise((resolve, reject) => {
-            this.http.get("../../rest/listTemplates").pipe(
+            this.http.get("../rest/listTemplates").pipe(
                 map((data: any) => {
                     data.listTemplates = data.listTemplates.filter((template: any) => template.entityId === null && ['visaCircuit', 'opinionCircuit'].indexOf(template.type) > -1).map((template: any) => {
                         return {
@@ -125,7 +125,7 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete("../../rest/listTemplates/" + listTemplate['id'])),
+            exhaustMap(() => this.http.delete("../rest/listTemplates/" + listTemplate['id'])),
             tap(() => {
                 this.listTemplates = this.listTemplates.filter((template: any) => template.id !== listTemplate.id);
                 this.notify.success(this.lang.diffusionModelDeleted);

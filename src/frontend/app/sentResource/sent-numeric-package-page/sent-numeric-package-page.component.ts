@@ -139,7 +139,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
         this.templateEmailListForm.reset();
 
-        this.http.post(`../../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resId } }).pipe(
+        this.http.post(`../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resId } }).pipe(
             tap((data: any) => {
                 const textArea = document.createElement('textarea');
                 textArea.innerHTML = data.mergedDocument;
@@ -156,7 +156,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
         this.emailSignListForm.reset();
 
-        this.http.get(`../../rest/currentUser/emailSignatures/${templateId}`).pipe(
+        this.http.get(`../rest/currentUser/emailSignatures/${templateId}`).pipe(
             tap((data: any) => {
                 const textArea = document.createElement('textarea');
                 textArea.innerHTML = data.emailSignature.content;
@@ -181,7 +181,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
     getNumericPackageData(emailId: number) {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/messageExchanges/${emailId}`).pipe(
+            this.http.get(`../rest/messageExchanges/${emailId}`).pipe(
                 map((data: any) => data.messageExchange),
                 tap((data: any) => {
                     this.numericPackageCreatorId = data.userId;
@@ -242,7 +242,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
     getResourceData() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}?light=true`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}?light=true`).pipe(
                 tap((data: any) => {
                     this.resourceData = data;
                     this.numericPackage.object = this.resourceData.subject;
@@ -266,7 +266,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     setSender(id: number) {
-        this.http.get(`../../rest/contacts/${id}`).pipe(
+        this.http.get(`../rest/contacts/${id}`).pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.communicationMeans) && !this.functions.empty(data.externalId['m2m'])) {
                     this.recipients.push(
@@ -288,7 +288,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
     getM2MSenders() {
         return new Promise((resolve) => {
-            this.http.get('../../rest/messageExchangesInitialization').pipe(
+            this.http.get('../rest/messageExchangesInitialization').pipe(
                 tap((data: any) => {
                     this.availableSenders = data.entities;
                     this.currentSender = this.availableSenders[0];
@@ -305,7 +305,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
     getAttachElements() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}/emailsInitialization`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}/emailsInitialization`).pipe(
                 tap((data: any) => {
                     Object.keys(data).forEach(element => {
                         if (element === 'resource') {
@@ -345,7 +345,7 @@ export class SentNumericPackagePageComponent implements OnInit {
             }),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/contacts/m2m', { params: { 'search': data } })),
+            switchMap(data => this.http.get('../rest/autocomplete/contacts/m2m', { params: { 'search': data } })),
             tap((data: any) => {
                 data = data.map((contact: any) => {
                     return {
@@ -364,7 +364,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     initEmailModelsList() {
-        this.http.get(`../../rest/resources/${this.data.resId}/emailTemplates`).pipe(
+        this.http.get(`../rest/resources/${this.data.resId}/emailTemplates`).pipe(
             tap((data: any) => {
                 this.availableEmailModels = data.templates;
             }),
@@ -376,7 +376,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     initSignEmailModelsList() {
-        this.http.get(`../../rest/currentUser/emailSignatures`).pipe(
+        this.http.get(`../rest/currentUser/emailSignatures`).pipe(
             tap((data: any) => {
                 this.availableSignEmailModels = data.emailSignatures;
             }),
@@ -414,7 +414,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     createEmail(closeModal: boolean = true) {
-        this.http.post(`../../rest/resources/${this.data.resId}/messageExchange`, this.formatNumericPackage()).pipe(
+        this.http.post(`../rest/resources/${this.data.resId}/messageExchange`, this.formatNumericPackage()).pipe(
             tap(() => {
                 this.notify.success(this.lang.numericPackageSent);
 
@@ -433,7 +433,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/messageExchanges/${this.data.emailId}`)),
+            exhaustMap(() => this.http.delete(`../rest/messageExchanges/${this.data.emailId}`)),
             tap(() => {
                 this.notify.success(this.lang.numericPackageDeleted);
                 this.closeModal('success');
@@ -447,7 +447,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     updateEmail(closeModal: boolean = true) {
-        this.http.put(`../../rest/emails/${this.data.emailId}`, this.formatNumericPackage()).pipe(
+        this.http.put(`../rest/emails/${this.data.emailId}`, this.formatNumericPackage()).pipe(
             tap(() => {
 
                 this.notify.success(this.lang.numericPackageSent);
@@ -529,7 +529,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     saveNumericPackageFile() {
-        this.http.get(`../../rest/messageExchanges/${this.data.emailId}/archiveContent`, { responseType: 'blob' }).pipe(
+        this.http.get(`../rest/messageExchanges/${this.data.emailId}/archiveContent`, { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);

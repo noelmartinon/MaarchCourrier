@@ -327,9 +327,6 @@ if (!defined('_DEST_ENTITY')) {
 if (!defined('_NOTIFICATIONS_CONTACT_DIFF_TYPE')) {
     define('_NOTIFICATIONS_CONTACT_DIFF_TYPE', 'Verzending naar de verzender van de brief');
 }
-if (!defined('_SCHEDULE_NOTIFICATIONS')) {
-    define('_SCHEDULE_NOTIFICATIONS', 'De meldingen plannen');
-}
 if (!defined('_HOUR')) {
     define('_HOUR', 'Uur');
 }
@@ -377,24 +374,6 @@ if (!defined('_CHOOSE_NOTIF')) {
 }
 if (!defined('_NO_NOTIF')) {
     define('_NO_NOTIF', 'Geen melding gepland');
-}
-if (!defined('_CREATE_NOTIF_SCRIPT')) {
-    define('_CREATE_NOTIF_SCRIPT', 'Het script aanmaken');
-}
-if (!defined('_PB_CRON_COMMAND')) {
-    define('_PB_CRON_COMMAND', 'Een geplande taak werd niet correct gewijzigd. Begin opnieuw.');
-}
-if (!defined('_DEST_USER_VISA')) {
-    define('_DEST_USER_VISA', 'GOEDKEURING Verzending aan de gebruiker die moet goedkeuren');
-}
-if (!defined('_DEST_USER_SIGN')) {
-    define('_DEST_USER_SIGN', 'GOEDKEURING Verzending aan de gebruiker die moet tekenen');
-}
-if (!defined('_NOTIFICATIONS_DEST_USER_VISA_DIFF_TYPE_WITH_STATUS')) {
-    define('_NOTIFICATIONS_DEST_USER_VISA_DIFF_TYPE_WITH_STATUS', 'Verzending naar de gebruiker die moet goedkeuren met de status(sen):');
-}
-if (!defined('_NOTIFICATIONS_DEST_USER_SIGN_DIFF_TYPE_WITH_STATUS')) {
-    define('_NOTIFICATIONS_DEST_USER_SIGN_DIFF_TYPE_WITH_STATUS', 'Verzending naar de gebruiker die moet tekenen met de status(sen):');
 }
 if (!defined('_DEPARTMENT')) {
     define('_DEPARTMENT', 'de eenheid');

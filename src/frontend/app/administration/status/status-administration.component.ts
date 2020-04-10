@@ -53,7 +53,7 @@ export class StatusAdministrationComponent implements OnInit {
             if (typeof params['identifier'] === 'undefined') {
                 this.headerService.setHeader(this.lang.statusCreation);
 
-                this.http.get('../../rest/administration/statuses/new')
+                this.http.get('../rest/administration/statuses/new')
                     .subscribe((data: any) => {
                         this.status.img_filename = 'fm-letter';
                         this.status.can_be_searched = true;
@@ -67,7 +67,7 @@ export class StatusAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
                 this.statusIdentifier = params['identifier'];
-                this.http.get('../../rest/statuses/' + params['identifier'])
+                this.http.get('../rest/statuses/' + params['identifier'])
                     .subscribe((data: any) => {
                         this.status = data['status'][0];
                         this.headerService.setHeader(this.lang.statusModification, this.status['label_status']);
@@ -94,7 +94,7 @@ export class StatusAdministrationComponent implements OnInit {
 
     isAvailable() {
         if (this.status.id) {
-            this.http.get('../../rest/status/' + this.status.id)
+            this.http.get('../rest/status/' + this.status.id)
                 .subscribe(() => {
                     this.statusIdAvailable = false;
                 }, (err) => {
@@ -110,7 +110,7 @@ export class StatusAdministrationComponent implements OnInit {
 
     submitStatus() {
         if (this.creationMode === true) {
-            this.http.post('../../rest/statuses', this.status)
+            this.http.post('../rest/statuses', this.status)
                 .subscribe(() => {
                     this.notify.success(this.lang.statusAdded);
                     this.router.navigate(['administration/statuses']);
@@ -119,7 +119,7 @@ export class StatusAdministrationComponent implements OnInit {
                 });
         } else if (this.creationMode === false) {
 
-            this.http.put('../../rest/statuses/' + this.statusIdentifier, this.status)
+            this.http.put('../rest/statuses/' + this.statusIdentifier, this.status)
                 .subscribe(() => {
                     this.notify.success(this.lang.statusUpdated);
                     this.router.navigate(['administration/statuses']);

@@ -52,7 +52,7 @@ export class StatusesAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/statuses')
+        this.http.get('../rest/statuses')
             .subscribe((data: any) => {
                 this.statuses = data.statuses;
                 this.loading = false;
@@ -73,7 +73,7 @@ export class StatusesAdministrationComponent implements OnInit {
     deleteStatus(status: any) {
         const resp = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + status.id + ' »');
         if (resp) {
-            this.http.delete('../../rest/statuses/' + status.identifier)
+            this.http.delete('../rest/statuses/' + status.identifier)
                 .subscribe((data: any) => {
                     this.statuses = data.statuses;
                     this.dataSource = new MatTableDataSource(this.statuses);

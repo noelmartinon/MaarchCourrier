@@ -220,7 +220,7 @@ export class ExportComponent implements OnInit {
     ngOnInit(): void {
         this.dataAvailableClone = JSON.parse(JSON.stringify(this.dataAvailable));
 
-        this.http.get('../../rest/resourcesList/exportTemplate')
+        this.http.get('../rest/resourcesList/exportTemplate')
             .subscribe((data: any) => {
                 this.exportModel.resources = this.data.selectedRes;
 
@@ -239,7 +239,7 @@ export class ExportComponent implements OnInit {
                 this.notify.handleErrors(err);
             });
 
-        this.http.get('../../rest/customFields').pipe(
+        this.http.get('../rest/customFields').pipe(
             map((data: any) => {
                 data.customFields = data.customFields.map((custom: any) => {
                     return {
@@ -289,7 +289,7 @@ export class ExportComponent implements OnInit {
 
     exportData() {
         this.loadingExport = true;
-        this.http.put('../../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/exports', this.exportModel, { responseType: 'blob' }).pipe(
+        this.http.put('../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/exports', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');

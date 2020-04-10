@@ -26,12 +26,12 @@
             </div>
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
-            <div class="container-content">
+            <div class="container-content" style="padding: 10px 10px 0px 10px;">
                 <div *ngIf="loading" style="display:flex;height:100%;">
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
-                <mat-card *ngIf="!loading" class="card-app-content">
-                    <form class="form-horizontal" (ngSubmit)="onSubmit()" #templatesFormUp="ngForm">
+                <mat-card *ngIf="!loading" class="card-app-content" style="display: contents;">
+                    <form style="display: contents;" class="form-horizontal" (ngSubmit)="onSubmit()" #templatesFormUp="ngForm">
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="col-sm-12">
@@ -124,8 +124,7 @@
                                             [(ngModel)]="selectedModelFile"
                                             [required]="template.target!='acknowledgementReceipt'">
                                             <mat-optgroup label="{{lang.loadedFile}} :">
-                                                <mat-option class="selectFile"
-                                                    (click)="uploadSignFileOffice.click()"
+                                                <mat-option class="selectFile" (click)="uploadSignFileOffice.click()"
                                                     [value]="template.file.name">
                                                     <mat-icon class="fa fa-paperclip" color="primary"
                                                         style="height:auto;"></mat-icon>
@@ -150,12 +149,11 @@
                                         [disabled]="lockFound">{{lang.templateEdition}}</button>
                                     <button mat-raised-button color="default" type="button"
                                         (click)="$event.stopPropagation();uploadSignFileOffice.click()"
-                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode))"
+                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode && !functionsService.empty(template.file.name)))"
                                         [disabled]="lockFound">{{lang.importFile}}</button>
                                 </div>
                                 <iframe *ngIf="templateDocView !== null" [src]="templateDocView"
                                     style="width:100%;height:800px;"></iframe>
-                                <!--<app-document-viewer *ngIf="templateDocView !== null" #appDocumentViewer [editMode]="false" [base64]="templateDocView" style="height:100%;width:100%;"></app-document-viewer>-->
                             </div>
                             <div class="form-group" *ngIf="template.type=='TXT'">
                                 <div class="col-sm-12">
@@ -221,16 +219,15 @@
                                                 <mat-select id="template_style"
                                                     [disabled]="!creationMode && template.file.paper.name !== null"
                                                     name="template_style" title="{{lang.defaultTemplate}}"
-                                                    placeholder="{{lang.chosenModel}}"
-                                                    [(ngModel)]="selectedModelFile"
-                                                    (ngModelChange)="resetFileUploaded()"
+                                                    placeholder="{{lang.chosenModel}}" [(ngModel)]="selectedModelFile"
                                                     [required]="template.target!='acknowledgementReceipt'">
                                                     <mat-optgroup label="{{lang.loadedFile}} :">
-                                                        <mat-option
-                                                            (click)="uploadSignFileOfficeHtml.click()"
-                                                            style="text-align: center;" [value]="template.file.paper.name">
+                                                        <mat-option (click)="uploadSignFileOfficeHtml.click()"
+                                                            style="text-align: center;"
+                                                            [value]="template.file.paper.name">
                                                             <mat-icon class="fa fa-paperclip" color="primary"
-                                                                style="height:auto;"></mat-icon> {{!functionsService.empty(template.file.paper) && !functionsService.empty(template.file.paper.name) ? template.file.paper.name : lang.importFile}}
+                                                                style="height:auto;"></mat-icon>
+                                                            {{!functionsService.empty(template.file.paper) && !functionsService.empty(template.file.paper.name) ? template.file.paper.name : lang.importFile}}
                                                         </mat-option>
                                                     </mat-optgroup>
                                                     <ng-container *ngFor="let extension of extensionModels">
@@ -247,7 +244,7 @@
                                             </mat-form-field>
                                             <button mat-raised-button color="default" type="button"
                                                 (click)="$event.stopPropagation();editFile()"
-                                                *ngIf="((creationMode && selectedModelFile) || (!creationMode))"
+                                                *ngIf="((creationMode && selectedModelFile) || (!creationMode && !functionsService.empty(template.file.paper.name)))"
                                                 [disabled]="lockFound">{{lang.templateEdition}}</button>
                                             <button mat-raised-button color="default" type="button"
                                                 (click)="$event.stopPropagation();uploadSignFileOfficeHtml.click()"
@@ -260,11 +257,9 @@
                                 </mat-tab-group>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="col-sm-12" style="text-align:center;">
-                                <button mat-raised-button color="primary" type="submit"
-                                    [disabled]="!templatesFormUp.form.valid || lockFound">{{lang.save}}</button>
-                            </div>
+                        <div class="col-sm-12" style="background: white;position:sticky;bottom:0px; text-align:center;">
+                            <button mat-raised-button color="primary" type="submit"
+                                [disabled]="!templatesFormUp.form.valid || lockFound">{{lang.save}}</button>
                         </div>
                     </form>
                 </mat-card>

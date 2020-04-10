@@ -65,7 +65,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/indexingModels?showDisabled=true').pipe(
+        this.http.get('../rest/indexingModels?showDisabled=true').pipe(
             map((data: any) => {
                 return data.indexingModels.filter((info: any) => info.private === false);
             }),
@@ -96,7 +96,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
             this.dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.delete('../../rest/indexingModels/' + indexingModel.id)),
+                exhaustMap(() => this.http.delete('../rest/indexingModels/' + indexingModel.id)),
                 tap(() => {
                     for (let i in this.indexingModels) {
                         if (this.indexingModels[i].id === indexingModel.id) {
@@ -123,7 +123,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('PUT', '../../rest/indexingModels/' + indexingModel.id + '/disable')),
+            exhaustMap(() => this.http.request('PUT', '../rest/indexingModels/' + indexingModel.id + '/disable')),
             tap((data: any) => {
                 for (const i in this.indexingModels) {
                     if (this.indexingModels[i].id === indexingModel.id) {
@@ -144,7 +144,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('PUT', '../../rest/indexingModels/' + indexingModel.id + '/enable')),
+            exhaustMap(() => this.http.request('PUT', '../rest/indexingModels/' + indexingModel.id + '/enable')),
             tap((data: any) => {
                 for (let i in this.indexingModels) {
                     if (this.indexingModels[i].id === indexingModel.id) {

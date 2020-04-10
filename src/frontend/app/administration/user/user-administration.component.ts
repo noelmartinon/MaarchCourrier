@@ -149,7 +149,7 @@ export class UserAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
                 this.serialId = params['id'];
-                this.http.get('../../rest/users/' + this.serialId + '/details')
+                this.http.get('../rest/users/' + this.serialId + '/details')
                     .subscribe((data: any) => {
                         this.user = data;
 
@@ -190,7 +190,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     checkInfoMaarchParapheurAccount() {
-        this.http.get('../../rest/users/' + this.serialId + '/statusInMaarchParapheur')
+        this.http.get('../rest/users/' + this.serialId + '/statusInMaarchParapheur')
             .subscribe((data: any) => {
                 this.maarchParapheurLink.login = data.link;
                 this.loading = false;
@@ -217,7 +217,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     linkAccountToMaarchParahpeur(externalId: number) {
-        this.http.put('../../rest/users/' + this.serialId + '/linkToMaarchParapheur', { maarchParapheurUserId: externalId })
+        this.http.put('../rest/users/' + this.serialId + '/linkToMaarchParapheur', { maarchParapheurUserId: externalId })
             .subscribe(() => {
                 this.user.canCreateMaarchParapheurUser = false;
                 this.user.external_id['maarchParapheur'] = externalId;
@@ -229,7 +229,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     createAccountToMaarchParahpeur(id: number, login: string) {
-        this.http.put('../../rest/users/' + id + '/createInMaarchParapheur', { login: login })
+        this.http.put('../rest/users/' + id + '/createInMaarchParapheur', { login: login })
             .subscribe((data: any) => {
                 this.user.canCreateMaarchParapheurUser = false;
                 this.user.external_id['maarchParapheur'] = data.externalId;
@@ -244,7 +244,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     loadAvatarMaarchParapheur(externalId: number) {
-        this.http.get('../../rest/maarchParapheur/user/' + externalId + '/picture')
+        this.http.get('../rest/maarchParapheur/user/' + externalId + '/picture')
             .subscribe((data: any) => {
                 this.maarchParapheurLink.picture = data.picture;
 
@@ -257,7 +257,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.unlinkAccount);
 
         if (r) {
-            this.http.put('../../rest/users/' + this.serialId + '/unlinkToMaarchParapheur', {})
+            this.http.put('../rest/users/' + this.serialId + '/unlinkToMaarchParapheur', {})
                 .subscribe(() => {
                     this.user.canCreateMaarchParapheurUser = true;
                     this.maarchParapheurLink.login = '';
@@ -273,7 +273,7 @@ export class UserAdministrationComponent implements OnInit {
     toogleRedirect(basket: any) {
         $('#redirectUser_' + basket.group_id + '_' + basket.basket_id).toggle();
 
-        this.http.get('../../rest/users')
+        this.http.get('../rest/users')
             .subscribe((data: any) => {
                 // this.userList = data['users'];
 
@@ -373,7 +373,7 @@ export class UserAdministrationComponent implements OnInit {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.sendActivationNotification);
 
         if (r) {
-            this.http.put('../../rest/users/' + this.serialId + '/accountActivationNotification', {})
+            this.http.put('../rest/users/' + this.serialId + '/accountActivationNotification', {})
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.activationNotificationSend);
                 }, (err) => {
@@ -388,7 +388,7 @@ export class UserAdministrationComponent implements OnInit {
                 'groupId': group.group_id,
                 'role': group.role
             };
-            this.http.post('../../rest/users/' + this.serialId + '/groups', groupReq)
+            this.http.post('../rest/users/' + this.serialId + '/groups', groupReq)
                 .subscribe(async (data: any) => {
                     this.user.groups = data.groups;
                     this.user.baskets = data.baskets;
@@ -401,7 +401,7 @@ export class UserAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.delete('../../rest/users/' + this.serialId + '/groups/' + group.group_id)
+            this.http.delete('../rest/users/' + this.serialId + '/groups/' + group.group_id)
                 .subscribe(async (data: any) => {
                     this.user.groups = data.groups;
                     this.user.baskets = data.baskets;
@@ -418,7 +418,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updateGroup(group: any) {
-        this.http.put('../../rest/users/' + this.serialId + '/groups/' + group.group_id, group)
+        this.http.put('../rest/users/' + this.serialId + '/groups/' + group.group_id, group)
             .subscribe((data: any) => {
                 this.notify.success(this.lang.groupUpdated);
             }, (err) => {
@@ -432,7 +432,7 @@ export class UserAdministrationComponent implements OnInit {
             'role': ''
         };
 
-        this.http.post('../../rest/users/' + this.serialId + '/entities', entity)
+        this.http.post('../rest/users/' + this.serialId + '/entities', entity)
             .subscribe((data: any) => {
                 this.user.entities = data.entities;
                 this.user.allEntities = data.allEntities;
@@ -446,7 +446,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updateEntity(entity: any) {
-        this.http.put('../../rest/users/' + this.serialId + '/entities/' + entity.entity_id, entity)
+        this.http.put('../rest/users/' + this.serialId + '/entities/' + entity.entity_id, entity)
             .subscribe(() => {
                 this.notify.success(this.lang.entityUpdated);
             }, (err) => {
@@ -455,7 +455,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     updatePrimaryEntity(entity: any) {
-        this.http.put('../../rest/users/' + this.serialId + '/entities/' + entity.entity_id + '/primaryEntity', {})
+        this.http.put('../rest/users/' + this.serialId + '/entities/' + entity.entity_id + '/primaryEntity', {})
             .subscribe((data: any) => {
                 this.user['entities'] = data.entities;
                 this.notify.success(this.lang.entityTooglePrimary + ' « ' + entity.entity_id + ' »');
@@ -467,10 +467,10 @@ export class UserAdministrationComponent implements OnInit {
     deleteEntity(entityId: any) {
 
         // first check confidential state
-        this.http.get('../../rest/users/' + this.serialId + '/entities/' + entityId)
+        this.http.get('../rest/users/' + this.serialId + '/entities/' + entityId)
             .subscribe((data: any) => {
                 if (!data['hasConfidentialityInstances'] && !data['hasListTemplates']) {
-                    this.http.delete('../../rest/users/' + this.serialId + '/entities/' + entityId)
+                    this.http.delete('../rest/users/' + this.serialId + '/entities/' + entityId)
                         .subscribe((dataEntities: any) => {
                             this.user.entities = dataEntities.entities;
                             this.user.allEntities = dataEntities.allEntities;
@@ -488,7 +488,7 @@ export class UserAdministrationComponent implements OnInit {
                         this.mode = 'delete';
                         if (result) {
                             this.mode = result.processMode;
-                            this.http.request('DELETE', '../../rest/users/' + this.serialId + '/entities/' + entityId, { body: { 'mode': this.mode, 'newUser': result.newUser } })
+                            this.http.request('DELETE', '../rest/users/' + this.serialId + '/entities/' + entityId, { body: { 'mode': this.mode, 'newUser': result.newUser } })
                                 .subscribe((dataEntities: any) => {
                                     this.user.entities = dataEntities.entities;
                                     this.user.allEntities = dataEntities.allEntities;
@@ -513,7 +513,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     submitSignature() {
-        this.http.post('../../rest/users/' + this.serialId + '/signatures', this.signatureModel)
+        this.http.post('../rest/users/' + this.serialId + '/signatures', this.signatureModel)
             .subscribe((data: any) => {
                 this.user.signatures = data.signatures;
                 this.notify.success(this.lang.signAdded);
@@ -534,7 +534,7 @@ export class UserAdministrationComponent implements OnInit {
         const id = this.user.signatures[selectedSignature].id;
         const label = this.user.signatures[selectedSignature].signature_label;
 
-        this.http.put('../../rest/users/' + this.serialId + '/signatures/' + id, { 'label': label })
+        this.http.put('../rest/users/' + this.serialId + '/signatures/' + id, { 'label': label })
             .subscribe((data: any) => {
                 this.user.signatures[selectedSignature].signature_label = data.signature.signature_label;
                 this.notify.success(this.lang.signUpdated);
@@ -547,7 +547,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + signature.signature_label + ' »');
 
         if (r) {
-            this.http.delete('../../rest/users/' + this.serialId + '/signatures/' + signature.id)
+            this.http.delete('../rest/users/' + this.serialId + '/signatures/' + signature.id)
                 .subscribe((data: any) => {
                     this.user.signatures = data.signatures;
                     this.notify.success(this.lang.signDeleted);
@@ -594,7 +594,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post('../../rest/users/' + this.serialId + '/redirectedBaskets', basketsRedirect)
+            this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', basketsRedirect)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets = data['redirectedBaskets'];
@@ -610,7 +610,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post('../../rest/users/' + this.serialId + '/redirectedBaskets', [
+            this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', [
                 {
                     'actual_user_id': newUser.serialId,
                     'basket_id': basket.basket_id,
@@ -632,7 +632,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete('../../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
+            this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets.splice(i, 1);
@@ -647,7 +647,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete('../../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
+            this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
@@ -669,7 +669,7 @@ export class UserAdministrationComponent implements OnInit {
             });
         });
         if (basketsDisable.length > 0) {
-            this.http.put('../../rest/users/' + this.serialId + '/baskets', { 'baskets': basketsDisable })
+            this.http.put('../rest/users/' + this.serialId + '/baskets', { 'baskets': basketsDisable })
                 .subscribe((data: any) => {
                     this.selectionBaskets.clear();
                     this.notify.success(this.lang.basketsUpdated);
@@ -680,7 +680,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     activateAbsence() {
-        this.http.put('../../rest/users/' + this.serialId + '/status', { 'status': 'ABS' })
+        this.http.put('../rest/users/' + this.serialId + '/status', { 'status': 'ABS' })
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
                 this.userAbsenceModel = [];
@@ -691,7 +691,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     desactivateAbsence() {
-        this.http.put('../../rest/users/' + this.serialId + '/status', { 'status': 'OK' })
+        this.http.put('../rest/users/' + this.serialId + '/status', { 'status': 'OK' })
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
                 this.notify.success(this.lang.absOff);
@@ -748,7 +748,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     changePasswd() {
-        this.http.get('../../rest/passwordRules')
+        this.http.get('../rest/passwordRules')
             .subscribe((data: any) => {
                 const valArr: ValidatorFn[] = [];
                 const ruleTextArr: String[] = [];
@@ -841,7 +841,7 @@ export class UserAdministrationComponent implements OnInit {
         this.passwordModel.currentPassword = this.firstFormGroup.controls['currentPasswordCtrl'].value;
         this.passwordModel.newPassword = this.firstFormGroup.controls['newPasswordCtrl'].value;
         this.passwordModel.reNewPassword = this.firstFormGroup.controls['retypePasswordCtrl'].value;
-        this.http.put('../../rest/users/' + this.serialId + '/password', this.passwordModel)
+        this.http.put('../rest/users/' + this.serialId + '/password', this.passwordModel)
             .subscribe(() => {
                 this.showPassword = false;
                 this.passwordModel = {
@@ -859,7 +859,7 @@ export class UserAdministrationComponent implements OnInit {
         if (this.creationMode) {
             let r = true;
 
-            this.http.get('../../rest/users/' + this.user.userId + '/status')
+            this.http.get('../rest/users/' + this.user.userId + '/status')
                 .subscribe((data: any) => {
                     let deletedUser = false;
                     if (data.status && data.status === 'DEL') {
@@ -867,7 +867,7 @@ export class UserAdministrationComponent implements OnInit {
                         deletedUser = true;
                     }
                     if (r) {
-                        this.http.post('../../rest/users', this.user)
+                        this.http.post('../rest/users', this.user)
                             .subscribe((result: any) => {
                                 if (deletedUser) {
                                     this.notify.success(this.lang.userUpdated);
@@ -883,7 +883,7 @@ export class UserAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/users/' + this.serialId, this.user)
+            this.http.put('../rest/users/' + this.serialId, this.user)
                 .subscribe((data: any) => {
                     if (this.headerService.user.id == this.serialId) {
                         this.headerService.resfreshCurrentUser();
@@ -907,7 +907,7 @@ export class UserAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.createUserInMaarchParapheur);
 
         if (r) {
-            this.http.put('../../rest/users/' + this.serialId + '/maarchParapheur', '')
+            this.http.put('../rest/users/' + this.serialId + '/maarchParapheur', '')
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.userCreatedInMaarchParapheur);
                     this.user.external_id['maarchParapheur'] = data.externalId;
@@ -925,7 +925,7 @@ export class UserAdministrationComponent implements OnInit {
     syncMP() {
         this.loadingSign = true;
 
-        this.http.put('../../rest/users/' + this.user.id + '/externalSignatures', {})
+        this.http.put('../rest/users/' + this.user.id + '/externalSignatures', {})
             .subscribe((data: any) => {
                 this.loadingSign = false;
                 this.notify.success(this.lang.signsSynchronized);

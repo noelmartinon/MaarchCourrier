@@ -618,7 +618,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'resId param is not an integer']);
         }
 
-        $pathToThumbnail = 'apps/maarch_entreprise/img/noThumbnail.png';
+        $pathToThumbnail = 'dist/assets/noThumbnail.png';
 
         $document = ResModel::getById(['select' => ['filename', 'version'], 'resId' => $args['resId']]);
         if (empty($document)) {

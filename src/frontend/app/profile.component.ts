@@ -180,7 +180,7 @@ export class ProfileComponent implements OnInit {
             debounceTime(500),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/contacts', { params: { 'search': data } }))
+            switchMap(data => this.http.get('../rest/autocomplete/contacts', { params: { 'search': data } }))
         ).subscribe((response: any) => {
             this.searchResult = response;
             this.dataSourceContactsListAutocomplete = new MatTableDataSource(this.searchResult);
@@ -188,7 +188,7 @@ export class ProfileComponent implements OnInit {
             // this.dataSource.sort      = this.sortContactList;
         });
 
-        this.http.get('../../rest/documentEditors').pipe(
+        this.http.get('../rest/documentEditors').pipe(
             tap((data: any) => {
                 this.editorsList = data;
             })
@@ -203,7 +203,7 @@ export class ProfileComponent implements OnInit {
                 this.sidenavRight.open();
             }
 
-            this.http.get('../../rest/history/users/' + this.user.id)
+            this.http.get('../rest/history/users/' + this.user.id)
                 .subscribe((data: any) => {
                     this.histories = data.histories;
                     setTimeout(() => {
@@ -257,7 +257,7 @@ export class ProfileComponent implements OnInit {
     initGroupsContact() {
         this.contactsListMode = false;
         this.selectedIndexContactsGrp = 0;
-        this.http.get('../../rest/contactsGroups')
+        this.http.get('../rest/contactsGroups')
             .subscribe((data) => {
                 this.contactsGroups = [];
                 this.contactsGroup = { public: false, contacts: [] };
@@ -280,7 +280,7 @@ export class ProfileComponent implements OnInit {
     }
 
     contactsGroupSubmit() {
-        this.http.post('../../rest/contactsGroups', this.contactsGroup)
+        this.http.post('../rest/contactsGroups', this.contactsGroup)
             .subscribe((data: any) => {
                 this.initGroupsContact();
                 // this.toggleAddGrp();
@@ -291,7 +291,7 @@ export class ProfileComponent implements OnInit {
     }
 
     updateGroupSubmit() {
-        this.http.put('../../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
+        this.http.put('../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
             .subscribe(() => {
                 this.notify.success(this.lang.contactsGroupUpdated);
                 this.initGroupsContact();
@@ -304,7 +304,7 @@ export class ProfileComponent implements OnInit {
         var contactsGroup = this.contactsGroups[row];
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + contactsGroup.label + ' »');
         if (r) {
-            this.http.delete('../../rest/contactsGroups/' + contactsGroup.id)
+            this.http.delete('../rest/contactsGroups/' + contactsGroup.id)
                 .subscribe(() => {
                     this.contactsListMode = false;
                     var lastElement = this.contactsGroups.length - 1;
@@ -325,7 +325,7 @@ export class ProfileComponent implements OnInit {
     loadContactsGroup(contactsGroup: any) {
         this.contactsListMode = true;
 
-        this.http.get('../../rest/contactsGroups/' + contactsGroup.id)
+        this.http.get('../rest/contactsGroups/' + contactsGroup.id)
             .subscribe((data: any) => {
                 this.contactsGroup = data.contactsGroup;
                 setTimeout(() => {
@@ -340,7 +340,7 @@ export class ProfileComponent implements OnInit {
     saveContactsList(elem: any): void {
         elem.textContent = this.lang.loading + '...';
         elem.disabled = true;
-        this.http.post('../../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
+        this.http.post('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
             .subscribe((data: any) => {
                 this.notify.success(this.lang.contactAdded);
                 this.selection.clear();
@@ -365,7 +365,7 @@ export class ProfileComponent implements OnInit {
     }
 
     removeContact(contact: any, row: any) {
-        this.http.delete('../../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
+        this.http.delete('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
             .subscribe(() => {
                 var lastElement = this.contactsGroup.contacts.length - 1;
                 this.contactsGroup.contacts[row] = this.contactsGroup.contacts[lastElement];
@@ -410,7 +410,7 @@ export class ProfileComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/currentUser/profile')
+        this.http.get('../rest/currentUser/profile')
             .subscribe((data: any) => {
                 this.user = data;
 
@@ -531,7 +531,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post('../../rest/users/' + this.user.id + '/redirectedBaskets', basketsRedirect)
+            this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', basketsRedirect)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets = data['redirectedBaskets'];
@@ -547,7 +547,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete('../../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
+            this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets.splice(i, 1);
@@ -562,7 +562,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction);
 
         if (r) {
-            this.http.delete('../../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
+            this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
@@ -577,7 +577,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
 
         if (r) {
-            this.http.post('../../rest/users/' + this.user.id + '/redirectedBaskets', [
+            this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', [
                 {
                     'actual_user_id': newUser.serialId,
                     'basket_id': basket.basket_id,
@@ -596,7 +596,7 @@ export class ProfileComponent implements OnInit {
     }
 
     updateBasketColor(i: number, y: number) {
-        this.http.put('../../rest/currentUser/groups/' + this.user.regroupedBaskets[i].groupSerialId + '/baskets/' + this.user.regroupedBaskets[i].baskets[y].basket_id, { 'color': this.user.regroupedBaskets[i].baskets[y].color })
+        this.http.put('../rest/currentUser/groups/' + this.user.regroupedBaskets[i].groupSerialId + '/baskets/' + this.user.regroupedBaskets[i].baskets[y].basket_id, { 'color': this.user.regroupedBaskets[i].baskets[y].color })
             .subscribe((data: any) => {
                 this.user.regroupedBaskets = data.userBaskets;
                 this.notify.success(this.lang.modificationSaved);
@@ -609,7 +609,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmToBeAbsent);
 
         if (r) {
-            this.http.put('../../rest/users/' + this.user.id + '/status', { 'status': 'ABS' })
+            this.http.put('../rest/users/' + this.user.id + '/status', { 'status': 'ABS' })
                 .subscribe(() => {
                     this.authService.logout();
                 }, (err) => {
@@ -636,7 +636,7 @@ export class ProfileComponent implements OnInit {
         this.passwordModel.currentPassword = this.firstFormGroup.controls['currentPasswordCtrl'].value;
         this.passwordModel.newPassword = this.firstFormGroup.controls['newPasswordCtrl'].value;
         this.passwordModel.reNewPassword = this.firstFormGroup.controls['retypePasswordCtrl'].value;
-        this.http.put('../../rest/users/' + this.user.id + '/password', this.passwordModel)
+        this.http.put('../rest/users/' + this.user.id + '/password', this.passwordModel)
             .subscribe((data: any) => {
                 this.showPassword = false;
                 this.passwordModel = {
@@ -653,7 +653,7 @@ export class ProfileComponent implements OnInit {
     submitEmailSignature() {
         this.mailSignatureModel.htmlBody = tinymce.get('emailSignature').getContent();
 
-        this.http.post('../../rest/currentUser/emailSignature', this.mailSignatureModel)
+        this.http.post('../rest/currentUser/emailSignature', this.mailSignatureModel)
             .subscribe((data: any) => {
                 if (data.errors) {
                     this.notify.error(data.errors);
@@ -674,7 +674,7 @@ export class ProfileComponent implements OnInit {
         this.mailSignatureModel.htmlBody = tinymce.get('emailSignature').getContent();
         var id = this.user.emailSignatures[this.mailSignatureModel.selected].id;
 
-        this.http.put('../../rest/currentUser/emailSignature/' + id, this.mailSignatureModel)
+        this.http.put('../rest/currentUser/emailSignature/' + id, this.mailSignatureModel)
             .subscribe((data: any) => {
                 if (data.errors) {
                     this.notify.error(data.errors);
@@ -692,7 +692,7 @@ export class ProfileComponent implements OnInit {
         if (r) {
             var id = this.user.emailSignatures[this.mailSignatureModel.selected].id;
 
-            this.http.delete('../../rest/currentUser/emailSignature/' + id)
+            this.http.delete('../rest/currentUser/emailSignature/' + id)
                 .subscribe((data: any) => {
                     if (data.errors) {
                         this.notify.error(data.errors);
@@ -711,7 +711,7 @@ export class ProfileComponent implements OnInit {
     }
 
     submitSignature() {
-        this.http.post('../../rest/users/' + this.user.id + '/signatures', this.signatureModel)
+        this.http.post('../rest/users/' + this.user.id + '/signatures', this.signatureModel)
             .subscribe((data: any) => {
                 this.user.signatures = data.signatures;
                 this.signatureModel = {
@@ -729,7 +729,7 @@ export class ProfileComponent implements OnInit {
     }
 
     updateSignature(signature: any) {
-        this.http.put('../../rest/users/' + this.user.id + '/signatures/' + signature.id, { 'label': signature.signature_label })
+        this.http.put('../rest/users/' + this.user.id + '/signatures/' + signature.id, { 'label': signature.signature_label })
             .subscribe((data: any) => {
                 this.notify.success(this.lang.signatureUpdated);
             }, (err) => {
@@ -741,7 +741,7 @@ export class ProfileComponent implements OnInit {
         let r = confirm(this.lang.confirmDeleteSignature);
 
         if (r) {
-            this.http.delete('../../rest/users/' + this.user.id + '/signatures/' + id)
+            this.http.delete('../rest/users/' + this.user.id + '/signatures/' + id)
                 .subscribe((data: any) => {
                     this.user.signatures = data.signatures;
                     this.notify.success(this.lang.signatureDeleted);
@@ -752,7 +752,7 @@ export class ProfileComponent implements OnInit {
     }
 
     onSubmit() {
-        this.http.put('../../rest/currentUser/profile', this.user)
+        this.http.put('../rest/currentUser/profile', this.user)
             .subscribe(() => {
                 this.notify.success(this.lang.modificationSaved);
                 this.headerService.user.firstname = this.user.firstname;
@@ -763,7 +763,7 @@ export class ProfileComponent implements OnInit {
     }
 
     updateUserPreferences() {
-        this.http.put('../../rest/currentUser/profile/preferences', { documentEdition: this.user.preferences.documentEdition })
+        this.http.put('../rest/currentUser/profile/preferences', { documentEdition: this.user.preferences.documentEdition })
             .subscribe(() => {
                 this.notify.success(this.lang.modificationSaved);
                 this.headerService.resfreshCurrentUser();
@@ -783,7 +783,7 @@ export class ProfileComponent implements OnInit {
     }
 
     changePasswd() {
-        this.http.get('../../rest/passwordRules')
+        this.http.get('../rest/passwordRules')
             .subscribe((data: any) => {
                 let valArr: ValidatorFn[] = [];
                 let ruleTextArr: String[] = [];
@@ -938,7 +938,7 @@ export class ProfileComponent implements OnInit {
     syncMP() {
         this.loadingSign = true;
 
-        this.http.put('../../rest/users/' + this.user.id + '/externalSignatures', {})
+        this.http.put('../rest/users/' + this.user.id + '/externalSignatures', {})
             .subscribe((data: any) => {
                 this.loadingSign = false;
                 this.notify.success(this.lang.signsSynchronized);

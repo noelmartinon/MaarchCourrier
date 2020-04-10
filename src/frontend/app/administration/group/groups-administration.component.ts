@@ -62,7 +62,7 @@ export class GroupsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/groups')
+        this.http.get('../rest/groups')
             .subscribe((data: any) => {
                 this.groups = data['groups'];
                 this.loading = false;
@@ -100,7 +100,7 @@ export class GroupsAdministrationComponent implements OnInit {
                     if (result === '_NO_REPLACEMENT') {
                         this.deleteGroup(group);
                     } else {
-                        this.http.put('../../rest/groups/' + group.id + '/reassign/' + result, {})
+                        this.http.put('../rest/groups/' + group.id + '/reassign/' + result, {})
                             .subscribe((data: any) => {
                                 this.deleteGroup(group);
                             }, (err) => {
@@ -115,7 +115,7 @@ export class GroupsAdministrationComponent implements OnInit {
     }
 
     deleteGroup(group: any) {
-        this.http.delete('../../rest/groups/' + group['id'])
+        this.http.delete('../rest/groups/' + group['id'])
             .subscribe((data: any) => {
                 setTimeout(() => {
                     this.groups = data['groups'];

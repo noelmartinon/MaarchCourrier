@@ -60,7 +60,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
         this.currentDate = event.toLocaleDateString(this.lang.langISO, options);
 
-        this.http.get('../../rest/home')
+        this.http.get('../rest/home')
             .subscribe((data: any) => {
                 this.homeData = data;
                 this.homeMessage = data['homeMessage'];
@@ -68,7 +68,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.http.get('../../rest/home/lastRessources')
+        this.http.get('../rest/home/lastRessources')
             .subscribe((data: any) => {
                 setTimeout(() => {
                     this.dataSource = new MatTableDataSource(data.lastResources);
@@ -78,7 +78,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../../rest/resources/${row.res_id}/content?mode=view`, { responseType: 'blob' })
+        this.http.get(`../rest/resources/${row.res_id}/content?mode=view`, { responseType: 'blob' })
             .subscribe((data: any) => {
                 const file = new Blob([data], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);
@@ -90,7 +90,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     viewThumbnail(row: any) {
         const timeStamp = +new Date();
-        this.thumbnailUrl = '../../rest/resources/' + row.res_id + '/thumbnail?tsp=' + timeStamp;
+        this.thumbnailUrl = '../rest/resources/' + row.res_id + '/thumbnail?tsp=' + timeStamp;
         $('#viewThumbnail').show();
         $('#listContent').css({ 'overflow': 'hidden' });
     }
@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     goToDetail(row: any) {
-        this.http.get('../../rest/resources/' + row.res_id + '/isAllowed')
+        this.http.get('../rest/resources/' + row.res_id + '/isAllowed')
             .subscribe((data: any) => {
                 if (data['isAllowed']) {
                     this.router.navigate([`/resources/${row.res_id}`]);

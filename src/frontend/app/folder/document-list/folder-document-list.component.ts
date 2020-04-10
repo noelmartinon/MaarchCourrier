@@ -143,7 +143,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
             this.dragInit = true;
             this.destroy$.next(true);
 
-            this.http.get('../../rest/folders/' + params['folderId'])
+            this.http.get('../rest/folders/' + params['folderId'])
                 .subscribe((data: any) => {
                     const keywordEntities = [{
                         keyword: 'ALL_ENTITIES',
@@ -165,7 +165,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
                     this.headerService.setHeader(this.folderInfo.label, '', 'fa fa-folder-open');
 
                 });
-            this.basketUrl = '../../rest/folders/' + params['folderId'] + '/resources';
+            this.basketUrl = '../rest/folders/' + params['folderId'] + '/resources';
             this.filtersListService.filterMode = false;
             this.selectedRes = [];
             this.sidenavRight.close();
@@ -225,10 +225,10 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
 
     goTo(row: any) {
         this.filtersListService.filterMode = false;
-        if (this.docUrl === '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
+        if (this.docUrl === '../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
             this.sidenavRight.close();
         } else {
-            this.docUrl = '../../rest/resources/' + row.resId + '/content';
+            this.docUrl = '../rest/resources/' + row.resId + '/content';
             this.currentChrono = row.chrono;
             this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
                 '<iframe style=\'height:100%;width:100%;\' src=\'' + this.docUrl + '\' class=\'embed-responsive-item\'>' +
@@ -263,7 +263,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
     }
 
     refreshFolderInformations() {
-        this.http.get('../../rest/folders/' + this.folderInfo.id)
+        this.http.get('../rest/folders/' + this.folderInfo.id)
             .subscribe((data: any) => {
                 const keywordEntities = [{
                     keyword: 'ALL_ENTITIES',
@@ -303,7 +303,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
 
     viewThumbnail(row: any) {
         if (row.hasDocument) {
-            this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
+            this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail';
             $('#viewThumbnail').show();
             $('#listContent').css({ 'overflow': 'hidden' });
         }
@@ -387,7 +387,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
 
     toggleMailTracking(row: any) {
         if (!row.mailTracking) {
-            this.http.post('../../rest/resources/follow', { resources: [row.resId] }).pipe(
+            this.http.post('../rest/resources/follow', { resources: [row.resId] }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed++),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -395,7 +395,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
                 })
             ).subscribe();
         } else {
-            this.http.request('DELETE', '../../rest/resources/unfollow', { body: { resources: [row.resId] } }).pipe(
+            this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: [row.resId] } }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed--),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -407,7 +407,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
+        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
             .subscribe((data: any) => {
                 const file = new Blob([data], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);

@@ -298,16 +298,10 @@ class Install extends functions
                 mkdir($cheminCustomMaarchCourrierModules, 0755);
 
                 /** Création répertoire notification dans le custom **/
-                $cheminCustomMaarchCourrierModulesNotifications = realpath('.')."/custom/cs_$databasename/modules/notifications";
-                mkdir($cheminCustomMaarchCourrierModulesNotifications, 0755);
-
-                $cheminCustomMaarchCourrierModulesNotificationsBatch = realpath('.')."/custom/cs_$databasename/modules/notifications/batch";
-                mkdir($cheminCustomMaarchCourrierModulesNotificationsBatch, 0755);
-
-                $cheminCustomMaarchCourrierModulesNotificationsConfig = realpath('.')."/custom/cs_$databasename/modules/notifications/batch/config";
+                $cheminCustomMaarchCourrierModulesNotificationsConfig = realpath('.')."/custom/cs_$databasename/bin/notification/config";
                 mkdir($cheminCustomMaarchCourrierModulesNotificationsConfig, 0755);
 
-                $cheminCustomMaarchCourrierModulesNotificationsScripts = realpath('.')."/custom/cs_$databasename/modules/notifications/batch/scripts";
+                $cheminCustomMaarchCourrierModulesNotificationsScripts = realpath('.')."/custom/cs_$databasename/bin/notification/scripts";
                 mkdir($cheminCustomMaarchCourrierModulesNotificationsScripts, 0755);
 
                 /** Création répertoire LDAP dans le custom **/
@@ -324,20 +318,12 @@ class Install extends functions
             if (is_dir(realpath('.')."/custom/cs_$databasename/modules/")) {
 
                 /* Création répertoire notif dans le custom **/
-                if (!is_dir(realpath('.')."/custom/cs_$databasename/modules/notifications/")) {
-                    $cheminCustomMaarchCourrierModulesNotifications = realpath('.')."/custom/cs_$databasename/modules/notifications/";
-                    mkdir($cheminCustomMaarchCourrierModulesNotifications, 0755);
-                }
-                if (!is_dir(realpath('.')."/custom/cs_$databasename/modules/notifications/batch/")) {
-                    $cheminCustomMaarchCourrierModulesNotificationsBatch = realpath('.')."/custom/cs_$databasename/modules/notifications/batch";
-                    mkdir($cheminCustomMaarchCourrierModulesNotificationsBatch, 0755);
-                }
-                if (!is_dir(realpath('.')."/custom/cs_$databasename/modules/notifications/batch/config/")) {
-                    $cheminCustomMaarchCourrierModulesNotificationsConfig = realpath('.')."/custom/cs_$databasename/modules/notifications/batch/config";
+                if (!is_dir(realpath('.')."/custom/cs_$databasename/bin/notification/config/")) {
+                    $cheminCustomMaarchCourrierModulesNotificationsConfig = realpath('.')."/custom/cs_$databasename/bin/notification/config";
                     mkdir($cheminCustomMaarchCourrierModulesNotificationsConfig, 0755);
                 }
-                if (!is_dir(realpath('.')."/custom/cs_$databasename/modules/notifications/batch/scripts/")) {
-                    $cheminCustomMaarchCourrierModulesNotificationsScripts = realpath('.')."/custom/cs_$databasename/modules/notifications/batch/scripts";
+                if (!is_dir(realpath('.')."/custom/cs_$databasename/bin/notification/scripts/")) {
+                    $cheminCustomMaarchCourrierModulesNotificationsScripts = realpath('.')."/custom/cs_$databasename/bin/notification/scripts";
                     mkdir($cheminCustomMaarchCourrierModulesNotificationsScripts, 0755);
                 }
 
@@ -460,13 +446,13 @@ class Install extends functions
             $cheminCustomMaarchCourrierModulesNotifications = realpath('.')."/custom/cs_$databasename/modules/notifications";
             mkdir($cheminCustomMaarchCourrierModulesNotifications, 0755);
 
-            $cheminCustomMaarchCourrierModulesNotificationsBatch = realpath('.')."/custom/cs_$databasename/modules/notifications/batch";
+            $cheminCustomMaarchCourrierModulesNotificationsBatch = realpath('.')."/custom/cs_$databasename/bin/notification";
             mkdir($cheminCustomMaarchCourrierModulesNotificationsBatch, 0755);
 
-            $cheminCustomMaarchCourrierModulesNotificationsConfig = realpath('.')."/custom/cs_$databasename/modules/notifications/batch/config";
+            $cheminCustomMaarchCourrierModulesNotificationsConfig = realpath('.')."/custom/cs_$databasename/bin/notification/config";
             mkdir($cheminCustomMaarchCourrierModulesNotificationsConfig, 0755);
 
-            $cheminCustomMaarchCourrierModulesNotificationsScripts = realpath('.')."/custom/cs_$databasename/modules/notifications/batch/scripts";
+            $cheminCustomMaarchCourrierModulesNotificationsScripts = realpath('.')."/custom/cs_$databasename/bin/notification/scripts";
             mkdir($cheminCustomMaarchCourrierModulesNotificationsScripts, 0755);
 
             /** Création répertoire LDAP dans le custom **/
@@ -479,13 +465,9 @@ class Install extends functions
             $cheminCustomMaarchCourrierModulesLdapScript = realpath('.')."/custom/cs_$databasename/modules/ldap/script";
             mkdir($cheminCustomMaarchCourrierModulesLdapScript, 0755);
 
-            // exit;
-
-            //Création du lien symbolique sous linux
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'LIN') {
-                $cmd = 'ln -s '.realpath('.')."/ cs_$databasename";
-                exec($cmd);
-            }
+            //Création du lien symbolique
+            $cmd = 'ln -s '.realpath('.')."/ cs_$databasename";
+            exec($cmd);
         }
 
         return true;
@@ -709,18 +691,16 @@ class Install extends functions
 
 ######################notification#################################################
 
-0 10 * * *      '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.sh
-0 12 * * *      '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.sh
-0 15 * * *      '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.sh
+0 10 * * *      '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/BASKETS.sh
+0 12 * * *      '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/BASKETS.sh
+0 15 * * *      '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/BASKETS.sh
 
-15 10 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/nct-ncc-and-anc.sh
+15 10 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/nct-ncc-and-anc.sh
 
-30 10 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/sendmail.sh
-30 12 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/sendmail.sh
-30 15 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/sendmail.sh
+30 10 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/sendmail.sh
+30 12 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/sendmail.sh
+30 15 * * *     '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/sendmail.sh
 
-10 12 * * 0        rm -Rf '.realpath('.').'/modules/notifications/batch/logs/process_event_stack/*.log
-11 12 * * 0        rm -Rf '.realpath('.').'/modules/notifications/batch/logs/process_email_stack/*.log
 ';
         fwrite($file, $cron);
         fclose($file);
@@ -787,7 +767,7 @@ class Install extends functions
 
     private function setConfig_batch_XmlNotifications()
     {
-        $xmlconfig = simplexml_load_file('modules/notifications/batch/config/config.xml.default');
+        $xmlconfig = simplexml_load_file('bin/notification/config/config.xml.default');
 
         $CONFIG = $xmlconfig->CONFIG;
 
@@ -808,7 +788,7 @@ class Install extends functions
         $CONFIG->customID     = 'cs_'.$_SESSION['config']['databasename'];
 
         $res = $xmlconfig->asXML();
-        $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml', 'w+');
+        $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml', 'w+');
         if (!$fp) {
             return false;
             exit;
@@ -887,151 +867,84 @@ class Install extends functions
 
     private function setScriptNotificationNctNccAndAncSh()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $res = 'cd '.realpath('.')."\modules\\notifications\\";
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\process_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n NCT';
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\process_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n NCC';
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\process_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n ANC';
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\process_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n AND';
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\process_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n RED';
+        $res = '#!/bin/bash';
+        $res .= "\n";
+        $res .= "eventStackPath='".realpath('.')."/bin/notification/process_event_stack.php'";
+        $res .= "\n";
+        $res .= 'cd '.realpath('.').'/bin/notification/';
+        $res .= "\n";
+        $res .= '#php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml -n NCT';
+        $res .= "\n";
+        $res .= '#php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml -n NCC';
+        $res .= "\n";
+        $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml -n ANC';
+        $res .= "\n";
+        $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml -n AND';
+        $res .= "\n";
+        $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml -n RED';
 
-            $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/nct-ncc-and-anc.bat', 'w+');
-            if (!$fp) {
-                return false;
-                exit;
-            }
-            $write = fwrite($fp, $res);
-            if (!$write) {
-                return false;
-                exit;
-            }
-
-            return true;
-        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'LIN') {
-            $res = '#!/bin/bash';
-            $res .= "\n";
-            $res .= "eventStackPath='".realpath('.')."/modules/notifications/batch/process_event_stack.php'";
-            $res .= "\n";
-            $res .= 'cd '.realpath('.').'/modules/notifications/batch/';
-            $res .= "\n";
-            $res .= '#php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n NCT';
-            $res .= "\n";
-            $res .= '#php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n NCC';
-            $res .= "\n";
-            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n ANC';
-            $res .= "\n";
-            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n AND';
-            $res .= "\n";
-            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n RED';
-
-            $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/nct-ncc-and-anc.sh', 'w+');
-            if (!$fp) {
-                return false;
-                exit;
-            }
-            $write = fwrite($fp, $res);
-            if (!$write) {
-                return false;
-                exit;
-            }
-
-            return true;
+        $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/nct-ncc-and-anc.sh', 'w+');
+        if (!$fp) {
+            return false;
+            exit;
         }
+        $write = fwrite($fp, $res);
+        if (!$write) {
+            return false;
+            exit;
+        }
+
+        return true;
     }
 
     private function setScriptNotificationBasketsSh()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $res = 'cd '.realpath('.')."\modules\\notifications\\";
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\basket_event_stack.php -c '.realpath('.')."\custom/cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml\ -n BASKETS';
-            $res .= "\n";
+        $res = '#!/bin/bash';
+        $res .= "\n";
+        $res .= "eventStackPath='".realpath('.')."/bin/notification/basket_event_stack.php'";
+        $res .= "\n";
+        $res .= 'cd '.realpath('.').'/bin/notification/';
+        $res .= "\n";
+        $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml -n BASKETS';
+        $res .= "\n";
 
-            $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.bat', 'w+');
-            if (!$fp) {
-                return false;
-                exit;
-            }
-            $write = fwrite($fp, $res);
-            if (!$write) {
-                return false;
-                exit;
-            }
-
-            return true;
-        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'LIN') {
-            $res = '#!/bin/bash';
-            $res .= "\n";
-            $res .= "eventStackPath='".realpath('.')."/modules/notifications/batch/basket_event_stack.php'";
-            $res .= "\n";
-            $res .= 'cd '.realpath('.').'/modules/notifications/batch/';
-            $res .= "\n";
-            $res .= 'php $eventStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml -n BASKETS';
-            $res .= "\n";
-
-            $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/BASKETS.sh', 'w+');
-            if (!$fp) {
-                return false;
-                exit;
-            }
-            $write = fwrite($fp, $res);
-            if (!$write) {
-                return false;
-                exit;
-            }
-
-            return true;
+        $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/BASKETS.sh', 'w+');
+        if (!$fp) {
+            return false;
+            exit;
         }
+        $write = fwrite($fp, $res);
+        if (!$write) {
+            return false;
+            exit;
+        }
+
+        return true;
     }
 
     private function setScriptNotificationSendmailSh()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $res = 'cd '.realpath('.')."\modules\\notifications\\";
-            $res .= "\n";
-            $res .= '"'.realpath('.').'\..\..\php\php.exe" '.realpath('.').'\modules\\notifications\batch\process_email_stack.php -c '.realpath('.')."\custom\cs_".$_SESSION['config']['databasename'].'\modules\\notifications\batch\config\config.xml';
-            $res .= "\n";
+        $res = '#!/bin/bash';
+        $res .= "\n";
+        $res .= 'cd '.realpath('.').'/bin/notification/';
+        $res .= "\n";
+        $res .= "emailStackPath='".realpath('.')."/bin/notification/process_email_stack.php'";
+        $res .= "\n";
+        $res .= 'php $emailStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml';
 
-            $fp = fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/sendmail.bat', 'w+');
-            if (!$fp) {
-                return false;
-                exit;
-            }
-            $write = fwrite($fp, $res);
-            if (!$write) {
-                return false;
-                exit;
-            }
+        $fp = fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/scripts/sendmail.sh', 'w+');
 
-            return true;
-        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'LIN') {
-            $res = '#!/bin/bash';
-            $res .= "\n";
-            $res .= 'cd '.realpath('.').'/modules/notifications/batch/';
-            $res .= "\n";
-            $res .= "emailStackPath='".realpath('.')."/modules/notifications/batch/process_email_stack.php'";
-            $res .= "\n";
-            $res .= 'php $emailStackPath -c '.realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml';
-
-            $fp = fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/scripts/sendmail.sh', 'w+');
-
-            if (!$fp) {
-                return false;
-                exit;
-            }
-            $write = fwrite($fp, $res);
-            if (!$write) {
-                return false;
-                exit;
-            }
-
-            return true;
+        if (!$fp) {
+            return false;
+            exit;
         }
+        $write = fwrite($fp, $res);
+        if (!$write) {
+            return false;
+            exit;
+        }
+
+        return true;
     }
 
     public function getDataList()

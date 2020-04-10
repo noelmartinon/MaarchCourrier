@@ -205,7 +205,7 @@ export class SentResourcePageComponent implements OnInit {
         this[type].splice(this[type].length - 1, 1);
 
         if (item.type === 'contactGroup') {
-            this.http.get(`../../rest/contactsGroups/${item.id}`).pipe(
+            this.http.get(`../rest/contactsGroups/${item.id}`).pipe(
                 map((data: any) => {
                     data = data.contactsGroup.contacts.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => {
                         return {
@@ -235,7 +235,7 @@ export class SentResourcePageComponent implements OnInit {
 
         this.templateEmailListForm.reset();
 
-        this.http.post(`../../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resId } }).pipe(
+        this.http.post(`../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resId } }).pipe(
             tap((data: any) => {
 
                 const div = document.createElement('div');
@@ -268,7 +268,7 @@ export class SentResourcePageComponent implements OnInit {
 
         this.emailSignListForm.reset();
 
-        this.http.get(`../../rest/currentUser/emailSignatures/${templateId}`).pipe(
+        this.http.get(`../rest/currentUser/emailSignatures/${templateId}`).pipe(
             tap((data: any) => {
                 const div = document.createElement('div');
 
@@ -305,7 +305,7 @@ export class SentResourcePageComponent implements OnInit {
 
     getEmailData(emailId: number) {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/emails/${emailId}`).pipe(
+            this.http.get(`../rest/emails/${emailId}`).pipe(
                 tap((data: any) => {
                     this.emailCreatorId = data.userId;
 
@@ -382,7 +382,7 @@ export class SentResourcePageComponent implements OnInit {
 
     getAcknowledgementReceiptData(emailId: number) {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/acknowledgementReceipts/${emailId}`).pipe(
+            this.http.get(`../rest/acknowledgementReceipts/${emailId}`).pipe(
                 tap((data: any) => {
                     this.currentSender = {
                         label: data.acknowledgementReceipt.userLabel,
@@ -395,7 +395,7 @@ export class SentResourcePageComponent implements OnInit {
 
                     this.emailStatus = 'SENT';
                 }),
-                exhaustMap(() => this.http.get(`../../rest/acknowledgementReceipts/${emailId}/content`)),
+                exhaustMap(() => this.http.get(`../rest/acknowledgementReceipts/${emailId}/content`)),
                 tap((data: any) => {
                     this.pdfMode = data.format === 'pdf';
 
@@ -419,7 +419,7 @@ export class SentResourcePageComponent implements OnInit {
 
     getResourceData() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}?light=true`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}?light=true`).pipe(
                 tap((data: any) => {
                     this.resourceData = data;
 
@@ -449,7 +449,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     setSender(id: number) {
-        this.http.get(`../../rest/contacts/${id}`).pipe(
+        this.http.get(`../rest/contacts/${id}`).pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.email)) {
                     this.recipients.push(
@@ -469,7 +469,7 @@ export class SentResourcePageComponent implements OnInit {
 
     getUserEmails() {
         return new Promise((resolve) => {
-            this.http.get('../../rest/currentUser/availableEmails').pipe(
+            this.http.get('../rest/currentUser/availableEmails').pipe(
                 tap((data: any) => {
                     this.availableSenders = data.emails;
                     resolve(true);
@@ -485,7 +485,7 @@ export class SentResourcePageComponent implements OnInit {
 
     getAttachElements() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}/emailsInitialization`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}/emailsInitialization`).pipe(
                 tap((data: any) => {
                     Object.keys(data).forEach(element => {
                         if (element === 'resource') {
@@ -529,7 +529,7 @@ export class SentResourcePageComponent implements OnInit {
             }),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/correspondents', { params: { 'search': data, 'searchEmails': 'true' } })),
+            switchMap(data => this.http.get('../rest/autocomplete/correspondents', { params: { 'search': data, 'searchEmails': 'true' } })),
             tap((data: any) => {
                 data = data.filter((contact: any) => !this.functions.empty(contact.email) || contact.type === 'contactGroup').map((contact: any) => {
                     let label = '';
@@ -562,7 +562,7 @@ export class SentResourcePageComponent implements OnInit {
 
 
     initEmailModelsList() {
-        this.http.get(`../../rest/resources/${this.data.resId}/emailTemplates`).pipe(
+        this.http.get(`../rest/resources/${this.data.resId}/emailTemplates`).pipe(
             tap((data: any) => {
                 this.availableEmailModels = data.templates;
             }),
@@ -574,7 +574,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     initSignEmailModelsList() {
-        this.http.get(`../../rest/currentUser/emailSignatures`).pipe(
+        this.http.get(`../rest/currentUser/emailSignatures`).pipe(
             tap((data: any) => {
                 this.availableSignEmailModels = data.emailSignatures;
             }),
@@ -614,7 +614,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     createEmail(closeModal: boolean = true) {
-        this.http.post(`../../rest/emails`, this.formatEmail()).pipe(
+        this.http.post(`../rest/emails`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
                     // this.notify.success(this.lang.draftSaved);
@@ -639,7 +639,7 @@ export class SentResourcePageComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/emails/${this.data.emailId}`)),
+            exhaustMap(() => this.http.delete(`../rest/emails/${this.data.emailId}`)),
             tap(() => {
                 this.notify.success(this.lang.emailDeleted);
                 this.closeModal('success');
@@ -652,7 +652,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     updateEmail(closeModal: boolean = true) {
-        this.http.put(`../../rest/emails/${this.data.emailId}`, this.formatEmail()).pipe(
+        this.http.put(`../rest/emails/${this.data.emailId}`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
                     // this.notify.success(this.lang.draftUpdated);

@@ -36,7 +36,7 @@ export class ForgotPasswordComponent implements OnInit {
         this.labelButton = this.lang.generation;
         this.loading = true;
 
-        this.http.post('../../rest/password', { 'login': this.newLogin.login })
+        this.http.post('../rest/password', { 'login': this.newLogin.login })
             .pipe(
                 finalize(() => {
                     this.labelButton = this.lang.send;

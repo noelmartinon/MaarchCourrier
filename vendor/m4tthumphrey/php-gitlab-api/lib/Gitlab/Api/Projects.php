@@ -23,6 +23,7 @@ class Projects extends AbstractApi
      *     @var bool   $statistics                  Include project statistics.
      *     @var bool   $with_issues_enabled         Limit by enabled issues feature.
      *     @var bool   $with_merge_requests_enabled Limit by enabled merge requests feature.
+     *     @var int    $min_access_level            Limit by current user minimal access level
      * }
      *
      * @throws UndefinedOptionsException If an option name is undefined
@@ -78,6 +79,9 @@ class Projects extends AbstractApi
         $resolver->setDefined('with_merge_requests_enabled')
             ->setAllowedTypes('with_merge_requests_enabled', 'bool')
             ->setNormalizer('with_merge_requests_enabled', $booleanNormalizer)
+        ;
+        $resolver->setDefined('min_access_level')
+            ->setAllowedValues('min_access_level', [null, 10, 20, 30, 40, 50])
         ;
 
         return $this->get('projects', $resolver->resolve($parameters));
@@ -178,6 +182,7 @@ class Projects extends AbstractApi
      *     @var string $scope       The scope of pipelines, one of: running, pending, finished, branches, tags.
      *     @var string $status      The status of pipelines, one of: running, pending, success, failed, canceled, skipped.
      *     @var string $ref         The ref of pipelines.
+     *     @var string $sha         The sha of pipelines.
      *     @var bool   $yaml_errors Returns pipelines with invalid configurations.
      *     @var string $name        The name of the user who triggered pipelines.
      *     @var string $username    The username of the user who triggered pipelines.
@@ -200,6 +205,7 @@ class Projects extends AbstractApi
             ->setAllowedValues('status', ['running', 'pending', 'success', 'failed', 'canceled', 'skipped'])
         ;
         $resolver->setDefined('ref');
+        $resolver->setDefined('sha');
         $resolver->setDefined('yaml_errors')
             ->setAllowedTypes('yaml_errors', 'bool')
             ->setNormalizer('yaml_errors', $booleanNormalizer)
@@ -255,6 +261,29 @@ class Projects extends AbstractApi
     public function cancelPipeline($project_id, $pipeline_id)
     {
         return $this->post($this->getProjectPath($project_id, 'pipelines/'.$this->encodePath($pipeline_id)).'/cancel');
+    }
+    
+    /**
+     * @param $project_id
+     * @param $pipeline_id
+     * @return mixed
+     */
+    public function deletePipeline($project_id, $pipeline_id)
+    {
+        return $this->delete($this->getProjectPath($project_id, 'pipelines/'.$this->encodePath($pipeline_id)));
+    }
+    
+    /**
+     * @param integer $project_id
+     * @param array $parameters
+     * @return mixed
+     */
+    public function allMembers($project_id, $parameters = [])
+    {
+        $resolver = $this->createOptionsResolver();
+        $resolver->setDefined('query');
+
+        return $this->get('projects/'.$this->encodePath($project_id).'/members/all', $resolver->resolve($parameters));
     }
 
     /**
@@ -338,7 +367,6 @@ class Projects extends AbstractApi
     /**
      * @param int $project_id
      * @param array $parameters
-     *
      * @return mixed
      */
     public function hooks($project_id, array $parameters = [])
@@ -356,6 +384,58 @@ class Projects extends AbstractApi
     public function hook($project_id, $hook_id)
     {
         return $this->get($this->getProjectPath($project_id, 'hooks/'.$this->encodePath($hook_id)));
+    }
+
+    /**
+     * Get project users.
+     *
+     * See https://docs.gitlab.com/ee/api/projects.html#get-project-users for more info.
+     *
+     * @param int $project_id
+     *   Project id.
+     * @param array $parameters
+     *   Url parameters.
+     *
+     * @return array
+     *   List of project users.
+     */
+    public function users($project_id, array $parameters = [])
+    {
+        return $this->get($this->getProjectPath($project_id, 'users'), $parameters);
+    }
+
+    /**
+     * Get project issues.
+     *
+     * See https://docs.gitlab.com/ee/api/issues.html#list-project-issues for more info.
+     *
+     * @param int $project_id
+     *   Project id.
+     * @param array $parameters
+     *   Url parameters. For example: issue state (opened / closed).
+     *
+     * @return array
+     *   List of project issues.
+     */
+    public function issues($project_id, array $parameters = [])
+    {
+        return $this->get($this->getProjectPath($project_id, 'issues'), $parameters);
+    }
+
+    /**
+     * Get projects board list.
+     *
+     * See https://docs.gitlab.com/ee/api/boards.html for more info.
+     *
+     * @param int $project_id
+     *   Project id.
+     *
+     * @return array
+     *   List of project boards.
+     */
+    public function boards($project_id)
+    {
+        return $this->get($this->getProjectPath($project_id, 'boards'));
     }
 
     /**
@@ -561,13 +641,15 @@ class Projects extends AbstractApi
      * @param array $params (
      *
      *     @var string $namespace      The ID or path of the namespace that the project will be forked to
+     *     @var string $path           The path of the forked project (optional)
+     *     @var string $name           The name of the forked project (optional)
      * )
      * @return mixed
      */
     public function fork($project_id, array $parameters = [])
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefined('namespace');
+        $resolver->setDefined(['namespace', 'path', 'name']);
 
         $resolved = $resolver->resolve($parameters);
 
@@ -617,7 +699,6 @@ class Projects extends AbstractApi
     /**
      * @param int $project_id
      * @param array $parameters
-     *
      * @return mixed
      */
     public function variables($project_id, array $parameters = [])
@@ -711,7 +792,6 @@ class Projects extends AbstractApi
     /**
      * @param int $project_id
      * @param array $parameters
-     *
      * @return mixed
      */
     public function deployments($project_id, array $parameters = [])
@@ -766,6 +846,67 @@ class Projects extends AbstractApi
      */
     public function removeShare($project_id, $group_id)
     {
-        return $this->delete($this->getProjectPath($project_id, 'services/'.$group_id));
+        return $this->delete($this->getProjectPath($project_id, 'share/' . $group_id));
+    }
+
+    /**
+     * @param int $project_id
+     * @return mixed
+     */
+    public function badges($project_id)
+    {
+        return $this->get($this->getProjectPath($project_id, 'badges'));
+    }
+
+    /**
+     * @param int $project_id
+     * @param string $badge_id
+     * @return mixed
+     */
+    public function badge($project_id, $badge_id)
+    {
+        return $this->get($this->getProjectPath($project_id, 'badges/' . $this->encodePath($badge_id)));
+    }
+
+    /**
+     * @param int $project_id
+     * @param array $params
+     * @return mixed
+     */
+    public function addBadge($project_id, array $params = array())
+    {
+        return $this->post($this->getProjectPath($project_id, 'badges'), $params);
+    }
+
+    /**
+     * @param int $project_id
+     * @param string $badge_id
+     * @return mixed
+     */
+    public function removeBadge($project_id, $badge_id)
+    {
+        return $this->delete($this->getProjectPath($project_id, 'badges/' . $this->encodePath($badge_id)));
+    }
+
+    /**
+     * @param int $project_id
+     * @param string $badge_id
+     * @param array $params
+     * @return mixed
+    */
+    public function updateBadge($project_id, $badge_id, array $params = array())
+    {
+        return $this->put($this->getProjectPath($project_id, 'badges/' . $this->encodePath($badge_id)));
+    }
+
+
+    /**
+     * @param int $project_id
+     * @param array $params
+     * @return mixed
+     */
+    public function addProtectedBranch($project_id, array $params = [])
+    {
+        return $this->post($this->getProjectPath($project_id, 'protected_branches'), $params);
     }
 }

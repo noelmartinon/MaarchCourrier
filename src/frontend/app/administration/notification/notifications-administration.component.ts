@@ -73,7 +73,7 @@ export class NotificationsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/notifications')
+        this.http.get('../rest/notifications')
             .subscribe((data: any) => {
                 this.notifications = data.notifications;
                 this.loading = false;
@@ -94,7 +94,7 @@ export class NotificationsAdministrationComponent implements OnInit {
         const r = confirm(this.lang.deleteMsg);
 
         if (r) {
-            this.http.delete('../../rest/notifications/' + notification.notification_sid)
+            this.http.delete('../rest/notifications/' + notification.notification_sid)
                 .subscribe((data: any) => {
                     this.notifications = data.notifications;
                     setTimeout(() => {
@@ -165,7 +165,7 @@ export class NotificationsAdministrationComponent implements OnInit {
             this.dom.push({ label: it, value: String(it) });
         }
 
-        this.http.get('../../rest/notifications/schedule')
+        this.http.get('../rest/notifications/schedule')
             .subscribe((data: any) => {
                 this.crontab = data.crontab;
                 this.authorizedNotification = data.authorizedNotification;
@@ -179,7 +179,7 @@ export class NotificationsAdministrationComponent implements OnInit {
         const description = this.newCron.cmd.split('/');
         this.newCron.description = description[description.length - 1];
         this.crontab.push(this.newCron);
-        this.http.post('../../rest/notifications/schedule', this.crontab)
+        this.http.post('../rest/notifications/schedule', this.crontab)
             .subscribe((data: any) => {
                 this.newCron = {
                     'm': '',
@@ -199,7 +199,7 @@ export class NotificationsAdministrationComponent implements OnInit {
 
     deleteCron(i: number) {
         this.crontab[i].state = 'deleted';
-        this.http.post('../../rest/notifications/schedule', this.crontab)
+        this.http.post('../rest/notifications/schedule', this.crontab)
             .subscribe((data: any) => {
                 this.crontab.splice(i, 1);
                 this.notify.success(this.lang.notificationScheduleUpdated);

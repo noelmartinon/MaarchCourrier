@@ -59,7 +59,7 @@ export class ContactsListComponent implements OnInit {
 
     getCustomFields() {
         return new Promise((resolve, reject) => {
-            this.http.get("../../rest/contactsCustomFields").pipe(
+            this.http.get("../rest/contactsCustomFields").pipe(
                 tap((data: any) => {
                     this.customFields = data.customFields.map((custom: any) => {
                         return {
@@ -74,7 +74,7 @@ export class ContactsListComponent implements OnInit {
     }
 
     loadContactsOfResource(resId: number, mode: string) {
-        this.http.get(`../../rest/resources/${resId}/contacts?type=${mode}`).pipe(
+        this.http.get(`../rest/resources/${resId}/contacts?type=${mode}`).pipe(
             tap((data: any) => {
                 this.contacts = data.contacts.map((contact: any) => {
                     return {
@@ -97,7 +97,7 @@ export class ContactsListComponent implements OnInit {
         this.contacts = [];
 
         if (type === 'contact') {
-            this.http.get('../../rest/contacts/' + contactId).pipe(
+            this.http.get('../rest/contacts/' + contactId).pipe(
                 tap((contact: any) => {
                     this.contacts[0] = {
                         ...contact,
@@ -114,7 +114,7 @@ export class ContactsListComponent implements OnInit {
                 })
             ).subscribe();
         } else if (type === 'user') {
-            this.http.get('../../rest/users/' + contactId).pipe(
+            this.http.get('../rest/users/' + contactId).pipe(
                 tap((data: any) => {
                     this.contacts[0] = {
                         type: 'user',
@@ -132,7 +132,7 @@ export class ContactsListComponent implements OnInit {
                 })
             ).subscribe();
         } else if (type === 'entity') {
-            this.http.get('../../rest/entities/' + contactId).pipe(
+            this.http.get('../rest/entities/' + contactId).pipe(
                 tap((data: any) => {
                     this.contacts[0] = {
                         type: 'entity',

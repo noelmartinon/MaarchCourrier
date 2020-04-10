@@ -54,7 +54,7 @@ export class ShippingsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/administration/shippings')
+        this.http.get('../rest/administration/shippings')
             .subscribe((data: any) => {
                 this.shippings = data.shippings;
 
@@ -71,7 +71,7 @@ export class ShippingsAdministrationComponent implements OnInit {
         const r = confirm(this.lang.deleteMsg);
 
         if (r) {
-            this.http.delete('../../rest/administration/shippings/' + id)
+            this.http.delete('../rest/administration/shippings/' + id)
                 .subscribe((data: any) => {
                     this.shippings = data.shippings;
                     this.dataSource = new MatTableDataSource(this.shippings);

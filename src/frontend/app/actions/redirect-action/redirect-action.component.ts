@@ -51,7 +51,7 @@ export class RedirectActionComponent implements OnInit {
     ngOnInit(): void {
         let noEntity = true;
         this.loading = true;
-        this.http.get('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/getRedirect')
+        this.http.get('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/getRedirect')
             .subscribe((data: any) => {
                 this.entities = data['entities'];
                 this.userListRedirect = data.users;
@@ -142,7 +142,7 @@ export class RedirectActionComponent implements OnInit {
 
         this.loading = false;
         if (this.data.resIds.length === 1) {
-            this.http.get('../../rest/resources/' + this.data.resIds[0] + '/listInstance').subscribe((data: any) => {
+            this.http.get('../rest/resources/' + this.data.resIds[0] + '/listInstance').subscribe((data: any) => {
                 this.diffusionListDestRedirect = data.listInstance;
                 Object.keys(data).forEach(diffusionRole => {
                     data[diffusionRole].forEach((line: any) => {
@@ -178,7 +178,7 @@ export class RedirectActionComponent implements OnInit {
 
         if (this.data.resIds.length === 1) {
             this.isDestinationChanging = false;
-            this.http.get('../../rest/resources/' + this.data.resIds[0] + '/users/' + user.id + '/isDestinationChanging')
+            this.http.get('../rest/resources/' + this.data.resIds[0] + '/users/' + user.id + '/isDestinationChanging')
                 .subscribe((data: any) => {
                     this.isDestinationChanging = data.isDestinationChanging;
                 }, (err: any) => {

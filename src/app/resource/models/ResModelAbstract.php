@@ -123,9 +123,8 @@ abstract class ResModelAbstract
 
     public static function getLastResources(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['limit', 'userId', 'select']);
-        ValidatorModel::intType($aArgs, ['limit']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::notEmpty($aArgs, ['limit', 'select']);
+        ValidatorModel::intType($aArgs, ['limit', 'userId',]);
         ValidatorModel::arrayType($aArgs, ['select']);
 
         $resources = DatabaseModel::select([

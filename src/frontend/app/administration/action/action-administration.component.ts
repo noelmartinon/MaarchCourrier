@@ -57,7 +57,7 @@ export class ActionAdministrationComponent implements OnInit {
 
                 this.creationMode = true;
 
-                this.http.get('../../rest/initAction')
+                this.http.get('../rest/initAction')
                     .subscribe((data: any) => {
                         this.action = data.action;
                         this.selectActionPageId.setValue(this.action.actionPageId);
@@ -79,7 +79,7 @@ export class ActionAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
 
-                this.http.get('../../rest/actions/' + params['id'])
+                this.http.get('../rest/actions/' + params['id'])
                     .subscribe(async (data: any) => {
                         this.action = data.action;
                         this.selectActionPageId.setValue(this.action.actionPageId);
@@ -121,7 +121,7 @@ export class ActionAdministrationComponent implements OnInit {
         this.action.actionPageId = this.selectActionPageId.value;
         return new Promise((resolve, reject) => {
             if (this.action.actionPageId === 'close_mail' && this.functions.empty(this.availableCustomFields)) {
-                this.http.get('../../rest/customFields').pipe(
+                this.http.get('../rest/customFields').pipe(
                     tap((data: any) => {
                         this.availableCustomFields = data.customFields.map((info: any) => {
                             info.id = 'indexingCustomField_' + info.id;
@@ -165,7 +165,7 @@ export class ActionAdministrationComponent implements OnInit {
             this.action.parameters = { mode: this.arMode };
         }
         if (this.creationMode) {
-            this.http.post('../../rest/actions', this.action)
+            this.http.post('../rest/actions', this.action)
                 .subscribe(() => {
                     this.router.navigate(['/administration/actions']);
                     this.notify.success(this.lang.actionAdded);
@@ -174,7 +174,7 @@ export class ActionAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/actions/' + this.action.id, this.action)
+            this.http.put('../rest/actions/' + this.action.id, this.action)
                 .subscribe(() => {
                     this.router.navigate(['/administration/actions']);
                     this.notify.success(this.lang.actionUpdated);

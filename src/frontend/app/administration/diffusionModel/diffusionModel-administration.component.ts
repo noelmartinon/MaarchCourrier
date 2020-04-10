@@ -85,7 +85,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
 
     getTemplate(id: number) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/listTemplates/${id}`).pipe(
+            this.http.get(`../rest/listTemplates/${id}`).pipe(
                 tap((data: any) => {
                     this.diffusionModel = data.listTemplate;
                     this.diffusionModel.id = id;
@@ -136,7 +136,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     }
 
     createTemplate() {
-        this.http.post("../../rest/listTemplates?admin=true", this.formatCircuit()).pipe(
+        this.http.post("../rest/listTemplates?admin=true", this.formatCircuit()).pipe(
             tap(() => {
                 this.router.navigate(["/administration/diffusionModels"]);
                 this.notify.success(this.lang.diffusionModelAdded);
@@ -149,7 +149,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     }
 
     updateTemplate() {
-        this.http.put(`../../rest/listTemplates/${this.diffusionModel.id}`, this.formatCircuit()).pipe(
+        this.http.put(`../rest/listTemplates/${this.diffusionModel.id}`, this.formatCircuit()).pipe(
             tap(() => {
                 this.router.navigate(["/administration/diffusionModels"]);
                 this.notify.success(this.lang.diffusionModelUpdated);

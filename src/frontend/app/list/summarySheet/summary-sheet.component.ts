@@ -130,7 +130,7 @@ export class SummarySheetComponent implements OnInit {
         this.loading = true;
 
 
-        this.http.post('../../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/summarySheets', { units: this.formatSummarySheet(), resources: this.data.selectedRes }, { responseType: 'blob' })
+        this.http.post('../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/summarySheets', { units: this.formatSummarySheet(), resources: this.data.selectedRes }, { responseType: 'blob' })
             .subscribe((data) => {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');

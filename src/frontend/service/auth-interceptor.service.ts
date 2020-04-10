@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpHandler, HttpInterceptor, HttpRequest, HttpClient } from '@angular/common/http';
 import { LANG } from '../app/translate.component';
-import { Router } from '@angular/router';
 import { catchError, switchMap } from 'rxjs/operators';
 import { NotificationService } from '../app/notification.service';
 import { AuthService } from './auth.service';
@@ -11,11 +10,30 @@ import { of } from 'rxjs/internal/observable/of';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
     lang: any = LANG;
-    excludeUrls: string[] = ['../rest/authenticate', '../rest/authenticate/token', '../rest/authenticationInformations', '../rest/password', '../rest/passwordRules'];
-
+    excludeUrls: any[] = [
+        {
+            route: '../rest/authenticate',
+            method : ['POST']
+        },
+        {
+            route: '../rest/authenticate/token',
+            method : ['GET']
+        },
+        {
+            route: '../rest/authenticationInformation',
+            method : ['GET']
+        },
+        {
+            route: '../rest/password',
+            method : ['GET']
+        },
+        {
+            route: '../rest/passwordRules',
+            method : ['GET']
+        }
+    ];
     constructor(
         public http: HttpClient,
-        private router: Router,
         public notificationService: NotificationService,
         public authService: AuthService
     ) { }
@@ -37,8 +55,9 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+
         // We don't want to intercept some routes
-        if (this.excludeUrls.indexOf(request.url) > -1 || request.url.indexOf('/password') > -1) {
+        if ((this.excludeUrls.filter(url => url.route === request.url && url.method.indexOf(request.method) > -1).length > 0)) {
             return next.handle(request);
         } else {
             // Add current token in header request

@@ -54,12 +54,12 @@ export class BasketsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/baskets')
+        this.http.get('../rest/baskets')
             .subscribe((data: any) => {
                 this.baskets = data['baskets'];
                 this.loading = false;
                 setTimeout(() => {
-                    this.http.get('../../rest/sortedBaskets')
+                    this.http.get('../rest/sortedBaskets')
                         .subscribe((dataSort: any) => {
                             this.basketsOrder = dataSort['baskets'];
                         }, (err) => {
@@ -81,14 +81,14 @@ export class BasketsAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + basket['basket_name'] + ' »');
 
         if (r) {
-            this.http.delete('../../rest/baskets/' + basket['basket_id'])
+            this.http.delete('../rest/baskets/' + basket['basket_id'])
                 .subscribe((data: any) => {
                     this.notify.success(this.lang.basketDeleted);
                     this.baskets = data['baskets'];
                     this.dataSource = new MatTableDataSource(this.baskets);
                     this.dataSource.paginator = this.paginator;
                     this.dataSource.sort = this.sort;
-                    this.http.get('../../rest/sortedBaskets')
+                    this.http.get('../rest/sortedBaskets')
                         .subscribe((dataSort: any) => {
                             this.basketsOrder = dataSort['baskets'];
                         }, (err) => {
@@ -101,7 +101,7 @@ export class BasketsAdministrationComponent implements OnInit {
     }
 
     updateBasketOrder(currentBasket: any) {
-        this.http.put('../../rest/sortedBaskets/' + currentBasket.basket_id, this.basketsOrder)
+        this.http.put('../rest/sortedBaskets/' + currentBasket.basket_id, this.basketsOrder)
             .subscribe((data: any) => {
                 this.baskets = data['baskets'];
                 this.notify.success(this.lang.modificationSaved);

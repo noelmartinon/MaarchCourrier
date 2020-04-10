@@ -66,7 +66,7 @@ export class PasswordModificationComponent implements OnInit {
             this.dialogRef = this.dialog.open(InfoChangePasswordModalComponent, this.config);
         }, 0);
 
-        this.http.get('../../rest/passwordRules')
+        this.http.get('../rest/passwordRules')
             .subscribe((data: any) => {
                 const valArr: ValidatorFn[] = [];
                 const ruleTextArr: String[] = [];
@@ -187,7 +187,7 @@ export class PasswordModificationComponent implements OnInit {
         this.passwordModel.currentPassword = this.firstFormGroup.controls['currentPasswordCtrl'].value;
         this.passwordModel.newPassword = this.firstFormGroup.controls['newPasswordCtrl'].value;
         this.passwordModel.reNewPassword = this.firstFormGroup.controls['retypePasswordCtrl'].value;
-        this.http.put('../../rest/users/' + this.headerService.user.id + '/password', this.passwordModel)
+        this.http.put('../rest/users/' + this.headerService.user.id + '/password', this.passwordModel)
             .subscribe(() => {
                 this.config = { panelClass: 'maarch-modal', data: { state: 'END' }, disableClose: true };
                 this.dialogRef = this.dialog.open(InfoChangePasswordModalComponent, this.config);

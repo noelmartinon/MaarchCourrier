@@ -29,7 +29,7 @@ export class closeMailWithAttachmentsOrNotesActionComponent implements OnInit {
     ngOnInit(): void {
         this.loadingInit = true;
 
-        this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/checkAttachmentsAndNotes', { resources: this.data.resIds })
+        this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/checkAttachmentsAndNotes', { resources: this.data.resIds })
             .subscribe((data: any) => {
                 this.resourcesInfo = data;
                 this.loadingInit = false;

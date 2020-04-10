@@ -57,7 +57,7 @@ export class FolderMenuComponent implements OnInit {
             filter(value => value.length > 2),
             tap(() => this.loading = true),
             //distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/folders', { params: { "search": data } })),
+            switchMap(data => this.http.get('../rest/autocomplete/folders', { params: { "search": data } })),
             tap((data: any) => {
                 this.pinnedFolder = false;
                 this.foldersList = data.map(
@@ -86,7 +86,7 @@ export class FolderMenuComponent implements OnInit {
 
     getFolders() {
         this.loading = true;
-        this.http.get("../../rest/pinnedFolders").pipe(
+        this.http.get("../rest/pinnedFolders").pipe(
             map((data: any) => data.folders),
             tap((data: any) => {
                 this.foldersList = data;
@@ -101,7 +101,7 @@ export class FolderMenuComponent implements OnInit {
 
     classifyDocuments(folder: any) {
 
-        this.http.post('../../rest/folders/' + folder.id + '/resources', { resources: this.resIds }).pipe(
+        this.http.post('../rest/folders/' + folder.id + '/resources', { resources: this.resIds }).pipe(
             tap(() => {
                 this.foldersService.getPinnedFolders();
                 this.refreshList.emit();
@@ -120,7 +120,7 @@ export class FolderMenuComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/folders/' + folder.id + '/resources', { body: { resources: this.resIds } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/folders/' + folder.id + '/resources', { body: { resources: this.resIds } })),
             tap(() => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.foldersService.getPinnedFolders();

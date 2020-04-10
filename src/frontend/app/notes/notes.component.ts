@@ -41,7 +41,7 @@ export class NotesListComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.resId !== null) {
-            this.http.get(`../../rest/resources/${this.resId}/notes`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/notes`).pipe(
                 tap((data: any) => {
                     this.resIds[0] = this.resId;
                     this.notes = data['notes'];
@@ -58,7 +58,7 @@ export class NotesListComponent implements OnInit {
     loadNotes(resId: number) {
         this.resIds[0] = resId;
         this.loading = true;
-        this.http.get("../../rest/resources/" + this.resIds[0] + "/notes")
+        this.http.get("../rest/resources/" + this.resIds[0] + "/notes")
         .subscribe((data: any) => {
             this.notes = data['notes'];
             this.reloadBadgeNotes.emit(`${this.notes.length}`);
@@ -78,7 +78,7 @@ export class NotesListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/notes/' + note.id)),
+            exhaustMap(() => this.http.request('DELETE', '../rest/notes/' + note.id)),
             tap(() => {
                 var index = this.notes.findIndex(elem => elem.id == note.id)
                 if (index > -1) {

@@ -225,7 +225,7 @@ export class IndexingFormComponent implements OnInit {
     initCustomFields() {
         return new Promise((resolve, reject) => {
 
-            this.http.get("../../rest/customFields").pipe(
+            this.http.get("../rest/customFields").pipe(
                 tap((data: any) => {
                     this.availableCustomFields = data.customFields.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
@@ -341,7 +341,7 @@ export class IndexingFormComponent implements OnInit {
             if (this.isValidForm()) {
                 const formatdatas = this.formatDatas(this.getDatas());
 
-                this.http.put(`../../rest/resources/${this.resId}`, formatdatas).pipe(
+                this.http.put(`../rest/resources/${this.resId}`, formatdatas).pipe(
                     tap(() => {
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                         this.notify.success(this.lang.dataUpdated);
@@ -443,7 +443,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     setDestinationField(elem: any) {
-        let route = this.adminMode || this.mode !== 'indexation' ? `../../rest/indexingModels/entities` : `../../rest/indexing/groups/${this.groupId}/entities`;
+        let route = this.adminMode || this.mode !== 'indexation' ? `../rest/indexingModels/entities` : `../rest/indexing/groups/${this.groupId}/entities`;
 
         return new Promise((resolve, reject) => {
             this.http.get(route).pipe(
@@ -504,7 +504,7 @@ export class IndexingFormComponent implements OnInit {
 
     setCategoryField(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/categories`).pipe(
+            this.http.get(`../rest/categories`).pipe(
                 tap((data: any) => {
                     elem.values = data.categories;
                     resolve(true);
@@ -515,7 +515,7 @@ export class IndexingFormComponent implements OnInit {
 
     setPriorityField(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/priorities`).pipe(
+            this.http.get(`../rest/priorities`).pipe(
                 tap((data: any) => {
                     elem.values = data.priorities;
                     elem.event = 'calcLimitDateByPriority';
@@ -530,7 +530,7 @@ export class IndexingFormComponent implements OnInit {
 
     setDoctypeField(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/doctypes`).pipe(
+            this.http.get(`../rest/doctypes`).pipe(
                 tap((data: any) => {
                     let title = '';
                     let arrValues: any[] = [];
@@ -633,7 +633,7 @@ export class IndexingFormComponent implements OnInit {
 
     setResource() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/resources/${this.resId}`).pipe(
+            this.http.get(`../rest/resources/${this.resId}`).pipe(
                 tap(async (data: any) => {
                     await Promise.all(this.fieldCategories.map(async (element: any) => {
 
@@ -689,7 +689,7 @@ export class IndexingFormComponent implements OnInit {
 
     getCurrentInitiator(field: any, initiatorId: number) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/entities/${initiatorId}`).pipe(
+            this.http.get(`../rest/entities/${initiatorId}`).pipe(
                 tap((data: any) => {
                     field.values.unshift({
                         id: data.id,
@@ -734,7 +734,7 @@ export class IndexingFormComponent implements OnInit {
             this.arrFormControl['mail­tracking'] = new FormControl({ value: '', disabled: this.adminMode ? true : false });
         }
 
-        this.http.get(`../../rest/indexingModels/${indexModelId}`).pipe(
+        this.http.get(`../rest/indexingModels/${indexModelId}`).pipe(
             tap(async (data: any) => {
                 this.currentCategory = data.indexingModel.category;
                 let fieldExist: boolean;
@@ -939,13 +939,13 @@ export class IndexingFormComponent implements OnInit {
     calcLimitDate(field: any, value: any) {
         let limitDate: Date = null;
         if (this.arrFormControl['processLimitDate'] !== undefined) {
-            this.http.get("../../rest/indexing/processLimitDate", { params: { "doctype": value } }).pipe(
+            this.http.get("../rest/indexing/processLimitDate", { params: { "doctype": value } }).pipe(
                 tap((data: any) => {
                     limitDate = new Date(data.processLimitDate);
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
                 }),
                 filter(() => this.arrFormControl['priority'] !== undefined),
-                exhaustMap(() => this.http.get('../../rest/indexing/priority', { params: { "processLimitDate": limitDate.toDateString() } })),
+                exhaustMap(() => this.http.get('../rest/indexing/priority', { params: { "processLimitDate": limitDate.toDateString() } })),
                 tap((data: any) => {
                     this.arrFormControl['priority'].setValue(data.priority);
                     this.setPriorityColor(null, data.priority);
@@ -963,7 +963,7 @@ export class IndexingFormComponent implements OnInit {
         let limitDate: Date = null;
 
         if (this.arrFormControl['processLimitDate'] !== undefined) {
-            this.http.get("../../rest/indexing/processLimitDate", { params: { "priority": value } }).pipe(
+            this.http.get("../rest/indexing/processLimitDate", { params: { "priority": value } }).pipe(
                 tap((data: any) => {
                     limitDate = new Date(data.processLimitDate);
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
@@ -996,7 +996,7 @@ export class IndexingFormComponent implements OnInit {
 
         const limitDate = new Date(value.value);
 
-        this.http.get("../../rest/indexing/priority", { params: { "processLimitDate": limitDate.toDateString() } }).pipe(
+        this.http.get("../rest/indexing/priority", { params: { "processLimitDate": limitDate.toDateString() } }).pipe(
             tap((data: any) => {
                 this.arrFormControl['priority'].setValue(data.priority);
                 this.setPriorityColor(null, data.priority);

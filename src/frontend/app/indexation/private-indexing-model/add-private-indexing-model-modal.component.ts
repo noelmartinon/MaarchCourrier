@@ -23,7 +23,7 @@ export class AddPrivateIndexingModelModalComponent {
     ngOnInit(): void { }
 
     onSubmit() {
-        this.http.post("../../rest/indexingModels", this.data.indexingModel).pipe(
+        this.http.post("../rest/indexingModels", this.data.indexingModel).pipe(
             tap((data: any) => {
                 this.data.indexingModel.id = data.id;
                 this.notify.success(this.lang.indexingModelAdded);

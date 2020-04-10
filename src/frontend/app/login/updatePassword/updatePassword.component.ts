@@ -60,7 +60,7 @@ export class UpdatePasswordComponent implements OnInit {
         this.labelButton = this.lang.emailSendInProgress;
         this.loading = true;
 
-        this.http.put('../../rest/password', { 'token': this.token, 'password': this.password.newPassword })
+        this.http.put('../rest/password', { 'token': this.token, 'password': this.password.newPassword })
             .pipe(
                 finalize(() => {
                     this.labelButton = this.lang.update;
@@ -97,7 +97,7 @@ export class UpdatePasswordComponent implements OnInit {
         this.handlePassword.error = false;
         this.handlePassword.errorMsg = '';
 
-        this.http.get('../../rest/passwordRules')
+        this.http.get('../rest/passwordRules')
             .subscribe((data: any) => {
                 const ruleTextArr: String[] = [];
                 const otherRuleTextArr: String[] = [];

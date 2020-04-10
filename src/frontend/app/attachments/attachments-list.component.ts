@@ -76,7 +76,7 @@ export class AttachmentsListComponent implements OnInit {
         }
         this.checkMaarchParapheurEnabled();
         if (this.resId !== null) {
-            this.http.get(`../../rest/resources/${this.resId}/attachments`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/attachments`).pipe(
                 tap((data: any) => {
                     this.mailevaEnabled = data.mailevaEnabled;
                     this.attachments = data.attachments;
@@ -87,7 +87,7 @@ export class AttachmentsListComponent implements OnInit {
                                 label: element.typeLabel
                             });
                         }
-                        element.thumbnailUrl = '../../rest/attachments/' + element.resId + '/thumbnail';
+                        element.thumbnailUrl = '../rest/attachments/' + element.resId + '/thumbnail';
                         element.canDelete = this.privilegeService.hasCurrentUserPrivilege('manage_attachments') || this.headerService.user.id === element.typist;
                     });
                 }),
@@ -101,7 +101,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     checkMaarchParapheurEnabled() {
-        this.http.get("../../rest/externalSignatureBooks/enabled")
+        this.http.get("../rest/externalSignatureBooks/enabled")
             .subscribe((data: any) => {
                 if (data.enabledSignatureBook === 'maarchParapheur') {
                     this.maarchParapheurEnabled = true;
@@ -116,7 +116,7 @@ export class AttachmentsListComponent implements OnInit {
         this.resId = resId;
         this.loading = true;
         this.filterAttachTypes = [];
-        this.http.get("../../rest/resources/" + this.resId + "/attachments")
+        this.http.get("../rest/resources/" + this.resId + "/attachments")
             .subscribe((data: any) => {
                 this.mailevaEnabled = data.mailevaEnabled;
                 this.attachments = data.attachments;
@@ -127,7 +127,7 @@ export class AttachmentsListComponent implements OnInit {
                             label: element.typeLabel
                         });
                     }
-                    element.thumbnailUrl = '../../rest/attachments/' + element.resId + '/thumbnail?tsp=' + timeStamp;
+                    element.thumbnailUrl = '../rest/attachments/' + element.resId + '/thumbnail?tsp=' + timeStamp;
                     element.canDelete = this.privilegeService.hasCurrentUserPrivilege('manage_attachments') || this.headerService.user.id === element.typist;
                 });
                 if (this.attachments.filter((attach: any) => attach.type === this.currentFilter).length === 0) {
@@ -141,7 +141,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     setInSignatureBook(attachment: any) {
-        this.http.put("../../rest/attachments/" + attachment.resId + "/inSignatureBook", {})
+        this.http.put("../rest/attachments/" + attachment.resId + "/inSignatureBook", {})
             .subscribe(() => {
                 attachment.inSignatureBook = !attachment.inSignatureBook;
                 this.afterActionAttachment.emit('setInSignatureBook');
@@ -152,7 +152,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     setInSendAttachment(attachment: any) {
-        this.http.put("../../rest/attachments/" + attachment.resId + "/inSendAttachment", {})
+        this.http.put("../rest/attachments/" + attachment.resId + "/inSendAttachment", {})
             .subscribe(() => {
                 attachment.inSendAttach = !attachment.inSendAttach;
                 this.afterActionAttachment.emit('setInSendAttachment');
@@ -211,7 +211,7 @@ export class AttachmentsListComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/attachments/${attachment.resId}`)),
+            exhaustMap(() => this.http.delete(`../rest/attachments/${attachment.resId}`)),
             tap(() => {
                 this.loadAttachments(this.resId);
                 this.afterActionAttachment.emit('setInSendAttachment');

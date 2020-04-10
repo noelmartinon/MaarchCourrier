@@ -45,7 +45,7 @@ export class RejectVisaBackToPrevousActionComponent implements OnInit {
         this.resourcesWarnings = [];
 
         return new Promise((resolve, reject) => {
-            this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkRejectVisa', { resources: this.data.resIds })
+            this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkRejectVisa', { resources: this.data.resIds })
                 .subscribe((data: any) => {
                     if (!this.functions.empty(data.resourcesInformations.warning)) {
                         this.resourcesWarnings = data.resourcesInformations.warning;

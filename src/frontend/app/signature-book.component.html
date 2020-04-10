@@ -81,7 +81,7 @@
                 <div *ngIf="leftSelectedThumbnail > 0 && signatureBook.documents[leftSelectedThumbnail].format != 'pdf' && !signatureBook.documents[leftSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopLeftPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
                     <div style="padding-top: 25%;">{{lang.noOverviewAvailable}}<br/><sub>{{lang.pdfVersionFile}} "{{signatureBook.documents[leftSelectedThumbnail].title}}.{{signatureBook.documents[leftSelectedThumbnail].format}}" {{lang.isNotAvailable}}.</sub></div>
                     <div class="visaPjView">
-                        <a title="{{lang.dlAttachment}}" href="../../rest/attachments/{{signatureBook.documents[leftSelectedThumbnail].res_id}}/originalContent" target="_blank">
+                        <a title="{{lang.dlAttachment}}" href="../rest/attachments/{{signatureBook.documents[leftSelectedThumbnail].res_id}}/originalContent" target="_blank">
                             <i class="fa fa-download fa-2x"></i>
                         </a>
                     </div>
@@ -179,7 +179,7 @@
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
                         <div style="padding-top: 25%;">{{lang.noOverviewAvailable}}<br/><sub>{{lang.pdfVersionFile}} "{{signatureBook.attachments[rightSelectedThumbnail].title}}.{{signatureBook.attachments[rightSelectedThumbnail].format}}" {{lang.isNotAvailable}}.</sub></div>
                         <div class="visaPjView">
-                            <a title="{{lang.dlAttachment}}" href="../../rest/attachments/{{signatureBook.attachments[rightSelectedThumbnail].res_id}}/originalContent" target="_blank">
+                            <a title="{{lang.dlAttachment}}" href="../rest/attachments/{{signatureBook.attachments[rightSelectedThumbnail].res_id}}/originalContent" target="_blank">
                                 <i class="fa fa-download fa-2x"></i>
                             </a>
                         </div>
@@ -196,7 +196,7 @@
                          (mouseenter)="showSignaturesPanel = true" (mouseleave)="showSignaturesPanel = false" class="pjSign" [ngClass]="[signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN' ? 'signed' : '']" [ngStyle]="{'box-shadow': signatureBook.listinstance.requested_signature ? 'inset 0px 0px 5px 0px red' : 'inset 0px 0px 5px 0px #656565;'}">
                         <span *ngIf="signatureBook.attachments[rightSelectedThumbnail].status != 'SIGN' && signatureBook.signatures[0]" style="cursor: pointer">
                             <span *ngIf="!loadingSign">
-                                <img *ngFor="let signature of signatureBook.signatures; let i = index" src="../../rest/users/{{signature.user_serial_id}}/signatures/{{signature.id}}/content" (click)="signFile(signatureBook.attachments[rightSelectedThumbnail], signature)" [ngStyle]="{'display': !showSignaturesPanel && i > 0 ? 'none' : ''}" title="{{signature.signature_label}}">
+                                <img *ngFor="let signature of signatureBook.signatures; let i = index" src="../rest/users/{{signature.user_serial_id}}/signatures/{{signature.id}}/content" (click)="signFile(signatureBook.attachments[rightSelectedThumbnail], signature)" [ngStyle]="{'display': !showSignaturesPanel && i > 0 ? 'none' : ''}" title="{{signature.signature_label}}">
                             </span>
                             <i *ngIf="loadingSign" class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
                         </span>
@@ -259,7 +259,7 @@
                 <span>{{version.relation}}</span>&nbsp;
                 <span>{{lang.object}} : </span>
                 <span>{{version.title}}</span>&nbsp;
-                <a style="color:#135F7F" title="{{lang.dlAttachment}}" href="../../rest/attachments/{{version.resId}}/originalContent" target="_blank">
+                <a style="color:#135F7F" title="{{lang.dlAttachment}}" href="../rest/attachments/{{version.resId}}/originalContent" target="_blank">
                     <i class="fa fa-download fa-2x"></i>
                 </a>
             </div>

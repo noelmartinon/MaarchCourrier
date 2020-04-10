@@ -191,7 +191,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     getEntityTypes() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/entityTypes`).pipe(
+            this.http.get(`../rest/entityTypes`).pipe(
                 tap((data: any) => {
                     this.entityTypeList = data['types'];
                     resolve(true);
@@ -206,7 +206,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     getRoles() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/listTemplates/types/entity_id/roles`).pipe(
+            this.http.get(`../rest/listTemplates/types/entity_id/roles`).pipe(
                 tap((data: any) => {
                     this.listTemplateRoles = data['roles'];
                     resolve(true);
@@ -222,7 +222,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     getEntities() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/entities`).pipe(
+            this.http.get(`../rest/entities`).pipe(
                 tap((data: any) => {
                     this.entities = data['entities'];
                     resolve(true);
@@ -239,7 +239,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     loadEntity(entity_id: any) {
         this.visaCircuitModified = false;
         this.opinionCircuitModified = false;
-        this.http.get('../../rest/entities/' + entity_id + '/details')
+        this.http.get('../rest/entities/' + entity_id + '/details')
             .subscribe((data: any) => {
                 this.currentEntity = data['entity'];
 
@@ -325,7 +325,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
         if (r) {
             if (this.creationMode) {
-                this.http.post('../../rest/entities', this.currentEntity)
+                this.http.post('../rest/entities', this.currentEntity)
                     .subscribe((data: any) => {
                         this.currentEntity.listTemplate = [];
                         this.entities = data['entities'];
@@ -343,7 +343,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                         this.notify.error(err.error.errors);
                     });
             } else {
-                this.http.put('../../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
+                this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
                     .subscribe((data: any) => {
                         this.entities = data['entities'];
                         $('#jstree').jstree(true).settings.core.data = this.entities;
@@ -357,7 +357,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     moveEntity() {
-        this.http.put('../../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
+        this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
             .subscribe(() => {
                 this.notify.success(this.lang.entityUpdated);
             }, (err) => {
@@ -395,10 +395,10 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.dialogRef.afterClosed().subscribe((result: any) => {
                 if (result) {
                     if (this.currentEntity.listTemplate.id) {
-                        this.http.delete('../../rest/listTemplates/' + this.currentEntity.listTemplate.id)
+                        this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id)
                             .subscribe((data: any) => {
                                 this.currentEntity.listTemplate.id = data.id;
-                                this.http.get('../../rest/listTemplates/types/entity_id/roles')
+                                this.http.get('../rest/listTemplates/types/entity_id/roles')
                                     .subscribe((dataTemplates: any) => {
                                         this.listTemplateRoles = dataTemplates['roles'];
                                     }, (err) => {
@@ -410,7 +410,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                     }
 
                     if (this.idVisaCircuit) {
-                        this.http.delete('../../rest/listTemplates/' + this.idVisaCircuit)
+                        this.http.delete('../rest/listTemplates/' + this.idVisaCircuit)
                             .subscribe(() => {
                                 this.idVisaCircuit = null;
                             }, (err) => {
@@ -418,7 +418,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                             });
                     }
 
-                    this.http.put('../../rest/entities/' + result.entity_id + '/reassign/' + result.redirectEntity, {})
+                    this.http.put('../rest/entities/' + result.entity_id + '/reassign/' + result.redirectEntity, {})
                         .subscribe((data: any) => {
                             this.entities = data['entities'];
                             $('#jstree').jstree(true).settings.core.data = this.entities;
@@ -441,10 +441,10 @@ export class EntitiesAdministrationComponent implements OnInit {
 
             if (r) {
                 if (this.currentEntity.listTemplate.id) {
-                    this.http.delete('../../rest/listTemplates/' + this.currentEntity.listTemplate.id)
+                    this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id)
                         .subscribe((data: any) => {
                             this.currentEntity.listTemplate.id = data.id;
-                            this.http.get('../../rest/listTemplates/types/entity_id/roles')
+                            this.http.get('../rest/listTemplates/types/entity_id/roles')
                                 .subscribe((dataTemplates: any) => {
                                     this.listTemplateRoles = dataTemplates['roles'];
                                 }, (err) => {
@@ -456,7 +456,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 }
 
                 if (this.idVisaCircuit) {
-                    this.http.delete('../../rest/listTemplates/' + this.idVisaCircuit)
+                    this.http.delete('../rest/listTemplates/' + this.idVisaCircuit)
                         .subscribe(() => {
                             this.idVisaCircuit = null;
                         }, (err) => {
@@ -464,7 +464,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                         });
                 }
 
-                this.http.delete('../../rest/entities/' + this.currentEntity.entity_id)
+                this.http.delete('../rest/entities/' + this.currentEntity.entity_id)
                     .subscribe((data: any) => {
                         this.entities = data['entities'];
                         $('#jstree').jstree(true).settings.core.data = this.entities;
@@ -508,7 +508,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     updateStatus(entity: any, method: string) {
-        this.http.put('../../rest/entities/' + entity['entity_id'] + '/status', { 'method': method })
+        this.http.put('../rest/entities/' + entity['entity_id'] + '/status', { 'method': method })
             .subscribe((data: any) => {
                 this.notify.success('');
             }, (err) => {
@@ -532,7 +532,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         };
 
         if (!this.functions.empty(this.currentEntity.listTemplate.id)) {
-            this.http.put(`../../rest/listTemplates/${this.currentEntity.listTemplate.id}`, newDiffList).pipe(
+            this.http.put(`../rest/listTemplates/${this.currentEntity.listTemplate.id}`, newDiffList).pipe(
                 tap(() => {
                     this.notify.success(this.lang.diffusionModelUpdated);
                     this.appDiffusionsList.loadListModel(this.currentEntity.id);
@@ -543,7 +543,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.post(`../../rest/listTemplates?admin=true`, newDiffList).pipe(
+            this.http.post(`../rest/listTemplates?admin=true`, newDiffList).pipe(
                 tap((data: any) => {
                     this.currentEntity.listTemplate.id = data.id;
                     this.notify.success(this.lang.diffusionModelUpdated);
@@ -561,7 +561,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/listTemplates/${this.currentEntity.listTemplate.id}`)),
+            exhaustMap(() => this.http.delete(`../rest/listTemplates/${this.currentEntity.listTemplate.id}`)),
             tap(() => {
                 this.currentEntity.listTemplate.id = null;
                 this.notify.success(this.lang.diffusionModelDeleted);
@@ -593,7 +593,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.notify.error(this.appVisaWorkflow.getError());
         } else {
             if (this.functions.empty(newDiffList.items)) {
-                this.http.delete(`../../rest/listTemplates/${this.idVisaCircuit}`).pipe(
+                this.http.delete(`../rest/listTemplates/${this.idVisaCircuit}`).pipe(
                     tap(() => {
                         this.idVisaCircuit = null;
                         this.notify.success(this.lang.diffusionModelDeleted);
@@ -605,7 +605,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (!this.functions.empty(this.idVisaCircuit)) {
-                this.http.put(`../../rest/listTemplates/${this.idVisaCircuit}`, newDiffList).pipe(
+                this.http.put(`../rest/listTemplates/${this.idVisaCircuit}`, newDiffList).pipe(
                     tap(() => {
                         this.notify.success(this.lang.diffusionModelUpdated);
                         this.appVisaWorkflow.loadListModel(this.currentEntity.id);
@@ -616,7 +616,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                     })
                 ).subscribe();
             } else {
-                this.http.post(`../../rest/listTemplates?admin=true`, newDiffList).pipe(
+                this.http.post(`../rest/listTemplates?admin=true`, newDiffList).pipe(
                     tap((data: any) => {
                         this.idVisaCircuit = data.id;
                         this.notify.success(this.lang.diffusionModelUpdated);
@@ -648,7 +648,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         };
 
         if (this.functions.empty(newDiffList.items)) {
-            this.http.delete(`../../rest/listTemplates/${this.idOpinionCircuit}`).pipe(
+            this.http.delete(`../rest/listTemplates/${this.idOpinionCircuit}`).pipe(
                 tap(() => {
                     this.idOpinionCircuit = null;
                     this.notify.success(this.lang.diffusionModelDeleted);
@@ -660,7 +660,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else if (!this.functions.empty(this.idOpinionCircuit)) {
-            this.http.put(`../../rest/listTemplates/${this.idOpinionCircuit}`, newDiffList).pipe(
+            this.http.put(`../rest/listTemplates/${this.idOpinionCircuit}`, newDiffList).pipe(
                 tap(() => {
                     this.notify.success(this.lang.diffusionModelUpdated);
                     this.appAvisWorkflow.loadListModel(this.currentEntity.id);
@@ -671,7 +671,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.post(`../../rest/listTemplates?admin=true`, newDiffList).pipe(
+            this.http.post(`../rest/listTemplates?admin=true`, newDiffList).pipe(
                 tap((data: any) => {
                     this.idOpinionCircuit = data.id;
                     this.notify.success(this.lang.diffusionModelUpdated);
@@ -697,7 +697,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             dialogRef.afterClosed().subscribe(result => {
                 if (result === 'ok') {
                     role.available = !role.available;
-                    this.http.put('../../rest/listTemplates/types/entity_id/roles', { 'roles': this.listTemplateRoles })
+                    this.http.put('../rest/listTemplates/types/entity_id/roles', { 'roles': this.listTemplateRoles })
                         .subscribe(() => {
                             role.usedIn = [];
                             if (this.currentEntity.listTemplate) {
@@ -711,11 +711,11 @@ export class EntitiesAdministrationComponent implements OnInit {
             });
         } else {
             role.available = !role.available;
-            this.http.put('../../rest/listTemplates/types/entity_id/roles', { 'roles': this.listTemplateRoles })
+            this.http.put('../rest/listTemplates/types/entity_id/roles', { 'roles': this.listTemplateRoles })
                 .subscribe(() => {
                     if (this.currentEntity.listTemplate) {
                         this.currentEntity.listTemplate.items[role.id] = [];
-                        this.http.get('../../rest/listTemplates/types/entity_id/roles')
+                        this.http.get('../rest/listTemplates/types/entity_id/roles')
                             .subscribe((data: any) => {
                                 this.listTemplateRoles = data['roles'];
                             }, (err) => {
@@ -735,7 +735,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             'role': ''
         };
 
-        this.http.post('../../rest/users/' + newUser.id + '/entities', entity)
+        this.http.post('../rest/users/' + newUser.id + '/entities', entity)
             .subscribe((data: any) => {
                 const displayName = newUser.idToDisplay.split(' ');
                 const user = {
@@ -761,7 +761,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     addEntityToAnnuary() {
-        this.http.put('../../rest/entities/' + this.currentEntity.id + '/annuaries', this.currentEntity)
+        this.http.put('../rest/entities/' + this.currentEntity.id + '/annuaries', this.currentEntity)
             .subscribe((data: any) => {
                 this.currentEntity.business_id = data['entitySiret'];
                 if (typeof data['synchronized'] === 'undefined') {

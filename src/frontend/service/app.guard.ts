@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, CanDeactivate } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators';
+import { map, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { HeaderService } from './header.service';
 import { ProcessComponent } from '../app/process/process.component';
 import { PrivilegeService } from './privileges.service';
@@ -24,29 +24,25 @@ export class AppGuard implements CanActivate {
         private privilegeService: PrivilegeService
     ) { }
 
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
-        this.headerService.resetSideNavSelection();
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
+        console.log('guard');
 
-        if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
-            this.headerService.hideSideBar = true;
-        } else {
-            this.headerService.hideSideBar = false;
-        }
-        if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
-            this.headerService.sideBarAdmin = true;
-        } else {
-            this.headerService.sideBarAdmin = false;
-        }
+        this.headerService.resetSideNavSelection();
 
         let tokenInfo = this.authService.getToken();
 
         if (tokenInfo !== null) {
+            console.log('Token trouvé !');
+
+            this.authService.setUrl(route.url.join('/'));
             if (this.headerService.user.id === undefined) {
-                return this.http.get('../../rest/currentUser/profile')
+                console.log('Récupération données user...');
+                return this.http.get('../rest/currentUser/profile')
                     .pipe(
                         map((data: any) => {
                             this.headerService.user = {
                                 id: data.id,
+                                status: data.status,
                                 userId: data.user_id,
                                 firstname: data.firstname,
                                 lastname: data.lastname,
@@ -58,13 +54,49 @@ export class AppGuard implements CanActivate {
 
                             this.headerService.nbResourcesFollowed = data.nbFollowedResources;
                             this.privilegeService.resfreshUserShortcuts();
-                            return true;
+
+                            if (this.headerService.user.status === 'ABS') {
+                                console.log('ABS!');
+                                return this.router.navigate(['/activate-user']);
+                            } else {
+                                if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
+                                    this.headerService.hideSideBar = true;
+                                } else {
+                                    this.headerService.hideSideBar = false;
+                                }
+                                if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                                    this.headerService.sideBarAdmin = true;
+                                } else {
+                                    this.headerService.sideBarAdmin = false;
+                                }
+                                return true;
+                            }
+
                         })
                     );
             } else {
-                return true;
+                console.log('Données user trouvé !');
+
+                if (this.headerService.user.status === 'ABS') {
+                    console.log('ABS!');
+                    return this.router.navigate(['/activate-user']);
+                } else {
+                    if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
+                        this.headerService.hideSideBar = true;
+                    } else {
+                        this.headerService.hideSideBar = false;
+                    }
+                    if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                        this.headerService.sideBarAdmin = true;
+                    } else {
+                        this.headerService.sideBarAdmin = false;
+                    }
+                    return true;
+                }
             }
         } else {
+            console.log('Aucun token trouvé ! Recupération du token ...');
+
             return this.http.get('../rest/authenticationInformations')
                 .pipe(
                     map((data: any) => {
@@ -74,38 +106,53 @@ export class AppGuard implements CanActivate {
                         tokenInfo = this.authService.getToken();
 
                         if (tokenInfo !== null) {
-                            this.authService.user = JSON.parse(atob(tokenInfo.split('.')[1])).user;
+                            this.authService.setUrl(route.url.join('/'));
+                            console.log('Token trouvé !');
+                            console.log('Récupération données user...');
+                            this.http.get('../rest/currentUser/profile')
+                                .pipe(
+                                    map((dataUser: any) => {
+                                        this.headerService.user = {
+                                            id: dataUser.id,
+                                            status: data.status,
+                                            userId: dataUser.user_id,
+                                            firstname: dataUser.firstname,
+                                            lastname: dataUser.lastname,
+                                            entities: dataUser.entities,
+                                            groups: dataUser.groups,
+                                            preferences: dataUser.preferences,
+                                            privileges: dataUser.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : dataUser.privileges
+                                        };
+
+                                        this.headerService.nbResourcesFollowed = dataUser.nbFollowedResources;
+                                        this.privilegeService.resfreshUserShortcuts();
+                                        if (this.headerService.user.status === 'ABS') {
+                                            console.log('ABS!');
+                                            return this.router.navigate(['/activate-user']);
+                                        } else {
+                                            if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
+                                                this.headerService.hideSideBar = true;
+                                            } else {
+                                                this.headerService.hideSideBar = false;
+                                            }
+                                            if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                                                this.headerService.sideBarAdmin = true;
+                                            } else {
+                                                this.headerService.sideBarAdmin = false;
+                                            }
+                                            return true;
+                                        }
+                                    })
+                                ).subscribe();
                             return true;
                         } else {
+                            console.log('Aucun token trouvé ! Redirection sur login ...');
                             this.authService.logout();
                             return false;
                         }
-                    })
+                    }),
                 );
 
-        }
-        if (this.headerService.user.id === undefined) {
-            return this.http.get('../../rest/currentUser/profile')
-                .pipe(
-                    map((data: any) => {
-                        this.headerService.user = {
-                            id: data.id,
-                            userId: data.user_id,
-                            firstname: data.firstname,
-                            lastname: data.lastname,
-                            entities: data.entities,
-                            groups: data.groups,
-                            preferences: data.preferences,
-                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : data.privileges
-                        };
-
-                        this.headerService.nbResourcesFollowed = data.nbFollowedResources;
-                        this.privilegeService.resfreshUserShortcuts();
-                        return true;
-                    })
-                );
-        } else {
-            return true;
         }
     }
 }

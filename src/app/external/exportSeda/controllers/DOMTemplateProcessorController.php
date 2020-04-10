@@ -243,9 +243,6 @@ class DOMTemplateProcessorController extends \DOMXPath
 
         // Get type of value
         $type = gettype($value);
-        //var_dump($type);
-        //if (isset($instr->params['source']))
-        //    var_dump($instr->params['source']);
 
         switch (true) {
             // If value is scalar, merge text before Pi
@@ -587,10 +584,6 @@ class DOMTemplateProcessorController extends \DOMXPath
     ------------------------------------------------------------------------ */
     protected function &getData($instr, $source = null)
     {
-        //var_dump("getData");
-        //var_dump($instr);
-        //var_dump($source);
-
         $value = null;
 
         $steps = $instr->source;
@@ -635,9 +628,6 @@ class DOMTemplateProcessorController extends \DOMXPath
 
     protected function &stepData($step, $source)
     {
-        //var_dump("stepData");
-        //var_dump($step);
-        //var_dump("from " . gettype($source));
         $value = null;
         switch ($step[0]) {
             case 'func':
@@ -673,7 +663,6 @@ class DOMTemplateProcessorController extends \DOMXPath
 
             return $value;
         }
-        //var_dump($params);
         switch ($name) {
             // Callback functions
             case 'func':

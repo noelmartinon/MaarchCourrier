@@ -105,7 +105,7 @@ export class ActionsListComponent implements OnInit {
 
             this.basketInfo = JSON.parse(JSON.stringify(this.currentBasketInfo));
 
-            this.http.get('../../rest/resourcesList/users/' + this.currentBasketInfo.ownerId + '/groups/' + this.currentBasketInfo.groupId + '/baskets/' + this.currentBasketInfo.basketId + '/actions')
+            this.http.get('../rest/resourcesList/users/' + this.currentBasketInfo.ownerId + '/groups/' + this.currentBasketInfo.groupId + '/baskets/' + this.currentBasketInfo.basketId + '/actions')
                 .subscribe((data: any) => {
                     if (data.actions.length > 0) {
                         this.actionsList = data.actions;    
@@ -136,7 +136,7 @@ export class ActionsListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
             tap((data: any) => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.headerService.nbResourcesFollowed -= data.unFollowed;

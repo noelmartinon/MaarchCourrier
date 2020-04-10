@@ -30,7 +30,6 @@
 
 $filename = realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/apps/maarch_entreprise/xml/config.xml';
 if (file_exists($filename)) {
-
     $xmlconfig = simplexml_load_file(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/apps/maarch_entreprise/xml/config.xml');
 
     $CONFIG = $xmlconfig->CONFIG;
@@ -43,10 +42,8 @@ if (file_exists($filename)) {
     $nblinetoshow = (string) $CONFIG->nblinetoshow;
     $debug = (string) $CONFIG->debug;
     $applicationname = $CONFIG->applicationname;
-    // var_dump((string) $CONFIG->applicationname);
-    // var_dump($applicationname);
 
-    $xmlconfigSMTP = simplexml_load_file(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml');
+    $xmlconfigSMTP = simplexml_load_file(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml');
 
     $MAILER = $xmlconfigSMTP->MAILER;
 
@@ -55,46 +52,37 @@ if (file_exists($filename)) {
     $smtp_port = (string) $MAILER->smtp_port;
     $smtp_user = (string) $MAILER->smtp_user;
     $smtp_auth = (string) $MAILER->smtp_auth;
-    $smtp_secure = (string) $MAILER->smtp_secure;
-
-?>
+    $smtp_secure = (string) $MAILER->smtp_secure; ?>
 <script>
-   
-    function setconfig(url,applicationname)
-    {
-        // alert(url);
-        // alert(applicationname);
+    function setconfig(url, applicationname) {
 
         $(document).ready(function() {
             var oneIsEmpty = false;
             if (applicationname.length < 1) {
                 var oneIsEmpty = true;
             }
-            
 
             if (oneIsEmpty) {
-                $('#ajaxReturn_testConnect_ko').html('<?php echo _ONE_FIELD_EMPTY;?>');
+                $('#ajaxReturn_testConnect_ko').html('<?php echo _ONE_FIELD_EMPTY; ?>');
                 return;
-             }
-             $('.wait').css('display','block');
-             $('#ajaxReturn_testConnect_ko').html('');
-            //alert("ok");
+            }
+            $('.wait').css('display', 'block');
+            $('#ajaxReturn_testConnect_ko').html('');
             ajaxDB(
                 'setConfig',
-                  'applicationname|'+applicationname,
+                'applicationname|' + applicationname,
                 'ajaxReturn_testConnect',
                 'false'
             );
 
             if (oneIsEmpty) {
-                $('#ajaxReturn_testConnect_ok').html('<?php echo "connexion ok";?>');
+                $('#ajaxReturn_testConnect_ok').html('<?php echo "connexion ok"; ?>');
                 return;
-             }
+            }
         });
     }
 
-    function uploadImg(loginpicture)
-    {
+    function uploadImg(loginpicture) {
         var file_data = loginpicture.prop('files')[0];
         var form_data = new FormData();
         form_data.append('file', file_data);
@@ -107,13 +95,11 @@ if (file_exists($filename)) {
             data: form_data,
             type: 'post',
             success: function(php_script_response) {
-                //console.log(php_script_response);
-                //console.log(php_script_response.indexOf('error'));
-                if(php_script_response.indexOf('error')==-1) {
+                if (php_script_response.indexOf('error') == -1) {
                     var theImg = document.getElementById("imageDiv");
                     theImg.src = php_script_response;
-                    theImg.innerHTML='<img src="'+php_script_response+'?'+new Date().getTime()
-                        +'" width="30%" height="30%" />';
+                    theImg.innerHTML = '<img src="' + php_script_response + '?' + new Date().getTime() +
+                        '" width="30%" height="30%" />';
                     $('#ajaxReturn_upload_ko').html('Image chargée');
                 } else {
                     $('#ajaxReturn_upload_ko').html(php_script_response);
@@ -122,22 +108,21 @@ if (file_exists($filename)) {
         });
     }
 
-    function uploadFromImagePicker()
-    {
+    function uploadFromImagePicker() {
         selectImgPicker = document.getElementById("selectImgPicker");
         console.log(selectImgPicker.value);
         $.ajax({
             url: 'scripts/uploadFromImagePicker.php',
             dataType: 'html',
-            data: 'imgSelected='+selectImgPicker.value,
+            data: 'imgSelected=' + selectImgPicker.value,
             type: 'post',
             success: function(php_script_response) {
                 console.log(php_script_response);
-                if(php_script_response.indexOf('error')==-1) {
+                if (php_script_response.indexOf('error') == -1) {
                     var theImg = document.getElementById("imageDiv");
                     theImg.src = php_script_response;
-                    theImg.innerHTML='<img src="'+php_script_response+'?'+new Date().getTime()
-                        +'" width="30%" height="30%" />';
+                    theImg.innerHTML = '<img src="' + php_script_response + '?' + new Date().getTime() +
+                        '" width="30%" height="30%" />';
                     $('#ajaxReturn_upload_ko').html('Image chargée');
                 } else {
                     $('#ajaxReturn_upload_ko').html(php_script_response);
@@ -149,44 +134,44 @@ if (file_exists($filename)) {
 
 <div class="blockWrapper">
     <div class="titleBlock">
-            <h2 onClick="slide('configImage');" style="cursor: pointer;">
-                <?php echo _CONFIG_IMAGE;?>
-            </h2>
+        <h2 onClick="slide('configImage');" style="cursor: pointer;">
+            <?php echo _CONFIG_IMAGE; ?>
+        </h2>
     </div>
     <div class="contentBlock" id="configImage">
         <p>
-            <h5>
-                <?php echo _CONFIG_IMG_EXP;?>
-            </h5>
-            <form>
-                <table>
-                    <tr>
-                        <td>
-                            <?php echo _LOGIN_PICTURE;?>
-                        </td>
-                        <td>
-                            :
-                        </td>
-                        <td>
-                            <input id="loginpicture" type="file" name="loginpicture" onchange="uploadImg($('#loginpicture'))" />
-                        </td>
-                    </tr>
-                </table>
-            </form>
-            <br />
-            <div id="ajaxReturn_upload_ko" style="margin-left :20px;color:red;"></div>
-            <div align="center">
-                <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);"/>
-            </div>
-            <div id="ajaxReturn_upload_ok"></div>
-            <p>Image de la page de login :</p>
-            <div id="imageDiv">
-                <img src="../apps/maarch_entreprise/img/bodylogin.jpg" width="30%" height="30%" />
-            </div>
+        <h5>
+            <?php echo _CONFIG_IMG_EXP; ?>
+        </h5>
+        <form>
+            <table>
+                <tr>
+                    <td>
+                        <?php echo _LOGIN_PICTURE; ?>
+                    </td>
+                    <td>
+                        :
+                    </td>
+                    <td>
+                        <input id="loginpicture" type="file" name="loginpicture" onchange="uploadImg($('#loginpicture'))" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <br />
+        <div id="ajaxReturn_upload_ko" style="margin-left :20px;color:red;"></div>
+        <div align="center">
+            <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);" />
+        </div>
+        <div id="ajaxReturn_upload_ok"></div>
+        <p>Image de la page de login :</p>
+        <div id="imageDiv">
+            <img src="../apps/maarch_entreprise/img/bodylogin.jpg" width="30%" height="30%" />
+        </div>
         </p>
         <link href="css/image-picker.css" rel="stylesheet" type="text/css">
         <div class="container">
-            <?php echo _LOGIN_PICTURE_FROM_DATA;?>
+            <?php echo _LOGIN_PICTURE_FROM_DATA; ?>
             <select id="selectImgPicker" name="selectImgPicker" class="image-picker" onchange="uploadFromImagePicker();">
                 <optgroup label="Lettres">
                     <option data-img-src="img/background/01.jpg" value="01">Lettre 1</option>
@@ -212,76 +197,74 @@ if (file_exists($filename)) {
         </div>
         <script src="js/image-picker.js"></script>
         <script>
-        $(".image-picker").imagepicker({
-            hide_select : false
-        })
+            $(".image-picker").imagepicker({
+                hide_select: false
+            })
         </script>
 
-</div>
-<div class="blockWrapper">
-    <div class="titleBlock">
-        <h2 onClick="slide('configGeneral');" style="cursor: pointer;">
-            <?php echo _CONFIG_INFO;?>
-        </h2>
     </div>
-    <div class="contentBlock" id="configGeneral">
-        <p>
+    <div class="blockWrapper">
+        <div class="titleBlock">
+            <h2 onClick="slide('configGeneral');" style="cursor: pointer;">
+                <?php echo _CONFIG_INFO; ?>
+            </h2>
+        </div>
+        <div class="contentBlock" id="configGeneral">
+            <p>
             <h6>
-                <?php echo _CONFIG_EXP;?>
+                <?php echo _CONFIG_EXP; ?>
             </h6>
             <form>
                 <table>
                     <tr>
                         <td>
-                            <?php echo _DATABASESERVER;?>
+                            <?php echo _DATABASESERVER; ?>
                         </td>
                         <td>
                             :
                         </td>
                         <td>
-                            <input type="text" name="databaseserver" id="databaseserver" disabled="disabled" value= <?php echo $databaseserver; ?> />
+                            <input type="text" name="databaseserver" id="databaseserver" disabled="disabled" value=<?php echo $databaseserver; ?> />
                         </td>
                     </tr>
                     <tr>
-                        <td><?php echo _SMTP_PORT;?></td>
+                        <td><?php echo _SMTP_PORT; ?>
+                        </td>
                         <td>:</td>
-                        <td><input type="text" name="databasetype" id="databasetype" disabled="disabled" value= <?php echo $databasetype; ?> /></td>
+                        <td><input type="text" name="databasetype" id="databasetype" disabled="disabled" value=<?php echo $databasetype; ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _DATABASENAME;?></td>
+                        <td><?php echo _DATABASENAME; ?>
+                        </td>
                         <td>:</td>
                         <td><input type="text" name="databasename" id="databasename" disabled="disabled" value=<?php echo $databasename; ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _USER_BDD;?></td>
+                        <td><?php echo _USER_BDD; ?>
+                        </td>
                         <td>:</td>
                         <td><input type="text" name="databaseuser" id="databaseuser" disabled="disabled" value=<?php echo $databaseuser; ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _LANG;?></td>
+                        <td><?php echo _LANG; ?>
+                        </td>
                         <td>:</td>
-                        <td><input type="text" name="lang" id="lang" disabled="disabled" value=<?php if($lang == 'fr'){echo 'Français';}elseif($lang == 'en'){echo 'English';} ?> /></td>
-                    </tr>
-                    <!--tr>
-                        <td><?php echo _NBLINETOSHOW;?></td>
-                        <td>:</td>
-                        <td><input type="text" name="nblinetoshow" id="nblinetoshow" disabled="disabled" value=<?php echo $nblinetoshow; ?> /></td>
+                        <td><input type="text" name="lang" id="lang" disabled="disabled" value=<?php if ($lang == 'fr') {
+        echo 'Français';
+    } elseif ($lang == 'en') {
+        echo 'English';
+    } ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _MODEDEBUG;?></td>
+                        <td><b style="color:red"><?php echo _APPLICATIONNAME; ?></b></td>
                         <td>:</td>
-                        <td><input type="text" name="debug" id="debug" disabled="disabled" value=<?php echo $debug; ?> /></td>
-                    </tr-->
-                    <tr>
-                        <td><b style="color:red"><?php echo _APPLICATIONNAME;?></b></td>
-                        <td>:</td>
-                        <td><input type="text" name="applicationname" id="applicationname" value="<?php echo (string) $_SESSION['config']['databasename']; ?> "/></td>
+                        <td><input type="text" name="applicationname" id="applicationname" value="<?php echo (string) $_SESSION['config']['databasename']; ?> " /></td>
                     </tr>
                     <tr>
                         <td></td>
                         <td></td>
                         <td>
-                            <input type="button" id="ajaxReturn_testConnect_button" onClick="setconfig('setConfig', $('#applicationname').val())"; value="<?php echo _SET_CONFIG;?>"/>
+                            <input type="button" id="ajaxReturn_testConnect_button" onClick="setconfig('setConfig', $('#applicationname').val())" ; value="<?php echo _SET_CONFIG; ?>" />
                         </td>
                     </tr>
                 </table>
@@ -289,55 +272,59 @@ if (file_exists($filename)) {
             <br />
             <div id="ajaxReturn_testConnect_ko"></div>
             <div align="center">
-                <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);"/>
+                <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);" />
             </div>
             <div id="ajaxReturn_testConnect_ok"></div>
-        </p>
+            </p>
+        </div>
     </div>
-</div>
-<br />
+    <br />
 
-<div class="blockWrapper">
-    <div class="titleBlock">
+    <div class="blockWrapper">
+        <div class="titleBlock">
             <h2 onClick="slide('configNotificationSendmail');" style="cursor: pointer;">
-                <?php echo _SMTP_INFO;?>
+                <?php echo _SMTP_INFO; ?>
             </h2>
-    </div>
-    <div class="contentBlock" id="configNotificationSendmail">
-        <p>
+        </div>
+        <div class="contentBlock" id="configNotificationSendmail">
+            <p>
             <h6>
-                <?php echo _CONFIG_SMTP_EXP;?>
+                <?php echo _CONFIG_SMTP_EXP; ?>
             </h6>
             <form>
                 <table>
                     <tr>
                         <td>
-                            <?php echo _TYPE;?>
+                            <?php echo _TYPE; ?>
                         </td>
                         <td>
                             :
                         </td>
                         <td>
-                            <input type="text" name="smtptype" id="smtptype" disabled="disabled" value= <?php echo $type; ?> />
+                            <input type="text" name="smtptype" id="smtptype" disabled="disabled" value=<?php echo $type; ?> />
                         </td>
                     </tr>
                     <tr>
-                        <td><?php echo _SMTP_HOST;?></td>
+                        <td><?php echo _SMTP_HOST; ?>
+                        </td>
                         <td>:</td>
-                        <td><input type="text" name="smtphost" id="smtphost" disabled="disabled" value= <?php echo $smtp_host; ?> /></td>
+                        <td><input type="text" name="smtphost" id="smtphost" disabled="disabled" value=<?php echo $smtp_host; ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _SMTP_PORT;?></td>
+                        <td><?php echo _SMTP_PORT; ?>
+                        </td>
                         <td>:</td>
                         <td><input type="text" name="smtpport" id="smtpport" disabled="disabled" value=<?php echo $smtp_port; ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _SMTP_USER;?></td>
+                        <td><?php echo _SMTP_USER; ?>
+                        </td>
                         <td>:</td>
                         <td><input type="text" name="smtpuser" id="smtpuser" disabled="disabled" value=<?php echo $smtp_user; ?> /></td>
                     </tr>
                     <tr>
-                        <td><?php echo _SMTP_AUTH;?></td>
+                        <td><?php echo _SMTP_AUTH; ?>
+                        </td>
                         <td>:</td>
                         <td><input type="text" name="smtpauth" id="smtpauth" disabled="disabled" value=<?php echo $smtp_auth; ?> /></td>
                     </tr>
@@ -345,70 +332,53 @@ if (file_exists($filename)) {
                     <tr>
                         <td></td>
                         <td></td>
-                        
+
                     </tr>
                 </table>
             </form>
             <br />
             <div id="ajaxReturn_testConnect_ko"></div>
             <div align="center">
-                    <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);"/>
+                <img src="img/wait.gif" width="100" class="wait" style="display: none; background-color: rgba(0, 0, 0, 0.2);" />
             </div>
             <div id="ajaxReturn_testConnect_ok"></div>
-        </p>
-</div>
-<div class="blockWrapper">
-    <div class="contentBlock" id="docservers">
-        <p>
-            <div id="buttons">
-                <div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=resume');">
-                        <?php echo _NEXT_INSTALL;?>
-                    </a>
-                </div>
-                
-            </div>
-            <br />
-            <br />
-        </p>
-    </div>
-</div>
+            </p>
+        </div>
+        <div class="blockWrapper">
+            <div class="contentBlock" id="docservers">
+                <p>
+                <div id="buttons">
+                    <div style="float: right;" class="nextButton" id="next">
+                        <a href="#" onClick="goTo('index.php?step=resume');">
+                            <?php echo _NEXT_INSTALL; ?>
+                        </a>
+                    </div>
 
-<?php
+                </div>
+                <br />
+                <br />
+                </p>
+            </div>
+        </div>
+
+        <?php
 } else {
-    echo "fichier de configuration non trouvé : vérifier votre custom";
-?>
-<div class="blockWrapper">
-    <div class="contentBlock" id="docservers">
-        <p>
-            <div id="buttons">
-                <div style="float: left;" class="previousButton" id="previous">
-                    <a href="#" onClick="goTo('index.php?step=database');" style="display:block;">
-                        <?php echo _PREVIOUS;?>
-                    </a>
+        echo "fichier de configuration non trouvé : vérifier votre custom"; ?>
+        <div class="blockWrapper">
+            <div class="contentBlock" id="docservers">
+                <p>
+                <div id="buttons">
+                    <div style="float: left;" class="previousButton" id="previous">
+                        <a href="#" onClick="goTo('index.php?step=database');" style="display:block;">
+                            <?php echo _PREVIOUS; ?>
+                        </a>
+                    </div>
                 </div>
-                <!--div style="float: left;" class="previousButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=password');" id="ajaxReturn_testConnect" >
-                        <?php echo "Sauter étape";?>
-                    </a>
-                </div-->
-                <!--div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=password');" id="ajaxReturn_testConnect">
-                        <?php echo _NEXT;?>
-                    </a>
-                </div-->
-                <!--div style="float: right;" class="nextButton" id="next">
-                    <a href="#" onClick="goTo('index.php?step=resume');">
-                        <?php echo _NEXT_INSTALL;?>
-                    </a>
-                </div-->
-                
+                <br />
+                <br />
+                </p>
             </div>
-            <br />
-            <br />
-        </p>
-    </div>
-</div>
+        </div>
 
-<?php
-}
+        <?php
+    }

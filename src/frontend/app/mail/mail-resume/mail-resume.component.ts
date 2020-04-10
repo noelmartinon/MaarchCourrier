@@ -40,7 +40,7 @@ export class MailResumeComponent implements OnInit {
 
     loadMails(resId: number) {
         this.loading = true;
-        this.http.get(`../../rest/externalSummary/${resId}?limit=3`).pipe(
+        this.http.get(`../rest/externalSummary/${resId}?limit=3`).pipe(
             map((data: any) => {
                 data.elementsSend = data.elementsSend.map((elem: any) => {
                     let object = elem.object;

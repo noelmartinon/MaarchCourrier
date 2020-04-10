@@ -59,7 +59,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     }
 
     checkAcknowledgementReceipt() {
-        this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkAcknowledgementReceipt?' + this.currentMode, { resources: this.data.resIds })
+        this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkAcknowledgementReceipt?' + this.currentMode, { resources: this.data.resIds })
             .subscribe((data: any) => {
                 this.acknowledgement = data;
                 this.realResSelected = data.sendList;
@@ -120,7 +120,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     downloadAcknowledgementReceipt(data: any) {
         this.loadingExport = true;
-        this.http.post('../../rest/acknowledgementReceipts', { 'resources': data }, { responseType: "blob" })
+        this.http.post('../rest/acknowledgementReceipts', { 'resources': data }, { responseType: "blob" })
             .subscribe((data) => {
                 let downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
@@ -201,7 +201,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
         this.templateEmailListForm.reset();
 
-        this.http.post(`../../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resIds[0] } }).pipe(
+        this.http.post(`../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resIds[0] } }).pipe(
             tap((data: any) => {
 
                 var div = document.createElement('div');
@@ -231,7 +231,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
         this.emailSignListForm.reset();
 
-        this.http.get(`../../rest/currentUser/emailSignatures/${templateId}`).pipe(
+        this.http.get(`../rest/currentUser/emailSignatures/${templateId}`).pipe(
             tap((data: any) => {
                 var div = document.createElement('div');
 
@@ -255,7 +255,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     initEmailModelsList() {
         if (this.availableEmailModels.length === 0 && this.data.resIds.length === 1) {
-            this.http.get(`../../rest/resources/${this.data.resIds[0]}/emailTemplates`).pipe(
+            this.http.get(`../rest/resources/${this.data.resIds[0]}/emailTemplates`).pipe(
                 tap((data: any) => {
                     this.availableEmailModels = data.templates;
                 }),
@@ -269,7 +269,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     initSignEmailModelsList() {
         if (this.availableSignEmailModels.length === 0  && this.data.resIds.length === 1) {
-            this.http.get(`../../rest/currentUser/emailSignatures`).pipe(
+            this.http.get(`../rest/currentUser/emailSignatures`).pipe(
                 tap((data: any) => {
                     this.availableSignEmailModels = data.emailSignatures;
                 }),

@@ -56,7 +56,7 @@ export class ActionsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/actions')
+        this.http.get('../rest/actions')
             .subscribe((data) => {
                 this.actions = data['actions'];
                 this.headerService.setHeader(this.lang.administration + ' ' + this.lang.actions);
@@ -78,7 +78,7 @@ export class ActionsAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + action.label_action + ' »');
 
         if (r) {
-            this.http.delete('../../rest/actions/' + action.id)
+            this.http.delete('../rest/actions/' + action.id)
                 .subscribe((data: any) => {
                     this.actions = data.actions;
                     this.dataSource = new MatTableDataSource(this.actions);

@@ -26,7 +26,7 @@
 
  function setConfigNotification_batch_config_Xml($from, $to, $host, $user, $pass, $type, $port, $auth, $charset, $smtpSecure, $mailfrom, $smtpDomains)
  {
-     $xmlconfig = simplexml_load_file(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/modules/notifications/batch/config/config.xml');
+     $xmlconfig = simplexml_load_file(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml');
 
      $CONFIG = $xmlconfig->CONFIG;
         
@@ -42,7 +42,7 @@
      $CONFIG->MaarchUrl = $maarchUrl;
 
      $res = $xmlconfig->asXML();
-     $fp = @fopen(realpath('.')."/custom/cs_".$_SESSION['config']['databasename']."/modules/notifications/batch/config/config.xml", "w+");
+     $fp = @fopen(realpath('.')."/custom/cs_".$_SESSION['config']['databasename']."/bin/notification/config/config.xml", "w+");
      if (!$fp) {
          return false;
          exit;

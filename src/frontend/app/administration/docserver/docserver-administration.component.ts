@@ -38,7 +38,7 @@ export class DocserverAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/docserverTypes')
+        this.http.get('../rest/docserverTypes')
             .subscribe((data: any) => {
                 this.docserversTypes = data.docserverTypes;
                 this.loading = false;
@@ -48,7 +48,7 @@ export class DocserverAdministrationComponent implements OnInit {
 
     onSubmit(docserver: any) {
         docserver.size_limit_number = docserver.limitSizeFormatted * 1000000000;
-        this.http.post('../../rest/docservers', docserver)
+        this.http.post('../rest/docservers', docserver)
             .subscribe((data: any) => {
                 this.notify.success(this.lang.docserverAdded);
                 this.router.navigate(['/administration/docservers/']);

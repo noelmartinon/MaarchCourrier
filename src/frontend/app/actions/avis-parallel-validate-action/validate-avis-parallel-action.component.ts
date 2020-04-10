@@ -52,7 +52,7 @@ export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
         this.loading = true;
         this.resourcesErrors = [];
         this.resourcesWarnings = [];
-        this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkValidateParallelOpinion', { resources: this.data.resIds }).pipe(
+        this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkValidateParallelOpinion', { resources: this.data.resIds }).pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.resourcesInformations.warning)) {
                     this.resourcesWarnings = data.resourcesInformations.warning;

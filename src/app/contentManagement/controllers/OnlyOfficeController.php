@@ -83,6 +83,9 @@ class OnlyOfficeController
             }
 
             $path = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $template['template_path']) . $template['template_file_name'];
+            if (!is_file($path)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Template does not exist on docserver']);
+            }
             $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'resourceCreation' || $body['objectType'] == 'attachmentCreation') {
             $docserver = DocserverModel::getCurrentDocserver(['typeId' => 'TEMPLATES', 'collId' => 'templates', 'select' => ['path_template']]);
@@ -128,11 +131,20 @@ class OnlyOfficeController
 
             $path = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachment['path']) . $attachment['filename'];
             $fileContent = file_get_contents($path);
+        } elseif ($body['objectType'] == 'encodedResource') {
+            if (empty($body['format'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body format is empty']);
+            }
+            $path = null;
+            $fileContent = base64_decode($body['objectId']);
+            $extension = $body['format'];
         } else {
             return $response->withStatus(400)->withJson(['errors' => 'Query param objectType does not exist']);
         }
 
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        if (empty($extension)) {
+            $extension = pathinfo($path, PATHINFO_EXTENSION);
+        }
         $tmpPath = CoreConfigModel::getTmpPath();
         $filename = "onlyOffice_{$GLOBALS['id']}_{$body['onlyOfficeKey']}.{$extension}";
 

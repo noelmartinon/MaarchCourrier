@@ -34,7 +34,7 @@ export class LinkResourceModalComponent {
 
     linkResources() {
         const selectedRes = this.appSearchAdvList.getSelectedRessources().filter(res => res !== this.data.resId);
-        this.http.post(`../../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
+        this.http.post(`../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
             tap(() => {
                 this.dialogRef.close('success');
             }),

@@ -89,7 +89,7 @@ export class FolderInputComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../../rest/autocomplete/folders', { params: { "search": data } });
+        return this.http.get('../rest/autocomplete/folders', { params: { "search": data } });
     }
 
     selectOpt(ev: any) {
@@ -101,7 +101,7 @@ export class FolderInputComponent implements OnInit {
     initFormValue() {
 
         this.controlAutocomplete.value.forEach((ids: any) => {
-            this.http.get('../../rest/folders/' + ids).pipe(
+            this.http.get('../rest/folders/' + ids).pipe(
                 tap((data) => {
                     for (var key in data) {
                         this.valuesToDisplay[data[key].id] = data[key].label;
@@ -150,7 +150,7 @@ export class FolderInputComponent implements OnInit {
             this.controlAutocomplete.value.splice(index, 1);
             this.controlAutocomplete.setValue(arrValue);
         } else {
-            this.http.delete('../../rest/folders/' + this.controlAutocomplete.value[index]).pipe(
+            this.http.delete('../rest/folders/' + this.controlAutocomplete.value[index]).pipe(
                 tap((data: any) => {
                     let arrValue = this.controlAutocomplete.value;
                     this.controlAutocomplete.value.splice(index, 1);
@@ -169,7 +169,7 @@ export class FolderInputComponent implements OnInit {
 
         newElem[this.key] = this.myControl.value;
 
-        this.http.post('../../rest/folders', { label: newElem[this.key] }).pipe(
+        this.http.post('../rest/folders', { label: newElem[this.key] }).pipe(
             tap((data: any) => {
                 for (var key in data) {
                     newElem['id'] = data[key];

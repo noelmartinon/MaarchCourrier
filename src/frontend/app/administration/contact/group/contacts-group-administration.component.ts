@@ -108,7 +108,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
             debounceTime(500),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/contacts', { params: { 'search': data } }))
+            switchMap(data => this.http.get('../rest/autocomplete/contacts', { params: { 'search': data } }))
         ).subscribe((response: any) => {
             this.searchResult = response;
             this.dataSource = new MatTableDataSource(this.searchResult);
@@ -133,7 +133,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
 
-                this.http.get('../../rest/contactsGroups/' + params['id'])
+                this.http.get('../rest/contactsGroups/' + params['id'])
                     .subscribe((data: any) => {
                         this.contactsGroup = data.contactsGroup;
                         this.headerService.setHeader(this.lang.contactsGroupModification, this.contactsGroup.label);
@@ -153,7 +153,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     saveContactsList(elem: any): void {
         elem.textContent = this.lang.loading + '...';
         elem.disabled = true;
-        this.http.post('../../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
+        this.http.post('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
             .subscribe((data: any) => {
                 this.notify.success(this.lang.contactAdded);
                 this.nbContact = this.nbContact + this.selection.selected.length;
@@ -172,7 +172,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            this.http.post('../../rest/contactsGroups', this.contactsGroup)
+            this.http.post('../rest/contactsGroups', this.contactsGroup)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/contacts/contacts-groups/' + data.contactsGroup]);
                     this.notify.success(this.lang.contactsGroupAdded);
@@ -180,7 +180,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
+            this.http.put('../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
                 .subscribe(() => {
                     this.router.navigate(['/administration/contacts-groups']);
                     this.notify.success(this.lang.contactsGroupUpdated);
@@ -200,7 +200,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     removeContact(contact: any, row: any) {
-        this.http.delete('../../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
+        this.http.delete('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
             .subscribe(() => {
                 const lastElement = this.contactsGroup.contacts.length - 1;
                 this.contactsGroup.contacts[row] = this.contactsGroup.contacts[lastElement];

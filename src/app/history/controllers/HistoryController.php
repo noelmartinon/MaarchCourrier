@@ -66,11 +66,11 @@ class HistoryController
                 }
             }
             $users = [];
-            if (!empty($userIds)) {
-                $users = UserModel::get(['select' => ['user_id'], 'where' => ['id in (?)'], 'data' => [$userIds]]);
-                $users = array_column($users, 'user_id');
+            if (!empty($userLogins)) {
+                $users = UserModel::get(['select' => ['id'], 'where' => ['user_id in (?)'], 'data' => [$userLogins]]);
+                $users = array_column($users, 'id');
             }
-            $users   = array_merge($users, $userLogins);
+            $users   = array_merge($users, $userIds);
             $where[] = 'user_id in (?)';
             $data[]  = $users;
         }
@@ -125,7 +125,7 @@ class HistoryController
 
         $total = $history[0]['count'] ?? 0;
         foreach ($history as $key => $value) {
-            $history[$key]['userLabel'] = UserModel::getLabelledUserById(['login' => $value['user_id']]);
+            $history[$key]['userLabel'] = UserModel::getLabelledUserById(['id' => $value['user_id']]);
             unset($history[$key]['count']);
         }
 
@@ -150,7 +150,7 @@ class HistoryController
         LogsController::add($aArgs);
 
         if (empty($aArgs['userId'])) {
-            $aArgs['userId'] = $GLOBALS['login'];
+            $aArgs['userId'] = $GLOBALS['id'];
         }
 
         HistoryModel::create([
@@ -167,19 +167,18 @@ class HistoryController
             "eventId"   => $aArgs['eventId'],
             "tableName" => $aArgs['tableName'],
             "recordId"  => $aArgs['recordId'],
-            "userId"    => $GLOBALS['id'],
+            "userId"    => $aArgs['userId'],
             "info"      => $aArgs['info'],
         ]);
     }
 
     public function getByUserId(Request $request, Response $response, array $aArgs)
     {
-        $user = UserModel::getById(['id' => $aArgs['userSerialId'], 'select' => ['user_id']]);
-        if ($user['user_id'] != $GLOBALS['login'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_history', 'userId' => $GLOBALS['id']])) {
+        if ($aArgs['userSerialId'] != $GLOBALS['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_history', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $aHistories = HistoryModel::getByUserId(['userId' => $user['user_id'], 'select' => ['info','record_id', 'event_date']]);
+        $aHistories = HistoryModel::getByUserId(['userId' => $aArgs['userSerialId'], 'select' => ['info','record_id', 'event_date']]);
 
         return $response->withJson(['histories' => $aHistories]);
     }
@@ -243,9 +242,11 @@ class HistoryController
 
         $users = [];
         foreach ($usersInHistory as $value) {
-            $user = UserModel::getByLogin(['login' => $value['user_id'], 'select' => ['id', 'firstname', 'lastname']]);
+            if (!empty($value['user_id'])) {
+                $user = UserModel::getById(['id' => $value['user_id'], 'select' => ['user_id', 'firstname', 'lastname']]);
+            }
 
-            $users[] = ['id' => $user['id'] ?? null, 'login' => $value['user_id'], 'label' => !empty($user['id']) ? "{$user['firstname']} {$user['lastname']}" : null];
+            $users[] = ['id' => $value['user_id'] ?? null, 'login' => $user['user_id'] ?? null, 'label' => !empty($user['user_id']) ? "{$user['firstname']} {$user['lastname']}" : null];
         }
 
         return $response->withJson(['actions' => $actions, 'systemActions' => $systemActions, 'users' => $users]);

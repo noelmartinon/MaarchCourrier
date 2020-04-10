@@ -55,7 +55,7 @@ export class TemplatesAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/templates')
+        this.http.get('../rest/templates')
             .subscribe((data) => {
                 this.templates = data['templates'];
                 this.loading = false;
@@ -76,7 +76,7 @@ export class TemplatesAdministrationComponent implements OnInit {
         const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + template.template_label + ' »');
 
         if (r) {
-            this.http.delete('../../rest/templates/' + template.template_id)
+            this.http.delete('../rest/templates/' + template.template_id)
                 .subscribe(() => {
                     for (const i in this.templates) {
                         if (this.templates[i].template_id === template.template_id) {

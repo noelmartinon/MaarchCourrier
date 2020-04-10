@@ -60,7 +60,7 @@ export class FoldersService {
     }
 
     getFolders() {
-        this.http.get("../../rest/folders").pipe(
+        this.http.get("../rest/folders").pipe(
             tap((data: any) => {
                 this.folders = data.folders;
                 this.eventAction.next({type:'initTree', content: ''});
@@ -80,7 +80,7 @@ export class FoldersService {
     getPinnedFolders() {
         this.loading = true;
 
-        this.http.get("../../rest/pinnedFolders").pipe(
+        this.http.get("../rest/pinnedFolders").pipe(
             tap((data: any) => {
                 this.pinnedFolders = data.folders;
             }),
@@ -101,7 +101,7 @@ export class FoldersService {
     }
 
     pinFolder(folder: any) {
-        this.http.post(`../../rest/folders/${folder.id}/pin`, {}).pipe(
+        this.http.post(`../rest/folders/${folder.id}/pin`, {}).pipe(
             tap(() => {
                 this.getPinnedFolders();
                 this.eventAction.next({type:'refreshFolderPinned', content: {id: folder.id, pinned : true}});
@@ -115,7 +115,7 @@ export class FoldersService {
     }
 
     unpinFolder(folder: any) {
-        this.http.delete(`../../rest/folders/${folder.id}/unpin`).pipe(
+        this.http.delete(`../rest/folders/${folder.id}/unpin`).pipe(
             tap(() => {
                 this.getPinnedFolders();
                 this.eventAction.next({type:'refreshFolderPinned', content: {id: folder.id, pinned : false}});
@@ -136,7 +136,7 @@ export class FoldersService {
     }
 
     classifyDocument(ev: any, folder: any) {
-        this.http.post(`../../rest/folders/${folder.id}/resources`, { resources: [ev.item.data.resId] }).pipe(
+        this.http.post(`../rest/folders/${folder.id}/resources`, { resources: [ev.item.data.resId] }).pipe(
             tap((data: any) => {
                 if (this.pinnedFolders.filter((pinFolder: any) => pinFolder.id === folder.id)[0] !== undefined) {
                     this.pinnedFolders.filter((pinFolder: any) => pinFolder.id === folder.id)[0].countResources = data.countResources;

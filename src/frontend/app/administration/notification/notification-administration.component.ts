@@ -42,7 +42,7 @@ export class NotificationAdministrationComponent implements OnInit {
                 this.headerService.setHeader(this.lang.notificationCreation);
 
                 this.creationMode = true;
-                this.http.get('../../rest/administration/notifications/new')
+                this.http.get('../rest/administration/notifications/new')
                     .subscribe((data: any) => {
                         this.notification = data.notification;
                         this.notification.attachfor_properties = [];
@@ -53,7 +53,7 @@ export class NotificationAdministrationComponent implements OnInit {
             } else {
 
                 this.creationMode = false;
-                this.http.get('../../rest/notifications/' + params['identifier'])
+                this.http.get('../rest/notifications/' + params['identifier'])
                     .subscribe((data: any) => {
                         this.headerService.setHeader(this.lang.notificationModification, data.notification.description);
 
@@ -69,7 +69,7 @@ export class NotificationAdministrationComponent implements OnInit {
     }
 
     createScript() {
-        this.http.post('../../rest/scriptNotification', this.notification)
+        this.http.post('../rest/scriptNotification', this.notification)
             .subscribe((data: any) => {
                 this.notification.scriptcreated = data;
                 this.notify.success(this.lang.scriptCreated);
@@ -81,7 +81,7 @@ export class NotificationAdministrationComponent implements OnInit {
     onSubmit() {
         if (this.creationMode) {
             this.notification.is_enabled = 'Y';
-            this.http.post('../../rest/notifications', this.notification)
+            this.http.post('../rest/notifications', this.notification)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/notifications']);
                     this.notify.success(this.lang.notificationAdded);
@@ -89,7 +89,7 @@ export class NotificationAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/notifications/' + this.notification.notification_sid, this.notification)
+            this.http.put('../rest/notifications/' + this.notification.notification_sid, this.notification)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/notifications']);
                     this.notify.success(this.lang.notificationUpdated);
@@ -105,7 +105,7 @@ export class NotificationAdministrationComponent implements OnInit {
         } else {
             this.notification.is_enabled = 'Y';
         }
-        this.http.put('../../rest/notifications/' + this.notification.notification_sid, this.notification)
+        this.http.put('../rest/notifications/' + this.notification.notification_sid, this.notification)
             .subscribe((data: any) => {
                 this.notify.success(this.lang.notificationUpdated);
             }, (err) => {

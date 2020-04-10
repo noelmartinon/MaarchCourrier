@@ -62,7 +62,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     initBanSearch() {
-        this.http.get("../../rest/ban/availableDepartments").pipe(
+        this.http.get("../rest/ban/availableDepartments").pipe(
             tap((data: any) => {
                 if (data.default !== null && data.departments.indexOf(data.default.toString()) !== - 1) {
                     this.addressBANCurrentDepartment = data.default;
@@ -100,7 +100,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../../rest/autocomplete/banAddresses', { params: { "address": data, 'department': this.addressBANCurrentDepartment } });
+        return this.http.get('../rest/autocomplete/banAddresses', { params: { "address": data, 'department': this.addressBANCurrentDepartment } });
     }
 
     selectOpt(ev: any) {

@@ -82,7 +82,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFieldsAdmin);
 
-        this.http.get('../../rest/customFields').pipe(
+        this.http.get('../rest/customFields').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
@@ -122,7 +122,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     values: []
                 };
             }),
-            exhaustMap((data) => this.http.post('../../rest/customFields', newCustomField)),
+            exhaustMap((data) => this.http.post('../rest/customFields', newCustomField)),
             tap((data: any) => {
                 newCustomField.id = data.customFieldId;
                 this.customFields.push(newCustomField);
@@ -153,7 +153,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete('../../rest/customFields/' + this.customFields[indexCustom].id)),
+            exhaustMap(() => this.http.delete('../rest/customFields/' + this.customFields[indexCustom].id)),
             tap(() => {
                 this.customFields.splice(indexCustom, 1);
                 this.notify.success(this.lang.customFieldDeleted);
@@ -180,7 +180,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             return of(false);
         }
 
-        this.http.put('../../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
+        this.http.put('../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
                 this.notify.success(this.lang.customFieldUpdated);

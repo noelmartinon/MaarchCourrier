@@ -130,7 +130,7 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     getCustomFields() {
-        this.http.get('../../rest/contactsCustomFields').pipe(
+        this.http.get('../rest/contactsCustomFields').pipe(
             tap((data: any) => {
                 this.customFields = data.customFields.map((custom: any) => {
                     return {
@@ -156,7 +156,7 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../../rest/autocomplete/correspondents', { params: { 'search': data } });
+        return this.http.get('../rest/autocomplete/correspondents', { params: { 'search': data } });
     }
 
     selectOpt(ev: any) {
@@ -178,7 +178,7 @@ export class ContactAutocompleteComponent implements OnInit {
             };
 
             if (contact.type === 'contact') {
-                this.http.get('../../rest/contacts/' + contact.id).pipe(
+                this.http.get('../rest/contacts/' + contact.id).pipe(
                     tap((data: any) => {
                         this.valuesToDisplay[data.id] = {
                             type: 'contact',
@@ -197,7 +197,7 @@ export class ContactAutocompleteComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (contact.type === 'user') {
-                this.http.get('../../rest/users/' + contact.id).pipe(
+                this.http.get('../rest/users/' + contact.id).pipe(
                     tap((data: any) => {
                         this.valuesToDisplay[data.id] = {
                             type: 'user',
@@ -215,7 +215,7 @@ export class ContactAutocompleteComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (contact.type === 'entity') {
-                this.http.get('../../rest/entities/' + contact.id).pipe(
+                this.http.get('../rest/entities/' + contact.id).pipe(
                     tap((data: any) => {
                         this.valuesToDisplay[data.id] = {
                             type: 'entity',
@@ -237,7 +237,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     setFormValue(item: any) {
         if (item.type === 'contactGroup') {
-            this.http.get('../../rest/contactsGroups/' + item.id).pipe(
+            this.http.get('../rest/contactsGroups/' + item.id).pipe(
                 map((data: any) => {
                     const contacts = data.contactsGroup.contacts.map((contact: any) => {
                         return {
@@ -315,7 +315,7 @@ export class ContactAutocompleteComponent implements OnInit {
             this.controlAutocomplete.value.splice(index, 1);
             this.controlAutocomplete.setValue(arrValue);
         } else {
-            this.http.delete('../../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
+            this.http.delete('../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
                 tap((data: any) => {
                     const arrValue = this.controlAutocomplete.value;
                     this.controlAutocomplete.value.splice(index, 1);

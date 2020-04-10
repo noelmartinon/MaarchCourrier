@@ -142,7 +142,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
             this.dragInit = true;
             this.destroy$.next(true);
 
-            this.basketUrl = '../../rest/resourcesList/users/' + params['userSerialId'] + '/groups/' + params['groupSerialId'] + '/baskets/' + params['basketId'];
+            this.basketUrl = '../rest/resourcesList/users/' + params['userSerialId'] + '/groups/' + params['groupSerialId'] + '/baskets/' + params['basketId'];
 
             this.currentBasketInfo = {
                 ownerId: params['userSerialId'],
@@ -217,10 +217,10 @@ export class BasketListComponent implements OnInit, OnDestroy {
 
     goTo(row: any) {
         this.filtersListService.filterMode = false;
-        if (this.docUrl === '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
+        if (this.docUrl === '../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
             this.sidenavRight.close();
         } else {
-            this.docUrl = '../../rest/resources/' + row.resId + '/content';
+            this.docUrl = '../rest/resources/' + row.resId + '/content';
             this.currentChrono = row.chrono;
             this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
                 '<iframe style=\'height:100%;width:100%;\' src=\'' + this.docUrl + '\' class=\'embed-responsive-item\'>' +
@@ -279,7 +279,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
     viewThumbnail(row: any) {
         if (row.hasDocument) {
             const timeStamp = +new Date();
-            this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail?tsp=' + timeStamp;
+            this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail?tsp=' + timeStamp;
             $('#viewThumbnail').show();
             $('#listContent').css({ 'overflow': 'hidden' });
         }
@@ -482,7 +482,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
+        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
             .subscribe((data: any) => {
                 const file = new Blob([data], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);
@@ -494,7 +494,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
 
     toggleMailTracking(row: any) {
         if (!row.mailTracking) {
-            this.http.post('../../rest/resources/follow', { resources: [row.resId] }).pipe(
+            this.http.post('../rest/resources/follow', { resources: [row.resId] }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed++),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -502,7 +502,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
                 })
             ).subscribe();
         } else {
-            this.http.request('DELETE', '../../rest/resources/unfollow', { body: { resources: [row.resId] } }).pipe(
+            this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: [row.resId] } }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed--),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);

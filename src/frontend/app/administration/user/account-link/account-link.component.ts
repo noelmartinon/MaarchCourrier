@@ -27,12 +27,12 @@ export class AccountLinkComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.http.get('../../rest/autocomplete/maarchParapheurUsers', { params: { 'search': this.data.user.mail, 'exludeAlreadyConnected': 'true' } })
+        this.http.get('../rest/autocomplete/maarchParapheurUsers', { params: { 'search': this.data.user.mail, 'exludeAlreadyConnected': 'true' } })
             .subscribe((dataUsers: any) => {
                 if (dataUsers.length > 0) {
                     this.externalUser = dataUsers[0];
                     this.externalUser.inMaarchParapheur = true;
-                    this.http.get('../../rest/maarchParapheur/user/' + this.externalUser.id + '/picture')
+                    this.http.get('../rest/maarchParapheur/user/' + this.externalUser.id + '/picture')
                         .subscribe((data: any) => {
                             this.externalUser.picture = data.picture;
                         }, (err) => {
@@ -53,7 +53,7 @@ export class AccountLinkComponent implements OnInit {
     selectUser(user: any) {
         this.externalUser = user;
         this.externalUser.inMaarchParapheur = true;
-        this.http.get('../../rest/maarchParapheur/user/' + this.externalUser.id + '/picture')
+        this.http.get('../rest/maarchParapheur/user/' + this.externalUser.id + '/picture')
             .subscribe((data: any) => {
                 this.externalUser.picture = data.picture;
             }, (err) => {

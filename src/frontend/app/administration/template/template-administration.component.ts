@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -21,7 +21,7 @@ declare var tinymce: any;
     styleUrls: ['template-administration.component.scss'],
     providers: [AppService]
 })
-export class TemplateAdministrationComponent implements OnInit {
+export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
@@ -32,6 +32,7 @@ export class TemplateAdministrationComponent implements OnInit {
     creationMode: boolean;
 
     template: any = {
+        id: 0,
         label: '',
         description: '',
         datasource: 'letterbox_attachment',
@@ -55,8 +56,6 @@ export class TemplateAdministrationComponent implements OnInit {
         'dotx',
         'odt',
         'ott',
-        'rtf',
-        'txt',
         'html',
         'xlsl',
         'xlsx',
@@ -111,7 +110,7 @@ export class TemplateAdministrationComponent implements OnInit {
 
                 this.creationMode = true;
 
-                this.http.get('../../rest/administration/templates/new')
+                this.http.get('../rest/administration/templates/new')
                     .subscribe((data: any) => {
                         this.setInitialValue(data);
                         this.loading = false;
@@ -120,10 +119,11 @@ export class TemplateAdministrationComponent implements OnInit {
             } else {
 
                 this.creationMode = false;
-                this.http.get('../../rest/templates/' + params['id'] + '/details')
+                this.http.get('../rest/templates/' + params['id'] + '/details')
                     .subscribe((data: any) => {
                         this.setInitialValue(data);
                         this.template = {
+                            id: data.template.template_id,
                             label: data.template.template_label,
                             description: data.template.template_comment,
                             datasource: data.template.template_datasource,
@@ -134,31 +134,42 @@ export class TemplateAdministrationComponent implements OnInit {
                         this.updateTemplateType();
 
                         this.selectedModelFile = data.template.template_file_name;
+                        this.template.template_attachment_type = data.template.template_attachment_type;
                         if (this.template.type === 'HTML' || this.template.type === 'TXT') {
                             this.template.file.content = data.template.template_content;
                         } else if (this.template.type === 'OFFICE') {
                             this.template.file.format = data.template.template_file_name.split('.').pop();
                             this.template.file.name = data.template.template_file_name;
+                            this.getViewTemplateContent();
                         } else if (this.template.target === 'acknowledgementReceipt') {
-                            this.template.file.paper.format = data.template.template_file_name.split('.').pop();
+                            if (!this.functionsService.empty(data.template.template_file_name)) {
+                                this.template.file.paper.format = data.template.template_file_name.split('.').pop();
+                            }
                             this.template.file.paper.name = data.template.template_file_name;
                             this.template.file.electronic.content = data.template.template_content;
-                            this.template.template_attachment_type = data.template.template_attachment_type;
+                            this.getViewTemplateContent();
                         }
 
                         this.headerService.setHeader(this.lang.templateModification, this.template.template_label);
                         this.loading = false;
-
-                        console.log(this.selectedModelFile);
-                        console.log(this.template);
-                        console.log(data);
-
                     });
             }
             if (!this.template.template_attachment_type) {
                 this.template.template_attachment_type = 'all';
             }
         });
+    }
+
+    getViewTemplateContent() {
+        this.http.get(`../rest/templates/${this.template.id}/content`).pipe(
+            tap((data: any) => {
+                this.templateDocView = this.sanitizer.bypassSecurityTrustResourceUrl('data:application/pdf;base64,' + data.encodedDocument);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     initMce(selectorId: string) {
@@ -309,21 +320,59 @@ export class TemplateAdministrationComponent implements OnInit {
 
     editFile() {
         const editorOptions: any = {};
-
-        if (this.creationMode || ((this.template.target !== 'acknowledgementReceipt' && this.functionsService.empty(this.template.file.name) || (this.template.target === 'acknowledgementReceipt' && this.functionsService.empty(this.template.file.paper.name))))) {
-            for (const element of this.defaultTemplatesList) {
-                if (this.selectedModelFile === element.fileExt + ': ' + element.fileName) {
-                    editorOptions.objectId = element.filePath;
+        editorOptions.docUrl = `rest/onlyOffice/mergedFile`;
+        if (this.creationMode) {
+            if (this.template.target !== 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.content;
+                    editorOptions.extension = this.template.file.format;
+                } else {
+                    editorOptions.objectType = 'templateCreation';
+                    for (const element of this.defaultTemplatesList) {
+                        if (this.selectedModelFile === element.fileExt + ': ' + element.fileName) {
+                            editorOptions.objectId = element.filePath;
+                        }
+                    }
+                    editorOptions.extension = editorOptions.objectId.toLowerCase().split('.').pop();
+                }
+            } else if (this.template.target === 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.paper.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.paper.content;
+                    editorOptions.extension = this.template.file.paper.format;
+                } else {
+                    editorOptions.objectType = 'templateCreation';
+                    for (const element of this.defaultTemplatesList) {
+                        if (this.selectedModelFile === element.fileExt + ': ' + element.fileName) {
+                            editorOptions.objectId = element.filePath;
+                        }
+                    }
+                    editorOptions.extension = editorOptions.objectId.toLowerCase().split('.').pop();
                 }
             }
-            editorOptions.objectType = 'templateCreation';
-            editorOptions.docUrl = `rest/onlyOffice/mergedFile`;
-            editorOptions.extension = editorOptions.objectId.toLowerCase().split('.').pop();
-
         } else {
-            editorOptions.objectType = 'templateModification';
-            editorOptions.objectId = this.template.template_id;
-            editorOptions.extension = this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.name : this.template.file.name;
+            if (this.template.target !== 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.content;
+                    editorOptions.extension = this.template.file.format;
+                } else {
+                    editorOptions.objectType = 'templateModification';
+                    editorOptions.objectId = this.template.id;
+                    editorOptions.extension = this.template.file.name.toLowerCase().split('.').pop();
+                }
+            } else if (this.template.target === 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.paper.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.paper.content;
+                    editorOptions.extension = this.template.file.paper.format;
+                } else {
+                    editorOptions.objectType = 'templateModification';
+                    editorOptions.objectId = this.template.id;
+                    editorOptions.extension = this.template.file.paper.name.toLowerCase().split('.').pop();
+                }
+            }
         }
 
         if (this.headerService.user.preferences.documentEdition === 'java') {
@@ -334,9 +383,9 @@ export class TemplateAdministrationComponent implements OnInit {
     }
 
     launchJavaEditor(params: any) {
-        this.http.post('../../rest/jnlp', params).pipe(
+        this.http.post('../rest/jnlp', params).pipe(
             tap((data: any) => {
-                window.location.href = '../../rest/jnlp/' + data.generatedJnlp;
+                window.location.href = '../rest/jnlp/' + data.generatedJnlp;
                 this.checkLockFile(data.jnlpUniqueId, params.extension);
             }),
             catchError((err: any) => {
@@ -383,8 +432,7 @@ export class TemplateAdministrationComponent implements OnInit {
     }
 
     getViewTemplateFile() {
-
-        this.http.post('../../rest/convertedFile/encodedFile', { encodedFile: this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.content : this.template.file.content, format: this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.format : this.template.file.format }).pipe(
+        this.http.post('../rest/convertedFile/encodedFile', { encodedFile: this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.content : this.template.file.content, format: this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.format : this.template.file.format }).pipe(
             tap((data: any) => {
                 this.templateDocView = this.sanitizer.bypassSecurityTrustResourceUrl('data:application/pdf;base64,' + data.encodedResource);
             }),
@@ -393,12 +441,11 @@ export class TemplateAdministrationComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-
     }
 
     checkLockFile(id: string, extension: string) {
         this.intervalLockFile = setInterval(() => {
-            this.http.get('../../rest/jnlp/lock/' + id).pipe(
+            this.http.get('../rest/jnlp/lock/' + id).pipe(
                 tap((data: any) => {
                     this.lockFound = data.lockFileFound;
                     if (!this.lockFound) {
@@ -411,7 +458,7 @@ export class TemplateAdministrationComponent implements OnInit {
     }
 
     loadTmpFile(filenameOnTmp: string) {
-        this.http.get(`../../rest/convertedFile/${filenameOnTmp}?convert=true`).pipe(
+        this.http.get(`../rest/convertedFile/${filenameOnTmp}?convert=true`).pipe(
             tap((data: any) => {
                 if (this.template.target === 'acknowledgementReceipt') {
                     this.template.file.paper.name = this.selectedModelFile;
@@ -432,7 +479,7 @@ export class TemplateAdministrationComponent implements OnInit {
             const r = confirm(this.lang.confirmDuplicate);
 
             if (r) {
-                this.http.post('../../rest/templates/' + this.template.template_id + '/duplicate', { 'id': this.template.template_id })
+                this.http.post('../rest/templates/' + this.template.id + '/duplicate', { 'id': this.template.id })
                     .subscribe((data: any) => {
                         this.notify.success(this.lang.templateDuplicated);
                         this.router.navigate(['/administration/templates/' + data.id]);
@@ -444,9 +491,8 @@ export class TemplateAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        this.formatTemplate();
 
-        /*this.template.entities = $('#jstree').jstree(true).get_checked([true]);
+        /*
         if (this.template.type === 'HTML') {
             this.template.template_content = tinymce.get('templateHtml').getContent();
 
@@ -456,8 +502,8 @@ export class TemplateAdministrationComponent implements OnInit {
 
         if (this.isValidTemplate()) {
             if (this.creationMode) {
-                this.http.post('../../rest/templates', this.template)
-                    .subscribe((data: any) => {
+                this.http.post('../rest/templates', this.formatTemplate()).pipe(
+                    tap((data: any) => {
                         if (data.checkEntities) {
                             this.config = {
                                 panelClass: 'maarch-modal',
@@ -471,13 +517,16 @@ export class TemplateAdministrationComponent implements OnInit {
                             this.router.navigate(['/administration/templates']);
                             this.notify.success(this.lang.templateAdded);
                         }
-                    }, (err) => {
-                        this.notify.error(err.error.errors);
-                    });
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
             } else {
-                this.http.put('../../rest/templates/' + this.template.template_id, this.template)
-                    .subscribe((data: any) => {
-                        if (data.checkEntities) {
+                this.http.put('../rest/templates/' + this.template.id, this.formatTemplate()).pipe(
+                    tap((data: any) => {
+                        if (!this.functionsService.empty(data) && data.checkEntities) {
                             this.config = {
                                 panelClass: 'maarch-modal',
                                 data: {
@@ -490,9 +539,12 @@ export class TemplateAdministrationComponent implements OnInit {
                             this.router.navigate(['/administration/templates']);
                             this.notify.success(this.lang.templateUpdated);
                         }
-                    }, (err) => {
-                        this.notify.error(err.error.errors);
-                    });
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
             }
         }
 
@@ -500,21 +552,18 @@ export class TemplateAdministrationComponent implements OnInit {
 
     formatTemplate() {
         const template = { ...this.template };
-        console.log(template);
-
+        template.entities = $('#jstree').jstree('get_checked', null, true);
+        return template;
     }
 
     isValidTemplate() {
-        if (this.template.target === 'acknowledgementReceipt') {
-            if (this.functionsService.empty(this.template.file.paper.name) && this.functionsService.empty(this.template.file.electronic.content)) {
-                alert(this.lang.mustCompleteAR);
-                return false;
-            }
-        } else if (this.template.target !== 'acknowledgementReceipt' && this.template.type === 'OFFICE') {
-            if (this.functionsService.empty(this.template.file.name)) {
-                alert(this.lang.editModelFirst);
-                return false;
-            }
+        if (this.template.target === 'acknowledgementReceipt' && this.functionsService.empty(this.template.file.paper.name) && this.functionsService.empty(this.template.file.electronic.content)) {
+            alert(this.lang.mustCompleteAR);
+            return false;
+
+        } else if (this.template.target !== 'acknowledgementReceipt' && this.template.type === 'OFFICE' && this.functionsService.empty(this.template.file.name)) {
+            alert(this.lang.editModelFirst);
+            return false;
         } else {
             return true;
         }
@@ -585,6 +634,10 @@ export class TemplateAdministrationComponent implements OnInit {
                 this.buttonFileName = this.lang.importFile;
             }
         }
+    }
+
+    ngOnDestroy() {
+        tinymce.remove('textarea');
     }
 }
 @Component({

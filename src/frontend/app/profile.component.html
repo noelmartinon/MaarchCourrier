@@ -468,7 +468,7 @@
                                                     (
                                                     < 2MB) </div> </div> <div class="col-md-2"
                                                                               *ngIf="signatureModel.size">
-                                            <img id="signaturePreview" src="{{signatureModel.base64ForJs}}"
+                                            <img id="signaturePreview" [src]="signatureModel.base64ForJs"
                                                  alt="Image non valide" style="width: 100%;">
                                         </div>
                                             <div class="col-md-12 form-group" style="margin-top: 10px;">
@@ -496,7 +496,7 @@
                                                                 <mat-icon class="fa fa-times"></mat-icon>
                                                             </button>
                                                         </mat-form-field>
-                                                        <img src="../../rest/users/{{user.id}}/signatures/{{signature.id}}/content"
+                                                        <img [src]="'../rest/users/' + user.id + '/signatures/' + signature.id + '/content' | secureUrl | async"
                                                              alt="Signature" style="max-width:100%;height:60px;">
                                                     </mat-card-content>
                                                 </mat-card>

@@ -89,7 +89,7 @@ export class FolderActionListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/folders/' + this.currentFolderInfo.id + '/resources', { body: { resources: this.selectedRes } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/folders/' + this.currentFolderInfo.id + '/resources', { body: { resources: this.selectedRes } })),
             tap((data: any) => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.refreshFolders();
@@ -100,7 +100,7 @@ export class FolderActionListComponent implements OnInit {
     }
 
     getBaskets() {
-        this.http.get('../../rest/folders/' + this.currentFolderInfo.id + '/resources/' + this.selectedRes + '/baskets').pipe(
+        this.http.get('../rest/folders/' + this.currentFolderInfo.id + '/resources/' + this.selectedRes + '/baskets').pipe(
             tap((data: any) => {
                 this.basketList.groups = data.groupsBaskets.filter((x: any, i: any, a: any) => x && a.map((info: any) => info.groupId).indexOf(x.groupId) === i);
                 this.basketList.list = data.groupsBaskets;
@@ -122,7 +122,7 @@ export class FolderActionListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
             tap((data: any) => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.headerService.nbResourcesFollowed -= data.unFollowed;

@@ -118,7 +118,7 @@ export class IndexationComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             this.currentGroupId = params['groupId'];
-            this.http.get('../../rest/indexingModels').pipe(
+            this.http.get('../rest/indexingModels').pipe(
                 tap((data: any) => {
                     this.indexingModels = data.indexingModels;
                     if (this.indexingModels.length > 0) {
@@ -142,7 +142,7 @@ export class IndexationComponent implements OnInit {
                     return of(false);
                 })
             ).subscribe();
-            this.http.get('../../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
+            this.http.get('../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
                 map((data: any) => {
                     data.actions = data.actions.map((action: any, index: number) => {
                         return {
@@ -339,7 +339,7 @@ export class IndexationComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/indexingModels/${id}`)),
+            exhaustMap(() => this.http.delete(`../rest/indexingModels/${id}`)),
             tap(() => {
                 this.indexingModels.splice(index, 1);
                 this.notify.success(this.lang.indexingModelDeleted);

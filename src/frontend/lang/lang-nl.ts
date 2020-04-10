@@ -1651,4 +1651,6 @@ export const LANG_NL = {
     "forgotPassword": "Forgot password", //_TO_TRANSLATE
     "wrongLoginPassword": "Wrong user name or wrong password", //_TO_TRANSLATE
     "sessionExpired": "Session expired", //_TO_TRANSLATE
+    "accountSuspended": "Your user account has been suspended", //_TO_TRANSLATE
+    "accountLocked": "Too many connections attemps. Retry in", //_TO_TRANSLATE
 };

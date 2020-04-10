@@ -157,7 +157,7 @@ export class DiffusionsListComponent implements OnInit {
 
     getListModel(entityId: number) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/listTemplates/entities/${entityId}?type=diffusionList`).pipe(
+            this.http.get(`../rest/listTemplates/entities/${entityId}?type=diffusionList`).pipe(
                 map((data: any) => {
                     data.listTemplates = data.listTemplates.map((item: any) => item.items.map((item: any) => {
                         const obj: any = {
@@ -191,7 +191,7 @@ export class DiffusionsListComponent implements OnInit {
     getListinstance(resId: number) {
         return new Promise((resolve, reject) => {
             if (resId != 0) {
-                this.http.get(`../../rest/resources/${resId}/listInstance`).pipe(
+                this.http.get(`../rest/resources/${resId}/listInstance`).pipe(
                     map((data: any) => {
                         data.listInstance = data.listInstance.map((item: any) => {
     
@@ -226,7 +226,7 @@ export class DiffusionsListComponent implements OnInit {
     }
 
     async loadListinstance(resId: number) {
-        this.http.get(`../../rest/resources/${resId}/fields/destination?alt=true`).pipe(
+        this.http.get(`../rest/resources/${resId}/fields/destination?alt=true`).pipe(
             tap((data: any) => {
                 this.currentEntityId = data.field;
             }),
@@ -267,7 +267,7 @@ export class DiffusionsListComponent implements OnInit {
                         listInstances: this.getCurrentListinstance()
                     }
                 ];
-                this.http.put('../../rest/listinstances', listInstance).pipe(
+                this.http.put('../rest/listinstances', listInstance).pipe(
                     tap((data: any) => {
                         if (data && data.errors != null) {
                             this.notify.error(data.errors);
@@ -290,7 +290,7 @@ export class DiffusionsListComponent implements OnInit {
 
     initRoles() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/roles?context=${this.target}`).pipe(
+            this.http.get(`../rest/roles?context=${this.target}`).pipe(
                 map((data: any) => {
                     data.roles = data.roles.map((role: any) => {
                         return {
@@ -355,7 +355,7 @@ export class DiffusionsListComponent implements OnInit {
 
     loadDestUserList() {
         if (this.currentEntityId > 0 && this.userDestList.length == 0) {
-            this.http.get("../../rest/entities/" + this.currentEntityId + "/users")
+            this.http.get("../rest/entities/" + this.currentEntityId + "/users")
                 .subscribe((data: any) => {
                     this.userDestList = data.users;
                     this.loading = false;
@@ -441,7 +441,7 @@ export class DiffusionsListComponent implements OnInit {
 
     isUserInCurrentEntity(userId: number) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/entities/${this.currentEntityId}/users`).pipe(
+            this.http.get(`../rest/entities/${this.currentEntityId}/users`).pipe(
                 tap((data: any) => {
                     const state = data.users.filter((user: any) => user.id === userId).length > 0;
                     resolve(state);
@@ -497,7 +497,7 @@ export class DiffusionsListComponent implements OnInit {
     }
 
     switchUserWithOldDest(user: any, oldRole: any) {
-        this.http.get("../../rest/users/" + user.itemSerialId + "/entities").pipe(
+        this.http.get("../rest/users/" + user.itemSerialId + "/entities").pipe(
             map((data: any) => {
                 data.entities = data.entities.map((entity: any) => entity.id);
                 return data;

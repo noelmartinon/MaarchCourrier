@@ -416,7 +416,7 @@
                                                         <mat-icon class="fa fa-times"></mat-icon>
                                                     </button>
                                                 </mat-form-field>
-                                                <img src="../../rest/users/{{user.id}}/signatures/{{signature.id}}/content"
+                                                <img [src]="'../rest/users/' + user.id + '/signatures/' + signature.id + '/content' | secureUrl | async"
                                                     alt="Signature" style="width:auto;height:60px;">
                                             </mat-card-content>
                                         </mat-card>

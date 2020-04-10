@@ -96,7 +96,7 @@ export class SendmailAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/configurations/admin_email_server')
+        this.http.get('../rest/configurations/admin_email_server')
             .subscribe((data: any) => {
                 this.sendmail = data.configuration.value;
                 this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
@@ -115,7 +115,7 @@ export class SendmailAdministrationComponent implements OnInit {
         if (this.sendmailFormCpt.invalid) {
             this.notify.handleErrors({ 'error': { 'errors': this.lang.notSavedBecauseInvalid } });
         } else {
-            this.http.put('../../rest/configurations/admin_email_server', this.sendmail)
+            this.http.put('../rest/configurations/admin_email_server', this.sendmail)
                 .subscribe((data: any) => {
                     this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
                     this.notify.success(this.lang.configurationUpdated);
@@ -136,7 +136,7 @@ export class SendmailAdministrationComponent implements OnInit {
             debug: '',
         };
         if (this.currentUser.mail === undefined) {
-            this.http.get('../../rest/currentUser/profile')
+            this.http.get('../rest/currentUser/profile')
                 .subscribe((data: any) => {
                     this.currentUser = data;
                     this.recipientTest = data.mail;
@@ -163,7 +163,7 @@ export class SendmailAdministrationComponent implements OnInit {
         };
         this.emailSendLoading = true;
 
-        this.http.post('../../rest/emails', email)
+        this.http.post('../rest/emails', email)
             .subscribe((data: any) => {
                 this.emailSendLoading = false;
                 this.emailSendResult = {

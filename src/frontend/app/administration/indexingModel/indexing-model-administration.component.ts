@@ -67,7 +67,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
 
                 this.headerService.setHeader(this.lang.indexingModelCreation);
 
-                this.http.get('../../rest/categories').pipe(
+                this.http.get('../rest/categories').pipe(
                     tap((data: any) => {
                         this.categoriesList = data.categories;
 
@@ -88,7 +88,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
             } else {
                 this.creationMode = false;
 
-                this.http.get('../../rest/indexingModels/' + params['id']).pipe(
+                this.http.get('../rest/indexingModels/' + params['id']).pipe(
                     tap((data: any) => {
                         this.indexingModel = data.indexingModel;
 
@@ -97,7 +97,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                         this.indexingModelClone = JSON.parse(JSON.stringify(this.indexingModel));
 
                     }),
-                    exhaustMap(() => this.http.get('../../rest/categories')),
+                    exhaustMap(() => this.http.get('../rest/categories')),
                     tap((data: any) => {
                         this.categoriesList = data.categories;
                     }),
@@ -126,7 +126,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
         this.indexingModel.fields = fields;
 
         if (this.creationMode) {
-            this.http.post('../../rest/indexingModels', this.indexingModel).pipe(
+            this.http.post('../rest/indexingModels', this.indexingModel).pipe(
                 tap((data: any) => {
                     this.indexingForm.setModification();
                     this.setModification();
@@ -140,7 +140,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.put('../../rest/indexingModels/' + this.indexingModel.id, this.indexingModel).pipe(
+            this.http.put('../rest/indexingModels/' + this.indexingModel.id, this.indexingModel).pipe(
                 tap((data: any) => {
                     this.indexingForm.setModification();
                     this.setModification();

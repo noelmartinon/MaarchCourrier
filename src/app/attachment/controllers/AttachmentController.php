@@ -293,8 +293,11 @@ class AttachmentController
             if ($attachment['modificationDate'] == $attachment['creationDate']) {
                 $attachments[$key]['modificationDate'] = null;
             }
-            $typist = UserModel::getById(['id' => $attachment['typist'], 'select' => ['firstname', 'lastname']]);
-            $attachments[$key]['typistLabel'] = $typist['firstname']. ' ' .$typist['lastname'];
+            $attachments[$key]['typistLabel'] = '';
+            if (!empty($attachment['typist'])) {
+                $typist = UserModel::getById(['id' => $attachment['typist'], 'select' => ['firstname', 'lastname']]);
+                $attachments[$key]['typistLabel'] = $typist['firstname']. ' ' .$typist['lastname'];
+            }
             $attachments[$key]['modifiedBy'] = UserModel::getLabelledUserById(['id' => $attachment['modifiedBy']]);
 
             if (!empty($attachmentsTypes[$attachment['type']]['label'])) {
@@ -414,7 +417,7 @@ class AttachmentController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $pathToThumbnail = 'apps/maarch_entreprise/img/noThumbnail.png';
+        $pathToThumbnail = 'dist/assets/noThumbnail.png';
 
         $tnlAdr = AdrModel::getTypedAttachAdrByResId([
             'select'    => ['docserver_id', 'path', 'filename'],

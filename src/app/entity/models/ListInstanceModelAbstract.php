@@ -173,7 +173,8 @@ abstract class ListInstanceModelAbstract
     public static function getWithConfidentiality(array $args)
     {
         ValidatorModel::notEmpty($args, ['entityId', 'userId']);
-        ValidatorModel::stringType($args, ['entityId', 'userId']);
+        ValidatorModel::stringType($args, ['entityId']);
+        ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::arrayType($args, ['select']);
 
         $aListInstances = DatabaseModel::select([

@@ -114,7 +114,7 @@
                 style="width: 50%;">
                 <div class="pjList">
                     <img *ngFor="let attach of attachList" title="{{attach.chrono}} : {{attach.title}}"
-                        src="../../rest/{{attach.type === 'attachment' ? 'attachments' : 'resources'}}/{{attach.res_id}}/thumbnail" />
+                        [src]="'../rest/' + (attach.type === 'attachment' ? 'attachments' : 'resources') + '/' + attach.res_id + '/thumbnail' | secureUrl | async" />
                 </div>
             </mat-sidenav>
         </mat-sidenav-container>

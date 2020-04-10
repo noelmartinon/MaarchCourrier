@@ -33,7 +33,7 @@ export class SearchAdvListComponent implements OnInit {
     allResInSearch: number[] = [];
 
     isLoadingResults = true;
-    routeUrl: string = '../../rest/search';
+    routeUrl: string = '../rest/search';
     resultListDatabase: ResourceListHttpDao | null;
     resultsLength = 0;
 

@@ -39,7 +39,7 @@ export class AddVisaModelModalComponent {
     }
 
     onSubmit() {
-        this.http.post(`../../rest/listTemplates`, this.template).pipe(
+        this.http.post(`../rest/listTemplates`, this.template).pipe(
             tap((data: any) => {
                 this.template.id = data.id;
                 this.notify.success(this.lang.modelSaved);

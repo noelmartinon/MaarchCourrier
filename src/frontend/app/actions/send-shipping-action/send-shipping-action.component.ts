@@ -68,7 +68,7 @@ export class SendShippingActionComponent implements OnInit {
     }
 
     checkShipping() {
-        this.http.post(`../../rest/resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}/actions/${this.data.action.id}/checkShippings`, { resources: this.data.resIds }).pipe(
+        this.http.post(`../rest/resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}/actions/${this.data.action.id}/checkShippings`, { resources: this.data.resIds }).pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.fatalError)) {
                     this.fatalError = data;
@@ -111,7 +111,7 @@ export class SendShippingActionComponent implements OnInit {
     }
 
     toggleIntegration(integrationId: string) {
-        this.http.put(`../../rest/resourcesList/integrations`, {resources : this.data.resIds, integrations : { [integrationId] : !this.data.resource.integrations[integrationId]}}).pipe(
+        this.http.put(`../rest/resourcesList/integrations`, {resources : this.data.resIds, integrations : { [integrationId] : !this.data.resource.integrations[integrationId]}}).pipe(
             tap(() => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
                 this.checkShipping();

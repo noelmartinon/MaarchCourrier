@@ -33,7 +33,6 @@ class DocserverTypeModelAbstract
             'limit'     => empty($aArgs['limit']) ? 0 : $aArgs['limit']
         ]);
 
-
         return $aDocserverTypes;
     }
 

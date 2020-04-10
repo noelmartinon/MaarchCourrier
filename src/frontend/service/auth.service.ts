@@ -24,6 +24,18 @@ export class AuthService {
         return this.localStorage.get('MaarchCourrierToken');
     }
 
+    getUrl(id: number) {
+        return this.localStorage.get(`MaarchCourrierUrl_${id}`);
+    }
+
+    setUrl(url: string) {
+        this.localStorage.save(`MaarchCourrierUrl_${JSON.parse(atob(this.getToken().split('.')[1])).user.id}`, url);
+    }
+
+    cleanUrl(id: number) {
+        return this.localStorage.remove(`MaarchCourrierUrl_${id}`);
+    }
+
     setToken(token: string) {
         this.localStorage.save('MaarchCourrierToken', token);
     }
@@ -42,6 +54,9 @@ export class AuthService {
     }
 
     logout() {
+        if ( this.getToken() !== null ) {
+            this.cleanUrl(JSON.parse(atob(this.getToken().split('.')[1])).user.id);
+        }
         this.clearTokens();
         this.headerService.setUser();
         this.router.navigate(['/login']);

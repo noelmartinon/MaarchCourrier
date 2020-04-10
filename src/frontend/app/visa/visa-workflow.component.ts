@@ -110,7 +110,7 @@ export class VisaWorkflowComponent implements OnInit {
 
         this.visaWorkflow.items = [];
 
-        let route = this.linkedToMaarchParapheur === true ? `../../rest/listTemplates/entities/${entityId}?type=visaCircuit&maarchParapheur=true` : `../../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
+        let route = this.linkedToMaarchParapheur === true ? `../rest/listTemplates/entities/${entityId}?type=visaCircuit&maarchParapheur=true` : `../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
 
         return new Promise((resolve, reject) => {
             this.http.get(route)
@@ -138,7 +138,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     loadVisaSignUsersList() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/autocomplete/users/circuit`).pipe(
+            this.http.get(`../rest/autocomplete/users/circuit`).pipe(
                 map((data: any) => {
                     data = data.map((user: any) => {
                         return {
@@ -175,7 +175,7 @@ export class VisaWorkflowComponent implements OnInit {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/availableCircuits?circuit=visa`).pipe(
+            this.http.get(`../rest/availableCircuits?circuit=visa`).pipe(
                 tap((data: any) => {
                     this.visaTemplates.public = this.visaTemplates.public.concat(data.circuits.filter((item: any) => !item.private).map((item: any) => {
                         return {
@@ -214,7 +214,7 @@ export class VisaWorkflowComponent implements OnInit {
         this.visaTemplates.public = [];
 
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/resources/${this.resId}/defaultCircuit?circuit=visa`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/defaultCircuit?circuit=visa`).pipe(
                 filter((data: any) => !this.functions.empty(data.circuit)),
                 tap((data: any) => {
                     if (!this.functions.empty(data.circuit)) {
@@ -283,7 +283,7 @@ export class VisaWorkflowComponent implements OnInit {
         this.loading = true;
         this.visaWorkflow.items = [];
         return new Promise((resolve, reject) => {
-            this.http.get("../../rest/resources/" + resId + "/visaCircuit").pipe(
+            this.http.get("../rest/resources/" + resId + "/visaCircuit").pipe(
                 filter((data: any) => !this.functions.empty(data.circuit)),
                 tap((data: any) => {
                     data.circuit.forEach((element: any) => {
@@ -310,7 +310,7 @@ export class VisaWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get("../../rest/resources/" + resId + "/defaultCircuit?circuit=visaCircuit").pipe(
+        this.http.get("../rest/resources/" + resId + "/defaultCircuit?circuit=visaCircuit").pipe(
             filter((data: any) => !this.functions.empty(data.circuit)),
             tap((data: any) => {
                 data.circuit.items.forEach((element: any) => {
@@ -334,7 +334,7 @@ export class VisaWorkflowComponent implements OnInit {
     loadWorkflowMaarchParapheur(attachmentId: number, type: string) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get(`../../rest/documents/${attachmentId}/maarchParapheurWorkflow?type=${type}`)
+        this.http.get(`../rest/documents/${attachmentId}/maarchParapheurWorkflow?type=${type}`)
             .subscribe((data: any) => {
                 data.workflow.forEach((element: any, key: any) => {
                     const user = {
@@ -347,7 +347,7 @@ export class VisaWorkflowComponent implements OnInit {
                         'hasPrivilege': true
                     };
                     this.visaWorkflow.items.push(user);
-                    this.http.get("../../rest/maarchParapheur/user/" + element.userId + "/picture")
+                    this.http.get("../rest/maarchParapheur/user/" + element.userId + "/picture")
                         .subscribe((data: any) => {
                             this.visaWorkflow.items.filter((item: any) => item.id === element.userId)[0].picture = data.picture;
                         }, (err: any) => {
@@ -416,7 +416,7 @@ export class VisaWorkflowComponent implements OnInit {
     saveVisaWorkflow(resIds: number[] = [this.resId]) {
         return new Promise((resolve, reject) => {
             if (this.visaWorkflow.items.length === 0) {
-                this.http.delete(`../../rest/resources/${resIds[0]}/circuits/visaCircuit`).pipe(
+                this.http.delete(`../rest/resources/${resIds[0]}/circuits/visaCircuit`).pipe(
                     tap(() => {
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                         this.notify.success(this.lang.visaWorkflowDeleted);
@@ -434,7 +434,7 @@ export class VisaWorkflowComponent implements OnInit {
                         listInstances: this.visaWorkflow.items
                     }
                 });
-                this.http.put(`../../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
+                this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
                     tap((data: any) => {
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                         this.notify.success(this.lang.visaWorkflowUpdated);
@@ -491,7 +491,7 @@ export class VisaWorkflowComponent implements OnInit {
                 this.searchVisaSignUserInput.nativeElement.blur();
                 resolve(true);
             } else if (item.type === 'entity') {
-                this.http.get(`../../rest/listTemplates/${item.id}`).pipe(
+                this.http.get(`../rest/listTemplates/${item.id}`).pipe(
                     tap((data: any) => {
                         this.visaWorkflow.items = this.visaWorkflow.items.concat(
 
@@ -576,7 +576,7 @@ export class VisaWorkflowComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/listTemplates/${model.id}`)),
+            exhaustMap(() => this.http.delete(`../rest/listTemplates/${model.id}`)),
             tap(() => {
                 this.visaTemplates.private = this.visaTemplates.private.filter((template: any) => template.id !== model.id);
                 this.searchVisaSignUser.reset();
@@ -591,7 +591,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     getMaarchParapheurUserAvatar(externalId: string, key: number) {
         if (!this.functions.empty(externalId)) {
-            this.http.get("../../rest/maarchParapheur/user/" + externalId + "/picture")
+            this.http.get("../rest/maarchParapheur/user/" + externalId + "/picture")
                 .subscribe((data: any) => {
                     this.visaWorkflow.items[key].picture = data.picture;
                 }, (err: any) => {

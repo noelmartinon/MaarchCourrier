@@ -99,7 +99,7 @@ export class AdministrationComponent implements OnInit {
     }
 
     getNbShortcuts() {
-        this.http.get('../../rest/administration/details').pipe(
+        this.http.get('../rest/administration/details').pipe(
             tap((data: any) => {
                 if (!this.functionService.empty(data.count.users)) {
                     this.shortcutsAdmin.filter(admin => admin.id === 'admin_users')[0].count = data.count.users;

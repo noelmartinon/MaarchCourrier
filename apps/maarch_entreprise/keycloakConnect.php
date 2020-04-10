@@ -2,54 +2,67 @@
 
 require 'vendor/autoload.php';
 
-//$ozwilloConfig = \SrcCore\models\CoreConfigModel::getOzwilloConfiguration();
-//
-//if (!empty($_SESSION['ozwillo']['code']) && !empty($_SESSION['ozwillo']['state'])) {
-//    $_REQUEST['code'] = $_SESSION['ozwillo']['code'];
-//    $_REQUEST['state'] = $_SESSION['ozwillo']['state'];
-//    $_SESSION['ozwillo'] = null;
-//}
-//
-//$oidc = new OpenIDConnectClient($ozwilloConfig['uri'], $ozwilloConfig['clientId'], $ozwilloConfig['clientSecret']);
-//$oidc->addScope('openid');
-//$oidc->addScope('email');
-//$oidc->addScope('profile');
-//$oidc->authenticate();
-//
-//$idToken = $oidc->getIdTokenPayload();
-//if (empty($idToken->app_user) && empty($idToken->app_admin)) {
-//    echo '<br>Utilisateur non autorisé';
-//    exit;
-//}
-//
-//$profile = $oidc->requestUserInfo();
-//$user = \User\models\UserModel::getByLogin(['login' => $idToken->sub]);
-//
-//if (empty($user)) {
-//    if (empty($ozwilloConfig['groupId'])) {
-//        $ozwilloConfig['groupId'] = 'AGENT';
-//    }
-//    if (empty($ozwilloConfig['entityId'])) {
-//        $ozwilloConfig['entityId'] = 'VILLE';
-//    }
-//    $group = \Group\models\GroupModel::getByGroupId(['groupId' => $ozwilloConfig['groupId'], 'select' => ['id']]);
-//    $firstname = empty($profile->given_name) ? 'utilisateur' : $profile->given_name;
-//    $lastname = empty($profile->family_name) ? 'utilisateur' : $profile->family_name;
-//    $preferences = ['documentEdition' => 'java'];
-//
-//    \User\models\UserModel::create(['user' => ['userId' => $idToken->sub, 'firstname' => $firstname, 'lastname' => $lastname, 'preferences' => json_encode($preferences)]]);
-//    $user = \User\models\UserModel::getByLogin(['login' => $idToken->sub]);
-//    \User\models\UserGroupModel::create(['user_id' => $user['id'], 'group_id' => $group['id']]);
-//    \User\models\UserEntityModel::addUserEntity(['id' => $user['id'], 'entityId' => $ozwilloConfig['entityId'], 'primaryEntity' => 'Y']);
-//}
-//
-//$_SESSION['ozwillo']['userId'] =  $idToken->sub;
-//$_SESSION['ozwillo']['accessToken'] = $oidc->getAccessToken();
-//unset($_REQUEST['code']);
-//unset($_REQUEST['state']);
-//
-//header("location: log.php");
-//$trace = new history();
-//$trace->add('users', $idToken->sub, 'LOGIN', 'userlogin', 'Ozwillo Connection', $_SESSION['config']['databasetype'], 'ADMIN', false, 'ok', 'DEBUG', $_SESSION['ozwillo']['userId']);
+$keycloakConfig = \SrcCore\models\CoreConfigModel::getKeycloakConfiguration();
 
-exit();
+if (empty($keycloakConfig)) {
+    echo _MISSING_KEYCLOAK_CONFIG;
+    exit;
+}
+
+if (empty($keycloakConfig['authServerUrl']) || empty($keycloakConfig['realm']) || empty($keycloakConfig['clientId']) || empty($keycloakConfig['clientSecret']) || empty($keycloakConfig['redirectUri'])) {
+    echo _MISSING_KEYCLOAK_CONFIG;
+    exit;
+}
+
+$provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak($keycloakConfig);
+
+if (!isset($_GET['code'])) {
+    // If we don't have an authorization code then get one
+    $authUrl = $provider->getAuthorizationUrl();
+    $_SESSION['oauth2state'] = $provider->getState();
+    header('Location: '.$authUrl);
+
+    exit;
+
+// Check given state against previously stored one to mitigate CSRF attack
+} elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+
+    unset($_SESSION['oauth2state']);
+    header('Location: '.$keycloakConfig['redirectUri']);
+    exit;
+
+} else {
+
+    // Try to get an access token (using the authorization coe grant)
+    try {
+        $token = $provider->getAccessToken('authorization_code', [
+            'code' => $_GET['code']
+        ]);
+    } catch (Exception $e) {
+//        exit('Failed to get access token: '.$e->getMessage());
+        header('Location: '.$keycloakConfig['redirectUri']);
+        exit;
+    }
+
+    try {
+        // We got an access token, let's now get the user's details
+        $user = $provider->getResourceOwner($token);
+
+        $userMaarch = \User\models\UserModel::getByLogin(['login' => $user->getId()]);
+
+        if (empty($userMaarch)) {
+            echo _USER_NOT_IN_APP;
+        } else {
+            $_SESSION['keycloak']['userId'] = $user->getId();
+            $_SESSION['keycloak']['accessToken'] = $token->getToken();
+            unset($_REQUEST['code']);
+            unset($_REQUEST['state']);
+            unset($_REQUEST['session_state']);
+            header("location: log.php");
+        }
+    } catch (Exception $e) {
+//        exit('Failed to get resource owner: '.$e->getMessage());
+        header('Location: '.$keycloakConfig['redirectUri']);
+        exit;
+    }
+}

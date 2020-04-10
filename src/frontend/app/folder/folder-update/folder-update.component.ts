@@ -54,9 +54,9 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     getFolder() {
-        this.http.get('../../rest/folders/' + this.data.folderId).pipe(
+        this.http.get('../rest/folders/' + this.data.folderId).pipe(
             tap((data: any) => this.folder = data.folder),
-            exhaustMap(() => this.http.get('../../rest/entities')),
+            exhaustMap(() => this.http.get('../rest/entities')),
             map((data: any) => {
                 const keywordEntities = {
                     serialId: 'ALL_ENTITIES',
@@ -86,7 +86,7 @@ export class FolderUpdateComponent implements OnInit {
             tap((data: any) => {
                 this.initEntitiesTree(data.entities);
             }),
-            exhaustMap(() => this.http.get('../../rest/folders')),
+            exhaustMap(() => this.http.get('../rest/folders')),
             map((data: any) => {
                 let currentParentId = 0;
                 data.folders.forEach((element: any) => {
@@ -231,10 +231,10 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     onSubmit(): void {
-        this.http.put('../../rest/folders/' + this.folder.id, this.folder).pipe(
+        this.http.put('../rest/folders/' + this.folder.id, this.folder).pipe(
             exhaustMap(() => {
                 if (JSON.stringify(this.sharingFolderCLone) !== JSON.stringify(this.folder.sharing.entities)) {
-                    return this.http.put('../../rest/folders/' + this.folder.id + '/sharing', { public: this.folder.sharing.entities.length > 0, sharing: this.folder.sharing });
+                    return this.http.put('../rest/folders/' + this.folder.id + '/sharing', { public: this.folder.sharing.entities.length > 0, sharing: this.folder.sharing });
                 } else {
                     return of(false);
                 }

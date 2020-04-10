@@ -144,20 +144,26 @@ abstract class TemplateModelAbstract
 
     public static function getDatasources()
     {
-        $datasources = [];
-
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/templates/xml/datasources.xml']);
-        if ($loadedXml) {
-            foreach ($loadedXml->datasource as $value) {
-                $value = (array)$value;
-                $datasources[] = [
-                    'id'        => (string)$value['id'],
-                    'label'     => (string)$value['label'],
-                    'script'    => (string)$value['script'],
-                    'target'    => (string)$value['target'],
-                ];
-            }
-        }
+        $datasources = [
+            [
+                'id'        => 'notif_events',
+                'label'     => '[notification] Informations événements systèmes',
+                'function'  => 'notifEvents',
+                'target'    => 'notification',
+            ],
+            [
+                'id'        => 'letterbox_events',
+                'label'     => '[notification] Informations du courrier traité',
+                'function'  => 'letterboxEvents',
+                'target'    => 'notification',
+            ],
+            [
+                'id'        => 'notes',
+                'label'     => '[notification] Informations sur notes associées au courrier',
+                'function'  => 'noteEvents',
+                'target'    => 'notification',
+            ]
+        ];
 
         return $datasources;
     }
@@ -166,21 +172,18 @@ abstract class TemplateModelAbstract
     {
         ValidatorModel::notEmpty($aArgs, ['id']);
 
-        $datasource = [];
+        $datasources = TemplateModel::getDatasources();
+        $datasource  = [];
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/templates/xml/datasources.xml']);
-        if ($loadedXml) {
-            foreach ($loadedXml->datasource as $value) {
-                $value = (array)$value;
-                if ($value['id'] == $aArgs['id']) {
-                    $datasource = [
-                        'id'        => (string)$value['id'],
-                        'label'     => (string)$value['label'],
-                        'script'    => (string)$value['script'],
-                        'target'    => (string)$value['target'],
-                    ];
-                    break;
-                }
+        foreach ($datasources as $value) {
+            if ($value['id'] == $aArgs['id']) {
+                $datasource = [
+                    'id'        => $value['id'],
+                    'label'     => $value['label'],
+                    'function'  => $value['function'],
+                    'target'    => $value['target'],
+                ];
+                break;
             }
         }
 
@@ -244,7 +247,7 @@ abstract class TemplateModelAbstract
         'table'     => ['templates t','templates_association ta', 'entities e'],
         'left_join' => ['ta.template_id = t.template_id', 'e.entity_id = ta.value_field'],
         'where'     => empty($data['template_id']) ? ['t.template_target = ?', 't.template_attachment_type = ?', 'value_field in (?)'] : ['t.template_target = ?', 't.template_attachment_type = ?', 'value_field in (?)', 't.template_id != ?' ],
-        'data'      => empty($data['template_id']) ? [$data['template_target'], $data['template_attachment_type'], $data['entities']]   : [$data['template_target'], $data['template_attachment_type'], $data['entities'], $data['template_id']],
+        'data'      => empty($data['template_id']) ? [$data['target'], $data['template_attachment_type'], $data['entities']]   : [$data['target'], $data['template_attachment_type'], $data['entities'], $data['template_id']],
         'groupBy'   => ['ta.value_field', 'e.entity_label']
         ]);
         

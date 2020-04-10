@@ -33,7 +33,7 @@ export class SendExternalNoteBookActionComponent implements OnInit {
     ngOnInit(): void {
         this.loading = true;
 
-        this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/checkExternalNoteBook', { resources: this.data.resIds }).pipe(
+        this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/checkExternalNoteBook', { resources: this.data.resIds }).pipe(
             map((data: any) => {
                 data.additionalsInfos.users.forEach((element: any) => {
                     element.displayName = element.firstname + ' ' + element.lastname;

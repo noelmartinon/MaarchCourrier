@@ -45,7 +45,7 @@ export class HeaderService {
 
     loadHeader() {
         return new Promise((resolve, reject) => {
-            this.http.get('../../rest/header').pipe(
+            this.http.get('../rest/header').pipe(
                 tap((data: any) => {
                     this.setUser(data.user);
                     resolve(true);
@@ -62,7 +62,7 @@ export class HeaderService {
 
     resfreshCurrentUser() {
         return new Promise((resolve, reject) => {
-            this.http.get('../../rest/currentUser/profile')
+            this.http.get('../rest/currentUser/profile')
                 .pipe(
                     map((data: any) => {
                         this.user = {
@@ -114,11 +114,10 @@ export class HeaderService {
             this.showMenuNav = true;
             this.sideBarAdmin = false;
             this.sideBarButton = null;
-            this.hideSideBar = false;
+            this.hideSideBar = true;
     }
 
     injectInSideBarLeft(template: TemplateRef<any>, viewContainerRef: ViewContainerRef, id: string = 'adminMenu', mode: string = '') {
-        
 
         if (mode === 'form') {
             this.sideBarForm = true;

@@ -613,7 +613,7 @@ class FolderPrintController
             $displayContact = $displayContact['contact']['otherInfo'];
         }
 
-        $creator = UserModel::getByLogin(['login' => $attachment['typist']]);
+        $creator = UserModel::getById(['id' => $attachment['typist'], 'select' => ['firstname', 'lastname']]);
 
         $status = StatusModel::getById(['id' => $attachment['status'], 'select' => ['label_status']]);
         $status = $status['label_status'];

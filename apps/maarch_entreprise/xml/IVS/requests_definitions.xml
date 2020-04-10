@@ -271,7 +271,6 @@
     <xi:include href="../../../../modules/ldap/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/life_cycle/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/notes/xml/IVS/requests_definitions.xml"/>
-    <xi:include href="../../../../modules/notifications/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/sendmail/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/tags/xml/IVS/requests_definitions.xml"/>
     <xi:include href="../../../../modules/templates/xml/IVS/requests_definitions.xml"/>
@@ -296,7 +295,6 @@
     <xi:include href="../../../../modules/ldap/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/life_cycle/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/notes/xml/IVS/validation_rules.xml"/>
-    <xi:include href="../../../../modules/notifications/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/sendmail/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/tags/xml/IVS/validation_rules.xml"/>
     <xi:include href="../../../../modules/templates/xml/IVS/validation_rules.xml"/>
@@ -321,7 +319,6 @@
     <xi:include href="../../../../modules/ldap/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/life_cycle/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/notes/xml/IVS/data_types.xml"/>
-    <xi:include href="../../../../modules/notifications/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/sendmail/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/tags/xml/IVS/data_types.xml"/>
     <xi:include href="../../../../modules/templates/xml/IVS/data_types.xml"/>

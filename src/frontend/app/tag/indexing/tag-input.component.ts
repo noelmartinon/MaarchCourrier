@@ -92,7 +92,7 @@ export class TagInputComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../../rest/autocomplete/tags', { params: { "search": data } });
+        return this.http.get('../rest/autocomplete/tags', { params: { "search": data } });
     }
 
     selectOpt(ev: any) {
@@ -103,7 +103,7 @@ export class TagInputComponent implements OnInit {
 
     initFormValue() {
         this.controlAutocomplete.value.forEach((ids: any) => {
-            this.http.get('../../rest/tags/' + ids).pipe(
+            this.http.get('../rest/tags/' + ids).pipe(
                 tap((data: any) => {
                     this.valuesToDisplay[data.id] = data.label;
                 })
@@ -150,7 +150,7 @@ export class TagInputComponent implements OnInit {
             this.controlAutocomplete.value.splice(index, 1);
             this.controlAutocomplete.setValue(arrValue);
         } else {
-            this.http.delete('../../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
+            this.http.delete('../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
                 tap((data: any) => {
                     let arrValue = this.controlAutocomplete.value;
                     this.controlAutocomplete.value.splice(index, 1);
@@ -169,7 +169,7 @@ export class TagInputComponent implements OnInit {
 
         newElem[this.key] = this.myControl.value;
 
-        this.http.post('../../rest/tags', { label: newElem[this.key] }).pipe(
+        this.http.post('../rest/tags', { label: newElem[this.key] }).pipe(
             tap((data: any) => {
                 for (var key in data) {
                     newElem['id'] = data[key];

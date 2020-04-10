@@ -87,7 +87,7 @@ export class AvisWorkflowComponent implements OnInit {
 
     loadAvisRoles() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/roles`).pipe(
+            this.http.get(`../rest/roles`).pipe(
                 tap((data: any) => {
                     this.availableRoles = data.roles.filter((role: any) => ['avis', 'avis_copy', 'avis_info'].indexOf(role.id) > -1).map((role: any) => {
                         return {
@@ -114,7 +114,7 @@ export class AvisWorkflowComponent implements OnInit {
 
         this.avisWorkflow.items = [];
 
-        this.http.get(`../../rest/listTemplates/entities/${entityId}?type=opinionCircuit`)
+        this.http.get(`../rest/listTemplates/entities/${entityId}?type=opinionCircuit`)
             .subscribe((data: any) => {
                 if (data.listTemplates[0]) {
                     this.avisWorkflow.items = data.listTemplates[0].items.map((item: any) => {
@@ -131,7 +131,7 @@ export class AvisWorkflowComponent implements OnInit {
 
     loadAvisUsersList() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/autocomplete/users/circuit?circuit=opinion`).pipe(
+            this.http.get(`../rest/autocomplete/users/circuit?circuit=opinion`).pipe(
                 map((data: any) => {
                     data = data.map((user: any) => {
                         return {
@@ -167,7 +167,7 @@ export class AvisWorkflowComponent implements OnInit {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/availableCircuits?circuit=opinion`).pipe(
+            this.http.get(`../rest/availableCircuits?circuit=opinion`).pipe(
                 tap((data: any) => {
                     this.avisTemplates.public = this.avisTemplates.public.concat(data.circuits.filter((item: any) => !item.private).map((item: any) => {
                         return {
@@ -206,7 +206,7 @@ export class AvisWorkflowComponent implements OnInit {
         this.avisTemplates.public = [];
 
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/resources/${this.resId}/defaultCircuit?circuit=opinion`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/defaultCircuit?circuit=opinion`).pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.itemsRemoved)) {
                         this.notify.error(this.lang.itemRemovedFromAvisTemplate + ' : ' + data.itemsRemoved.join(', '));
@@ -278,7 +278,7 @@ export class AvisWorkflowComponent implements OnInit {
         this.loading = true;
         this.avisWorkflow.items = [];
         return new Promise((resolve, reject) => {
-            this.http.get("../../rest/resources/" + resId + "/opinionCircuit").pipe(
+            this.http.get("../rest/resources/" + resId + "/opinionCircuit").pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.itemsRemoved)) {
                         this.notify.error(this.lang.itemRemovedFromAvisTemplate + ' : ' + data.itemsRemoved.join(', '));
@@ -313,7 +313,7 @@ export class AvisWorkflowComponent implements OnInit {
         this.loading = true;
         this.avisWorkflow.items = [];
         return new Promise((resolve, reject) => {
-            this.http.get("../../rest/resources/" + resId + "/parallelOpinion")
+            this.http.get("../rest/resources/" + resId + "/parallelOpinion")
                 .subscribe((data: any) => {
                     data.forEach((element: any) => {
                         this.avisWorkflow.items.push(
@@ -335,7 +335,7 @@ export class AvisWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.avisWorkflow.items = [];
-        this.http.get("../../rest/resources/" + resId + "/defaultCircuit?circuit=opinion").pipe(
+        this.http.get("../rest/resources/" + resId + "/defaultCircuit?circuit=opinion").pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.itemsRemoved)) {
                     this.notify.error(this.lang.itemRemovedFromAvisTemplate + ' : ' + data.itemsRemoved.join(', '));
@@ -411,7 +411,7 @@ export class AvisWorkflowComponent implements OnInit {
     saveAvisWorkflow(resIds: number[] = [this.resId]) {
         return new Promise((resolve, reject) => {
             if (this.avisWorkflow.items.length === 0) {
-                this.http.delete(`../../rest/resources/${resIds[0]}/circuits/opinionCircuit`).pipe(
+                this.http.delete(`../rest/resources/${resIds[0]}/circuits/opinionCircuit`).pipe(
                     tap(() => {
                         this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
                         this.notify.success(this.lang.avisWorkflowDeleted);
@@ -429,7 +429,7 @@ export class AvisWorkflowComponent implements OnInit {
                         listInstances: this.avisWorkflow.items
                     }
                 });
-                this.http.put(`../../rest/circuits/opinionCircuit`, { resources: arrAvis }).pipe(
+                this.http.put(`../rest/circuits/opinionCircuit`, { resources: arrAvis }).pipe(
                     tap((data: any) => {
                         this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
                         this.notify.success(this.lang.avisWorkflowUpdated);
@@ -464,7 +464,7 @@ export class AvisWorkflowComponent implements OnInit {
                 this.searchAvisUserInput.nativeElement.blur();
                 resolve(true);
             } else if (item.type === 'entity') {
-                this.http.get(`../../rest/listTemplates/${item.id}`).pipe(
+                this.http.get(`../rest/listTemplates/${item.id}`).pipe(
                     tap((data: any) => {
                         this.avisWorkflow.items = this.avisWorkflow.items.concat(
                             data.listTemplate.items.map((itemTemplate: any) => {
@@ -543,7 +543,7 @@ export class AvisWorkflowComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/listTemplates/${model.id}`)),
+            exhaustMap(() => this.http.delete(`../rest/listTemplates/${model.id}`)),
             tap(() => {
                 this.avisTemplates.private = this.avisTemplates.private.filter((template: any) => template.id !== model.id);
                 this.searchAvisUser.reset();
@@ -558,7 +558,7 @@ export class AvisWorkflowComponent implements OnInit {
 
     getMaarchParapheurUserAvatar(externalId: string, key: number) {
         if (!this.functions.empty(externalId)) {
-            this.http.get("../../rest/maarchParapheur/user/" + externalId + "/picture")
+            this.http.get("../rest/maarchParapheur/user/" + externalId + "/picture")
                 .subscribe((data: any) => {
                     this.avisWorkflow.items[key].picture = data.picture;
                 }, (err: any) => {

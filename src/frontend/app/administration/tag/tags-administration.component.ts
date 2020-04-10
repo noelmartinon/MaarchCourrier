@@ -60,7 +60,7 @@ export class TagsAdministrationComponent implements OnInit {
 
     loadList() {
         this.loading = true;
-        this.http.get('../../rest/tags').pipe(
+        this.http.get('../rest/tags').pipe(
             tap((data: any) => {
                 setTimeout(() => {
                     this.dataSource = new MatTableDataSource(data.tags);
@@ -81,7 +81,7 @@ export class TagsAdministrationComponent implements OnInit {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.lang.delete} "${item.label}"`, msg: this.lang.confirmAction } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/tags/${item.id}`)),
+            exhaustMap(() => this.http.delete(`../rest/tags/${item.id}`)),
             tap(() => {
                 this.loadList();
                 this.notify.success(this.lang.tagDeleted);

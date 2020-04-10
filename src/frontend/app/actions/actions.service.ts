@@ -89,8 +89,8 @@ export class ActionsService {
             this.currentBasketId = basketId;
             this.currentResIds = resIds === null ? [] : resIds;
 
-            this.indexActionRoute = `../../rest/indexing/groups/${this.currentGroupId}/actions/${this.currentAction.id}`;
-            this.processActionRoute = `../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions/${this.currentAction.id}`;
+            this.indexActionRoute = `../rest/indexing/groups/${this.currentGroupId}/actions/${this.currentAction.id}`;
+            this.processActionRoute = `../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions/${this.currentAction.id}`;
 
             return true;
         } else {
@@ -105,7 +105,7 @@ export class ActionsService {
     saveDocument(datas: any) {
         this.loading = true;
         this.setResourceInformations(datas);
-        return this.http.post('../../rest/resources', this.currentResourceInformations);
+        return this.http.post('../rest/resources', this.currentResourceInformations);
     }
 
     setResourceInformations(datas: any) {
@@ -143,7 +143,7 @@ export class ActionsService {
                 if (action.component == 'viewDoc' || action.component == 'documentDetails') {
                     this[action.component](action.data);
                 } else {
-                    this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
+                    this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
                         tap((data: any) => {
                             if (this.canExecuteAction(data.countLockedResources, data.lockers, resIds)) {
                                 try {
@@ -197,7 +197,7 @@ export class ActionsService {
 
     lockResource() {
         this.currentResourceLock = setInterval(() => {
-            this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: this.currentResIds }).pipe(
+            this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: this.currentResIds }).pipe(
                 catchError((err: any) => {
                     if (err.status == 403) {
                         clearInterval(this.currentResourceLock);
@@ -211,7 +211,7 @@ export class ActionsService {
 
     unlockResource() {
         if (this.currentResIds.length > 0) {
-            this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/unlock`, { resources: this.currentResIds }).pipe(
+            this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/unlock`, { resources: this.currentResIds }).pipe(
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
                     return of(false);
@@ -674,7 +674,7 @@ export class ActionsService {
     noConfirmAction(options: any = null) {
         let dataActionToSend = this.setDatasActionToSend();
         if (dataActionToSend.resIds.length === 0) {
-            this.http.post('../../rest/resources', dataActionToSend.resource).pipe(
+            this.http.post('../rest/resources', dataActionToSend.resource).pipe(
                 tap((data: any) => {
                     dataActionToSend.resIds = [data.resId];
                 }),

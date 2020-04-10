@@ -42,7 +42,7 @@ export class DocserversAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/docservers')
+        this.http.get('../rest/docservers')
             .subscribe((data: any) => {
                 this.docservers = data.docservers;
                 this.docserversClone = JSON.parse(JSON.stringify(this.docservers));
@@ -75,7 +75,7 @@ export class DocserversAdministrationComponent implements OnInit {
 
     onSubmit(docserver: any, i: number) {
         docserver.size_limit_number = docserver.limitSizeFormatted * 1000000000;
-        this.http.put('../../rest/docservers/' + docserver.id, docserver)
+        this.http.put('../rest/docservers/' + docserver.id, docserver)
             .subscribe((data: any) => {
                 this.docservers[docserver.docserver_type_id][i] = data['docserver'];
                 this.docserversClone[docserver.docserver_type_id][i] = JSON.parse(JSON.stringify(this.docservers[docserver.docserver_type_id][i]));
@@ -94,7 +94,7 @@ export class DocserversAdministrationComponent implements OnInit {
         }
 
         if (r) {
-            this.http.delete('../../rest/docservers/' + docserver.id)
+            this.http.delete('../rest/docservers/' + docserver.id)
                 .subscribe(() => {
                     this.docservers[docserver.docserver_type_id].splice(i, 1);
                     this.notify.success(this.lang.docserverDeleted);

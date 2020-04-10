@@ -45,7 +45,7 @@ export class PriorityAdministrationComponent implements OnInit {
 
                 this.creationMode = false;
                 this.id = params['id'];
-                this.http.get('../../rest/priorities/' + this.id)
+                this.http.get('../rest/priorities/' + this.id)
                     .subscribe((data: any) => {
                         this.priority = data.priority;
                         this.headerService.setHeader(this.lang.priorityModification, this.priority.label);
@@ -59,7 +59,7 @@ export class PriorityAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            this.http.post('../../rest/priorities', this.priority)
+            this.http.post('../rest/priorities', this.priority)
                 .subscribe(() => {
                     this.notify.success(this.lang.priorityAdded);
                     this.router.navigate(['/administration/priorities']);
@@ -67,7 +67,7 @@ export class PriorityAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../../rest/priorities/' + this.id, this.priority)
+            this.http.put('../rest/priorities/' + this.id, this.priority)
                 .subscribe(() => {
                     this.notify.success(this.lang.priorityUpdated);
                     this.router.navigate(['/administration/priorities']);

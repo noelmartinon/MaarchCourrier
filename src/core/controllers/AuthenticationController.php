@@ -32,7 +32,7 @@ class AuthenticationController
 {
     const MAX_DURATION_TOKEN = 30; //Minutes
     const ROUTES_WITHOUT_AUTHENTICATION = [
-        'GET/authenticationInformations', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
+        'GET/authenticationInformations', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate'
     ];
 
@@ -63,25 +63,25 @@ class AuthenticationController
                 }
             }
         } else {
-           if (!empty($authorizationHeaders)) {
-               $token = null;
-               foreach ($authorizationHeaders as $authorizationHeader) {
-                   if (strpos($authorizationHeader, 'Bearer') === 0) {
-                       $token = str_replace('Bearer ', '', $authorizationHeader);
-                   }
-               }
-               if (!empty($token)) {
-                   try {
-                       $jwt = (array)JWT::decode($token, CoreConfigModel::getEncryptKey(), ['HS256']);
-                   } catch (\Exception $e) {
-                       return null;
-                   }
-                   $jwt['user'] = (array)$jwt['user'];
-                   if (!empty($jwt) && !empty($jwt['user']['id'])) {
-                       $userId = $jwt['user']['id'];
-                   }
-               }
-           }
+            if (!empty($authorizationHeaders)) {
+                $token = null;
+                foreach ($authorizationHeaders as $authorizationHeader) {
+                    if (strpos($authorizationHeader, 'Bearer') === 0) {
+                        $token = str_replace('Bearer ', '', $authorizationHeader);
+                    }
+                }
+                if (!empty($token)) {
+                    try {
+                        $jwt = (array)JWT::decode($token, CoreConfigModel::getEncryptKey(), ['HS256']);
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                    $jwt['user'] = (array)$jwt['user'];
+                    if (!empty($jwt) && !empty($jwt['user']['id'])) {
+                        $userId = $jwt['user']['id'];
+                    }
+                }
+            }
         }
 
         if (!empty($userId)) {
@@ -173,19 +173,20 @@ class AuthenticationController
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
-        var_dump('ttotoi');
+
         $login = strtolower($body['login']);
         $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $body['password']]);
         if (empty($authenticated)) {
             return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
         }
 
-        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'loginmode', 'refresh_token']]);
+        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'loginmode', 'refresh_token', 'user_id']]);
         if (empty($user) || $user['loginmode'] == 'restMode') {
             return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
         }
 
         $GLOBALS['id'] = $user['id'];
+        $GLOBALS['login'] = $user['user_id'];
 
         $user['refresh_token'] = json_decode($user['refresh_token'], true);
         foreach ($user['refresh_token'] as $key => $refreshToken) {
@@ -210,14 +211,14 @@ class AuthenticationController
         $response = $response->withHeader('Token', AuthenticationController::getJWT());
         $response = $response->withHeader('Refresh-Token', $refreshToken);
 
-        /* HistoryController::add([
+        HistoryController::add([
             'tableName' => 'users',
             'recordId'  => $user['id'],
             'eventType' => 'LOGIN',
             'info'      => _LOGIN . ' : ' . $login,
             'moduleId'  => 'authentication',
             'eventId'   => 'login'
-        ]); */
+        ]);
 
         return $response->withStatus(204);
     }

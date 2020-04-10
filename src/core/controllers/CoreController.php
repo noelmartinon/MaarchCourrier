@@ -119,20 +119,28 @@ class CoreController
 
         $customId = CoreConfigModel::getCustomId();
 
+        $assetPath = 'dist/assets';
+
         if ($queryParams['image'] == 'loginPage') {
-            $path = 'apps/maarch_entreprise/img/bodylogin.jpg';
-            if (!empty($customId) && is_file("custom/{$customId}/{$path}")) {
-                $path = "custom/{$customId}/{$path}";
+            $filename = 'bodylogin.jpg';
+            if (!empty($customId) && is_file("custom/{$customId}/img/{$filename}")) {
+                $path = "custom/{$customId}/{$filename}";
+            } else {
+                $path = "{$assetPath}/{$filename}";
             }
         } elseif ($queryParams['image'] == 'logo') {
-            $path = 'apps/maarch_entreprise/img/logo.svg';
-            if (!empty($customId) && is_file("custom/{$customId}/{$path}")) {
+            $filename = 'logo.svg';
+            if (!empty($customId) && is_file("custom/{$customId}/img/{$filename}")) {
                 $path = "custom/{$customId}/{$path}";
+            } else {
+                $path = "{$assetPath}/{$filename}";
             }
         } elseif ($queryParams['image'] == 'onlyLogo') {
-            $path = 'apps/maarch_entreprise/img/logo_only.svg';
-            if (!empty($customId) && is_file("custom/{$customId}/{$path}")) {
+            $filename = 'logo_only.svg';
+            if (!empty($customId) && is_file("custom/{$customId}/img/{$filename}")) {
                 $path = "custom/{$customId}/{$path}";
+            } else {
+                $path = "{$assetPath}/{$filename}";
             }
         } else {
             return $response->withStatus(404)->withJson(['errors' => 'QueryParams image is empty or not valid']);

@@ -1664,4 +1664,6 @@ export const LANG_EN = {
     "forgotPassword":                              "Forgot password",
     "wrongLoginPassword":                          "Wrong user name or wrong password",
     "sessionExpired": "Session expired",
+    "accountSuspended": "Your user account has been suspended",
+    "accountLocked": "Too many connections attemps. Retry in",
 };

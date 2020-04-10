@@ -107,7 +107,8 @@ abstract class NotificationScheduleModelAbstract
             }
 
             $state = 'normal';
-            if (strpos($cmd, $pathToFolow.'modules/notifications/batch/scripts/') !== 0 && $aArgs['setHiddenValue']) {
+            if (strpos($cmd, $pathToFolow.'bin/notification/scripts/') !== 0 && strpos($cmd, $pathToFolow.'modules/notifications/batch/scripts/') !== 0
+                    && $aArgs['setHiddenValue']) {
                 $cmd = 'hidden';
                 $state = 'hidden';
             }
@@ -153,24 +154,30 @@ abstract class NotificationScheduleModelAbstract
             $ConfigNotif = $corePath.'custom/'.$customId.'/modules/notifications/batch/config/config_'.$customId.'.xml';
         } elseif (file_exists($corePath.'modules/notifications/batch/config/config_'.$customId.'.xml')) {
             $ConfigNotif = $corePath.'modules/notifications/batch/config/config_'.$customId.'.xml';
+        } elseif (file_exists($corePath.'custom/'.$customId.'/bin/notification/config/config.xml')) {
+            $ConfigNotif = $corePath.'custom/'.$customId.'/bin/notification/config/config.xml';
+        } elseif (file_exists($corePath.'custom/'.$customId.'/bin/notification/config/config_'.$customId.'.xml')) {
+            $ConfigNotif = $corePath.'custom/'.$customId.'/bin/notification/config/config_'.$customId.'.xml';
+        } elseif (file_exists($corePath.'bin/notification/config/config_'.$customId.'.xml')) {
+            $ConfigNotif = $corePath.'bin/notification/config/config_'.$customId.'.xml';
         } else {
             $ConfigNotif = $corePath.'modules/notifications/batch/config/config.xml';
         }
 
         if ($customId != '') {
             $pathToFolow = $corePath.'custom/'.$customId.'/';
-            if (!file_exists($pathToFolow.'modules/notifications/batch/scripts/')) {
-                mkdir($pathToFolow.'modules/notifications/batch/scripts/', 0777, true);
+            if (!file_exists($pathToFolow.'bin/notification/scripts/')) {
+                mkdir($pathToFolow.'bin/notification/scripts/', 0777, true);
             }
-            $file_open = fopen($pathToFolow.'modules/notifications/batch/scripts/'.$filename, 'w+');
+            $file_open = fopen($pathToFolow.'bin/notification/scripts/'.$filename, 'w+');
         } else {
             $pathToFolow = $corePath;
-            $file_open = fopen($pathToFolow.'modules/notifications/batch/scripts/'.$filename, 'w+');
+            $file_open = fopen($pathToFolow.'bin/notification/scripts/'.$filename, 'w+');
         }
 
         fwrite($file_open, '#!/bin/sh');
         fwrite($file_open, "\n");
-        fwrite($file_open, 'path=\''.$corePath.'modules/notifications/batch/\'');
+        fwrite($file_open, 'path=\''.$corePath.'bin/notification/\'');
         fwrite($file_open, "\n");
         fwrite($file_open, 'cd $path');
         fwrite($file_open, "\n");
@@ -189,7 +196,7 @@ abstract class NotificationScheduleModelAbstract
         fwrite($file_open, 'php \'process_email_stack.php\' -c '.$ConfigNotif);
         fwrite($file_open, "\n");
         fclose($file_open);
-        shell_exec('chmod +x '.escapeshellarg($pathToFolow.'modules/notifications/batch/scripts/'.$filename));
+        shell_exec('chmod +x '.escapeshellarg($pathToFolow.'bin/notification/scripts/'.$filename));
 
         HistoryController::add([
             'tableName' => 'notifications',

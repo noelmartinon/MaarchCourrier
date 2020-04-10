@@ -33,7 +33,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
     displayedColumnsHistory: string[] = ['event_date', 'total_processed', 'total_errors', 'info', 'module_name'];
 
     isLoadingResults = true;
-    routeUrl: string = '../../rest/batchHistory';
+    routeUrl: string = '../rest/batchHistory';
     resultListDatabase: HistoryListHttpDao | null;
     resultsLength = 0;
 
@@ -159,7 +159,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
             this.filterList = {};
             this.loadingFilters = true;
 
-            this.http.get("../../rest/batchHistory/availableFilters").pipe(
+            this.http.get("../rest/batchHistory/availableFilters").pipe(
                 map((data: any) => {
                     let returnData = { modules: [{}], totalErrors: [{}] };
                     returnData.modules = data.modules;

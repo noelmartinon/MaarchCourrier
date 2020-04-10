@@ -83,7 +83,7 @@ export class AttachmentCreateComponent implements OnInit {
 
     loadAttachmentTypes() {
         return new Promise((resolve, reject) => {
-            this.http.get('../../rest/attachmentsTypes').pipe(
+            this.http.get('../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
                         if (data.attachmentsTypes[templateType].show) {
@@ -107,7 +107,7 @@ export class AttachmentCreateComponent implements OnInit {
 
     loadResource() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/resources/${this.data.resIdMaster}?light=true`).pipe(
+            this.http.get(`../rest/resources/${this.data.resIdMaster}?light=true`).pipe(
                 tap(async (data: any) => {
                     let contact: any = '';
                     if (data.categoryId === 'outgoing') {
@@ -183,7 +183,7 @@ export class AttachmentCreateComponent implements OnInit {
     getContact(contactId: number, type: string) {
         return new Promise((resolve, reject) => {
             if (type === 'contact') {
-                this.http.get('../../rest/contacts/' + contactId).pipe(
+                this.http.get('../rest/contacts/' + contactId).pipe(
                     tap((data: any) => {
                         this.resourceContacts.push({
                             id: data.id,
@@ -199,7 +199,7 @@ export class AttachmentCreateComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (type === 'user') {
-                this.http.get('../../rest/users/' + contactId).pipe(
+                this.http.get('../rest/users/' + contactId).pipe(
                     tap((data: any) => {
                         this.resourceContacts.push({
                             id: data.id,
@@ -215,7 +215,7 @@ export class AttachmentCreateComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (type === 'entity') {
-                this.http.get('../../rest/entities/' + contactId).pipe(
+                this.http.get('../rest/entities/' + contactId).pipe(
                     tap((data: any) => {
                         this.resourceContacts.push({
                             id: data.id,
@@ -293,7 +293,7 @@ export class AttachmentCreateComponent implements OnInit {
         attachment.status = this.sendMassMode ? 'SEND_MASS' : 'A_TRA';
 
         return new Promise((resolve, reject) => {
-            this.http.post(`../../rest/attachments`, attachment).pipe(
+            this.http.post(`../rest/attachments`, attachment).pipe(
                 tap((data: any) => {
                     resolve(data.id);
                 }),
@@ -308,7 +308,7 @@ export class AttachmentCreateComponent implements OnInit {
 
     generateMailling(resId: number) {
         return new Promise((resolve, reject) => {
-            this.http.post(`../../rest/attachments/${resId}/mailing`, {}).pipe(
+            this.http.post(`../rest/attachments/${resId}/mailing`, {}).pipe(
                 tap(() => {
                     resolve(true);
                 }),

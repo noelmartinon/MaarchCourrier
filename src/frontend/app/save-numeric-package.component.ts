@@ -79,7 +79,7 @@ export class SaveNumericPackageComponent implements OnInit {
 
     submitNumericPackage() {
         if (this.numericPackage.size != 0) {
-            this.http.post('../../rest/saveNumericPackage', this.numericPackage)
+            this.http.post('../rest/saveNumericPackage', this.numericPackage)
                 .subscribe((data: any) => {
                     if (data.errors) {
                         this.notify.error(data.errors);

@@ -32,8 +32,8 @@ export class HistoryComponent implements OnInit {
     displayedColumnsHistory: string[] = ['event_date', 'userLabel', 'info', 'remote_ip'];
 
     isLoadingResults = true;
-    routeUrl: string = '../../rest/history';
-    filterListUrl: string = '../../rest/history/availableFilters';
+    routeUrl: string = '../rest/history';
+    filterListUrl: string = '../rest/history/availableFilters';
     extraParamUrl: string = '';
     resultListDatabase: HistoryListHttpDao | null;
     resultsLength = 0;
@@ -103,10 +103,10 @@ export class HistoryComponent implements OnInit {
 
         if (this.fullHistoryMode) {
             this.extraParamUrl = this.resId !== null ? `&resId=${this.resId}` : '';
-            this.filterListUrl = this.resId !== null ? `../../rest/history/availableFilters?resId=${this.resId}` : '../../rest/history/availableFilters';
+            this.filterListUrl = this.resId !== null ? `../rest/history/availableFilters?resId=${this.resId}` : '../rest/history/availableFilters';
         } else {
             this.extraParamUrl = this.resId !== null ? `&resId=${this.resId}&onlyActions=true` : '&onlyActions=true';
-            this.filterListUrl = this.resId !== null ? `../../rest/history/availableFilters?resId=${this.resId}&onlyActions=true` : '../../rest/history/availableFilters?onlyActions=true';
+            this.filterListUrl = this.resId !== null ? `../rest/history/availableFilters?resId=${this.resId}&onlyActions=true` : '../rest/history/availableFilters?onlyActions=true';
         }
     }
 

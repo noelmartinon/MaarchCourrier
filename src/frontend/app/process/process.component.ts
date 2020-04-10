@@ -212,7 +212,7 @@ export class ProcessComponent implements OnInit {
 
     checkAccesDocument(resId: number) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../../rest/resources/${resId}/isAllowed`).pipe(
+            this.http.get(`../rest/resources/${resId}/isAllowed`).pipe(
                 tap((data: any) => {
                     if (data.isAllowed) {
                         resolve(true);
@@ -262,7 +262,7 @@ export class ProcessComponent implements OnInit {
             }, 800);
         }
 
-        this.http.get(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions?resId=${this.currentResourceInformations.resId}`).pipe(
+        this.http.get(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions?resId=${this.currentResourceInformations.resId}`).pipe(
             map((data: any) => {
                 data.actions = data.actions.map((action: any, index: number) => {
                     return {
@@ -318,7 +318,7 @@ export class ProcessComponent implements OnInit {
     }
 
     loadResource() {
-        this.http.get(`../../rest/resources/${this.currentResourceInformations.resId}?light=true`).pipe(
+        this.http.get(`../rest/resources/${this.currentResourceInformations.resId}?light=true`).pipe(
             tap((data: any) => {
                 this.currentResourceInformations = data;
                 this.resourceFollowed = data.followed;
@@ -351,7 +351,7 @@ export class ProcessComponent implements OnInit {
                 }, 200);
             }
         } else {
-            this.http.get(`../../rest/resources/${this.currentResourceInformations.resId}/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/processingData`).pipe(
+            this.http.get(`../rest/resources/${this.currentResourceInformations.resId}/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/processingData`).pipe(
                 tap((data: any) => {
                     if (data.listEventData !== null) {
                         if (this.isToolEnabled(data.listEventData.defaultTab)) {
@@ -371,7 +371,7 @@ export class ProcessComponent implements OnInit {
     loadAvaibleIntegrations(integrationsData: any) {
         this.integrationsInfo['inSignatureBook'].enable = !this.functions.empty(integrationsData['inSignatureBook']) ? integrationsData['inSignatureBook'] : false;
 
-        this.http.get(`../../rest/externalConnectionsEnabled`).pipe(
+        this.http.get(`../rest/externalConnectionsEnabled`).pipe(
             tap((data: any) => {
                 Object.keys(data.connection).filter(connectionId => connectionId !== 'maarchParapheur').forEach(connectionId => {
                     if (connectionId === 'maileva') {
@@ -389,7 +389,7 @@ export class ProcessComponent implements OnInit {
     }
 
     toggleIntegration(integrationId: string) {
-        this.http.put(`../../rest/resourcesList/integrations`, { resources: [this.currentResourceInformations.resId], integrations: { [integrationId]: !this.currentResourceInformations.integrations[integrationId] } }).pipe(
+        this.http.put(`../rest/resourcesList/integrations`, { resources: [this.currentResourceInformations.resId], integrations: { [integrationId]: !this.currentResourceInformations.integrations[integrationId] } }).pipe(
             tap(() => {
                 this.currentResourceInformations.integrations[integrationId] = !this.currentResourceInformations.integrations[integrationId];
                 this.notify.success(this.lang.actionDone);
@@ -402,7 +402,7 @@ export class ProcessComponent implements OnInit {
     }
 
     loadBadges() {
-        this.http.get(`../../rest/resources/${this.currentResourceInformations.resId}/items`).pipe(
+        this.http.get(`../rest/resources/${this.currentResourceInformations.resId}/items`).pipe(
             tap((data: any) => {
                 this.processTool.forEach(element => {
                     element.count = data[element.id] !== undefined ? data[element.id] : 0;
@@ -423,7 +423,7 @@ export class ProcessComponent implements OnInit {
         } else if (this.currentResourceInformations.senders.length == 1) {
             this.hasContact = true;
             if (this.currentResourceInformations.senders[0].type === 'contact') {
-                this.http.get('../../rest/contacts/' + this.currentResourceInformations.senders[0].id).pipe(
+                this.http.get('../rest/contacts/' + this.currentResourceInformations.senders[0].id).pipe(
                     tap((data: any) => {
                         const arrInfo = [];
                         if (this.empty(data.firstname) && this.empty(data.lastname)) {
@@ -449,13 +449,13 @@ export class ProcessComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (this.currentResourceInformations.senders[0].type == 'entity') {
-                this.http.get('../../rest/entities/' + this.currentResourceInformations.senders[0].id).pipe(
+                this.http.get('../rest/entities/' + this.currentResourceInformations.senders[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.entity_label, 'filling': null };
                     })
                 ).subscribe();
             } else if (this.currentResourceInformations.senders[0].type == 'user') {
-                this.http.get('../../rest/users/' + this.currentResourceInformations.senders[0].id).pipe(
+                this.http.get('../rest/users/' + this.currentResourceInformations.senders[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.firstname + ' ' + data.lastname, 'filling': null };
                     })
@@ -475,7 +475,7 @@ export class ProcessComponent implements OnInit {
         } else if (this.currentResourceInformations.recipients.length == 1) {
             this.hasContact = true;
             if (this.currentResourceInformations.recipients[0].type === 'contact') {
-                this.http.get('../../rest/contacts/' + this.currentResourceInformations.recipients[0].id).pipe(
+                this.http.get('../rest/contacts/' + this.currentResourceInformations.recipients[0].id).pipe(
                     tap((data: any) => {
                         const arrInfo = [];
                         if (this.empty(data.firstname) && this.empty(data.lastname)) {
@@ -501,13 +501,13 @@ export class ProcessComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (this.currentResourceInformations.recipients[0].type == 'entity') {
-                this.http.get('../../rest/entities/' + this.currentResourceInformations.recipients[0].id).pipe(
+                this.http.get('../rest/entities/' + this.currentResourceInformations.recipients[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.entity_label, 'filling': null };
                     })
                 ).subscribe();
             } else if (this.currentResourceInformations.recipients[0].type == 'user') {
-                this.http.get('../../rest/users/' + this.currentResourceInformations.recipients[0].id).pipe(
+                this.http.get('../rest/users/' + this.currentResourceInformations.recipients[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.firstname + ' ' + data.lastname, 'filling': null };
                     })
@@ -520,7 +520,7 @@ export class ProcessComponent implements OnInit {
     }
 
     lockResource() {
-        this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
+        this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -528,7 +528,7 @@ export class ProcessComponent implements OnInit {
         ).subscribe();
 
         this.currentResourceLock = setInterval(() => {
-            this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
+            this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
                 catchError((err: any) => {
                     if (err.status == 403) {
                         clearInterval(this.currentResourceLock);
@@ -543,7 +543,7 @@ export class ProcessComponent implements OnInit {
     unlockResource() {
         clearInterval(this.currentResourceLock);
 
-        this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/unlock`, { resources: [this.currentResourceInformations.resId] }).pipe(
+        this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/unlock`, { resources: [this.currentResourceInformations.resId] }).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -814,7 +814,7 @@ export class ProcessComponent implements OnInit {
         this.resourceFollowed = !this.resourceFollowed;
 
         if (this.resourceFollowed) {
-            this.http.post('../../rest/resources/follow', { resources: [this.currentResourceInformations.resId] }).pipe(
+            this.http.post('../rest/resources/follow', { resources: [this.currentResourceInformations.resId] }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed++),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -822,7 +822,7 @@ export class ProcessComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.request('DELETE', '../../rest/resources/unfollow', { body: { resources: [this.currentResourceInformations.resId] } }).pipe(
+            this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: [this.currentResourceInformations.resId] } }).pipe(
                 tap(() => this.headerService.nbResourcesFollowed--),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);

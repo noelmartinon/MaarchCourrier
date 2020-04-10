@@ -54,7 +54,7 @@ export class ParametersAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/parameters')
+        this.http.get('../rest/parameters')
             .subscribe((data: any) => {
                 this.parameters = data.parameters;
 
@@ -73,7 +73,7 @@ export class ParametersAdministrationComponent implements OnInit {
         const r = confirm(this.lang.deleteMsg);
 
         if (r) {
-            this.http.delete('../../rest/parameters/' + paramId)
+            this.http.delete('../rest/parameters/' + paramId)
                 .subscribe((data: any) => {
                     this.parameters = data.parameters;
                     this.dataSource = new MatTableDataSource(this.parameters);

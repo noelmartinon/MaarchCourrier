@@ -265,7 +265,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
     }
 
     saveNode(node: any, value: any) {
-        this.http.post('../../rest/folders', { label: value, parent_id: node.parent_id }).pipe(
+        this.http.post('../rest/folders', { label: value, parent_id: node.parent_id }).pipe(
             tap((data: any) => {
                 const nestedNode = this.flatNodeMap.get(node);
                 nestedNode.label = value;
@@ -320,7 +320,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete('../../rest/folders/' + node.id)),
+            exhaustMap(() => this.http.delete('../rest/folders/' + node.id)),
             tap(() => {
                 const parentNode = this.getParentNode(node);
 
@@ -392,7 +392,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
         let userEntities: any[] = [];
         let currentUserId: number = 0;
 
-        this.http.get(`../../rest/folders/${node.id}`).pipe(
+        this.http.get(`../rest/folders/${node.id}`).pipe(
             tap((data: any) => {
                 userEntities = this.headerService.user.entities.map((info: any) => info.id);
                 currentUserId = this.headerService.user.id;

@@ -37,7 +37,7 @@ export class ConfirmActionComponent implements OnInit {
     }
 
     indexDocumentAndExecuteAction() {
-        this.http.post('../../rest/resources', this.data.resource).pipe(
+        this.http.post('../rest/resources', this.data.resource).pipe(
             tap((data: any) => {
                 this.data.resIds = [data.resId];
             }),

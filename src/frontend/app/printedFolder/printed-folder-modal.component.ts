@@ -65,7 +65,7 @@ export class PrintedFolderModalComponent {
 
     getMainDocInfo() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}/fileInformation`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}/fileInformation`).pipe(
                 map((data: any) => {   
                     data = {
                         ...data.information,
@@ -88,7 +88,7 @@ export class PrintedFolderModalComponent {
 
     getAttachments() {
         return new Promise((resolve) => {
-            this.http.get("../../rest/resources/" + this.data.resId + "/attachments").pipe(
+            this.http.get("../rest/resources/" + this.data.resId + "/attachments").pipe(
                 map((data: any) => {
                     data.attachments = data.attachments.map((attachment: any) => {
                         return {
@@ -119,7 +119,7 @@ export class PrintedFolderModalComponent {
 
     getEmails() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}/emails?type=email`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}/emails?type=email`).pipe(
                 map((data: any) => {
                     data.emails = data.emails.map((item: any) => {
                         return {
@@ -148,7 +148,7 @@ export class PrintedFolderModalComponent {
 
     getNotes() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}/notes`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}/notes`).pipe(
                 map((data: any) => {
                     data.notes = data.notes.map((item: any) => {
                         return {
@@ -177,7 +177,7 @@ export class PrintedFolderModalComponent {
 
     getAcknowledgementReceips() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.data.resId}/acknowledgementReceipts?type=ar`).pipe(
+            this.http.get(`../rest/resources/${this.data.resId}/acknowledgementReceipts?type=ar`).pipe(
                 map((data: any) => {
                     data = data.map((item: any) => {
                         let email;
@@ -230,7 +230,7 @@ export class PrintedFolderModalComponent {
     onSubmit() {
         this.isLoadingResults = true;
 
-        this.http.post(`../../rest/resources/folderPrint`, this.formatPrintedFolder(), { responseType: "blob" }).pipe(
+        this.http.post(`../rest/resources/folderPrint`, this.formatPrintedFolder(), { responseType: "blob" }).pipe(
             tap((data: any) => {
                 let downloadLink = document.createElement('a');
                     downloadLink.href = window.URL.createObjectURL(data);

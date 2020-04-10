@@ -72,7 +72,7 @@ class NotificationScheduleControllerTest extends TestCase
             'dom' => '',
             'mon' => '*',
             'dow' => '*',
-            'cmd' => $corePath.'modules/notifications/batch/scripts/notification_testtu.sh',
+            'cmd' => $corePath.'bin/notification/scripts/notification_testtu.sh',
             'state' => 'normal',
         ];
 
@@ -81,7 +81,7 @@ class NotificationScheduleControllerTest extends TestCase
         $response = $NotificationScheduleController->create($fullRequest, new \Slim\Http\Response());
         $responseBodyFail = json_decode((string) $response->getBody());
 
-        $this->assertSame( 'wrong format for dom', $responseBodyFail->errors[ count($responseBodyFail->errors) - 1 ] );
+        $this->assertSame('wrong format for dom', $responseBodyFail->errors[ count($responseBodyFail->errors) - 1 ]);
 
         // CREATE
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
@@ -96,7 +96,7 @@ class NotificationScheduleControllerTest extends TestCase
             'dom' => '*',
             'mon' => '*',
             'dow' => '*',
-            'cmd' => $corePath.'modules/notifications/batch/scripts/notification_testtu.sh',
+            'cmd' => $corePath.'bin/notification/scripts/notification_testtu.sh',
             'state' => 'normal',
         ];
 
@@ -146,7 +146,7 @@ class NotificationScheduleControllerTest extends TestCase
             'dom' => '*',
             'mon' => '*',
             'dow' => '*',
-            'cmd' => $corePath.'modules/notifications/batch/scripts/notification_testtu.sh',
+            'cmd' => $corePath.'bin/notification/scripts/notification_testtu.sh',
             'state' => 'normal',
         ];
 
@@ -181,7 +181,7 @@ class NotificationScheduleControllerTest extends TestCase
         $aArgs = $responseBody->crontab;
 
         foreach ($aArgs as $id => $value) {
-            if ($value->cmd == dirname(__FILE__, 5).'/'.'modules/notifications/batch/scripts/notification_testtu.sh') {
+            if ($value->cmd == dirname(__FILE__, 5).'/'.'bin/notification/scripts/notification_testtu.sh') {
                 $aArgs[$id]->state = 'hidden';
             }
         }
@@ -199,7 +199,7 @@ class NotificationScheduleControllerTest extends TestCase
         $aArgs = $responseBody->crontab;
 
         foreach ($aArgs as $id => $value) {
-            if ($value->cmd == dirname(__FILE__, 5).'/'.'modules/notifications/batch/scripts/notification_testtu.sh') {
+            if ($value->cmd == dirname(__FILE__, 5).'/'.'bin/notification/scripts/notification_testtu.sh') {
                 $aArgs[$id]->state = 'deleted';
             }
         }
@@ -211,6 +211,6 @@ class NotificationScheduleControllerTest extends TestCase
 
         $this->assertSame(true, $responseBody);
 
-        unlink('modules/notifications/batch/scripts/notification_USERS.sh');
+        unlink('bin/notification/scripts/notification_USERS.sh');
     }
 }

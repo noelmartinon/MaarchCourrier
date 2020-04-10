@@ -89,7 +89,7 @@ export class NoteEditorComponent implements OnInit {
 
     setDefaultRestriction() {
         this.entitiesRestriction = [];
-        this.http.get(`../../rest/resources/${this.resIds[0]}/fields/destination`).pipe(
+        this.http.get(`../rest/resources/${this.resIds[0]}/fields/destination`).pipe(
             tap((data: any) => {
                 this.entitiesRestriction = this.headerService.user.entities.map((entity: any) => entity.entity_id);
                 if (this.entitiesRestriction.indexOf(data.field) === -1 && !this.functions.empty(data.field)) {
@@ -108,7 +108,7 @@ export class NoteEditorComponent implements OnInit {
 
     addNote() {
         this.loading = true;
-        this.http.post("../../rest/notes", { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
+        this.http.post("../rest/notes", { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
             .subscribe((data: any) => {
                 this.refreshNotes.emit(this.resIds[0]);
                 this.loading = false;
@@ -117,7 +117,7 @@ export class NoteEditorComponent implements OnInit {
 
     updateNote() {
         this.loading = true;
-        this.http.put("../../rest/notes/" + this.noteId, { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
+        this.http.put("../rest/notes/" + this.noteId, { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
             .subscribe((data: any) => {
                 this.refreshNotes.emit(this.resIds[0]);
                 this.loading = false;
@@ -156,7 +156,7 @@ export class NoteEditorComponent implements OnInit {
             if (!this.functions.empty(this.resIds) && this.resIds.length == 1) {
                 params['resId'] = this.resIds[0];
             }
-            this.http.get("../../rest/notesTemplates", { params: params })
+            this.http.get("../rest/notesTemplates", { params: params })
                 .subscribe((data: any) => {
                     this.templatesNote = data['templates'];
                 });
@@ -171,7 +171,7 @@ export class NoteEditorComponent implements OnInit {
                 if (!this.functions.empty(this.resIds) && this.resIds.length == 1) {
                     params['resId'] = this.resIds[0];
                 }
-                this.http.get("../../rest/entities").pipe(
+                this.http.get("../rest/entities").pipe(
                     tap((data: any) => {
                         this.entities = data['entities'];
                         resolve(true);

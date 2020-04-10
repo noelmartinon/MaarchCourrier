@@ -44,11 +44,11 @@ export class NotificationService {
 
     handleErrors(err: any) {
         console.log(err);
-        if (err.status === 401 && this.router.url !== '/home') {
+        /*if (err.status === 401 && this.router.url !== '/home') {
             this.router.navigate(['/home']);
             window.location.reload(true);
             this.error(this.lang.mustReconnect);
-        } else if (err.status === 0 && err.statusText === 'Unknown Error') {
+        } else*/ if (err.status === 0 && err.statusText === 'Unknown Error') {
             this.error(this.lang.connectionFailed);
         } else {
             if (err.error !== undefined) {

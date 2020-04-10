@@ -70,7 +70,7 @@ export class SentResourceListComponent implements OnInit {
 
     initAcknowledgementReceiptList() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.resId}/acknowledgementReceipts?type=ar`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/acknowledgementReceipts?type=ar`).pipe(
                 map((data: any) => {
                     data = data.map((item: any) => {
                         let email;
@@ -122,7 +122,7 @@ export class SentResourceListComponent implements OnInit {
 
     initEmailList() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.resId}/emails?type=email`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/emails?type=email`).pipe(
                 map((data: any) => {
                     data.emails = data.emails.map((item: any) => {
                         return {
@@ -159,7 +159,7 @@ export class SentResourceListComponent implements OnInit {
 
     initMessageExchange() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.resId}/messageExchanges`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/messageExchanges`).pipe(
                 map((data: any) => {
                     data.messageExchanges = data.messageExchanges.map((item: any) => {
                         return {
@@ -197,7 +197,7 @@ export class SentResourceListComponent implements OnInit {
 
     initShippings() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.resId}/shippings`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/shippings`).pipe(
                 map((data: any) => {
                     data = data.map((item: any) => {
                         return {
@@ -311,7 +311,7 @@ export class SentResourceListComponent implements OnInit {
     refreshWaitingElements() {
         this.sentResources.forEach((draftElement: any) => {
             if (draftElement.status == 'WAITING' && draftElement.type == 'email') {
-                this.http.get(`../../rest/emails/${draftElement.id}`).pipe(
+                this.http.get(`../rest/emails/${draftElement.id}`).pipe(
                     tap((data: any) => {
                         if (data.status == 'SENT' || data.status == 'ERROR') {
                             if (data.status == 'SENT') {
@@ -338,7 +338,7 @@ export class SentResourceListComponent implements OnInit {
 
     refreshEmailList() {
         return new Promise((resolve) => {
-            this.http.get(`../../rest/resources/${this.resId}/emails?type=email`).pipe(
+            this.http.get(`../rest/resources/${this.resId}/emails?type=email`).pipe(
                 map((data: any) => {
                     data.emails = data.emails.map((item: any) => {
                         return {

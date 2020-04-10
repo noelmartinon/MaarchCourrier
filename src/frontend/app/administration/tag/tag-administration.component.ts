@@ -61,7 +61,7 @@ export class TagAdministrationComponent implements OnInit {
             } else {
                 this.creationMode = false;
                 this.id = params['id'];
-                this.http.get("../../rest/tags/" + this.id).pipe(
+                this.http.get("../rest/tags/" + this.id).pipe(
                     tap((data: any) => {
                         this.getTags();
                         Object.keys(this.tag).forEach(element => {
@@ -99,7 +99,7 @@ export class TagAdministrationComponent implements OnInit {
     }
 
     createTag() {
-        this.http.post(`../../rest/tags`, this.formatTag()).pipe(
+        this.http.post(`../rest/tags`, this.formatTag()).pipe(
             tap(() => {
                 this.notify.success(this.lang.tagAdded);
                 this.router.navigate(["/administration/tags"]);
@@ -112,7 +112,7 @@ export class TagAdministrationComponent implements OnInit {
     }
 
     updateTag() {
-        this.http.put(`../../rest/tags/${this.id}`, this.formatTag()).pipe(
+        this.http.put(`../rest/tags/${this.id}`, this.formatTag()).pipe(
             tap(() => {
                 this.notify.success(this.lang.tagUpdated);
                 this.router.navigate(["/administration/tags"]);
@@ -125,7 +125,7 @@ export class TagAdministrationComponent implements OnInit {
     }
 
     getTags() {
-        this.http.get('../../rest/tags').pipe(
+        this.http.get('../rest/tags').pipe(
             tap((data: any) => {                
                 this.tags = data.tags.filter((tag: any) => tag.id != this.id).map((tag: any) => {
                     return {
@@ -152,7 +152,7 @@ export class TagAdministrationComponent implements OnInit {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.lang.mergeWith}  "${selectedTag.label}"`, msg: dialogMessage } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.put(`../../rest/mergeTags`, { idMaster: selectedTag.id, idMerge: this.id })),
+            exhaustMap(() => this.http.put(`../rest/mergeTags`, { idMaster: selectedTag.id, idMerge: this.id })),
             tap(() => {
                 this.notify.success(this.lang.tagMerged);
                 this.router.navigate([`/administration/tags/${selectedTag.id}`]);

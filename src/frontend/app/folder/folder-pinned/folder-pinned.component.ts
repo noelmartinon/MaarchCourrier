@@ -7,25 +7,25 @@ import { FoldersService } from '../folders.service';
 
 @Component({
     selector: 'folder-pinned',
-    templateUrl: "folder-pinned.component.html",
+    templateUrl: 'folder-pinned.component.html',
     styleUrls: ['folder-pinned.component.scss'],
 })
 export class FolderPinnedComponent implements OnInit {
 
     lang: any = LANG;
-    
+
     subscription: Subscription;
 
     @Input('noInit') noInit: boolean = false;
-    
+
     constructor(
         public http: HttpClient,
         public foldersService: FoldersService
     ) {
-        // Event after process action 
+        // Event after process action
         this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
             //console.log(result);
-        }); 
+        });
     }
 
     ngOnInit(): void {

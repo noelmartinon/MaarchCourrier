@@ -27,13 +27,15 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'template_label'            => 'TEST TEMPLATE',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'sendmail',
+            'label'                     => 'TEST TEMPLATE',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'                    => 'sendmail',
             'template_attachment_type'  => 'all',
-            'template_type'             => 'HTML',
-            'template_content'          => 'Content of this template',
-            'template_datasource'       => 'letterbox_attachment',
+            'type'                      => 'HTML',
+            'file'                      => [
+                'content'               => 'Content of this template',
+            ],
+            'datasource'                => 'letterbox_attachment',
             'entities'                  => ['DGS', 'COU']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -50,13 +52,13 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'template_label'            => '',
-            'template_comment'          => '',
-            'template_target'           => 'sendmail',
+            'label'                     => '',
+            'description'               => '',
+            'target'                    => 'sendmail',
             'template_attachment_type'  => 'all',
-            'template_type'             => 'HTML',
-            'template_content'          => 'Content of this template',
-            'template_datasource'       => 'letterbox_attachment'
+            'type'                      => 'HTML',
+            'content'                   => 'Content of this template',
+            'datasource'                => 'letterbox_attachment'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -93,13 +95,17 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'template_label'            => 'TEST TEMPLATE AR',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'acknowledgementReceipt',
+            'label'            => 'TEST TEMPLATE AR',
+            'description'          => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'           => 'acknowledgementReceipt',
             'template_attachment_type'  => 'ARsimple',
-            'template_type'             => 'OFFICE_HTML',
-            'template_content'          => 'Content of this template',
-            'template_datasource'       => 'letterbox_attachment',
+            'type'             => 'OFFICE_HTML',
+            'file' => [
+                'electronic' => [
+                    'content'          => 'Content of this template',
+                ]
+            ],
+            'datasource'       => 'letterbox_attachment',
             'entities'                  => ['TST']
         ];
 
@@ -116,16 +122,16 @@ class TemplateControllerTest extends TestCase
         $encodedFile = base64_encode($fileContent);
 
         $aArgs = [
-            'template_label'           => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'          => 'OFFICE',
-            'template_attachment_type' => 'ARsimple',
-            'template_type'            => 'OFFICE',
-            'template_datasource'      => 'letterbox_attachment',
-            'entities'                 => ['TST', 'BAD'],
-            'uploadedFile'             => [
-                'name'   => 'test_template.docx',
-                'base64' => $encodedFile
+            'label'                     => 'TEST TEMPLATE AR OFFICE',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'                    => 'OFFICE',
+            'template_attachment_type'  => 'ARsimple',
+            'type'                      => 'OFFICE',
+            'datasource'                => 'letterbox_attachment',
+            'entities'                  => ['TST', 'BAD'],
+            'file'                      => [
+                'content'               => $encodedFile,
+                'format'                => 'docx'
             ]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -142,16 +148,16 @@ class TemplateControllerTest extends TestCase
         $encodedFile = base64_encode($fileContent);
 
         $aArgs = [
-            'template_label'           => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'          => 'OFFICE',
-            'template_attachment_type' => 'ARsimple',
-            'template_type'            => 'OFFICE',
-            'template_datasource'      => 'letterbox_attachment',
-            'entities'                 => ['TST', 'BAD'],
-            'uploadedFile'             => [
-                'name'   => 'test_template.txt',
-                'base64' => $encodedFile
+            'label'                     => 'TEST TEMPLATE AR OFFICE',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'                    => 'OFFICE',
+            'template_attachment_type'  => 'ARsimple',
+            'type'                      => 'OFFICE',
+            'datasource'                => 'letterbox_attachment',
+            'entities'                  => ['TST', 'BAD'],
+            'file'                      => [
+                'content'               => $encodedFile,
+                'format'                => 'txt'
             ]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -159,7 +165,7 @@ class TemplateControllerTest extends TestCase
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame(_WRONG_FILE_TYPE, $responseBody['errors']);
+        $this->assertSame(_WRONG_FILE_TYPE . ' : text/plain', $responseBody['errors']);
 
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
@@ -184,13 +190,17 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'template_label'            => 'TEST TEMPLATE AR FAIL',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'acknowledgementReceipt',
+            'label'                     => 'TEST TEMPLATE AR FAIL',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'                    => 'acknowledgementReceipt',
             'template_attachment_type'  => 'ARsimple',
-            'template_type'             => 'OFFICE_HTML',
-            'template_content'          => 'Content of this template',
-            'template_datasource'       => 'letterbox_attachment',
+            'type'                      => 'OFFICE_HTML',
+            'file' => [
+                'electronic' => [
+                    'content'          => 'Content of this template',
+                ]
+            ],
+            'datasource'                => 'letterbox_attachment',
             'entities'                  => ['TST', 'BAD']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -205,59 +215,18 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'template_label'            => 'TEST TEMPLATE AR FAIL',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'acknowledgementReceipt',
+            'label'            => 'TEST TEMPLATE AR FAIL',
+            'description'          => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'           => 'acknowledgementReceipt',
             'template_attachment_type'  => 'ARsimple',
-            'template_type'             => 'OFFICE_HTML',
-            'template_content'          => '',
-            'template_datasource'       => 'letterbox_attachment',
+            'type'             => 'OFFICE_HTML',
+            'datasource'       => 'letterbox_attachment',
             'entities'                  => ['TST', 'BAD']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody());
-
-        $this->assertSame("You must complete at least one of the two templates", $responseBody->errors);
-
-        // File missing
-        $aArgs = [
-            'template_label'            => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'OFFICE',
-            'template_attachment_type'  => 'ARsimple',
-            'template_type'             => 'OFFICE',
-            'template_datasource'       => 'letterbox_attachment',
-            'entities'                  => ['TST', 'BAD'],
-            'uploadedFile'              => ''
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
-
-        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
-        $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame("Template file is missing", $responseBody['errors']);
-
-        $aArgs = [
-            'template_label'            => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'OFFICE',
-            'template_attachment_type'  => 'ARsimple',
-            'template_type'             => 'OFFICE',
-            'template_datasource'       => 'letterbox_attachment',
-            'entities'                  => ['TST', 'BAD'],
-            'uploadedFile'              => 'missing base64 + name'
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
-
-        $response     = $templates->create($fullRequest, new \Slim\Http\Response());
-        $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame("Uploaded file is missing", $responseBody['errors']);
 
         // Fail
         $GLOBALS['login'] = 'bbain';
@@ -304,7 +273,7 @@ class TemplateControllerTest extends TestCase
         $this->assertNotNull($responseBody->datasources);
         $this->assertNotNull($responseBody->datasources[0]->id);
         $this->assertNotNull($responseBody->datasources[0]->label);
-        $this->assertNotNull($responseBody->datasources[0]->script);
+        $this->assertNotNull($responseBody->datasources[0]->function);
         $this->assertNotNull($responseBody->datasources[0]->target);
         $this->assertNotNull($responseBody->entities);
         $this->assertNotNull($responseBody->entities[0]->entity_id);
@@ -342,22 +311,18 @@ class TemplateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'template_label'            => 'TEST TEMPLATE UPDATE',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE UPDATE',
-            'template_target'           => 'sendmail',
+            'label'                     => 'TEST TEMPLATE UPDATE',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE UPDATE',
             'template_attachment_type'  => 'all',
-            'template_type'             => 'HTML',
-            'template_content'          => 'Content of this template',
-            'template_datasource'       => 'letterbox_attachment',
+            'file'                      => [
+                'content'               => 'Content of this template',
+            ],
             'entities'                  => ['TST_AR']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
-        $this->assertSame(200, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody());
-
-        $this->assertSame("success", $responseBody->success);
+        $this->assertSame(204, $response->getStatusCode());
 
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
@@ -382,25 +347,19 @@ class TemplateControllerTest extends TestCase
         $encodedFile = base64_encode($fileContent);
 
         $aArgs = [
-            'template_label'           => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'          => 'OFFICE',
-            'template_attachment_type' => 'ARsimple',
-            'template_type'            => 'OFFICE',
-            'template_datasource'      => 'letterbox_attachment',
-            'entities'                 => ['TST', 'BAD'],
-            'uploadedFile'             => [
-                'name'   => 'test_template.docx',
-                'base64' => $encodedFile
+            'label'                     => 'TEST TEMPLATE AR OFFICE',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE',
+            'template_attachment_type'  => 'ARsimple',
+            'entities'                  => ['TST', 'BAD'],
+            'file'                      => [
+                'content'               => $encodedFile,
+                'format'                => 'docx'
             ]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
-        $this->assertSame(200, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame("success", $responseBody['success']);
+        $this->assertSame(204, $response->getStatusCode());
 
         ########## UPDATE FAIL MISSING PARAMETERS ##########
 
@@ -444,38 +403,19 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Template does not exist', $responseBody->errors);
 
-        $aArgs = [
-            'template_label'            => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'          => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'           => 'OFFICE',
-            'template_attachment_type'  => 'ARsimple',
-            'template_type'             => 'OFFICE',
-            'template_datasource'       => 'letterbox_attachment',
-            'entities'                  => ['TST', 'BAD'],
-            'uploadedFile'              => 'missing base64 + name'
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
-
-        $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
-        $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame("Uploaded file is missing", $responseBody['errors']);
-
         $fileContent = file_get_contents('test/unitTests/samples/test.txt');
         $encodedFile = base64_encode($fileContent);
 
         $aArgs = [
-            'template_label'           => 'TEST TEMPLATE AR OFFICE',
-            'template_comment'         => 'DESCRIPTION OF THIS TEMPLATE',
-            'template_target'          => 'OFFICE',
-            'template_attachment_type' => 'ARsimple',
-            'template_type'            => 'OFFICE',
-            'template_datasource'      => 'letterbox_attachment',
-            'entities'                 => ['TST', 'BAD'],
-            'uploadedFile'             => [
-                'name'   => 'test_template.txt',
-                'base64' => $encodedFile
+            'label'                     => 'TEST TEMPLATE AR OFFICE',
+            'description'               => 'DESCRIPTION OF THIS TEMPLATE',
+            'target'                    => 'OFFICE',
+            'template_attachment_type'  => 'ARsimple',
+            'type'                      => 'OFFICE',
+            'entities'                  => ['TST', 'BAD'],
+            'file'                      => [
+                'content'               => $encodedFile,
+                'format'                => 'txt'
             ]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -483,7 +423,7 @@ class TemplateControllerTest extends TestCase
         $response     = $templates->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame(_WRONG_FILE_TYPE, $responseBody['errors']);
+        $this->assertSame(_WRONG_FILE_TYPE . ' : text/plain', $responseBody['errors']);
 
         // Fail
         $GLOBALS['login'] = 'bbain';
@@ -723,7 +663,7 @@ class TemplateControllerTest extends TestCase
         $this->assertNotNull($responseBody->datasources);
         $this->assertNotNull($responseBody->datasources[0]->id);
         $this->assertNotNull($responseBody->datasources[0]->label);
-        $this->assertNotNull($responseBody->datasources[0]->script);
+        $this->assertNotNull($responseBody->datasources[0]->function);
         $this->assertNotNull($responseBody->datasources[0]->target);
         $this->assertNotNull($responseBody->entities);
         $this->assertNotNull($responseBody->entities[0]->entity_id);

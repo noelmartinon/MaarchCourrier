@@ -41,7 +41,8 @@ abstract class HistoryModelAbstract
     public static function create(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['tableName', 'recordId', 'eventType', 'userId', 'info', 'moduleId', 'eventId']);
-        ValidatorModel::stringType($aArgs, ['tableName', 'eventType', 'userId', 'info', 'moduleId', 'eventId']);
+        ValidatorModel::stringType($aArgs, ['tableName', 'eventType', 'info', 'moduleId', 'eventId']);
+        ValidatorModel::intVal($aArgs, ['userId']);
 
         DatabaseModel::insert([
             'table'         => 'history',
@@ -61,16 +62,16 @@ abstract class HistoryModelAbstract
         return true;
     }
 
-    public static function getByUserId(array $aArgs)
+    public static function getByUserId(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::notEmpty($args, ['userId']);
+        ValidatorModel::stringType($args, ['userId']);
 
         $aHistories = DatabaseModel::select([
-            'select'   => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'select'   => empty($args['select']) ? ['*'] : $args['select'],
             'table'    => ['history'],
             'where'    => ['user_id = ?'],
-            'data'     => [$aArgs['userId']],
+            'data'     => [$args['userId']],
             'order_by' => ['event_date DESC'],
             'limit'    => 500
         ]);

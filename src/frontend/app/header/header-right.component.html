@@ -42,9 +42,9 @@
     </button>
     <mat-menu #menu="matMenu" class="headerMaarch">
         <canvas class="header-bg" width="250" height="70"
-            style="margin-top:-8px;background-size:cover;border-bottom: solid 1px white;" [style.background-image]="'url(../../rest/images?image=loginPage)'"></canvas>
+            style="margin-top:-8px;background-size:cover;border-bottom: solid 1px white;" [style.background-image]="'url(../rest/images?image=loginPage)'"></canvas>
         <i title="{{lang.myProfileAccess}}" routerLink="/profile"
-            style="cursor:pointer;z-index:1;color:white;position: absolute;left: 85px;top: 17px;width: 70px;height: 70px;background-size: cover;background-position: top center;border-radius: 50%;border: solid white;background-color:white;" [style.background-image]="'url(../../rest/images?image=onlyLogo)'"></i>
+            style="cursor:pointer;z-index:1;color:white;position: absolute;left: 85px;top: 17px;width: 70px;height: 70px;background-size: cover;background-position: top center;border-radius: 50%;border: solid white;background-color:white;" [style.background-image]="'url(../rest/images?image=onlyLogo)'"></i>
         <div class="content" style="padding-top:20px;color:white;max-height:250px;overflow-y:auto;overflow-x:hidden;">
             <p routerLink="/profile" class="text-center" style="cursor:pointer;">{{headerService.user.firstname}}
                 {{headerService.user.lastname | uppercase}}</p>

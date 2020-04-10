@@ -146,7 +146,7 @@ class HomeController
                 'res_letterbox.filename'
             ],
             'limit'     => 5,
-            'userId'    => $GLOBALS['login']
+            'userId'    => $GLOBALS['id']
         ]);
 
         if (!empty($lastResources)) {

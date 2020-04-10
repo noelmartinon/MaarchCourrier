@@ -54,7 +54,7 @@ class NotificationScheduleController
                     $errors[] = $key.' is empty';
                 }
 
-                if ($key != 'cmd' && $key != 'state' && $key != 'description' && !preg_match('#^[0-9\/*][0-9]?[,\/-]?([0-9]?){2}#', $value) ) {
+                if ($key != 'cmd' && $key != 'state' && $key != 'description' && !preg_match('#^[0-9\/*][0-9]?[,\/-]?([0-9]?){2}#', $value)) {
                     $errors[] = 'wrong format for '.$key;
                 }
             }
@@ -90,9 +90,13 @@ class NotificationScheduleController
             }
 
             $path = $pathToFolow.'modules/notifications/batch/scripts/'.$filename;
-
             if (file_exists($path)) {
                 $notificationsArray[] = ['description' => $result['description'], 'path' => $path];
+            } else {
+                $path = $pathToFolow.'bin/notification/scripts/'.$filename;
+                if (file_exists($path)) {
+                    $notificationsArray[] = ['description' => $result['description'], 'path' => $path];
+                }
             }
         }
 
@@ -121,7 +125,8 @@ class NotificationScheduleController
                     $pathToFolow = $corePath;
                 }
                 $returnValue = true;
-                if (strpos($crontabToSave[$id]['cmd'], $pathToFolow.'modules/notifications/batch/scripts/') !== 0) {
+                if (strpos($crontabToSave[$id]['cmd'], $pathToFolow.'modules/notifications/batch/scripts/') !== 0
+                    && strpos($crontabToSave[$id]['cmd'], $pathToFolow.'bin/notification/scripts/') !== 0) {
                     $returnValue = false;
                     break;
                 }

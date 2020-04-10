@@ -83,7 +83,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         this.headerService.setHeader(this.lang.contactsParameters);
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
-        this.http.get('../../rest/contactsParameters')
+        this.http.get('../rest/contactsParameters')
             .subscribe((data: any) => {
                 this.contactsFilling = data.contactsFilling;
                 this.contactsParameters = data.contactsParameters;
@@ -110,7 +110,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         if (this.contactsFilling.first_threshold >= this.contactsFilling.second_threshold) {
             this.contactsFilling.second_threshold = this.contactsFilling.first_threshold + 1;
         }
-        this.http.put('../../rest/contactsParameters', { 'contactsFilling': this.contactsFilling, 'contactsParameters': this.contactsParameters })
+        this.http.put('../rest/contactsParameters', { 'contactsFilling': this.contactsFilling, 'contactsParameters': this.contactsParameters })
             .subscribe(() => {
                 this.notify.success(this.lang.parameterUpdated);
 

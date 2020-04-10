@@ -134,7 +134,7 @@ export class SignatureBookComponent implements OnInit {
 
             this.signatureBook.resList = []; // This line is added because of manage action behaviour (processAfterAction is called twice)
             this.lockResource();
-            this.http.get('../../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + this.resId)
+            this.http.get('../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + this.resId)
                 .subscribe((data: any) => {
                     if (data.error) {
                         location.hash = '';
@@ -193,7 +193,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     lockResource() {
-        this.http.put(`../../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
+        this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -201,7 +201,7 @@ export class SignatureBookComponent implements OnInit {
         ).subscribe();
 
         this.currentResourceLock = setInterval(() => {
-            this.http.put(`../../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
+            this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
                 catchError((err: any) => {
                     if (err.status == 403) {
                         clearInterval(this.currentResourceLock);
@@ -216,7 +216,7 @@ export class SignatureBookComponent implements OnInit {
     unlockResource() {
         clearInterval(this.currentResourceLock);
 
-        this.http.put(`../../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/unlock`, { resources: [this.resId] }).pipe(
+        this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/unlock`, { resources: [this.resId] }).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -225,7 +225,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     loadActions() {
-        this.http.get('../../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
+        this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
                 this.signatureBook.actions = data.actions;
             }, (err) => {
@@ -304,7 +304,7 @@ export class SignatureBookComponent implements OnInit {
                 this.rightContentWidth = '44%';
                 this.leftContentWidth = '44%';
                 if (this.signatureBook.resList.length === 0 || typeof this.signatureBook.resList[0].creation_date === 'undefined') {
-                    this.http.get('../../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources')
+                    this.http.get('../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources')
                         .subscribe((data: any) => {
                             this.signatureBook.resList = data.resources;
                             this.signatureBook.resList.forEach((value: any, index: number) => {
@@ -344,13 +344,13 @@ export class SignatureBookComponent implements OnInit {
 
     refreshAttachments(mode: string) {
         if (mode === 'rightContent') {
-            this.http.get('../../rest/signatureBook/' + this.resId + '/incomingMailAttachments')
+            this.http.get('../rest/signatureBook/' + this.resId + '/incomingMailAttachments')
                 .subscribe((data: any) => {
                     this.signatureBook.documents = data;
                 });
 
         } else {
-            this.http.get('../../rest/signatureBook/' + this.resId + '/attachments')
+            this.http.get('../rest/signatureBook/' + this.resId + '/attachments')
                 .subscribe((data: any) => {
                     var i = 0;
                     if (mode === 'add') {
@@ -389,7 +389,7 @@ export class SignatureBookComponent implements OnInit {
                 var r = confirm('Voulez-vous vraiment supprimer la pièce jointe ?');
             }
             if (r) {
-                this.http.delete('../../rest/attachments/' + attachment.res_id).pipe(
+                this.http.delete('../rest/attachments/' + attachment.res_id).pipe(
                     tap(() => {
                         this.refreshAttachments('del');
                     }),
@@ -405,11 +405,11 @@ export class SignatureBookComponent implements OnInit {
     signFile(attachment: any, signature: any) {
         if (!this.loadingSign && this.signatureBook.canSign) {
             this.loadingSign = true;
-            var route = attachment.isResource ? '../../rest/resources/' + attachment.res_id + '/sign' : '../../rest/attachments/' + attachment.res_id + '/sign';
+            var route = attachment.isResource ? '../rest/resources/' + attachment.res_id + '/sign' : '../rest/attachments/' + attachment.res_id + '/sign';
             this.http.put(route, { 'signatureId': signature.id })
                 .subscribe((data: any) => {
                     if (!attachment.isResource) {
-                        this.rightViewerLink = '../../rest/attachments/' + data.id + '/content';
+                        this.rightViewerLink = '../rest/attachments/' + data.id + '/content';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'SIGN';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = data.new_id;
                     } else {
@@ -437,7 +437,7 @@ export class SignatureBookComponent implements OnInit {
 
     unsignFile(attachment: any) {
         if (attachment.isResource) {
-            this.http.put('../../rest/resources/' + attachment.res_id + '/unsign', {})
+            this.http.put('../rest/resources/' + attachment.res_id + '/unsign', {})
                 .subscribe(() => {
                     this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
@@ -453,9 +453,9 @@ export class SignatureBookComponent implements OnInit {
                     }
                 });
         } else {
-            this.http.put('../../rest/attachments/' + attachment.res_id + '/unsign', {})
+            this.http.put('../rest/attachments/' + attachment.res_id + '/unsign', {})
                 .subscribe(() => {
-                    this.rightViewerLink = '../../rest/attachments/' + attachment.res_id + '/content';
+                    this.rightViewerLink = '../rest/attachments/' + attachment.res_id + '/content';
                     this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
                     this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = attachment.res_id;
@@ -476,7 +476,7 @@ export class SignatureBookComponent implements OnInit {
 
     backToBasket() {
         let path = '/basketList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId;
-        this.http.put('../../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/unlock', { resources: [this.resId] })
+        this.http.put('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/unlock', { resources: [this.resId] })
             .subscribe((data: any) => {
                 this.router.navigate([path]);
             }, (err: any) => {
@@ -485,7 +485,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     backToDetails() {
-        this.http.put('../../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/unlock', { resources: [this.resId] })
+        this.http.put('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/unlock', { resources: [this.resId] })
             .subscribe((data: any) => {
                 this.router.navigate([`/resources/${this.resId}`]);
             }, (err: any) => { });
@@ -493,7 +493,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     changeLocation(resId: number, origin: string) {
-        this.http.put('../../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/lock', { resources: [resId] })
+        this.http.put('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/lock', { resources: [resId] })
             .subscribe((data: any) => {
                 if (data.countLockedResources > 0) {
                     alert(data.countLockedResources + ' ' + this.lang.warnLockRes + '.');
@@ -515,7 +515,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     processAction() {
-        this.http.get(`../../rest/resources/${this.resId}?light=true`).pipe(
+        this.http.get(`../rest/resources/${this.resId}?light=true`).pipe(
             tap((data: any) => {
                 const actionId = $('#signatureBookActions option:selected').val();
                 const selectedAction = this.signatureBook.actions.filter((action: any) => action.id == actionId)[0];
@@ -533,7 +533,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     loadBadges() {
-        this.http.get(`../../rest/resources/${this.resId}/items`).pipe(
+        this.http.get(`../rest/resources/${this.resId}/items`).pipe(
             tap((data: any) => {
                 this.processTool.forEach(element => {
                     element.count = data[element.id] !== undefined ? data[element.id] : 0;

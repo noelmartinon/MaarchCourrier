@@ -316,17 +316,17 @@ export class ContactsFormComponent implements OnInit {
 
             this.creationMode = true;
 
-            this.http.get('../../rest/contactsParameters').pipe(
+            this.http.get('../rest/contactsParameters').pipe(
                 tap((data: any) => {
                     this.fillingParameters = data.contactsFilling;
                     this.initElemForm(data);
                     this.annuaryEnabled = data.annuaryEnabled;
                 }),
-                exhaustMap(() => this.http.get('../../rest/civilities')),
+                exhaustMap(() => this.http.get('../rest/civilities')),
                 tap((data: any) => {
                     this.initCivilities(data.civilities);
                 }),
-                exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
+                exhaustMap(() => this.http.get('../rest/contactsCustomFields')),
                 tap((data: any) => {
                     this.initCustomElementForm(data);
                     this.initAutocompleteAddressBan();
@@ -346,24 +346,24 @@ export class ContactsFormComponent implements OnInit {
                 element.display = false;
             });
 
-            this.http.get('../../rest/contactsParameters').pipe(
+            this.http.get('../rest/contactsParameters').pipe(
                 tap((data: any) => {
                     this.fillingParameters = data.contactsFilling;
                     this.initElemForm(data);
                     this.annuaryEnabled = data.annuaryEnabled;
                 }),
-                exhaustMap(() => this.http.get('../../rest/civilities')),
+                exhaustMap(() => this.http.get('../rest/civilities')),
                 tap((data: any) => {
                     this.initCivilities(data.civilities);
                 }),
-                exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
+                exhaustMap(() => this.http.get('../rest/contactsCustomFields')),
                 tap((data: any) => {
                     this.initCustomElementForm(data);
                     this.initAutocompleteAddressBan();
                     this.initAutocompleteCommunicationMeans();
                     this.initAutocompleteExternalIdM2M();
                 }),
-                exhaustMap(() => this.http.get('../../rest/contacts/' + this.contactId)),
+                exhaustMap(() => this.http.get('../rest/contacts/' + this.contactId)),
                 map((data: any) => {
                     // data.civility = this.contactService.formatCivilityObject(data.civility);
                     data.fillingRate = this.contactService.formatFillingObject(data.fillingRate);
@@ -558,7 +558,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initBanSearch() {
-        this.http.get('../../rest/ban/availableDepartments').pipe(
+        this.http.get('../rest/ban/availableDepartments').pipe(
             tap((data: any) => {
                 if (data.default !== null && data.departments.indexOf(data.default.toString()) !== - 1) {
                     this.addressBANCurrentDepartment = data.default;
@@ -602,7 +602,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     createContact() {
-        this.http.post('../../rest/contacts', this.formatContact()).pipe(
+        this.http.post('../rest/contacts', this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(data.id);
                 this.notify.success(this.lang.contactAdded);
@@ -619,7 +619,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     updateContact() {
-        this.http.put(`../../rest/contacts/${this.contactId}`, this.formatContact()).pipe(
+        this.http.put(`../rest/contacts/${this.contactId}`, this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(this.contactId);
                 this.notify.success(this.lang.contactUpdated);
@@ -707,7 +707,7 @@ export class ContactsFormComponent implements OnInit {
     checkCompany(field: any) {
 
         if (field.id === 'company' && field.control.value !== '' && (this.companyFound === null || this.companyFound.company !== field.control.value)) {
-            this.http.get(`../../rest/autocomplete/contacts/company?search=${field.control.value}`).pipe(
+            this.http.get(`../rest/autocomplete/contacts/company?search=${field.control.value}`).pipe(
                 tap(() => this.companyFound = null),
                 filter((data: any) => data.length > 0),
                 tap((data) => {
@@ -800,7 +800,7 @@ export class ContactsFormComponent implements OnInit {
                 filter((value: string) => value.length > 2),
                 distinctUntilChanged(),
                 tap(() => this.communicationMeanLoading = true),
-                switchMap((data: any) => this.http.get('../../rest/autocomplete/ouM2MAnnuary', { params: { 'company': data } })),
+                switchMap((data: any) => this.http.get('../rest/autocomplete/ouM2MAnnuary', { params: { 'company': data } })),
                 tap((data: any) => {
                     if (this.isEmptyValue(data)) {
                         this.communicationMeanInfo = this.lang.noAvailableValue;
@@ -841,7 +841,7 @@ export class ContactsFormComponent implements OnInit {
                 debounceTime(300),
                 distinctUntilChanged(),
                 tap(() => this.externalId_m2mLoading = true),
-                switchMap((data: any) => this.http.get('../../rest/autocomplete/businessIdM2MAnnuary', { params: { 'query': data, 'communicationValue': this.contactForm[indexFieldCommunicationMeans].control.value } })),
+                switchMap((data: any) => this.http.get('../rest/autocomplete/businessIdM2MAnnuary', { params: { 'query': data, 'communicationValue': this.contactForm[indexFieldCommunicationMeans].control.value } })),
                 tap((data: any) => {
                     if (this.isEmptyValue(data)) {
                         this.externalId_m2mInfo = this.lang.noAvailableValue;
@@ -904,7 +904,7 @@ export class ContactsFormComponent implements OnInit {
                 filter(value => value.length > 2),
                 distinctUntilChanged(),
                 tap(() => this.addressBANLoading = true),
-                switchMap((data: any) => this.http.get('../../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
+                switchMap((data: any) => this.http.get('../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
                 tap((data: any) => {
                     if (data.length === 0) {
                         this.addressBANInfo = this.lang.noAvailableValue;

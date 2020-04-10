@@ -40,7 +40,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../../rest/versionsUpdate').pipe(
+        this.http.get('../rest/versionsUpdate').pipe(
             tap((data: any) => {
                 this.versions = data;
             }),
@@ -69,7 +69,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
                     return false;
                 }
             }),
-            exhaustMap(() => this.http.put('../../rest/versionsUpdate', {})),
+            exhaustMap(() => this.http.put('../rest/versionsUpdate', {})),
             tap(() => {
                 this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateOk, msg: '' } });
             }),

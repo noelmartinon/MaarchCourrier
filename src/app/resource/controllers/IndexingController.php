@@ -360,7 +360,11 @@ class IndexingController
             $processDelayUpdated = 1;
             for ($i = 1; $i <= $args['delay']; $i++) {
                 $tmpDate = new \DateTime($args['date']);
-                $tmpDate->add(new \DateInterval("P{$i}D"));
+                if ($args['sub']) {
+                    $tmpDate->sub(new \DateInterval("P{$i}D"));
+                } else {
+                    $tmpDate->add(new \DateInterval("P{$i}D"));
+                }
                 if (in_array($tmpDate->format('N'), [6, 7]) || in_array($tmpDate->format('d-m'), $hollidays)) {
                     ++$args['delay'];
                 }
@@ -369,10 +373,18 @@ class IndexingController
                 }
             }
 
-            $date->add(new \DateInterval("P{$processDelayUpdated}D"));
+            if ($args['sub']) {
+                $date->sub(new \DateInterval("P{$processDelayUpdated}D"));
+            } else {
+                $date->add(new \DateInterval("P{$processDelayUpdated}D"));
+            }
         } else {
             // Calendar or empty delay
-            $date->add(new \DateInterval("P{$args['delay']}D"));
+            if ($args['sub']) {
+                $date->sub(new \DateInterval("P{$args['delay']}D"));
+            } else {
+                $date->add(new \DateInterval("P{$args['delay']}D"));
+            }
         }
 
         return $date->format('Y-m-d');
