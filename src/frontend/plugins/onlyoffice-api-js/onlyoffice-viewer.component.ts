@@ -5,17 +5,19 @@ import {
     Input,
     EventEmitter,
     Output,
-    HostListener
+    HostListener,
+    OnDestroy
 } from '@angular/core';
 import './onlyoffice-api.js';
 import { HttpClient } from '@angular/common/http';
-import { Subject, of } from 'rxjs';
-import { catchError, tap, filter } from 'rxjs/operators';
+import { catchError, tap, filter, finalize } from 'rxjs/operators';
 import { LANG } from '../../app/translate.component';
 import { ConfirmComponent } from '../modal/confirm.component';
-import { MatDialogRef, MatDialog } from '@angular/material';
+import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { NotificationService } from '../../app/notification.service';
 import { HeaderService } from '../../service/header.service';
+import { Subject } from 'rxjs/internal/Subject';
+import { of } from 'rxjs/internal/observable/of';
 
 declare var DocsAPI: any;
 declare function $j(selector: any): any;
@@ -25,7 +27,7 @@ declare function $j(selector: any): any;
     templateUrl: 'onlyoffice-viewer.component.html',
     styleUrls: ['onlyoffice-viewer.component.scss'],
 })
-export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
+export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     lang: any = LANG;
 
@@ -34,6 +36,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
+    @Input() hideCloseEditor: any = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
@@ -53,14 +56,20 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
     onlyOfficeUrl: string = '';
 
     allowedExtension: string[] = [
-        "doc",
-        "docx",
-        "dotx",
-        "odt",
-        "ott",
-        "rtf",
-        "txt",
-        "html"
+        'doc',
+        'docx',
+        'dotx',
+        'odt',
+        'ott',
+        'rtf',
+        'txt',
+        'html',
+        'xlsl',
+        'xlsx',
+        'xltx',
+        'ods',
+        'ots',
+        'csv',
     ];
 
     private eventAction = new Subject<any>();
@@ -69,7 +78,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
 
     @HostListener('window:message', ['$event'])
     onMessage(e: any) {
-        //console.log(e);
+        // console.log(e);
         const response = JSON.parse(e.data);
         // EVENT TO CONSTANTLY UPDATE CURRENT DOCUMENT
         if (response.event === 'onDownloadAs') {
@@ -88,7 +97,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
             filter((data: string) => data === 'ok'),
             tap(() => {
                 this.docEditor.destroyEditor();
-                this.closeEditor()
+                this.closeEditor();
             })
         ).subscribe();
     }
@@ -97,7 +106,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
         if (this.headerService.sideNavLeft !== null) {
             this.headerService.sideNavLeft.open();
         }
-        $j("iframe[name='frameEditor']").css("position", "initial");
+        $j('iframe[name=\'frameEditor\']').css('position', 'initial');
         this.fullscreenMode = false;
         this.triggerAfterUpdatedDoc.emit();
         this.triggerCloseEditor.emit();
@@ -110,8 +119,8 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
 
     getEncodedDocument(data: any) {
         this.http.get('../../rest/onlyOffice/encodedFile', { params: { url: data } }).pipe(
-            tap((data: any) => {
-                this.file.content = data.encodedFile;
+            tap((result: any) => {
+                this.file.content = result.encodedFile;
                 this.isSaving = false;
                 this.triggerAfterUpdatedDoc.emit();
                 this.eventAction.next(this.file);
@@ -137,21 +146,21 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
             await this.getServerConfiguration();
 
             await this.checkServerStatus();
-    
+
             await this.getMergedFileTemplate();
-    
+
             this.initOfficeEditor();
-    
+
             this.loading = false;
         }
     }
-    
+
     canLaunchOnlyOffice() {
         if (this.isAllowedEditExtension(this.file.format)) {
             return true;
         } else {
-            this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format  + '</b> ' + this.lang.onlyofficeEditDenied2);
-            this.closeEditor();
+            this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format + '</b> ' + this.lang.onlyofficeEditDenied2);
+            this.triggerCloseEditor.emit();
             return false;
         }
     }
@@ -167,12 +176,12 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
                         this.appUrl = data.coreUrl;
                         resolve(true);
                     } else {
-                        this.closeEditor();
+                        this.triggerCloseEditor.emit();
                     }
                 }),
                 catchError((err) => {
                     this.notify.handleErrors(err);
-                    this.closeEditor();
+                    this.triggerCloseEditor.emit();
                     return of(false);
                 }),
             ).subscribe();
@@ -186,7 +195,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
             const regex2 = /localhost/g;
             if (this.appUrl.match(regex) !== null || this.appUrl.match(regex2) !== null) {
                 this.notify.error(`${this.lang.errorOnlyoffice1}`);
-                this.closeEditor()
+                this.triggerCloseEditor.emit();
             } else {
                 this.http.get(`../../rest/onlyOffice/available`).pipe(
                     tap((data: any) => {
@@ -194,12 +203,12 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
                             resolve(true);
                         } else {
                             this.notify.error(`${this.lang.errorOnlyoffice2} ${this.onlyOfficeUrl}`);
-                            this.closeEditor();
+                            this.triggerCloseEditor.emit();
                         }
                     }),
                     catchError((err) => {
                         this.notify.error(`${this.lang[err.error.lang]}`);
-                        this.closeEditor();
+                        this.triggerCloseEditor.emit();
                         return of(false);
                     }),
                 ).subscribe();
@@ -209,7 +218,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
 
     getMergedFileTemplate() {
         return new Promise((resolve, reject) => {
-            this.http.post(`../../${this.params.docUrl}`, { objectId: this.params.objectId, objectType: this.params.objectType, onlyOfficeKey: this.key, data: this.params.dataToMerge }).pipe(
+            this.http.post(`../../${this.params.docUrl}`, { objectId: this.params.objectId, objectType: this.params.objectType, format: this.file.format, onlyOfficeKey: this.key, data: this.params.dataToMerge }).pipe(
                 tap((data: any) => {
                     this.tmpFilename = data.filename;
 
@@ -225,7 +234,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
                 }),
                 catchError((err) => {
                     this.notify.handleErrors(err);
-                    this.closeEditor();
+                    this.triggerCloseEditor.emit();
                     return of(false);
                 }),
             ).subscribe();
@@ -233,10 +242,10 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
     }
 
     generateUniqueId(length: number = 5) {
-        var result = '';
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for (var i = 0; i < length; i++) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
@@ -279,8 +288,8 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
                     zoom: -2,
                 },
                 user: {
-                    id: "1",
-                    name: " "
+                    id: '1',
+                    name: ' '
                 },
             },
         };
@@ -306,21 +315,21 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit {
     }
 
     openFullscreen() {
-        $j("iframe[name='frameEditor']").css("top", "0px");
-        $j("iframe[name='frameEditor']").css("left", "0px");
+        $j('iframe[name=\'frameEditor\']').css('top', '0px');
+        $j('iframe[name=\'frameEditor\']').css('left', '0px');
 
         if (!this.fullscreenMode) {
             if (this.headerService.sideNavLeft !== null) {
                 this.headerService.sideNavLeft.close();
             }
-            $j("iframe[name='frameEditor']").css("position", "fixed");
-            $j("iframe[name='frameEditor']").css("z-index", "2");
+            $j('iframe[name=\'frameEditor\']').css('position', 'fixed');
+            $j('iframe[name=\'frameEditor\']').css('z-index', '2');
         } else {
             if (this.headerService.sideNavLeft !== null) {
                 this.headerService.sideNavLeft.open();
             }
-            $j("iframe[name='frameEditor']").css("position", "initial");
-            $j("iframe[name='frameEditor']").css("z-index", "1");
+            $j('iframe[name=\'frameEditor\']').css('position', 'initial');
+            $j('iframe[name=\'frameEditor\']').css('z-index', '1');
         }
         this.fullscreenMode = !this.fullscreenMode;
     }

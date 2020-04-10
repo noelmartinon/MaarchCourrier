@@ -39,6 +39,7 @@ import { VersionsUpdateAdministrationComponent }        from './versionUpdate/ve
 import { DocserversAdministrationComponent }            from './docserver/docservers-administration.component';
 import { DocserverAdministrationComponent }             from './docserver/docserver-administration.component';
 import { TemplatesAdministrationComponent }             from './template/templates-administration.component';
+import { TemplateFileEditorModalComponent }             from './template/templateFileEditorModal/template-file-editor-modal.component';
 import { TemplateAdministrationComponent, TemplateAdministrationCheckEntitiesModalComponent }              from './template/template-administration.component';
 import { SecuritiesAdministrationComponent }            from './security/securities-administration.component';
 import { SendmailAdministrationComponent }              from './sendmail/sendmail-administration.component';
@@ -117,7 +118,8 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         ContactsCustomFieldsAdministrationComponent,
         ContactsPageAdministrationComponent,
         TagsAdministrationComponent,
-        TagAdministrationComponent
+        TagAdministrationComponent,
+        TemplateFileEditorModalComponent
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,
@@ -129,7 +131,8 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         DoctypesAdministrationRedirectModalComponent,
         ContactsListAdministrationRedirectModalComponent,
         TemplateAdministrationCheckEntitiesModalComponent,
-        AccountLinkComponent
+        AccountLinkComponent,
+        TemplateFileEditorModalComponent
     ],
 })
 export class AdministrationModule {}

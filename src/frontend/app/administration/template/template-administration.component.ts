@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -7,65 +7,106 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
+import { filter, tap, catchError } from 'rxjs/operators';
+import { FunctionsService } from '../../../service/functions.service';
+import { of } from 'rxjs/internal/observable/of';
+import { TemplateFileEditorModalComponent } from './templateFileEditorModal/template-file-editor-modal.component';
+import { DomSanitizer } from '@angular/platform-browser';
+import { AlertComponent } from '../../../plugins/modal/alert.component';
 
-declare function $j(selector: any): any;
 declare var tinymce: any;
+declare function $j(selector: any): any;
 
 @Component({
-    templateUrl: "template-administration.component.html",
+    templateUrl: 'template-administration.component.html',
     styleUrls: ['template-administration.component.scss'],
     providers: [AppService]
 })
-export class TemplateAdministrationComponent implements OnInit {
+export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight  : MatSidenav;
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang                    : any = LANG;
-    loading                 : boolean = false;
+    lang: any = LANG;
+    loading: boolean = false;
 
-    creationMode            : boolean;
-    template                : any       = {};
-    statuses                : any[]     = [];
-    categoriesList          : any[]     = [];
-    keywordsList            : any[]     = [];
-    defaultTemplatesList    : any;
-    attachmentTypesList     : any;
-    datasourcesList         : any;
-    jnlpValue               : any       = {};
-    extensionModels         : any[]     = [];
-    buttonFileName          : any       = this.lang.importFile;
-    lockFound               : boolean   = false;
-    intervalLockFile        : any;
+    creationMode: boolean;
 
-    dialogRef               : MatDialogRef<any>;
-    data                    : any[]      = [];
-    config                  : any        = {};
+    template: any = {
+        id: 0,
+        label: '',
+        description: '',
+        datasource: 'letterbox_attachment',
+        target: '',
+        type: '',
+        file: null
+    };
+
+    targetTypes: string[] = [
+        'acknowledgementReceipt',
+        'notes',
+        'sendmail',
+        'indexingFile',
+        'notifications',
+        'attachments'
+    ];
+
+    allowedExtensions: string[] = [
+        'doc',
+        'docx',
+        'dotx',
+        'odt',
+        'ott',
+        'html',
+        'xlsl',
+        'xlsx',
+        'xltx',
+        'ods',
+        'ots',
+        'csv',
+    ];
+
+    selectedModelFile: any = null;
+    availableTypes: string[] = [];
+
+    statuses: any[] = [];
+    categoriesList: any[] = [];
+    keywordsList: any[] = [];
+    defaultTemplatesList: any;
+    attachmentTypesList: any;
+    datasourcesList: any;
+    jnlpValue: any = {};
+    extensionModels: any[] = [];
+    buttonFileName: any = this.lang.importFile;
+    lockFound: boolean = false;
+    intervalLockFile: any;
+
+    templateDocView: any = null;
+
+    dialogRef: MatDialogRef<any>;
+    data: any[] = [];
+    config: any = {};
 
 
     constructor(
-        public http: HttpClient, 
-        private zone: NgZone, 
-        private route: ActivatedRoute, 
-        private router: Router, 
-        private notify: NotificationService, 
-        private headerService: HeaderService, 
+        public http: HttpClient,
+        private sanitizer: DomSanitizer,
+        private route: ActivatedRoute,
+        private router: Router,
+        private notify: NotificationService,
+        private headerService: HeaderService,
         public dialog: MatDialog,
         public appService: AppService,
-        private viewContainerRef: ViewContainerRef
-    ) {
-        $j("link[href='merged_css.php']").remove();
-        window['angularTemplateComponent'] = {
-            componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content)
-        };
-    }
+        private viewContainerRef: ViewContainerRef,
+        private functionsService: FunctionsService
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.route.params.subscribe(params => {
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
                 this.headerService.setHeader(this.lang.templateCreation);
 
                 this.creationMode = true;
@@ -73,8 +114,6 @@ export class TemplateAdministrationComponent implements OnInit {
                 this.http.get('../../rest/administration/templates/new')
                     .subscribe((data: any) => {
                         this.setInitialValue(data);
-                        this.template.template_target = '';
-                        this.template.template_type = 'OFFICE';
                         this.loading = false;
 
                     });
@@ -84,24 +123,36 @@ export class TemplateAdministrationComponent implements OnInit {
                 this.http.get('../../rest/templates/' + params['id'] + '/details')
                     .subscribe((data: any) => {
                         this.setInitialValue(data);
-                        this.template = data.template;
-                        this.headerService.setHeader(this.lang.templateModification, this.template.template_label);
-                        this.loading = false;
-                        if (this.template.template_type == 'HTML') {
-                            this.initMce('textarea#templateHtml');
-                        }
-                        if (this.template.template_type == 'OFFICE_HTML') {
-                            this.initMce('textarea#templateOfficeHtml');
-                        }
-                        if (this.template.template_style == '' && this.template.template_file_name != null) {
-                            this.buttonFileName = this.template.template_file_name;
-                        } else if (this.template.template_style != '') {
-                            this.buttonFileName = this.template.template_style;
+                        this.template = {
+                            id: data.template.template_id,
+                            label: data.template.template_label,
+                            description: data.template.template_comment,
+                            datasource: data.template.template_datasource,
+                            target: data.template.template_target,
+                            type: data.template.template_type,
+                            file: {}
+                        };
+                        this.updateTemplateType();
+
+                        this.selectedModelFile = data.template.template_file_name;
+                        this.template.template_attachment_type = data.template.template_attachment_type;
+                        if (this.template.type === 'HTML' || this.template.type === 'TXT') {
+                            this.template.file.content = data.template.template_content;
+                        } else if (this.template.type === 'OFFICE') {
+                            this.template.file.format = data.template.template_file_name.split('.').pop();
+                            this.template.file.name = data.template.template_file_name;
+                            this.getViewTemplateContent();
+                        } else if (this.template.target === 'acknowledgementReceipt') {
+                            if (!this.functionsService.empty(data.template.template_file_name)) {
+                                this.template.file.paper.format = data.template.template_file_name.split('.').pop();
+                            }
+                            this.template.file.paper.name = data.template.template_file_name;
+                            this.template.file.electronic.content = data.template.template_content;
+                            this.getViewTemplateContent();
                         }
 
-                        if (this.template.template_style == '') {
-                            this.template.template_style = 'uploadFile';
-                        }
+                        this.headerService.setHeader(this.lang.templateModification, this.template.template_label);
+                        this.loading = false;
                     });
             }
             if (!this.template.template_attachment_type) {
@@ -110,47 +161,58 @@ export class TemplateAdministrationComponent implements OnInit {
         });
     }
 
+    getViewTemplateContent() {
+        this.http.get(`../../rest/templates/${this.template.id}/content`).pipe(
+            tap((data: any) => {
+                this.templateDocView = this.sanitizer.bypassSecurityTrustResourceUrl('data:application/pdf;base64,' + data.encodedDocument);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
     initMce(selectorId: string) {
         setTimeout(() => {
             tinymce.remove('textarea');
-            //LOAD EDITOR TINYMCE for MAIL SIGN
-            tinymce.baseURL = "../../node_modules/tinymce";
+            // LOAD EDITOR TINYMCE for MAIL SIGN
+            tinymce.baseURL = '../../node_modules/tinymce';
             tinymce.suffix = '.min';
             tinymce.init({
                 selector: selectorId,
                 statusbar: false,
                 language: this.lang.langISO.replace('-', '_'),
                 language_url: `../../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
-                height: "200",
+                height: '200',
                 plugins: [
-                    "textcolor",
-                    "autoresize",
-                    "code"
+                    'autoresize',
+                    'code'
                 ],
                 external_plugins: {
-                    'maarch_b64image': "../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js"
+                    'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
                 },
                 menubar: false,
-                toolbar: "undo | bold italic underline | alignleft aligncenter alignright | maarch_b64image | forecolor | code",
-                theme_buttons1_add: "fontselect,fontsizeselect",
-                theme_buttons2_add_before: "cut,copy,paste,pastetext,pasteword,separator,search,replace,separator",
-                theme_buttons2_add: "separator,insertdate,inserttime,preview,separator,forecolor,backcolor",
-                theme_buttons3_add_before: "tablecontrols,separator",
-                theme_buttons3_add: "separator,print,separator,ltr,rtl,separator,fullscreen,separator,insertlayer,moveforward,movebackward,absolut",
-                theme_toolbar_align: "left",
-                theme_advanced_toolbar_location: "top",
-                theme_styles: "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1",
-                setup: (ed :any) => {
+                toolbar: 'undo | bold italic underline | alignleft aligncenter alignright | maarch_b64image | forecolor | code',
+                theme_buttons1_add: 'fontselect,fontsizeselect',
+                theme_buttons2_add_before: 'cut,copy,paste,pastetext,pasteword,separator,search,replace,separator',
+                theme_buttons2_add: 'separator,insertdate,inserttime,preview,separator,forecolor,backcolor',
+                theme_buttons3_add_before: 'tablecontrols,separator',
+                theme_buttons3_add: 'separator,print,separator,ltr,rtl,separator,fullscreen,separator,insertlayer,moveforward,movebackward,absolut',
+                theme_toolbar_align: 'left',
+                theme_advanced_toolbar_location: 'top',
+                theme_styles: 'Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1',
+                setup: (ed: any) => {
                     ed.on('keyup', (e: any) => {
-                        if (this.template.template_type == 'HTML' && tinymce.get('templateHtml') != null) {
-                            this.template.template_content = tinymce.get('templateHtml').getContent();
+                        if (this.template.type === 'HTML' && tinymce.get('templateHtml') != null) {
+                            this.template.file.content = tinymce.get('templateHtml').getContent();
                         }
-                        if (this.template.template_type == 'OFFICE_HTML' && tinymce.get('templateOfficeHtml') != null) {
-                            this.template.template_content = tinymce.get('templateOfficeHtml').getContent();
+                        if (this.template.type === 'OFFICE_HTML' && tinymce.get('templateOfficeHtml') != null) {
+                            this.template.file.electronic.content = tinymce.get('templateOfficeHtml').getContent();
                         }
                     });
                 }
-                
+
             });
         }, 20);
     }
@@ -158,7 +220,7 @@ export class TemplateAdministrationComponent implements OnInit {
     setInitialValue(data: any) {
         this.extensionModels = [];
         data.templatesModels.forEach((model: any) => {
-            if (this.extensionModels.indexOf(model.fileExt) == -1) {
+            if (this.extensionModels.indexOf(model.fileExt) === -1) {
                 this.extensionModels.push(model.fileExt);
             }
         });
@@ -168,113 +230,257 @@ export class TemplateAdministrationComponent implements OnInit {
         this.datasourcesList = data.datasources;
         setTimeout(() => {
             $j('#jstree')
-                .on('select_node.jstree', function (e: any, data: any) {
-                    if (data.event) {
-                        data.instance.select_node(data.node.children_d);
+                .on('select_node.jstree', function (e: any, item: any) {
+                    if (item.event) {
+                        item.instance.select_node(item.node.children_d);
                     }
                 })
                 .jstree({
-                    "checkbox": { three_state: false },
+                    'checkbox': { three_state: false },
                     'core': {
-                        force_text : true,
+                        force_text: true,
                         'themes': {
                             'name': 'proton',
                             'responsive': true
                         },
                         'data': data.entities
                     },
-                    "plugins": ["checkbox", "search", "sort"]
+                    'plugins': ['checkbox', 'search', 'sort']
                 });
-            var to: any = false;
+            let to: any = false;
             $j('#jstree_search').keyup(function () {
                 if (to) { clearTimeout(to); }
                 to = setTimeout(function () {
-                    var v = $j('#jstree_search').val();
+                    const v: any = $j('#jstree_search').val();
                     $j('#jstree').jstree(true).search(v);
                 }, 250);
             });
         }, 0);
     }
 
-    clickOnUploader(id: string) {
-        $j('#' + id).click();
+    getBase64Document(buffer: ArrayBuffer) {
+        const TYPED_ARRAY = new Uint8Array(buffer);
+        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => {
+            return data + String.fromCharCode(byte);
+        }, '');
+
+        return btoa(STRING_CHAR);
     }
 
     uploadFileTrigger(fileInput: any) {
-        this.template.jnlpUniqueId = null;
-        if (fileInput.target.files && fileInput.target.files[0]) {
-            this.template.uploadedFile = {};
-            this.template.uploadedFile.name = fileInput.target.files[0].name;
-            this.template.uploadedFile.size = fileInput.target.files[0].size;
-            this.template.uploadedFile.type = fileInput.target.files[0].type;
-            if (this.template.uploadedFile.label == "") {
-                this.template.uploadedFile.label = this.template.uploadedFile.name;
+        if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
+
+            const reader = new FileReader();
+
+            if (this.template.target === 'acknowledgementReceipt') {
+                this.template.file.paper = {
+                    name: '',
+                    type: '',
+                    content: ''
+                };
+                this.template.file.paper.name = fileInput.target.files[0].name;
+                this.selectedModelFile = this.template.file.paper.name;
+                this.template.file.paper.type = fileInput.target.files[0].type;
+                this.template.file.paper.format = this.template.file.paper.name.split('.').pop();
+            } else {
+                this.template.file = {
+                    name: '',
+                    type: '',
+                    content: ''
+                };
+                this.template.file.name = fileInput.target.files[0].name;
+                this.selectedModelFile = this.template.file.name;
+                this.template.file.type = fileInput.target.files[0].type;
+                this.template.file.format = this.template.file.name.split('.').pop();
             }
 
-            var reader = new FileReader();
-            reader.readAsDataURL(fileInput.target.files[0]);
+            reader.readAsArrayBuffer(fileInput.target.files[0]);
 
-            reader.onload = function (value: any) {
-                window['angularTemplateComponent'].componentAfterUpload(value.target.result);
+            reader.onload = (value: any) => {
+                if (this.template.target === 'acknowledgementReceipt') {
+                    this.template.file.paper.content = this.getBase64Document(value.target.result);
+                } else {
+                    this.template.file.content = this.getBase64Document(value.target.result);
+                }
+
+                this.getViewTemplateFile();
             };
         }
     }
 
-    processAfterUpload(b64Content: any) {
-        this.zone.run(() => this.resfreshUpload(b64Content));
+    isExtensionAllowed(file: any) {
+        const fileExtension = file.name.toLowerCase().split('.').pop();
+
+        if (this.allowedExtensions.filter(ext => ext.toLowerCase() === fileExtension.toLowerCase()).length === 0) {
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.notAllowedExtension + ' !', msg: this.lang.file + ' : <b>' + file.name + '</b>, ' + this.lang.type + ' : <b>' + file.type + '</b><br/><br/><u>' + this.lang.allowedExtensions + '</u> : <br/>' + this.allowedExtensions.filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
+            return false;
+        } else {
+            return true;
+        }
     }
 
-    resfreshUpload(b64Content: any) {
-        this.template.uploadedFile.base64 = b64Content.replace(/^data:.*?;base64,/, "");
-        this.template.template_style = 'uploadFile';
-        this.fileImported();
-    }
-
-    startJnlp() {
-        if (this.creationMode || (this.template.template_file_name == null && this.template.template_path == null)) {
-            this.jnlpValue.objectType = 'templateCreation';
-            for (let element of this.defaultTemplatesList) {
-                if (this.template.template_style == element.fileExt + ': ' + element.fileName) {
-                    this.jnlpValue.objectId = element.filePath;
+    editFile() {
+        const editorOptions: any = {};
+        editorOptions.docUrl = `rest/onlyOffice/mergedFile`;
+        if (this.creationMode) {
+            if (this.template.target !== 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.content;
+                    editorOptions.extension = this.template.file.format;
+                } else {
+                    editorOptions.objectType = 'templateCreation';
+                    for (const element of this.defaultTemplatesList) {
+                        if (this.selectedModelFile === element.fileExt + ': ' + element.fileName) {
+                            editorOptions.objectId = element.filePath;
+                        }
+                    }
+                    editorOptions.extension = editorOptions.objectId.toLowerCase().split('.').pop();
+                }
+            } else if (this.template.target === 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.paper.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.paper.content;
+                    editorOptions.extension = this.template.file.paper.format;
+                } else {
+                    editorOptions.objectType = 'templateCreation';
+                    for (const element of this.defaultTemplatesList) {
+                        if (this.selectedModelFile === element.fileExt + ': ' + element.fileName) {
+                            editorOptions.objectId = element.filePath;
+                        }
+                    }
+                    editorOptions.extension = editorOptions.objectId.toLowerCase().split('.').pop();
                 }
             }
         } else {
-            this.jnlpValue.objectType = 'templateModification';
-            this.jnlpValue.objectId = this.template.template_id;
+            if (this.template.target !== 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.content;
+                    editorOptions.extension = this.template.file.format;
+                } else {
+                    editorOptions.objectType = 'templateModification';
+                    editorOptions.objectId = this.template.id;
+                    editorOptions.extension = this.template.file.name.toLowerCase().split('.').pop();
+                }
+            } else if (this.template.target === 'acknowledgementReceipt') {
+                if (!this.functionsService.empty(this.template.file.paper.content)) {
+                    editorOptions.objectType = 'encodedResource';
+                    editorOptions.objectId = this.template.file.paper.content;
+                    editorOptions.extension = this.template.file.paper.format;
+                } else {
+                    editorOptions.objectType = 'templateModification';
+                    editorOptions.objectId = this.template.id;
+                    editorOptions.extension = this.template.file.paper.name.toLowerCase().split('.').pop();
+                }
+            }
         }
-        this.jnlpValue.table = 'templates';
-        this.jnlpValue.uniqueId = 0;
-        this.jnlpValue.cookies = document.cookie;
 
-        this.http.post('../../rest/jnlp', this.jnlpValue)
-            .subscribe((data: any) => {
-                this.template.jnlpUniqueId = data.jnlpUniqueId;
-                this.fileToImport();
-                window.location.href = '../../rest/jnlp/' + data.generatedJnlp;
-                this.checkLockFile();
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
+        if (this.headerService.user.preferences.documentEdition === 'java') {
+            this.launchJavaEditor(editorOptions);
+        } else if (this.headerService.user.preferences.documentEdition === 'onlyoffice') {
+            this.launchOOEditor(editorOptions);
+        }
     }
 
-    checkLockFile() {
+    launchJavaEditor(params: any) {
+        this.http.post('../../rest/jnlp', params).pipe(
+            tap((data: any) => {
+                window.location.href = '../../rest/jnlp/' + data.generatedJnlp;
+                this.checkLockFile(data.jnlpUniqueId, params.extension);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    launchOOEditor(params: any) {
+        this.dialogRef = this.dialog.open(
+            TemplateFileEditorModalComponent,
+            {
+                autoFocus: false,
+                panelClass: 'maarch-full-height-modal',
+                minWidth: '80%',
+                disableClose: true,
+                data: {
+                    title: this.template.template_style,
+                    editorOptions: params,
+                    file: { format: params.extension }
+                }
+            }
+        );
+        this.dialogRef.afterClosed().pipe(
+            filter((data: string) => !this.functionsService.empty(data)),
+            tap((data: any) => {
+                if (this.template.target === 'acknowledgementReceipt') {
+                    this.template.file.paper.name = this.selectedModelFile;
+                    this.template.file.paper.format = params.extension;
+                    this.template.file.paper.content = data.content;
+                } else {
+                    this.template.file.name = this.selectedModelFile;
+                    this.template.file.format = params.extension;
+                    this.template.file.content = data.content;
+                }
+                this.getViewTemplateFile();
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getViewTemplateFile() {
+        this.http.post('../../rest/convertedFile/encodedFile', { encodedFile: this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.content : this.template.file.content, format: this.template.target === 'acknowledgementReceipt' ? this.template.file.paper.format : this.template.file.format }).pipe(
+            tap((data: any) => {
+                this.templateDocView = this.sanitizer.bypassSecurityTrustResourceUrl('data:application/pdf;base64,' + data.encodedResource);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    checkLockFile(id: string, extension: string) {
         this.intervalLockFile = setInterval(() => {
-            this.http.get('../../rest/jnlp/lock/' + this.template.jnlpUniqueId)
-                .subscribe((data: any) => {
+            this.http.get('../../rest/jnlp/lock/' + id).pipe(
+                tap((data: any) => {
                     this.lockFound = data.lockFileFound;
                     if (!this.lockFound) {
                         clearInterval(this.intervalLockFile);
+                        this.loadTmpFile(`${data.fileTrunk}.${extension}`);
                     }
-                });
-        }, 1000)
+                })
+            ).subscribe();
+        }, 1000);
+    }
+
+    loadTmpFile(filenameOnTmp: string) {
+        this.http.get(`../../rest/convertedFile/${filenameOnTmp}?convert=true`).pipe(
+            tap((data: any) => {
+                if (this.template.target === 'acknowledgementReceipt') {
+                    this.template.file.paper.name = this.selectedModelFile;
+                    this.template.file.paper.format = filenameOnTmp.toLowerCase().split('.').pop();
+                    this.template.file.paper.content = data.encodedResource;
+                } else {
+                    this.template.file.name = this.selectedModelFile;
+                    this.template.file.format = filenameOnTmp.toLowerCase().split('.').pop();
+                    this.template.file.content = data.encodedResource;
+                }
+                this.templateDocView = data.encodedConvertedResource;
+            })
+        ).subscribe();
     }
 
     duplicateTemplate() {
-        if (!this.lockFound && this.template.template_target != 'acknowledgementReceipt') {
-            let r = confirm(this.lang.confirmDuplicate);
+        if (!this.lockFound && this.template.target !== 'acknowledgementReceipt') {
+            const r = confirm(this.lang.confirmDuplicate);
 
             if (r) {
-                this.http.post('../../rest/templates/' + this.template.template_id + '/duplicate', { 'id': this.template.template_id })
+                this.http.post('../../rest/templates/' + this.template.id + '/duplicate', { 'id': this.template.id })
                     .subscribe((data: any) => {
                         this.notify.success(this.lang.templateDuplicated);
                         this.router.navigate(['/administration/templates/' + data.id]);
@@ -286,135 +492,173 @@ export class TemplateAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        this.template.entities = $j('#jstree').jstree(true).get_checked();
-        if (this.template.template_target != 'notifications') {
-            this.template.template_datasource = 'letterbox_attachment';
-        }
 
-        if (this.template.template_type == 'HTML') {
+        /*
+        if (this.template.type === 'HTML') {
             this.template.template_content = tinymce.get('templateHtml').getContent();
 
-        } else if (this.template.template_type == 'OFFICE_HTML') {
+        } else if (this.template.type === 'OFFICE_HTML') {
             this.template.template_content = tinymce.get('templateOfficeHtml').getContent();
+        }*/
+
+        if (this.isValidTemplate()) {
+            if (this.creationMode) {
+                this.http.post('../../rest/templates', this.formatTemplate()).pipe(
+                    tap((data: any) => {
+                        if (data.checkEntities) {
+                            this.config = {
+                                panelClass: 'maarch-modal',
+                                data: {
+                                    entitiesList: data.checkEntities,
+                                    template_attachment_type: this.template.template_attachment_type
+                                }
+                            };
+                            this.dialog.open(TemplateAdministrationCheckEntitiesModalComponent, this.config);
+                        } else {
+                            this.router.navigate(['/administration/templates']);
+                            this.notify.success(this.lang.templateAdded);
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else {
+                this.http.put('../../rest/templates/' + this.template.id, this.formatTemplate()).pipe(
+                    tap((data: any) => {
+                        if (!this.functionsService.empty(data) && data.checkEntities) {
+                            this.config = {
+                                panelClass: 'maarch-modal',
+                                data: {
+                                    entitiesList: data.checkEntities,
+                                    template_attachment_type: this.template.template_attachment_type
+                                }
+                            };
+                            this.dialogRef = this.dialog.open(TemplateAdministrationCheckEntitiesModalComponent, this.config);
+                        } else {
+                            this.router.navigate(['/administration/templates']);
+                            this.notify.success(this.lang.templateUpdated);
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
         }
 
-        if (this.template.template_target == 'acknowledgementReceipt') {
-            if (this.template.template_content == '' && (!this.template.template_style || (this.template.template_style && !this.template.jnlpUniqueId && !this.template.uploadedFile && !this.template.template_file_name))) {
-                alert(this.lang.mustCompleteAR);
-                return;
-            }
-        } else if (this.template.template_target != 'acknowledgementReceipt' && this.template.template_type == 'OFFICE') {
-            if (!this.template.template_style || (this.template.template_style && !this.template.jnlpUniqueId && !this.template.template_file_name && !this.template.uploadedFile)) {
-                alert(this.lang.editModelFirst);
-                return;
-            }
-        }
-        
-        if (this.creationMode) {
-            if (this.template.template_style == 'uploadFile') {
-                this.template.template_style = '';
-            }
-            this.http.post('../../rest/templates', this.template)
-                .subscribe((data: any) => {
-                    if (data.checkEntities) {
-                        this.config = {
-                            panelClass: 'maarch-modal',
-                            data: {
-                                entitiesList: data.checkEntities,
-                                template_attachment_type: this.template.template_attachment_type
-                            }
-                        };
-                        this.dialogRef = this.dialog.open(TemplateAdministrationCheckEntitiesModalComponent, this.config);
-                    } else {
-                        this.router.navigate(['/administration/templates']);
-                        this.notify.success(this.lang.templateAdded);
-                    }
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        } else {
-            if (this.template.template_style == 'uploadFile') {
-                this.template.template_style = '';
-            }
-            this.http.put('../../rest/templates/' + this.template.template_id, this.template)
-                .subscribe((data: any) => {
-                    if (data.checkEntities) {
-                        this.config = {
-                            panelClass: 'maarch-modal',
-                            data: {
-                                entitiesList: data.checkEntities,
-                                template_attachment_type: this.template.template_attachment_type
-                            }
-                        };
-                        this.dialogRef = this.dialog.open(TemplateAdministrationCheckEntitiesModalComponent, this.config);
-                    } else {
-                        this.router.navigate(['/administration/templates']);
-                        this.notify.success(this.lang.templateUpdated);
-                    }
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
     }
 
-    checkArMode() {
-        if (this.template.template_content == '' && !this.template.template_style && this.template.target === 'acknowledgementReceipt') {
+    formatTemplate() {
+        const template = { ...this.template };
+        template.entities = $j('#jstree').jstree('get_checked', null, true);
+        return template;
+    }
+
+    isValidTemplate() {
+        if (this.template.target === 'acknowledgementReceipt' && this.functionsService.empty(this.template.file.paper.name) && this.functionsService.empty(this.template.file.electronic.content)) {
             alert(this.lang.mustCompleteAR);
-            return true;
-        } else {
             return false;
+
+        } else if (this.template.target !== 'acknowledgementReceipt' && this.template.type === 'OFFICE' && this.functionsService.empty(this.template.file.name)) {
+            alert(this.lang.editModelFirst);
+            return false;
+        } else {
+            return true;
         }
     }
 
     displayDatasources(datasource: any) {
-        if (datasource.target == 'notification' && this.template.template_target == 'notifications') {
+        if (datasource.target === 'notification' && this.template.target === 'notifications') {
             return true;
-        } else if (datasource.target == 'document' && this.template.template_target != 'notifications') {
+        } else if (datasource.target === 'document' && this.template.target !== 'notifications') {
             return true;
         }
         return false;
     }
 
     updateTemplateType() {
-        if (this.template.template_target == 'attachments' || this.template.template_target == 'indexingFile') {
-            this.template.template_type = 'OFFICE';
-        } else if (this.template.template_target == 'notifications' || this.template.template_target == 'doctypes' || this.template.template_target == 'sendmail') {
-            this.template.template_type = 'HTML';
+        this.template.file = {
+            name: '',
+            type: '',
+            content: ''
+        };
+
+        this.templateDocView = null;
+        if (['attachments', 'indexingFile'].indexOf(this.template.target) > -1) {
+            this.template.type = 'OFFICE';
+            this.availableTypes = ['OFFICE'];
+        } else if (['notifications', 'sendmail'].indexOf(this.template.target) > -1) {
+            this.template.type = 'HTML';
+            this.availableTypes = ['HTML', 'TXT'];
             this.initMce('textarea#templateHtml');
-        } else if (this.template.template_target == 'notes') {
-            this.template.template_type = 'TXT';
-        } else if (this.template.template_target == 'acknowledgementReceipt') {
-            this.template.template_type = 'OFFICE_HTML';
+        } else if (this.template.target === 'notes') {
+            this.template.type = 'TXT';
+            this.availableTypes = ['TXT'];
+        } else if (this.template.target === 'acknowledgementReceipt') {
+            this.template.file = {
+                electronic: {
+                    name: '',
+                    type: '',
+                    content: ''
+                },
+                paper: {
+                    name: '',
+                    type: '',
+                    content: ''
+                }
+            };
+            this.template.type = 'OFFICE_HTML';
+            this.availableTypes = [];
             this.template.template_attachment_type = '';
             this.initMce('textarea#templateOfficeHtml');
         }
     }
 
-    fileImported() {
-        this.buttonFileName = this.template.uploadedFile.name;
+    changeType(ev: any) {
+        if (ev.value === 'HTML') {
+            this.initMce('textarea#templateHtml');
+        } else {
+            tinymce.remove('textarea');
+        }
+        this.template.type = ev.value;
     }
 
-    fileToImport() {
-        this.buttonFileName = this.lang.importFile;
-    }
-
-    resetFileUploaded() {
-        this.fileToImport();
-        this.template.uploadedFile = null;
+    changeModel() {
+        this.template.file = {
+            name: '',
+            type: '',
+            content: ''
+        };
+        
+        this.template.file = {
+            electronic: {
+                name: '',
+                type: '',
+                content: ''
+            }
+        };
     }
 
     loadTab(event: any) {
         if (event.index === 0) {
             this.initMce('textarea#templateOfficeHtml');
         } else {
+            tinymce.remove('textarea');
             if (this.template.template_file_name == null && this.template.template_style == null) {
                 this.buttonFileName = this.lang.importFile;
             }
         }
     }
+
+    ngOnDestroy() {
+        tinymce.remove('textarea');
+    }
 }
 @Component({
-    templateUrl: "template-administration-checkEntities-modal.component.html",
+    templateUrl: 'template-administration-checkEntities-modal.component.html',
     styleUrls: ['template-administration-checkEntities-modal.scss']
 })
 export class TemplateAdministrationCheckEntitiesModalComponent {
@@ -422,7 +666,4 @@ export class TemplateAdministrationCheckEntitiesModalComponent {
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TemplateAdministrationCheckEntitiesModalComponent>) {
     }
-
-    ngOnInit(): void { }
-
 }
