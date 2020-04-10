@@ -462,6 +462,7 @@ $app->delete('/tags/{tagId}/link/{id}', \Tag\controllers\TagController::class . 
 $app->get('/templates', \Template\controllers\TemplateController::class . ':get');
 $app->post('/templates', \Template\controllers\TemplateController::class . ':create');
 $app->get('/templates/{id}/details', \Template\controllers\TemplateController::class . ':getDetailledById');
+$app->get('/templates/{id}/content', \Template\controllers\TemplateController::class . ':getContentById');
 $app->put('/templates/{id}', \Template\controllers\TemplateController::class . ':update');
 $app->delete('/templates/{id}', \Template\controllers\TemplateController::class . ':delete');
 $app->post('/templates/{id}/duplicate', \Template\controllers\TemplateController::class . ':duplicate');
