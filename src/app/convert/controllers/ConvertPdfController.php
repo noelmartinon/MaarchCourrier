@@ -166,7 +166,9 @@ class ConvertPdfController
             return ['errors' => '[ConvertPdf]  Conversion failed ! '. implode(" ", $convertedFile['output'])];
         }
 
-        unlink("{$tmpPath}{$tmpFilename}");
+        if (is_file("{$tmpPath}{$tmpFilename}.{$aArgs['extension']}")) {
+            unlink("{$tmpPath}{$tmpFilename}.{$aArgs['extension']}");
+        }
 
         $resource = file_get_contents("{$tmpPath}{$tmpFilename}.pdf");
 
