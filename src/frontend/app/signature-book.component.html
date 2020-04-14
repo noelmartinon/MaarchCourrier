@@ -124,45 +124,45 @@
                 <div *ngIf="signatureBook.attachments[rightSelectedThumbnail] && !showAttachmentPanel" style="height:100%;overflow: auto;">
                     <div [ngStyle]="{'display': showTopRightPanel ? 'block' : 'none'}" class="pjDetails">
                         <div class="infoPj" title="{{signatureBook.attachments[rightSelectedThumbnail].attachment_type}}">
-                            <label>Type : </label>
+                            <label>Type :&nbsp;</label>
                             <span>{{signatureBook.attachments[rightSelectedThumbnail].attachment_type}} <sup *ngIf="signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN'" style="color:#135F7F;">{{lang.signed}}</sup></span>
                         </div>
                         <div class="infoPj" title="{{signatureBook.attachments[rightSelectedThumbnail].title}}">
-                            <label>{{lang.object}} : </label>
+                            <label>{{lang.object}} :&nbsp;</label>
                             <span>{{signatureBook.attachments[rightSelectedThumbnail].title}}</span>
                         </div>
                         <div class="infoPj" title="{{signatureBook.attachments[rightSelectedThumbnail].destUser}}">
-                            <label>{{lang.for}} : </label>
+                            <label>{{lang.for}} :&nbsp;</label>
                             <span>{{signatureBook.attachments[rightSelectedThumbnail].destUser}}</span>
                         </div>
                         <div>
                             <div *ngIf="!signatureBook.attachments[rightSelectedThumbnail].updated_by" title="{{signatureBook.attachments[rightSelectedThumbnail].typist}}" class="infoPj">
-                                <label>{{lang.createdBy}} : </label>
+                                <label>{{lang.createdBy}} :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].typist}}</span>
                             </div>
                             <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].updated_by" title="{{lang.modifiedBy}} : {{signatureBook.attachments[rightSelectedThumbnail].updated_by}} le {{signatureBook.attachments[rightSelectedThumbnail].doc_date | date:'dd/MM/y'}}" class="infoPj">
-                                <label><i>*</i> {{lang.createdBy}} : </label>
+                                <label><i>*</i> {{lang.createdBy}} :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].typist}}</span>
                             </div>
                             <div class="infoPj">
-                                <label>{{lang.createdOn}} : </label>
+                                <label>{{lang.createdOn}} :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].creation_date | date:'dd/MM/y à HH:mm'}}</span>
                             </div>
                             <div class="infoPj" title="{{signatureBook.attachments[rightSelectedThumbnail].validation_date | date:'dd/MM/y'}}">
-                                <label>{{lang.back}} : </label>
+                                <label>{{lang.back}} :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].validation_date | date:'dd/MM/y'}}</span>
                             </div>
                             <div class="infoPj" title="{{signatureBook.attachments[rightSelectedThumbnail].identifier}}">
-                                <label>{{lang.chrono}} : </label>
+                                <label>{{lang.chrono}} :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].identifier}}</span>
                             </div>
                             <div class="infoPj">
-                                <label>Version : </label>
+                                <label>Version :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].relation}}</span>
                                 <i [ngStyle]="{'display': signatureBook.attachments[rightSelectedThumbnail].relation > 1 ? '' : 'none'}" style="color:#135F7F" class="fa fa-chevron-circle-up" id="obsVersion" data-tooltip-content="#obsVersionTooltip" aria-hidden="true"></i>
                             </div>
                             <div class="infoPj">
-                                <label>Format : </label>
+                                <label>Format :&nbsp;</label>
                                 <span>{{signatureBook.attachments[rightSelectedThumbnail].format.toUpperCase()}}</span>
                             </div>
                         </div>
@@ -174,6 +174,7 @@
                     <pdf-viewer #rightPanelShowDocumentIframe  id="rightPanelShowDocumentIframe" [src]="rightViewerLink" 
                                         [render-text]="true" [autoresize]="true" [original-size]="false"
                                         [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}" [show-all]="true"
+                                        *ngIf="signatureBook.attachments[rightSelectedThumbnail].isConverted"
                             ></pdf-viewer>
                     <!-- <iframe id="rightPanelShowDocumentIframe" [src]="rightViewerLink | safeUrl" [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}"></iframe> -->
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
