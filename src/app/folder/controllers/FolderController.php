@@ -125,7 +125,7 @@ class FolderController
         $userEntities = EntityModel::getWithUserEntities([
             'select' => ['id'],
             'where'  => ['user_id = ?'],
-            'data'   => [$GLOBALS['id']]
+            'data'   => [$GLOBALS['userId']]
         ]);
         $userEntities = array_column($userEntities, 'id');
 
@@ -276,7 +276,7 @@ class FolderController
             $userEntities = EntityModel::getWithUserEntities([
                 'select' => ['id'],
                 'where'  => ['user_id = ?'],
-                'data'   => [$GLOBALS['id']]
+                'data'   => [$GLOBALS['userId']]
             ]);
             $userEntities = array_column($userEntities, 'id');
 
@@ -563,7 +563,7 @@ class FolderController
         $userEntities = EntityModel::getWithUserEntities([
             'select' => ['id'],
             'where'  => ['user_id = ?'],
-            'data'   => [$GLOBALS['id']]
+            'data'   => [$GLOBALS['userId']]
         ]);
         $userEntities = array_column($userEntities, 'id');
 
@@ -621,9 +621,13 @@ class FolderController
 
     public static function areChildrenInPerimeter(array $args = [])
     {
-        ValidatorModel::notEmpty($args, ['folderId', 'entities']);
+        ValidatorModel::notEmpty($args, ['folderId']);
         ValidatorModel::intVal($args, ['folderId']);
         ValidatorModel::arrayType($args, ['entities']);
+
+        if (empty($args['entities'])) {
+            $args['entities'] = [0];
+        }
 
         $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['folderId'], 'edition' => true]);
         if (empty($folder[0])) {
