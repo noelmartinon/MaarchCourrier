@@ -217,6 +217,10 @@ export class FollowedDocumentListComponent implements OnInit {
         this.router.navigate([`/resources/${row.resId}`]);
     }
 
+    goToFolder(folder: any) {
+        this.router.navigate([`/folders/${folder.id}`]);
+    }
+
     togglePanel(mode: string, row: any) {
         let thisSelect = { checked: true };
         let thisDeselect = { checked: false };
