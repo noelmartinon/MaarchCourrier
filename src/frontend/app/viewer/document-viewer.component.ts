@@ -131,7 +131,8 @@ export class DocumentViewerComponent implements OnInit {
 
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
-    @ViewChild('docToUpload', { static: false }) docToUpload: ElementRef<HTMLInputElement>;
+
+    docToUploadValue: any;
 
     constructor(
         public http: HttpClient,
@@ -443,7 +444,7 @@ export class DocumentViewerComponent implements OnInit {
                     content: null,
                     src: null
                 };
-                this.docToUpload.nativeElement.value = "";
+                this.docToUploadValue = "";
                 this.triggerEvent.emit('cleanFile');
             }),
             catchError((err: any) => {
