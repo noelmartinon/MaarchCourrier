@@ -689,7 +689,7 @@ class AutoCompleteController
         }
     }
 
-    private static function getDataForRequest(array $aArgs)
+    public static function getDataForRequest(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['search', 'fields', 'where', 'data', 'fieldsNumber']);
         ValidatorModel::stringType($aArgs, ['search', 'fields']);
