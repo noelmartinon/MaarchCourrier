@@ -85,6 +85,7 @@ class ActionMethodController
                     'recordId'  => $resource,
                     'eventType' => 'ACTION#' . $aArgs['id'],
                     'eventId'   => $aArgs['id'],
+                    'moduleId'  => 'res',
                     'info'      => "{$aArgs['basketName']} : {$action['label_action']}{$aArgs['history']}"
                 ]);
 
