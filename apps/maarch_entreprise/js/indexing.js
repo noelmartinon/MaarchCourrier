@@ -749,17 +749,23 @@ function change_category(cat_id, display_value_tr, path_manage_script,get_js_scr
     }
 
     if(cat_id == 'attachment'){ // only qualification page
-        document.getElementById("attachment_tr").style.display='table-row';
-        document.getElementById("attach_show").style.display='display';
+        if (document.getElementById("attachment_tr") !== null) {
+            document.getElementById("attachment_tr").style.display='table-row';
+        }
+        if (document.getElementById("attach_show") !== null) {
+            document.getElementById("attach_show").style.display='display';
+        }
         $j('#attach_reconciliation').click();
 
         document.getElementById("subject_tr").style.display = 'none';
         document.getElementById("diff_list_tr").style.display = 'none';
     }else{
-        if($j('#attach_reconciliation').length > 0){ // qualification page
-            document.getElementById("attachment_tr").style.display='none';
-        } else { // indexing page
-            document.getElementById("attachment_tr").style.display='table-row';
+        if (document.getElementById("attachment_tr") !== null) {
+            if($j('#attach_reconciliation').length > 0){ // qualification page
+                document.getElementById("attachment_tr").style.display='none';
+            } else { // indexing page
+                document.getElementById("attachment_tr").style.display='table-row';
+            }
         }
         $j('#no_attach').click();
         
