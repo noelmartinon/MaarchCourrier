@@ -14,7 +14,6 @@
 
 namespace Convert\controllers;
 
-
 use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -188,7 +187,7 @@ class ConvertPdfController
         return $convertedDocument;
     }
 
-    private static function canConvert(array $args)
+    public static function canConvert(array $args)
     {
         ValidatorModel::notEmpty($args, ['extension']);
         ValidatorModel::stringType($args, ['extension']);
@@ -206,7 +205,8 @@ class ConvertPdfController
         return $canConvert;
     }
 
-    public static function addBom($filePath) {
+    public static function addBom($filePath)
+    {
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
         if (strtolower($extension) == strtolower('txt')) {
             $content = file_get_contents($filePath);
