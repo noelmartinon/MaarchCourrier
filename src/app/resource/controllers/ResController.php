@@ -365,7 +365,7 @@ class ResController extends ResourceControlController
                 'recordId'  => $document['res_id'],
                 'eventType' => 'UP',
                 'info'      => $data['historyMessage'],
-                'moduleId'  => 'apps',
+                'moduleId'  => 'res',
                 'eventId'   => 'resup',
             ]);
         }

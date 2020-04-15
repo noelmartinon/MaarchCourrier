@@ -125,6 +125,7 @@ class ActionMethodController
                     'eventType' => 'ACTION#' . $args['id'],
                     'moduleId'  => 'resource',
                     'eventId'   => $args['id'],
+                    'moduleId'  => 'res',
                     'info'      => $info
                 ]);
 
