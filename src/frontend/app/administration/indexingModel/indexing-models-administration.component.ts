@@ -100,7 +100,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
                 filter((data: string) => data === 'ok'),
                 exhaustMap(() => this.http.delete('../../rest/indexingModels/' + indexingModel.id)),
                 tap(() => {
-                    for (let i in this.indexingModels) {
+                    for (const i in this.indexingModels) {
                         if (this.indexingModels[i].id == indexingModel.id) {
                             this.indexingModels.splice(Number(i), 1);
                         }
@@ -112,6 +112,11 @@ export class IndexingModelsAdministrationComponent implements OnInit {
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
+                    if (err.error.errors === 'Model is used by at least one resource') {
+                        this.notify.error(this.lang.modelUsedByResources);
+                    } else {
+                        this.notify.handleSoftErrors(err);
+                    }
                     return of(false);
                 })
             ).subscribe();
