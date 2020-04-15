@@ -110,7 +110,7 @@ abstract class ContactModelAbstract
 
     public static function createAddress(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['contactId', 'contactPurposeId', 'userId', 'entityId', 'isPrivate', 'email']);
+        ValidatorModel::notEmpty($aArgs, ['contactId', 'contactPurposeId', 'userId', 'entityId', 'isPrivate']);
         ValidatorModel::intVal($aArgs, ['contactId', 'contactPurposeId']);
         ValidatorModel::stringType($aArgs, [
             'departement', 'addressFirstname', 'addressLastname', 'addressTitle', 'addressFunction', 'occupancy', 'addressNum', 'addressStreet', 'addressComplement',

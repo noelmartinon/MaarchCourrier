@@ -189,7 +189,7 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'society_short', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
         foreach ($fields as $key => $field) {
             $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
             $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
@@ -211,7 +211,7 @@ class AutoCompleteController
                         $isIncluded = true;
                     }
                 }
-                for ($i = 0; $i < 9; $i++) {
+                for ($i = 0; $i < 10; $i++) {
                     $requestData[] = ($isIncluded ? "%{$item}" : "%{$item}%");
                 }
             }

@@ -45,7 +45,6 @@ class ContactController
         $check = Validator::intVal()->notEmpty()->validate($data['contactType']);
         $check = $check && Validator::intVal()->notEmpty()->validate($data['contactPurposeId']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['isCorporatePerson']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['email']);
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
@@ -78,9 +77,11 @@ class ContactController
             $data['isPrivate'] = 'Y';
         }
 
-        $contact = ContactModel::getByEmail(['email' => $data['email'], 'select' => ['contacts_v2.contact_id', 'contact_addresses.id']]);
-        if (!empty($contact['id'])) {
-            return $response->withJson(['contactId' => $contact['contact_id'], 'addressId' => $contact['id']]);
+        if (!empty($data['email'])) {
+            $contact = ContactModel::getByEmail(['email' => $data['email'], 'select' => ['contacts_v2.contact_id', 'contact_addresses.id']]);
+            if (!empty($contact['id'])) {
+                return $response->withJson(['contactId' => $contact['contact_id'], 'addressId' => $contact['id']]);
+            }
         }
 
         $contactId = ContactModel::create($data);
@@ -114,7 +115,6 @@ class ContactController
         $data = $request->getParams();
 
         $check = Validator::intVal()->notEmpty()->validate($data['contactPurposeId']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['email']);
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }

@@ -168,6 +168,7 @@ export class BasketListComponent implements OnInit {
                 takeUntil(this.destroy$),
                 startWith({}),
                 switchMap(() => {
+                    this.data = [];
                     this.isLoadingResults = true;
                     return this.resultListDatabase!.getRepoIssues(
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters(), this.paginator.pageSize);

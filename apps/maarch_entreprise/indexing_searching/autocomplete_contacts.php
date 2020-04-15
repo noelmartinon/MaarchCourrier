@@ -48,7 +48,7 @@ if (is_array($multi_sessions_address_id) && count($multi_sessions_address_id) > 
 
 $searchItems = explode(' ', $_REQUEST['Input']);
 
-$fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+$fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'society_short', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
 foreach ($fields as $key => $field) {
     $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
     $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
@@ -61,8 +61,17 @@ $requestData = [];
 foreach ($searchItems as $item) {
     if (strlen($item) >= 2) {
         $where[] = $fields;
-        for ($i = 0; $i < 9; $i++) {
-            $requestData[] = "%{$item}%";
+        $isIncluded = false;
+        foreach ($searchItems as $key => $value) {
+            if ($keyItem == $key) {
+                continue;
+            }
+            if (strpos($value, $item) === 0) {
+                $isIncluded = true;
+            }
+        }
+        for ($i = 0; $i < 10; $i++) {
+            $requestData[] = ($isIncluded ? "%{$item}" : "%{$item}%");
         }
     }
 }

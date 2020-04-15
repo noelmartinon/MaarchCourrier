@@ -323,7 +323,7 @@ DO $$ BEGIN
     UPDATE res_letterbox set sve_start_date =
     (
       SELECT sve_start_date FROM mlb_coll_ext
-      WHERE res_letterbox.res_id = mlb_coll_ext.res_id
+      WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND sve_start_date is not null
     );
     ALTER TABLE mlb_coll_ext DROP COLUMN IF EXISTS sve_start_date;
   END IF;
