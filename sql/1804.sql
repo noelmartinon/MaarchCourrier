@@ -675,13 +675,22 @@ DO $$ BEGIN
     SELECT users.id, usergroups.id, groupbasket.basket_id, TRUE FROM users, usergroups, groupbasket, usergroup_content
     WHERE usergroup_content.primary_group = 'Y' AND groupbasket.group_id = usergroup_content.group_id AND users.user_id = usergroup_content.user_id AND usergroups.group_id = usergroup_content.group_id
     ORDER BY users.id;
-    INSERT INTO users_baskets_preferences (user_serial_id, group_serial_id, basket_id, display)
-    SELECT users.id, usergroups.id, user_baskets_secondary.basket_id, TRUE from users, usergroups, user_baskets_secondary
-    WHERE users.user_id = user_baskets_secondary.user_id and usergroups.group_id = user_baskets_secondary.group_id
-    ORDER BY users.id;
-    INSERT INTO users_baskets_preferences (user_serial_id, group_serial_id, basket_id, display) 
-    SELECT u.id, g.id, 'IndexingBasket', TRUE FROM users as u INNER JOIN usergroup_content AS c ON u.user_id=c.user_id INNER JOIN usergroups AS g ON g.group_id=c.group_id 
-    WHERE (u.user_id,g.group_id) IN (SELECT user_id, group_id FROM usergroup_content WHERE primary_group = 'N');
+
+    BEGIN
+      INSERT INTO users_baskets_preferences (user_serial_id, group_serial_id, basket_id, display)
+      SELECT users.id, usergroups.id, user_baskets_secondary.basket_id, TRUE from users, usergroups, user_baskets_secondary
+      WHERE users.user_id = user_baskets_secondary.user_id and usergroups.group_id = user_baskets_secondary.group_id
+      ORDER BY users.id;
+    EXCEPTION WHEN unique_violation THEN
+    END;
+
+    BEGIN
+      INSERT INTO users_baskets_preferences (user_serial_id, group_serial_id, basket_id, display) 
+      SELECT u.id, g.id, 'IndexingBasket', TRUE FROM users as u INNER JOIN usergroup_content AS c ON u.user_id=c.user_id INNER JOIN usergroups AS g ON g.group_id=c.group_id 
+      WHERE (u.user_id,g.group_id) IN (SELECT user_id, group_id FROM usergroup_content WHERE primary_group = 'N');
+    EXCEPTION WHEN unique_violation THEN
+    END;
+
     DROP TABLE IF EXISTS user_baskets_secondary;
   END IF;
 END$$;
@@ -780,7 +789,7 @@ UPDATE notifications SET event_id = 'baskets' WHERE notification_id = 'BASKETS';
 DELETE FROM parameters where id = 'user_quota';
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('user_quota', '', 0, NULL);
 DELETE FROM parameters where id = 'database_version';
-INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '18.04.10', NULL, NULL);
+INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '18.04.17', NULL, NULL);
 
 INSERT INTO templates_doctype_ext SELECT null, d.type_id, 'N' FROM doctypes d LEFT JOIN templates_doctype_ext tde ON d.type_id = tde.type_id WHERE tde.type_id IS NULL;
 
