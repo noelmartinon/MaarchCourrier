@@ -58,15 +58,17 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
     $query.= "LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')))";
     $query.= "OR (LOWER(translate(society,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))";
     $query.= "LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')))";
+    $query.= "OR (LOWER(translate(society_short,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr'))";
+    $query.= "LIKE LOWER(translate(?,'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ','aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')))";
     $query.= "ORDER BY lastname,firstname ASC";
-    $arrayPDO = array('%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%');
+    $arrayPDO = array('%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%');
     $stmt = $db->query($query, $arrayPDO);
     $nb_step1 = $stmt->rowCount();
-    
+
     $m = 30;
     if ($nb_step1 >= $m) $l = $m;
     else $l = $nb_step1;
-    
+
     $found = false;
 
     for ($i=0; $i<$l; $i++) {
@@ -77,7 +79,7 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
         if(!empty($res->society)){
             if($res->firstname == null && $res->lastname == null){
                 $arr_contact_info = array($res->firstname,$res->lastname,$res->society);
-                $isSociety = true;               
+                $isSociety = true;
             } else {
                 $arr_contact_info = array($res->firstname,$res->lastname,'('.$res->society.')');
                 $contact_info = implode(' ', $arr_contact_info);
@@ -106,11 +108,11 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
     $arrayPDO = array('%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%');
     $stmt = $db->query($query, $arrayPDO);
     $nb_step3 = $stmt->rowCount();
-    
+
     $m = 30;
     if ($nb_step3 >= $m) $l = $m;
     else $l = $nb_step3;
-    
+
     $found = false;
 
     for ($i=0; $i<$l; $i++) {
@@ -138,15 +140,15 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
     $arrayPDO = array('%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%');
     $stmt = $db->query($query, $arrayPDO);
     $nb_step4 = $stmt->rowCount();
-    
+
     $m = 30;
     if ($nb_step4 >= $m) $l = $m;
     else $l = $nb_step4;
-    
+
     $found = false;
 
     for ($i=0; $i<$l; $i++) {
-     
+
         $res = $stmt->fetchObject();
 
         if ($i%2==1) $color = 'LightYellow';
@@ -164,11 +166,11 @@ echo "<ul id=\"autocomplete_contacts_ul\">";
     $arrayPDO = array('%'.$_REQUEST['what'].'%','%'.$_REQUEST['what'].'%');
     $stmt = $db->query($query, $arrayPDO);
     $nb_step5 = $stmt->rowCount();
-    
+
     $m = 30;
     if ($nb_step5 >= $m) $l = $m;
     else $l = $nb_step5;
-    
+
     $found = false;
 
     for ($i=0; $i<$l; $i++) {
