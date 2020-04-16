@@ -263,7 +263,7 @@ if ($configRemoteSignatoryBook['id'] == 'ixbus') {
 } elseif ($configRemoteSignatoryBook['id'] == 'maarchParapheur') {
     $retrievedMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
 } elseif ($configRemoteSignatoryBook['id'] == 'xParaph') {
-    $retrievedMails = \ExternalSignatoryBook\controllers\XParaphController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\XParaphController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'versions' => ['noVersion', 'isVersion', 'noVersionOutgoing', 'isVersionOutgoing']]);
 }
 
 $GLOBALS['logger']->write('Retrieve mails sent to remote signatory book', 'INFO');
@@ -279,7 +279,7 @@ if (!empty($idsToRetrieve['resLetterbox'])) {
     $idsToRetrieve['isVersion'] = [];
     $idsToRetrieve['noVersionOutgoing'] = [];
     $idsToRetrieve['isVersionOutgoing'] = [];
-    $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve, 'versions' => ['resLetterbox']]);
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'];
 }
 
