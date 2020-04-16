@@ -18,6 +18,7 @@ namespace ExternalSignatoryBook\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Entity\models\ListInstanceModel;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
@@ -27,71 +28,98 @@ class FastParapheurController
 {
     public static function retrieveSignedMails($aArgs)
     {
-        foreach (['noVersion', 'resLetterbox'] as $version) {
-            foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
-                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
-                    <soapenv:Header/>
-                        <soapenv:Body>
-                            <sei:history>
-                                <documentId>' .  $value->external_id . '</documentId>
-                            </sei:history>
-                        </soapenv:Body>
-                </soapenv:Envelope>';
+        $version = $aArgs['version'];
+        foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
+                <soapenv:Header/>
+                    <soapenv:Body>
+                        <sei:history>
+                            <documentId>' .  $value->external_id . '</documentId>
+                        </sei:history>
+                    </soapenv:Body>
+            </soapenv:Envelope>';
 
-                $curlReturn = CurlModel::execSOAP([
-                    'xmlPostString' => $xmlPostString,
-                    'url'           => $aArgs['config']['data']['url'],
-                    'options'       => [
-                        CURLOPT_SSLCERT         => $aArgs['config']['data']['certPath'],
-                        CURLOPT_SSLCERTPASSWD   => $aArgs['config']['data']['certPass'],
-                        CURLOPT_SSLCERTTYPE     => $aArgs['config']['data']['certType']
-                    ]
-                ]);
+            $curlReturn = CurlModel::execSOAP([
+                'xmlPostString' => $xmlPostString,
+                'url'           => $aArgs['config']['data']['url'],
+                'options'       => [
+                    CURLOPT_SSLCERT         => $aArgs['config']['data']['certPath'],
+                    CURLOPT_SSLCERTPASSWD   => $aArgs['config']['data']['certPass'],
+                    CURLOPT_SSLCERTTYPE     => $aArgs['config']['data']['certType']
+                ]
+            ]);
 
-                if ($curlReturn['infos']['http_code'] == 404) {
-                    return ['error' => 'Erreur 404 : ' . $curlReturn['raw']];
+            if ($curlReturn['infos']['http_code'] == 404) {
+                return ['error' => 'Erreur 404 : ' . $curlReturn['raw']];
+            }
+
+            $isError = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
+            if (!empty($isError ->Fault[0]) && !empty($value->res_id_master)) {
+                echo 'PJ n° ' . $resId . ' et document original n° ' . $value->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                continue;
+            } elseif (!empty($isError ->Fault[0])) {
+                echo 'Document principal n° ' . $resId . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                continue;
+            }
+
+            $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->historyResponse->children();
+
+            foreach ($response->return as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+                $state      = (string) $res->stateName;
+                if ($state == $aArgs['config']['data']['validatedState']) {
+                    $response = FastParapheurController::download(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
+                    $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
+                    $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf';
+                    $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = $response['b64FileContent'];
+                    FastParapheurController::processVisaWorkflow(['res_id_master' => $value->res_id_master, 'res_id' => $value->res_id]);
+                    break;
+                } elseif ($state == $aArgs['config']['data']['refusedState']) {
+                    $res = DatabaseModel::select([
+                        'select'    => ['firstname', 'lastname'],
+                        'table'     => ['listinstance', 'users'],
+                        'left_join' => ['listinstance.item_id = users.user_id'],
+                        'where'     => ['res_id = ?', 'item_mode = ?'],
+                        'data'      => [$aArgs['idsToRetrieve'][$version][$resId]->res_id_master, 'sign']
+                    ])[0];
+
+                    $response = FastParapheurController::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
+                    $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
+                    $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $res['lastname'] . ' ' . $res['firstname'] . ' : ' . $response;
+                    break;
+                } else {
+                    $aArgs['idsToRetrieve'][$version][$resId]->status = 'waiting';
                 }
+            }
+        }
+        
+        return $aArgs['idsToRetrieve'];
+    }
 
-                $isError = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-                if (!empty($isError ->Fault[0]) && !empty($value->res_id_master)) {
-                    echo 'PJ n° ' . $resId . ' et document original n° ' . $value->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
-                    continue;
-                } elseif (!empty($isError ->Fault[0])) {
-                    echo 'Document principal n° ' . $resId . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
-                    continue;
-                }
+    public static function processVisaWorkflow($aArgs = [])
+    {
+        $resIdMaster = $aArgs['res_id_master'] ?? $aArgs['res_id'];
 
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->historyResponse->children();
-
-                foreach ($response->return as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
-                    $state      = (string) $res->stateName;
-                    if ($state == $aArgs['config']['data']['validatedState']) {
-                        $response = FastParapheurController::download(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
-                        $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf';
-                        $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = $response['b64FileContent'];
+        $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$resIdMaster, 'FRZ']]);
+        if (count($attachments) < 2) {
+            $visaWorkflow = ListInstanceModel::get([
+                'select'  => ['listinstance_id', 'requested_signature'],
+                'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
+                'data'    => [$resIdMaster, 'VISA_CIRCUIT'],
+                'orderBY' => ['ORDER BY listinstance_id ASC']
+            ]);
+    
+            if (!empty($visaWorkflow)) {
+                foreach ($visaWorkflow as $listInstance) {
+                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                    // Stop to the first signatory user
+                    if ($listInstance['requested_signature']) {
+                        ListInstanceModel::update(['set' => ['signatory' => 'true'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
                         break;
-                    } elseif ($state == $aArgs['config']['data']['refusedState']) {
-                        $res = DatabaseModel::select([
-                            'select'    => ['firstname', 'lastname'],
-                            'table'     => ['listinstance', 'users'],
-                            'left_join' => ['listinstance.item_id = users.user_id'],
-                            'where'     => ['res_id = ?', 'item_mode = ?'],
-                            'data'      => [$aArgs['idsToRetrieve'][$version][$resId]->res_id_master, 'sign']
-                        ])[0];
-
-                        $response = FastParapheurController::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
-                        $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $res['lastname'] . ' ' . $res['firstname'] . ' : ' . $response;
-                        break;
-                    } else {
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'waiting';
                     }
                 }
             }
         }
-        return $aArgs['idsToRetrieve'];
     }
 
     public static function upload($aArgs)
@@ -321,7 +349,8 @@ class FastParapheurController
             'data'      => [$aArgs['resIdMaster']]
         ])[0];
 
-        if (empty($signatory['business_id']) || substr($signatory['business_id'], 0, 3) == 'org') {
+        //Default value
+        if (empty($signatory['business_id']) || substr($signatory['business_id'], 0, 3) == 'org' || substr($signatory['business_id'], 0, 6) == '452392') {
             $signatory['business_id'] = $config['data']['subscriberId'];
         }
 

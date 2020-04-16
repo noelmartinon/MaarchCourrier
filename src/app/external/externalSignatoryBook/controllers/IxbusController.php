@@ -333,27 +333,26 @@ class IxbusController
         if (!empty($sessionId['error'])) {
             return ['error' => $sessionId['error']];
         }
-        foreach (['noVersion', 'resLetterbox'] as $version) {
-            foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                $etatDossier = IxbusController::getEtatDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
-    
-                // Refused
-                if ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatRefused']) {
-                    $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
-                    $notes = IxbusController::getDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
-                    $aArgs['idsToRetrieve'][$version][$resId]->noteContent = (string)$notes->MotifRefus;
-                // Validated
-                } elseif ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatValidated']) {
-                    $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
-                    $signedDocument = IxbusController::getAnnexes(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
-                    $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf'; // format du fichier récupéré
-                    $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = (string)$signedDocument->Fichier;
+        $version = $aArgs['version'];
+        foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            $etatDossier = IxbusController::getEtatDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
 
-                    $notes = IxbusController::getAnnotations(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
-                    $aArgs['idsToRetrieve'][$version][$resId]->noteContent = (string)$notes->Annotation->Texte;
-                } else {
-                    unset($aArgs['idsToRetrieve'][$version][$resId]);
-                }
+            // Refused
+            if ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatRefused']) {
+                $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
+                $notes = IxbusController::getDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
+                $aArgs['idsToRetrieve'][$version][$resId]->noteContent = (string)$notes->MotifRefus;
+            // Validated
+            } elseif ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatValidated']) {
+                $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
+                $signedDocument = IxbusController::getAnnexes(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
+                $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf'; // format du fichier récupéré
+                $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = (string)$signedDocument->Fichier;
+
+                $notes = IxbusController::getAnnotations(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value->external_id]);
+                $aArgs['idsToRetrieve'][$version][$resId]->noteContent = (string)$notes->Annotation->Texte;
+            } else {
+                unset($aArgs['idsToRetrieve'][$version][$resId]);
             }
         }
 
