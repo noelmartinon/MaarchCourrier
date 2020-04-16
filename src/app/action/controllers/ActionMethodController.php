@@ -123,10 +123,9 @@ class ActionMethodController
                     'tableName' => 'res_letterbox',
                     'recordId'  => $resource,
                     'eventType' => 'ACTION#' . $args['id'],
+                    'info'      => $info,
                     'moduleId'  => 'resource',
-                    'eventId'   => $args['id'],
-                    'moduleId'  => 'res',
-                    'info'      => $info
+                    'eventId'   => $args['id']
                 ]);
 
                 MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['userId']]);
