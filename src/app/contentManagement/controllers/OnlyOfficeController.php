@@ -202,9 +202,12 @@ class OnlyOfficeController
         $checkUrl = str_replace('http://', '', $queryParams['url']);
         $checkUrl = str_replace('https://', '', $checkUrl);
         $uri = (string)$loadedXml->onlyoffice->server_uri;
+        $uriPaths = explode('/', $uri, 2);
+        $masterPath = $uriPaths[0];
+        $lastPath = !empty($uriPaths[1]) ? "/{$uriPaths[1]}" : '';
         $port = (string)$loadedXml->onlyoffice->server_port;
 
-        if (strpos($checkUrl, "{$uri}:{$port}/cache/files/") !== 0 && (($port != 80 && $port != 443) || strpos($checkUrl, "{$uri}/cache/files/") !== 0)) {
+        if (strpos($checkUrl, "{$masterPath}:{$port}{$lastPath}/cache/files/") !== 0 && (($port != 80 && $port != 443) || strpos($checkUrl, "{$masterPath}{$lastPath}/cache/files/") !== 0)) {
             return $response->withStatus(400)->withJson(['errors' => 'Query params url is not allowed']);
         }
 
