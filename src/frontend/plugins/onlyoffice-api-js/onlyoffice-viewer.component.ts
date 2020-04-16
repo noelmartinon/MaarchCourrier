@@ -170,9 +170,16 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             this.http.get(`../../rest/onlyOffice/configuration`).pipe(
                 tap((data: any) => {
                     if (data.enabled) {
+
+                        const serverUriArr = data.serverUri.split('/');
                         const protocol = data.serverSsl ? 'https://' : 'http://';
+                        const domain = data.serverUri.split('/')[0];
+                        const path = serverUriArr.slice(1).join('/');
                         const port = data.serverPort ? `:${data.serverPort}` : ':80';
-                        this.onlyOfficeUrl = `${protocol}${data.serverUri}${port}`;
+
+                        const serverUri = [domain + port, path].join('/');
+
+                        this.onlyOfficeUrl = `${protocol}${serverUri}`;
                         this.appUrl = data.coreUrl;
                         resolve(true);
                     } else {
