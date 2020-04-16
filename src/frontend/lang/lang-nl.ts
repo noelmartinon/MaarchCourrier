@@ -1651,4 +1651,5 @@ export const LANG_NL = {
     "reconcileMsg2": "If an <b>outgoing mail</b> is selected, only the <b>last mail</b> will be converted into signed version. The others will be <b>removed</b> !", //_TO_TRANSLATE
     "selectMailToReconcile": "Please, select a mail to reconcile", //_TO_TRANSLATE
     "modelUsedByResources": "This model is used by resources, you can't delete it.", //_TO_TRANSLATE
+    "cantEditFileWithJava": "You can't edit with the java applet an uploaded document." //_TO_TRANSLATE
 };

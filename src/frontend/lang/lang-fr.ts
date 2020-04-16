@@ -220,6 +220,7 @@ export const LANG_FR = {
     "cannotMergeTags":                             "Ce mot-clé possède un parent ou des enfants : impossible de le fusionner avec un autre mot-clé.",
     "canNotSendAr":                                "accusé(s) de réception impossible à envoyer",
     "canNotUpdateApplication":                     "Certains fichiers de l'application sont modifiés sur le serveur. Impossible de mettre à jour l'application",
+    "cantEditFileWithJava":                        "Vous ne pouvez pas éditer avec l'applet Java un document importé.",
     "cantMoveDoctype":                             "Le type de courrier peut uniquement être déplacé dans une sous-chemise",
     "cantMoveFirstLevel":                          "La sous-chemise peut uniquement être déplacée dans une chemise",
     "canUpdateData":                               "Pouvoir modifier les métadonnées du courrier",

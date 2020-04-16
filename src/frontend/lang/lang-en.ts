@@ -220,6 +220,7 @@ export const LANG_EN = {
     "cannotMergeTags":                             "This tag has a parent or children : impossible to merge tags",
     "canNotSendAr":                                "acknowledgement of receipts impossible to send",
     "canNotUpdateApplication":                     "Some files have been modified on the server. Cannot update the application",
+    "cantEditFileWithJava":                        "You can't edit with the java applet an uploaded document.",
     "cantMoveDoctype":                             "The document type can only be moved in a sub-folder",
     "cantMoveFirstLevel":                          "Sub-folder can only be moved in folder",
     "canUpdateData":                               "Can update resource data",

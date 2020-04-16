@@ -149,7 +149,7 @@
                                         [disabled]="lockFound">{{lang.templateEdition}}</button>
                                     <button mat-raised-button color="default" type="button"
                                         (click)="$event.stopPropagation();uploadSignFileOffice.click()"
-                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode && !functionsService.empty(template.file.name)))"
+                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode && !functionsService.empty(template.file.name)) && headerService.user.preferences.documentEdition !== 'java')"
                                         [disabled]="lockFound">{{lang.importFile}}</button>
                                 </div>
                                 <iframe *ngIf="templateDocView !== null" [src]="templateDocView"
@@ -248,7 +248,7 @@
                                                 [disabled]="lockFound">{{lang.templateEdition}}</button>
                                             <button mat-raised-button color="default" type="button"
                                                 (click)="$event.stopPropagation();uploadSignFileOfficeHtml.click()"
-                                                *ngIf="!selectedModelFile || !creationMode"
+                                                *ngIf="!selectedModelFile || (!creationMode && headerService.user.preferences.documentEdition !== 'java')"
                                                 [disabled]="lockFound">{{lang.importFile}}</button>
                                         </div>
                                         <iframe *ngIf="templateDocView !== null" [src]="templateDocView"
