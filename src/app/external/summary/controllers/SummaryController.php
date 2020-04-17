@@ -76,7 +76,7 @@ class SummaryController
         ]);
         foreach ($maarch2ged as $key => $value) {
             if (!empty($value['account_id'])) {
-                $userInfo = UserModel::getByLogin(['select' => ['firstname', 'lastname'], 'login' => $value['account_id']]);
+                $userInfo = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $value['account_id']]);
             }
             $maarch2ged[$key]['userInfo'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
             $maarch2ged[$key]['object']   = '';

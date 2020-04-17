@@ -90,8 +90,7 @@ chdir($maarchDirectory);
 
 $GLOBALS['customId']  = $customID;
 $GLOBALS['batchDirectory'] = $GLOBALS['maarchDirectory'] . 'modules'
-                           . DIRECTORY_SEPARATOR . 'notifications'
-                           . DIRECTORY_SEPARATOR . 'batch';
+                           . DIRECTORY_SEPARATOR . 'notifications';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['maarchDirectory']);
 

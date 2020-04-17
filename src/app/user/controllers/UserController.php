@@ -132,7 +132,7 @@ class UserController
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
         $user['redirectedBaskets']  = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
-        $user['history']            = HistoryModel::getByUserId(['userId' => $aArgs['id'], 'select' => ['record_id', 'event_date', 'info', 'remote_ip']]);
+        $user['history']            = HistoryModel::get(['select' => ['record_id', 'event_date', 'info', 'remote_ip'], 'where' => ['user_id = ?'], 'data' => [$aArgs['id']], 'orderBy' => ['event_date DESC'], 'limit' => 500]);
         $user['canModifyPassword']              = false;
         $user['canSendActivationNotification']  = false;
         $user['canCreateMaarchParapheurUser']   = false;
@@ -226,7 +226,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_CREATED . " {$data['userId']}"
@@ -293,7 +293,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$data['firstname']} {$data['lastname']}"
@@ -421,7 +421,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'DEL',
             'eventId'      => 'userSuppression',
             'info'         => _USER_SUSPENDED . " {$user['firstname']} {$user['lastname']}"
@@ -487,7 +487,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'DEL',
             'eventId'      => 'userSuppression',
             'info'         => _USER_DELETED . " {$user['firstname']} {$user['lastname']}"
@@ -565,7 +565,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$body['firstname']} {$body['lastname']}"
@@ -601,7 +601,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_PREFERENCE_UPDATED . " {$user['firstname']} {$user['lastname']}"
@@ -646,7 +646,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $user['user_id'],
+            'recordId'     => $aArgs['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_PASSWORD_UPDATED
@@ -852,7 +852,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $user['user_id'],
+            'recordId'     => $aArgs['id'],
             'eventType'    => $data['status'] == 'ABS' ? 'ABS' : 'PRE',
             'eventId'      => 'userabs',
             'info'         => $message
@@ -1103,7 +1103,7 @@ class UserController
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         HistoryController::add([
             'tableName' => 'users',
-            'recordId'  => $user['user_id'],
+            'recordId'  => $aArgs['id'],
             'eventType' => 'UP',
             'info'      => _USER_GROUP_CREATION . " : {$user['user_id']} {$data['groupId']}",
             'moduleId'  => 'user',
@@ -1142,7 +1142,7 @@ class UserController
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         HistoryController::add([
             'tableName' => 'users',
-            'recordId'  => $user['user_id'],
+            'recordId'  => $aArgs['id'],
             'eventType' => 'UP',
             'info'      => _USER_GROUP_MODIFICATION . " : {$user['user_id']} {$aArgs['groupId']}",
             'moduleId'  => 'user',
@@ -1181,7 +1181,7 @@ class UserController
         $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
         HistoryController::add([
             'tableName' => 'users',
-            'recordId'  => $user['user_id'],
+            'recordId'  => $aArgs['id'],
             'eventType' => 'UP',
             'info'      => _USER_GROUP_SUPPRESSION . " : {$user['user_id']} {$aArgs['groupId']}",
             'moduleId'  => 'user',
@@ -1236,7 +1236,7 @@ class UserController
         UserEntityModel::addUserEntity(['id' => $aArgs['id'], 'entityId' => $data['entityId'], 'role' => $data['role'], 'primaryEntity' => $pEntity]);
         HistoryController::add([
             'tableName' => 'users',
-            'recordId'  => $user['user_id'],
+            'recordId'  => $aArgs['id'],
             'eventType' => 'UP',
             'info'      => _USER_ENTITY_CREATION . " : {$user['user_id']} {$data['entityId']}",
             'moduleId'  => 'user',
@@ -1375,7 +1375,7 @@ class UserController
             }
         }
 
-        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $aArgs['id'], 'select' => ['entities.entity_label']]);
+        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $aArgs['id'], 'select' => ['entities.entity_label', 'entities.entity_id']]);
         UserEntityModel::deleteUserEntity(['id' => $aArgs['id'], 'entityId' => $aArgs['entityId']]);
 
         if (!empty($primaryEntity['entity_id']) && $primaryEntity['entity_id'] == $aArgs['entityId']) {
@@ -1384,7 +1384,7 @@ class UserController
 
         HistoryController::add([
             'tableName' => 'users',
-            'recordId'  => $user['user_id'],
+            'recordId'  => $aArgs['id'],
             'eventType' => 'UP',
             'info'      => _USER_ENTITY_SUPPRESSION . " : {$user['user_id']} {$aArgs['entityId']}",
             'moduleId'  => 'user',
@@ -1537,21 +1537,19 @@ class UserController
 
     public function updateCurrentUserBasketPreferences(Request $request, Response $response, array $aArgs)
     {
-        $data = $request->getParams();
-
-        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $data = $request->getParsedBody();
 
         if (isset($data['color']) && $data['color'] == '') {
             UserBasketPreferenceModel::update([
                 'set'   => ['color' => null],
                 'where' => ['user_serial_id = ?', 'group_serial_id = ?', 'basket_id = ?'],
-                'data'  => [$user['id'], $aArgs['groupId'], $aArgs['basketId']]
+                'data'  => [$GLOBALS['id'], $aArgs['groupId'], $aArgs['basketId']]
             ]);
         } elseif (!empty($data['color'])) {
             UserBasketPreferenceModel::update([
                 'set'   => ['color' => $data['color']],
                 'where' => ['user_serial_id = ?', 'group_serial_id = ?', 'basket_id = ?'],
-                'data'  => [$user['id'], $aArgs['groupId'], $aArgs['basketId']]
+                'data'  => [$GLOBALS['id'], $aArgs['groupId'], $aArgs['basketId']]
             ]);
         }
 
@@ -1653,7 +1651,7 @@ class UserController
         $resetToken = AuthenticationController::getResetJWT(['id' => $user['id'], 'expirationTime' => 3600]); // 1 hour
         UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$user['id']]]);
 
-        $url = UrlController::getCoreUrl() . 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+        $url = UrlController::getCoreUrl() . 'dist/index.html#/update-password?token=' . $resetToken;
         $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
         $configuration = json_decode($configuration['value'], true);
         if (!empty($configuration['from'])) {
@@ -1680,7 +1678,7 @@ class UserController
         }
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $body['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'RESETPSW',
             'eventId'      => 'userModification',
             'info'         => $historyMessage
@@ -1725,7 +1723,7 @@ class UserController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $user['user_id'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _PASSWORD_REINIT . " {$body['login']}"

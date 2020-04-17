@@ -43,6 +43,8 @@
             <file>test/unitTests/app/resource/UserFollowedResourceControllerTest.php</file>
             <file>test/unitTests/app/resource/FolderPrintControllerTest.php</file>
             <file>test/unitTests/app/search/SearchControllerTest.php</file>
+            <file>test/unitTests/app/template/DatasourceControllerTest.php</file>
+            <file>test/unitTests/app/acknowledgementReceipt/AcknowledgementReceiptControllerTest.php</file>
             <!-- The last one should be history -->
             <file>test/unitTests/app/history/HistoryControllerTest.php</file>
         </testsuite>

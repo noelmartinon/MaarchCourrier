@@ -93,7 +93,7 @@ trait AcknowledgementReceiptTrait
             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $template[0]['template_path']) . $template[0]['template_file_name'];
         }
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id', 'mail']]);
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'mail']]);
         $ids          = [];
         $errors       = [];
         $emailsToSend = [];
@@ -114,7 +114,7 @@ trait AcknowledgementReceiptTrait
                 if (empty($contentToSend)) {
                     $mergedDocument = MergeController::mergeDocument([
                         'content' => $template[0]['template_content'],
-                        'data'    => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $currentUser['id']]
+                        'data'    => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $GLOBALS['id']]
                     ]);
                 } else {
                     $mergedDocument['encodedDocument'] = base64_encode($contentToSend);
@@ -129,7 +129,7 @@ trait AcknowledgementReceiptTrait
 
                     $mergedDocument = MergeController::mergeDocument([
                         'path' => $pathToDocument,
-                        'data' => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $currentUser['id']]
+                        'data' => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $GLOBALS['id']]
                     ]);
 
                     $extension = pathinfo($pathToDocument, PATHINFO_EXTENSION);

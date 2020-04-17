@@ -183,17 +183,16 @@ class EntityController
         ]);
 
         if (empty($data['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
-            $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
             $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
             $pEntity = 'N';
             if (empty($primaryEntity)) {
                 $pEntity = 'Y';
             }
 
-            UserEntityModel::addUserEntity(['id' => $user['id'], 'entityId' => $data['entity_id'], 'role' => '', 'primaryEntity' => $pEntity]);
+            UserEntityModel::addUserEntity(['id' => $GLOBALS['id'], 'entityId' => $data['entity_id'], 'role' => '', 'primaryEntity' => $pEntity]);
             HistoryController::add([
                 'tableName' => 'users',
-                'recordId'  => $GLOBALS['login'],
+                'recordId'  => $GLOBALS['id'],
                 'eventType' => 'UP',
                 'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['login']} {$data['entity_id']}",
                 'moduleId'  => 'user',
@@ -268,7 +267,7 @@ class EntityController
                 UserEntityModel::addUserEntity(['id' => $GLOBALS['id'], 'entityId' => $aArgs['id'], 'role' => '', 'primaryEntity' => $pEntity]);
                 HistoryController::add([
                     'tableName' => 'users',
-                    'recordId'  => $GLOBALS['login'],
+                    'recordId'  => $GLOBALS['id'],
                     'eventType' => 'UP',
                     'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['login']} {$aArgs['id']}",
                     'moduleId'  => 'user',

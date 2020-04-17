@@ -113,17 +113,27 @@ class AuthenticationControllerTest extends TestCase
             $fullRequest = \httpRequestCustom::addContentInBody(['rules' => $rules], $request);
             $passwordController->updateRules($fullRequest, new \Slim\Http\Response());
     
-            $response = \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => 'superadmin']);
-            $this->assertSame(true, $response);
-    
-            for ($i = 1; $i < $lockAttempts; $i++) {
-                $response = \SrcCore\controllers\AuthenticationController::handleFailedAuthentication(['userId' => 'superadmin']);
-                $this->assertSame(_BAD_LOGIN_OR_PSW, $response);
-            }
-            $response = \SrcCore\controllers\AuthenticationController::handleFailedAuthentication(['userId' => 'superadmin']);
-            $this->assertSame(_ACCOUNT_LOCKED_FOR . " " . $lockTime . " mn", $response);
+            \User\models\UserModel::update([
+                'set'   => ['failed_authentication' => 0, 'locked_until' => null],
+                'where' => ['user_id = ?'],
+                'data'  => ['superadmin']
+            ]);
 
-            $response = \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => 'superadmin']);
+            for ($i = 1; $i < $lockAttempts; $i++) {
+                $response = \SrcCore\controllers\AuthenticationController::handleFailedAuthentication(['userId' => $GLOBALS['id']]);
+                $this->assertSame(true, $response);
+            }
+            $response = \SrcCore\controllers\AuthenticationController::handleFailedAuthentication(['userId' => $GLOBALS['id']]);
+            $this->assertSame(true, $response['accountLocked']);
+            $response = \SrcCore\controllers\AuthenticationController::handleFailedAuthentication(['userId' => $GLOBALS['id']]);
+            $this->assertSame(true, $response['accountLocked']);
+            $this->assertNotNull($response['lockedDate']);
+
+            \User\models\UserModel::update([
+                'set'   => ['failed_authentication' => 0, 'locked_until' => null],
+                'where' => ['user_id = ?'],
+                'data'  => ['superadmin']
+            ]);
         }
     }
 }

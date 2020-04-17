@@ -39,8 +39,6 @@ trait ShippingTrait
         ValidatorModel::intVal($args, ['resId']);
         ValidatorModel::arrayType($args, ['data']);
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
         $resource = ResModel::getById(['select' => ['destination', 'integrations', 'subject as title', 'external_id', 'res_id', 'version'], 'resId' => $args['resId']]);
         $integrations = json_decode($resource['integrations'], true);
 
@@ -323,7 +321,7 @@ trait ShippingTrait
             ]);
 
             ShippingModel::create([
-                'userId'            => $currentUser['id'],
+                'userId'            => $GLOBALS['id'],
                 'documentId'        => $resId,
                 'documentType'      => $resource['type'],
                 'options'           => json_encode($shippingTemplate['options']),

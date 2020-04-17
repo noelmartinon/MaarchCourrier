@@ -9,12 +9,6 @@
 		<parameter name="pdfContent" type="string" />
 		<parameter name="errorCode" type="string" />
     </validationRule>
-    <validationRule name="vi_checkSignFile" extends="standardForm" mode="error">
-    	<parameter name="res_id" type="integer" />
-    </validationRule>
-    <validationRule name="vi_encodePinCode" extends="standardForm" mode="error">
-    	<parameter name="pinCode" type="string" />
-    </validationRule>
     <validationRule name="vi_saveVisaWF" extends="standardForm" mode="error">
     	<parameter name="res_id" type="integer" />
     	<parameter name="coll_id" type="collection_list" />

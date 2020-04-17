@@ -50,7 +50,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     logout() {
-        this.authService.logout();
+        this.authService.logout(false);
         this.notificationService.error(this.lang.sessionExpired);
     }
 

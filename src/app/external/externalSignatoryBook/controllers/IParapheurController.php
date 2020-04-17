@@ -18,9 +18,11 @@ namespace ExternalSignatoryBook\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Entity\models\ListInstanceModel;
 use Resource\models\ResModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
+use User\models\UserModel;
 
 /**
     * @codeCoverageIgnore
@@ -59,7 +61,11 @@ class IParapheurController
             'where'     => ['res_id = ?', 'item_mode = ?'],
             'data'      => [$aArgs['resIdMaster'], 'sign']
         ])[0];
-        $sousType = IParapheurController::getSousType(['config' => $config, 'sousType' => $signatory['item_id']]);
+
+        if (!empty($signatory['item_id'])) {
+            $user = UserModel::getById(['id' => $signatory['item_id'], 'select' => ['user_id']]);
+        }
+        $sousType = IParapheurController::getSousType(['config' => $config, 'sousType' => $user['user_id']]);
         if (!empty($sousType['error'])) {
             return ['error' => $sousType['error']];
         }
@@ -268,64 +274,91 @@ class IParapheurController
 
     public static function retrieveSignedMails($aArgs)
     {
-        foreach (['noVersion', 'resLetterbox'] as $version) {
-            foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                if (!empty($value->external_id)) {
-                    $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
-                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
-                        <soapenv:Header/> 
-                        <soapenv:Body> 
-                            <ns:GetHistoDossierRequest>' . $value->external_id . '</ns:GetHistoDossierRequest> 
-                        </soapenv:Body> 
-                    </soapenv:Envelope>';
+        $version = $aArgs['version'];
+        foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            if (!empty($value['external_id'])) {
+                $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
+                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.adullact.org/spring-ws/iparapheur/1.0">
+                    <soapenv:Header/> 
+                    <soapenv:Body> 
+                        <ns:GetHistoDossierRequest>' . $value['external_id'] . '</ns:GetHistoDossierRequest> 
+                    </soapenv:Body> 
+                </soapenv:Envelope>';
 
-                    $curlReturn = IParapheurController::returnCurl($xmlPostString, $aArgs['config']);
+                $curlReturn = IParapheurController::returnCurl($xmlPostString, $aArgs['config']);
 
-                    if (!empty($curlReturn['error'])) {
-                        return ['error' => $curlReturn['error']];
-                    }
+                if (!empty($curlReturn['error'])) {
+                    return ['error' => $curlReturn['error']];
+                }
 
-                    $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
 
-                    if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
-                        return ['error' => 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
-                    } else {
-                        $noteContent = '';
-                        foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
-                            $status = $res->status;
-                            if ($status == $aArgs['config']['data']['visaState'] || $status == $aArgs['config']['data']['signState']) {
-                                $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
+                if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
+                    return ['error' => 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
+                } else {
+                    $noteContent = '';
+                    foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
+                        $status = $res->status;
+                        if ($status == $aArgs['config']['data']['visaState'] || $status == $aArgs['config']['data']['signState']) {
+                            $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
 
-                                $response = IParapheurController::download([
-                                    'config'     => $aArgs['config'],
-                                    'documentId' => $value->external_id
-                                ]);
-                                if (!empty($response['error'])) {
-                                    return ['error' => $response['error']];
-                                }
-                                $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
-                                $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf';
-                                $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = $response['b64FileContent'];
-                                $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $noteContent;
-                                if ($status == $aArgs['config']['data']['signState']) {
-                                    break;
-                                }
-                            } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
-                                $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
-                                $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
-                                $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $noteContent;
-                                break;
-                            } else {
-                                $aArgs['idsToRetrieve'][$version][$resId]->status = 'waiting';
+                            $response = IParapheurController::download([
+                                'config'     => $aArgs['config'],
+                                'documentId' => $value['external_id']
+                            ]);
+                            if (!empty($response['error'])) {
+                                return ['error' => $response['error']];
                             }
+                            $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
+                            $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
+                            $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $response['b64FileContent'];
+                            $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $noteContent;
+                            if ($status == $aArgs['config']['data']['signState']) {
+                                IParapheurController::processVisaWorkflow(['res_id_master' => $value['res_id_master'], 'res_id' => $value['res_id']]);
+                                break;
+                            }
+                        } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
+                            $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
+                            $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
+                            $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $noteContent;
+                            break;
+                        } else {
+                            $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'waiting';
                         }
                     }
-                } else {
-                    echo 'ExternalId is empty';
+                }
+            } else {
+                echo 'ExternalId is empty';
+            }
+        }
+        
+        return $aArgs['idsToRetrieve'];
+    }
+
+    public static function processVisaWorkflow($aArgs = [])
+    {
+        $resIdMaster = $aArgs['res_id_master'] ?? $aArgs['res_id'];
+
+        $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$resIdMaster, 'FRZ']]);
+        if (count($attachments) < 2) {
+            $visaWorkflow = ListInstanceModel::get([
+                'select'  => ['listinstance_id', 'requested_signature'],
+                'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
+                'data'    => [$resIdMaster, 'VISA_CIRCUIT'],
+                'orderBY' => ['ORDER BY listinstance_id ASC']
+            ]);
+    
+            if (!empty($visaWorkflow)) {
+                foreach ($visaWorkflow as $listInstance) {
+                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                    // Stop to the first signatory user
+                    if ($listInstance['requested_signature']) {
+                        ListInstanceModel::update(['set' => ['signatory' => 'true'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        break;
+                    }
                 }
             }
         }
-        return $aArgs['idsToRetrieve'];
     }
 
     public static function getType($aArgs)

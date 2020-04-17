@@ -34,7 +34,6 @@ export class SafeUrlPipe implements PipeTransform {
 })
 export class SignatureBookComponent implements OnInit {
 
-    coreUrl: string;
     resId: number;
     basketId: number;
     groupId: number;
@@ -174,8 +173,10 @@ export class SignatureBookComponent implements OnInit {
 
                     setTimeout(() => {
                         $('#rightPanelContent').niceScroll({ touchbehavior: false, cursorcolor: '#666', cursoropacitymax: 0.6, cursorwidth: '4' });
-                        if ($('.tooltipstered').length == 0) {
+
+                        if ($('.tooltipstered').length === 0) {
                             $('#obsVersion').tooltipster({
+                                theme: 'tooltipster-light',
                                 interactive: true
                             });
                         }
@@ -580,6 +581,22 @@ export class SignatureBookComponent implements OnInit {
 
     saveVisaWorkflow() {
         this.appVisaWorkflow.saveVisaWorkflow();
+    }
+
+    downloadOriginalFile(resId: any) {
+        const downloadLink = document.createElement('a');
+        this.http.get(`../rest/attachments/${resId}/originalContent?mode=base64`).pipe(
+            tap((data: any) => {
+                downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                downloadLink.setAttribute('download', `${resId}.${data.extension}`);
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     ngOnDestroy() {

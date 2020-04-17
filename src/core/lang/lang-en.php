@@ -449,6 +449,7 @@ define("_CHRONO_NUMBER_MASTER", "Resource chrono number");
 define("_SENT_BY", "Sent by");
 define('_TO_CCI', 'Copy hidden');
 define('_PRIMARY_INFORMATION', 'Primary information');
+define('_SEND_ALFRESCO', 'Send to Aflresco');
 define("_EMPTY_SUBJECT", "Empty subject");
 
 define("_ATTACH_REMOVE_FROM_SIGNATORY_BOOK", "Attachment removed from signatory book");

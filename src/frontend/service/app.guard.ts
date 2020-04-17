@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, CanDeactivate } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, tap, catchError, exhaustMap } from 'rxjs/operators';
+import { map, tap, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { HeaderService } from './header.service';
 import { ProcessComponent } from '../app/process/process.component';
 import { PrivilegeService } from './privileges.service';
@@ -24,7 +24,7 @@ export class AppGuard implements CanActivate {
         private privilegeService: PrivilegeService
     ) { }
 
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
         console.log('guard');
 
         this.headerService.resetSideNavSelection();
@@ -59,7 +59,7 @@ export class AppGuard implements CanActivate {
                                 console.log('ABS!');
                                 return this.router.navigate(['/activate-user']);
                             } else {
-                                if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
+                                if (route.url.map((url: any) => url.path).filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
                                     this.headerService.hideSideBar = true;
                                 } else {
                                     this.headerService.hideSideBar = false;
@@ -79,9 +79,10 @@ export class AppGuard implements CanActivate {
 
                 if (this.headerService.user.status === 'ABS') {
                     console.log('ABS!');
-                    return this.router.navigate(['/activate-user']);
+                    this.router.navigate(['/activate-user']);
+                    return of(false);
                 } else {
-                    if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
+                    if (route.url.map((url: any) => url.path).filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
                         this.headerService.hideSideBar = true;
                     } else {
                         this.headerService.hideSideBar = false;
@@ -91,7 +92,7 @@ export class AppGuard implements CanActivate {
                     } else {
                         this.headerService.sideBarAdmin = false;
                     }
-                    return true;
+                    return of(true);
                 }
             }
         } else {
@@ -100,55 +101,55 @@ export class AppGuard implements CanActivate {
             return this.http.get('../rest/authenticationInformations')
                 .pipe(
                     map((data: any) => {
-                        this.authService.authMode = data.connection;
-                        this.authService.changeKey = data.changeKey;
+                        this.authService.setAppSession(data.instanceId);
+                        // this.authService.authMode = data.connection;
+                        // this.authService.changeKey = data.changeKey;
                         this.localStorage.setAppSession(data.instanceId);
                         tokenInfo = this.authService.getToken();
+                        console.log(tokenInfo);
 
                         if (tokenInfo !== null) {
                             this.authService.setUrl(route.url.join('/'));
-                            console.log('Token trouvé !');
-                            console.log('Récupération données user...');
-                            this.http.get('../rest/currentUser/profile')
-                                .pipe(
-                                    map((dataUser: any) => {
-                                        this.headerService.user = {
-                                            id: dataUser.id,
-                                            status: data.status,
-                                            userId: dataUser.user_id,
-                                            firstname: dataUser.firstname,
-                                            lastname: dataUser.lastname,
-                                            entities: dataUser.entities,
-                                            groups: dataUser.groups,
-                                            preferences: dataUser.preferences,
-                                            privileges: dataUser.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : dataUser.privileges
-                                        };
-
-                                        this.headerService.nbResourcesFollowed = dataUser.nbFollowedResources;
-                                        this.privilegeService.resfreshUserShortcuts();
-                                        if (this.headerService.user.status === 'ABS') {
-                                            console.log('ABS!');
-                                            return this.router.navigate(['/activate-user']);
-                                        } else {
-                                            if (route.url.map((url: any) => url.path).filter((url: any) => url === 'signatureBook').length > 0) {
-                                                this.headerService.hideSideBar = true;
-                                            } else {
-                                                this.headerService.hideSideBar = false;
-                                            }
-                                            if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
-                                                this.headerService.sideBarAdmin = true;
-                                            } else {
-                                                this.headerService.sideBarAdmin = false;
-                                            }
-                                            return true;
-                                        }
-                                    })
-                                ).subscribe();
-                            return true;
+                            return tokenInfo;
                         } else {
+                            this.authService.setCachedUrl(route.url.join('/'));
                             console.log('Aucun token trouvé ! Redirection sur login ...');
-                            this.authService.logout();
+                            this.authService.logout(false);
                             return false;
+                        }
+                    }),
+                    filter((info: any) => info !== null),
+                    exhaustMap(() => this.http.get('../rest/currentUser/profile')),
+                    map((dataUser: any) => {
+                        this.headerService.user = {
+                            id: dataUser.id,
+                            status: dataUser.status,
+                            userId: dataUser.user_id,
+                            firstname: dataUser.firstname,
+                            lastname: dataUser.lastname,
+                            entities: dataUser.entities,
+                            groups: dataUser.groups,
+                            preferences: dataUser.preferences,
+                            privileges: dataUser.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : dataUser.privileges
+                        };
+
+                        this.headerService.nbResourcesFollowed = dataUser.nbFollowedResources;
+                        this.privilegeService.resfreshUserShortcuts();
+                        if (this.headerService.user.status === 'ABS') {
+                            console.log('ABS!');
+                            return this.router.navigate(['/activate-user']);
+                        } else {
+                            if (route.url.map((url: any) => url.path).filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
+                                this.headerService.hideSideBar = true;
+                            } else {
+                                this.headerService.hideSideBar = false;
+                            }
+                            if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                                this.headerService.sideBarAdmin = true;
+                            } else {
+                                this.headerService.sideBarAdmin = false;
+                            }
+                            return true;
                         }
                     }),
                 );

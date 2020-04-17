@@ -485,50 +485,49 @@ class MaarchParapheurController
 
     public static function retrieveSignedMails(array $aArgs)
     {
-        foreach (['noVersion', 'resLetterbox'] as $version) {
-            foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                $documentWorkflow = MaarchParapheurController::getDocumentWorkflow(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
-                $state = MaarchParapheurController::getState(['workflow' => $documentWorkflow]);
-                
-                if (in_array($state['status'], ['validated', 'refused'])) {
-                    $signedDocument = MaarchParapheurController::getDocument(['config' => $aArgs['config'], 'documentId' => $value->external_id]);
-                    $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf';
-                    $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = $signedDocument['encodedDocument'];
-                    if ($state['status'] == 'validated' && in_array($state['mode'], ['sign', 'visa'])) {
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
-                    } elseif ($state['status'] == 'refused' && in_array($state['mode'], ['sign', 'visa'])) {
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
-                    } elseif ($state['status'] == 'validated' && $state['mode'] == 'note') {
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'validatedNote';
-                    } elseif ($state['status'] == 'refused' && $state['mode'] == 'note') {
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'refusedNote';
-                    }
-                    if (!empty($state['note'])) {
-                        $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $state['note'];
-                        $userInfos = UserModel::getByExternalId([
-                            'select'            => ['id', 'firstname', 'lastname'],
-                            'externalId'        => $state['noteCreatorId'],
-                            'externalName'      => 'maarchParapheur'
-                        ]);
-                        if (!empty($userInfos)) {
-                            $aArgs['idsToRetrieve'][$version][$resId]->noteCreatorId = $userInfos['id'];
-                        }
-                        $aArgs['idsToRetrieve'][$version][$resId]->noteCreatorName = $state['noteCreatorName'];
-                    }
-                    if (!empty($state['signatoryUserId'])) {
-                        $signatoryUser = UserModel::getByExternalId([
-                            'select'            => ['user_id'],
-                            'externalId'        => $state['signatoryUserId'],
-                            'externalName'      => 'maarchParapheur'
-                        ]);
-                        if (!empty($signatoryUser['user_id'])) {
-                            $aArgs['idsToRetrieve'][$version][$resId]->typist = $signatoryUser['user_id'];
-                        }
-                    }
-                    $aArgs['idsToRetrieve'][$version][$resId]->workflowInfo = implode(", ", $state['workflowInfo']);
-                } else {
-                    unset($aArgs['idsToRetrieve'][$version][$resId]);
+        $version = $aArgs['version'];
+        foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            $documentWorkflow = MaarchParapheurController::getDocumentWorkflow(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+            $state = MaarchParapheurController::getState(['workflow' => $documentWorkflow]);
+            
+            if (in_array($state['status'], ['validated', 'refused'])) {
+                $signedDocument = MaarchParapheurController::getDocument(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+                $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
+                $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $signedDocument['encodedDocument'];
+                if ($state['status'] == 'validated' && in_array($state['mode'], ['sign', 'visa'])) {
+                    $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
+                } elseif ($state['status'] == 'refused' && in_array($state['mode'], ['sign', 'visa'])) {
+                    $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
+                } elseif ($state['status'] == 'validated' && $state['mode'] == 'note') {
+                    $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validatedNote';
+                } elseif ($state['status'] == 'refused' && $state['mode'] == 'note') {
+                    $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refusedNote';
                 }
+                if (!empty($state['note'])) {
+                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $state['note'];
+                    $userInfos = UserModel::getByExternalId([
+                        'select'            => ['id', 'firstname', 'lastname'],
+                        'externalId'        => $state['noteCreatorId'],
+                        'externalName'      => 'maarchParapheur'
+                    ]);
+                    if (!empty($userInfos)) {
+                        $aArgs['idsToRetrieve'][$version][$resId]['noteCreatorId'] = $userInfos['id'];
+                    }
+                    $aArgs['idsToRetrieve'][$version][$resId]['noteCreatorName'] = $state['noteCreatorName'];
+                }
+                if (!empty($state['signatoryUserId'])) {
+                    $signatoryUser = UserModel::getByExternalId([
+                        'select'            => ['user_id'],
+                        'externalId'        => $state['signatoryUserId'],
+                        'externalName'      => 'maarchParapheur'
+                    ]);
+                    if (!empty($signatoryUser['user_id'])) {
+                        $aArgs['idsToRetrieve'][$version][$resId]['typist'] = $signatoryUser['user_id'];
+                    }
+                }
+                $aArgs['idsToRetrieve'][$version][$resId]['workflowInfo'] = implode(", ", $state['workflowInfo']);
+            } else {
+                unset($aArgs['idsToRetrieve'][$version][$resId]);
             }
         }
 
@@ -697,7 +696,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_CREATED_IN_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"
@@ -777,7 +776,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_LINKED_TO_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"
@@ -803,7 +802,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
             'info'         => _USER_UNLINKED_TO_MAARCHPARAPHEUR . " {$userInfo['firstname']} {$userInfo['lastname']}"
@@ -952,7 +951,7 @@ class MaarchParapheurController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $userInfo['user_id'],
+            'recordId'     => $aArgs['id'],
             'eventType'    => 'UP',
             'eventId'      => 'signatureSync',
             'info'         => _SIGNATURES_SEND_TO_MAARCHPARAPHEUR . " : " . implode(", ", $signaturesId)

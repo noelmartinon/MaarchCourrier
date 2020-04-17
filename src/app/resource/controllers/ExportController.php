@@ -62,9 +62,8 @@ class ExportController
     public function updateExport(Request $request, Response $response, array $aArgs)
     {
         set_time_limit(240);
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
 
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -107,10 +106,10 @@ class ExportController
         }
         $order .= 'END';
 
-        $template = ExportTemplateModel::get(['select' => [1], 'where' => ['user_id = ?', 'format = ?'], 'data' => [$currentUser['id'], $body['format']]]);
+        $template = ExportTemplateModel::get(['select' => [1], 'where' => ['user_id = ?', 'format = ?'], 'data' => [$GLOBALS['id'], $body['format']]]);
         if (empty($template)) {
             ExportTemplateModel::create([
-                'userId'    => $currentUser['id'],
+                'userId'    => $GLOBALS['id'],
                 'format'    => $body['format'],
                 'delimiter' => empty($body['delimiter']) ? null : $body['delimiter'],
                 'data'      => json_encode($body['data'])
@@ -122,7 +121,7 @@ class ExportController
                     'data'      => json_encode($body['data'])
                 ],
                 'where' => ['user_id = ?', 'format = ?'],
-                'data'  => [$currentUser['id'], $body['format']]
+                'data'  => [$GLOBALS['id'], $body['format']]
             ]);
         }
 

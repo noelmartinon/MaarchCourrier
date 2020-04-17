@@ -241,6 +241,10 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
         this.router.navigate([`/resources/${row.resId}`]);
     }
 
+    goToFolder(folder: any) {
+        this.router.navigate([`/folders/${folder.id}`]);
+    }
+
     togglePanel(mode: string, row: any) {
         const thisSelect = { checked: true };
         const thisDeselect = { checked: false };

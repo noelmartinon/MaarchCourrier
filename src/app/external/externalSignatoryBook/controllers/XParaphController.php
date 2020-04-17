@@ -377,101 +377,100 @@ class XParaphController
     {
         $tmpPath = CoreConfigModel::getTmpPath();
 
-        foreach (['noVersion'] as $version) {
-            $depotsBySiret = [];
-            foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                $externalId = json_decode($value->xparaphdepot, true);
-                $depotsBySiret[$externalId['siret']][$value->external_id] = ['resId' => $resId, 'login' => $externalId['login']];
+        $version = $aArgs['version'];
+        $depotsBySiret = [];
+        foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            $externalId = json_decode($value['xparaphdepot'], true);
+            $depotsBySiret[$externalId['siret']][$value['external_id']] = ['resId' => $resId, 'login' => $externalId['login']];
+        }
+
+        foreach ($depotsBySiret as $siret => $depotids) {
+            if (isset($aArgs['config']['data']['userGeneric']->siret)) {
+                if ($aArgs['config']['data']['userGeneric']->siret == $siret) {
+                    $userGeneric = (array)$aArgs['config']['data']['userGeneric'];
+                }
+            } else {
+                foreach ($aArgs['config']['data']['userGeneric'] as $userGenericXml) {
+                    if ($userGenericXml->siret == $siret) {
+                        $userGeneric = (array)$userGenericXml;
+                        break;
+                    }
+                }
             }
 
-            foreach ($depotsBySiret as $siret => $depotids) {
-                if (isset($aArgs['config']['data']['userGeneric']->siret)) {
-                    if ($aArgs['config']['data']['userGeneric']->siret == $siret) {
-                        $userGeneric = (array)$aArgs['config']['data']['userGeneric'];
-                    }
-                } else {
-                    foreach ($aArgs['config']['data']['userGeneric'] as $userGenericXml) {
-                        if ($userGenericXml->siret == $siret) {
-                            $userGeneric = (array)$userGenericXml;
-                            break;
-                        }
-                    }
-                }
+            if (!empty($depotids)) {
+                $avancements = XParaphController::getAvancement(['config' => $aArgs['config'], 'depotsIds' => $depotids, 'userGeneric' => $userGeneric]);
+            } else {
+                unset($aArgs['idsToRetrieve'][$version]);
+                continue;
+            }
 
-                if (!empty($depotids)) {
-                    $avancements = XParaphController::getAvancement(['config' => $aArgs['config'], 'depotsIds' => $depotids, 'userGeneric' => $userGeneric]);
-                } else {
-                    unset($aArgs['idsToRetrieve'][$version]);
-                    continue;
-                }
-    
-                foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
-                    $xParaphDepot = json_decode($value->xparaphdepot, true);
-                    $avancement = $avancements[$value->external_id];
-    
-                    $state = XParaphController::getState(['avancement' => $avancement]);
-    
-                    if ($state['id'] == 'refused') {
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'refused';
-                        $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $state['note'];
-    
-                        $processedFile = XParaphController::getFile(['config' => $aArgs['config'], 'depotId' => $value->external_id, 'userGeneric' => $userGeneric, 'depotLogin' => $xParaphDepot['login']]);
-                        if (!empty($processedFile['errors'])) {
-                            unset($aArgs['idsToRetrieve'][$version][$resId]);
-                            continue;
-                        }
-                        $file      = base64_decode($processedFile['zip']);
-                        $unzipName = 'tmp_file_' .rand(). '_xParaph_' .rand();
-                        $tmpName   = $unzipName . '.zip';
-                
-                        file_put_contents($tmpPath . $tmpName, $file);
-    
-                        $zip = new \ZipArchive();
-                        $zip->open($tmpPath . $tmpName);
-                        $zip->extractTo($tmpPath . $unzipName);
-    
-                        foreach (glob($tmpPath . $unzipName . '/*.xml') as $filename) {
-                            $log = base64_encode(file_get_contents($filename));
-                        }
-                        unlink($tmpPath . $tmpName);
-    
-                        $aArgs['idsToRetrieve'][$version][$resId]->log = $log;
-                    } elseif ($state['id'] == 'validateSignature' || $state['id'] == 'validateOnlyVisa') {
-                        $processedFile = XParaphController::getFile(['config' => $aArgs['config'], 'depotId' => $value->external_id, 'userGeneric' => $userGeneric, 'depotLogin' => $xParaphDepot['login']]);
-                        if (!empty($processedFile['errors'])) {
-                            unset($aArgs['idsToRetrieve'][$version][$resId]);
-                            continue;
-                        }
-                        $aArgs['idsToRetrieve'][$version][$resId]->status = 'validated';
-                        $aArgs['idsToRetrieve'][$version][$resId]->format = 'pdf';
-    
-                        $file      = base64_decode($processedFile['zip']);
-                        $unzipName = 'tmp_file_' .rand(). '_xParaph_' .rand();
-                        $tmpName   = $unzipName . '.zip';
-                
-                        file_put_contents($tmpPath . $tmpName, $file);
-    
-                        $zip = new \ZipArchive();
-                        $zip->open($tmpPath . $tmpName);
-                        $zip->extractTo($tmpPath . $unzipName);
-    
-                        foreach (glob($tmpPath . $unzipName . '/*.pdf') as $filename) {
-                            $encodedFile = base64_encode(file_get_contents($filename));
-                        }
-                        foreach (glob($tmpPath . $unzipName . '/*.xml') as $filename) {
-                            $log = base64_encode(file_get_contents($filename));
-                        }
-                        unlink($tmpPath . $tmpName);
-    
-                        $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = $encodedFile;
-                        $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $state['note'];
-                        if ($state['id'] == 'validateOnlyVisa') {
-                            $aArgs['idsToRetrieve'][$version][$resId]->onlyVisa = true;
-                        }
-                        $aArgs['idsToRetrieve'][$version][$resId]->log = $log;
-                    } else {
+            foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+                $xParaphDepot = json_decode($value['xparaphdepot'], true);
+                $avancement = $avancements[$value['external_id']];
+
+                $state = XParaphController::getState(['avancement' => $avancement]);
+
+                if ($state['id'] == 'refused') {
+                    $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
+                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $state['note'];
+
+                    $processedFile = XParaphController::getFile(['config' => $aArgs['config'], 'depotId' => $value['external_id'], 'userGeneric' => $userGeneric, 'depotLogin' => $xParaphDepot['login']]);
+                    if (!empty($processedFile['errors'])) {
                         unset($aArgs['idsToRetrieve'][$version][$resId]);
+                        continue;
                     }
+                    $file      = base64_decode($processedFile['zip']);
+                    $unzipName = 'tmp_file_' .rand(). '_xParaph_' .rand();
+                    $tmpName   = $unzipName . '.zip';
+            
+                    file_put_contents($tmpPath . $tmpName, $file);
+
+                    $zip = new \ZipArchive();
+                    $zip->open($tmpPath . $tmpName);
+                    $zip->extractTo($tmpPath . $unzipName);
+
+                    foreach (glob($tmpPath . $unzipName . '/*.xml') as $filename) {
+                        $log = base64_encode(file_get_contents($filename));
+                    }
+                    unlink($tmpPath . $tmpName);
+
+                    $aArgs['idsToRetrieve'][$version][$resId]['log'] = $log;
+                } elseif ($state['id'] == 'validateSignature' || $state['id'] == 'validateOnlyVisa') {
+                    $processedFile = XParaphController::getFile(['config' => $aArgs['config'], 'depotId' => $value['external_id'], 'userGeneric' => $userGeneric, 'depotLogin' => $xParaphDepot['login']]);
+                    if (!empty($processedFile['errors'])) {
+                        unset($aArgs['idsToRetrieve'][$version][$resId]);
+                        continue;
+                    }
+                    $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
+                    $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
+
+                    $file      = base64_decode($processedFile['zip']);
+                    $unzipName = 'tmp_file_' .rand(). '_xParaph_' .rand();
+                    $tmpName   = $unzipName . '.zip';
+            
+                    file_put_contents($tmpPath . $tmpName, $file);
+
+                    $zip = new \ZipArchive();
+                    $zip->open($tmpPath . $tmpName);
+                    $zip->extractTo($tmpPath . $unzipName);
+
+                    foreach (glob($tmpPath . $unzipName . '/*.pdf') as $filename) {
+                        $encodedFile = base64_encode(file_get_contents($filename));
+                    }
+                    foreach (glob($tmpPath . $unzipName . '/*.xml') as $filename) {
+                        $log = base64_encode(file_get_contents($filename));
+                    }
+                    unlink($tmpPath . $tmpName);
+
+                    $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $encodedFile;
+                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $state['note'];
+                    if ($state['id'] == 'validateOnlyVisa') {
+                        $aArgs['idsToRetrieve'][$version][$resId]['onlyVisa'] = true;
+                    }
+                    $aArgs['idsToRetrieve'][$version][$resId]['log'] = $log;
+                } else {
+                    unset($aArgs['idsToRetrieve'][$version][$resId]);
                 }
             }
         }
@@ -601,7 +600,7 @@ class XParaphController
             }
         }
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User not found']);
         }
@@ -617,7 +616,7 @@ class XParaphController
                 $accountFound = true;
                 HistoryController::add([
                     'tableName'    => 'users',
-                    'recordId'     => $GLOBALS['login'],
+                    'recordId'     => $GLOBALS['id'],
                     'eventType'    => 'UP',
                     'eventId'      => 'userModification',
                     'info'         => _USER_UPDATED . " {$user['firstname']} {$user['lastname']}. " . _XPARAPH_ACCOUNT_CREATED
@@ -643,7 +642,7 @@ class XParaphController
             }
         }
 
-        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['external_id', 'id', 'firstname', 'lastname']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User not found']);
         }
@@ -655,7 +654,7 @@ class XParaphController
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $GLOBALS['login'],
+            'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$user['firstname']} {$user['lastname']}. " . _XPARAPH_ACCOUNT_DELETED

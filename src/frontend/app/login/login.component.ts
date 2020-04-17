@@ -75,7 +75,10 @@ export class LoginComponent implements OnInit {
             tap((data: any) => {
                 this.authService.saveTokens(data.headers.get('Token'), data.headers.get('Refresh-Token'));
                 this.authService.setUser({});
-                if (!this.functionsService.empty(this.authService.getUrl(JSON.parse(atob(data.headers.get('Token').split('.')[1])).user.id))) {
+                if (this.authService.getCachedUrl()) {
+                    this.router.navigate([this.authService.getCachedUrl()]);
+                    this.authService.cleanCachedUrl();
+                } else if (!this.functionsService.empty(this.authService.getUrl(JSON.parse(atob(data.headers.get('Token').split('.')[1])).user.id))) {
                     this.router.navigate([this.authService.getUrl(JSON.parse(atob(data.headers.get('Token').split('.')[1])).user.id)]);
                 } else {
                     this.router.navigate(['/home']);
@@ -85,10 +88,10 @@ export class LoginComponent implements OnInit {
                 this.loading = false;
                 if (err.error.errors === 'Authentication Failed') {
                     this.notify.error(this.lang.wrongLoginPassword);
-                } else if (err.error.errors === 'Account suspended') {
+                } else if (err.error.errors === 'Account Suspended') {
                     this.notify.error(this.lang.accountSuspended);
-                } else if (err.error.errors === 'Account locked') {
-                    this.notify.error(this.lang.accountLocked + ' ' + this.timeLimit.transform(err.error.time));
+                } else if (err.error.errors === 'Account Locked') {
+                    this.notify.error(this.lang.accountLocked + ' ' + this.timeLimit.transform(err.error.date));
                 } else {
                     this.notify.handleSoftErrors(err);
                 }
@@ -100,6 +103,9 @@ export class LoginComponent implements OnInit {
     getLoginInformations() {
         this.http.get('../rest/authenticationInformations').pipe(
             tap((data: any) => {
+                this.authService.setAppSession(data.instanceId);
+                // this.authService.authMode = data.connection;
+                // this.authService.changeKey = data.changeKey;
                 this.applicationName = data.applicationName;
                 this.loginMessage = data.loginMessage;
             }),

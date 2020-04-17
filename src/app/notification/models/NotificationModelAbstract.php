@@ -243,9 +243,13 @@ abstract class NotificationModelAbstract
     public static function getDiffusionTypesUsers()
     {
         $users = DatabaseModel::select([
-            'select' => ["user_id as id, concat(firstname,' ',lastname) as label"],
+            'select' => ["id, concat(firstname,' ',lastname) as label"],
             'table'  => ['users'],
         ]);
+
+        foreach ($users as $key => $user) {
+            $users[$key]['id'] = (string)$user['id'];
+        }
 
         return $users;
     }

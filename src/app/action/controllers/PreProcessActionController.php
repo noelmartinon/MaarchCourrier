@@ -51,9 +51,7 @@ class PreProcessActionController
 {
     public static function getRedirectInformations(Request $request, Response $response, array $args)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -178,9 +176,7 @@ class PreProcessActionController
             $currentMode = 'auto';
         }
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -220,7 +216,7 @@ class PreProcessActionController
             $lock = true;
             if (empty($resource['locker_user_id'] || empty($resource['locker_time']))) {
                 $lock = false;
-            } elseif ($resource['locker_user_id'] == $currentUser['id']) {
+            } elseif ($resource['locker_user_id'] == $GLOBALS['id']) {
                 $lock = false;
             } elseif (strtotime($resource['locker_time']) < time()) {
                 $lock = false;
@@ -380,9 +376,7 @@ class PreProcessActionController
 
     public function checkExternalSignatoryBook(Request $request, Response $response, array $aArgs)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -511,7 +505,7 @@ class PreProcessActionController
                     }
                 }
             } elseif ($signatureBookEnabled == 'xParaph') {
-                $userInfos  = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id']]);
+                $userInfos  = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['external_id']]);
                 $externalId = json_decode($userInfos['external_id'], true);
                 $additionalsInfos['accounts'] = [];
                 if (!empty($externalId['xParaph'])) {
@@ -572,9 +566,7 @@ class PreProcessActionController
 
     public function checkExternalNoteBook(Request $request, Response $response, array $aArgs)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -846,9 +838,7 @@ class PreProcessActionController
 
     public function checkInitiatorEntity(Request $request, Response $response, array $args)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -885,9 +875,7 @@ class PreProcessActionController
 
     public function checkAttachmentsAndNotes(Request $request, Response $response, array $args)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -1494,6 +1482,60 @@ class PreProcessActionController
         }
 
         return $response->withJson(['resourcesInformations' => $resourcesInformation]);
+    }
+
+    public function checkSendAlfresco(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+        $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
+        if (empty($loadedXml) || (string)$loadedXml->ENABLED != 'true') {
+            return $response->withJson(['fatalError' => 'Alfresco configuration is not enabled', 'reason' => 'missingAlfrescoConfig']);
+        } elseif (empty((string)$loadedXml->URI)) {
+            return $response->withJson(['fatalError' => 'Alfresco configuration URI is empty', 'reason' => 'missingAlfrescoConfig']);
+        }
+
+        $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
+        if (empty($entity)) {
+            return $response->withJson(['fatalError' => 'User has no primary entity', 'reason' => 'userHasNoPrimaryEntity']);
+        }
+        $entityInformations = json_decode($entity['external_id'], true);
+        if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
+            return $response->withJson(['fatalError' => 'User primary entity has not enough alfresco informations', 'reason' => 'notEnoughAlfrescoInformations']);
+        }
+
+        $resourcesInformations = [];
+        foreach ($body['resources'] as $resId) {
+            $resource = ResModel::getById(['select' => ['filename', 'alt_identifier', 'external_id'], 'resId' => $resId]);
+            if (empty($resource['filename'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noFile'];
+                continue;
+            }
+            $externalId = json_decode($resource['external_id'], true);
+            if (!empty($externalId['alfrescoId'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'alreadySentToAlfresco'];
+                continue;
+            }
+
+            $resourcesInformations['success'][] = ['res_id' => $resId, 'alt_identifier' => $resource['alt_identifier']];
+        }
+
+        return $response->withJson(['resourcesInformations' => $resourcesInformations]);
     }
 
     private static function getNonLockedResources(array $args)

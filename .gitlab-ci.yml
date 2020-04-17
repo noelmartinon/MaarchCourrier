@@ -38,7 +38,7 @@ job_e2e:
  script:
    - service apache2 start
    - mkdir -p /opt/maarch/docservers/indexes/{letterbox_coll,attachments_coll,version_attachments_coll}
-   - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates}
+   - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates,acknowledgement_receipts}
    - mkdir -p /opt/maarch/docservers/{convert_attachments,convert_attachments_version,convert_mlb}
    - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
    - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
@@ -62,6 +62,7 @@ job_e2e:
    - sed 's/<databaseserver>.*<\/databaseserver>/<databaseserver>postgres<\/databaseserver>/;s/<databasepassword>.*<\/databasepassword>/<databasepassword><\/databasepassword>/;s/<databasename>.*<\/databasename>/<databasename>MaarchCourrier<\/databasename>/;s/<databaseuser>.*<\/databaseuser>/<databaseuser>maarch<\/databaseuser>/' apps/maarch_entreprise/xml/config.xml.default > apps/maarch_entreprise/xml/config.xml
    - curl -o /dev/null --silent --head --write-out '%{http_code}\n' http://127.0.0.1/MaarchCourrier
    - npm run ee-launch
+ allow_failure: true
  only:
    - schedules
 
@@ -70,7 +71,7 @@ job_php-7.4:
  stage: test
  script:
    - mkdir -p /opt/maarch/docservers/indexes/{letterbox_coll,attachments_coll,version_attachments_coll}
-   - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates}
+   - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates,acknowledgement_receipts}
    - mkdir -p /opt/maarch/docservers/{convert_attachments,convert_attachments_version,convert_mlb}
    - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
    - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
@@ -93,7 +94,7 @@ job_php-7.3:
  stage: test
  script:
    - mkdir -p /opt/maarch/docservers/indexes/{letterbox_coll,attachments_coll,version_attachments_coll}
-   - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates}
+   - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates,acknowledgement_receipts}
    - mkdir -p /opt/maarch/docservers/{convert_attachments,convert_attachments_version,convert_mlb}
    - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
    - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
@@ -116,7 +117,7 @@ job_php-7.2:
   stage: test
   script:
     - mkdir -p /opt/maarch/docservers/indexes/{letterbox_coll,attachments_coll,version_attachments_coll}
-    - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates}
+    - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates,acknowledgement_receipts}
     - mkdir -p /opt/maarch/docservers/{convert_attachments,convert_attachments_version,convert_mlb}
     - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
     - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}

@@ -12,7 +12,7 @@
     "upgrade": "ncu -u",
     "create-component": "echo Component name ? && read varname && ng g c $varname --module app",
     "create-component-admin": "echo Component name ? && read varname && ng g c administration/$varname --module administration",
-    "ee-launch": "webdriver-manager update && webdriver-manager start --detach && protractor test/e2e/conf.js && webdriver-manager shutdown && fuser -k 4444/tcp",
+    "ee-launch": "webdriver-manager update --versions.chrome=80.0.3987.162 && webdriver-manager start --detach --versions.chrome=80.0.3987.162 && protractor test/e2e/conf.js && webdriver-manager shutdown && fuser -k 4444/tcp && base64 exception.png",
     "ee-update": "webdriver-manager update",
     "ee-start-server": "webdriver-manager start",
     "ee-test": "protractor test/e2e/conf.js"

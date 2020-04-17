@@ -1,4 +1,4 @@
-<mat-expansion-panel #basketPanel class="basketList" [expanded]="!loading">
+<mat-expansion-panel #basketPanel class="basketList" expanded *ngIf="!loading">
     <mat-expansion-panel-header>
         <mat-panel-title>
             <i class="fa fa-inbox panelIconMenu"></i>&nbsp;{{lang.myBaskets}}

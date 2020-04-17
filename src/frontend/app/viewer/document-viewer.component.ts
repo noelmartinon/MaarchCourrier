@@ -5,7 +5,6 @@ import { NotificationService } from '../notification.service';
 import { HeaderService } from '../../service/header.service';
 import { AppService } from '../../service/app.service';
 import { tap, catchError, filter, map, exhaustMap } from 'rxjs/operators';
-import { of, Subject } from 'rxjs';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../../plugins/modal/alert.component';
@@ -16,12 +15,13 @@ import { EcplOnlyofficeViewerComponent } from '../../plugins/onlyoffice-api-js/o
 import { FunctionsService } from '../../service/functions.service';
 import { DocumentViewerModalComponent } from './modal/document-viewer-modal.component';
 import { PrivilegeService } from '../../service/privileges.service';
-import { VisaWorkflowModalComponent } from "../visa/modal/visa-workflow-modal.component";
+import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
+import { of } from 'rxjs/internal/observable/of';
 
 
 @Component({
     selector: 'app-document-viewer',
-    templateUrl: "document-viewer.component.html",
+    templateUrl: 'document-viewer.component.html',
     styleUrls: [
         'document-viewer.component.scss',
         '../indexation/indexing-form/indexing-form.component.scss',
@@ -34,50 +34,50 @@ export class DocumentViewerComponent implements OnInit {
     /**
      * document name stored in server (in tmp folder)
      */
-    @Input('tmpFilename') tmpFilename: string;
+    @Input() tmpFilename: string;
 
     /**
      * base64 of document  (@format is required!)
      */
-    @Input('base64') base64: any = null;
-    @Input('format') format: string = null;
+    @Input() base64: any = null;
+    @Input() format: string = null;
 
     /**
      * Target of resource (document or attachment)
      */
-    @Input('mode') mode: 'mainDocument' | 'attachment' = 'mainDocument';
+    @Input() mode: 'mainDocument' | 'attachment' = 'mainDocument';
 
     /**
      * Resource of document or attachment (based on @mode)
      */
-    @Input('resId') resId: number = null;
+    @Input() resId: number = null;
 
 
     /**
      * Resource of document link to attachment (@mode = 'attachment' required!)
      */
-    @Input('resIdMaster') resIdMaster: number = null;
+    @Input() resIdMaster: number = null;
 
     /**
      * Can manage document ? (create, delete, update)
      */
-    @Input('editMode') editMode: boolean = false;
+    @Input() editMode: boolean = false;
 
     /**
      * Title of new tab when open document in external tab
      */
-    @Input('title') title: string = '';
+    @Input() title: string = '';
 
 
     /**
      * To load specific attachment type in template list (to create document)
      */
-    @Input('attachType') attachType: string = null;
+    @Input() attachType: string = null;
 
     /**
      * Event emitter
      */
-    @Output('triggerEvent') triggerEvent = new EventEmitter<string>();
+    @Output() triggerEvent = new EventEmitter<string>();
 
     lang: any = LANG;
 
@@ -131,7 +131,8 @@ export class DocumentViewerComponent implements OnInit {
 
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
-    @ViewChild('docToUpload', { static: false }) docToUpload: ElementRef<HTMLInputElement>;
+
+    docToUploadValue: any;
 
     constructor(
         public http: HttpClient,
@@ -259,7 +260,7 @@ export class DocumentViewerComponent implements OnInit {
         if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
             this.initUpload();
 
-            var reader = new FileReader();
+            const reader = new FileReader();
             this.file.name = fileInput.target.files[0].name;
             this.file.type = fileInput.target.files[0].type;
             this.file.format = this.file.name.split('.').pop();
@@ -296,7 +297,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     getBase64Document(buffer: ArrayBuffer) {
-        let TYPED_ARRAY = new Uint8Array(buffer);
+        const TYPED_ARRAY = new Uint8Array(buffer);
         const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => {
             return data + String.fromCharCode(byte);
         }, '');
@@ -305,10 +306,10 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     base64ToArrayBuffer(base64: string) {
-        var binary_string = window.atob(base64);
-        var len = binary_string.length;
-        var bytes = new Uint8Array(len);
-        for (var i = 0; i < len; i++) {
+        const binary_string = window.atob(base64);
+        const len = binary_string.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
             bytes[i] = binary_string.charCodeAt(i);
         }
         return bytes.buffer;
@@ -354,13 +355,13 @@ export class DocumentViewerComponent implements OnInit {
             );
         } else {
             this.noConvertedFound = true;
-            this.loading = false
+            this.loading = false;
         }
 
     }
 
     upload(data: any) {
-        let uploadURL = `../rest/convertedFile`;
+        const uploadURL = `../rest/convertedFile`;
 
         return this.http.post<any>(uploadURL, data, {
             reportProgress: true,
@@ -443,7 +444,7 @@ export class DocumentViewerComponent implements OnInit {
                     content: null,
                     src: null
                 };
-                this.docToUpload.nativeElement.value = "";
+                this.docToUploadValue = '';
                 this.triggerEvent.emit('cleanFile');
             }),
             catchError((err: any) => {
@@ -520,27 +521,49 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     downloadOriginalFile() {
-        let downloadLink = document.createElement('a');
+        const downloadLink = document.createElement('a');
         if (this.file.contentMode === 'base64') {
             downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
+            downloadLink.setAttribute('download', this.file.name);
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
         } else {
-            downloadLink.href = this.file.content;
+            this.http.get(this.file.content).pipe(
+                tap((data: any) => {
+                    downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                    downloadLink.setAttribute('download', this.file.name);
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         }
-
-        downloadLink.setAttribute('download', this.file.name);
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
     }
 
     openPdfInTab() {
-        let src = this.file.contentView;
+        let src = '';
         if (this.file.contentMode === 'base64') {
             src = `data:${this.file.type};base64,${this.file.content}`;
+            const newWindow = window.open();
+            newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${src}" frameborder="0" allowfullscreen></iframe>`);
+            newWindow.document.title = this.title;
+        } else {
+            this.http.get(this.file.contentView).pipe(
+                tap((data: any) => {
+                    src = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                    const newWindow = window.open();
+                    newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${src}" frameborder="0" allowfullscreen></iframe>`);
+                    newWindow.document.title = this.title;
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         }
-
-        let newWindow = window.open();
-        newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${src}" frameborder="0" allowfullscreen></iframe>`);
-        newWindow.document.title = this.title;
     }
 
     async loadRessource(resId: any, target: string = 'mainDocument') {
@@ -550,10 +573,11 @@ export class DocumentViewerComponent implements OnInit {
                 (data: any) => {
                     if (data.encodedDocument) {
                         this.file.contentMode = 'route';
+                        this.file.name = `${resId}.${data.originalFormat}`;
                         this.file.format = data.originalFormat;
                         this.file.creatorId = data.originalCreatorId;
-                        this.file.content = `../rest/attachments/${resId}/originalContent`;
-                        this.file.contentView = `../rest/attachments/${resId}/content?mode=view`;
+                        this.file.content = `../rest/attachments/${resId}/originalContent?mode=base64`;
+                        this.file.contentView = `../rest/attachments/${resId}/content?mode=base64`;
                         this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                         this.loading = false;
                     }
@@ -563,7 +587,7 @@ export class DocumentViewerComponent implements OnInit {
                         this.noFile = true;
                     } else if (err.error.errors === 'Converted Document not found') {
                         this.file.contentMode = 'route';
-                        this.file.content = `../rest/attachments/${resId}/originalContent`;
+                        this.file.content = `../rest/attachments/${resId}/originalContent?mode=base64`;
                         this.noConvertedFound = true;
                     } else {
                         this.notify.error(err.error.errors);
@@ -581,7 +605,7 @@ export class DocumentViewerComponent implements OnInit {
                 this.loading = false;
             } else if (!this.file.subinfos.canConvert) {
                 this.file.contentMode = 'route';
-                this.file.content = `../rest/resources/${resId}/originalContent`;
+                this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;
                 this.noConvertedFound = true;
                 this.loading = false;
             } else {
@@ -589,9 +613,10 @@ export class DocumentViewerComponent implements OnInit {
                     (data: any) => {
                         if (data.encodedDocument) {
                             this.file.contentMode = 'route';
+                            this.file.name = `${resId}.${data.originalFormat}`;
                             this.file.format = data.originalFormat;
-                            this.file.content = `../rest/resources/${resId}/originalContent`;
-                            this.file.contentView = `../rest/resources/${resId}/content?mode=view`;
+                            this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;
+                            this.file.contentView = `../rest/resources/${resId}/content?mode=base64`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                             this.loading = false;
                         }
@@ -652,7 +677,7 @@ export class DocumentViewerComponent implements OnInit {
 
     editTemplate(templateId: number) {
         let confirmMsg = '';
-        if (this.mode == 'attachment') {
+        if (this.mode === 'attachment') {
             confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmThird;
         } else {
             confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmSecond;
@@ -669,7 +694,7 @@ export class DocumentViewerComponent implements OnInit {
             tap(() => {
 
                 this.triggerEvent.emit();
-                const template = this.listTemplates.filter(template => template.id === templateId)[0];
+                const template = this.listTemplates.filter(templateItem => templateItem.id === templateId)[0];
 
                 this.file.format = template.extension;
 
@@ -811,7 +836,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     loadTemplatesByResId(resId: number, attachType: string) {
-        let arrValues: any[] = [];
+        const arrValues: any[] = [];
         let arrTypes: any = [];
         this.listTemplates = [];
         this.http.get('../rest/attachmentsTypes').pipe(
@@ -864,8 +889,8 @@ export class DocumentViewerComponent implements OnInit {
 
     loadTemplates() {
         if (this.listTemplates.length === 0) {
-            let arrValues: any[] = [];
-            if (this.mode == 'mainDocument') {
+            const arrValues: any[] = [];
+            if (this.mode === 'mainDocument') {
                 this.http.get('../rest/currentUser/templates?target=indexingFile').pipe(
                     tap((data: any) => {
                         this.listTemplates = data.templates;
@@ -998,7 +1023,7 @@ export class DocumentViewerComponent implements OnInit {
                         src: this.base64ToArrayBuffer(data.encodedResource)
                     };
                 }),
-                //exhaustMap((data) => this.http.post(`../rest/convertedFile/encodedFile`, data.content)),
+                // exhaustMap((data) => this.http.post(`../rest/convertedFile/encodedFile`, data.content)),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
                     resolve(false);

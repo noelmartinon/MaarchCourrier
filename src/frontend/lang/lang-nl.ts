@@ -493,7 +493,9 @@ export const LANG_NL = {
     "keywordHelpDesc_11"                    : "Voorbeeld van documentaire perimeter toegang tot assets met betrekking tot de hoofddienst van de verbonden gebruiker of tot de subdiensten van deze dienst",
     "keywordHelpDesc_2"                     : "E-mail van de verbonden gebruiker",
     "keywordHelpDesc_3"                     : "Alle eenheden die aan de verbonden gebruiker gekoppeld zijn Bevat geen subeenheden",
+    "keywordHelpDesc_13"                     : "Alle eenheden die aan de verbonden gebruiker gekoppeld zijn Bevat geen subeenheden",//TRANSLATE
     "keywordHelpDesc_4"                     : "Primaire eenheid van de verbonden gebruiker",
+    "keywordHelpDesc_14"                     : "Primaire eenheid van de verbonden gebruiker",//TRANSLATE
     "keywordHelpDesc_5"                     : "Subeenheden van de argumentenlijst die ook @my_entities of @my_primary_entity kan zijn",
     "keywordHelpDesc_6"                     : "Bovenliggende eenheid van de eenheid in het argument",
     "keywordHelpDesc_7"                     : "Alle eenheden van hetzelfde niveau van de eenheid in het argument",
@@ -1653,4 +1655,5 @@ export const LANG_NL = {
     "sessionExpired": "Session expired", //_TO_TRANSLATE
     "accountSuspended": "Your user account has been suspended", //_TO_TRANSLATE
     "accountLocked": "Too many connections attemps. Retry in", //_TO_TRANSLATE
+    "modelUsedByResources": "This model is used by resources, you can't delete it.", //_TO_TRANSLATE
 };

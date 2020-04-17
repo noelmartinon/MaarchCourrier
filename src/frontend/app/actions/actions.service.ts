@@ -35,6 +35,7 @@ import { ValidateAvisParallelComponent } from './avis-parallel-validate-action/v
 import { HeaderService } from '../../service/header.service';
 import { FunctionsService } from '../../service/functions.service';
 import { ReconcileActionComponent } from './reconciliation-action/reconcile-action.component';
+import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
 
 @Injectable()
 export class ActionsService {
@@ -916,6 +917,28 @@ export class ActionsService {
             filter((resIds: any) => !this.functions.empty(resIds)),
             tap((resIds: any) => {
                 this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    sendAlfrescoAction(options: any = null) {
+        const dialogRef = this.dialog.open(SendAlfrescoActionComponent, {
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                this.unlockResourceAfterActionModal(data);
+            }),
+            filter((data: string) => data === 'success'),
+            tap((result: any) => {
+                this.endAction(result);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

@@ -43,7 +43,7 @@ class MessageExchangeController
         foreach ($messagesModel as $message) {
             $messageType = 'm2m_' . strtoupper($message['type']);
 
-            $user = UserModel::getLabelledUserById(['login' => $message['account_id']]);
+            $user = UserModel::getLabelledUserById(['id' => $message['account_id']]);
             $sender = $user . ' (' . $message['sender_org_name'] . ')';
 
             $recipient = $message['recipient_org_name'] . ' (' . $message['recipient_org_identifier'] . ')';
@@ -159,7 +159,7 @@ class MessageExchangeController
         }
 
         $messageType = 'm2m_' . strtoupper($type);
-        $user = UserModel::getLabelledUserById(['login' => $message['account_id']]);
+        $user = UserModel::getLabelledUserById(['id' => $message['account_id']]);
         $sender = $user . ' (' . $message['sender_org_name'] . ')';
 
         if ($message['status'] == 'S') {
@@ -172,9 +172,8 @@ class MessageExchangeController
             $status = 'DRAFT';
         }
 
-        $userInfo = UserModel::getByLogin(['login' => $message['account_id'], 'select' => ['id']]);
         $messageExchange = [
-            'userId'                    => $userInfo['id'],
+            'userId'                    => $message['account_id'],
             'messageId'                 => $message['message_id'],
             'creationDate'              => $message['date'],
             'type'                      => $messageType,

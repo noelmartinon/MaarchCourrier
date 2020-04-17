@@ -25,58 +25,21 @@ class IncludeFileError extends Exception
     }
 }
 
-try {
-    include('Maarch_CLITools/ArgsParser.php');
-    include('LoggerLog4php.php');
-    include('Maarch_CLITools/FileHandler.php');
-    include('Maarch_CLITools/ConsoleHandler.php');
-} catch (IncludeFileError $e) {
-    echo 'Maarch_CLITools required ! \n (pear.maarch.org)\n';
-    exit(106);
-}
-
 // Globals variables definition
 $GLOBALS['batchName']    = 'retrieveMailsFromSignatoryBook';
 $GLOBALS['wb']           = '';
 $totalProcessedResources = 0;
 
-// Open Logger
-$GLOBALS['logger'] = new Logger4Php();
-$GLOBALS['logger']->set_threshold_level('INFO');
-
-$logFile = 'logs' . DIRECTORY_SEPARATOR . date('Y-m-d_H-i-s') . '.log';
-
-$file = new FileHandler($logFile);
-$GLOBALS['logger']->add_handler($file);
-
 // Load tools
 include('batch_tools.php');
 
-// Defines scripts arguments
-$argsparser = new ArgsParser();
-// The config file
-$argsparser->add_arg(
-    'config',
-    array(
-        'short' => 'c',
-        'long' => 'config',
-        'mandatory' => true,
-        'help' => 'Config file path is mandatory.',
-    )
-);
-
-// Parsing script options
-try {
-    $options = $argsparser->parse_args($GLOBALS['argv']);
-    // If option = help then options = false and the script continues ...
-    if ($options == false) {
-        exit(0);
-    }
-} catch (MissingArgumentError $e) {
-    if ($e->arg_name == 'config') {
-        $GLOBALS['logger']->write('Configuration file missing', 'ERROR', 101);
-        exit(101);
-    }
+$options = getopt("c:", ["config:"]);
+if (empty($options['c']) && empty($options['config'])) {
+    print("Configuration file missing\n");
+    exit(101);
+} elseif (!empty($options['c']) && empty($options['config'])) {
+    $options['config'] = $options['c'];
+    unset($options['c']);
 }
 
 $txt = '';
@@ -87,46 +50,34 @@ foreach (array_keys($options) as $key) {
         $txt .= $key . '=' . $options[$key] . ',';
     }
 }
-$GLOBALS['logger']->write($txt, 'DEBUG');
+print($txt . "\n");
 $GLOBALS['configFile'] = $options['config'];
-// Loading config file
-$GLOBALS['logger']->write(
-    'Load xml config file:' . $GLOBALS['configFile'],
-    'INFO'
-);
+
+print("Load xml config file:" . $GLOBALS['configFile'] . "\n");
 // Tests existence of config file
 if (!file_exists($GLOBALS['configFile'])) {
-    $GLOBALS['logger']->write(
-        'Configuration file ' . $GLOBALS['configFile']
-        . ' does not exist',
-        'ERROR',
-        102
+    print(
+        "Configuration file " . $GLOBALS['configFile']
+        . " does not exist\n"
     );
-    echo "\nConfiguration file " . $GLOBALS['configFile'] . " does not exist ! \nThe batch cannot be launched !\n\n";
     exit(102);
 }
 
 $xmlconfig = simplexml_load_file($GLOBALS['configFile']);
 
 if ($xmlconfig == false) {
-    $GLOBALS['logger']->write(
-        'Error on loading config file:'
-        . $GLOBALS['configFile'],
-        'ERROR',
-        103
-    );
+    print("Error on loading config file:" . $GLOBALS['configFile'] . "\n");
     exit(103);
 }
 
 // Load config
 $config = $xmlconfig->CONFIG;
-$GLOBALS['MaarchDirectory']        = $_SESSION['config']['corepath'] = (string)$config->MaarchDirectory;
-$_SESSION['config']['app_id']      = 'maarch_entreprise';
-$GLOBALS['CustomId']               = $_SESSION['custom_override_id'] = (string)$config->CustomId;
+$GLOBALS['MaarchDirectory']        = (string)$config->MaarchDirectory;
+$GLOBALS['customId']               = (string)$config->CustomId;
 $GLOBALS['applicationUrl']         = (string)$config->applicationUrl;
 $GLOBALS['userWS']                 = (string)$config->userWS;
 $GLOBALS['passwordWS']             = (string)$config->passwordWS;
-$GLOBALS['batchDirectory']         = $GLOBALS['MaarchDirectory'] . 'modules' . DIRECTORY_SEPARATOR . 'visa' . DIRECTORY_SEPARATOR . 'batch';
+$GLOBALS['batchDirectory']         = $GLOBALS['MaarchDirectory'] . 'modules/visa/batch';
 $validatedStatus                   = (string)$config->validatedStatus;
 $validatedStatusOnlyVisa           = (string)$config->validatedStatusOnlyVisa;
 $refusedStatus                     = (string)$config->refusedStatus;
@@ -135,26 +86,12 @@ $refusedStatusAnnot                = (string)$config->refusedStatusAnnot;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['MaarchDirectory']);
 
-//log4php params
-$log4phpParams = $xmlconfig->LOG4PHP;
-if ((string) $log4phpParams->enabled == 'true') {
-    $GLOBALS['logger']->set_log4PhpLibrary(
-        $GLOBALS['MaarchDirectory'] . 'apps/maarch_entreprise/tools/log4php/Logger.php'
-    );
-    $GLOBALS['logger']->set_log4PhpLogger((string) $log4phpParams->Log4PhpLogger);
-    $GLOBALS['logger']->set_log4PhpBusinessCode((string) $log4phpParams->Log4PhpBusinessCode);
-    $GLOBALS['logger']->set_log4PhpConfigPath((string) $log4phpParams->Log4PhpConfigPath);
-    $GLOBALS['logger']->set_log4PhpBatchName($GLOBALS['batchName']);
-} else {
-    echo "\n/!\ WARNING /!\ LOG4PHP is disabled ! Informations of batch process will not show !\n\n";
-}
-
 try {
     Bt_myInclude($GLOBALS['MaarchDirectory'] . 'vendor/autoload.php');
 
     // On regarde la configuration du parapheur
-    if (file_exists($GLOBALS['MaarchDirectory'] . "custom/".$GLOBALS['CustomId']."/modules/visa/xml/remoteSignatoryBooks.xml")) {
-        $path = $GLOBALS['MaarchDirectory'] . "custom/".$GLOBALS['CustomId']."/modules/visa/xml/remoteSignatoryBooks.xml";
+    if (file_exists($GLOBALS['MaarchDirectory'] . "custom/".$GLOBALS['customId']."/modules/visa/xml/remoteSignatoryBooks.xml")) {
+        $path = $GLOBALS['MaarchDirectory'] . "custom/".$GLOBALS['customId']."/modules/visa/xml/remoteSignatoryBooks.xml";
     } else {
         $path = $GLOBALS['MaarchDirectory'] . 'modules/visa/xml/remoteSignatoryBooks.xml';
     }
@@ -174,191 +111,203 @@ try {
                 }
             }
         } else {
-            $GLOBALS['logger']->write($path . ' can not be loaded', 'ERROR', 102);
-            echo "\nConfiguration file ".$path." can not be loaded ! \nThe batch cannot be launched !\n\n";
+            Bt_writeLog(['level' => 'ERROR', 'message' => $path . ' can not be loaded']);
             exit(102);
         }
     } else {
-        $GLOBALS['logger']->write($path . ' does not exist', 'ERROR', 102);
-        echo "\nConfiguration file ".$path." does not exist ! \nThe batch cannot be launched !\n\n";
+        Bt_writeLog(['level' => 'ERROR', 'message' => $path . ' does not exist']);
         exit(102);
     }
 
     if (empty($configRemoteSignatoryBook)) {
-        $GLOBALS['logger']->write('no signatory book enabled', 'ERROR', 102);
-        echo "\nNo signatory book enabled ! \nThe batch cannot be launched !\n\n";
+        Bt_writeLog(['level' => 'ERROR', 'message' => 'no signatory book enabled']);
         exit(102);
     }
 
     // On inclut la classe du parapheur activé
     if (!in_array($configRemoteSignatoryBook['id'], ['maarchParapheur', 'xParaph', 'fastParapheur', 'iParapheur', 'ixbus'])) {
-        $GLOBALS['logger']->write('No class detected', 'ERROR', 102);
-        echo "\nNo class detected ! \nThe batch cannot be launched !\n\n";
+        Bt_writeLog(['level' => 'ERROR', 'message' => 'No class detected']);
         exit(102);
     }
 } catch (IncludeFileError $e) {
-    $GLOBALS['logger']->write(
-        'Problem with the php include path:' .$e .' '. get_include_path(),
-        'ERROR'
-    );
+    Bt_writeLog(['level' => 'ERROR', 'message' => 'Problem with the php include path:' .$e .' '. get_include_path()]);
     exit();
 }
 
 \SrcCore\models\DatabasePDO::reset();
-$GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
+new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['customId']]);
 
 $GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR . $GLOBALS['batchName'] .'_error.lck';
 $GLOBALS['lckFile']      = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR . $GLOBALS['batchName'] . '.lck';
 
 if (file_exists($GLOBALS['errorLckFile'])) {
-    $GLOBALS['logger']->write(
-        'Error persists, please solve this before launching a new batch',
-        'ERROR',
-        13
-    );
+    Bt_writeLog(['level' => 'ERROR', 'message' => 'Error persists, please solve this before launching a new batch']);
     exit(13);
 }
 
 Bt_getWorkBatch();
 
-$GLOBALS['logger']->write('Retrieve attachments sent to remote signatory book', 'INFO');
-$query = "SELECT res_id, external_id->>'signatureBookId' as external_id, external_id->>'xparaphDepot' as xparaphdepot, format, res_id_master, title, identifier, attachment_type, recipient_id, recipient_type, typist, origin_id, relation 
-        FROM res_attachments WHERE status = 'FRZ' AND external_id->>'signatureBookId' IS NOT NULL AND external_id->>'signatureBookId' <> ''";
-$stmt = $GLOBALS['db']->query($query, []);
+Bt_writeLog(['level' => 'INFO', 'message' => 'Retrieve attachments sent to remote signatory book']);
+
+$attachments = \Attachment\models\AttachmentModel::get([
+    'select' => ['res_id', 'external_id->>\'signatureBookId\' as external_id', 'external_id->>\'xparaphDepot\' as xparaphdepot', 'format', 'res_id_master', 'title', 'identifier', 'attachment_type', 'recipient_id', 'recipient_type', 'typist', 'origin_id', 'relation'],
+    'where' => ['status = ?', 'external_id->>\'signatureBookId\' IS NOT NULL', 'external_id->>\'signatureBookId\' <> \'\''],
+    'data'  => ['FRZ']
+]);
     
 $idsToRetrieve = ['noVersion' => [], 'resLetterbox' => []];
 
-while ($reqResult = $stmt->fetchObject()) {
-    $idsToRetrieve['noVersion'][$reqResult->res_id] = $reqResult;
+foreach ($attachments as $value) {
+    $idsToRetrieve['noVersion'][$value['res_id']] = $value;
 }
 
 // On récupère les pj signés dans le parapheur distant
-$GLOBALS['logger']->write('Retrieve signed/annotated documents from remote signatory book', 'INFO');
+Bt_writeLog(['level' => 'INFO', 'message' => 'Retrieve signed/annotated documents from remote signatory book']);
 if ($configRemoteSignatoryBook['id'] == 'ixbus') {
-    $retrievedMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'noVersion']);
 } elseif ($configRemoteSignatoryBook['id'] == 'iParapheur') {
-    $retrievedMails = \ExternalSignatoryBook\controllers\IParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\IParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'noVersion']);
 } elseif ($configRemoteSignatoryBook['id'] == 'fastParapheur') {
-    $retrievedMails = \ExternalSignatoryBook\controllers\FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'noVersion']);
 } elseif ($configRemoteSignatoryBook['id'] == 'maarchParapheur') {
-    $retrievedMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'noVersion']);
 } elseif ($configRemoteSignatoryBook['id'] == 'xParaph') {
-    $retrievedMails = \ExternalSignatoryBook\controllers\XParaphController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+    $retrievedMails = \ExternalSignatoryBook\controllers\XParaphController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'noVersion']);
 }
 
-$GLOBALS['logger']->write('Retrieve mails sent to remote signatory book', 'INFO');
-$query = "SELECT res_id, external_id->>'signatureBookId' as external_id, subject, typist, version 
-        FROM res_letterbox WHERE external_id->>'signatureBookId' IS NOT NULL AND external_id->>'signatureBookId' <> ''";
-$stmt = $GLOBALS['db']->query($query, []);
+Bt_writeLog(['level' => 'INFO', 'message' => 'Retrieve mails sent to remote signatory book']);
+$resources = \Resource\models\ResModel::get([
+    'select' => ['res_id', 'external_id->>\'signatureBookId\' as external_id', 'subject', 'typist', 'version'],
+    'where' => ['external_id->>\'signatureBookId\' IS NOT NULL', 'external_id->>\'signatureBookId\' <> \'\'']
+]);
 
-while ($reqResult = $stmt->fetchObject()) {
-    $idsToRetrieve['resLetterbox'][$reqResult->res_id] = $reqResult;
+foreach ($resources as $value) {
+    $idsToRetrieve['resLetterbox'][$value['res_id']] = $value;
 }
+
 if (!empty($idsToRetrieve['resLetterbox'])) {
     if ($configRemoteSignatoryBook['id'] == 'maarchParapheur') {
-        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve]);
+        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\MaarchParapheurController::retrieveSignedMails(['config' => $configRemoteNoteBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     } elseif ($configRemoteSignatoryBook['id'] == 'fastParapheur') {
-        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\FastParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     } elseif ($configRemoteSignatoryBook['id'] == 'iParapheur') {
-        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IParapheurController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     } elseif ($configRemoteSignatoryBook['id'] == 'ixbus') {
-        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve]);
+        $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     }
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'];
 }
 
 if (!empty($retrievedMails['error'])) {
-    $GLOBALS['logger']->write($retrievedMails['error'], 'ERROR');
+    Bt_writeLog(['level' => 'ERROR', 'message' => $retrievedMails['error']]);
     exit;
 }
 
 // On dégele les pj et on créé une nouvelle ligne si le document a été signé
 $nbMailsRetrieved = 0;
 foreach ($retrievedMails['noVersion'] as $resId => $value) {
-    $GLOBALS['logger']->write('Update res_attachments : ' . $resId . '. ExternalId : ' . $value->external_id, 'INFO');
+    Bt_writeLog(['level' => 'INFO', 'message' => 'Update res_attachments : ' . $resId . '. ExternalId : ' . $value['external_id']]);
 
-    if (!empty($value->log)) {
-        $GLOBALS['logger']->write('Create log Attachment', 'INFO');
+    if (!empty($value['log'])) {
+        Bt_writeLog(['level' => 'INFO', 'message' => 'Create log Attachment']);
         Bt_createAttachment([
-            'resIdMaster'       => $value->res_id_master,
-            'title'             => '[xParaph Log] ' . $value->title,
-            'chrono'            => $value->identifier,
-            'recipientId'       => $value->recipient_id,
-            'recipientType'     => $value->recipient_type,
-            'typist'            => $value->typist,
+            'resIdMaster'       => $value['res_id_master'],
+            'title'             => '[xParaph Log] ' . $value['title'],
+            'chrono'            => $value['identifier'],
+            'recipientId'       => $value['recipient_id'],
+            'recipientType'     => $value['recipient_type'],
+            'typist'            => $value['typist'],
             'format'            => 'xml',
-            'type'              => $value->attachment_type,
+            'type'              => $value['attachment_type'],
             'inSignatureBook'   => false,
-            'encodedFile'       => $value->log,
+            'encodedFile'       => $value['log'],
             'status'            => 'TRA'
         ]);
     }
     $additionalHistoryInfo = '';
-    if (!empty($value->workflowInfo)) {
-        $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+    if (!empty($value['workflowInfo'])) {
+        $additionalHistoryInfo =  ' : ' . $value['workflowInfo'];
     }
 
-    if ($value->status == 'validated') {
-        if (!empty($value->encodedFile)) {
+    if ($value['status'] == 'validated') {
+        if (!empty($value['encodedFile'])) {
             \SrcCore\models\DatabaseModel::delete([
                 'table' => 'res_attachments',
                 'where' => ['res_id_master = ?', 'status = ?', 'relation = ?', 'origin = ?'],
-                'data'  => [$value->res_id_master, 'SIGN', $value->relation, $value->res_id . ',res_attachments']
+                'data'  => [$value['res_id_master'], 'SIGN', $value['relation'], $value['res_id'] . ',res_attachments']
             ]);
 
-            $GLOBALS['logger']->write('Create validated Attachment', 'INFO');
+            Bt_writeLog(['level' => 'INFO', 'message' => 'Create validated Attachment']);
             Bt_createAttachment([
-                'resIdMaster'     => $value->res_id_master,
-                'title'           => $value->title,
-                'chrono'          => $value->identifier,
-                'recipientId'     => $value->recipient_id,
-                'recipientType'   => $value->recipient_type,
-                'typist'          => $value->typist,
-                'format'          => $value->format,
+                'resIdMaster'     => $value['res_id_master'],
+                'title'           => $value['title'],
+                'chrono'          => $value['identifier'],
+                'recipientId'     => $value['recipient_id'],
+                'recipientType'   => $value['recipient_type'],
+                'typist'          => $value['typist'],
+                'format'          => $value['format'],
                 'type'            => 'signed_response',
                 'status'          => 'TRA',
-                'encodedFile'     => $value->encodedFile,
+                'encodedFile'     => $value['encodedFile'],
                 'inSignatureBook' => true,
                 'originId'        => $resId
             ]);
         }
 
-        $GLOBALS['logger']->write('Document validated', 'INFO');
-        $GLOBALS['db']->query("UPDATE res_attachments SET status = 'SIGN', external_id = external_id - 'signatureBookId', in_signature_book = 'false' WHERE res_id = ?", [$resId]);
-        if (!empty($value->onlyVisa) && $value->onlyVisa) {
+        Bt_writeLog(['level' => 'INFO', 'message' => 'Document validated']);
+        \Attachment\models\AttachmentModel::update([
+            'set'     => ['status' => 'SIGN', 'in_signature_book' => 'false'],
+            'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
+            'where'   => ['res_id = ?'],
+            'data'    => [$resId]
+        ]);
+        if (!empty($value['onlyVisa']) && $value['onlyVisa']) {
             $status = $validatedStatusOnlyVisa;
         } else {
             $status = $validatedStatus;
         }
-        Bt_validatedMail(['status' => $status, 'resId' => $value->res_id_master]);
+        Bt_validatedMail(['status' => $status, 'resId' => $value['res_id_master']]);
 
         $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été validée dans le parapheur externe' . $additionalHistoryInfo;
-    } elseif ($value->status == 'refused') {
-        if (!empty($value->encodedFile)) {
-            $GLOBALS['logger']->write('Create refused Attachment', 'INFO');
+    } elseif ($value['status'] == 'refused') {
+        if (!empty($value['encodedFile'])) {
+            Bt_writeLog(['level' => 'INFO', 'message' => 'Create refused Attachment']);
             Bt_createAttachment([
-                'resIdMaster'     => $value->res_id_master,
-                'title'           => '[REFUSE] ' . $value->title,
-                'chrono'          => $value->identifier,
-                'recipientId'     => $value->recipient_id,
-                'recipientType'   => $value->recipient_type,
-                'typist'          => $value->typist,
-                'format'          => $value->format,
-                'type'            => $value->attachment_type,
+                'resIdMaster'     => $value['res_id_master'],
+                'title'           => '[REFUSE] ' . $value['title'],
+                'chrono'          => $value['identifier'],
+                'recipientId'     => $value['recipient_id'],
+                'recipientType'   => $value['recipient_type'],
+                'typist'          => $value['typist'],
+                'format'          => $value['format'],
+                'type'            => $value['attachment_type'],
                 'status'          => 'A_TRA',
-                'encodedFile'     => $value->encodedFile,
+                'encodedFile'     => $value['encodedFile'],
                 'inSignatureBook' => false
             ]);
         }
-        $GLOBALS['logger']->write('Document refused', 'INFO');
-        $GLOBALS['db']->query('UPDATE listinstance SET process_date = NULL WHERE res_id = ? AND difflist_type = ?', [$value->res_id_master, 'VISA_CIRCUIT']);
-        $GLOBALS['db']->query("UPDATE res_attachments SET status = 'A_TRA', external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$resId]);
-        $GLOBALS['db']->query("UPDATE res_letterbox SET status = '" . $refusedStatus . "' WHERE res_id = ?", [$value->res_id_master]);
+        Bt_writeLog(['level' => 'INFO', 'message' => 'Document refused']);
+        \Entity\models\ListInstanceModel::update([
+            'set' => ['process_date' => null],
+            'where' => ['res_id = ?', 'difflist_type = ?'],
+            'data' => [$value['res_id_master'], 'VISA_CIRCUIT']
+        ]);
+        \Attachment\models\AttachmentModel::update([
+            'set'     => ['status' => 'A_TRA'],
+            'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
+            'where'   => ['res_id = ?'],
+            'data'    => [$resId]
+        ]);
+        \Resource\models\ResModel::update([
+            'set' => ['status' => $refusedStatus],
+            'where' => ['res_id = ?'],
+            'data' => [$value['res_id_master']]
+        ]);
     
         $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été refusée dans le parapheur externe' . $additionalHistoryInfo;
     }
-    if (in_array($value->status, ['validated', 'refused'])) {
-        Bt_createNote(['creatorId' => $value->noteCreatorId, 'creatorName' => $value->noteCreatorName, 'content' => $value->noteContent, 'resId' => $value->res_id_master]);
+    if (in_array($value['status'], ['validated', 'refused'])) {
+        Bt_createNote(['creatorId' => $value['noteCreatorId'], 'creatorName' => $value['noteCreatorName'], 'content' => $value['noteContent'], 'resId' => $value['res_id_master']]);
         Bt_history([
             'table_name' => 'res_attachments',
             'record_id'  => $resId,
@@ -369,7 +318,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
     
         Bt_history([
             'table_name' => 'res_letterbox',
-            'record_id'  => $value->res_id_master,
+            'record_id'  => $value['res_id_master'],
             'info'       => $historyInfo,
             'event_type' => 'ACTION#1',
             'event_id'   => '1'
@@ -379,11 +328,11 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
 }
 
 foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
-    $GLOBALS['logger']->write('Update res_letterbox : ' . $resId . '. SignatoryBookId : ' . $value->external_id, 'INFO');
+    Bt_writeLog(['level' => 'INFO', 'message' => 'Update res_letterbox : ' . $resId . '. SignatoryBookId : ' . $value['external_id']]);
 
-    if (!empty($value->encodedFile)) {
-        $GLOBALS['logger']->write('Create document in res_letterbox', 'INFO');
-        if ($value->status =='validated') {
+    if (!empty($value['encodedFile'])) {
+        Bt_writeLog(['level' => 'INFO', 'message' => 'Create document in res_letterbox']);
+        if ($value['status'] =='validated') {
             $typeToDelete = ['SIGN', 'TNL'];
         } else {
             $typeToDelete = ['NOTE'];
@@ -391,44 +340,44 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
         \SrcCore\models\DatabaseModel::delete([
             'table' => 'adr_letterbox',
             'where' => ['res_id = ?', 'type in (?)', 'version = ?'],
-            'data'  => [$resId, $typeToDelete, $value->version]
+            'data'  => [$resId, $typeToDelete, $value['version']]
         ]);
 
         $storeResult = \Docserver\controllers\DocserverController::storeResourceOnDocServer([
             'collId'          => 'letterbox_coll',
             'docserverTypeId' => 'DOC',
-            'encodedResource' => $value->encodedFile,
+            'encodedResource' => $value['encodedFile'],
             'format'          => 'pdf'
         ]);
         \SrcCore\models\DatabaseModel::insert([
             'table'         => 'adr_letterbox',
             'columnsValues' => [
                 'res_id'       => $resId,
-                'type'         => in_array($value->status, ['refused', 'refusedNote', 'validatedNote']) ? 'NOTE' : 'SIGN',
+                'type'         => in_array($value['status'], ['refused', 'refusedNote', 'validatedNote']) ? 'NOTE' : 'SIGN',
                 'docserver_id' => $storeResult['docserver_id'],
                 'path'         => $storeResult['destination_dir'],
                 'filename'     => $storeResult['file_destination_name'],
-                'version'      => $value->version,
+                'version'      => $value['version'],
                 'fingerprint'  => empty($storeResult['fingerPrint']) ? null : $storeResult['fingerPrint']
             ]
         ]);
     }
-    if (in_array($value->status, ['validatedNote', 'validated', 'refusedNote', 'refused'])) {
+    if (in_array($value['status'], ['validatedNote', 'validated', 'refusedNote', 'refused'])) {
         $additionalHistoryInfo = '';
-        if (!empty($value->workflowInfo)) {
-            $additionalHistoryInfo =  ' : ' . $value->workflowInfo;
+        if (!empty($value['workflowInfo'])) {
+            $additionalHistoryInfo =  ' : ' . $value['workflowInfo'];
         }
-        if (in_array($value->status, ['validatedNote', 'validated'])) {
-            $GLOBALS['logger']->write('Document validated', 'INFO');
+        if (in_array($value['status'], ['validatedNote', 'validated'])) {
+            Bt_writeLog(['level' => 'INFO', 'message' => 'Document validated']);
             $status = $validatedStatus;
-            if ($value->status == 'validatedNote') {
+            if ($value['status'] == 'validatedNote') {
                 $status = $validatedStatusAnnot;
             }
             $history = 'Le document '.$resId.' (res_letterbox) a été validé dans le parapheur externe' . $additionalHistoryInfo;
-        } elseif (in_array($value->status, ['refusedNote', 'refused'])) {
-            $GLOBALS['logger']->write('Document refused', 'INFO');
+        } elseif (in_array($value['status'], ['refusedNote', 'refused'])) {
+            Bt_writeLog(['level' => 'INFO', 'message' => 'Document refused']);
             $status = $refusedStatus;
-            if ($value->status == 'refusedNote') {
+            if ($value['status'] == 'refusedNote') {
                 $status = $refusedStatusAnnot;
             }
             $history = 'Le document '.$resId.' (res_letterbox) a été refusé dans le parapheur externe' . $additionalHistoryInfo;
@@ -440,20 +389,21 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
             'event_type' => 'ACTION#1',
             'event_id'   => '1'
         ]);
-        Bt_createNote(['creatorId' => $value->noteCreatorId, 'creatorName' => $value->noteCreatorName, 'content' => $value->noteContent, 'resId' => $resId]);
-        $GLOBALS['db']->query("UPDATE res_letterbox SET status = ?, external_id = external_id - 'signatureBookId' WHERE res_id = ?", [$status, $resId]);
+        Bt_createNote(['creatorId' => $value['noteCreatorId'], 'creatorName' => $value['noteCreatorName'], 'content' => $value['noteContent'], 'resId' => $resId]);
+        \Resource\models\ResModel::update([
+            'set'     => ['status' => $status],
+            'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
+            'where'   => ['res_id = ?'],
+            'data'    => [$value['res_id_master']]
+        ]);
         $nbMailsRetrieved++;
     }
 }
 
-$GLOBALS['logger']->write('End of process', 'INFO');
-$GLOBALS['logger']->write($nbMailsRetrieved.' document(s) retrieved', 'INFO');
+Bt_writeLog(['level' => 'INFO', 'message' => 'End of process']);
+Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsRetrieved.' document(s) retrieved']);
 
-Bt_logInDataBase(
-    $nbMailsRetrieved,
-    $err,
-    $nbMailsRetrieved.' mail(s) retrieved from signatory book'
-);
+Bt_logInDataBase($nbMailsRetrieved, $err, $nbMailsRetrieved.' mail(s) retrieved from signatory book');
 Bt_updateWorkBatch();
 
 exit($GLOBALS['exitCode']);

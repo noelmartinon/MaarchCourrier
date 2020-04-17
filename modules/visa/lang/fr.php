@@ -312,42 +312,6 @@ if (!defined('_REQUESTED_SIGNATURE')) {
     define('_REQUESTED_SIGNATURE', 'Signature demandée');
 }
 
-if (!defined('_SELECT_MESSAGE_MODEL_IXBUS')) {
-    define('_SELECT_MESSAGE_MODEL_IXBUS', "Choisissez un circuit");
-}
-
-if (!defined('_RESPONSES_WILL_BE_GENERATED')) {
-    define('_RESPONSES_WILL_BE_GENERATED', "réponse(s) seront générée(s).");
-}
-
-if (!defined('_GENERATE_PDF')) {
-    define('_GENERATE_PDF', "Générer la version PDF");
-}
-
-if (!defined('_CONVERSION_FAILED')) {
-    define('_CONVERSION_FAILED', "Échec de la conversion !");
-}
-
-if (!defined('_NATURE_IXBUS')) {
-    define('_NATURE_IXBUS', "Nature du document");
-}
-
-if (!defined('_WORKFLOW_MODEL_IXBUS')) {
-    define('_WORKFLOW_MODEL_IXBUS', "Modèle de circuit visa");
-}
-
-if (!defined('_ID_IXBUS')) {
-    define('_ID_IXBUS', "Identifiant IxBus");
-}
-
-if (!defined('_PASSWORD_IXBUS')) {
-    define('_PASSWORD_IXBUS', "Mot de passe IxBus");
-}
-
-if (!defined('_WRONG_ID_PASSWORD_IXBUS')) {
-    define('_WRONG_ID_PASSWORD_IXBUS', "Identifiant ou Mot de passe IxBus incorrect");
-}
-
 if (!defined('_HANDWRITTEN_SIGN')) {
     define('_HANDWRITTEN_SIGN', "Signature manuscrite");
 }

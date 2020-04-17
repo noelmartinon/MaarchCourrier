@@ -121,7 +121,7 @@
                                     <mat-form-field *ngIf="creationMode || template.file.name">
                                         <mat-select id="template_style" [disabled]="!creationMode" name="template_style"
                                             title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
-                                            [(ngModel)]="selectedModelFile"
+                                            [(ngModel)]="selectedModelFile" (selectionChange)="changeModel($event)"
                                             [required]="template.target!='acknowledgementReceipt'">
                                             <mat-optgroup label="{{lang.loadedFile}} :">
                                                 <mat-option class="selectFile" (click)="uploadSignFileOffice.click()"
@@ -149,7 +149,7 @@
                                         [disabled]="lockFound">{{lang.templateEdition}}</button>
                                     <button mat-raised-button color="default" type="button"
                                         (click)="$event.stopPropagation();uploadSignFileOffice.click()"
-                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode && !functionsService.empty(template.file.name)))"
+                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode && !functionsService.empty(template.file.name)) && headerService.user.preferences.documentEdition !== 'java')"
                                         [disabled]="lockFound">{{lang.importFile}}</button>
                                 </div>
                                 <iframe *ngIf="templateDocView !== null" [src]="templateDocView"
@@ -248,7 +248,7 @@
                                                 [disabled]="lockFound">{{lang.templateEdition}}</button>
                                             <button mat-raised-button color="default" type="button"
                                                 (click)="$event.stopPropagation();uploadSignFileOfficeHtml.click()"
-                                                *ngIf="!selectedModelFile || !creationMode"
+                                                *ngIf="!selectedModelFile || (!creationMode && headerService.user.preferences.documentEdition !== 'java')"
                                                 [disabled]="lockFound">{{lang.importFile}}</button>
                                         </div>
                                         <iframe *ngIf="templateDocView !== null" [src]="templateDocView"

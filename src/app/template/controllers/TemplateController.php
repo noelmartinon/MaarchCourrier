@@ -282,7 +282,7 @@ class TemplateController
 
     public function getContentById(Request $request, Response $response, array $aArgs)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
+        if (!Validator::intVal()->validate($aArgs['id']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -476,7 +476,7 @@ class TemplateController
         return $response->withJson(['templates' => $templates]);
     }
 
-    public static function mergeEmailTemplate(Request $request, Response $response, array $args)
+    public function mergeEmailTemplate(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Route param id is not an integer']);

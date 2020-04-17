@@ -168,7 +168,7 @@ class HomeController
 
     public function getMaarchParapheurDocuments(Request $request, Response $response)
     {
-        $user = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['external_id']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['external_id']]);
 
         $externalId = json_decode($user['external_id'], true);
         if (empty($externalId['maarchParapheur'])) {

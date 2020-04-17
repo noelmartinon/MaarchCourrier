@@ -146,7 +146,7 @@ class DatasourceController
             if ($event['table_name'] != 'notes') {
                 $note = DatabaseModel::select([
                     'select'    => ['mlb.*', 'notes.*', 'users.*'],
-                    'table'     => ['listinstance', $aArgs['params']['res_view'] . ' mlb', 'notes', 'users'],
+                    'table'     => ['listinstance li', $aArgs['params']['res_view'] . ' mlb', 'notes', 'users'],
                     'left_join' => ['mlb.res_id = li.res_id', 'notes.identifier = li.res_id', 'users.id = notes.user_id'],
                     'where'     => ['li.item_id = ?', 'li.item_mode = \'dest\'', 'li.item_type = \'user_id\'', 'li.res_id = ?'],
                     'data'      => [$aArgs['params']['recipient']['user_id'], $event['record_id']],

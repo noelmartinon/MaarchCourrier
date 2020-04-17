@@ -95,11 +95,12 @@ class SendMessageExchangeController
             'filePath'          => $aArgs['file_path'],
         ];
 
+        $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
         $messageId = MessageExchangeModel::insertMessage([
             "data"          => $oData,
             "type"          => $aArgs['type'],
             "dataExtension" => $aDataExtension,
-            "userId"        => $aArgs['userId']
+            "userId"        => $user['id']
         ]);
 
         return $messageId;

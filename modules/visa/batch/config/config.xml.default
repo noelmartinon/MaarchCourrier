@@ -12,10 +12,4 @@
         <userWS>superadmin</userWS>
         <passwordWS>superadmin</passwordWS>
     </CONFIG>
-    <LOG4PHP>
-        <enabled>true</enabled>
-        <Log4PhpLogger>loggerTechnique</Log4PhpLogger>
-        <Log4PhpBusinessCode>retrieveMailsFromSignatoryBook</Log4PhpBusinessCode>
-        <Log4PhpConfigPath>/var/www/html/MaarchCourrier/apps/maarch_entreprise/xml/log4php.xml</Log4PhpConfigPath>
-    </LOG4PHP>
 </ROOT>

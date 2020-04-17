@@ -13,6 +13,7 @@ import { LinkResourceModalComponent } from './linkResourceModal/link-resource-mo
 import { FunctionsService } from '../../service/functions.service';
 import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
 import { of } from 'rxjs/internal/observable/of';
+import { PrivilegeService } from '../../service/privileges.service';
 
 declare var $: any;
 
@@ -45,6 +46,7 @@ export class LinkedResourceListComponent implements OnInit {
         public appService: AppService,
         public dialog: MatDialog,
         public functions: FunctionsService,
+        public privilegeService: PrivilegeService
     ) { }
 
     ngOnInit(): void {

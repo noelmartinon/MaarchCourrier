@@ -93,7 +93,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private notify: NotificationService,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         public dialog: MatDialog,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
@@ -376,6 +376,24 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         }
 
         if (this.headerService.user.preferences.documentEdition === 'java') {
+            // WORKAROUND JAVA MODE DOESNT SUPPORT BASE64 
+            if (this.creationMode) {
+                editorOptions.objectId = '';
+                editorOptions.objectType = 'templateCreation';
+                for (const element of this.defaultTemplatesList) {
+                    if (this.selectedModelFile === element.fileExt + ': ' + element.fileName) {
+                        editorOptions.objectId = element.filePath;
+                    }
+                }
+                if (this.functionsService.empty(editorOptions.objectId)) {
+                    alert('Vous ne pouvez pas éditer avec l\'applet Java un document importé.');
+                    return false;
+                }
+            } else {
+                editorOptions.objectType = 'templateModification';
+                editorOptions.objectId = this.template.id;
+            }
+
             this.launchJavaEditor(editorOptions);
         } else if (this.headerService.user.preferences.documentEdition === 'onlyoffice') {
             this.launchOOEditor(editorOptions);
@@ -469,7 +487,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                     this.template.file.format = filenameOnTmp.toLowerCase().split('.').pop();
                     this.template.file.content = data.encodedResource;
                 }
-                this.templateDocView = data.encodedConvertedResource;
+                this.templateDocView = this.sanitizer.bypassSecurityTrustResourceUrl('data:application/pdf;base64,' + data.encodedConvertedResource);
             })
         ).subscribe();
     }
@@ -623,6 +641,22 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             tinymce.remove('textarea');
         }
         this.template.type = ev.value;
+    }
+
+    changeModel() {
+        this.template.file = {
+            name: '',
+            type: '',
+            content: ''
+        };
+
+        this.template.file = {
+            electronic: {
+                name: '',
+                type: '',
+                content: ''
+            }
+        };
     }
 
     loadTab(event: any) {

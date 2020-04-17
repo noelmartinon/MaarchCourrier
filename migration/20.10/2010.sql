@@ -141,6 +141,15 @@ DO $$ BEGIN
         UPDATE history set user_id_tmp = (select id FROM users where users.user_id = history.user_id);
         ALTER TABLE history DROP COLUMN IF EXISTS user_id;
         ALTER TABLE history RENAME COLUMN user_id_tmp TO user_id;
+        UPDATE history set record_id = (select id FROM users where users.user_id = history.record_id) WHERE table_name = 'users';
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'message_exchange' and column_name = 'account_id' and data_type != 'integer') THEN
+        ALTER TABLE message_exchange ADD COLUMN account_id_tmp INTEGER;
+        UPDATE message_exchange set account_id_tmp = (select id FROM users where users.user_id = message_exchange.account_id);
+        ALTER TABLE message_exchange DROP COLUMN IF EXISTS account_id;
+        ALTER TABLE message_exchange RENAME COLUMN account_id_tmp TO account_id;
     END IF;
 END$$;
 

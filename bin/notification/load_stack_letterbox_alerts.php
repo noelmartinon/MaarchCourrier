@@ -93,9 +93,8 @@ chdir($maarchDirectory);
 $maarchUrl = (string)$config->MaarchUrl;
 
 $GLOBALS['customId']  = $customID;
-$GLOBALS['batchDirectory'] = $maarchDirectory . 'modules'
-                           . DIRECTORY_SEPARATOR . 'notifications'
-                           . DIRECTORY_SEPARATOR . 'batch';
+$GLOBALS['batchDirectory'] = $maarchDirectory . 'bin'
+                           . DIRECTORY_SEPARATOR . 'notification';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $maarchDirectory);
   

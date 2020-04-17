@@ -17,36 +17,6 @@
  */
 
 /**
- * Execute a sql query
- *
- * @param object $dbConn connection object to the database
- * @param string $queryTxt path of the file to include
- * @param boolean $transaction for rollback if error
- * @return true if ok, exit if ko and rollback if necessary
- */
-function Bt_doQuery($dbConn, $queryTxt, $param=array(), $transaction=false)
-{
-    if (count($param) > 0) {
-        $stmt = $dbConn->query($queryTxt, $param);
-    } else {
-        $stmt = $dbConn->query($queryTxt);
-    }
-
-    if (!$stmt) {
-        if ($transaction) {
-            $GLOBALS['logger']->write('ROLLBACK', 'INFO');
-            $dbConn->query('ROLLBACK');
-        }
-        Bt_exitBatch(
-            104,
-            'SQL Query error:' . $queryTxt
-        );
-    }
-    $GLOBALS['logger']->write('SQL query:' . $queryTxt, 'DEBUG');
-    return $stmt;
-}
-
-/**
  * Exit the batch with a return code, message in the log and
  * in the database if necessary
  *
@@ -72,10 +42,10 @@ function Bt_exitBatch($returnCode, $message='')
             fwrite($semaphore, '1');
             fclose($semaphore);
         }
-        $GLOBALS['logger']->write($message, 'ERROR', $returnCode);
+        Bt_writeLog(['level' => 'ERROR', 'message' => $message]);
         Bt_logInDataBase($GLOBALS['totalProcessedResources'], 1, $message.' (return code: '. $returnCode.')');
     } elseif ($message <> '') {
-        $GLOBALS['logger']->write($message, 'INFO', $returnCode);
+        Bt_writeLog(['level' => 'INFO', 'message' => $message]);
         Bt_logInDataBase($GLOBALS['totalProcessedResources'], 0, $message.' (return code: '. $returnCode.')');
     }
     Bt_updateWorkBatch();
@@ -90,10 +60,13 @@ function Bt_exitBatch($returnCode, $message='')
 */
 function Bt_logInDataBase($totalProcessed=0, $totalErrors=0, $info='')
 {
-    $query = "INSERT INTO history_batch (module_name, batch_id, event_date, "
-           . "total_processed, total_errors, info) values(?, ?, CURRENT_TIMESTAMP, ?, ?, ?)";
-    $arrayPDO = array($GLOBALS['batchName'], $GLOBALS['wb'], $totalProcessed, $totalErrors, substr(str_replace('\\', '\\\\', str_replace("'", "`", $info)), 0, 999));
-    $GLOBALS['db']->query($query, $arrayPDO);
+    \History\models\BatchHistoryModel::create([
+        'module_name'     => $GLOBALS['batchName'],
+        'batch_id'        => $GLOBALS['wb'],
+        'info'            => substr(str_replace('\\', '\\\\', str_replace("'", "`", $info)), 0, 999),
+        'total_processed' => $totalProcessed,
+        'total_errors'    => $totalErrors
+    ]);
 }
 
 
@@ -102,10 +75,15 @@ function Bt_logInDataBase($totalProcessed=0, $totalErrors=0, $info='')
 */
 function Bt_history($aArgs = [])
 {
-    $query = "INSERT INTO history (table_name, record_id, event_type, "
-           . "user_id, event_date, info, id_module, remote_ip, event_id) values(?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)";
-    $arrayPDO = array($aArgs['table_name'], $aArgs['record_id'], $aArgs['event_type'], 'superadmin', $aArgs['info'], 'visa', 'localhost', $aArgs['event_id']);
-    $GLOBALS['db']->query($query, $arrayPDO);
+    $user = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
+    \History\controllers\HistoryController::add([
+        'tableName'    => $aArgs['table_name'],
+        'recordId'     => $aArgs['record_id'],
+        'eventType'    => $aArgs['event_type'],
+        'eventId'      => $aArgs['event_id'],
+        'userId'       => $user[0]['id'],
+        'info'         => $aArgs['info']
+    ]);
 }
 
 /**
@@ -115,15 +93,11 @@ function Bt_history($aArgs = [])
  */
 function Bt_getWorkBatch()
 {
-    $req = "SELECT param_value_int FROM parameters WHERE id = ? ";
-    $stmt = $GLOBALS['db']->query($req, array($GLOBALS['batchName']."_id"));
-    
-    while ($reqResult = $stmt->fetchObject()) {
-        $GLOBALS['wb'] = $reqResult->param_value_int + 1;
-    }
-    if ($GLOBALS['wb'] == '') {
-        $req = "INSERT INTO parameters(id, param_value_int) VALUES (?, 1)";
-        $GLOBALS['db']->query($req, array($GLOBALS['batchName']."_id"));
+    $parameter = \Parameter\models\ParameterModel::getById(['select' => ['param_value_int'], 'id' => $GLOBALS['batchName']."_id"]);
+    if (!empty($parameter)) {
+        $GLOBALS['wb'] = $parameter['param_value_int'] + 1;
+    } else {
+        \Parameter\models\ParameterModel::create(['id' => $GLOBALS['batchName']."_id", 'param_value_int' => 1]);
         $GLOBALS['wb'] = 1;
     }
 }
@@ -135,8 +109,7 @@ function Bt_getWorkBatch()
  */
 function Bt_updateWorkBatch()
 {
-    $req = "UPDATE parameters SET param_value_int = ? WHERE id = ?";
-    $GLOBALS['db']->query($req, array($GLOBALS['wb'], $GLOBALS['batchName']."_id"));
+    \Parameter\models\ParameterModel::update(['id' => $GLOBALS['batchName']."_id", 'param_value_int' => $GLOBALS['wb']]);
 }
 
 /**
@@ -154,6 +127,20 @@ function Bt_myInclude($file)
     }
 }
 
+function Bt_writeLog($args = [])
+{
+    \SrcCore\controllers\LogsController::add([
+        'isTech'    => true,
+        'moduleId'  => $GLOBALS['batchName'],
+        'level'     => $args['level'],
+        'tableName' => '',
+        'recordId'  => $GLOBALS['batchName'],
+        'eventType' => $GLOBALS['batchName'],
+        'eventId'   => $args['message']
+    ]);
+}
+
+
 function Bt_createNote($aArgs = [])
 {
     if (!empty($aArgs['content'])) {
@@ -161,18 +148,17 @@ function Bt_createNote($aArgs = [])
         if (!empty($aArgs['creatorId'])) {
             $creatorId = $aArgs['creatorId'];
         } else {
-            $req         = "SELECT id FROM users ORDER BY user_id='superadmin' desc limit 1";
-            $stmt        = $GLOBALS['db']->query($req, []);
-            $reqResult   = $stmt->fetchObject();
-            $creatorId   = $reqResult->id;
+            $users = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
+            $creatorId   = $users[0]['id'];
         }
         if (!empty($aArgs['creatorName'])) {
             $creatorName = $aArgs['creatorName'] . ' (Maarch Parapheur) : ';
         }
-        $GLOBALS['db']->query(
-            "INSERT INTO notes (identifier, user_id, creation_date, note_text) VALUES (?, ?, CURRENT_TIMESTAMP, ?)",
-            [$aArgs['resId'], $creatorId, $creatorName . $aArgs['content']]
-        );
+        \Note\models\NoteModel::create([
+            'resId' => $aArgs['resId'],
+            'user_id' => $creatorId,
+            'note_text' => $creatorName . $aArgs['content'],
+        ]);
     }
 }
 
@@ -196,13 +182,13 @@ function Bt_createAttachment($args = [])
     $rawResponse = curl_exec($curl);
     $error       = curl_error($curl);
     if (!empty($error)) {
-        $GLOBALS['logger']->write($error, 'ERROR');
+        Bt_writeLog(['level' => 'ERROR', 'message' => $error]);
         exit;
     }
 
     $return = json_decode($rawResponse, true);
     if (!empty($return['errors'])) {
-        $GLOBALS['logger']->write($return['errors'], 'ERROR');
+        Bt_writeLog(['level' => 'ERROR', 'message' => $return['errors']]);
         exit;
     }
 
@@ -211,10 +197,12 @@ function Bt_createAttachment($args = [])
 
 function Bt_validatedMail($aArgs = [])
 {
-    $req       = "SELECT count(1) as nbresult FROM res_attachments WHERE res_id_master = ? AND status = ?";
-    $stmt      = $GLOBALS['db']->query($req, array($aArgs['resId'], 'FRZ'));
-    $reqResult = $stmt->fetchObject();
-    if ($reqResult->nbresult == 0) {
-        $GLOBALS['db']->query('UPDATE res_letterbox SET status = ? WHERE res_id = ? ', [$aArgs['status'], $aArgs['resId']]);
+    $attachments = \Attachment\models\AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$aArgs['resId'], 'FRZ']]);
+    if ($attachments[0]['count'] == 0) {
+        \Resource\models\ResModel::update([
+            'set'     => ['status' => $aArgs['status']],
+            'where'   => ['res_id = ?'],
+            'data'    => [$aArgs['resId']]
+        ]);
     }
 }

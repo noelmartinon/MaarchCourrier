@@ -24,6 +24,22 @@ export class AuthService {
         return this.localStorage.get('MaarchCourrierToken');
     }
 
+    setAppSession(id: string) {
+        this.localStorage.setAppSession(id);
+    }
+
+    setCachedUrl(url: string) {
+        this.localStorage.save('MaarchCourrierCachedUrl', url);
+    }
+
+    getCachedUrl() {
+        return this.localStorage.get('MaarchCourrierCachedUrl');
+    }
+
+    cleanCachedUrl() {
+        return this.localStorage.remove(`MaarchCourrierCachedUrl`);
+    }
+
     getUrl(id: number) {
         return this.localStorage.get(`MaarchCourrierUrl_${id}`);
     }
@@ -53,8 +69,8 @@ export class AuthService {
         this.localStorage.remove('MaarchCourrierRefreshToken');
     }
 
-    logout() {
-        if ( this.getToken() !== null ) {
+    logout(cleanUrl: boolean = true) {
+        if ( this.getToken() !== null && cleanUrl) {
             this.cleanUrl(JSON.parse(atob(this.getToken().split('.')[1])).user.id);
         }
         this.clearTokens();

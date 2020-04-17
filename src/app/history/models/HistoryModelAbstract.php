@@ -61,21 +61,4 @@ abstract class HistoryModelAbstract
 
         return true;
     }
-
-    public static function getByUserId(array $args)
-    {
-        ValidatorModel::notEmpty($args, ['userId']);
-        ValidatorModel::stringType($args, ['userId']);
-
-        $aHistories = DatabaseModel::select([
-            'select'   => empty($args['select']) ? ['*'] : $args['select'],
-            'table'    => ['history'],
-            'where'    => ['user_id = ?'],
-            'data'     => [$args['userId']],
-            'order_by' => ['event_date DESC'],
-            'limit'    => 500
-        ]);
-
-        return $aHistories;
-    }
 }

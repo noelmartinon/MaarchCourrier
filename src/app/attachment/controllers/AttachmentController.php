@@ -597,10 +597,8 @@ class AttachmentController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
-
-        $response->write($fileContent);
-        $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.{$pathInfo['extension']}");
-
+        $data = $request->getQueryParams();
+        
         HistoryController::add([
             'tableName' => 'res_attachments',
             'recordId'  => $args['id'],
@@ -619,7 +617,13 @@ class AttachmentController
             'eventId'   => 'resview'
         ]);
 
-        return $response->withHeader('Content-Type', $mimeType);
+        if ($data['mode'] == 'base64') {
+            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType]);
+        } else {
+            $response->write($fileContent);
+            $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.{$pathInfo['extension']}");
+            return $response->withHeader('Content-Type', $mimeType);
+        }
     }
 
     public function getByChrono(Request $request, Response $response)

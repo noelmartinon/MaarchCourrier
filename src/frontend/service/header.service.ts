@@ -28,7 +28,7 @@ export class HeaderService {
     headerMessageIcon: string = '';
     headerMessage: string = '';
     subHeaderMessage: string = '';
-    user: any = { firstname: '', lastname: '', groups: [], privileges: [] };
+    user: any = { firstname: '', lastname: '', groups: [], privileges: [], preferences: [] };
     lang: any = LANG;
     nbResourcesFollowed: number = 0;
     base64: string = null;

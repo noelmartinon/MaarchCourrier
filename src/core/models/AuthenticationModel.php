@@ -39,59 +39,6 @@ class AuthenticationModel
 
         return password_verify($args['password'], $aReturn[0]['password']);
     }
-    
-    public static function resetFailedAuthentication(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
-
-        DatabaseModel::update([
-            'table'     => 'users',
-            'set'       => [
-                'failed_authentication' => 0,
-                'locked_until'          => null,
-            ],
-            'where'     => ['lower(user_id) = lower(?)'],
-            'data'      => [$aArgs['userId']]
-        ]);
-
-        return true;
-    }
-
-    public static function increaseFailedAuthentication(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['userId', 'tentatives']);
-        ValidatorModel::stringType($aArgs, ['userId']);
-        ValidatorModel::intVal($aArgs, ['tentatives']);
-
-        DatabaseModel::update([
-            'table'     => 'users',
-            'set'       => [
-                'failed_authentication' => $aArgs['tentatives']
-            ],
-            'where'     => ['lower(user_id) = lower(?)'],
-            'data'      => [$aArgs['userId']]
-        ]);
-
-        return true;
-    }
-
-    public static function lockUser(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['userId', 'lockedUntil']);
-        ValidatorModel::stringType($aArgs, ['userId']);
-
-        DatabaseModel::update([
-            'table' => 'users',
-            'set'   => [
-                'locked_until'  => date('Y-m-d H:i:s', $aArgs['lockedUntil'])
-            ],
-            'where' => ['lower(user_id) = lower(?)'],
-            'data'  => [$aArgs['userId']]
-        ]);
-
-        return true;
-    }
 
     public static function generatePassword()
     {

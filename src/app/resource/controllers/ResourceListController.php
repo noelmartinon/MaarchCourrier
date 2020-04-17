@@ -164,9 +164,7 @@ class ResourceListController
 
     public function getFilters(Request $request, Response $response, array $aArgs)
     {
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -483,8 +481,7 @@ class ResourceListController
         }
         $body['resources'] = array_slice($body['resources'], 0, 500);
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -512,7 +509,7 @@ class ResourceListController
             $lock = true;
             if (empty($resource['locker_user_id'] || empty($resource['locker_time']))) {
                 $lock = false;
-            } elseif ($resource['locker_user_id'] == $currentUser['id']) {
+            } elseif ($resource['locker_user_id'] == $GLOBALS['id']) {
                 $lock = false;
             } elseif (strtotime($resource['locker_time']) < time()) {
                 $lock = false;
@@ -528,7 +525,7 @@ class ResourceListController
 
         if (!empty($resourcesToLock)) {
             ResModel::update([
-                'set'   => ['locker_user_id' => $currentUser['id'], 'locker_time' => 'CURRENT_TIMESTAMP + interval \'1\' MINUTE'],
+                'set'   => ['locker_user_id' => $GLOBALS['id'], 'locker_time' => 'CURRENT_TIMESTAMP + interval \'1\' MINUTE'],
                 'where' => ['res_id in (?)'],
                 'data'  => [$resourcesToLock]
             ]);
@@ -553,8 +550,7 @@ class ResourceListController
         }
         $body['resources'] = array_slice($body['resources'], 0, 500);
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $currentUser['id']]);
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
         if (!empty($errors['errors'])) {
             return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
         }
@@ -577,7 +573,7 @@ class ResourceListController
 
         $resourcesToUnlock = [];
         foreach ($resources as $resource) {
-            if (!(!empty($resource['locker_user_id']) && $resource['locker_user_id'] != $currentUser['id'] && strtotime($resource['locker_time']) > time())) {
+            if (!(!empty($resource['locker_user_id']) && $resource['locker_user_id'] != $GLOBALS['id'] && strtotime($resource['locker_time']) > time())) {
                 $resourcesToUnlock[] = $resource['res_id'];
             }
         }

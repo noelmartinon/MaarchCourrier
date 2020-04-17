@@ -69,6 +69,7 @@ import { SendAvisParallelComponent }               from './actions/avis-parallel
 import { GiveAvisParallelActionComponent }               from './actions/avis-give-parallel-action/give-avis-parallel-action.component';
 import { ValidateAvisParallelComponent }               from './actions/avis-parallel-validate-action/validate-avis-parallel-action.component';
 import { ReconcileActionComponent }               from './actions/reconciliation-action/reconcile-action.component';
+import { SendAlfrescoActionComponent }               from './actions/send-alfresco-action/send-alfresco-action.component';
 
 import { FiltersListComponent }                 from './list/filters/filters-list.component';
 import { FiltersToolComponent }                 from './list/filters/filters-tool.component';
@@ -113,6 +114,7 @@ import { SentResourceListComponent } from './sentResource/sent-resource-list.com
 import { SentResourcePageComponent } from './sentResource/sent-resource-page/sent-resource-page.component';
 import { SentNumericPackagePageComponent } from './sentResource/sent-numeric-package-page/sent-numeric-package-page.component';
 import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-create-modal.component';
+import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.component';
 
 
 
@@ -177,6 +179,7 @@ import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-
         SendAvisParallelComponent,
         GiveAvisParallelActionComponent,
         ValidateAvisParallelComponent,
+        SendAlfrescoActionComponent,
         ActionsListComponent,
         PrintSeparatorComponent,
         FolderPinnedComponent,
@@ -214,7 +217,8 @@ import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-
         PrintedFolderModalComponent,
         SentNumericPackagePageComponent,
         FolderCreateModalComponent,
-        ReconcileActionComponent
+        ReconcileActionComponent,
+        DocumentViewerPageComponent
     ],
     entryComponents: [
         InfoChangePasswordModalComponent,
@@ -245,6 +249,7 @@ import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-
         redirectInitiatorEntityActionComponent,
         closeMailWithAttachmentsOrNotesActionComponent,
         SendSignatureBookActionComponent,
+        SendAlfrescoActionComponent,
         ViewDocActionComponent,
         FolderUpdateComponent,
         AddPrivateIndexingModelModalComponent,

@@ -6,6 +6,9 @@ import { HeaderService } from '../service/header.service';
 import { AppService } from '../service/app.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { LangService } from '../service/app-lang.service';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/internal/operators/map';
+import { AuthService } from '../service/auth.service';
 
 /** Custom options the configure the tooltip's default show/hide delays. */
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
@@ -25,14 +28,16 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 })
 export class AppComponent implements OnInit {
 
-    @ViewChild('snavLeft', { static: false }) snavLeft: MatSidenav;
+    @ViewChild('snavLeft', { static: true }) snavLeft: MatSidenav;
 
     constructor(
+        public http: HttpClient,
         public langService: LangService,
         iconReg: MatIconRegistry,
         sanitizer: DomSanitizer,
         public appService: AppService,
-        public headerService: HeaderService
+        public headerService: HeaderService,
+        private authService: AuthService
     ) {
 
         iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=onlyLogo'));
@@ -43,13 +48,8 @@ export class AppComponent implements OnInit {
 
     }
 
-    ngOnInit(): void {
-
+    async ngOnInit(): Promise<void> {
         this.headerService.hideSideBar = true;
-        setTimeout(() => {
-            this.headerService.sideNavLeft = this.snavLeft;
-        }, 200);
-
         this.headerService.sideNavLeft = this.snavLeft;
     }
 }

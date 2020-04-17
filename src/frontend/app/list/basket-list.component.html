@@ -165,7 +165,7 @@
                                         </span>
                                     </div>
                                     <div *ngIf="displayFolderTags && row.folders !== undefined && row.folders.length > 0" class="folder-info">
-                                        <span class="badge badge-folder" *ngFor="let folder of row.folders | sortBy : 'label'" routerLink="/folders/{{folder.id}}" title="{{lang.goToFolder}} : {{folder.label}}"><i class="fa fa-folder"></i> {{folder.label}}</span>
+                                        <span class="badge badge-folder" *ngFor="let folder of row.folders | sortBy : 'label'" (click)="$event.stopPropagation();goToFolder(folder);" title="{{lang.goToFolder}} : {{folder.label}}"><i class="fa fa-folder"></i> {{folder.label}}</span>
                                     </div>
                                 </td>
                             </ng-container>

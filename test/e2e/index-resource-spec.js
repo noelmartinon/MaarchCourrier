@@ -1,18 +1,36 @@
+var fs = require('fs');
+
+// abstract writing screen shot to a file
+function writeScreenShot(data, filename) {
+    var stream = fs.createWriteStream(filename);
+    stream.write(new Buffer(data, 'base64'));
+    stream.end();
+}
+
 describe('index resource page', function() {
     it('login to app', function() {
-        browser.waitForAngularEnabled(false);
-        browser.get(browser.baseUrl+ '/apps/maarch_entreprise/index.php?display=true&page=login');
-
+        browser.waitForAngularEnabled(true);
+        browser.get(browser.baseUrl+ '/dist/index.html#/login');
+        browser.takeScreenshot().then(function (png) {
+            writeScreenShot(png, 'exception.png');
+        });
         element(by.id('login')).sendKeys('bblier');
-        element(by.id('pass')).sendKeys('maarch');
-        element(by.css('[name="submit"]')).click();
+        browser.sleep(500);
+        element(by.id('password')).sendKeys('maarch');
+        browser.sleep(500);
+        element(by.id('submit')).click();
     });
 
     it('index a document whitout file', function() {
-        browser.sleep(5000);
-        browser.waitForAngularEnabled(false);
+        browser.sleep(4000);
+        browser.takeScreenshot().then(function (png) {
+            writeScreenShot(png, 'exception.png');
+        });
         element(by.id('indexing')).click();
         browser.sleep(500);
+        browser.takeScreenshot().then(function (png) {
+            writeScreenShot(png, 'exception.png');
+        });
         element(by.id('doctype')).click();
         browser.sleep(500);
         element(by.css('[title="Demande de renseignements"]')).click();
@@ -47,4 +65,3 @@ describe('index resource page', function() {
         browser.sleep(4000);
     });
 });
-

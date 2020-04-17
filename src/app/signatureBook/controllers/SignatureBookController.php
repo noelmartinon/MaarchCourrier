@@ -67,7 +67,6 @@ class SignatureBookController
             'data'      => [$aArgs['resId'], ['visa', 'sign']]
         ]);
 
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $owner = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
         $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $owner['user_id']]);
         $resources = ResModel::getOnView([
@@ -81,7 +80,7 @@ class SignatureBookController
         $datas['resList']               = $resources;
         $datas['nbNotes']               = NoteModel::countByResId(['resId' => $resId, 'userId' => $GLOBALS['id'], 'login' => $GLOBALS['login']]);
         $datas['nbLinks']               = 0;
-        $datas['signatures']            = UserSignatureModel::getByUserSerialId(['userSerialid' => $currentUser['id']]);
+        $datas['signatures']            = UserSignatureModel::getByUserSerialId(['userSerialid' => $GLOBALS['id']]);
         $datas['consigne']              = UserModel::getCurrentConsigneById(['resId' => $resId]);
         $datas['hasWorkflow']           = ((int)$listInstances[0]['count'] > 0);
         $datas['listinstance']          = ListInstanceModel::getCurrentStepByResId(['resId' => $resId]);
@@ -129,8 +128,8 @@ class SignatureBookController
                 'alt_id'          => $incomingMail['alt_identifier'],
                 'title'           => $incomingMail['subject'],
                 'category_id'     => $incomingMail['category_id'],
-                'viewerLink'      => "../../rest/resources/{$resId}/content",
-                'thumbnailLink'   => "rest/resources/{$resId}/thumbnail",
+                'viewerLink'      => "../rest/resources/{$resId}/content",
+                'thumbnailLink'   => "../rest/resources/{$resId}/thumbnail",
                 'inSignatureBook' => false
             ];
         } else {
@@ -149,21 +148,13 @@ class SignatureBookController
         foreach ($incomingMailAttachments as $value) {
             $realId = $value['res_id'];
 
-            $convertedAttachment = ConvertPdfController::getConvertedPdfById(['resId' => $realId, 'collId' => 'attachments_coll']);
-
-            if (empty($convertedAttachment['errors'])) {
-                $isConverted = true;
-            } else {
-                $isConverted = false;
-            }
-
             $documents[] = [
                 'res_id'        => $realId,
                 'title'         => $value['title'],
                 'format'        => $value['format'],
-                'isConverted'   => $isConverted,
-                'viewerLink'    => "../../rest/attachments/{$realId}/content",
-                'thumbnailLink' => "rest/attachments/{$realId}/thumbnail"
+                'isConverted'   => ConvertPdfController::canConvert(['extension' => $value['format']]),
+                'viewerLink'    => "../rest/attachments/{$realId}/content",
+                'thumbnailLink' => "../rest/attachments/{$realId}/thumbnail"
             ];
         }
 
@@ -206,18 +197,11 @@ class SignatureBookController
                 continue;
             }
 
-            $realId = $value['res_id'];
-
+            $realId         = $value['res_id'];
             $viewerId       = $realId;
             $viewerNoSignId = $realId;
             $pathToFind     = $value['path'] . str_replace(strrchr($value['filename'], '.'), '.pdf', $value['filename']);
             $isConverted    = false;
-
-            $convertedAttachment = ConvertPdfController::getConvertedPdfById(['resId' => $realId, 'collId' => 'attachments_coll']);
-
-            if (empty($convertedAttachment['errors'])) {
-                $isConverted = true;
-            }
 
             foreach ($attachments as $tmpKey => $tmpValue) {
                 if ($value['status'] == 'SIGN' && $tmpValue['attachment_type'] == 'signed_response' && !empty($tmpValue['origin'])) {
@@ -242,14 +226,12 @@ class SignatureBookController
                 $attachments[$key]['modified_by'] = UserModel::getLabelledUserById(['id' => $value['modified_by']]);
             }
             if (!empty($value['typist'])) {
-                $attachments[$key]['typist'] = UserModel::getLabelledUserById(['login' => $value['typist']]);
+                $attachments[$key]['typist'] = UserModel::getLabelledUserById(['id' => $value['typist']]);
             }
-
-            $rawUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
 
             $attachments[$key]['canModify'] = false;
             $attachments[$key]['canDelete'] = false;
-            if ($canManageAttachment || $value['typist'] == $rawUser['user_id']) {
+            if ($canManageAttachment || $value['typist'] == $args['userId']) {
                 $attachments[$key]['canModify'] = true;
                 $attachments[$key]['canDelete'] = true;
             }
@@ -261,16 +243,16 @@ class SignatureBookController
             if ($attachments[$key]['doc_date']) {
                 $attachments[$key]['doc_date'] = date(DATE_ATOM, strtotime($attachments[$key]['doc_date']));
             }
-            $attachments[$key]['isConverted'] = $isConverted;
-            $attachments[$key]['viewerNoSignId'] = $viewerNoSignId;
+            $attachments[$key]['isConverted']     = ConvertPdfController::canConvert(['extension' => $attachments[$key]['format']]);
+            $attachments[$key]['viewerNoSignId']  = $viewerNoSignId;
             $attachments[$key]['attachment_type'] = $attachmentTypes[$value['attachment_type']]['label'];
-            $attachments[$key]['icon'] = $attachmentTypes[$value['attachment_type']]['icon'];
-            $attachments[$key]['sign'] = $attachmentTypes[$value['attachment_type']]['sign'];
+            $attachments[$key]['icon']            = $attachmentTypes[$value['attachment_type']]['icon'];
+            $attachments[$key]['sign']            = $attachmentTypes[$value['attachment_type']]['sign'];
 
             if ($value['status'] == 'SIGN') {
-                $attachments[$key]['viewerLink'] = "../../rest/attachments/{$viewerId}/content?".rand();
+                $attachments[$key]['viewerLink'] = "../rest/attachments/{$viewerId}/content?".rand();
             } else {
-                $attachments[$key]['viewerLink'] = "../../rest/attachments/{$realId}/content?".rand();
+                $attachments[$key]['viewerLink'] = "../rest/attachments/{$realId}/content?".rand();
             }
         }
 
@@ -316,7 +298,7 @@ class SignatureBookController
             $attachments[0]['attachment_type'] = _MAIN_DOCUMENT;
             $attachments[0]['title'] = $attachments[0]['subject'];
             $attachments[0]['sign'] = true;
-            $attachments[0]['viewerLink'] = "../../rest/resources/{$args['resId']}/content?".rand();
+            $attachments[0]['viewerLink'] = "../rest/resources/{$args['resId']}/content?".rand();
 
             $isSigned = AdrModel::getDocuments([
                 'select'    => [1],
@@ -326,12 +308,8 @@ class SignatureBookController
             if (!empty($isSigned)) {
                 $attachments[0]['status'] = 'SIGN';
             }
-            $convertedAttachment = ConvertPdfController::getConvertedPdfById(['resId' => $attachments[0]['res_id'], 'collId' => 'letterbox_coll']);
-            if (empty($convertedAttachment['errors'])) {
-                $attachments[0]['isConverted'] = true;
-            } else {
-                $attachments[0]['isConverted'] = false;
-            }
+
+            $attachments[0]['isConverted'] = ConvertPdfController::canConvert(['extension' => $attachments[0]['format']]);
         }
 
         return $attachments;

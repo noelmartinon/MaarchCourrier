@@ -58,6 +58,18 @@ class CoreConfigModel
         return $customId;
     }
 
+    public static function getConfigPath()
+    {
+        $customId = CoreConfigModel::getCustomId();
+        if (!empty($customId) && is_file("custom/{$customId}/apps/maarch_entreprise/xml/config.xml")) {
+            $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.xml";
+        } else {
+            $path = 'apps/maarch_entreprise/xml/config.xml';
+        }
+
+        return $path;
+    }
+
     public static function getApplicationName()
     {
         static $applicationName;
@@ -79,13 +91,10 @@ class CoreConfigModel
 
     public static function getApplicationVersion()
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/applicationVersion.xml']);
+        $file = file_get_contents('package.json');
+        $file = json_decode($file, true);
 
-        if (empty($loadedXml)) {
-            return '';
-        }
-
-        return (string)$loadedXml->version;
+        return $file['version'];
     }
 
     public static function getLanguage()
@@ -225,7 +234,7 @@ class CoreConfigModel
 
         $customId = CoreConfigModel::getCustomId();
 
-        if (file_exists("custom/{$customId}/{$args['path']}")) {
+        if (is_file("custom/{$customId}/{$args['path']}")) {
             $path = "custom/{$customId}/{$args['path']}";
         } else {
             $path = $args['path'];

@@ -38,13 +38,13 @@ class AuthenticationController
 
     public function getInformations(Request $request, Response $response)
     {
-//        $path = CoreConfigModel::getConfigPath();
-//        $hashedPath = md5($path);
+        $path = CoreConfigModel::getConfigPath();
+        $hashedPath = md5($path);
 
         $appName = CoreConfigModel::getApplicationName();
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
 
-        return $response->withJson(['instanceId' => null, 'applicationName' => $appName, 'loginMessage' => $parameter['param_value_string'] ?? null]);
+        return $response->withJson(['instanceId' => $hashedPath, 'applicationName' => $appName, 'loginMessage' => $parameter['param_value_string'] ?? null]);
     }
 
     public static function authentication($authorizationHeaders = [])
@@ -129,39 +129,37 @@ class AuthenticationController
         return ['isRouteAvailable' => true];
     }
 
-    public static function handleFailedAuthentication(array $aArgs)
+    public static function handleFailedAuthentication(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::notEmpty($args, ['userId']);
+        ValidatorModel::intVal($args, ['userId']);
 
         $passwordRules = PasswordModel::getEnabledRules();
 
         if (!empty($passwordRules['lockAttempts'])) {
-            $user = UserModel::getByLowerLogin(['select' => ['failed_authentication', 'locked_until'], 'login' => $aArgs['userId']]);
+            $user = UserModel::getById(['select' => ['failed_authentication', 'locked_until'], 'id' => $args['userId']]);
+            if (!empty($user['locked_until'])) {
+                return ['accountLocked' => true, 'lockedDate' => $user['locked_until']];
+            }
 
-            if (!empty($user)) {
-                if (!empty($user['locked_until'])) {
-                    $lockedDate = new \DateTime($user['locked_until']);
-                    $currentDate = new \DateTime();
-                    if ($currentDate > $lockedDate) {
-                        AuthenticationModel::resetFailedAuthentication(['userId' => $aArgs['userId']]);
-                        $user['failed_authentication'] = 0;
-                    } else {
-                        return _ACCOUNT_LOCKED_UNTIL . " {$lockedDate->format('d/m/Y H:i')}";
-                    }
-                }
+            UserModel::update([
+                'set'       => ['failed_authentication' => $user['failed_authentication'] + 1],
+                'where'     => ['id = ?'],
+                'data'      => [$args['userId']]
+            ]);
 
-                AuthenticationModel::increaseFailedAuthentication(['userId' => $aArgs['userId'], 'tentatives' => $user['failed_authentication'] + 1]);
-
-                if (!empty($user['failed_authentication']) && ($user['failed_authentication'] + 1) >= $passwordRules['lockAttempts'] && !empty($passwordRules['lockTime'])) {
-                    $lockedUntil = time() + 60 * $passwordRules['lockTime'];
-                    AuthenticationModel::lockUser(['userId' => $aArgs['userId'], 'lockedUntil' => $lockedUntil]);
-                    return _ACCOUNT_LOCKED_FOR . " {$passwordRules['lockTime']} mn";
-                }
+            if (!empty($user['failed_authentication']) && ($user['failed_authentication'] + 1) >= $passwordRules['lockAttempts'] && !empty($passwordRules['lockTime'])) {
+                $lockedUntil = time() + 60 * $passwordRules['lockTime'];
+                UserModel::update([
+                    'set'   => ['locked_until'  => date('Y-m-d H:i:s', $lockedUntil)],
+                    'where'     => ['id = ?'],
+                    'data'      => [$args['userId']]
+                ]);
+                return ['accountLocked' => true];
             }
         }
 
-        return _BAD_LOGIN_OR_PSW;
+        return true;
     }
 
     public function authenticate(Request $request, Response $response)
@@ -177,7 +175,18 @@ class AuthenticationController
         $login = strtolower($body['login']);
         $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $body['password']]);
         if (empty($authenticated)) {
-            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+            $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'status']]);
+            if (empty($user)) {
+                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+            } elseif ($user['status'] == 'SPD') {
+                return $response->withStatus(401)->withJson(['errors' => 'Account Suspended']);
+            } else {
+                $handle = AuthenticationController::handleFailedAuthentication(['userId' => $user['id']]);
+                if (!empty($handle['accountLocked'])) {
+                    return $response->withStatus(401)->withJson(['errors' => 'Account Locked', 'date' => $handle['lockedDate'] ?? null]);
+                }
+                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+            }
         }
 
         $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'loginmode', 'refresh_token', 'user_id']]);
@@ -204,10 +213,11 @@ class AuthenticationController
         $refreshToken = AuthenticationController::getRefreshJWT();
         $user['refresh_token'][] = $refreshToken;
         UserModel::update([
-            'set'   => ['reset_token' => null, 'refresh_token' => json_encode($user['refresh_token'])],
+            'set'   => ['reset_token' => null, 'refresh_token' => json_encode($user['refresh_token']), 'failed_authentication' => 0, 'locked_until' => null],
             'where' => ['id = ?'],
             'data'  => [$user['id']]
         ]);
+
         $response = $response->withHeader('Token', AuthenticationController::getJWT());
         $response = $response->withHeader('Refresh-Token', $refreshToken);
 
@@ -317,7 +327,7 @@ class AuthenticationController
         $resetToken = AuthenticationController::getResetJWT(['id' => $args['userId'], 'expirationTime' => 1209600]); // 14 days
         UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$args['userId']]]);
 
-        $url = UrlController::getCoreUrl() . 'apps/maarch_entreprise/index.php?display=true&page=login&update-password-token=' . $resetToken;
+        $url = UrlController::getCoreUrl() . 'dist/index.html#/update-password?token=' . $resetToken;
 
         $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
         $configuration = json_decode($configuration['value'], true);

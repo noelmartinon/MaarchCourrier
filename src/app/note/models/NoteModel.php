@@ -17,7 +17,6 @@ namespace Note\models;
 use Entity\models\EntityModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
-use User\models\UserModel;
 
 class NoteModel
 {

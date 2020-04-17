@@ -39,7 +39,7 @@
                     style="align-items: center;justify-content: center;text-align: center;display: flex;">{{lang.chooseFile}}</button>
             </div>
         </div>
-        <input type="file" #docToUpload name="files[]" (change)="uploadTrigger($event)" style="display:none;">
+        <input type="file" #docToUpload [ngModel]="docToUploadValue" name="files[]" (change)="uploadTrigger($event)" style="display:none;">
         <div style="display: block;width:100%;" appUploadFileDragDrop (onFileDropped)="dndUploadFile($event)"
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null" class="viewer-tools">

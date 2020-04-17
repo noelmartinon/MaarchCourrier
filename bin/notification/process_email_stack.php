@@ -112,13 +112,13 @@ while ($state <> 'END') {
                 $phpmailer->SMTPDebug = 1;
                 $phpmailer->Debugoutput = function ($str) {
                     if (strpos($str, 'SMTP ERROR') !== false) {
-                        $user = \User\models\UserModel::getBylogin(['select' => ['id'], 'login' => 'superadmin']);
+                        $user = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
                         \History\controllers\HistoryController::add([
                             'tableName'    => 'emails',
                             'recordId'     => 'email',
                             'eventType'    => 'ERROR',
                             'eventId'      => 'sendEmail',
-                            'userId'       => $user['id'],
+                            'userId'       => $user[0]['id'],
                             'info'         => $str
                         ]);
                     }
