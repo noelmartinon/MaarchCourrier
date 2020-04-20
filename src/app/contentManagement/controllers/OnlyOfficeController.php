@@ -16,6 +16,7 @@ namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
 use Docserver\models\DocserverModel;
+use Firebase\JWT\JWT;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -48,14 +49,42 @@ class OnlyOfficeController
         return $response->withJson($configurations);
     }
 
+    public static function getToken(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+        if (!Validator::notEmpty()->validate($body['config'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body params config is empty']);
+        }
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+
+        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false' || empty($loadedXml->onlyoffice->server_uri)) {
+            return $response->withStatus(400)->withJson(['errors' => 'OnlyOffice server is disabled']);
+        }
+
+        $jwt = null;
+        $serverSecret = (string)$loadedXml->onlyoffice->server_secret;
+        if (!empty($serverSecret)) {
+            $header = [
+                "alg" => "HS256",
+                "typ" => "JWT"
+            ];
+
+            $jwt = JWT::encode($body['config'], $serverSecret, 'HS256', null, $header);
+        }
+
+        return $response->withJson($jwt);
+    }
+
+
     public static function saveMergedFile(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['onlyOfficeKey'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Query params onlyOfficeKey is empty']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body params onlyOfficeKey is empty']);
         } elseif (!preg_match('/[A-Za-z0-9]/i', $body['onlyOfficeKey'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Query params onlyOfficeKey is forbidden']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body params onlyOfficeKey is forbidden']);
         }
 
         if ($body['objectType'] == 'templateCreation') {
@@ -204,7 +233,7 @@ class OnlyOfficeController
         $uri = (string)$loadedXml->onlyoffice->server_uri;
         $uriPaths = explode('/', $uri, 2);
         $masterPath = $uriPaths[0];
-        $lastPath = !empty($uriPaths[1]) ? "/{$uriPaths[1]}" : '';
+        $lastPath   = !empty($uriPaths[1]) ? rtrim("/{$uriPaths[1]}", '/') : '';
         $port = (string)$loadedXml->onlyoffice->server_port;
 
         if (strpos($checkUrl, "{$masterPath}:{$port}{$lastPath}/cache/files/") !== 0 && (($port != 80 && $port != 443) || strpos($checkUrl, "{$masterPath}{$lastPath}/cache/files/") !== 0)) {
@@ -233,7 +262,8 @@ class OnlyOfficeController
         $uri = (string)$loadedXml->onlyoffice->server_uri;
         $port = (string)$loadedXml->onlyoffice->server_port;
 
-        $exec = shell_exec("nc -vz -w 5 {$uri} {$port} 2>&1");
+        $aUri = explode("/", $uri);
+        $exec = shell_exec("nc -vz -w 5 {$aUri[0]} {$port} 2>&1");
 
         if (strpos($exec, 'not found') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'Netcat command not found', 'lang' => 'preRequisiteMissing']);

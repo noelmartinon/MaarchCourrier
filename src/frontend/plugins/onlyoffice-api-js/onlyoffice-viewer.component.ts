@@ -149,6 +149,10 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
 
             await this.getMergedFileTemplate();
 
+            this.setEditorConfig();
+
+            await this.getTokenOOServer();
+
             this.initOfficeEditor();
 
             this.loading = false;
@@ -263,6 +267,28 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     }
 
     initOfficeEditor() {
+        this.docEditor = new DocsAPI.DocEditor('placeholder', this.editorConfig, this.onlyOfficeUrl);
+    }
+
+    getTokenOOServer() {
+        return new Promise((resolve, reject) => {
+            this.http.post('../../rest/onlyOffice/token', { config: this.editorConfig }).pipe(
+                tap((data: any) => {
+                    if (data !== null) {
+                        this.editorConfig.token = data;
+                    }
+                    resolve(true);
+                }),
+                catchError((err) => {
+                    this.notify.handleErrors(err);
+                    this.triggerCloseEditor.emit();
+                    return of(false);
+                }),
+            ).subscribe();
+        });
+    }
+
+    setEditorConfig() {
         this.editorConfig = {
             documentType: this.getEditorMode(this.file.format),
             document: {
@@ -300,7 +326,6 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
                 },
             },
         };
-        this.docEditor = new DocsAPI.DocEditor('placeholder', this.editorConfig, this.onlyOfficeUrl);
     }
 
     isLocked() {

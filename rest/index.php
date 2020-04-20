@@ -162,6 +162,7 @@ $app->post('/jnlp/{jnlpUniqueId}', \ContentManagement\controllers\JnlpController
 $app->get('/jnlp/lock/{jnlpUniqueId}', \ContentManagement\controllers\JnlpController::class . ':isLockFileExisting');
 $app->get('/documentEditors', \ContentManagement\controllers\DocumentEditorController::class . ':get');
 $app->get('/onlyOffice/configuration', \ContentManagement\controllers\OnlyOfficeController::class . ':getConfiguration');
+$app->post('/onlyOffice/token', \ContentManagement\controllers\OnlyOfficeController::class . ':getToken');
 $app->post('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':saveMergedFile');
 $app->get('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getMergedFile');
 $app->get('/onlyOffice/encodedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getEncodedFileFromUrl');
