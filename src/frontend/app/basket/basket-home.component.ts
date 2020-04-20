@@ -80,8 +80,11 @@ export class BasketHomeComponent implements OnInit {
         this.refreshBasketHome();
 
         // AVOID DOUBLE REQUEST IF ANOTHER BASKET IS SELECTED
-        if (this.currentBasketInfo.basketId == basket.id) {
-            this.refreshEvent.emit();
+        if (this.headerService.headerMessage === basket.basket_name) {
+            /**
+             * TO refresh basket list
+             */
+            this.actionService.emitAction();
         }
     }
 

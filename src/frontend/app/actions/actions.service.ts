@@ -74,6 +74,10 @@ export class ActionsService {
         return this.eventAction.asObservable();
     }
 
+    emitAction() {
+        this.eventAction.next();
+    }
+
     setLoading(state: boolean) {
         this.loading = state;
     }
