@@ -124,7 +124,7 @@ class security extends Database
         }
 
         $check = \SrcCore\models\AuthenticationModel::authentication(['userId' => $s_login, 'password' => $pass]);
-        if ($check || (in_array($method, ['ldap', 'shibboleth', 'cas', 'sso']) && $standardConnect == 'false')) {
+        if ($check || (in_array($method, ['ldap', 'shibboleth', 'cas', 'sso', 'keycloak']) && $standardConnect == 'false')) {
             $user = $uc->getWithComp($s_login, $comp, $params);
         }
 

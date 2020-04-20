@@ -62,6 +62,7 @@ if (isset($_SESSION['web_cas_url'])) {
 } elseif (!empty($_SESSION['keycloak']['userId'])) {
     $login = $_SESSION['keycloak']['userId'];
     $_REQUEST['pass'] = 'maarch';
+    $method = 'keycloak';
 } elseif (!empty($_SESSION['sso']['userId'])) {
     $login = $_SESSION['sso']['userId'];
     $_REQUEST['pass'] = 'maarch';
