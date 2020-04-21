@@ -20,7 +20,7 @@
     display: flex;
     height: 100%;
     width: 100%;
-    position: absolute;
+    padding: 10px;
     top: 0px;
     left: 0px;
 }
@@ -56,6 +56,10 @@
 
 .attachments {
     grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+}
+
+.linkedResources {
+    grid-template-columns: 1fr 1fr 2fr 1fr 1fr 1fr;
 }
 
 .printedFolderContainer {

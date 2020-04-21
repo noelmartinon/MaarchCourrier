@@ -826,6 +826,7 @@ export const LANG_EN = {
     "linkAccount":                                 "Link Maarch Parapheur account",
     "linkContact":                                 "Link a contact",
     "linkDetails":                                 "Go to detail page",
+    "linkedResources":                             "Attachments (linked mails)",
     "linkEntityToUserInfo":                        "Click on an entity in the tree to link / unlink it to this user",
     "linkGroup":                                   "Link a group",
     "linkNewAction":                               "Link new action",

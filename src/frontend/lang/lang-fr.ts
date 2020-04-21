@@ -826,6 +826,7 @@ export const LANG_FR = {
     "linkAccount":                                 "Lier un compte Maarch Parapheur",
     "linkContact":                                 "Associer un contact",
     "linkDetails":                                 "Accédez à la fiche détaillée",
+    "linkedResources":                             "Pièces jointes (courriers liés)",
     "linkEntityToUserInfo":                        "Cliquez sur une entité de l'arborescence pour l'associer / dissocier à l'utilisateur",
     "linkGroup":                                   "Associer un groupe",
     "linkNewAction":                               "Associer une nouvelle action",
