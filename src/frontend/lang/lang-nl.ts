@@ -1378,6 +1378,7 @@ export const LANG_NL = {
     "editorOption": "Editor option", //_TO_TRANSLATE
     "editorOptionAdmin": "Manage editor option", //_TO_TRANSLATE
     "documentEditor": "Document editor", //_TO_TRANSLATE
+    "canNotEditImportedDocumentWhenJava":          "You can not edit imported document with Java applet", //translate
     "documentEditor_java": "Open your defaut document editor in a new windows", //_TO_TRANSLATE
     "documentEditor_onlyoffice": "Open OnlyOffice inside Maarch Courrier application", //_TO_TRANSLATE
     "contactsList": "Contacts list", //_TO_TRANSLATE

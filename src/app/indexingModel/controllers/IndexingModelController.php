@@ -396,7 +396,7 @@ class IndexingModelController
         ]);
 
         if (!empty($resources)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource']);
+            return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource', 'lang' => 'modelUsedByResources']);
         }
 
         $childrenModels = IndexingModelModel::get(['select' => ['id', 'label'], 'where' => ['"master" = ?'], 'data' => [$args['id']]]);
@@ -490,7 +490,7 @@ class IndexingModelController
         return $response->withStatus(204);
     }
 
-    public function getEntities(Request $request, Response $response, array $aArgs)
+    public function getEntities(Request $request, Response $response)
     {
         $entitiesTmp = EntityModel::get([
             'select'   => ['id', 'entity_label', 'entity_id'],

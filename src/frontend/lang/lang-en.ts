@@ -510,6 +510,7 @@ export const LANG_EN = {
     "doctype":                                     "Document type",
     "doctypes":                                    "Document types",
     "documentation":                               "Documentation",
+    "canNotEditImportedDocumentWhenJava":          "You can not edit imported document with Java applet",
     "documentEditor_java":                         "Open your default document editor in a new window",
     "documentEditor_onlyoffice":                   "Open OnlyOffice directly inside Maarch Courrier",
     "documentEditor":                              "Document editor",

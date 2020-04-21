@@ -387,7 +387,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                     }
                 }
                 if (this.functionsService.empty(editorOptions.objectId)) {
-                    alert('Vous ne pouvez pas éditer avec l\'applet Java un document importé.');
+                    alert(this.lang.canNotEditImportedDocumentWhenJava);
                     return false;
                 }
             } else {

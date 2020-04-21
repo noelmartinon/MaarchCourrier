@@ -111,12 +111,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
                     this.notify.success(this.lang.indexingModelDeleted);
                 }),
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    if (err.error.errors === 'Model is used by at least one resource') {
-                        this.notify.error(this.lang.modelUsedByResources);
-                    } else {
-                        this.notify.handleSoftErrors(err);
-                    }
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();
