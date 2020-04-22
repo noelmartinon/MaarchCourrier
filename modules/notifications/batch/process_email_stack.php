@@ -71,9 +71,11 @@ while ($state <> 'END') {
             if (substr($email->sender, -1) != '>') {
                 $email->sender .= '>';
             }
-
-            $GLOBALS['mailer']->setReturnPath($email->sender);
-            $GLOBALS['mailer']->setFrom($email->sender);
+            
+            if ($email->sender <> '<>') {
+                $GLOBALS['mailer']->setReturnPath($email->sender);
+                $GLOBALS['mailer']->setFrom($email->sender);
+            }
             //$GLOBALS['logger']->write("Subject : " . $email->subject, 'INFO');
             $GLOBALS['mailer']->setSubject($email->subject);
             $GLOBALS['mailer']->setHtml($email->html_body);
