@@ -20,7 +20,19 @@
         <timezone>Europe/Paris</timezone>
         <userdefaultpassword>maarch</userdefaultpassword> <!-- default user's password -->
         <usePHPIDS>true</usePHPIDS>
+        <MaarchDirectory>/var/www/html/MaarchCourrier/</MaarchDirectory>
+        <customID></customID>
+        <MaarchUrl>http://preview.maarchcourrier.com/</MaarchUrl>
     </CONFIG>
+    <SIGNATUREBOOK>
+        <validatedStatus>EENV</validatedStatus>
+        <validatedStatusOnlyVisa>EENV</validatedStatusOnlyVisa>
+        <refusedStatus>REJ_SIGN</refusedStatus>
+        <validatedStatusAnnot>COU</validatedStatusAnnot>
+        <refusedStatusAnnot>RET</refusedStatusAnnot>
+        <userWS>superadmin</userWS>
+        <passwordWS>superadmin</passwordWS>
+    </SIGNATUREBOOK>
     <CRYPT>
         <encrypt>false</encrypt>
         <pathtopublickey>/home/user/maarchkey.pub</pathtopublickey>

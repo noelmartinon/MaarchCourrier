@@ -45,7 +45,11 @@ export class AuthService {
     }
 
     setUrl(url: string) {
-        this.localStorage.save(`MaarchCourrierUrl_${JSON.parse(atob(this.getToken().split('.')[1])).user.id}`, url);
+        const arrUrl = url.split('/');
+
+        if (arrUrl.indexOf('resources') === -1 && arrUrl.indexOf('content') === -1) {
+            this.localStorage.save(`MaarchCourrierUrl_${JSON.parse(atob(this.getToken().split('.')[1])).user.id}`, url);
+        }
     }
 
     cleanUrl(id: number) {

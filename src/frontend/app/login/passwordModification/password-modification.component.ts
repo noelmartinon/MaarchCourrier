@@ -1,17 +1,17 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from './translate.component';
-import { NotificationService } from './notification.service';
+import { LANG } from '../../translate.component';
+import { NotificationService } from '../../notification.service';
 import { FormBuilder, FormGroup, Validators, ValidationErrors, AbstractControl, ValidatorFn } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AppService } from '../service/app.service';
+import { AppService } from '../../../service/app.service';
 import { Router } from '@angular/router';
-import { HeaderService } from '../service/header.service';
-import { AuthService } from '../service/auth.service';
+import { HeaderService } from '../../../service/header.service';
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
     templateUrl: 'password-modification.component.html',
-    providers: [NotificationService, AppService]
+    providers: [AppService]
 })
 export class PasswordModificationComponent implements OnInit {
 
@@ -57,7 +57,7 @@ export class PasswordModificationComponent implements OnInit {
         public dialog: MatDialog,
         public appService: AppService
     ) {
-        this.user = this.headerService.user;
+        this.user =  JSON.parse(atob(this.authService.getToken().split('.')[1])).user;
     }
 
     ngOnInit(): void {
@@ -187,7 +187,7 @@ export class PasswordModificationComponent implements OnInit {
         this.passwordModel.currentPassword = this.firstFormGroup.controls['currentPasswordCtrl'].value;
         this.passwordModel.newPassword = this.firstFormGroup.controls['newPasswordCtrl'].value;
         this.passwordModel.reNewPassword = this.firstFormGroup.controls['retypePasswordCtrl'].value;
-        this.http.put('../rest/users/' + this.headerService.user.id + '/password', this.passwordModel)
+        this.http.put('../rest/users/' + this.user.id + '/password', this.passwordModel)
             .subscribe(() => {
                 this.config = { panelClass: 'maarch-modal', data: { state: 'END' }, disableClose: true };
                 this.dialogRef = this.dialog.open(InfoChangePasswordModalComponent, this.config);
@@ -217,5 +217,6 @@ export class InfoChangePasswordModalComponent {
 
     redirect() {
         this.router.navigate(['/home']);
+        this.dialogRef.close();
     }
 }

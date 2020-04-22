@@ -89,7 +89,7 @@ class NotificationController
 
         $notification['scriptcreated'] = false;
 
-        if (file_exists($pathToFolow.'modules/notifications/batch/scripts/'.$filename) || file_exists($pathToFolow.'bin/notification/scripts/'.$filename)) {
+        if (file_exists($pathToFolow.'bin/notification/scripts/'.$filename)) {
             $notification['scriptcreated'] = true;
         }
 
@@ -232,7 +232,7 @@ class NotificationController
             }
 
             foreach ($cronTab as $key => $value) {
-                if (in_array($value['cmd'], [$pathToFolow.'modules/notifications/batch/scripts/'.$filename, $pathToFolow.'bin/notification/scripts/'.$filename])) {
+                if (in_array($value['cmd'], [$pathToFolow.'bin/notification/scripts/'.$filename])) {
                     $cronTab[$key]['state'] = 'deleted';
                     $flagCron = true;
                     break;
@@ -243,14 +243,9 @@ class NotificationController
                 NotificationScheduleModel::saveCrontab($cronTab);
             }
 
-            $filePath = $pathToFolow.'modules/notifications/batch/scripts/'.$filename;
+            $filePath = $pathToFolow.'bin/notification/scripts/'.$filename;
             if (file_exists($filePath)) {
                 unlink($filePath);
-            } else {
-                $filePath = $pathToFolow.'bin/notification/scripts/'.$filename;
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
             }
         }
 

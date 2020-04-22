@@ -6,7 +6,7 @@
         <button [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
-    <mat-dialog-content>
+    <mat-dialog-content style="padding-bottom:10px;">
         <div class="loading" *ngIf="loading; else loadingTemplate">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
@@ -55,6 +55,10 @@
                                     *ngFor="let element of printedFolderElement[keyVal.key]"
                                     [disabled]="!element.canConvert" [value]="element.id">
                                     <div class="printedFolderElement-item {{keyVal.key}}">
+                                        <div color="primary" style="flex:1;font-size: 80%;padding-right: 10px;"
+                                            *ngIf="!functions.empty(element.chronoMaster)">
+                                            {{element.chronoMaster}}
+                                        </div>
                                         <div color="primary" style="flex:1;font-size: 80%;padding-right: 10px;"
                                             *ngIf="!functions.empty(element.chrono)">
                                             {{element.chrono}}

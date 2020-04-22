@@ -1378,6 +1378,7 @@ export const LANG_NL = {
     "editorOption": "Editor option", //_TO_TRANSLATE
     "editorOptionAdmin": "Manage editor option", //_TO_TRANSLATE
     "documentEditor": "Document editor", //_TO_TRANSLATE
+    "canNotEditImportedDocumentWhenJava":          "You can not edit imported document with Java applet", //translate
     "documentEditor_java": "Open your defaut document editor in a new windows", //_TO_TRANSLATE
     "documentEditor_onlyoffice": "Open OnlyOffice inside Maarch Courrier application", //_TO_TRANSLATE
     "contactsList": "Contacts list", //_TO_TRANSLATE
@@ -1656,4 +1657,8 @@ export const LANG_NL = {
     "accountSuspended": "Your user account has been suspended", //_TO_TRANSLATE
     "accountLocked": "Too many connections attemps. Retry in", //_TO_TRANSLATE
     "modelUsedByResources": "This model is used by resources, you can't delete it.", //_TO_TRANSLATE
+    "mustChangePassword": "Please, you must change your password.", //_TO_TRANSLATE
+    "linkedResources": "Attachments (linked mails)", //_TO_TRANSLATE
+    "accessNotFound": "Access not found", //_TO_TRANSLATE
+    "moreOneCustom": "This url is not an available instance of this application, please verify your address.", //_TO_TRANSLATE
 };

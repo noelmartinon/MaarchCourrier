@@ -172,7 +172,7 @@ export class PluginAutocomplete implements OnInit {
         let arrayObs: any = [];
         let test: any = [];
         this.routeDatas.forEach(element => {
-            arrayObs.push(this.http.get('../..' + element, { params: { "search": data } }));
+            arrayObs.push(this.http.get('..' + element, { params: { "search": data } }));
         });
 
         return forkJoin(arrayObs).pipe(
@@ -204,7 +204,7 @@ export class PluginAutocomplete implements OnInit {
     initFormValue() {
 
         this.controlAutocomplete.value.forEach((ids: any) => {
-            this.http.get('../..' + this.manageDatas + '/' + ids).pipe(
+            this.http.get('..' + this.manageDatas + '/' + ids).pipe(
                 tap((data) => {
                     for (var key in data) {
                         this.valuesToDisplay[data[key].id] = data[key].label;
@@ -267,7 +267,7 @@ export class PluginAutocomplete implements OnInit {
 
             this.dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.post('../..' + this.manageDatas, { label: newElem[this.key] })),
+                exhaustMap(() => this.http.post('..' + this.manageDatas, { label: newElem[this.key] })),
                 tap((data: any) => {
                     for (var key in data) {
                         newElem['id'] = data[key];

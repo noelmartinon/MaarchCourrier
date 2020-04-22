@@ -4,7 +4,7 @@
         <div class="alert-message alert-message-info" [innerHTML]="data.msg"></div>
     </div>
     <span class="divider-modal"></span>
-    <div mat-dialog-actions>
+    <div mat-dialog-actions *ngIf="data.hidebutton">
         <button class="actions" color="primary" mat-raised-button (click)="this.dialogRef.close();">{{lang.ok}}</button>
     </div>
 </div>

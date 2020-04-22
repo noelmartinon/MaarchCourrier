@@ -16,6 +16,7 @@ namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
 use Docserver\models\DocserverModel;
+use Firebase\JWT\JWT;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -38,14 +39,41 @@ class OnlyOfficeController
         $coreUrl = str_replace('rest/', '', UrlController::getCoreUrl());
 
         $configurations = [
-            'enabled'       => true,
-            'serverUri'     => (string)$loadedXml->onlyoffice->server_uri,
-            'serverPort'    => (int)$loadedXml->onlyoffice->server_port,
-            'serverSsl'     => filter_var((string)$loadedXml->onlyoffice->server_ssl, FILTER_VALIDATE_BOOLEAN),
-            'coreUrl'       => $coreUrl
+            'enabled'    => true,
+            'serverUri'  => (string)$loadedXml->onlyoffice->server_uri,
+            'serverPort' => (int)$loadedXml->onlyoffice->server_port,
+            'serverSsl'  => filter_var((string)$loadedXml->onlyoffice->server_ssl, FILTER_VALIDATE_BOOLEAN),
+            'coreUrl'    => $coreUrl
         ];
 
         return $response->withJson($configurations);
+    }
+
+    public static function getToken(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+        if (!Validator::notEmpty()->validate($body['config'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body params config is empty']);
+        }
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+
+        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false' || empty($loadedXml->onlyoffice->server_uri)) {
+            return $response->withStatus(400)->withJson(['errors' => 'OnlyOffice server is disabled']);
+        }
+
+        $jwt = null;
+        $serverSecret = (string)$loadedXml->onlyoffice->server_secret;
+        if (!empty($serverSecret)) {
+            $header = [
+                "alg" => "HS256",
+                "typ" => "JWT"
+            ];
+
+            $jwt = JWT::encode($body['config'], $serverSecret, 'HS256', null, $header);
+        }
+
+        return $response->withJson($jwt);
     }
 
     public static function saveMergedFile(Request $request, Response $response)
@@ -53,9 +81,9 @@ class OnlyOfficeController
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['onlyOfficeKey'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Query params onlyOfficeKey is empty']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body params onlyOfficeKey is empty']);
         } elseif (!preg_match('/[A-Za-z0-9]/i', $body['onlyOfficeKey'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Query params onlyOfficeKey is forbidden']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body params onlyOfficeKey is forbidden']);
         }
 
         if ($body['objectType'] == 'templateCreation') {
@@ -135,9 +163,9 @@ class OnlyOfficeController
             if (empty($body['format'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body format is empty']);
             }
-            $path = null;
+            $path        = null;
             $fileContent = base64_decode($body['objectId']);
-            $extension = $body['format'];
+            $extension   = $body['format'];
         } else {
             return $response->withStatus(400)->withJson(['errors' => 'Query param objectType does not exist']);
         }
@@ -167,7 +195,7 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Query params filename forbidden']);
         }
 
-        $tmpPath = CoreConfigModel::getTmpPath();
+        $tmpPath  = CoreConfigModel::getTmpPath();
         $filename = "onlyOffice_{$queryParams['filename']}";
 
         $fileContent = file_get_contents($tmpPath . $filename);
@@ -175,8 +203,8 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'No content found']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $finfo     = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType  = $finfo->buffer($fileContent);
         $extension = pathinfo($tmpPath . $filename, PATHINFO_EXTENSION);
         unlink($tmpPath . $filename);
 
@@ -199,13 +227,13 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice is not enabled']);
         }
 
-        $checkUrl = str_replace('http://', '', $queryParams['url']);
-        $checkUrl = str_replace('https://', '', $checkUrl);
-        $uri = (string)$loadedXml->onlyoffice->server_uri;
-        $uriPaths = explode('/', $uri, 2);
+        $checkUrl   = str_replace('http://', '', $queryParams['url']);
+        $checkUrl   = str_replace('https://', '', $checkUrl);
+        $uri        = (string)$loadedXml->onlyoffice->server_uri;
+        $uriPaths   = explode('/', $uri, 2);
         $masterPath = $uriPaths[0];
-        $lastPath = !empty($uriPaths[1]) ? "/{$uriPaths[1]}" : '';
-        $port = (string)$loadedXml->onlyoffice->server_port;
+        $lastPath   = !empty($uriPaths[1]) ? rtrim("/{$uriPaths[1]}", '/') : '';
+        $port       = (string)$loadedXml->onlyoffice->server_port;
 
         if (strpos($checkUrl, "{$masterPath}:{$port}{$lastPath}/cache/files/") !== 0 && (($port != 80 && $port != 443) || strpos($checkUrl, "{$masterPath}{$lastPath}/cache/files/") !== 0)) {
             return $response->withStatus(400)->withJson(['errors' => 'Query params url is not allowed']);
@@ -230,10 +258,11 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice server_port is empty', 'lang' => 'portIsEmpty']);
         }
 
-        $uri = (string)$loadedXml->onlyoffice->server_uri;
+        $uri  = (string)$loadedXml->onlyoffice->server_uri;
         $port = (string)$loadedXml->onlyoffice->server_port;
 
-        $exec = shell_exec("nc -vz -w 5 {$uri} {$port} 2>&1");
+        $aUri = explode("/", $uri);
+        $exec = shell_exec("nc -vz -w 5 {$aUri[0]} {$port} 2>&1");
 
         if (strpos($exec, 'not found') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'Netcat command not found', 'lang' => 'preRequisiteMissing']);

@@ -65,6 +65,10 @@ class FolderPrintControllerTest extends TestCase
         self::$attachmentId = $responseBody->id;
         $this->assertIsInt(self::$attachmentId);
 
+
+        //  CREATE LINK
+        \Resource\models\ResModel::update(['set' => ['linked_resources' => json_encode([$GLOBALS['resources'][1]])], 'where' => ['res_id = ?'], 'data' => [$GLOBALS['resources'][0]]]);
+
         // GENERATE FOLDER PRINT
 
         $folderPrintController = new \Resource\controllers\FolderPrintController();
@@ -80,6 +84,12 @@ class FolderPrintControllerTest extends TestCase
                 "notes"                   => [self::$noteId],
                 "acknowledgementReceipts" => [],
                 "emails"                  => [],
+                "linkedResources"         => [
+                    [
+                        'resId'     => $GLOBALS['resources'][1],
+                        'document'  => true
+                    ]
+                ],
             ]],
             "summarySheet" => [
                 [

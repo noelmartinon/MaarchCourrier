@@ -190,9 +190,6 @@ class ResControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $fileContent = file_get_contents('test/unitTests/samples/test.txt');
-        $encodedFile = base64_encode($fileContent);
-
         $aArgs = [
             'modelId'       => 1,
             'status'        => 'NEW',
@@ -682,9 +679,7 @@ class ResControllerTest extends TestCase
             $responseBody = json_decode((string)$response->getBody());
             $newId = $responseBody->resId;
             $this->assertIsInt($newId);
-            if ($key < 2) {
-                $GLOBALS['resources'][] = $newId;
-            }
+            $GLOBALS['resources'][] = $newId;
         }
 
         $GLOBALS['login'] = 'superadmin';

@@ -488,6 +488,10 @@ class MaarchParapheurController
         $version = $aArgs['version'];
         foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
             $documentWorkflow = MaarchParapheurController::getDocumentWorkflow(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+            if (!is_array($documentWorkflow)) {
+                unset($aArgs['idsToRetrieve'][$version][$resId]);
+                continue;
+            }
             $state = MaarchParapheurController::getState(['workflow' => $documentWorkflow]);
             
             if (in_array($state['status'], ['validated', 'refused'])) {

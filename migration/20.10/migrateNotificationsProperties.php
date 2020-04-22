@@ -7,7 +7,7 @@ chdir('../..');
 $customs =  scandir('custom');
 $migrated = 0;
 foreach ($customs as $custom) {
-    if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
+    if (in_array($custom, ['custom.json', 'custom.xml', '.', '..'])) {
         continue;
     }
 
@@ -26,8 +26,10 @@ foreach ($customs as $custom) {
             $users = array_column($users, 'id');
             if (!empty($users)) {
                 $users = implode(',', $users);
-                \Notification\models\NotificationModel::update(['notification_sid' => $notification['notification_sid'], 'diffusion_properties' => $users]);
+            } else {
+                $users = null;
             }
+            \Notification\models\NotificationModel::update(['notification_sid' => $notification['notification_sid'], 'diffusion_properties' => $users]);
         }
     }
     $migrated++;

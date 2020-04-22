@@ -165,7 +165,7 @@ function Bt_createNote($aArgs = [])
 function Bt_createAttachment($args = [])
 {
     $opts = [
-        CURLOPT_URL => $GLOBALS['applicationUrl'] . 'rest/attachments',
+        CURLOPT_URL => rtrim($GLOBALS['applicationUrl'], "/") . '/rest/attachments',
         CURLOPT_HTTPHEADER => [
             'accept:application/json',
             'content-type:application/json',

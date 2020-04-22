@@ -73,16 +73,20 @@ if ($xmlconfig == false) {
 // Load config
 $config = $xmlconfig->CONFIG;
 $GLOBALS['MaarchDirectory']        = (string)$config->MaarchDirectory;
-$GLOBALS['customId']               = (string)$config->CustomId;
-$GLOBALS['applicationUrl']         = (string)$config->applicationUrl;
+$GLOBALS['customId']               = (string)$config->customID;
+$GLOBALS['applicationUrl']         = (string)$config->MaarchUrl;
+
+$config = $xmlconfig->SIGNATUREBOOK;
 $GLOBALS['userWS']                 = (string)$config->userWS;
 $GLOBALS['passwordWS']             = (string)$config->passwordWS;
-$GLOBALS['batchDirectory']         = $GLOBALS['MaarchDirectory'] . 'modules/visa/batch';
+$GLOBALS['batchDirectory']         = $GLOBALS['MaarchDirectory'] . 'bin/signatureBook';
 $validatedStatus                   = (string)$config->validatedStatus;
 $validatedStatusOnlyVisa           = (string)$config->validatedStatusOnlyVisa;
 $refusedStatus                     = (string)$config->refusedStatus;
 $validatedStatusAnnot              = (string)$config->validatedStatusAnnot;
 $refusedStatusAnnot                = (string)$config->refusedStatusAnnot;
+
+chdir($GLOBALS['MaarchDirectory']);
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['MaarchDirectory']);
 

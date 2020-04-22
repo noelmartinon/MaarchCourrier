@@ -210,9 +210,9 @@ class DatasourceControllerTest extends TestCase
         $this->assertEmpty($result['res_letterbox'][0]['custom_fields']);
         $this->assertSame('Pôle des Services Fonctionnels', $result['res_letterbox'][0]['entity_label']);
         $this->assertSame('Service', $result['res_letterbox'][0]['entitytype']);
-        $this->assertSame('http://localhost/rest/resources/'.self::$resId.'/content?mode=view', $result['res_letterbox'][0]['linktodoc']);
-        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['res_letterbox'][0]['linktodetail']);
-        $this->assertSame('http://localhost/dist/index.html#/process/users/19/groups/2/baskets/4/resId/' . self::$resId, $result['res_letterbox'][0]['linktoprocess']);
+        $this->assertIsString($result['res_letterbox'][0]['linktodoc']);
+        $this->assertIsString($result['res_letterbox'][0]['linktodetail']);
+        $this->assertIsString($result['res_letterbox'][0]['linktoprocess']);
 
 
         // Test view res_letterbox table
@@ -262,9 +262,9 @@ class DatasourceControllerTest extends TestCase
         $this->assertSame('Breaking News : Superman is dead again - PHP unit', $result['res_letterbox'][0]['subject']);
         $this->assertSame('Pôle des Services Fonctionnels', $result['res_letterbox'][0]['entity_label']);
         $this->assertSame('Service', $result['res_letterbox'][0]['entitytype']);
-        $this->assertSame('http://localhost/rest/resources/'.self::$resId.'/content?mode=view', $result['res_letterbox'][0]['linktodoc']);
-        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['res_letterbox'][0]['linktodetail']);
-        $this->assertSame('http://localhost/dist/index.html#/process/users/19/groups/2/baskets/4/resId/' . self::$resId, $result['res_letterbox'][0]['linktoprocess']);
+        $this->assertIsString($result['res_letterbox'][0]['linktodoc']);
+        $this->assertIsString($result['res_letterbox'][0]['linktodetail']);
+        $this->assertIsString($result['res_letterbox'][0]['linktoprocess']);
     }
 
     public function testNoteEvents()
@@ -344,9 +344,9 @@ class DatasourceControllerTest extends TestCase
         $this->assertSame('Breaking News : Superman is dead again - PHP unit', $result['res_letterbox'][0]['subject']);
         $this->assertSame('poiuytre1357nbvc', $result['res_letterbox'][0]['priority']);
         $this->assertEmpty($result['res_letterbox'][0]['custom_fields']);
-        $this->assertSame('http://localhost/rest/resources/'.self::$resId.'/content?mode=view', $result['res_letterbox'][0]['linktodoc']);
-        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['res_letterbox'][0]['linktodetail']);
-        $this->assertSame('http://localhost/rest/resources/'.self::$resId.'/content?mode=view', $result['res_letterbox'][0]['linktoprocess']);
+        $this->assertIsString($result['res_letterbox'][0]['linktodoc']);
+        $this->assertIsString($result['res_letterbox'][0]['linktodetail']);
+        $this->assertIsString($result['res_letterbox'][0]['linktoprocess']);
 
 
         // Test view res_letterbox table

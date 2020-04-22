@@ -68,21 +68,21 @@ class CoreController
         if ($queryParams['image'] == 'loginPage') {
             $filename = 'bodylogin.jpg';
             if (!empty($customId) && is_file("custom/{$customId}/img/{$filename}")) {
-                $path = "custom/{$customId}/{$filename}";
+                $path = "custom/{$customId}/img/{$filename}";
             } else {
                 $path = "{$assetPath}/{$filename}";
             }
         } elseif ($queryParams['image'] == 'logo') {
             $filename = 'logo.svg';
             if (!empty($customId) && is_file("custom/{$customId}/img/{$filename}")) {
-                $path = "custom/{$customId}/{$path}";
+                $path = "custom/{$customId}/img/{$filename}";
             } else {
                 $path = "{$assetPath}/{$filename}";
             }
         } elseif ($queryParams['image'] == 'onlyLogo') {
             $filename = 'logo_only.svg';
             if (!empty($customId) && is_file("custom/{$customId}/img/{$filename}")) {
-                $path = "custom/{$customId}/{$path}";
+                $path = "custom/{$customId}/img/{$filename}";
             } else {
                 $path = "{$assetPath}/{$filename}";
             }

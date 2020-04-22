@@ -30,10 +30,9 @@ class IncludeFileError extends Exception
 }
 
 // Globals variables definition
-$GLOBALS['batchName'] = 'process_letterbox_alerts';
-$GLOBALS['wb'] = '';
+$GLOBALS['batchName']    = 'process_letterbox_alerts';
+$GLOBALS['wb']           = '';
 $totalProcessedResources = 0;
-$batchDirectory = '';
 
 // Load tools
 include('batch_tools.php');

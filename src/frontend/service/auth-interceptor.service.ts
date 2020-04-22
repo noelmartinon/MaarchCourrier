@@ -6,6 +6,7 @@ import { NotificationService } from '../app/notification.service';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -34,6 +35,7 @@ export class AuthInterceptor implements HttpInterceptor {
     ];
     constructor(
         public http: HttpClient,
+        private router: Router,
         public notificationService: NotificationService,
         public authService: AuthService
     ) { }
@@ -111,6 +113,8 @@ export class AuthInterceptor implements HttpInterceptor {
                                 return of(false);
                             })
                         );
+                    } else if (error.status === 405) {
+                        return this.router.navigate(['/password-modification']);
                     } else {
                         return next.handle(request);
                     }

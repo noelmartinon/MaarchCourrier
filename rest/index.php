@@ -53,6 +53,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
 
 //Authentication
 $app->get('/authenticationInformations', \SrcCore\controllers\AuthenticationController::class . ':getInformations');
+$app->get('/validUrl', \SrcCore\controllers\AuthenticationController::class . ':getValidUrl');
 $app->post('/authenticate', \SrcCore\controllers\AuthenticationController::class . ':authenticate');
 $app->get('/authenticate/token', \SrcCore\controllers\AuthenticationController::class . ':getRefreshedToken');
 
@@ -167,6 +168,7 @@ $app->post('/jnlp/{jnlpUniqueId}', \ContentManagement\controllers\JnlpController
 $app->get('/jnlp/lock/{jnlpUniqueId}', \ContentManagement\controllers\JnlpController::class . ':isLockFileExisting');
 $app->get('/documentEditors', \ContentManagement\controllers\DocumentEditorController::class . ':get');
 $app->get('/onlyOffice/configuration', \ContentManagement\controllers\OnlyOfficeController::class . ':getConfiguration');
+$app->post('/onlyOffice/token', \ContentManagement\controllers\OnlyOfficeController::class . ':getToken');
 $app->post('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':saveMergedFile');
 $app->get('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getMergedFile');
 $app->get('/onlyOffice/encodedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getEncodedFileFromUrl');
@@ -559,6 +561,7 @@ $app->get('/externalSummary/{resId}', \ExternalSummary\controllers\SummaryContro
 $app->get('/externalConnectionsEnabled', \SrcCore\controllers\CoreController::class . ':externalConnectionsEnabled');
 
 //Alfresco
+$app->get('/alfresco/accounts', \Alfresco\controllers\AlfrescoController::class . ':getAccounts');
 $app->get('/alfresco/rootFolders', \Alfresco\controllers\AlfrescoController::class . ':getRootFolders');
 $app->get('/alfresco/folders/{id}/children', \Alfresco\controllers\AlfrescoController::class . ':getChildrenFoldersById');
 $app->get('/alfresco/autocomplete/folders', \Alfresco\controllers\AlfrescoController::class . ':getFolders');

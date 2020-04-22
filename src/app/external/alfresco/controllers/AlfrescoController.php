@@ -17,6 +17,8 @@ namespace Alfresco\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
+use Entity\models\EntityModel;
+use Group\controllers\PrivilegeController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -29,6 +31,30 @@ use User\models\UserModel;
 
 class AlfrescoController
 {
+    public function getAccounts(Request $request, Response $response)
+    {
+//        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_alfresco', 'userId' => $GLOBALS['id']])) {
+//            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+//        }
+
+        $entities = EntityModel::get(['select' => ['external_id'], 'where' => ["external_id->>'alfresco' is not null"]]);
+
+        $accounts = [];
+        $alreadyAdded = [];
+        foreach ($entities as $entity) {
+            $alfresco = json_decode($entity['external_id'], true);
+            if (!in_array($alfresco['alfresco']['login'], $alreadyAdded)) {
+                $accounts[] = [
+                    'label' => $alfresco['alfresco']['label'],
+                    'login' => $alfresco['alfresco']['login']
+                ];
+                $alreadyAdded[] = $alfresco['alfresco']['login'];
+            }
+        }
+
+        return $response->withJson(['accounts' => $accounts]);
+    }
+
     public function getRootFolders(Request $request, Response $response)
     {
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);

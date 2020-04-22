@@ -33,7 +33,6 @@ class IncludeFileError extends Exception
 $GLOBALS['batchName'] = 'process_email_stack';
 $GLOBALS['wb'] = '';
 $totalProcessedResources = 0;
-$batchDirectory = '';
 
 // Load tools
 include('batch_tools.php');
@@ -89,8 +88,8 @@ if ($customID <> '') {
 chdir($maarchDirectory);
 
 $GLOBALS['customId']  = $customID;
-$GLOBALS['batchDirectory'] = $GLOBALS['maarchDirectory'] . 'modules'
-                           . DIRECTORY_SEPARATOR . 'notifications';
+$GLOBALS['batchDirectory'] = $GLOBALS['maarchDirectory'] . 'bin'
+                           . DIRECTORY_SEPARATOR . 'notification';
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['maarchDirectory']);
 

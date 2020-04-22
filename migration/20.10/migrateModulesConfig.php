@@ -9,7 +9,7 @@ $migrated = 0;
 $customs =  scandir('custom');
 
 foreach ($customs as $custom) {
-    if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
+    if (in_array($custom, ['custom.json', 'custom.xml', '.', '..'])) {
         continue;
     }
 
@@ -25,6 +25,7 @@ foreach ($customs as $custom) {
         $loadedXml = simplexml_load_file($path);
         
         if ($loadedXml) {
+            $loadedXml->CONFIG->CookieTime = 10080;
             $i = 0;
             foreach ($loadedXml->MODULES as $value) {
                 if (in_array($loadedXml->MODULES[$i]->moduleid, ['convert', 'reports', 'full_text', 'cases'])) {

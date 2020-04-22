@@ -31,7 +31,7 @@ class CoreConfigModel
             return $customId;
         }
 
-        if (!file_exists('custom/custom.xml') || empty($_SERVER['SCRIPT_NAME']) || empty($_SERVER['SERVER_ADDR'])) {
+        if (!is_file('custom/custom.json') || empty($_SERVER['SCRIPT_NAME']) || empty($_SERVER['SERVER_ADDR'])) {
             $customId = '';
             return $customId;
         }
@@ -40,16 +40,14 @@ class CoreConfigModel
 
         $path = $explodeUrl[count($explodeUrl) - 3];
 
-        $xmlfile = simplexml_load_file('custom/custom.xml');
-        foreach ($xmlfile->custom as $value) {
-            if (!empty($value->path) && $value->path == $path) {
-                $customId = (string)$value->custom_id;
+        $jsonFile = file_get_contents('custom/custom.json');
+        $jsonFile = json_decode($jsonFile, true);
+        foreach ($jsonFile as $value) {
+            if (!empty($value['path']) && $value['path'] == $path) {
+                $customId = $value['id'];
                 return $customId;
-            } elseif ($value->ip == $_SERVER['SERVER_ADDR']) {
-                $customId = (string)$value->custom_id;
-                return $customId;
-            } elseif ($value->external_domain == $_SERVER['HTTP_HOST'] || $value->domain == $_SERVER['HTTP_HOST']) {
-                $customId = (string)$value->custom_id;
+            } elseif ($value['uri'] == $_SERVER['HTTP_HOST'] || ($_SERVER['HTTP_HOST'] == $_SERVER['SERVER_ADDR'] && $value['uri'] == $_SERVER['SERVER_ADDR'])) {
+                $customId = $value['id'];
                 return $customId;
             }
         }

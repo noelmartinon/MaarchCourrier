@@ -269,8 +269,7 @@ class SendMessageExchangeController
                 'eventType' => 'UP',
                 'eventId'   => 'resup',
                 'info'       => _NUMERIC_PACKAGE_ADDED . _ON_DOC_NUM
-                    . $args['resId'] . ' ('.$messageId.') : "' . TextFormatModel::cutString(['string' => $mainDocument[0]['Title'], 'max' => 254]),
-                'userId' => $GLOBALS['login']
+                    . $args['resId'] . ' ('.$messageId.') : "' . TextFormatModel::cutString(['string' => $mainDocument[0]['Title'], 'max' => 254])
             ]);
 
             HistoryController::add([
@@ -278,8 +277,7 @@ class SendMessageExchangeController
                 'recordId'  => $messageId,
                 'eventType' => 'ADD',
                 'eventId'   => 'messageexchangeadd',
-                'info'       => _NUMERIC_PACKAGE_ADDED . ' (' . $messageId . ')',
-                'userId' => $GLOBALS['login']
+                'info'       => _NUMERIC_PACKAGE_ADDED . ' (' . $messageId . ')'
             ]);
 
             /******** ENVOI *******/
@@ -492,10 +490,12 @@ class SendMessageExchangeController
         $contentObject->DocumentType                           = $aArgs['DocumentType'];
         $contentObject->Status                                 = StatusModel::getById(['id' => $aArgs['Status']])['label_status'];
 
-        if (is_numeric($aArgs['Writer'])) {
-            $userInfos = UserModel::getById(['id' => $aArgs['Writer'], 'select' => ['firstname', 'lastname']]);
-        } else {
-            $userInfos = UserModel::getByLogin(['login' => $aArgs['Writer'], 'select' => ['firstname', 'lastname']]);
+        if (!empty($aArgs['Writer'])) {
+            if (is_numeric($aArgs['Writer'])) {
+                $userInfos = UserModel::getById(['id' => $aArgs['Writer'], 'select' => ['firstname', 'lastname']]);
+            } else {
+                $userInfos = UserModel::getByLogin(['login' => $aArgs['Writer'], 'select' => ['firstname', 'lastname']]);
+            }
         }
 
         $writer                = new \stdClass();

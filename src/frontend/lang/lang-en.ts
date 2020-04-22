@@ -538,6 +538,7 @@ export const LANG_EN = {
     "doctype":                                     "Document type",
     "doctypes":                                    "Document types",
     "documentEditor":                              "Document editor",
+    "canNotEditImportedDocumentWhenJava":          "You can not edit imported document with Java applet",
     "documentEditor_java":                         "Open your default document editor in a new window",
     "documentEditor_onlyoffice":                   "Open OnlyOffice directly inside Maarch Courrier",
     "documentOutOfPerimeter":                      "This document is out of your perimeter",
@@ -1672,4 +1673,8 @@ export const LANG_EN = {
     "accountSuspended": "Your user account has been suspended",
     "accountLocked": "Too many connections attemps. Retry in",
     "modelUsedByResources": "This model is used by resources, you can't delete it.",
+    "mustChangePassword": "Please, you must change your password.",
+    "linkedResources": "Attachments (linked mails)",
+    "accessNotFound": "Access not found",
+    "moreOneCustom": "This url is not an available instance of this application, please verify your address.",
 };

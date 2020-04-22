@@ -202,7 +202,7 @@ export class FiltersToolComponent implements OnInit {
             },
         ];
 
-        this.http.get('../..' + this.routeDatas + '?init' + this.filtersListService.getUrlFilters())
+        this.http.get('..' + this.routeDatas + '?init' + this.filtersListService.getUrlFilters())
             .subscribe((data: any) => {
                 data.categories.forEach((element: any) => {
                     if (this.listProperties.categories.map((category: any) => (category.id)).indexOf(element.id) === -1) {

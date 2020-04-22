@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { ActivateUserComponent } from './activate-user.component';
-import { PasswordModificationComponent } from './password-modification.component';
+import { PasswordModificationComponent } from './login/passwordModification/password-modification.component';
 import { ProfileComponent } from './profile.component';
 import { AboutUsComponent } from './about-us.component';
 import { HomeComponent } from './home/home.component';

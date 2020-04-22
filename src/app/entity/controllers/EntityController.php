@@ -28,6 +28,7 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\PasswordModel;
 use Template\models\TemplateAssociationModel;
 use User\models\UserEntityModel;
 use User\models\UserModel;
@@ -131,6 +132,10 @@ class EntityController
             'entities'  => [$aArgs['id']]
         ]);
 
+        $entity['externalId'] = json_decode($entity['external_id'], true);
+        unset($entity['externalId']['alfrescoPassword'], $entity['external_id']);
+
+
         $entity['users'] = EntityModel::getUsersById(['id' => $entity['entity_id'], 'select' => ['users.id','users.user_id', 'users.firstname', 'users.lastname', 'users.status']]);
         $children = EntityModel::get(['select' => [1], 'where' => ['parent_entity_id = ?'], 'data' => [$aArgs['id']]]);
         $entity['hasChildren'] = count($children) > 0;
@@ -171,6 +176,15 @@ class EntityController
         if (!empty($existingEntity)) {
             return $response->withStatus(400)->withJson(['errors' => _ENTITY_ID_ALREADY_EXISTS]);
         }
+
+        $externalId = [];
+        if (!empty($data['externalId'])) {
+            $externalId = $data['externalId'];
+            if (!empty($data['externalId']['alfrescoPassword'])) {
+                $externalId['alfrescoPassword'] = PasswordModel::encrypt(['password' => $data['externalId']['alfrescoPassword']]);
+            }
+        }
+        $data['external_id'] = json_encode($externalId);
 
         EntityModel::create($data);
         HistoryController::add([
@@ -245,6 +259,16 @@ class EntityController
                 unset($data[$key]);
             }
         }
+
+        $externalId = $entity['external_id'];
+        if (!empty($data['externalId'])) {
+            $externalId = array_merge($externalId, $data['externalId']);
+            if (!empty($data['externalId']['alfrescoPassword'])) {
+                $externalId['alfrescoPassword'] = PasswordModel::encrypt(['password' => $data['externalId']['alfrescoPassword']]);
+            }
+        }
+        $data['external_id'] = json_encode($externalId);
+
         EntityModel::update(['set' => $data, 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
         HistoryController::add([
             'tableName' => 'entities',

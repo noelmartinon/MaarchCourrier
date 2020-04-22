@@ -176,11 +176,11 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     initMce() {
         tinymce.init({
             selector: "textarea#emailSignature",
-            base_url: '../../node_modules/tinymce/',
+            base_url: '../node_modules/tinymce/',
             readonly: false,
             suffix: '.min',
             language: this.lang.langISO.replace('-', '_'),
-            language_url: `../../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
+            language_url: `../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
             menubar: false,
             statusbar: false,
             plugins: [

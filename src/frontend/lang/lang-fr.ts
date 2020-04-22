@@ -538,6 +538,7 @@ export const LANG_FR = {
     "doctype":                                     "Type de courrier",
     "doctypes":                                    "Types de courriers",
     "documentEditor":                              "Editeur de document",
+    "canNotEditImportedDocumentWhenJava":          "Vous ne pouvez pas éditer un document importé avec l'applet Java",
     "documentEditor_java":                         "Ouvre votre éditeur de document par défaut dans une nouvelle fenêtre",
     "documentEditor_onlyoffice":                   "Ouvre la suite OnlyOffice directement dans l'application Maarch Courrier",
     "documentOutOfPerimeter":                      "Ce document est en dehors de votre périmètre",
@@ -1672,4 +1673,8 @@ export const LANG_FR = {
     "accountSuspended": "Votre compte utilisateur a été suspendu",
     "accountLocked": "Nombre de tentatives de connexion dépassée. Réessayez dans",
     "modelUsedByResources": "Le modèle est utilisé par des courriers, vous ne pouvez pas le supprimer.",
+    "mustChangePassword": "Vous êtes invité à changer votre mot de passe.",
+    "linkedResources": "Pièces jointes (courriers liés)",
+    "accessNotFound": "Accès introuvable",
+    "moreOneCustom": "Cette url ne correspond à aucune instance configurée, veuillez vérifier l'adresse.",
 };

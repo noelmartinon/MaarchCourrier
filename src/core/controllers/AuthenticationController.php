@@ -32,7 +32,7 @@ class AuthenticationController
 {
     const MAX_DURATION_TOKEN = 30; //Minutes
     const ROUTES_WITHOUT_AUTHENTICATION = [
-        'GET/authenticationInformations', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
+        'GET/authenticationInformations', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate'
     ];
 
@@ -45,6 +45,31 @@ class AuthenticationController
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
 
         return $response->withJson(['instanceId' => $hashedPath, 'applicationName' => $appName, 'loginMessage' => $parameter['param_value_string'] ?? null]);
+    }
+
+    public function getValidUrl(Request $request, Response $response)
+    {
+        if (!is_file('custom/custom.json')) {
+            return $response->withJson(['message' => 'No custom file', 'lang' => 'noConfiguration']);
+        }
+
+        $jsonFile = file_get_contents('custom/custom.json');
+        $jsonFile = json_decode($jsonFile, true);
+        if (count($jsonFile) == 0) {
+            return $response->withJson(['message' => 'No custom', 'lang' => 'noConfiguration']);
+        } elseif (count($jsonFile) > 1) {
+            return $response->withJson(['message' => 'There is more than 1 custom', 'lang' => 'moreOneCustom']);
+        }
+
+        $url = null;
+        if (!empty($jsonFile[0]['path'])) {
+            $coreUrl = UrlController::getCoreUrl();
+            $url = $coreUrl . $jsonFile[0]['path'] . "/dist/index.html";
+        } elseif (!empty($jsonFile[0]['uri'])) {
+            $url = $jsonFile[0]['uri'] . "/dist/index.html";
+        }
+
+        return $response->withJson(['url' => $url]);
     }
 
     public static function authentication($authorizationHeaders = [])
@@ -101,26 +126,24 @@ class AuthenticationController
         ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::stringType($args, ['currentRoute']);
 
-        if ($args['currentRoute'] != '/initialize') {
-            $user = UserModel::getById(['select' => ['status'], 'id' => $args['userId']]);
+        $user = UserModel::getById(['select' => ['status', 'password_modification_date'], 'id' => $args['userId']]);
 
-            if ($user['status'] == 'ABS' && !in_array($args['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
-                return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
-            }
+        if ($user['status'] == 'ABS' && !in_array($args['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
+            return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
+        }
 
-            if (!in_array($args['currentRoute'], ['/passwordRules', '/users/{id}/password'])) {
-                $loggingMethod = CoreConfigModel::getLoggingMethod();
+        if (!in_array($args['currentRoute'], ['/passwordRules', '/users/{id}/password'])) {
+            $loggingMethod = CoreConfigModel::getLoggingMethod();
 
-                if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'])) {
-                    $passwordRules = PasswordModel::getEnabledRules();
-                    if (!empty($passwordRules['renewal'])) {
-                        $currentDate = new \DateTime();
-                        $lastModificationDate = new \DateTime($user['password_modification_date']);
-                        $lastModificationDate->add(new \DateInterval("P{$passwordRules['renewal']}D"));
+            if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'])) {
+                $passwordRules = PasswordModel::getEnabledRules();
+                if (!empty($passwordRules['renewal'])) {
+                    $currentDate = new \DateTime();
+                    $lastModificationDate = new \DateTime($user['password_modification_date']);
+                    $lastModificationDate->add(new \DateInterval("P{$passwordRules['renewal']}D"));
 
-                        if ($currentDate > $lastModificationDate) {
-                            return ['isRouteAvailable' => false, 'errors' => 'User must change his password'];
-                        }
+                    if ($currentDate > $lastModificationDate) {
+                        return ['isRouteAvailable' => false, 'errors' => 'User must change his password'];
                     }
                 }
             }
@@ -138,12 +161,21 @@ class AuthenticationController
 
         if (!empty($passwordRules['lockAttempts'])) {
             $user = UserModel::getById(['select' => ['failed_authentication', 'locked_until'], 'id' => $args['userId']]);
+            $set = [];
             if (!empty($user['locked_until'])) {
-                return ['accountLocked' => true, 'lockedDate' => $user['locked_until']];
+                $currentDate = new \DateTime();
+                $lockedUntil = new \DateTime($user['locked_until']);
+                if ($lockedUntil < $currentDate) {
+                    $set['locked_until'] = null;
+                    $user['failed_authentication'] = 0;
+                } else {
+                    return ['accountLocked' => true, 'lockedDate' => $user['locked_until']];
+                }
             }
 
+            $set['failed_authentication'] = $user['failed_authentication'] + 1;
             UserModel::update([
-                'set'       => ['failed_authentication' => $user['failed_authentication'] + 1],
+                'set'       => $set,
                 'where'     => ['id = ?'],
                 'data'      => [$args['userId']]
             ]);
@@ -151,11 +183,11 @@ class AuthenticationController
             if (!empty($user['failed_authentication']) && ($user['failed_authentication'] + 1) >= $passwordRules['lockAttempts'] && !empty($passwordRules['lockTime'])) {
                 $lockedUntil = time() + 60 * $passwordRules['lockTime'];
                 UserModel::update([
-                    'set'   => ['locked_until'  => date('Y-m-d H:i:s', $lockedUntil)],
+                    'set'       => ['locked_until'  => date('Y-m-d H:i:s', $lockedUntil)],
                     'where'     => ['id = ?'],
                     'data'      => [$args['userId']]
                 ]);
-                return ['accountLocked' => true];
+                return ['accountLocked' => true, 'lockedDate' => date('Y-m-d H:i:s', $lockedUntil)];
             }
         }
 
@@ -183,7 +215,7 @@ class AuthenticationController
             } else {
                 $handle = AuthenticationController::handleFailedAuthentication(['userId' => $user['id']]);
                 if (!empty($handle['accountLocked'])) {
-                    return $response->withStatus(401)->withJson(['errors' => 'Account Locked', 'date' => $handle['lockedDate'] ?? null]);
+                    return $response->withStatus(401)->withJson(['errors' => 'Account Locked', 'date' => $handle['lockedDate']]);
                 }
                 return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
             }
@@ -275,11 +307,11 @@ class AuthenticationController
             }
         }
 
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'firstname', 'lastname', 'status', 'user_id as login']]);
+
         $token = [
             'exp'   => time() + 60 * $sessionTime,
-            'user'  => [
-                'id' => $GLOBALS['id']
-            ]
+            'user'  => $user
         ];
 
         $jwt = JWT::encode($token, CoreConfigModel::getEncryptKey());

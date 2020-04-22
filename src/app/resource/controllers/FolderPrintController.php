@@ -366,6 +366,106 @@ class FolderPrintController
             }
         }
 
+        if (!empty($resource['linkedResources']) && is_array($resource['linkedResources'])) {
+            $controlResource = ResModel::getById(['resId' => $resource['resId'], 'select' => ['linked_resources']]);
+            $controlResource['linked_resources'] = json_decode($controlResource['linked_resources'], true);
+            foreach ($resource['linkedResources'] as $linkedResource) {
+                if (!Validator::intVal()->validate($linkedResource['resId'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'LinkedResources resId is not an integer']);
+                }
+                if (!in_array($linkedResource['resId'], $controlResource['linked_resources'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'LinkedResources resId is not linked to resource']);
+                }
+                if (!ResController::hasRightByResId(['resId' => [$linkedResource['resId']], 'userId' => $GLOBALS['id']])) {
+                    return $response->withStatus(403)->withJson(['errors' => 'LinkedResources out of perimeter']);
+                }
+
+                if (!empty($linkedResource['document'])) {
+                    $document = ResModel::getById([
+                        'select' => ['res_id', 'docserver_id', 'path', 'filename', 'fingerprint', 'category_id', 'alt_identifier'],
+                        'resId'  => $linkedResource['resId']
+                    ]);
+                    if (empty($document)) {
+                        return $response->withStatus(400)->withJson(['errors' => 'LinkedResources Document does not exist']);
+                    }
+
+                    if (empty($document['filename'])) {
+                        return $response->withStatus(400)->withJson(['errors' => 'LinkedResources document has no file']);
+                    }
+
+                    $path = FolderPrintController::getDocumentFilePath(['document' => $document, 'collId' => 'letterbox_coll']);
+                    if (!empty($path['errors'])) {
+                        return $response->withStatus($path['code'])->withJson(['errors' => $path['errors']]);
+                    }
+
+                    $documentPaths[] = $path;
+                }
+
+                if (!empty($linkedResource['attachments']) && is_array($linkedResource['attachments'])) {
+                    foreach ($linkedResource['attachments'] as $attachment) {
+                        if (!Validator::intVal()->validate($attachment)) {
+                            return $response->withStatus(400)->withJson(['errors' => 'LinkedResources attachment id is not an integer']);
+                        }
+                    }
+
+                    $attachments = AttachmentModel::get([
+                        'select'  => ['res_id', 'res_id_master', 'recipient_type', 'recipient_id', 'typist', 'status', 'attachment_type',
+                            'creation_date', 'identifier', 'title', 'format', 'docserver_id', 'origin'],
+                        'where'   => ['res_id in (?)', 'status not in (?)'],
+                        'data'    => [$linkedResource['attachments'], ['DEL', 'OBS']],
+                        'orderBy' => ['creation_date desc']
+                    ]);
+
+                    if (count($attachments) < count($linkedResource['attachments'])) {
+                        return $response->withStatus(400)->withJson(['errors' => 'LinkedResources attachments not found']);
+                    }
+
+                    $chronoResource = ResModel::getById(['select' => ['alt_identifier'], 'resId' => $resource['resId']]);
+                    $chronoResource = $chronoResource['alt_identifier'];
+
+                    $attachmentsIds = array_column($attachments, 'res_id');
+
+                    foreach ($attachments as $attachment) {
+                        if ($attachment['res_id_master'] != $linkedResource['resId']) {
+                            return $response->withStatus(400)->withJson(['errors' => 'LinkedResources attachment is not linked to resource']);
+                        }
+
+                        $originAttachment = AttachmentModel::get([
+                            'select' => [
+                                'res_id', 'res_id_master', 'recipient_type', 'recipient_id', 'typist', 'status', 'attachment_type',
+                                'creation_date', 'identifier', 'title', 'format', 'docserver_id', 'origin'
+                            ],
+                            'where'  => ['origin = ?'],
+                            'data'   => [$attachment['res_id'] . ',res_attachments']
+                        ]);
+
+                        if (!empty($originAttachment[0])) {
+                            $originAttachment = $originAttachment[0];
+                            if (in_array($originAttachment['res_id'], $attachmentsIds)) {
+                                continue;
+                            }
+
+                            $attachment = $originAttachment;
+                        }
+
+                        if ($withSeparators) {
+                            $documentPaths[] = FolderPrintController::getAttachmentSeparator([
+                                'attachment'     => $attachment,
+                                'chronoResource' => $chronoResource
+                            ]);
+                        }
+
+                        $path = FolderPrintController::getDocumentFilePath(['document' => $attachment, 'collId' => 'attachments_coll']);
+                        if (!empty($path['errors'])) {
+                            return $response->withStatus($path['code'])->withJson(['errors' => $path['errors']]);
+                        }
+
+                        $documentPaths[] = $path;
+                    }
+                }
+            }
+        }
+
         if (!empty($documentPaths)) {
             $tmpDir = CoreConfigModel::getTmpPath();
             $filePathOnTmp = $tmpDir . 'mergedFile.pdf';

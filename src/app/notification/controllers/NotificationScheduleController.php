@@ -89,14 +89,9 @@ class NotificationScheduleController
                 $pathToFolow = $corePath;
             }
 
-            $path = $pathToFolow.'modules/notifications/batch/scripts/'.$filename;
+            $path = $pathToFolow.'bin/notification/scripts/'.$filename;
             if (file_exists($path)) {
                 $notificationsArray[] = ['description' => $result['description'], 'path' => $path];
-            } else {
-                $path = $pathToFolow.'bin/notification/scripts/'.$filename;
-                if (file_exists($path)) {
-                    $notificationsArray[] = ['description' => $result['description'], 'path' => $path];
-                }
             }
         }
 
@@ -125,8 +120,7 @@ class NotificationScheduleController
                     $pathToFolow = $corePath;
                 }
                 $returnValue = true;
-                if (strpos($crontabToSave[$id]['cmd'], $pathToFolow.'modules/notifications/batch/scripts/') !== 0
-                    && strpos($crontabToSave[$id]['cmd'], $pathToFolow.'bin/notification/scripts/') !== 0) {
+                if (strpos($crontabToSave[$id]['cmd'], $pathToFolow.'bin/notification/scripts/') !== 0) {
                     $returnValue = false;
                     break;
                 }

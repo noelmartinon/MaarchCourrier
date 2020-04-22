@@ -9,6 +9,9 @@ UPDATE parameters SET param_value_string = '20.10' WHERE id = 'database_version'
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
+/* SENDMAIL */
+DROP TABLE IF EXISTS sendmail;
+
 /* REPORTS */
 DROP TABLE IF EXISTS usergroups_reports;
 DELETE FROM usergroups_services WHERE service_id IN ('reports', 'admin_reports');

@@ -143,7 +143,7 @@ export class SentResourcePageComponent implements OnInit {
     initMce() {
         tinymce.init({
             selector: 'textarea#emailSignature',
-            base_url: '../../node_modules/tinymce/',
+            base_url: '../node_modules/tinymce/',
             setup: (editor: any) => {
                 editor.on('init', (e: any) => {
                     this.loading = false;
@@ -153,7 +153,7 @@ export class SentResourcePageComponent implements OnInit {
             height: '400',
             suffix: '.min',
             language: this.lang.langISO.replace('-', '_'),
-            language_url: `../../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
+            language_url: `../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
             menubar: false,
             statusbar: false,
             plugins: [

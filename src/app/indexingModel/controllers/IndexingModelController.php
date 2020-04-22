@@ -396,7 +396,7 @@ class IndexingModelController
         ]);
 
         if (!empty($resources)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource']);
+            return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource', 'lang' => 'modelUsedByResources']);
         }
 
         $childrenModels = IndexingModelModel::get(['select' => ['id', 'label'], 'where' => ['"master" = ?'], 'data' => [$args['id']]]);

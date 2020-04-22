@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ROOT>
-<!-- le nom du fichier doit etre config.xml ou config_{custom_id}.xml -->
-    <CONFIG>
-        <MaarchDirectory>/var/www/html/MaarchCourrier/</MaarchDirectory>
-        <customID></customID>
-        <MaarchUrl>http://preview.maarchcourrier.com</MaarchUrl>
-    </CONFIG>
-</ROOT>

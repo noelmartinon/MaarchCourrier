@@ -193,7 +193,7 @@
                             </a>
                         </div>
                     </div>
-                    <div *ngIf="signatureBook.signatures[0] && signatureBook.canSign && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && signatureBook.attachments[rightSelectedThumbnail].sign"
+                    <div *ngIf="signatureBook.signatures[0] && signatureBook.canSign && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && signatureBook.attachments[rightSelectedThumbnail].sign && signatureBook.attachments[rightSelectedThumbnail].isConverted"
                          (mouseenter)="showSignaturesPanel = true" (mouseleave)="showSignaturesPanel = false" class="pjSign" [ngClass]="[signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN' ? 'signed' : '']" [ngStyle]="{'box-shadow': signatureBook.listinstance.requested_signature ? 'inset 0px 0px 5px 0px red' : 'inset 0px 0px 5px 0px #656565;'}">
                         <span *ngIf="signatureBook.attachments[rightSelectedThumbnail].status != 'SIGN' && signatureBook.signatures[0]" style="cursor: pointer">
                             <span *ngIf="!loadingSign">

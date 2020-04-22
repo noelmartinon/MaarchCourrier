@@ -92,7 +92,7 @@ class DatasourceController
             ])[0];
         
             // Lien vers la page detail
-            $res['linktodoc']     = trim($aArgs['params']['maarchUrl'], '/') . '/rest/resources/'.$res['res_id'].'/content?mode=view';
+            $res['linktodoc']     = trim($aArgs['params']['maarchUrl'], '/') . '/dist/index.html#/resources/'.$res['res_id'].'/content';
             $res['linktodetail']  = trim($aArgs['params']['maarchUrl'], '/') . '/dist/index.html#/resources/'.$res['res_id'];
             if (!empty($res['res_id']) && !empty($preferenceBasket[0]['group_serial_id']) && !empty($basket['id']) && !empty($aArgs['params']['recipient']['id'])) {
                 $res['linktoprocess'] = trim($aArgs['params']['maarchUrl'], '/') . '/dist/index.html#/process/users/'.$aArgs['params']['recipient']['id'].'/groups/'.$preferenceBasket[0]['group_serial_id'].'/baskets/'.$basket['id'].'/resId/'.$res['res_id'];
@@ -159,7 +159,7 @@ class DatasourceController
                 $datasources['res_letterbox'][] = $resLetterbox;
             }
         
-            $note['linktodoc']     = trim($aArgs['params']['maarchUrl'], '/') . '/rest/resources/'.$resId.'/content?mode=view';
+            $note['linktodoc']     = trim($aArgs['params']['maarchUrl'], '/') . '/dist/index.html#/resources/'.$resId.'/content';
             $note['linktodetail']  = trim($aArgs['params']['maarchUrl'], '/') . '/dist/index.html#/resources/'.$resId;
         
             if (!empty($resId) && !empty($preferenceBasket[0]['group_serial_id']) && !empty($basket['id']) && !empty($aArgs['params']['recipient']['id'])) {

@@ -7,12 +7,13 @@ function writeScreenShot(data, filename) {
     stream.end();
 }
 
-describe('index resource page', function() {
-    it('login to app', function() {
+describe('index resource page', function () {
+    it('login to app', function () {
         browser.waitForAngularEnabled(true);
-        browser.get(browser.baseUrl+ '/dist/index.html#/login');
+        browser.get(browser.baseUrl + '/dist/index.html#/login');
+        browser.sleep(500);
         browser.takeScreenshot().then(function (png) {
-            writeScreenShot(png, 'exception.png');
+            writeScreenShot(png, 'test/e2e/screenshots/login_to_app_' + browser.browserName + '.png');
         });
         element(by.id('login')).sendKeys('bblier');
         browser.sleep(500);
@@ -21,15 +22,15 @@ describe('index resource page', function() {
         element(by.id('submit')).click();
     });
 
-    it('index a document whitout file', function() {
-        browser.sleep(4000);
+    it('index a document whitout file', function () {
+        browser.sleep(1000);
         browser.takeScreenshot().then(function (png) {
-            writeScreenShot(png, 'exception.png');
+            writeScreenShot(png, 'test/e2e/screenshots/home_' + browser.browserName + '.png');
         });
         element(by.id('indexing')).click();
         browser.sleep(500);
         browser.takeScreenshot().then(function (png) {
-            writeScreenShot(png, 'exception.png');
+            writeScreenShot(png, 'test/e2e/screenshots/index_a_document_' + browser.browserName + '.png');
         });
         element(by.id('doctype')).click();
         browser.sleep(500);

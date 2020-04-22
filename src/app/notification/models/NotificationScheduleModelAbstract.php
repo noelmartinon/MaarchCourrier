@@ -107,8 +107,7 @@ abstract class NotificationScheduleModelAbstract
             }
 
             $state = 'normal';
-            if (strpos($cmd, $pathToFolow.'bin/notification/scripts/') !== 0 && strpos($cmd, $pathToFolow.'modules/notifications/batch/scripts/') !== 0
-                    && $aArgs['setHiddenValue']) {
+            if (strpos($cmd, $pathToFolow.'bin/notification/scripts/') !== 0 && $aArgs['setHiddenValue']) {
                 $cmd = 'hidden';
                 $state = 'hidden';
             }
@@ -148,21 +147,7 @@ abstract class NotificationScheduleModelAbstract
         $corePath = str_replace('custom/'.$customId.'/src/app/notification/models', '', __DIR__);
         $corePath = str_replace('src/app/notification/models', '', $corePath);
 
-        if (file_exists($corePath.'custom/'.$customId.'/modules/notifications/batch/config/config.xml')) {
-            $ConfigNotif = $corePath.'custom/'.$customId.'/modules/notifications/batch/config/config.xml';
-        } elseif (file_exists($corePath.'custom/'.$customId.'/modules/notifications/batch/config/config_'.$customId.'.xml')) {
-            $ConfigNotif = $corePath.'custom/'.$customId.'/modules/notifications/batch/config/config_'.$customId.'.xml';
-        } elseif (file_exists($corePath.'modules/notifications/batch/config/config_'.$customId.'.xml')) {
-            $ConfigNotif = $corePath.'modules/notifications/batch/config/config_'.$customId.'.xml';
-        } elseif (file_exists($corePath.'custom/'.$customId.'/bin/notification/config/config.xml')) {
-            $ConfigNotif = $corePath.'custom/'.$customId.'/bin/notification/config/config.xml';
-        } elseif (file_exists($corePath.'custom/'.$customId.'/bin/notification/config/config_'.$customId.'.xml')) {
-            $ConfigNotif = $corePath.'custom/'.$customId.'/bin/notification/config/config_'.$customId.'.xml';
-        } elseif (file_exists($corePath.'bin/notification/config/config_'.$customId.'.xml')) {
-            $ConfigNotif = $corePath.'bin/notification/config/config_'.$customId.'.xml';
-        } else {
-            $ConfigNotif = $corePath.'modules/notifications/batch/config/config.xml';
-        }
+        $ConfigNotif = $corePath . CoreConfigModel::getConfigPath();
 
         if ($customId != '') {
             $pathToFolow = $corePath.'custom/'.$customId.'/';

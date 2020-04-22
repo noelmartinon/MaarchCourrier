@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationService } from '../../notification.service';
 import { LANG } from '../../translate.component';
 import { finalize } from 'rxjs/operators';
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
     templateUrl: 'updatePassword.component.html',
@@ -45,16 +46,22 @@ export class UpdatePasswordComponent implements OnInit {
     otherRuleText = '';
 
 
-    constructor(private router: Router, private route: ActivatedRoute, public http: HttpClient, public notificationService: NotificationService) {
-        this.route.queryParams
-            .subscribe(params => {
-                this.token = params.token;
-            });
+    constructor(
+        private router: Router,
+        private route: ActivatedRoute,
+        public http: HttpClient,
+        public notificationService: NotificationService,
+        private authService: AuthService,
+    ) {
+        this.route.queryParams.subscribe(params => {
+            this.token = params.token;
+        });
     }
 
     ngOnInit(): void {
         this.getPassRules();
     }
+
 
     updatePassword() {
         this.labelButton = this.lang.emailSendInProgress;
@@ -72,7 +79,7 @@ export class UpdatePasswordComponent implements OnInit {
                 this.notificationService.success(this.lang.passwordChanged);
                 this.router.navigate(['/login']);
             }, (err: any) => {
-                this.notificationService.error(this.lang[err.error.lang]);
+                this.notificationService.handleSoftErrors(err);
             });
     }
 
