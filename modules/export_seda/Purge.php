@@ -3,7 +3,8 @@
 require_once 'vendor/autoload.php';
 require_once __DIR__.'/RequestSeda.php';
 
-Class Purge{
+class Purge
+{
     protected $xml;
     public function __construct()
     {
@@ -16,14 +17,13 @@ Class Purge{
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
             . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
             . DIRECTORY_SEPARATOR . 'config.xml'
-        ))
-        {
+        )) {
             $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                 . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
                 . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
-        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+        } elseif (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
             $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
                 . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
@@ -34,6 +34,10 @@ Class Purge{
         }
 
         $this->deleteData = (string) $this->xml->CONFIG->deleteData;
+
+        if (!empty($_SESSION['custom_override_id'])) {
+            new \SrcCore\models\DatabasePDO(['customId' => $_SESSION['custom_override_id']]);
+        }
     }
 
     public function purge($resId)
