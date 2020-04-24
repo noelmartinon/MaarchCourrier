@@ -1,6 +1,7 @@
 <?php
 
-class AdapterMaarchRM{
+class AdapterMaarchRM
+{
     private $xml;
 
     public function __construct()
@@ -12,14 +13,13 @@ class AdapterMaarchRM{
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
             . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
             . DIRECTORY_SEPARATOR . 'config.xml'
-        ))
-        {
+        )) {
             $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                 . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
                 . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
-        } else if (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
+        } elseif (file_exists($_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'.  DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml')) {
             $path = $_SESSION['config']['corepath'] . 'modules' . DIRECTORY_SEPARATOR . 'export_seda'
                 . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'config.xml';
             $getXml = true;
@@ -30,14 +30,19 @@ class AdapterMaarchRM{
         }
     }
 
-    public function getInformations($reference) {
+    public function getInformations($reference)
+    {
         $res = []; // [0] = url, [1] = header, [2] = cookie, [3] = data
 
         $res[0] =  (string) $this->xml->CONFIG->urlSAEService. "/medona/Archivetransfer";
+        $userAgent = (string) $this->xml->CONFIG->userAgent;
+        if (empty($userAgent)) {
+            $userAgent = 'maarchrestclient';
+        }
         $res[1] = [
             'accept:application/json',
             'content-type:application/json',
-            'user-agent:maarchrestclient'
+            'user-agent:'.$userAgent
         ];
 
         $token = urlencode((string)$this->xml->CONFIG->token);

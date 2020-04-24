@@ -30,8 +30,8 @@
  * @ingroup visa
  */
 define('FPDF_FONTPATH', $core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/font/');
-require $core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdf.php';
-require $core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdi.php';
+require_once $core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdf.php';
+require_once $core_path.'apps/maarch_entreprise/tools/pdfb/fpdf_1_7/fpdi.php';
 
 abstract class visa_Abstract extends Database
 {
