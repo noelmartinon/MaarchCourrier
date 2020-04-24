@@ -6,15 +6,15 @@
         <file_prefix>seda</file_prefix>
         <loaded>true</loaded>
         <sae>MaarchRM</sae>
-        <token>RJpzB36bmR+iuz/aHN9Zl9PDn8tZEs46z87xNzQkc4vMgnX5xU0nQsN+eDvLQ1Uu2RC00faGys/+axucO0O57gK+vhVahM281sLUnrIe2jgkXg7xCfTXnbSWsbE9pxLK</token>
-        <urlSAEService>https://demo-ap.maarchrm.com</urlSAEService>
+        <token>phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCrrA61NWmmXVWU7AR5Sw+wq9eazIrIiGnLNDPB6BqMMum8fauclhcR2nklsEdTlveHjcGp/WIDlQ</token>
+        <urlSAEService>http://demo-ap.maarchrm.com:81</urlSAEService>
         <urlSAE>https://demo-ap.maarchrm.com/transfer/sent</urlSAE>
         <directoryMessage>/tmp/</directoryMessage>
-        <senderOrgRegNumber>MAARCH_LES_BAINS_SA</senderOrgRegNumber>
+        <senderOrgRegNumber>org_987654321_DGS_SA</senderOrgRegNumber>
         <accessRuleCode>AR039</accessRuleCode>
         <deleteData>true</deleteData>
         <certificateSSL></certificateSSL>
-        <userAgent>service</userAgent>
+        <userAgent></userAgent>
     </CONFIG>
     <TABLENAME/>
     <HISTORY>
