@@ -61,19 +61,19 @@ class CheckAllReply
 
         $xml = simplexml_load_file($options['config']);
 
-        $_SESSION['config']['lang'] = $xml->CONFIG->Lang;
-        $_SESSION['config']['corepath'] = $xml->CONFIG->MaarchDirectory;
-        $_SESSION['config']['custom_override_id'] = $xml->CONFIG->CustomId;
-        $_SESSION['config']['app_id'] = $xml->CONFIG->MaarchApps;
+        $_SESSION['config']['lang']               = (string)$xml->CONFIG->Lang;
+        $_SESSION['config']['corepath']           = (string)$xml->CONFIG->MaarchDirectory;
+        $_SESSION['config']['custom_override_id'] = (string)$xml->CONFIG->CustomId;
+        $_SESSION['config']['app_id']             = (string)$xml->CONFIG->MaarchApps;
 
-        $_SESSION['config']['databaseserver'] = $xml->CONFIG_BASE->databaseserver;
-        $_SESSION['config']['databaseserverport'] = $xml->CONFIG_BASE->databaseserverport;
-        $_SESSION['config']['databaseuser'] = $xml->CONFIG_BASE->databaseuser;
-        $_SESSION['config']['databasepassword'] = $xml->CONFIG_BASE->databasepassword;
-        $_SESSION['config']['databasename'] = $xml->CONFIG_BASE->databasename;
-        $_SESSION['config']['databasetype'] = $xml->CONFIG_BASE->databasetype;
-        $_SESSION['custom_override_id'] = $xml->CONFIG->CustomId;
-        $_SESSION['collection_id_choice'] = $xml->COLLECTION->Id;
-        $_SESSION['tablename']['docservers'] = 'docservers';
+        $_SESSION['config']['databaseserver']     = (string)$xml->CONFIG_BASE->databaseserver;
+        $_SESSION['config']['databaseserverport'] = (string)$xml->CONFIG_BASE->databaseserverport;
+        $_SESSION['config']['databaseuser']       = (string)$xml->CONFIG_BASE->databaseuser;
+        $_SESSION['config']['databasepassword']   = (string)$xml->CONFIG_BASE->databasepassword;
+        $_SESSION['config']['databasename']       = (string)$xml->CONFIG_BASE->databasename;
+        $_SESSION['config']['databasetype']       = (string)$xml->CONFIG_BASE->databasetype;
+        $_SESSION['custom_override_id']           = (string)$xml->CONFIG->CustomId;
+        $_SESSION['collection_id_choice']         = (string)$xml->COLLECTION->Id;
+        $_SESSION['tablename']['docservers']      = 'docservers';
     }
 }

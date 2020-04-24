@@ -1,5 +1,6 @@
 <?php
 
+require_once 'vendor/autoload.php';
 require_once __DIR__ . '/RequestSeda.php';
 require_once __DIR__ . '/class/AbstractMessage.php';
 require_once __DIR__ . '/class/ArchiveTransferReply.php';
@@ -40,7 +41,15 @@ class CheckReply
         $tokenEncode = urlencode($this->token);
         $this->token = "LAABS-AUTH=". $tokenEncode;
         $this->urlService = (string) $this->xml->CONFIG->urlSAEService . "/medona/message/reference";
+        $this->userAgent = (string) $this->xml->CONFIG->userAgent;
+        if (empty($this->userAgent)) {
+            $this->userAgent = 'maarchrestclient';
+        }
         $this->db = new RequestSeda();
+
+        if (!empty($_SESSION['custom_override_id'])) {
+            new \SrcCore\models\DatabasePDO(['customId' => $_SESSION['custom_override_id']]);
+        }
     }
 
     public function checkAll()
@@ -125,7 +134,7 @@ class CheckReply
         $header = [
             'accept:application/json',
             'content-type:application/json',
-            'user-agent:maarchrestclient'
+            'user-agent:'.$this->userAgent
         ];
 
         $refEncode = str_replace('.', '%2E', urlencode($reference));

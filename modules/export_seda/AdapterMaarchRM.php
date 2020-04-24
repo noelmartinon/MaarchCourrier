@@ -2,7 +2,8 @@
 
 require_once __DIR__. DIRECTORY_SEPARATOR. 'RequestSeda.php';
 
-class AdapterMaarchRM{
+class AdapterMaarchRM
+{
     private $xml;
     private $db;
 
@@ -16,8 +17,7 @@ class AdapterMaarchRM{
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
             . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
             . DIRECTORY_SEPARATOR . 'config.xml'
-        ))
-        {
+        )) {
             $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                 . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'export_seda'. DIRECTORY_SEPARATOR . 'xml'
@@ -41,10 +41,14 @@ class AdapterMaarchRM{
         $res = []; // [0] = url, [1] = header, [2] = cookie, [3] = data
 
         $res[0] =  (string) $this->xml->CONFIG->urlSAEService. "/medona/Archivetransfer";
+        $userAgent = (string) $this->xml->CONFIG->userAgent;
+        if (empty($userAgent)) {
+            $userAgent = 'maarchrestclient';
+        }
         $res[1] = [
             'accept:application/json',
             'content-type:application/json',
-            'user-agent:maarchrestclient'
+            'user-agent:'.$userAgent
         ];
 
         $token = urlencode((string)$this->xml->CONFIG->token);

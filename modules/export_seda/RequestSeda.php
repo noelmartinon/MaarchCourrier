@@ -34,6 +34,23 @@ class RequestSeda
 
         //create session if NO SESSION
         if (empty($_SESSION['user'])) {
+            $customId = '';
+            if (!empty($_SESSION['custom_override_id'])) {
+                $customId = $_SESSION['custom_override_id'];
+            }
+            $collectionId = '';
+            if (!empty($_SESSION['collection_id_choice'])) {
+                $collectionId = $_SESSION['collection_id_choice'];
+            }
+
+            $sessionsDataToKeep = ['lang' => '', 'corepath' => '', 'custom_override_id' => '', 'app_id' => '', 'databaseserver' => '', 'databaseserverport' => '',
+                                    'databaseuser' => '', 'databasepassword' => '', 'databasename' => '', 'databasetype' => ''];
+            foreach ($_SESSION['config'] as $key => $value) {
+                if (!empty($value) && in_array($key, array_keys($sessionsDataToKeep))) {
+                    $sessionsDataToKeep[$key] = $value;
+                }
+            }
+
             require_once('core/class/class_functions.php');
             include_once('core/init.php');
             require_once('core/class/class_portal.php');
@@ -47,7 +64,17 @@ class RequestSeda
             $portal->unset_session();
             $portal->build_config();
             $coreTools = new core_tools();
-            $_SESSION['custom_override_id'] = $coreTools->get_custom_id();
+            if (empty($customId)) {
+                $_SESSION['custom_override_id'] = $coreTools->get_custom_id();
+            } else {
+                $_SESSION['custom_override_id'] = $customId;
+            }
+            $_SESSION['collection_id_choice'] = $collectionId;
+            foreach ($sessionsDataToKeep as $key => $value) {
+                if (!empty($value)) {
+                    $_SESSION['config'][$key] = $value;
+                }
+            }
             if (isset($_SESSION['custom_override_id'])
                 && ! empty($_SESSION['custom_override_id'])
                 && isset($_SESSION['config']['corepath'])
