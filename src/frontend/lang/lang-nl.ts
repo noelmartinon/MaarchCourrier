@@ -1662,8 +1662,8 @@ export const LANG_NL = {
     "mustFillAccountMsg": "Please fill the Alfresco account information in order to choose a root folder.", //_TO_TRANSLATE
     "accountUpdated": "Account updated", //_TO_TRANSLATE
     "alfrescoAccount": "Alfresco account", //_TO_TRANSLATE
-    "rootFolder": "Dossier racine", //_TO_TRANSLATE
+    "rootFolder": "Root folder", //_TO_TRANSLATE
     "chooseEntityAssociationAccount": "Choose entities who will be able to use this account", //_TO_TRANSLATE
     "alfrescoAPI": "API Alfresco address", //_TO_TRANSLATE
-
+    "test": "Test", //_TO_TRANSLATE
 };

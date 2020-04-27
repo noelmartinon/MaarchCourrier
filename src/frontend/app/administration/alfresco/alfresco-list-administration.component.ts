@@ -68,14 +68,14 @@ export class AlfrescoListAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get('../rest/alfresco/configuration').pipe(
+        this.http.get('../../rest/alfresco/configuration').pipe(
             filter((data: any) => !this.functions.empty(data.configuration)),
             tap((data: any) => {
                 this.alfrescoUrl = data.configuration.uri;
             })
         ).subscribe();
 
-        this.http.get('../rest/alfresco/accounts')
+        this.http.get('../../rest/alfresco/accounts')
             .subscribe((data: any) => {
                 this.accounts = data.accounts;
 
@@ -94,7 +94,7 @@ export class AlfrescoListAdministrationComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete('../rest/alfresco/accounts/' + id)),
+            exhaustMap(() => this.http.delete('../../rest/alfresco/accounts/' + id)),
             tap(() => {
                 this.accounts = this.accounts.filter((account: any) => account.id !== id);
                 this.dataSource = new MatTableDataSource(this.accounts);
@@ -110,7 +110,7 @@ export class AlfrescoListAdministrationComponent implements OnInit {
     }
 
     saveUrl() {
-        this.http.put('../rest/alfresco/configuration', { uri: this.alfrescoUrl }).pipe(
+        this.http.put('../../rest/alfresco/configuration', { uri: this.alfrescoUrl }).pipe(
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);

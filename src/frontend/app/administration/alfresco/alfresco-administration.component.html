@@ -28,7 +28,7 @@
                                 <div class="formType-title">
                                     {{lang.alfrescoAccount}}
                                 </div>
-                                <div style="width: 100%;">
+                                <div style="width: 100%;text-align: center;">
                                     <mat-form-field>
                                         <input matInput [(ngModel)]="alfresco.account.id" required name="accountId"
                                             id="accountId" title="{{lang.id}}" type="text" placeholder="{{lang.id}}">
@@ -41,6 +41,7 @@
                                             (click)="hidePassword = !hidePassword" class="fa fa-2x"
                                             [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
                                     </mat-form-field>
+                                    <button mat-raised-button type="button" color="primary" (click)="checkAccount()" [disabled]="functionsService.empty(alfresco.account.id) || functionsService.empty(alfresco.account.password)">{{lang.test}}</button>
                                 </div>
                             </div>
                             <div class="formType ratio-1 col-sm-12">
