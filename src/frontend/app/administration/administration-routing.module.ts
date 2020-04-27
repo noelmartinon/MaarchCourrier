@@ -47,6 +47,8 @@ import { ContactsCustomFieldsAdministrationComponent } from './contact/customFie
 import { ContactsPageAdministrationComponent } from './contact/page/contacts-page-administration.component';
 import { TagsAdministrationComponent } from './tag/tags-administration.component';
 import { TagAdministrationComponent } from './tag/tag-administration.component';
+import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administration.component';
+import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-administration.component';
 
 @NgModule({
     imports: [
@@ -112,10 +114,13 @@ import { TagAdministrationComponent } from './tag/tag-administration.component';
             { path: 'administration/tags', canActivate: [AppGuard], component: TagsAdministrationComponent },
             { path: 'administration/tags/new', canActivate: [AppGuard], component: TagAdministrationComponent },
             { path: 'administration/tags/:id', canActivate: [AppGuard], component: TagAdministrationComponent },
+            { path: 'administration/alfresco', canActivate: [AppGuard], component: AlfrescoListAdministrationComponent },
+            { path: 'administration/alfresco/new', canActivate: [AppGuard], component: AlfrescoAdministrationComponent },
+            { path: 'administration/alfresco/:id', canActivate: [AppGuard], component: AlfrescoAdministrationComponent },
         ]),
     ],
     exports: [
         RouterModule
     ]
 })
-export class AdministrationRoutingModule {}
+export class AdministrationRoutingModule { }

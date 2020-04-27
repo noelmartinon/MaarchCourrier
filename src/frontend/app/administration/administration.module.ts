@@ -54,6 +54,10 @@ import { ContactsCustomFieldsAdministrationComponent }              from './cont
 import { ContactsPageAdministrationComponent }              from './contact/page/contacts-page-administration.component';
 import { TagsAdministrationComponent }              from './tag/tags-administration.component';
 import { TagAdministrationComponent }              from './tag/tag-administration.component';
+import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-administration.component';
+import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administration.component';
+
+
 
 @NgModule({
     imports:      [
@@ -119,7 +123,9 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         ContactsPageAdministrationComponent,
         TagsAdministrationComponent,
         TagAdministrationComponent,
-        TemplateFileEditorModalComponent
+        TemplateFileEditorModalComponent,
+        AlfrescoAdministrationComponent,
+        AlfrescoListAdministrationComponent
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,
@@ -135,4 +141,4 @@ import { TagAdministrationComponent }              from './tag/tag-administratio
         TemplateFileEditorModalComponent
     ],
 })
-export class AdministrationModule {}
+export class AdministrationModule { }
