@@ -300,9 +300,9 @@ class AuthenticationController
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
         if ($loadedXml) {
-            if (!empty($loadedXml->CONFIG->CookieTime)) {
-                if ($sessionTime > (int)$loadedXml->CONFIG->CookieTime) {
-                    $sessionTime = (int)$loadedXml->CONFIG->CookieTime;
+            if (!empty($loadedXml->CONFIG->cookieTime)) {
+                if ($sessionTime > (int)$loadedXml->CONFIG->cookieTime) {
+                    $sessionTime = (int)$loadedXml->CONFIG->cookieTime;
                 }
             }
         }
@@ -325,7 +325,7 @@ class AuthenticationController
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
         if ($loadedXml) {
-            $sessionTime = (int)$loadedXml->CONFIG->CookieTime;
+            $sessionTime = (int)$loadedXml->CONFIG->cookieTime;
         }
 
         $token = [

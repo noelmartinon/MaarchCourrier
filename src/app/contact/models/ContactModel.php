@@ -106,26 +106,6 @@ class ContactModel
         return true;
     }
 
-    public static function getContactCommunication(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['contactId']);
-        ValidatorModel::intVal($aArgs, ['contactId']);
-
-        $aReturn = DatabaseModel::select([
-            'select'    => ['*'],
-            'table'     => ['contact_communication'],
-            'where'     => ['contact_id = ?'],
-            'data'      => [$aArgs['contactId']],
-        ]);
-
-        if (empty($aReturn)) {
-            return "";
-        } else {
-            $aReturn[0]['value'] = trim(trim($aReturn[0]['value']), '/');
-            return $aReturn[0];
-        }
-    }
-
     public static function purgeContact($aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['id']);

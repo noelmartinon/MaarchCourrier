@@ -210,10 +210,9 @@ class DatasourceControllerTest extends TestCase
         $this->assertEmpty($result['res_letterbox'][0]['custom_fields']);
         $this->assertSame('Pôle des Services Fonctionnels', $result['res_letterbox'][0]['entity_label']);
         $this->assertSame('Service', $result['res_letterbox'][0]['entitytype']);
-        $this->assertIsString($result['res_letterbox'][0]['linktodoc']);
-        $this->assertIsString($result['res_letterbox'][0]['linktodetail']);
-        $this->assertIsString($result['res_letterbox'][0]['linktoprocess']);
-
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId . '/content', $result['res_letterbox'][0]['linktodoc']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['res_letterbox'][0]['linktodetail']);
+        $this->assertSame('http://localhost/dist/index.html#/process/users/19/groups/2/baskets/4/resId/' . self::$resId, $result['res_letterbox'][0]['linktoprocess']);
 
         // Test view res_letterbox table
         $args = [
@@ -262,9 +261,9 @@ class DatasourceControllerTest extends TestCase
         $this->assertSame('Breaking News : Superman is dead again - PHP unit', $result['res_letterbox'][0]['subject']);
         $this->assertSame('Pôle des Services Fonctionnels', $result['res_letterbox'][0]['entity_label']);
         $this->assertSame('Service', $result['res_letterbox'][0]['entitytype']);
-        $this->assertIsString($result['res_letterbox'][0]['linktodoc']);
-        $this->assertIsString($result['res_letterbox'][0]['linktodetail']);
-        $this->assertIsString($result['res_letterbox'][0]['linktoprocess']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId . '/content', $result['res_letterbox'][0]['linktodoc']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['res_letterbox'][0]['linktodetail']);
+        $this->assertSame('http://localhost/dist/index.html#/process/users/19/groups/2/baskets/4/resId/' . self::$resId, $result['res_letterbox'][0]['linktoprocess']);
     }
 
     public function testNoteEvents()
@@ -275,7 +274,8 @@ class DatasourceControllerTest extends TestCase
             'params' => [
                 'notification' => 'testNotification',
                 'recipient'    => [
-                    'id' => 19
+                    'id'      => 19,
+                    'user_id' => 19
                 ],
                 'res_view'     => 'res_view_letterbox',
                 'events'       => [
@@ -344,17 +344,17 @@ class DatasourceControllerTest extends TestCase
         $this->assertSame('Breaking News : Superman is dead again - PHP unit', $result['res_letterbox'][0]['subject']);
         $this->assertSame('poiuytre1357nbvc', $result['res_letterbox'][0]['priority']);
         $this->assertEmpty($result['res_letterbox'][0]['custom_fields']);
-        $this->assertIsString($result['res_letterbox'][0]['linktodoc']);
-        $this->assertIsString($result['res_letterbox'][0]['linktodetail']);
-        $this->assertIsString($result['res_letterbox'][0]['linktoprocess']);
-
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId . '/content', $result['res_letterbox'][0]['linktodoc']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['res_letterbox'][0]['linktodetail']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId . '/content', $result['res_letterbox'][0]['linktoprocess']);
 
         // Test view res_letterbox table
         $args = [
             'params' => [
                 'notification' => 'testNotification',
                 'recipient'    => [
-                    'id' => 19
+                    'id'      => 19,
+                    'user_id' => 19
                 ],
                 'res_view'     => 'res_view_letterbox',
                 'events'       => [
@@ -367,11 +367,21 @@ class DatasourceControllerTest extends TestCase
             ]
         ];
 
+        \Entity\models\ListInstanceModel::create([
+            'res_id'          => self::$resId,
+            'sequence'        => 0,
+            'item_id'         => 19, // args['params']['recipient']['id']
+            'item_type'       => 'user_id',
+            'item_mode'       => 'dest',
+            'added_by_user'   => $GLOBALS['id'],
+            'viewed'          => 0,
+            'difflist_type'   => 'entity_id'
+        ]);
+
         $result = $dataSourceController::noteEvents($args);
 
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
-
 
         $this->assertIsArray($result['recipient']);
         $this->assertNotEmpty($result['recipient']);
@@ -382,8 +392,8 @@ class DatasourceControllerTest extends TestCase
 
         $this->assertIsArray($result['notes']);
 
-        $this->assertIsString($result['notes']['linktodoc']);
-        $this->assertIsString($result['notes']['linktodetail']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId . '/content', $result['notes']['linktodoc']);
+        $this->assertSame('http://localhost/dist/index.html#/resources/' . self::$resId, $result['notes']['linktodetail']);
     }
 
     public function testClean()

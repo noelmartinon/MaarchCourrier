@@ -12,7 +12,7 @@
     "upgrade": "ncu -u",
     "create-component": "echo Component name ? && read varname && ng g c $varname --module app",
     "create-component-admin": "echo Component name ? && read varname && ng g c administration/$varname --module administration",
-    "ee-launch": "rm test/e2e/screenshots/* && webdriver-manager update --versions.chrome=80.0.3987.162 && webdriver-manager start --detach --versions.chrome=80.0.3987.162 && protractor test/e2e/conf.js && webdriver-manager shutdown && fuser -k 4444/tcp",
+    "ee-launch": "webdriver-manager update && webdriver-manager start --detach && protractor test/e2e/conf.js && webdriver-manager shutdown && fuser -k 4444/tcp",
     "ee-update": "webdriver-manager update",
     "ee-start-server": "webdriver-manager start",
     "ee-test": "protractor test/e2e/conf.js"
@@ -25,10 +25,10 @@
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.901.1",
+    "@angular-devkit/build-angular": "^0.901.2",
     "@angular/animations": "^9.1.1",
     "@angular/cdk": "^9.2.0",
-    "@angular/cli": "^9.1.1",
+    "@angular/cli": "^9.1.2",
     "@angular/common": "^9.1.1",
     "@angular/compiler": "^9.1.1",
     "@angular/compiler-cli": "^9.1.1",
@@ -65,7 +65,7 @@
     "npm-check-updates": "^4.1.2",
     "pdfjs-dist": "2.3.200",
     "photoswipe": "^4.1.3",
-    "protractor": "^5.4.3",
+    "protractor": "^5.4.4",
     "rxjs": "^6.5.5",
     "tinymce": "^5.2.1",
     "tinymce-i18n": "^19.9.17",
@@ -76,7 +76,7 @@
     "uglify-es": "3.3.9",
     "uglifyjs-webpack-plugin": "2.2.0",
     "url-loader": "^4.1.0",
-    "webpack": "^4.42.1"
+    "webpack": "^4.43.0"
   },
   "repository": {}
 }

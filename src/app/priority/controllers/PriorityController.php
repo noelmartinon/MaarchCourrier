@@ -45,7 +45,7 @@ class PriorityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $data = $request->getParams();
+        $data = $request->getParsedBody();
         $check = Validator::stringType()->notEmpty()->validate($data['label']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['color']);
         $check = $check && (Validator::intVal()->notEmpty()->validate($data['delays']) || $data['delays'] == 0);

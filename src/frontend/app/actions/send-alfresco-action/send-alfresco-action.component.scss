@@ -26,19 +26,3 @@
     height: auto;
   }
 }
-
-#jstreeAlfresco{
-  max-height: 300px;
-  overflow: auto;
-
-  ::ng-deep.jstree-anchor {
-    .jstree-icon {
-      color: $primary !important;
-    }
-  }
-  ::ng-deep.jstree-hovered, ::ng-deep.jstree-clicked {
-    .jstree-icon {
-      color: white !important;
-    }
-  }
-}

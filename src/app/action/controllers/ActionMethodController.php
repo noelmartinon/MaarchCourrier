@@ -16,6 +16,7 @@ use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Action\models\ActionModel;
 use Action\models\BasketPersistenceModel;
 use Action\models\ResMarkAsReadModel;
+use Alfresco\controllers\AlfrescoController;
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
 use Convert\controllers\ConvertPdfController;
@@ -78,6 +79,7 @@ class ActionMethodController
         'giveOpinionParallelAction'                 => 'giveOpinionParallel',
         'validateParallelOpinionDiffusionAction'    => 'validateParallelOpinionDiffusion',
         'reconcileAction'                           => 'reconcile',
+        'sendAlfrescoAction'                        => 'sendResourceAlfresco',
         'noConfirmAction'                           => null
     ];
 
@@ -881,6 +883,19 @@ class ActionMethodController
         ]);
 
         return true;
+    }
+
+    public static function sendResourceAlfresco(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $sent = AlfrescoController::sendResource(['resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'folderId' => $args['data']['folderId'], 'folderName' => $args['data']['folderName']]);
+        if (!empty($sent['errors'])) {
+            return ['errors' => [$sent['errors']]];
+        }
+
+        return ['history' => $sent['history']];
     }
 
     public static function reconcile(array $args)

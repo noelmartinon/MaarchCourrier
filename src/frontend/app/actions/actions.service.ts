@@ -71,6 +71,12 @@ export class ActionsService {
     ) {
     }
 
+    ngOnDestroy(): void {
+        if (this.currentResourceLock) {
+            clearInterval(this.currentResourceLock);
+        }
+    }
+
     catchAction(): Observable<any> {
         return this.eventAction.asObservable();
     }
@@ -932,6 +938,7 @@ export class ActionsService {
 
     sendAlfrescoAction(options: any = null) {
         const dialogRef = this.dialog.open(SendAlfrescoActionComponent, {
+            panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()

@@ -561,7 +561,14 @@ $app->get('/externalSummary/{resId}', \ExternalSummary\controllers\SummaryContro
 $app->get('/externalConnectionsEnabled', \SrcCore\controllers\CoreController::class . ':externalConnectionsEnabled');
 
 //Alfresco
+$app->get('/alfresco/configuration', \Alfresco\controllers\AlfrescoController::class . ':getConfiguration');
+$app->put('/alfresco/configuration', \Alfresco\controllers\AlfrescoController::class . ':updateConfiguration');
+$app->get('/alfresco/availableEntities', \Alfresco\controllers\AlfrescoController::class . ':getAvailableEntities');
 $app->get('/alfresco/accounts', \Alfresco\controllers\AlfrescoController::class . ':getAccounts');
+$app->post('/alfresco/accounts', \Alfresco\controllers\AlfrescoController::class . ':createAccount');
+$app->get('/alfresco/accounts/{id}', \Alfresco\controllers\AlfrescoController::class . ':getAccountById');
+$app->put('/alfresco/accounts/{id}', \Alfresco\controllers\AlfrescoController::class . ':updateAccount');
+$app->delete('/alfresco/accounts/{id}', \Alfresco\controllers\AlfrescoController::class . ':deleteAccount');
 $app->get('/alfresco/rootFolders', \Alfresco\controllers\AlfrescoController::class . ':getRootFolders');
 $app->get('/alfresco/folders/{id}/children', \Alfresco\controllers\AlfrescoController::class . ':getChildrenFoldersById');
 $app->get('/alfresco/autocomplete/folders', \Alfresco\controllers\AlfrescoController::class . ':getFolders');

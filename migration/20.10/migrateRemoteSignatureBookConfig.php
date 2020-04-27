@@ -43,8 +43,8 @@ foreach ($customs as $custom) {
             $loadedXml->SIGNATUREBOOK->refusedStatusAnnot       = (string)$loadedVisaXml->CONFIG->refusedStatusAnnot;
             $loadedXml->SIGNATUREBOOK->userWS                   = (string)$loadedVisaXml->CONFIG->userWS;
             $loadedXml->SIGNATUREBOOK->passwordWS               = (string)$loadedVisaXml->CONFIG->passwordWS;
-            if (empty($loadedXml->CONFIG->MaarchUrl)) {
-                $loadedXml->CONFIG->MaarchUrl = (string)$loadedVisaXml->CONFIG->applicationUrl;
+            if (empty($loadedXml->CONFIG->maarchUrl)) {
+                $loadedXml->CONFIG->maarchUrl = (string)$loadedVisaXml->CONFIG->applicationUrl;
             }
 
             $res = formatXml($loadedXml);

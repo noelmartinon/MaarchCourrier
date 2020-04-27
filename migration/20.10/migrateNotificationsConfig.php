@@ -38,10 +38,10 @@ foreach ($customs as $custom) {
         $loadedNotificationXml = simplexml_load_file($notificationFilePath);
         
         if ($loadedXml && $loadedNotificationXml) {
-            $loadedXml->CONFIG->MaarchDirectory = (string)$loadedNotificationXml->CONFIG->MaarchDirectory;
+            $loadedXml->CONFIG->maarchDirectory = (string)$loadedNotificationXml->CONFIG->MaarchDirectory;
             $loadedXml->CONFIG->customID        = (string)$loadedNotificationXml->CONFIG->customID;
-            if (empty($loadedXml->CONFIG->MaarchUrl)) {
-                $loadedXml->CONFIG->MaarchUrl = (string)$loadedNotificationXml->CONFIG->MaarchUrl;
+            if (empty($loadedXml->CONFIG->maarchUrl)) {
+                $loadedXml->CONFIG->maarchUrl = (string)$loadedNotificationXml->CONFIG->MaarchUrl;
             }
 
             $res = formatXml($loadedXml);

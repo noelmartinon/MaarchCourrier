@@ -78,7 +78,7 @@ if ($xmlconfig == false) {
 
 // Load config
 $config                     = $xmlconfig->CONFIG;
-$GLOBALS['maarchDirectory'] = (string)$config->MaarchDirectory;
+$GLOBALS['maarchDirectory'] = (string)$config->maarchDirectory;
 $customID                   = (string)$config->customID;
 $customIDPath               = '';
 

@@ -28,6 +28,7 @@ import { FullDatePipe } from '../plugins/fullDate.pipe';
 import { SafeHtmlPipe } from '../plugins/safeHtml.pipe';
 import { SecureUrlPipe } from '../plugins/secureUrl.pipe';
 import { EcplOnlyofficeViewerComponent } from '../plugins/onlyoffice-api-js/onlyoffice-viewer.component';
+import { MaarchTreeComponent } from '../plugins/tree/maarch-tree.component';
 
 /*FRONT IMPORTS*/
 import { AppMaterialModule } from './app-material.module';
@@ -134,7 +135,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         HistoryComponent,
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
-        AvisWorkflowComponent
+        AvisWorkflowComponent,
+        MaarchTreeComponent
     ],
     exports: [
         CommonModule,
@@ -180,7 +182,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         HistoryComponent,
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
-        AvisWorkflowComponent
+        AvisWorkflowComponent,
+        MaarchTreeComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -17,6 +17,7 @@ use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketRedirectModel;
+use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
@@ -1503,11 +1504,13 @@ class PreProcessActionController
         }
         $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/alfrescoConfig.xml']);
-        if (empty($loadedXml) || (string)$loadedXml->ENABLED != 'true') {
-            return $response->withJson(['fatalError' => 'Alfresco configuration is not enabled', 'reason' => 'missingAlfrescoConfig']);
-        } elseif (empty((string)$loadedXml->URI)) {
-            return $response->withJson(['fatalError' => 'Alfresco configuration URI is empty', 'reason' => 'missingAlfrescoConfig']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        if (empty($configuration)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
+        }
+        $configuration = json_decode($configuration['value'], true);
+        if (empty($configuration['uri'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration URI is empty']);
         }
 
         $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
@@ -1515,7 +1518,7 @@ class PreProcessActionController
             return $response->withJson(['fatalError' => 'User has no primary entity', 'reason' => 'userHasNoPrimaryEntity']);
         }
         $entityInformations = json_decode($entity['external_id'], true);
-        if (empty($entityInformations['alfrescoNodeId']) || empty($entityInformations['alfrescoLogin']) || empty($entityInformations['alfrescoPassword'])) {
+        if (empty($entityInformations['alfresco'])) {
             return $response->withJson(['fatalError' => 'User primary entity has not enough alfresco informations', 'reason' => 'notEnoughAlfrescoInformations']);
         }
 

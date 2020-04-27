@@ -4,15 +4,16 @@ import { NotificationService } from '../../notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
-import { tap, finalize, catchError, debounceTime, filter } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { tap, finalize, catchError, debounceTime, filter, switchMap } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../service/functions.service';
+import { MaarchTreeComponent } from '../../../plugins/tree/maarch-tree.component';
+import { of } from 'rxjs/internal/observable/of';
 
 declare var $: any;
 
 @Component({
-    templateUrl: "send-alfresco-action.component.html",
+    templateUrl: 'send-alfresco-action.component.html',
     styleUrls: ['send-alfresco-action.component.scss'],
 })
 export class SendAlfrescoActionComponent implements OnInit {
@@ -33,6 +34,7 @@ export class SendAlfrescoActionComponent implements OnInit {
     noResourceToProcess: boolean = null;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchTreeComponent;
 
     constructor(
         public http: HttpClient,
@@ -46,42 +48,24 @@ export class SendAlfrescoActionComponent implements OnInit {
         this.loading = true;
         await this.checkAlfresco();
         this.loading = false;
-        this.initTree();
+        this.getRootFolders();
 
         this.searchFolder.valueChanges
             .pipe(
                 debounceTime(300),
-                tap((value: any) => {
+                tap(async (value: any) => {
                     this.selectedFolder = null;
                     this.selectedFolderName = null;
                     if (value.length === 0) {
-                        $('#jstreeAlfresco').jstree(true).settings.core.data =
-                            {
-                                'url': (node: any) => {
-                                    return node.id === '#' ?
-                                        '../rest/alfresco/rootFolders' : `../rest/alfresco/folders/${node.id}/children`;
-                                },
-                                'data': (node: any) => {
-                                    return { 'id': node.id };
-                                }
-                            };
-                        $('#jstreeAlfresco').jstree("refresh");
+                        await this.getRootFolders();
+                        this.refreshTree();
                     }
                 }),
                 filter(value => value.length > 2),
+                switchMap(data => this.http.get('../rest/alfresco/autocomplete/folders', { params: { 'search': data } })),
                 tap((data: any) => {
-
-                    $('#jstreeAlfresco').jstree(true).settings.core.data =
-                        {
-                            'url': (node: any) => {
-                                return node.id === '#' ?
-                                    `../rest/alfresco/autocomplete/folders?search=${data}` : `../rest/alfresco/folders/${node.id}/children`;
-                            },
-                            'data': (node: any) => {
-                                return { 'id': node.id };
-                            }
-                        };
-                    $('#jstreeAlfresco').jstree("refresh");
+                    this.alfrescoFolders = data;
+                    this.refreshTree();
                 })
             ).subscribe();
     }
@@ -92,10 +76,10 @@ export class SendAlfrescoActionComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkSendAlfresco', { resources: this.data.resIds })
                 .subscribe((data: any) => {
-                    if(!this.functions.empty(data.fatalError)) {
+                    if (!this.functions.empty(data.fatalError)) {
                         this.notify.error(this.lang[data.reason]);
                         this.dialogRef.close();
-                    } else if(!this.functions.empty(data.resourcesInformations.error)) {
+                    } else if (!this.functions.empty(data.resourcesInformations.error)) {
                         this.resourcesErrors = data.resourcesInformations.error;
                         this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
                     }
@@ -107,66 +91,33 @@ export class SendAlfrescoActionComponent implements OnInit {
         });
     }
 
-    initTree() {
+    refreshTree() {
+        const tmpData = this.alfrescoFolders;
+        this.alfrescoFolders = [];
+
         setTimeout(() => {
-            $('#jstreeAlfresco').jstree({
-                "checkbox": {
-                    'deselect_all': true,
-                    "three_state": false //no cascade selection
-                },
-                'core': {
-                    force_text: true,
-                    'themes': {
-                        'name': 'proton',
-                        'responsive': true
-                    },
-                    'multiple': false,
-                    'data': {
-                        'url': (node: any) => {
-                            return node.id === '#' ?
-                                '../rest/alfresco/rootFolders' : `../rest/alfresco/folders/${node.id}/children`;
-                        },
-                        'data': (node: any) => {
-                            return { 'id': node.id };
-                        },
-                        /*"dataFilter": (data: any) => {
+            this.alfrescoFolders = tmpData;
+        }, 200);
+    }
 
-                            let objFold = JSON.parse(data);
-                            objFold = objFold.folders;
+    getRootFolders() {
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/alfresco/rootFolders').pipe(
+                tap((data: any) => {
+                    this.alfrescoFolders = data;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
 
-                            return JSON.stringify(objFold);
-                        },*/
-                        /*"success": (data: any) => {
-                            data.folders = data.folders.map((folder: any) => {
-                                return {
-                                    ...folder,
-                                    id: folder.id,
-                                    icon: 'fa fa-folder',
-                                    text: folder.name,
-                                    parent: '#',
-                                    children: true
-                                }
-                            });
-                            console.log(data.folders);
-                            return data.folders;
-                        }*/
-                    },
-
-                    //'data': this.alfrescoFolders,
-                },
-                "plugins": ["checkbox"]
-            });
-            $('#jstreeAlfresco')
-            // listen for event
-                .on('select_node.jstree', (e: any, data: any) => {
-                    this.selectedFolder = data.node.id;
-                    this.selectedFolderName = this.getNameWithParents(data.node.text, data.node.parent);
-                }).on('deselect_node.jstree', (e: any, data: any) => {
-                this.selectedFolder = null;
-                this.selectedFolderName = null;
-            })
-                .jstree();
-        }, 0);
+    selectFolder(folder: any) {
+        this.selectedFolder = folder.id;
+        this.selectedFolderName = this.getNameWithParents(folder.text, folder.parent);
     }
 
     onSubmit() {
@@ -206,10 +157,11 @@ export class SendAlfrescoActionComponent implements OnInit {
         if (parentId === '#') {
             return name;
         }
-        $('#jstreeAlfresco').jstree(true).get_json('#', {flat:true}).forEach((folder: any) => {
+
+        this.maarchTree.getTreeData().forEach((folder: any) => {
             if (folder.id == parentId) {
-                name = folder.text + "/" + name;
-                if (folder.parent != '#') {
+                name = folder.text + '/' + name;
+                if (folder.parent !== '#') {
                     name = this.getNameWithParents(name, folder.parent);
                 }
             }

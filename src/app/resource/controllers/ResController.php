@@ -242,7 +242,7 @@ class ResController extends ResourceControlController
     public function update(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['resId'])) {
-            return ['errors' => 'Route resId is not an integer'];
+            return $response->withStatus(400)->withJson(['errors' => 'Route resId is not an integer']);
         } elseif (!PrivilegeController::canUpdateResource(['userId' => $GLOBALS['id'], 'resId' => $args['resId']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
@@ -1236,7 +1236,7 @@ class ResController extends ResourceControlController
     public function getProcessingData(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['groupId'])) {
-            return $response->withStatus(403)->withJson(['errors' => 'resId param is not an integer']);
+            return $response->withStatus(403)->withJson(['errors' => 'groupId param is not an integer']);
         }
         if (!Validator::intVal()->validate($args['userId'])) {
             return $response->withStatus(403)->withJson(['errors' => 'userId param is not an integer']);

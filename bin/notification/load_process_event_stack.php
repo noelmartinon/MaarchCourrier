@@ -86,7 +86,7 @@ if ($xmlconfig == false) {
 
 // Load config
 $config          = $xmlconfig->CONFIG;
-$maarchDirectory = (string)$config->MaarchDirectory;
+$maarchDirectory = (string)$config->maarchDirectory;
 $customID        = (string)$config->customID;
 $customIDPath    = '';
 
@@ -94,7 +94,7 @@ if ($customID <> '') {
     $customIDPath = $customID . '_';
 }
 chdir($maarchDirectory);
-$maarchUrl  = (string)$config->MaarchUrl;
+$maarchUrl  = (string)$config->maarchUrl;
 
 $GLOBALS['customId']  = $customID;
 $GLOBALS['batchDirectory'] = $maarchDirectory . 'bin'

@@ -64,9 +64,9 @@ abstract class business_app_tools_Abstract extends Database
                   . 'config.xml';
         }
 
-        if(file_exists($path)){
+        if (file_exists($path)) {
             $xmlconfig = simplexml_load_file($path);
-        }else{
+        } else {
             $xmlconfig = false;
             exit('<i style="color:red;">Fichier de configuration manquant ...</i><br/><br/>Si un custom est utilis&eacute; assurez-vous que l\'url soit correct');
         }
@@ -78,7 +78,9 @@ abstract class business_app_tools_Abstract extends Database
             $url = $_SESSION['config']['coreurl']
                  .substr($_SERVER['SCRIPT_NAME'], $uriBeginning);
             $_SESSION['config']['businessappurl'] = str_replace(
-                'index.php', '', $url
+                'index.php',
+                '',
+                $url
             );
 
             $_SESSION['config']['databaseserver'] =
@@ -107,7 +109,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['config']['debug']               = (string) $config->debug;
             $_SESSION['config']['applicationname']     = (string) $config->applicationname;
             $_SESSION['config']['defaultPage']         = (string) $config->defaultPage;
-            $_SESSION['config']['cookietime']          = (string) $config->CookieTime;
+            $_SESSION['config']['cookietime']          = (string) $config->cookieTime;
             $_SESSION['config']['userdefaultpassword'] = (string) $config->userdefaultpassword;
             $_SESSION['config']['usePHPIDS']           = (string) $config->usePHPIDS;
             if (isset($config->showfooter)) {
@@ -128,12 +130,12 @@ abstract class business_app_tools_Abstract extends Database
             
             $i = 0;
 
-            if ( isset($_SESSION['custom_override_id']) && file_exists(
+            if (isset($_SESSION['custom_override_id']) && file_exists(
                 'custom/' . $_SESSION['custom_override_id'] . '/'
                 . $_SESSION['config']['lang'] . '.php'
             )
             ) {
-               include_once 'custom/' . $_SESSION['custom_override_id'] . '/'
+                include_once 'custom/' . $_SESSION['custom_override_id'] . '/'
                 . $_SESSION['config']['lang'] . '.php';
             }
             include_once 'apps' . DIRECTORY_SEPARATOR
@@ -144,7 +146,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['coll_categories'] = array();
             foreach ($xmlconfig->COLLECTION as $col) {
                 $tmp = (string) $col->label;
-                if (!empty($tmp) && defined($tmp) && constant($tmp) <> NULL) {
+                if (!empty($tmp) && defined($tmp) && constant($tmp) <> null) {
                     $tmp = constant($tmp);
                 }
                 $collId = (string) $col->id;
@@ -239,7 +241,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['history_keywords'] = array();
             foreach ($xmlconfig->KEYWORDS as $keyword) {
                 $tmp = (string) $keyword->label;
-                if (!empty($tmp) && defined($tmp) && constant($tmp) <> NULL) {
+                if (!empty($tmp) && defined($tmp) && constant($tmp) <> null) {
                     $tmp = constant($tmp);
                 }
 
@@ -254,7 +256,6 @@ abstract class business_app_tools_Abstract extends Database
 
             $i = 0;
             foreach ($xmlconfig->MODULES as $modules) {
-
                 $_SESSION['modules'][$i] = array(
                     'moduleid' => (string) $modules->moduleid,
                     //,"comment" => (string) $MODULES->comment
@@ -305,7 +306,7 @@ abstract class business_app_tools_Abstract extends Database
             foreach ($xmlfile->ACTIONPAGE as $actionPage) {
                 $label = (string) $actionPage->LABEL;
                 if (!empty($label) && defined($label)
-                    && constant($label) <> NULL
+                    && constant($label) <> null
                 ) {
                     $label = constant($label);
                 }
@@ -336,7 +337,6 @@ abstract class business_app_tools_Abstract extends Database
 
         //LOAD actions in other modules
         foreach ($_SESSION['modules'] as $key => $value) {
-          
             if (file_exists(
                 $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                 . $_SESSION['custom_override_id'] . 'modules' . DIRECTORY_SEPARATOR . $value['moduleid']
@@ -348,7 +348,6 @@ abstract class business_app_tools_Abstract extends Database
                       . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
                       . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . $value['moduleid'] . DIRECTORY_SEPARATOR
                       . 'xml' . DIRECTORY_SEPARATOR . 'actions_pages.xml';
-
             } else {
                 $path = 'modules' . DIRECTORY_SEPARATOR . $value['moduleid'] . DIRECTORY_SEPARATOR . 'xml'
                       . DIRECTORY_SEPARATOR . 'actions_pages.xml';
@@ -366,32 +365,32 @@ abstract class business_app_tools_Abstract extends Database
             )
 
             ) {
-            $xmlfile = simplexml_load_file($path);
+                $xmlfile = simplexml_load_file($path);
 
-            $langPath = 'modules' . DIRECTORY_SEPARATOR . $value['moduleid'] . DIRECTORY_SEPARATOR
+                $langPath = 'modules' . DIRECTORY_SEPARATOR . $value['moduleid'] . DIRECTORY_SEPARATOR
                       . 'lang' . DIRECTORY_SEPARATOR. $_SESSION['config']['lang'] . '.php';
 
-            include_once($langPath);
-            foreach ($xmlfile->ACTIONPAGE as $actionPage) {
-                $label = (string) $actionPage->LABEL;
-                if (!empty($label) && defined($label)
-                    && constant($label) <> NULL
+                include_once($langPath);
+                foreach ($xmlfile->ACTIONPAGE as $actionPage) {
+                    $label = (string) $actionPage->LABEL;
+                    if (!empty($label) && defined($label)
+                    && constant($label) <> null
                 ) {
-                    $label = constant($label);
-                }
-                $keyword = '';
-                if (isset($actionPage->KEYWORD)
+                        $label = constant($label);
+                    }
+                    $keyword = '';
+                    if (isset($actionPage->KEYWORD)
                     && ! empty($actionPage->KEYWORD)
                 ) {
-                    $keyword = (string) $actionPage->KEYWORD;
-                }
-                $createFlag = 'N';
-                if (isset($actionPage->FLAG_CREATE)
+                        $keyword = (string) $actionPage->KEYWORD;
+                    }
+                    $createFlag = 'N';
+                    if (isset($actionPage->FLAG_CREATE)
                     && (string) $actionPage->FLAG_CREATE == 'true'
                 ) {
-                    $createFlag = 'Y';
-                }
-                $_SESSION['actions_pages'][$i] = array(
+                        $createFlag = 'Y';
+                    }
+                    $_SESSION['actions_pages'][$i] = array(
                     'ID'          => (string) $actionPage->ID,
                     'LABEL'       => $label,
                     'NAME'        => (string) $actionPage->NAME,
@@ -400,10 +399,9 @@ abstract class business_app_tools_Abstract extends Database
                     'KEYWORD'     => $keyword,
                     'FLAG_CREATE' => $createFlag
                 );
-                $i++;
+                    $i++;
+                }
             }
-        }
-
         }
     }
 
@@ -441,7 +439,7 @@ abstract class business_app_tools_Abstract extends Database
         $_SESSION['attachment_types_reconciliation'] = array(); //NCH01
         $attachmentTypes = $xmlfile->attachment_types;
         if (count($attachmentTypes) > 0) {
-            foreach ($attachmentTypes->type as $type ) {
+            foreach ($attachmentTypes->type as $type) {
                 $label = (string) $type->label;
                 $with_chrono = (string) $type['with_chrono'];
                 $get_chrono = (string) $type['get_chrono'];
@@ -451,7 +449,7 @@ abstract class business_app_tools_Abstract extends Database
                 $select_in_reconciliation = (string) $type['select_in_reconciliation']; //NCH01
                 $process = (string) $type->process_mode;
                 if (!empty($label) && defined($label)
-                    && constant($label) <> NULL
+                    && constant($label) <> null
                 ) {
                     $label = constant($label);
                 }
@@ -503,10 +501,10 @@ abstract class business_app_tools_Abstract extends Database
         $mailTitles = $xmlfile->titles;
         if (count($mailTitles) > 0) {
             $i = 0;
-            foreach ($mailTitles->title as $title ) {
+            foreach ($mailTitles->title as $title) {
                 $label = (string) $title->label;
                 if (!empty($label) && defined($label)
-                    && constant($label) <> NULL
+                    && constant($label) <> null
                 ) {
                     $label = constant($label);
                 }
@@ -514,7 +512,6 @@ abstract class business_app_tools_Abstract extends Database
             }
             $_SESSION['default_mail_title'] = (string) $mailTitles->default_title;
         }
-        
     }
 
     public function compare_base_version($xmlVersionBase)
@@ -541,7 +538,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['maarch_entreprise']['database_version'] = $vbg->param_value_string;
         }
         //If this two parameters is not find, this is the end of this function
-        if ($_SESSION['maarch_entreprise']['xml_versionbase'] <> 'none' ) {
+        if ($_SESSION['maarch_entreprise']['xml_versionbase'] <> 'none') {
             if (($_SESSION['maarch_entreprise']['xml_versionbase'] <> $_SESSION['maarch_entreprise']['database_version'])
                 || ($_SESSION['maarch_entreprise']['database_version'] == 'none')
             ) {
@@ -584,12 +581,12 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['features']['watermark']['text_color'] = (string) $watermark->text_color;
             $_SESSION['features']['type_calendar']           = (string) $feats->type_calendar;
             $send_to_contact_with_mandatory_attachment       = (string) $feats->send_to_contact_with_mandatory_attachment;
-            if(strtoupper($send_to_contact_with_mandatory_attachment) == 'TRUE'){
-                $_SESSION['features']['send_to_contact_with_mandatory_attachment'] = TRUE;
-            }elseif(strtoupper($send_to_contact_with_mandatory_attachment) == 'FALSE'){
-                $_SESSION['features']['send_to_contact_with_mandatory_attachment'] = FALSE;
+            if (strtoupper($send_to_contact_with_mandatory_attachment) == 'TRUE') {
+                $_SESSION['features']['send_to_contact_with_mandatory_attachment'] = true;
+            } elseif (strtoupper($send_to_contact_with_mandatory_attachment) == 'FALSE') {
+                $_SESSION['features']['send_to_contact_with_mandatory_attachment'] = false;
             }
-            if(!empty($feats->notes_in_print_page->label)){
+            if (!empty($feats->notes_in_print_page->label)) {
                 foreach ($feats->notes_in_print_page->label as $value) {
                     $_SESSION['features']['notes_in_print_page'][] = (string) $value;
                 }
@@ -612,8 +609,8 @@ abstract class business_app_tools_Abstract extends Database
         $this->_loadListsConfig();
     }
 
-    protected function _loadListsConfig() {
-
+    protected function _loadListsConfig()
+    {
         if (file_exists(
             $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
             . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
@@ -637,16 +634,14 @@ abstract class business_app_tools_Abstract extends Database
         //Load filters
         $_SESSION['filters'] = array();
         foreach ($xmlfile->FILTERS as $filtersObject) {
-        
             foreach ($filtersObject as $filter) {
-            
                 $desc = (string) $filter->LABEL;
-                if (!empty($desc) && defined($desc) && constant($desc) <> NULL) {
+                if (!empty($desc) && defined($desc) && constant($desc) <> null) {
                     $desc = constant($desc);
                 }
                 $id = (string) $filter->ID;
                 $enabled = (string) $filter->ENABLED;
-                if( trim($enabled) == 'true') {
+                if (trim($enabled) == 'true') {
                     $_SESSION['filters'][$id] = array(
                         'ID'      => $id,
                         'LABEL'   => $desc,
@@ -673,11 +668,9 @@ abstract class business_app_tools_Abstract extends Database
         
         //Load templates
         foreach ($xmlfile->TEMPLATES as $templatesObject) {
-        
             foreach ($templatesObject as $template) {
-            
                 $desc = (string) $template->LABEL;
-                if (!empty($desc) && defined($desc) && constant($desc) <> NULL) {
+                if (!empty($desc) && defined($desc) && constant($desc) <> null) {
                     $desc = constant($desc);
                 }
                 $id         = (string) $template->ID;
@@ -698,24 +691,24 @@ abstract class business_app_tools_Abstract extends Database
                         // The page is in the apps
                         if (strtoupper($listOrigin) == 'APPS'
                         ) {
-                            if( file_exists(
-                                $_SESSION['config']['corepath'].'custom' . DIRECTORY_SEPARATOR 
-                                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps' 
-                                . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id'] 
+                            if (file_exists(
+                                $_SESSION['config']['corepath'].'custom' . DIRECTORY_SEPARATOR
+                                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
+                                . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
                                 . DIRECTORY_SEPARATOR . $listName . '.php'
                             ) ||
-                                file_exists('apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
+                                file_exists(
+                                    'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
                                 . DIRECTORY_SEPARATOR . $listName.'.php'
                             )
-                            )
-                            {
+                            ) {
                                 $pathToList = $_SESSION['config']['businessappurl']
                                             . 'index.php?display=true&page='. $listName;
                             }
-                        } else if (strtoupper(
+                        } elseif (strtoupper(
                             $listOrigin
                         ) == "MODULE"
-                        ) { 
+                        ) {
                             // The page is in a module
                             $core = new core_tools();
                             // Error : The module name is empty or the module is not loaded
@@ -732,7 +725,8 @@ abstract class business_app_tools_Abstract extends Database
                                     . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                                     . DIRECTORY_SEPARATOR . $listModule . DIRECTORY_SEPARATOR . $listName . '.php'
                                 ) ||
-                                    file_exists('modules' . DIRECTORY_SEPARATOR . $listModule
+                                    file_exists(
+                                        'modules' . DIRECTORY_SEPARATOR . $listModule
                                         . DIRECTORY_SEPARATOR . $listName . '.php'
                                 )
                                 ) {
@@ -747,15 +741,15 @@ abstract class business_app_tools_Abstract extends Database
                 
                 //Path to template
                 if ($origin == "apps") { //Origin apps
-                    if(file_exists(
-                        $_SESSION['config']['corepath'].'custom' . DIRECTORY_SEPARATOR 
-                        . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps' 
-                        . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id'] 
-                        . DIRECTORY_SEPARATOR . "template" . DIRECTORY_SEPARATOR 
+                    if (file_exists(
+                        $_SESSION['config']['corepath'].'custom' . DIRECTORY_SEPARATOR
+                        . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
+                        . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
+                        . DIRECTORY_SEPARATOR . "template" . DIRECTORY_SEPARATOR
                         . $name . '.html'
                     )
                     ) {
-                        $path = $_SESSION['config']['corepath'] . 'custom' 
+                        $path = $_SESSION['config']['corepath'] . 'custom'
                         . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
                         . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR
                         . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR
@@ -764,7 +758,7 @@ abstract class business_app_tools_Abstract extends Database
                         $path = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
                         . DIRECTORY_SEPARATOR . "template" . DIRECTORY_SEPARATOR . $name.'.html';
                     }
-                } else if ($origin == "module") { //Origin module
+                } elseif ($origin == "module") { //Origin module
                     if (file_exists(
                         $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                         . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
@@ -785,7 +779,7 @@ abstract class business_app_tools_Abstract extends Database
                 }
                 
                 //Values of html_templates array
-                if( trim($enabled) == 'true') {
+                if (trim($enabled) == 'true') {
                     $_SESSION['html_templates'][$id] = array(
                         'ID'       => $id,
                         'LABEL'    => $desc,
@@ -834,7 +828,7 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['PHPIDS_EXCLUDES'] = array();
             foreach ($xmlfile->exclude as $exclude) {
                 array_push(
-                    $_SESSION['PHPIDS_EXCLUDES'], 
+                    $_SESSION['PHPIDS_EXCLUDES'],
                     array(
                         'TARGET' => (string) $exclude->target,
                         'PAGE'   => (string) $exclude->page,

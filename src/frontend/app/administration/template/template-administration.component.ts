@@ -672,6 +672,9 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         tinymce.remove('textarea');
+        if (this.intervalLockFile) {
+            clearInterval(this.intervalLockFile);
+        }
     }
 }
 @Component({

@@ -16,13 +16,13 @@
         <debug>false</debug>
         <applicationname>MAARCH COURRIER 20.1X</applicationname>
         <defaultPage>welcome</defaultPage>
-        <CookieTime>20</CookieTime> <!-- minutes -->
+        <cookieTime>20</cookieTime> <!-- minutes -->
         <timezone>Europe/Paris</timezone>
         <userdefaultpassword>maarch</userdefaultpassword> <!-- default user's password -->
         <usePHPIDS>true</usePHPIDS>
-        <MaarchDirectory>/var/www/html/MaarchCourrier/</MaarchDirectory>
+        <maarchDirectory>/var/www/html/MaarchCourrier/</maarchDirectory>
         <customID></customID>
-        <MaarchUrl>http://preview.maarchcourrier.com/</MaarchUrl>
+        <maarchUrl>http://preview.maarchcourrier.com/</maarchUrl>
     </CONFIG>
     <SIGNATUREBOOK>
         <validatedStatus>EENV</validatedStatus>

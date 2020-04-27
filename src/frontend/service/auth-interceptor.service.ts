@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
 import { Router } from '@angular/router';
+import { FunctionsService } from './functions.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -37,7 +38,8 @@ export class AuthInterceptor implements HttpInterceptor {
         public http: HttpClient,
         private router: Router,
         public notificationService: NotificationService,
-        public authService: AuthService
+        public authService: AuthService,
+        private functionsService: FunctionsService
     ) { }
 
     addAuthHeader(request: HttpRequest<any>) {
@@ -75,14 +77,14 @@ export class AuthInterceptor implements HttpInterceptor {
                 catchError(error => {
                     // Disconnect user if bad token process
                     if (error.status === 401) {
-                        console.log('Auth error !');
+                        this.functionsService.debug('Auth error', request.url);
                         return this.http.get('../rest/authenticate/token', {
                             params: {
                                 refreshToken: this.authService.getRefreshToken()
                             }
                         }).pipe(
                             switchMap((data: any) => {
-                                console.log('Attempt get token ... !');
+                                this.functionsService.debug('Attempt get token ... !', request.url);
                                 // Update stored token
                                 this.authService.setToken(data.token);
 
@@ -107,7 +109,7 @@ export class AuthInterceptor implements HttpInterceptor {
                             catchError(err => {
                                 // Disconnect user if bad token process
                                 if (err.status === 401) {
-                                    console.log('Refresh Auth error !');
+                                    this.functionsService.debug('Refresh token failed !', request.url);
                                     this.logout();
                                 }
                                 return of(false);

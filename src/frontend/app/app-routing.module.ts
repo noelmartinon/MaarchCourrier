@@ -41,7 +41,7 @@ import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.
             { path: 'followed', canActivate: [AppGuard], component: FollowedDocumentListComponent },
             { path: 'resources/:detailResId', canActivate: [AppGuard], canDeactivate: [AfterProcessGuard], component: ProcessComponent },
             { path: 'resources/:resId/content', canActivate: [AppGuard], component: DocumentViewerPageComponent },
-            { path: '**', redirectTo: 'login', pathMatch: 'full' },
+            { path: '**', redirectTo: 'home', pathMatch: 'full' },
         ], { useHash: true }),
     ],
     exports: [

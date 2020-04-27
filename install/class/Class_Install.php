@@ -550,11 +550,6 @@ class Install extends functions
             exit;
         }
 
-        if (!$this->setConfig_batch_XmlNotifications()) {
-            return false;
-            exit;
-        }
-
         if (!$this->setLog4php()) {
             return false;
             exit;
@@ -638,11 +633,6 @@ class Install extends functions
         }
 
         if (!$this->setScript_syn_LDAP_sh()) {
-            return false;
-            exit;
-        }
-
-        if (!$this->setConfig_batch_XmlNotifications()) {
             return false;
             exit;
         }
@@ -751,44 +741,6 @@ class Install extends functions
         $res = $xmlconfig->asXML();
 
         $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/apps/maarch_entreprise/xml/config.xml', 'w+');
-        if (!$fp) {
-            return false;
-            exit;
-        }
-        $write = fwrite($fp, $res);
-        if (!$write) {
-            return false;
-            exit;
-        }
-
-        return true;
-    }
-
-
-    private function setConfig_batch_XmlNotifications()
-    {
-        $xmlconfig = simplexml_load_file('bin/notification/config/config.xml.default');
-
-        $CONFIG = $xmlconfig->CONFIG;
-
-        $chemin_core = realpath('.').'/core/';
-
-        $CONFIG = $xmlconfig->CONFIG;
-        $CONFIG->MaarchDirectory = realpath('.').'/';
-
-        if ($_SERVER['SERVER_ADDR'] == '::1') {
-            $SERVER_ADDR = 'localhost';
-        } else {
-            $SERVER_ADDR = $_SERVER['SERVER_ADDR'];
-        }
-        $chemin = $SERVER_ADDR.dirname($_SERVER['PHP_SELF'].'cs_'.$_SESSION['config']['databasename']);
-        $maarchUrl = rtrim($chemin, 'install');
-        $maarchUrl = $maarchUrl.'cs_'.$_SESSION['config']['databasename'].'/';
-        $CONFIG->MaarchUrl    = $maarchUrl;
-        $CONFIG->customID     = 'cs_'.$_SESSION['config']['databasename'];
-
-        $res = $xmlconfig->asXML();
-        $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml', 'w+');
         if (!$fp) {
             return false;
             exit;

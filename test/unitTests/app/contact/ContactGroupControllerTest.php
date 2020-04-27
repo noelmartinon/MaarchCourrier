@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 class ContactGroupControllerTest extends TestCase
 {
     private static $id = null;
+    private static $id2 = null;
 
 
     public function testCreate()
@@ -22,23 +23,51 @@ class ContactGroupControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $aArgs = [
+        $body = [
             'label'             => 'Groupe petition',
             'description'       => 'Groupe de petition',
-            'public'            => true
+            'public'            => false
         ];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $contactGroupController->create($fullRequest, new \Slim\Http\Response());
-        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
 
-        self::$id = $responseBody->contactsGroup;
+        $this->assertIsInt($responseBody['contactsGroup']);
+        self::$id = $responseBody['contactsGroup'];
 
-        $this->assertIsInt(self::$id);
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $body = [
+            'label'             => 'Groupe petition 2',
+            'description'       => 'Groupe de petition',
+            'public'            => false
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsInt($responseBody['contactsGroup']);
+        self::$id2 = $responseBody['contactsGroup'];
+
 
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $response       = $contactGroupController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Contacts group out of perimeter', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
         $response       = $contactGroupController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
         $responseBody   = json_decode((string)$response->getBody());
 
@@ -46,15 +75,46 @@ class ContactGroupControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody->contactsGroup->id);
         $this->assertSame('Groupe petition', $responseBody->contactsGroup->label);
         $this->assertSame('Groupe de petition', $responseBody->contactsGroup->description);
-        $this->assertSame(true, $responseBody->contactsGroup->public);
+        $this->assertSame(false, $responseBody->contactsGroup->public);
         $this->assertSame($user['id'], $responseBody->contactsGroup->owner);
         $this->assertSame('superadmin', $responseBody->contactsGroup->entity_owner);
         $this->assertIsString($responseBody->contactsGroup->labelledOwner);
         $this->assertIsArray($responseBody->contactsGroup->contacts);
+
+        // Fail
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $body = [
+            'label'             => 'Groupe petition',
+            'public'            => true
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Bad Request', $responseBody['errors']);
+
+        $body = [
+            'label'             => 'Groupe petition',
+            'description'       => 'Groupe de petition',
+            'public'            => true
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(_CONTACTS_GROUP_LABEL_ALREADY_EXISTS, $responseBody['errors']);
     }
 
     public function testGet()
     {
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
         $contactGroupController = new \Contact\controllers\ContactGroupController();
 
         //  GET
@@ -65,6 +125,10 @@ class ContactGroupControllerTest extends TestCase
 
         $this->assertIsArray($responseBody->contactsGroups);
         $this->assertNotNull($responseBody->contactsGroups);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testUpdate()
@@ -75,12 +139,12 @@ class ContactGroupControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $aArgs = [
+        $body = [
             'label'             => 'Groupe petition updated',
             'description'       => 'Groupe de petition updated',
-            'public'            => false
+            'public'            => true
         ];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $contactGroupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
         $responseBody = json_decode((string)$response->getBody());
@@ -96,10 +160,62 @@ class ContactGroupControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody->contactsGroup->id);
         $this->assertSame('Groupe petition updated', $responseBody->contactsGroup->label);
         $this->assertSame('Groupe de petition updated', $responseBody->contactsGroup->description);
-        $this->assertSame(false, $responseBody->contactsGroup->public);
+        $this->assertSame(true, $responseBody->contactsGroup->public);
         $this->assertSame('superadmin', $responseBody->contactsGroup->entity_owner);
         $this->assertIsString($responseBody->contactsGroup->labelledOwner);
         $this->assertIsArray($responseBody->contactsGroup->contacts);
+
+        // Fail
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $body = [
+            'label'             => 'Groupe petition updated',
+            'description'       => 'Groupe de petition updated',
+            'public'            => true
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Contacts Group does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactGroupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $body = [
+            'label'             => 'Groupe petition updated',
+            'public'            => true
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Bad Request', $responseBody['errors']);
+
+        $body = [
+            'label'             => 'Groupe petition updated',
+            'description'       => 'Groupe de petition 2 updated',
+            'public'            => true
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(_CONTACTS_GROUP_LABEL_ALREADY_EXISTS, $responseBody['errors']);
     }
 
     public function testAddContacts()
@@ -111,10 +227,11 @@ class ContactGroupControllerTest extends TestCase
             'limit'     => 1
         ]);
 
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
         if (!empty($contacts[0])) {
             //  UPDATE
-            $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
-            $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
             $aArgs = [
                 'contacts'  => [$contacts[0]['id']]
@@ -132,6 +249,34 @@ class ContactGroupControllerTest extends TestCase
             $this->assertIsString($responseBody->contactsGroup->contacts[0]->contact);
             $this->assertIsString($responseBody->contactsGroup->contacts[0]->address);
         }
+
+        $body = [
+
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $contactGroupController->addContacts($fullRequest, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Contacts Group does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactGroupController->addContacts($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactGroupController->addContacts($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Bad Request', $responseBody['errors']);
     }
 
     public function testDeleteContacts()
@@ -167,6 +312,27 @@ class ContactGroupControllerTest extends TestCase
         $this->assertIsString($responseBody->contactsGroup->labelledOwner);
         $this->assertIsArray($responseBody->contactsGroup->contacts);
         $this->assertEmpty($responseBody->contactsGroup->contacts);
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $contactGroupController->deleteContact($request, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Contacts Group does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactGroupController->deleteContact($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDelete()
@@ -176,7 +342,33 @@ class ContactGroupControllerTest extends TestCase
         //  DELETE
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        // Fail
+        $response     = $contactGroupController->delete($request, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Contacts Group does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactGroupController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        // Sucess
         $response       = $contactGroupController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $responseBody   = json_decode((string)$response->getBody());
+
+        $this->assertSame('success', $responseBody->success);
+
+        $response       = $contactGroupController->delete($request, new \Slim\Http\Response(), ['id' => self::$id2]);
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);

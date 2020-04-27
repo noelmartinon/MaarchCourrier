@@ -72,9 +72,9 @@ if ($xmlconfig == false) {
 
 // Load config
 $config = $xmlconfig->CONFIG;
-$GLOBALS['MaarchDirectory']        = (string)$config->MaarchDirectory;
+$GLOBALS['MaarchDirectory']        = (string)$config->maarchDirectory;
 $GLOBALS['customId']               = (string)$config->customID;
-$GLOBALS['applicationUrl']         = (string)$config->MaarchUrl;
+$GLOBALS['applicationUrl']         = (string)$config->maarchUrl;
 
 $config = $xmlconfig->SIGNATUREBOOK;
 $GLOBALS['userWS']                 = (string)$config->userWS;

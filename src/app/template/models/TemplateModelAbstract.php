@@ -86,10 +86,10 @@ abstract class TemplateModelAbstract
         return $aTemplate;
     }
 
-    public static function create(array $aArgs)
+    public static function create(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['template_label']);
-        ValidatorModel::stringType($aArgs, ['template_label']);
+        ValidatorModel::notEmpty($args, ['template_label']);
+        ValidatorModel::stringType($args, ['template_label']);
 
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'templates_seq']);
 
@@ -97,16 +97,16 @@ abstract class TemplateModelAbstract
             'table'         => 'templates',
             'columnsValues' => [
                 'template_id'               => $nextSequenceId,
-                'template_label'            => $aArgs['template_label'],
-                'template_comment'          => $aArgs['template_comment'],
-                'template_content'          => $aArgs['template_content'],
-                'template_type'             => $aArgs['template_type'],
-                'template_style'            => $aArgs['template_style'],
-                'template_datasource'       => $aArgs['template_datasource'],
-                'template_target'           => $aArgs['template_target'],
-                'template_attachment_type'  => $aArgs['template_attachment_type'],
-                'template_path'             => $aArgs['template_path'],
-                'template_file_name'        => $aArgs['template_file_name'],
+                'template_label'            => $args['template_label'],
+                'template_comment'          => $args['template_comment'],
+                'template_content'          => $args['template_content'],
+                'template_type'             => $args['template_type'],
+                'template_style'            => $args['template_style'],
+                'template_datasource'       => $args['template_datasource'],
+                'template_target'           => $args['template_target'],
+                'template_attachment_type'  => $args['template_attachment_type'],
+                'template_path'             => $args['template_path'],
+                'template_file_name'        => $args['template_file_name'],
             ]
         ]);
 

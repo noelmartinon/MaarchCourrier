@@ -53,6 +53,8 @@ import { ContactsPageAdministrationComponent } from './contact/page/contacts-pag
 import { TagsAdministrationComponent } from './tag/tags-administration.component';
 import { TagAdministrationComponent } from './tag/tag-administration.component';
 import { TemplateFileEditorModalComponent } from './template/templateFileEditorModal/template-file-editor-modal.component';
+import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-administration.component';
+import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administration.component';
 
 
 
@@ -119,7 +121,9 @@ import { TemplateFileEditorModalComponent } from './template/templateFileEditorM
         ContactsPageAdministrationComponent,
         TagsAdministrationComponent,
         TagAdministrationComponent,
-        TemplateFileEditorModalComponent
+        TemplateFileEditorModalComponent,
+        AlfrescoAdministrationComponent,
+        AlfrescoListAdministrationComponent
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,

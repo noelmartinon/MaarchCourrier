@@ -121,6 +121,7 @@ class LinkControllerTest extends TestCase
         $this->assertNotEmpty($responseBody['linkedResources'][0]['status']);
         $this->assertNotEmpty($responseBody['linkedResources'][0]['destination']);
         $this->assertNotEmpty($responseBody['linkedResources'][0]['destinationLabel']);
+        $this->assertIsBool($responseBody['linkedResources'][0]['canConvert']);
 
         $response     = $linkController->getLinkedResources($request, new \Slim\Http\Response(), ['resId' => self::$secondResourceId]);
         $this->assertSame(200, $response->getStatusCode());
@@ -132,6 +133,7 @@ class LinkControllerTest extends TestCase
         $this->assertNotEmpty($responseBody['linkedResources'][0]['status']);
         $this->assertNotEmpty($responseBody['linkedResources'][0]['destination']);
         $this->assertNotEmpty($responseBody['linkedResources'][0]['destinationLabel']);
+        $this->assertIsBool($responseBody['linkedResources'][0]['canConvert']);
     }
 
     public function testUnlinkResources()

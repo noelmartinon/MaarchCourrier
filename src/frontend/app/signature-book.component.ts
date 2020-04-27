@@ -600,6 +600,10 @@ export class SignatureBookComponent implements OnInit {
     }
 
     ngOnDestroy() {
+        if (this.currentResourceLock) {
+            clearInterval(this.currentResourceLock);
+        }
+
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();
     }

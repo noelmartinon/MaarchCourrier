@@ -208,6 +208,12 @@ export class DocumentViewerComponent implements OnInit {
         }
     }
 
+    ngOnDestroy() {
+        if (this.intervalLockFile) {
+            clearInterval(this.intervalLockFile);
+        }
+    }
+
     loadFileFromBase64() {
         this.loading = true;
         this.file = {

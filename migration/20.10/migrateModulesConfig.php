@@ -25,7 +25,8 @@ foreach ($customs as $custom) {
         $loadedXml = simplexml_load_file($path);
         
         if ($loadedXml) {
-            $loadedXml->CONFIG->CookieTime = 10080;
+            unset($loadedXml->CONFIG->CookieTime);
+            $loadedXml->CONFIG->cookieTime = 10080;
             $i = 0;
             foreach ($loadedXml->MODULES as $value) {
                 if (in_array($loadedXml->MODULES[$i]->moduleid, ['convert', 'reports', 'full_text', 'cases'])) {

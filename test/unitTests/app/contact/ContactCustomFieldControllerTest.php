@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 class ContactCustomFieldControllerTest extends TestCase
 {
     private static $id = null;
+    private static $id2 = null;
 
     public function testCreate()
     {
@@ -36,14 +37,29 @@ class ContactCustomFieldControllerTest extends TestCase
 
         self::$id = $responseBody['id'];
 
+        $args = [
+            'label'  => 'my second custom',
+            'type'   => 'select',
+            'values' => ['one', 'two']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsInt($responseBody['id']);
+
+        self::$id2 = $responseBody['id'];
+
         //  Errors
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $args = [
-            'label'     => 'mon custom',
-            'type'      => 'select',
-            'values'    => ['one', 'two']
+            'label'  => 'mon custom',
+            'type'   => 'select',
+            'values' => ['one', 'two']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 
@@ -52,6 +68,51 @@ class ContactCustomFieldControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
 
         $this->assertSame('Custom field with this label already exists', $responseBody['errors']);
+
+        $args = [
+
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body label is empty or not a string', $responseBody['errors']);
+
+        $args = [
+            'label' => 'mon custom'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body type is empty or not a string', $responseBody['errors']);
+
+        $args = [
+            'label'  => 'mon custom',
+            'type'   => 'select',
+            'values' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body values is not an array', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactCustomFieldController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testReadList()
@@ -77,7 +138,7 @@ class ContactCustomFieldControllerTest extends TestCase
 
         $args = [
             'label'     => 'mon custom22',
-            'values'    => ['one', 'two', 'trois']
+            'values'    => ['un', 'deux', 'trois']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 
@@ -93,6 +154,73 @@ class ContactCustomFieldControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
 
         $this->assertSame('Body label is empty or not a string', $responseBody['errors']);
+
+        // Fail
+        $response     = $contactCustomFieldController->update($request, new \Slim\Http\Response(), ['id' => 'wrong format']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Param id is empty or not an integer', $responseBody['errors']);
+
+        $args = [
+            'label'  => 'mon custom',
+            'type'   => 'select',
+            'values' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body values is not an array', $responseBody['errors']);
+
+        $args = [
+            'label'  => 'mon custom',
+            'type'   => 'select',
+            'values' => ['one', 'one', 'two']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Some values have the same name', $responseBody['errors']);
+
+        $args = [
+            'label'  => 'mon custom',
+            'type'   => 'select',
+            'values' => ['one', 'two']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Custom field not found', $responseBody['errors']);
+
+        $args = [
+            'label'  => 'my second custom',
+            'type'   => 'select',
+            'values' => ['one', 'two']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $contactCustomFieldController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Custom field with this label already exists', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactCustomFieldController->update($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];;
     }
 
     public function testDelete()
@@ -106,5 +234,24 @@ class ContactCustomFieldControllerTest extends TestCase
 
         $response     = $contactCustomFieldController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
         $this->assertSame(204, $response->getStatusCode());
+
+        // Fail
+        $response     = $contactCustomFieldController->delete($request, new \Slim\Http\Response(), ['id' => 'wrong format']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Param id is empty or not an integer', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $contactCustomFieldController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];;
     }
 }

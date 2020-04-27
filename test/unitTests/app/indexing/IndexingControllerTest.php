@@ -39,8 +39,23 @@ class IndexingControllerTest extends TestCase
 
         //ERROR
         $response = $indexingController->getIndexingActions($request, new \Slim\Http\Response(), ['groupId' => 99999]);
+        $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('This user is not in this group', $responseBody->errors);
+
+        $response = $indexingController->getIndexingActions($request, new \Slim\Http\Response(), ['groupId' => 'wrong format']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Param groupId must be an integer val', $responseBody->errors);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $indexingController->getIndexingActions($request, new \Slim\Http\Response(), ['groupId' => 8]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('This group can not index document', $responseBody->errors);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -73,9 +88,14 @@ class IndexingControllerTest extends TestCase
         }
 
         //ERROR
-        $response = $indexingController->getIndexingActions($request, new \Slim\Http\Response(), ['groupId' => 99999]);
+        $response = $indexingController->getIndexingEntities($request, new \Slim\Http\Response(), ['groupId' => 99999]);
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('This user is not in this group', $responseBody->errors);
+
+        $response = $indexingController->getIndexingEntities($request, new \Slim\Http\Response(), ['groupId' => 'wrong format']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Param groupId must be an integer val', $responseBody->errors);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -195,6 +215,66 @@ class IndexingControllerTest extends TestCase
 
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Query params processLimitDate is empty', $responseBody->errors);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testSetAction()
+    {
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $indexingController = new \Resource\controllers\IndexingController();
+
+        // GET
+        // ERROR
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $indexingController->setAction($request, new \Slim\Http\Response(), []);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body resource is empty or not an integer', $responseBody['errors']);
+
+
+        $body = [
+            'resource' => 1
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $indexingController->setAction($fullRequest, new \Slim\Http\Response(), ['groupId' => 10000 ]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Route groupId does not exist', $responseBody->errors);
+
+        $body = [
+            'resource' => 1
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $indexingController->setAction($fullRequest, new \Slim\Http\Response(), ['groupId' => 1 ]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Group is not linked to this user', $responseBody->errors);
+
+        $body = [
+            'resource' => 1
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $indexingController->setAction($fullRequest, new \Slim\Http\Response(), ['groupId' => 2, 'actionId' => 2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Action is not linked to this group', $responseBody->errors);
+
+        $body = [
+            'resource' => 1
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $indexingController->setAction($fullRequest, new \Slim\Http\Response(), ['groupId' => 2, 'actionId' => 22]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Resource does not exist', $responseBody->errors);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

@@ -633,7 +633,7 @@ class ContactController
         return $response->withJson(['contacts' => $contacts]);
     }
 
-    public static function getLightFormattedContact(Request $request, Response $response, array $args)
+    public function getLightFormattedContact(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->notEmpty()->validate($args['id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Query params id is not an integer']);
@@ -659,84 +659,11 @@ class ContactController
         return $response->withJson(['contact' => $contact]);
     }
 
-    public static function getCivilities(Request $request, Response $response)
+    public function getCivilities(Request $request, Response $response)
     {
         $civilities = ContactModel::getCivilities();
 
         return $response->withJson(['civilities' => $civilities]);
-    }
-
-    public static function getFormattedContactsForSearchV1(Request $request, Response $response)
-    {
-        $data = $request->getParsedBody();
-
-        $return = '';
-
-        if (!isset($data['resId']) && !isset($data['mode'])) {
-            $status = 1;
-            $return .= '<td colspan="6" style="background-color: red;">';
-            $return .= '<p style="padding: 10px; color: black;">';
-            $return .= 'Erreur lors du chargement des contacts';
-            $return .= '</p>';
-            $return .= '</td>';
-
-            return $response->withJson(['status' => $status, 'toShow' => $return]);
-        }
-
-        $status = 0;
-        $return .= '<td>';
-        $return .= '<div align="center">';
-        $return .= '<table width="100%">';
-
-        $resourceContacts = ResourceContactModel::get([
-            'where' => ['res_id = ?', 'mode = ?'],
-            'data'  => [$data['resId'], $data['mode']]
-        ]);
-
-        $mode = '';
-        if ($data['mode'] == 'sender') {
-            $mode = _SENDER;
-        } elseif ($data['mode'] == 'recipient') {
-            $mode = _RECIPIENT;
-        }
-
-        foreach ($resourceContacts as $resourceContact) {
-            $return .= '<tr>';
-            $return .= '<td style="background: transparent; border: 0px dashed rgb(200, 200, 200);">';
-
-            $return .= '<div style="text-align: left; background-color: rgb(230, 230, 230); padding: 3px; margin-left: 20px; margin-top: -6px;">';
-
-            if ($resourceContact['type'] == 'contact') {
-                $contactRaw = ContactModel::getById([
-                    'select' => ['*'],
-                    'id'     => $resourceContact['item_id']
-                ]);
-
-                $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $contactRaw]);
-
-                $return .= '<span style="font-size:10px;color:#135F7F;">' . $mode . '</span> - ';
-                $return .= $contactToDisplay['contact']['otherInfo'];
-            } elseif ($resourceContact['type'] == 'user') {
-                $return .= '<span style="font-size:10px;color:#135F7F;">' . $mode . ' (interne)</span> - ';
-                $return .= UserModel::getLabelledUserById(['id' => $resourceContact['item_id']]);
-            } elseif ($resourceContact['type'] == 'entity') {
-                $return .= '<span style="font-size:10px;color:#135F7F;">' . $mode . ' (interne)</span> - ';
-                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label']]);
-                $return .= $entity['entity_label'];
-            }
-
-            $return .= '</div>';
-
-            $return .= '</td>';
-            $return .= '</tr>';
-        }
-
-        $return .= '</table>';
-        $return .= '<br />';
-        $return .= '</div>';
-        $return .= '</td>';
-
-        return $response->withJson(['status' => $status, 'toShow' => $return]);
     }
 
     public static function getFillingRate(array $aArgs)

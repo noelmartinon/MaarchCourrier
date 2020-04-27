@@ -23,37 +23,6 @@
      \Configuration\models\ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['service = ?'], 'data' => ['admin_email_server']]);
  }
 
-
- function setConfigNotification_batch_config_Xml($from, $to, $host, $user, $pass, $type, $port, $auth, $charset, $smtpSecure, $mailfrom, $smtpDomains)
- {
-     $xmlconfig = simplexml_load_file(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/bin/notification/config/config.xml');
-
-     $CONFIG = $xmlconfig->CONFIG;
-        
-     $CONFIG->MaarchDirectory = realpath('.')."/";
-     if ($_SERVER['REMOTE_ADDR'] == '::1') {
-         $REMOTE_ADDR = 'localhost';
-     } else {
-         $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
-     }
-     $chemin = $REMOTE_ADDR . dirname($_SERVER['PHP_SELF']);
-     $maarchUrl = rtrim($chemin, "install");
-     $maarchUrl = $maarchUrl . 'cs_'.$_SESSION['config']['databasename'].'/';
-     $CONFIG->MaarchUrl = $maarchUrl;
-
-     $res = $xmlconfig->asXML();
-     $fp = @fopen(realpath('.')."/custom/cs_".$_SESSION['config']['databasename']."/bin/notification/config/config.xml", "w+");
-     if (!$fp) {
-         return false;
-         exit;
-     }
-     $write = fwrite($fp, $res);
-     if (!$write) {
-         return false;
-         exit;
-     }
- }
-
 include($_SESSION['config']['corepath']
     . '/apps/maarch_entreprise/tools/mails/htmlMimeMail.php');
 
@@ -91,8 +60,6 @@ if ($_REQUEST['type'] == 'test') {
     
         setConfigSendmail_batch_config_Xml($from, $to, $host, $user, $pass, $_REQUEST['smtpType'], $port, $auth, $charset, $smtpSecure, $from, $_REQUEST['smtpDomains']);
 
-        setConfigNotification_batch_config_Xml($from, $to, $host, $user, $pass, $_REQUEST['smtpType'], $port, $auth, $charset, $smtpSecure, $from, $_REQUEST['smtpDomains']);
-
         $return2['status'] = 2;
         $return2['text'] = _SMTP_OK;
 
@@ -103,8 +70,6 @@ if ($_REQUEST['type'] == 'test') {
     }
 } elseif ($_REQUEST['type'] == 'add') {
     setConfigSendmail_batch_config_Xml($from, $to, $host, $user, $pass, $_REQUEST['smtpType'], $port, $auth, $charset, $smtpSecure, $from, $_REQUEST['smtpDomains']);
-
-    setConfigNotification_batch_config_Xml($from, $to, $host, $user, $pass, $_REQUEST['smtpType'], $port, $auth, $charset, $smtpSecure, $from, $_REQUEST['smtpDomains']);
 
     $return2['status'] = 2;
     $return2['text'] = _INFO_SMTP_OK;

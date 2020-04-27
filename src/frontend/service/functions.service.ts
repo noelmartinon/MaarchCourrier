@@ -1,13 +1,20 @@
 import { Injectable } from '@angular/core';
 import { LANG } from '../app/translate.component';
-import {LatinisePipe} from "ngx-pipes";
+import { LatinisePipe } from 'ngx-pipes';
+import { AuthService } from './auth.service';
+import { HeaderService } from './header.service';
+import { TimeLimitPipe } from '../plugins/timeLimit.pipe';
 
 @Injectable()
 export class FunctionsService {
 
     lang: any = LANG;
 
-    constructor(public latinisePipe: LatinisePipe) { }
+    constructor(
+        private authService: AuthService,
+        private headerService: HeaderService,
+        private latinisePipe: LatinisePipe,
+    ) { }
 
     empty(value: any) {
         if (value === null || value === undefined) {
@@ -29,15 +36,15 @@ export class FunctionsService {
     formatFrenchDateToTechnicalDate(date: string) {
         if (!this.empty(date)) {
             let arrDate = date.split('-');
-            arrDate = arrDate.concat(arrDate[arrDate.length-1].split(' '));
-            arrDate.splice(2,1);
+            arrDate = arrDate.concat(arrDate[arrDate.length - 1].split(' '));
+            arrDate.splice(2, 1);
 
             if (this.empty(arrDate[3])) {
                 arrDate[3] = '00:00:00';
             }
-     
+
             const formatDate = `${arrDate[2]}-${arrDate[1]}-${arrDate[0]} ${arrDate[3]}`;
-    
+
             return formatDate;
         } else {
             return date;
@@ -47,22 +54,22 @@ export class FunctionsService {
     formatFrenchDateToObjectDate(date: string, delimiter: string = '-') {
         if (!this.empty(date)) {
             let arrDate = date.split(delimiter);
-            arrDate = arrDate.concat(arrDate[arrDate.length-1].split(' '));
-            arrDate.splice(2,1);
+            arrDate = arrDate.concat(arrDate[arrDate.length - 1].split(' '));
+            arrDate.splice(2, 1);
 
             if (this.empty(arrDate[3])) {
                 arrDate[3] = '00:00:00';
             }
-     
+
             const formatDate = `${arrDate[2]}-${arrDate[1]}-${arrDate[0]} ${arrDate[3]}`;
-    
+
             return new Date(formatDate);
         } else {
             return date;
         }
     }
 
-    formatDateObjectToDateString(date: Date, limitMode: boolean = false, format:string = 'dd-mm-yyyy') {
+    formatDateObjectToDateString(date: Date, limitMode: boolean = false, format: string = 'dd-mm-yyyy') {
         if (date !== null) {
             let formatDate: any[] = [];
             format.split('-').forEach((element: any) => {
@@ -100,12 +107,33 @@ export class FunctionsService {
     filterUnSensitive(template: any, filter: string, filteredColumns: any) {
         let filterReturn = false;
         filter = this.latinisePipe.transform(filter);
-        filteredColumns.forEach((column:any) => {
+        filteredColumns.forEach((column: any) => {
+            let val = template[column];
             if (typeof template[column] !== 'string') {
-                template[column] = JSON.stringify(template[column]);
+                val = JSON.stringify(val);
             }
-            filterReturn = filterReturn || this.latinisePipe.transform(template[column].toLowerCase()).includes(filter);
+            filterReturn = filterReturn || this.latinisePipe.transform(val.toLowerCase()).includes(filter);
         });
         return filterReturn;
+    }
+
+    debug(msg: string, route: string) {
+        const info: any = {
+            route : route,
+            session : {
+                id : this.authService.getAppSession(),
+                expireIn : new Date((JSON.parse(atob(this.authService.getToken().split('.')[1])).exp) * 1000)
+            },
+            refreshSession : {
+                id : this.authService.getAppSession(),
+                expireIn : new Date((JSON.parse(atob(this.authService.getRefreshToken().split('.')[1])).exp) * 1000)
+            },
+            user : this.headerService.user,
+        };
+        if (msg !== '') {
+            console.log(msg, info);
+        } else {
+            console.log(info);
+        }
     }
 }
