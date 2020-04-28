@@ -406,4 +406,14 @@ An action page is described in a ACTIONPAGE tag :
         <MODULE></MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>send_alfresco</ID>
+        <LABEL>_SEND_ALFRESCO</LABEL>
+        <NAME>send_alfresco</NAME>
+        <DESC>_SEND_ALFRESCO</DESC>
+        <component>sendAlfrescoAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
 </ROOT>

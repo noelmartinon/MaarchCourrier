@@ -36,6 +36,7 @@
             "Template\\"                : "src/app/template/",
             "User\\"                    : "src/app/user/",
             "VersionUpdate\\"           : "src/app/versionUpdate/",
+            "Alfresco\\"                : "src/app/external/alfresco/",
             "MessageExchange\\"         : "src/app/external/messageExchange/",
             "ExportSeda\\"              : "src/app/external/exportSeda/",
             "ExternalSignatoryBook\\"   : "src/app/external/externalSignatoryBook/",

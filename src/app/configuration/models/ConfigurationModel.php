@@ -19,29 +19,17 @@ use SrcCore\models\ValidatorModel;
 
 class ConfigurationModel
 {
-    public static function get(array $aArgs = [])
+    public static function getByService(array $args)
     {
-        ValidatorModel::arrayType($aArgs, ['select']);
-
-        $configurations = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['configurations']
-        ]);
-
-        return $configurations;
-    }
-
-    public static function getByService(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['service']);
-        ValidatorModel::stringType($aArgs, ['service']);
-        ValidatorModel::arrayType($aArgs, ['select']);
+        ValidatorModel::notEmpty($args, ['service']);
+        ValidatorModel::stringType($args, ['service']);
+        ValidatorModel::arrayType($args, ['select']);
 
         $configuration = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
             'table'     => ['configurations'],
             'where'     => ['service = ?'],
-            'data'      => [$aArgs['service']],
+            'data'      => [$args['service']],
         ]);
 
         if (empty($configuration[0])) {
@@ -51,16 +39,32 @@ class ConfigurationModel
         return $configuration[0];
     }
 
-    public static function update(array $aArgs)
+    public static function create(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['set', 'where', 'data']);
-        ValidatorModel::arrayType($aArgs, ['set', 'where', 'data']);
+        ValidatorModel::notEmpty($args, ['service', 'value']);
+        ValidatorModel::stringType($args, ['service', 'value']);
+
+        DatabaseModel::insert([
+            'table'         => 'configurations',
+            'columnsValues' => [
+                'service'   => $args['service'],
+                'value'     => $args['value']
+            ]
+        ]);
+
+        return true;
+    }
+
+    public static function update(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
 
         DatabaseModel::update([
             'table' => 'configurations',
-            'set'   => $aArgs['set'],
-            'where' => $aArgs['where'],
-            'data'  => $aArgs['data']
+            'set'   => $args['set'],
+            'where' => $args['where'],
+            'data'  => $args['data']
         ]);
 
         return true;

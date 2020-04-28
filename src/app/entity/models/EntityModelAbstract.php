@@ -112,21 +112,17 @@ abstract class EntityModelAbstract
         return true;
     }
 
-    public static function update(array $aArgs)
+    public static function update(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['set', 'where', 'data']);
-        ValidatorModel::arrayType($aArgs, ['set', 'where', 'data']);
-        ValidatorModel::stringType($aArgs['set'], [
-            'entity_label', 'short_label', 'entity_type', 'adrs_1', 'adrs_2', 'adrs_3',
-            'zipcode', 'city', 'country', 'email', 'business_id', 'parent_entity_id',
-            'ldap_id', 'transferring_agency', 'archival_agreement', 'archival_agency', 'entity_full_name'
-        ]);
+        ValidatorModel::notEmpty($args, ['where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'postSet', 'where', 'data']);
 
         DatabaseModel::update([
-            'table' => 'entities',
-            'set'   => $aArgs['set'],
-            'where' => $aArgs['where'],
-            'data'  => $aArgs['data']
+            'table'     => 'entities',
+            'set'       => $args['set'],
+            'postSet'   => $args['postSet'],
+            'where'     => $args['where'],
+            'data'      => $args['data']
         ]);
 
         return true;
@@ -343,15 +339,24 @@ abstract class EntityModelAbstract
             $entitiesAllowed = EntityModel::getAllEntitiesByUserId(['userId' => $aArgs['userId']]);
         }
 
-        $allEntities = EntityModel::get(['select' => ['id', 'entity_id', 'entity_label', 'parent_entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y'], 'orderBy' => ['parent_entity_id']]);
+        $allEntities = EntityModel::get([
+            'select'    => ['e1.id', 'e1.entity_id', 'e1.entity_label', 'e1.parent_entity_id', 'e2.id as parent_id'],
+            'table'     => ['entities e1', 'entities e2'],
+            'left_join' => ['e1.parent_entity_id = e2.entity_id'],
+            'where'     => ['e1.enabled = ?'],
+            'data'      => ['Y'],
+            'orderBy'   => ['e1.parent_entity_id']
+        ]);
 
         foreach ($allEntities as $key => $value) {
             $allEntities[$key]['serialId'] = $value['id'];
             $allEntities[$key]['id'] = $value['entity_id'];
             if (empty($value['parent_entity_id'])) {
+                $allEntities[$key]['parentSerialId'] = '#';
                 $allEntities[$key]['parent'] = '#';
                 $allEntities[$key]['icon'] = "fa fa-building";
             } else {
+                $allEntities[$key]['parentSerialId'] = $value['parent_id'];
                 $allEntities[$key]['parent'] = $value['parent_entity_id'];
                 $allEntities[$key]['icon'] = "fa fa-sitemap";
             }

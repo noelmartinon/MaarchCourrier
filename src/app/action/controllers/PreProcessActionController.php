@@ -17,6 +17,7 @@ use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketRedirectModel;
+use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
@@ -1496,6 +1497,62 @@ class PreProcessActionController
         }
 
         return $response->withJson(['resourcesInformations' => $resourcesInformation]);
+    }
+
+    public function checkSendAlfresco(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+        $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
+
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        if (empty($configuration)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
+        }
+        $configuration = json_decode($configuration['value'], true);
+        if (empty($configuration['uri'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration URI is empty']);
+        }
+
+        $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
+        if (empty($entity)) {
+            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity', 'lang' => 'userHasNoPrimaryEntity']);
+        }
+        $entityInformations = json_decode($entity['external_id'], true);
+        if (empty($entityInformations['alfresco'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations', 'lang' => 'notEnoughAlfrescoInformations']);
+        }
+
+        $resourcesInformations = [];
+        foreach ($body['resources'] as $resId) {
+            $resource = ResModel::getById(['select' => ['filename', 'alt_identifier', 'external_id'], 'resId' => $resId]);
+            if (empty($resource['filename'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noFile'];
+                continue;
+            }
+            $externalId = json_decode($resource['external_id'], true);
+            if (!empty($externalId['alfrescoId'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'alreadySentToAlfresco'];
+                continue;
+            }
+
+            $resourcesInformations['success'][] = ['res_id' => $resId, 'alt_identifier' => $resource['alt_identifier']];
+        }
+
+        return $response->withJson(['resourcesInformations' => $resourcesInformations]);
     }
 
     private static function getNonLockedResources(array $args)
