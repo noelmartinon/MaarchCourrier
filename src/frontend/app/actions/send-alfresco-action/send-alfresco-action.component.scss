@@ -1,0 +1,44 @@
+@import '../../../css/vars.scss';
+
+.loading {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffffb3;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.smallInput {
+    font-size: 9px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    ::ng-deep.mat-form-field-flex {
+        display: flex;
+        align-items: center;
+    }
+
+    .mat-icon {
+        height: auto;
+    }
+}
+
+#jstreeAlfresco{
+    max-height: 300px;
+    overflow: auto;
+
+    ::ng-deep.jstree-anchor {
+        .jstree-icon {
+            color: $primary !important;
+        }
+    }
+    ::ng-deep.jstree-hovered, ::ng-deep.jstree-clicked {
+        .jstree-icon {
+            color: white !important;
+        }
+    }
+}
