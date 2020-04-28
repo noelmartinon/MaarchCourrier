@@ -319,7 +319,8 @@ $param['confidentiality'] = $arr_tmp2;
 //doc_type
 $stmt = $conn->query(
     'SELECT type_id, description  FROM  '
-    .$_SESSION['tablename']['doctypes']." WHERE enabled = 'Y' order by description asc", []
+    .$_SESSION['tablename']['doctypes']." WHERE enabled = 'Y' order by description asc",
+    []
 );
 $arr_tmp = array();
 while ($res = $stmt->fetchObject()) {
@@ -374,54 +375,58 @@ $src_tab = $tab[0];
 
 //$core_tools->show_array($param);
 ?>
-<script type="text/javascript" src="<?php echo $_SESSION['config']['businessappurl']; ?>static.php?filename=search_adv.js" ></script>
-<script type="text/javascript">
-<!--
-var valeurs = { <?php echo $tab[1]; ?>};
-var loaded_query = <?php if (isset($_SESSION['current_search_query']) && !empty($_SESSION['current_search_query'])) {
+        <script type="text/javascript" src="<?php echo $_SESSION['config']['businessappurl']; ?>static.php?filename=search_adv.js"></script>
+        <script type="text/javascript">
+            <!--
+            var valeurs = {
+                <?php echo $tab[1]; ?> };
+            var loaded_query =
+                <?php if (isset($_SESSION['current_search_query']) && !empty($_SESSION['current_search_query'])) {
     echo $_SESSION['current_search_query'];
 } else {
     echo '{}';
-}?>;
+}?>
+            ;
 
-function del_query_confirm()
-{
-    if(confirm('<?php echo _REALLY_DELETE.' '._THIS_SEARCH.'?'; ?>'))
-    {
-        del_query_db($('query').options[$('query').selectedIndex], 'select_criteria', 'frmsearch2', '<?php echo _SQL_ERROR; ?>', '<?php echo _SERVER_ERROR; ?>', '<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=manage_query'; ?>');
-        return false;
-    }
-}
--->
-</script>
-<?php if ($_GET['mode'] != 'popup') {
+            function del_query_confirm() {
+                if (confirm('<?php echo _REALLY_DELETE.' '._THIS_SEARCH.'?'; ?>')) {
+                    del_query_db($('query').options[$('query').selectedIndex], 'select_criteria', 'frmsearch2', '<?php echo _SQL_ERROR; ?>', '<?php echo _SERVER_ERROR; ?>', '<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=manage_query'; ?>');
+                    return false;
+                }
+            }
+            -->
+        </script>
+        <?php if ($_GET['mode'] != 'popup') {
     ?>
-<h1>
-    <i class="fa fa-search fa-2x"></i> <?php echo _ADV_SEARCH_MLB; ?>
-</h1>
-<?php
+        <h1>
+            <i class="fa fa-search fa-2x"></i> <?php echo _ADV_SEARCH_MLB; ?>
+        </h1>
+        <?php
 } ?>
-<div id="inner_content">
+        <div id="inner_content">
 
-<?php if (count($queries) > 0) {
+            <?php if (count($queries) > 0) {
         ?>
-<form name="choose_query" id="choose_query" action="#" method="post" >
-<div align="center" style="display:block;" id="div_query">
+            <form name="choose_query" id="choose_query" action="#" method="post">
+                <div align="center" style="display:block;" id="div_query">
 
-<label for="query"><?php echo _MY_SEARCHES; ?> : </label>
-<select name="query" id="query" onchange="load_query_db(this.options[this.selectedIndex].value, 'select_criteria', 'parameters_tab', '<?php echo _SQL_ERROR; ?>', '<?php echo _SERVER_ERROR; ?>', '<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=manage_query'; ?>');return false;" >
-    <option id="default_query" value=""><?php echo _CHOOSE_SEARCH; ?></option>
-    <?php for ($i = 0; $i < count($queries); ++$i) {
-            ?><option value="<?php functions::xecho($queries[$i]['ID']); ?>" id="query_<?php functions::xecho($queries[$i]['ID']); ?>"><?php functions::xecho($queries[$i]['LABEL']); ?></option><?php
+                    <label for="query"><?php echo _MY_SEARCHES; ?> : </label>
+                    <select name="query" id="query" onchange="load_query_db(this.options[this.selectedIndex].value, 'select_criteria', 'parameters_tab', '<?php echo _SQL_ERROR; ?>', '<?php echo _SERVER_ERROR; ?>', '<?php echo $_SESSION['config']['businessappurl'].'index.php?display=true&dir=indexing_searching&page=manage_query'; ?>');return false;">
+                        <option id="default_query" value=""><?php echo _CHOOSE_SEARCH; ?>
+                        </option>
+                        <?php for ($i = 0; $i < count($queries); ++$i) {
+            ?>
+                        <option value="<?php functions::xecho($queries[$i]['ID']); ?>" id="query_<?php functions::xecho($queries[$i]['ID']); ?>"><?php functions::xecho($queries[$i]['LABEL']); ?>
+                        </option><?php
         } ?>
-</select>
+                    </select>
 
-<input name="del_query" id="del_query" value="<?php echo _DELETE_QUERY; ?>" type="button"  onclick="del_query_confirm();" class="button" style="display:none" />
-</div>
-</form>
-<?php
+                    <input name="del_query" id="del_query" value="<?php echo _DELETE_QUERY; ?>" type="button" onclick="del_query_confirm();" class="button" style="display:none" />
+                </div>
+            </form>
+            <?php
     } ?>
-<form name="frmsearch2" method="post" action="<?php 
+            <form name="frmsearch2" method="post" action="<?php
     if ($mode == 'normal') {
         //echo $_SESSION['config']['businessappurl'] . 'index.php';
         echo $_SESSION['config']['businessappurl']
@@ -429,43 +434,43 @@ function del_query_confirm()
     } elseif ($mode == 'frame' || $mode == 'popup') {
         echo $_SESSION['config']['businessappurl']
             .'index.php?display=true&dir=indexing_searching&page=search_adv_result';
-    }?>"  id="frmsearch2" class="<?php functions::xecho($class_for_form); ?>">
-<input type="hidden" name="dir" value="indexing_searching" />
-    <input type="hidden" name="page" value="search_adv_result" />
-<input type="hidden" name="mode" value="<?php functions::xecho($mode); ?>" />
-<?php if ($mode == 'frame' || $mode == 'popup') {
+    }?>" id="frmsearch2" class="<?php functions::xecho($class_for_form); ?>">
+                <input type="hidden" name="dir" value="indexing_searching" />
+                <input type="hidden" name="page" value="search_adv_result" />
+                <input type="hidden" name="mode" value="<?php functions::xecho($mode); ?>" />
+                <?php if ($mode == 'frame' || $mode == 'popup') {
         ?>
-    <input type="hidden" name="display" value="true" />
-    <input type="hidden" name="action_form" value="<?php functions::xecho($_REQUEST['action_form']); ?>" />
-    <input type="hidden" name="modulename" value="<?php functions::xecho($_REQUEST['modulename']); ?>" />
-<?php
+                <input type="hidden" name="display" value="true" />
+                <input type="hidden" name="action_form" value="<?php functions::xecho($_REQUEST['action_form']); ?>" />
+                <input type="hidden" name="modulename" value="<?php functions::xecho($_REQUEST['modulename']); ?>" />
+                <?php
     }
 if (isset($_REQUEST['nodetails'])) {
     ?>
-<input type="hidden" name="nodetails" value="true" />
-<?php
+                <input type="hidden" name="nodetails" value="true" />
+                <?php
 }?>
-<table align="center" border="0" width="100%">
-    <tr>
-        <td>
-            <a href="#" onclick="clear_search_form('frmsearch2','select_criteria');clear_q_list();erase_contact_external_id('recipient', 'recipient_id');erase_contact_external_id('recipient', 'recipient_type');erase_contact_external_id('sender', 'sender_id');erase_contact_external_id('sender', 'sender_type');erase_contact_external_id('signatory_name', 'ac_signatory_name');">
-                <i class="fa fa-sync fa-4x" title="<?php echo _CLEAR_SEARCH; ?>"></i>
-            </a>
-        </td>
-        <td align="right">
-            <span style="display:none;">
-                <input name="imageField" type="submit" value="" onclick="valid_search_form('frmsearch2');this.form.submit();" />
-            </span>
-            <a href="#" onclick="valid_search_form('frmsearch2');$('frmsearch2').submit();">
-                <i class="fa fa-search fa-4x" title="<?php echo _SEARCH; ?>"></i>
-            </a>
-        </td>
-    </tr>
-</table>
-<table align="center" border="0" width="100%">
-    <tr>
-    <td>
-<?php
+                <table align="center" border="0" width="100%">
+                    <tr>
+                        <td>
+                            <a href="#" onclick="clear_search_form('frmsearch2','select_criteria');clear_q_list();erase_contact_external_id('recipient', 'recipient_id');erase_contact_external_id('recipient', 'recipient_type');erase_contact_external_id('sender', 'sender_id');erase_contact_external_id('sender', 'sender_type');erase_contact_external_id('signatory_name', 'ac_signatory_name');">
+                                <i class="fa fa-sync fa-4x" title="<?php echo _CLEAR_SEARCH; ?>"></i>
+                            </a>
+                        </td>
+                        <td align="right">
+                            <span style="display:none;">
+                                <input name="imageField" type="submit" value="" onclick="valid_search_form('frmsearch2');this.form.submit();" />
+                            </span>
+                            <a href="#" onclick="valid_search_form('frmsearch2');$('frmsearch2').submit();">
+                                <i class="fa fa-search fa-4x" title="<?php echo _SEARCH; ?>"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                <table align="center" border="0" width="100%">
+                    <tr>
+                        <td>
+                            <?php
 if ($core_tools->is_module_loaded('basket') == true) {
         ?>
                             <div class="block">
@@ -509,201 +514,219 @@ if ($core_tools->is_module_loaded('basket') == true) {
                             <?php
     }
 ?>
-</td>
-</tr>
-</table>
-<table align="center" border="0" width="100%">
-    <tr>
-        <td colspan="2" ></td>
-    </tr>
-    <tr >
-        <td >
-        <div class="block">
-        <h2><?php echo _LETTER_INFO; ?></h2>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="subject" class="bold" ><?php echo _MAIL_OBJECT; ?></label>
-            </div>
-            <div class="adv_search_field">
-                <input type="text" name="subject" id="subject" <?php functions::xecho($size); ?>  />
-                <input type="hidden" name="meta[]" value="subject#subject#input_text" /><span class="green_asterisk"><i class="fa fa-star"></i></span>
-            </div>
-            <div class="adv_search_field">
-                <em><?php echo _MAIL_OBJECT_HELP; ?></em> 
-            </div>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="chrono" class="bold"><?php echo _CHRONO_NUMBER;?></label>
-            </div>
-            <div class="adv_search_field">
-                <input type="text" name="chrono" id="chrono" <?php functions::xecho($size); ?>  />
-                <input type="hidden" name="meta[]" value="chrono#chrono#input_text" /><span class="green_asterisk"><i class="fa fa-star"></i></span>
-            </div>
-            <div class="adv_search_field">
-                <em><?php echo _CHRONO_NUMBER_HELP; ?></em>
-            </div>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="barcode" class="bold"><?php echo _BARCODE;?></label>
-            </div>
-            <div class="adv_search_field">
-                <input type="text" name="barcode" id="barcode" <?php echo $size; ?>  />
-                <input type="hidden" name="meta[]" value="barcode#barcode#input_text" />
-            </div>
-            <div class="adv_search_field">
-                <em><?php echo _BARCODE_HELP; ?></em>
-            </div>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="sender" class="bold"><?php echo _SENDER; ?></label>
-            </div>
-            <div class="adv_search_field indexing_field">
-                <span style="position:relative;">
-                    <div class="typeahead__container"><div class="typeahead__field">
-                        <span class="typeahead__query">
-                            <input name="sender" type="text" id="sender" autocomplete="off" placeholder="<?php echo _CONTACTS_USERS_SEARCH; ?>" title="<?php echo _CONTACTS_USERS_SEARCH; ?>"/>
-                            <input type="hidden" name="meta[]" value="sender#sender#input_text" />
-                        </span>
-                    </div></div>
-                </span>
-                <script type="text/javascript">
-                    initSenderRecipientAutocomplete('sender','contactsUsers', true);
-                </script>
-                <input type="hidden" name="sender_id" id="sender_id" />
-                <input type="hidden" name="sender_type" id="sender_type" />
-            </div>
-            <div class="adv_search_field">
-
-            </div>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="recipient" class="bold"><?php echo _DEST; ?></label>
-            </div>
-            <div class="adv_search_field indexing_field">
-                <span style="position:relative;">
-                    <div class="typeahead__container"><div class="typeahead__field">
-                        <span class="typeahead__query">
-                            <input name="recipient" type="text" id="recipient" autocomplete="off" placeholder="<?php echo _CONTACTS_USERS_SEARCH; ?>" title="<?php echo _CONTACTS_USERS_SEARCH; ?>"/>
-                            <span class="green_asterisk" style="position: absolute;right: -10px;top: 0px;"><i class="fa fa-star"></i></span>
-                            <input type="hidden" name="meta[]" value="recipient#recipient#input_text" />
-                        </span>
-                    </div></div>
-                </span>
-                <script type="text/javascript">
-                    initSenderRecipientAutocomplete('recipient', 'contactsUsers', true);
-                </script>
-                <input type="hidden" name="recipient_id" id="recipient_id" />
-                <input type="hidden" name="recipient_type" id="recipient_type" />
-            </div>
-            <div class="adv_search_field">
-
-            </div>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="signatory_name" class="bold"><?php echo _SIGNATORY_NAME;?></label>
-            </div>
-            <div class="adv_search_field">
-                <input type="text" name="signatory_name" id="signatory_name" onkeyup="erase_contact_external_id('signatory_name', 'ac_signatory_name');"/>
-                <input type="hidden" name="meta[]" value="signatory_name#signatory_name#input_text" />
-                <div id="signatoryNameList" class="autocomplete"></div>
-                <script type="text/javascript">
-                    initList_hidden_input('signatory_name', 'signatoryNameList', '<?php 
+                        </td>
+                    </tr>
+                </table>
+                <table align="center" border="0" width="100%">
+                    <tr>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="block">
+                                <h2><?php echo _LETTER_INFO; ?>
+                                </h2>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="subject" class="bold"><?php echo _MAIL_OBJECT; ?></label>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <input type="text" name="subject" id="subject" <?php functions::xecho($size); ?> />
+                                        <input type="hidden" name="meta[]" value="subject#subject#input_text" /><span class="green_asterisk"><i class="fa fa-star"></i></span>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _MAIL_OBJECT_HELP; ?></em>
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="chrono" class="bold"><?php echo _CHRONO_NUMBER;?></label>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <input type="text" name="chrono" id="chrono" <?php functions::xecho($size); ?> />
+                                        <input type="hidden" name="meta[]" value="chrono#chrono#input_text" /><span class="green_asterisk"><i class="fa fa-star"></i></span>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _CHRONO_NUMBER_HELP; ?></em>
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="barcode" class="bold"><?php echo _BARCODE;?></label>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <input type="text" name="barcode" id="barcode" <?php echo $size; ?> />
+                                        <input type="hidden" name="meta[]" value="barcode#barcode#input_text" />
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _BARCODE_HELP; ?></em>
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="sender" class="bold"><?php echo _SENDER; ?></label>
+                                    </div>
+                                    <div class="adv_search_field indexing_field">
+                                        <span style="position:relative;">
+                                            <div class="typeahead__container">
+                                                <div class="typeahead__field">
+                                                    <span class="typeahead__query">
+                                                        <input name="sender" type="text" id="sender" autocomplete="off" placeholder="<?php echo _CONTACTS_USERS_SEARCH; ?>" title="<?php echo _CONTACTS_USERS_SEARCH; ?>" />
+                                                        <input type="hidden" name="meta[]" value="sender#sender#input_text" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </span>
+                                        <script type="text/javascript">
+                                            initSenderRecipientAutocomplete('sender', 'contactsUsers', true);
+                                        </script>
+                                        <input type="hidden" name="sender_id" id="sender_id" />
+                                        <input type="hidden" name="sender_type" id="sender_type" />
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _SEARCH_CONTACT_AUTOCOMPLETION_HELP; ?></em>
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="recipient" class="bold"><?php echo _DEST; ?></label>
+                                    </div>
+                                    <div class="adv_search_field indexing_field">
+                                        <span style="position:relative;">
+                                            <div class="typeahead__container">
+                                                <div class="typeahead__field">
+                                                    <span class="typeahead__query">
+                                                        <input name="recipient" type="text" id="recipient" autocomplete="off" placeholder="<?php echo _CONTACTS_USERS_SEARCH; ?>" title="<?php echo _CONTACTS_USERS_SEARCH; ?>" />
+                                                        <span class="green_asterisk" style="position: absolute;right: -10px;top: 0px;"><i class="fa fa-star"></i></span>
+                                                        <input type="hidden" name="meta[]" value="recipient#recipient#input_text" />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </span>
+                                        <script type="text/javascript">
+                                            initSenderRecipientAutocomplete('recipient', 'contactsUsers', true);
+                                        </script>
+                                        <input type="hidden" name="recipient_id" id="recipient_id" />
+                                        <input type="hidden" name="recipient_type" id="recipient_type" />
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _SEARCH_CONTACT_AUTOCOMPLETION_HELP; ?></em>
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="signatory_name" class="bold"><?php echo _SIGNATORY_NAME;?></label>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <input type="text" name="signatory_name" id="signatory_name" onkeyup="erase_contact_external_id('signatory_name', 'ac_signatory_name');" />
+                                        <input type="hidden" name="meta[]" value="signatory_name#signatory_name#input_text" />
+                                        <div id="signatoryNameList" class="autocomplete"></div>
+                                        <script type="text/javascript">
+                                            initList_hidden_input('signatory_name', 'signatoryNameList', '<?php
                         echo $_SESSION['config']['businessappurl'];?>index.php?display=true&dir=indexing_searching&page=users_list_by_name_search', 'what', '2', 'ac_signatory_name');
-                </script>
-                <input id="ac_signatory_name" name="ac_signatory_name" type="hidden" />
-            </div>
-            <div class="adv_search_field">
+                                        </script>
+                                        <input id="ac_signatory_name" name="ac_signatory_name" type="hidden" />
+                                    </div>
+                                    <div class="adv_search_field">
 
-            </div>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="fulltext" class="bold" ><?php echo _FULLTEXT; ?></label>
-            </div>
-            <div class="adv_search_field">
-                <input type="text" name="fulltext" id="fulltext" <?php functions::xecho($size); ?>  />
-                <input type="hidden" name="meta[]" value="fulltext#fulltext#input_text" />
-                <a href="javascript::" onclick='$j("#iframe_fulltext_help").slideToggle("fast");'><i class="fa fa-search" title="<?php echo _HELP_FULLTEXT_SEARCH; ?>"></i></a>
-            </div>
-            <div class="adv_search_field">
-                <em><?php echo _FULLTEXT_HELP; ?></em>
-            </div>
-        </div>
-        <div class="adv_search_field_content" id="iframe_fulltext_help" style="display:none;">
-            <iframe src="<?php echo $_SESSION['config']['businessappurl']
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="fulltext" class="bold"><?php echo _FULLTEXT; ?></label>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <input type="text" name="fulltext" id="fulltext" <?php functions::xecho($size); ?> />
+                                        <input type="hidden" name="meta[]" value="fulltext#fulltext#input_text" />
+                                        <a href="javascript::" onclick='$j("#iframe_fulltext_help").slideToggle("fast");'><i class="fa fa-search" title="<?php echo _HELP_FULLTEXT_SEARCH; ?>"></i></a>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _FULLTEXT_HELP; ?></em>
+                                    </div>
+                                </div>
+                                <div class="adv_search_field_content" id="iframe_fulltext_help" style="display:none;">
+                                    <iframe src="<?php echo $_SESSION['config']['businessappurl']
                 .'index.php?display=true&page=fulltext_search_help'; ?>" frameborder="0" width="100%" height="240px">
-            </iframe>
-        </div>
-        <div class="adv_search_field_content">
-            <div class="adv_search_field">
-                <label for="multifield" class="bold" ><?php echo _MULTI_FIELD; ?></label>
-            </div>
-            <div class="adv_search_field">
-                <input type="text" name="multifield" id="multifield" <?php functions::xecho($size); ?>  />
-                <input type="hidden" name="meta[]" value="multifield#multifield#input_text" />
-            </div>
-            <div class="adv_search_field">
-                <em><?php echo _MULTI_FIELD_HELP; ?></em>
-            </div>
-        </div>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <td><span class="green_asterisk"><i class="fa fa-star" style="vertical-align:50%"></i></span><?php echo _SEARCH_INDICATION; ?></td>
-    </tr>
-    <tr><td colspan="2">&nbsp;</td></tr>
-<tr>
-<td >
-<div class="block">
-<h2><?php echo _ADD_PARAMETERS; ?>&nbsp;:&nbsp;<select name="select_criteria" id="select_criteria" style="display:inline;" onchange="add_criteria(this.options[this.selectedIndex].id, 'parameters_tab', <?php 
+                                    </iframe>
+                                </div>
+                                <div class="adv_search_field_content">
+                                    <div class="adv_search_field">
+                                        <label for="multifield" class="bold"><?php echo _MULTI_FIELD; ?></label>
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <input type="text" name="multifield" id="multifield" <?php functions::xecho($size); ?> />
+                                        <input type="hidden" name="meta[]" value="multifield#multifield#input_text" />
+                                    </div>
+                                    <div class="adv_search_field">
+                                        <em><?php echo _MULTI_FIELD_HELP; ?></em>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="green_asterisk"><i class="fa fa-star" style="vertical-align:50%"></i></span><?php echo _SEARCH_INDICATION; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="block">
+                                <h2><?php echo _ADD_PARAMETERS; ?>&nbsp;:&nbsp;<select name="select_criteria" id="select_criteria" style="display:inline;" onchange="add_criteria(this.options[this.selectedIndex].id, 'parameters_tab', <?php
         echo $browser_ie; ?>, '<?php echo _ERROR_IE_SEARCH; ?>');window.location.href = '#bottom';">
-            <?php echo $src_tab; ?>
-        </select></h2>
-<table border = "0" width="100%" class="content" id="parameters_tab">
-       <tr>
-        <td width="100%" colspan="3" style="text-align:center;"><em><?php echo _ADD_PARAMETERS_HELP; ?></em></td>
-        </tr>
- </table>
- </div>
-</td></tr>
-</table>
+                                        <?php echo $src_tab; ?>
+                                    </select></h2>
+                                <table border="0" width="100%" class="content" id="parameters_tab">
+                                    <tr>
+                                        <td width="100%" colspan="3" style="text-align:center;"><em><?php echo _ADD_PARAMETERS_HELP; ?></em></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
 
-<table align="center" border="0" width="100%">
-    <tr>
-        <td>
-            <a href="#" onclick="clear_search_form('frmsearch2','select_criteria');clear_q_list();erase_contact_external_id('recipient', 'recipient_id');erase_contact_external_id('recipient', 'recipient_type');erase_contact_external_id('sender', 'sender_id');erase_contact_external_id('sender', 'sender_type');erase_contact_external_id('signatory_name', 'ac_signatory_name');">
-             <i class="fa fa-sync fa-4x" title="<?php echo _CLEAR_FORM; ?>"></i>
-            </a>
-        </td>
-        <td align="right">
-            <a href="#" onclick="valid_search_form('frmsearch2');$('frmsearch2').submit();">
-                <i class="fa fa-search fa-4x" title="<?php echo _SEARCH; ?>"></i>
-            </a>
-        </td>
-    </tr>
-</table>
+                <table align="center" border="0" width="100%">
+                    <tr>
+                        <td>
+                            <a href="#" onclick="clear_search_form('frmsearch2','select_criteria');clear_q_list();erase_contact_external_id('recipient', 'recipient_id');erase_contact_external_id('recipient', 'recipient_type');erase_contact_external_id('sender', 'sender_id');erase_contact_external_id('sender', 'sender_type');erase_contact_external_id('signatory_name', 'ac_signatory_name');">
+                                <i class="fa fa-sync fa-4x" title="<?php echo _CLEAR_FORM; ?>"></i>
+                            </a>
+                        </td>
+                        <td align="right">
+                            <a href="#" onclick="valid_search_form('frmsearch2');$('frmsearch2').submit();">
+                                <i class="fa fa-search fa-4x" title="<?php echo _SEARCH; ?>"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
 
-</form>
-<br/>
-</div>
+            </form>
+            <br />
+        </div>
 
-<script type="text/javascript">
-load_query(valeurs, loaded_query, 'parameters_tab', '<?php echo $browser_ie; ?>', '<?php echo _ERROR_IE_SEARCH; ?>');
-<?php if (isset($_REQUEST['init_search'])) {
-            ?>clear_search_form('frmsearch2','select_criteria');clear_q_list();erase_contact_external_id('recipient', 'recipient_id');erase_contact_external_id('recipient', 'recipient_type');erase_contact_external_id('sender', 'sender_id');erase_contact_external_id('sender', 'sender_type');erase_contact_external_id('signatory_name', 'ac_signatory_name') <?php
+        <script type="text/javascript">
+            load_query(valeurs, loaded_query, 'parameters_tab', '<?php echo $browser_ie; ?>', '<?php echo _ERROR_IE_SEARCH; ?>');
+            <?php if (isset($_REQUEST['init_search'])) {
+            ?>
+            clear_search_form('frmsearch2', 'select_criteria');
+            clear_q_list();
+            erase_contact_external_id('recipient', 'recipient_id');
+            erase_contact_external_id('recipient', 'recipient_type');
+            erase_contact_external_id('sender', 'sender_id');
+            erase_contact_external_id('sender', 'sender_type');
+            erase_contact_external_id('signatory_name', 'ac_signatory_name')
+            <?php
         }?>
-</script>
+        </script>
 
-<?php if ($mode == 'popup' || $mode == 'frame') {
+        <?php if ($mode == 'popup' || $mode == 'frame') {
             echo '</div>';
             if ($mode == 'popup') {
-                ?><br/><div align="center"><input type="button" name="close" class="button" value="<?php echo _CLOSE_WINDOW; ?>" onclick="self.close();" /></div> <?php
+                ?><br />
+        <div align="center"><input type="button" name="close" class="button" value="<?php echo _CLOSE_WINDOW; ?>" onclick="self.close();" /></div> <?php
             }
             echo '</body></html>';
         }

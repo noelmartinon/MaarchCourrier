@@ -1407,6 +1407,7 @@ if (!defined('_CHOOSE_DEPARTMENT_NUMBER')) { define('_CHOOSE_DEPARTMENT_NUMBER',
 if (!defined('_DEPARTMENT_NUMBER')) { define('_DEPARTMENT_NUMBER', 'Betrokken departement');}
 if (!defined('_CHRONO_NUMBER_HELP')) { define('_CHRONO_NUMBER_HELP', 'Voorbeeld: MAARCH/2018A/36');}
 if (!defined('_BARCODE_HELP')) { define('_BARCODE_HELP', 'Voorbeeld: ABC000004');}
+if (!defined('_SEARCH_CONTACT_AUTOCOMPLETION_HELP')) {define('_SEARCH_CONTACT_AUTOCOMPLETION_HELP', "Search on company field if no element select in autocompletion");} // _TO_TRANSLATE
 if (!defined('_PROCESS_IN_PROGRESS')) { define('_PROCESS_IN_PROGRESS', 'Verwerking bezig');}
 if (!defined('_CONTACTS_FILLING')) { define('_CONTACTS_FILLING', 'Volledigheid van de contactinformatie');}
 if (!defined('_PROCESSED_BY')) { define('_PROCESSED_BY', 'Verwerkt door');}

@@ -650,31 +650,48 @@ where lower(translate(folders.label , 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓ�
 
                 $where_request .= ') and ';
             }
-            //recherche sur les contacts externes en fonction de ce que la personne a saisi
-            /*elseif ($tab_id_fields[$j] == 'contactid' && empty($_REQUEST['contactid_external']) && !empty($_REQUEST['contactid']))
-            {
-                $json_txt .= " 'contactid_external' : ['".addslashes(trim($_REQUEST['contactid_external']))."'], 'contactid' : ['".addslashes(trim($_REQUEST['contactid']))."'],";
-                    $contact_id = $_REQUEST['contactid'];
-                    $where_request .= " (contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) ".
-                        " or res_id in (SELECT res_id_master FROM res_attachments WHERE dest_contact_id in (select contact_id from view_contacts where society ilike :contactId or contact_firstname ilike :contactId or contact_lastname ilike :contactId) AND status NOT IN ('DEL','OBS','TMP') ) ) and ";
-                    $arrayPDO = array_merge($arrayPDO, array(":contactId" => "%".$contact_id."%"));
+            //recherche sur le destinataire en fonction de ce que la personne a saisi
+            elseif ($tab_id_fields[$j] == 'recipient' && !empty(trim($_REQUEST['recipient'])) && empty($_REQUEST['recipient_type']) && empty($_REQUEST['recipient_id'])) {
+                $fields = \SrcCore\controllers\AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+        
+                $requestData = \SrcCore\controllers\AutoCompleteController::getDataForRequest([
+                    'search'       => $_REQUEST['recipient'],
+                    'fields'       => $fields,
+                    'fieldsNumber' => 1
+                ]);
+        
+                $contacts = \Contact\models\ContactModel::get([
+                    'select'    => ['id'],
+                    'where'     => $requestData['where'],
+                    'data'      => $requestData['data']
+                ]);
+                $contactIds     = array_column($contacts, 'id');
+                $contactIds    = !empty($contactIds) ? $contactIds : [0];
+                $json_txt      .= " 'recipient' : ['".addslashes(trim($_REQUEST['recipient']))."'],";
+                $where_request .= " (res_id in (select res_id from resource_contacts where item_id in (:recipientIds) and type = 'contact' and mode = 'recipient')) and ";
+                $arrayPDO       = array_merge($arrayPDO, array(":recipientIds" => $contactIds));
             }
-            elseif ($tab_id_fields[$j] == 'addresses_id' && !empty($_REQUEST['addresses_id']))
-            {
-                $json_txt .= " 'addresses_id' : ['".addslashes(trim($_REQUEST['addresses_id']))."'], 'addresses_id' : ['".addslashes(trim($_REQUEST['addresses_id']))."'],";
-                    $addresses_id = $_REQUEST['addresses_id'];
-                    $where_request .= " address_id in (select ca_id from view_contacts where lastname ilike :addressId or firstname ilike :addressId ) and ";
-                    $arrayPDO = array_merge($arrayPDO, array(":addressId" => "%".$addresses_id."%"));
+            //recherche sur l'expéditeur en fonction de ce que la personne a saisi
+            elseif ($tab_id_fields[$j] == 'sender' && !empty(trim($_REQUEST['sender'])) && empty($_REQUEST['sender_type']) && empty($_REQUEST['sender_id'])) {
+                $fields = \SrcCore\controllers\AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+        
+                $requestData = \SrcCore\controllers\AutoCompleteController::getDataForRequest([
+                    'search'       => $_REQUEST['sender'],
+                    'fields'       => $fields,
+                    'fieldsNumber' => 1
+                ]);
+        
+                $contacts = \Contact\models\ContactModel::get([
+                    'select'    => ['id'],
+                    'where'     => $requestData['where'],
+                    'data'      => $requestData['data']
+                ]);
+                $contactIds     = array_column($contacts, 'id');
+                $contactIds    = !empty($contactIds) ? $contactIds : [0];
+                $json_txt      .= " 'sender' : ['".addslashes(trim($_REQUEST['sender']))."'],";
+                $where_request .= " (res_id in (select res_id from resource_contacts where item_id in (:senderIds) and type = 'contact' and mode = 'sender')) and ";
+                $arrayPDO       = array_merge($arrayPDO, array(":senderIds" => $contactIds));
             }
-            //recherche sur les contacts internes en fonction de ce que la personne a saisi
-            elseif ($tab_id_fields[$j] == 'contactid_internal' && empty($_REQUEST['contact_internal_id']) && !empty($_REQUEST['contactid_internal']))
-            {
-                $json_txt .= " 'contactid_internal' : ['".addslashes(trim($_REQUEST['contactid_internal']))."'], 'contact_internal_id' : ['".addslashes(trim($_REQUEST['contactid_internal']))."']";
-                    $contactid_internal = pg_escape_string($_REQUEST['contactid_internal']);
-                    //$where_request .= " ((user_firstname = '".$contactid_internal."' or user_lastname = '".$contactid_internal."') or ";
-                    $where_request .= " (exp_user_id in (select user_id from users where firstname ilike :contactIdInternal or lastname ilike :contactIdInternal )) and ";
-                    $arrayPDO = array_merge($arrayPDO, array(":contactIdInternal" => "%".$contactid_internal."%"));
-            }*/
             //VISA USER
             elseif ($tab_id_fields[$j] == 'visa_user' && !empty($_REQUEST['ac_visa_user'])) {
                 $json_txt .= " 'visa_user' : ['".addslashes(trim($_REQUEST['visa_user']))."'], 'user_visa' : ['".addslashes(trim($_REQUEST['ac_visa_user']))."']";

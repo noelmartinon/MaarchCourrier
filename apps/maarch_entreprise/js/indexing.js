@@ -89,6 +89,14 @@ function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId
                     $j("#" + cardId).css('visibility', 'visible');
                 }
             },
+            onSearch: function () {
+                $j("#" + inputId + "_id").val('');
+                $j("#" + inputId + "_type").val('');
+                $j("#" + inputId).css('background-color', "");
+                if(typeof cardId != 'undefined'){
+                    $j("#" + cardId).css('visibility', 'hidden');
+                }
+            },
             onCancel: function () {
                 $j("#" + inputId + "_id").val('');
                 $j("#" + inputId + "_type").val('');

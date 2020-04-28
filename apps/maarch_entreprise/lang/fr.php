@@ -4314,6 +4314,9 @@ if (!defined('_CHRONO_NUMBER_HELP')) {
 if (!defined('_BARCODE_HELP')) {
     define('_BARCODE_HELP', "Exemple : ABC000004");
 }
+if (!defined('_SEARCH_CONTACT_AUTOCOMPLETION_HELP')) {
+    define('_SEARCH_CONTACT_AUTOCOMPLETION_HELP', "Recherche sur l'organisme si aucun élément sélectionné via l'autocompletion");
+}
 if (!defined('_PROCESS_IN_PROGRESS')) {
     define('_PROCESS_IN_PROGRESS', "Traitement en cours");
 }
@@ -4421,5 +4424,3 @@ if (!defined('_USER_NOT_IN_APP')) {
 if (!defined('_MISSING_KEYCLOAK_CONFIG')) {
     define('_MISSING_KEYCLOAK_CONFIG', 'Configuration manquante pour Keycloak');
 }
-
-

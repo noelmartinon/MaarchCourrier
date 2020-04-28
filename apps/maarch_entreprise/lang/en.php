@@ -4124,6 +4124,9 @@ if (!defined('_CHRONO_NUMBER_HELP')) {
 if (!defined('_BARCODE_HELP')) {
     define('_BARCODE_HELP', "Example : ABC000004");
 }
+if (!defined('_SEARCH_CONTACT_AUTOCOMPLETION_HELP')) {
+    define('_SEARCH_CONTACT_AUTOCOMPLETION_HELP', "Search on company field if no element select in autocompletion");
+}
 if (!defined('_PROCESS_IN_PROGRESS')) {
     define('_PROCESS_IN_PROGRESS', "Data processing ...");
 }
