@@ -36,6 +36,7 @@ export class PrintedFolderModalComponent implements OnInit {
         emails: [],
         acknowledgementReceipts: [],
         linkedResources : [],
+        linkedResourcesAttachments : [],
     };
 
     selectedPrintedFolderElement: any = {};
@@ -55,11 +56,11 @@ export class PrintedFolderModalComponent implements OnInit {
             this.selectedPrintedFolderElement[element] = new FormControl({ value: [], disabled: false });
         });
 
-        await this.getMainDocInfo();
-        await this.getAttachments();
-        await this.getEmails();
-        await this.getAcknowledgementReceips();
-        await this.getNotes();
+        this.getMainDocInfo();
+        this.getAttachments();
+        this.getEmails();
+        this.getAcknowledgementReceips();
+        this.getNotes();
         await this.getLinkedResources();
 
         this.loading = false;
@@ -124,6 +125,13 @@ export class PrintedFolderModalComponent implements OnInit {
             this.http.get(`../../rest/resources/${this.data.resId}/linkedResources`).pipe(
                 tap(async (data: any) => {
                     for (let index = 0; index < data.linkedResources.length; index++) {
+                        this.printedFolderElement.linkedResources.push({
+                            id: data.linkedResources[index].resId,
+                            label: data.linkedResources[index].subject,
+                            chrono: !this.functions.empty(data.linkedResources[index].chrono) ? data.linkedResources[index].chrono : this.lang.undefined,
+                            creationDate: data.linkedResources[index].documentDate,
+                            canConvert: data.linkedResources[index].canConvert
+                        });
                         await this.getLinkedAttachments(data.linkedResources[index]);
                     }
                     resolve(true);
@@ -157,7 +165,7 @@ export class PrintedFolderModalComponent implements OnInit {
                     return data.attachments;
                 }),
                 tap((data) => {
-                    this.printedFolderElement.linkedResources = this.printedFolderElement.linkedResources.concat(this.sortPipe.transform(data, 'chronoMaster'));
+                    this.printedFolderElement.linkedResourcesAttachments = this.printedFolderElement.linkedResourcesAttachments.concat(this.sortPipe.transform(data, 'chronoMaster'));
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -329,28 +337,7 @@ export class PrintedFolderModalComponent implements OnInit {
             resource[element] = this.selectedPrintedFolderElement[element].value.length === this.printedFolderElement[element].length ? 'ALL' : this.selectedPrintedFolderElement[element].value;
         });
 
-        // for Linked ressource (complex array)
-        if (!this.functions.empty(resource['linkedResources'])) {
-            resource['linkedResources'] = [];
-            this.selectedPrintedFolderElement['linkedResources'].value.forEach((item: any) => {
-                const resIdMaster = this.printedFolderElement.linkedResources.filter((res: any) => res.id === item)[0].resIdMaster;
-                if (resource['linkedResources'].filter((res: any) => res.resId === resIdMaster).length > 0) {
-                    resource['linkedResources'].filter((res: any) => res.resId === resIdMaster)[0].attachments.push(item);
-                } else {
-                    resource['linkedResources'].push(
-                        {
-                            resId : resIdMaster,
-                            attachments : [
-                                item
-                            ]
-                        }
-                    );
-                }
-            });
-        }
-
         printedFolder.resources.push(resource);
-
 
         return printedFolder;
     }
