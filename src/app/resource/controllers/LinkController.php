@@ -16,6 +16,7 @@ namespace Resource\controllers;
 
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
+use Convert\controllers\ConvertPdfController;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Group\controllers\PrivilegeController;
@@ -44,7 +45,7 @@ class LinkController
             $linkedResourcesIds = ResController::getAuthorizedResources(['resources' => $linkedResourcesIds, 'userId' => $GLOBALS['id']]);
             if (!empty($linkedResourcesIds)) {
                 $linkedResources = ResModel::get([
-                    'select' => ['res_id as "resId"', 'subject', 'doc_date as "documentDate"', 'status', 'dest_user as "destUser"', 'destination', 'alt_identifier as chrono', 'category_id as "categoryId"', 'filename', 'confidentiality'],
+                    'select' => ['res_id as "resId"', 'subject', 'doc_date as "documentDate"', 'status', 'dest_user as "destUser"', 'destination', 'alt_identifier as chrono', 'category_id as "categoryId"', 'filename', 'format', 'confidentiality'],
                     'where'  => ['res_id in (?)'],
                     'data'   => [$linkedResourcesIds]
                 ]);
@@ -94,6 +95,11 @@ class LinkController
                 $linkedResources[$key]['visaCircuit'] = ListInstanceModel::get(['select' => ['item_id', 'item_mode'], 'where' => ['res_id = ?', 'difflist_type = ?'], 'data' => [$value['resId'], 'VISA_CIRCUIT']]);
                 foreach ($linkedResources[$key]['visaCircuit'] as $keyCircuit => $valueCircuit) {
                     $linkedResources[$key]['visaCircuit'][$keyCircuit]['userLabel'] = UserModel::getLabelledUserById(['login' => $valueCircuit['item_id']]);
+                }
+
+                $linkedResources[$key]['canConvert'] = false;
+                if (!empty($value['format'])) {
+                    $linkedResources[$key]['canConvert'] = ConvertPdfController::canConvert(['extension' => $value['format']]);
                 }
             }
         }
