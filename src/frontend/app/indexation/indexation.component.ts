@@ -4,24 +4,25 @@ import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../service/header.service';
 import { FiltersListService } from '../../service/filtersList.service';
 
 import { Overlay } from '@angular/cdk/overlay';
 import { AppService } from '../../service/app.service';
 import { IndexingFormComponent } from './indexing-form/indexing-form.component';
-import { tap, finalize, catchError, map, filter, exhaustMap, take } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
+import { tap, finalize, catchError, map, filter, take } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import { AddPrivateIndexingModelModalComponent } from './private-indexing-model/add-private-indexing-model-modal.component';
 import { ActionsService } from '../actions/actions.service';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { FunctionsService } from '../../service/functions.service';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { of } from 'rxjs/internal/observable/of';
+import { SelectIndexingModelComponent } from './select-indexing-model/select-indexing-model.component';
 
 @Component({
-    templateUrl: "indexation.component.html",
+    templateUrl: 'indexation.component.html',
     styleUrls: [
         'indexation.component.scss',
         'indexing-form/indexing-form.component.scss'
@@ -36,6 +37,7 @@ export class IndexationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    @ViewChild('appSelectIndexingModel', { static: false }) appSelectIndexingModel: SelectIndexingModelComponent;
     @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
 
@@ -80,22 +82,9 @@ export class IndexationComponent implements OnInit {
             params => this.tmpFilename = params.tmpfilename
         );
 
-        // Event after process action 
+        // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(resIds => {
-            const param = this.isMailing ? {
-                isMailing: true
-            } : null;
-            this.router.navigate([`/resources/${resIds[0]}`], { queryParams: param });
-        });
-    }
-
-    ngOnInit(): void {
-        // Use to clean data after navigate on same url
-        this._activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
-            const refresh = paramMap.get('refresh');
-            this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu', 'form');
-            this.headerService.sideBarButton = { icon: 'fa fa-home', label: this.lang.backHome, route: '/home' };
-            if (refresh) {
+            if (this.selectedAction.component === 'closeAndIndexAction') {
                 this.appDocumentViewer.templateListForm.reset();
                 this.appDocumentViewer.file = {
                     name: '',
@@ -104,9 +93,19 @@ export class IndexationComponent implements OnInit {
                     src: null
                 };
                 this.appDocumentViewer.triggerEvent.emit('cleanFile');
-                this.loadIndexingModel(this.indexingModels[0]);
+                this.appSelectIndexingModel.resetIndexingModel();
+            } else {
+                const param = this.isMailing ? {
+                    isMailing: true
+                } : null;
+                this.router.navigate([`/resources/${resIds[0]}`], { queryParams: param });
             }
         });
+    }
+
+    ngOnInit(): void {
+        this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu', 'form');
+        this.headerService.sideBarButton = { icon: 'fa fa-home', label: this.lang.backHome, route: '/home' };
 
         this.fetchData();
     }
@@ -117,31 +116,8 @@ export class IndexationComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             this.currentGroupId = params['groupId'];
-            this.http.get("../../rest/indexingModels").pipe(
-                tap((data: any) => {
-                    this.indexingModels = data.indexingModels;
-                    if (this.indexingModels.length > 0) {
-                        this.currentIndexingModel = this.indexingModels.filter(model => model.default === true)[0];
-                        if (this.currentIndexingModel === undefined) {
-                            this.currentIndexingModel = this.indexingModels[0];
-                            this.notify.error(this.lang.noDefaultIndexingModel);
-                        }
-                        this.loadIndexingModelsList();
-                    }
 
-                    if (this.appService.getViewMode()) {
-                        setTimeout(() => {
-                            this.headerService.sideNavLeft.open();
-                        }, 400);
-                    }
-                }),
-                finalize(() => this.loading = false),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-            this.http.get("../../rest/indexing/groups/" + this.currentGroupId + "/actions").pipe(
+            this.http.get('../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
                 map((data: any) => {
                     data.actions = data.actions.map((action: any, index: number) => {
                         return {
@@ -151,7 +127,7 @@ export class IndexationComponent implements OnInit {
                             enabled: action.enabled,
                             default: index === 0 ? true : false,
                             categoryUse: action.categories
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -171,18 +147,8 @@ export class IndexationComponent implements OnInit {
             });
     }
 
-    loadIndexingModelsList() {
-        let tmpIndexingModels: any[] = this.sortPipe.transform(this.indexingModels.filter(elem => elem.master === null), 'label');
-        let privateTmpIndexingModels: any[] = this.sortPipe.transform(this.indexingModels.filter(elem => elem.master !== null), 'label');
-        this.indexingModels = [];
-        tmpIndexingModels.forEach(indexingModel => {
-            this.indexingModels.push(indexingModel);
-            privateTmpIndexingModels.forEach(privateIndexingModel => {
-                if (privateIndexingModel.master === indexingModel.id) {
-                    this.indexingModels.push(privateIndexingModel);
-                }
-            });
-        });
+    isEmptyIndexingModels() {
+        return this.appSelectIndexingModel !== undefined && this.appSelectIndexingModel.getIndexingModels().length === 0;
     }
 
     onSubmit() {
@@ -202,17 +168,31 @@ export class IndexationComponent implements OnInit {
                     this.isMailing = !this.functions.empty(formatdatas.recipients) && formatdatas.recipients.length > 0 && this.currentIndexingModel.category === 'outgoing' && formatdatas['encodedFile'] === null;
 
                     if (formatdatas['encodedFile'] === null) {
-                        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.noFile, msg: this.lang.noFileMsg } });
+                        this.dialogRef = this.dialog.open(
+                            ConfirmComponent, {
+                            panelClass: 'maarch-modal',
+                            autoFocus: false,
+                            disableClose: true,
+                            data: {
+                                title: this.lang.noFile,
+                                msg: this.lang.noFileMsg
+                            }
+                        }
+                        );
 
                         this.dialogRef.afterClosed().pipe(
-                            tap((data: string) => {
-                                if (data !== 'ok') {
+                            tap((result: string) => {
+                                if (result !== 'ok') {
                                     this.actionService.loading = false;
                                 }
                             }),
-                            filter((data: string) => data === 'ok'),
+                            filter((result: string) => result === 'ok'),
                             tap(() => {
-                                this.actionService.launchIndexingAction(this.selectedAction, this.headerService.user.id, this.currentGroupId, formatdatas);
+                                this.actionService.launchIndexingAction(
+                                    this.selectedAction,
+                                    this.headerService.user.id,
+                                    this.currentGroupId, formatdatas
+                                );
                             }),
                             catchError((err: any) => {
                                 this.notify.handleErrors(err);
@@ -220,7 +200,11 @@ export class IndexationComponent implements OnInit {
                             })
                         ).subscribe();
                     } else {
-                        this.actionService.launchIndexingAction(this.selectedAction, this.headerService.user.id, this.currentGroupId, formatdatas);
+                        this.actionService.launchIndexingAction(
+                            this.selectedAction,
+                            this.headerService.user.id,
+                            this.currentGroupId, formatdatas
+                        );
                     }
                 })
             ).subscribe();
@@ -230,7 +214,7 @@ export class IndexationComponent implements OnInit {
     }
 
     formatDatas(datas: any) {
-        let formatData: any = {};
+        const formatData: any = {};
         const regex = /indexingCustomField_[.]*/g;
 
         formatData['customFields'] = {};
@@ -250,65 +234,12 @@ export class IndexationComponent implements OnInit {
 
     loadIndexingModel(indexingModel: any) {
         this.currentIndexingModel = indexingModel;
-        this.indexingForm.loadForm(indexingModel.id);
     }
 
     selectAction(action: any) {
         this.selectedAction = action;
     }
 
-    savePrivateIndexingModel() {
-        let fields = JSON.parse(JSON.stringify(this.indexingForm.getDatas()));
-        fields.forEach((element: any, key: any) => {
-            delete fields[key].event;
-            delete fields[key].label;
-            delete fields[key].system;
-            delete fields[key].type;
-            delete fields[key].values;
-        });
-
-        const privateIndexingModel = {
-            category: this.indexingForm.getCategory(),
-            label: '',
-            owner: this.headerService.user.id,
-            private: true,
-            fields: fields,
-            master: this.currentIndexingModel.master !== null ? this.currentIndexingModel.master : this.currentIndexingModel.id
-        }
-
-        const masterIndexingModel = this.indexingModels.filter((indexingModel) => indexingModel.id === privateIndexingModel.master)[0];
-        this.dialogRef = this.dialog.open(AddPrivateIndexingModelModalComponent, { panelClass: 'maarch-modal', autoFocus: true, disableClose: true, data: { indexingModel: privateIndexingModel, masterIndexingModel: masterIndexingModel } });
-
-        this.dialogRef.afterClosed().pipe(
-            filter((data: any) => data !== undefined),
-            tap((data) => {
-                this.indexingModels.push(data.indexingModel);
-                this.currentIndexingModel = this.indexingModels.filter(indexingModel => indexingModel.id === data.indexingModel.id)[0];
-                this.loadIndexingModelsList();
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-    }
-
-    deletePrivateIndexingModel(id: number, index: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
-
-        this.dialogRef.afterClosed().pipe(
-            filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../../rest/indexingModels/${id}`)),
-            tap(() => {
-                this.indexingModels.splice(index, 1);
-                this.notify.success(this.lang.indexingModelDeleted);
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-    }
 
     ngOnDestroy() {
         // unsubscribe to ensure no memory leaks
@@ -318,9 +249,9 @@ export class IndexationComponent implements OnInit {
     showActionInCurrentCategory(action: any) {
 
         if (this.selectedAction.categoryUse.indexOf(this.indexingForm.getCategory()) === -1) {
-            const newAction = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
+            const newAction = this.actionsList.filter(actionList => actionList.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
             if (newAction !== undefined) {
-                this.selectedAction = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
+                this.selectedAction = this.actionsList.filter(actionList => actionList.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
             } else {
                 this.selectedAction = {
                     id: 0,

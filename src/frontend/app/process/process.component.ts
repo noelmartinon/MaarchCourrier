@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
@@ -13,7 +13,6 @@ import { Overlay } from '@angular/cdk/overlay';
 import { AppService } from '../../service/app.service';
 import { ActionsService } from '../actions/actions.service';
 import { tap, catchError, map, finalize, filter } from 'rxjs/operators';
-import { of, Subscription } from 'rxjs';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
@@ -26,17 +25,19 @@ import { PrivilegeService } from '../../service/privileges.service';
 import { AvisWorkflowComponent } from '../avis/avis-workflow.component';
 import { FunctionsService } from '../../service/functions.service';
 import { PrintedFolderModalComponent } from '../printedFolder/printed-folder-modal.component';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { of } from 'rxjs/internal/observable/of';
 
 
 @Component({
-    templateUrl: "process.component.html",
+    templateUrl: 'process.component.html',
     styleUrls: [
         'process.component.scss',
         '../indexation/indexing-form/indexing-form.component.scss'
     ],
     providers: [AppService, ActionsService, ContactService],
 })
-export class ProcessComponent implements OnInit {
+export class ProcessComponent implements OnInit, OnDestroy {
 
     lang: any = LANG;
 
@@ -135,6 +136,7 @@ export class ProcessComponent implements OnInit {
     actionEnded: boolean = false;
 
     canEditData: boolean = false;
+    canChangeModel: boolean = false;
 
     autoAction: boolean = false;
 
@@ -186,7 +188,7 @@ export class ProcessComponent implements OnInit {
             this.headerService.showMenuNav = false;
             this.headerService.sideBarAdmin = true;
 
-            if (typeof params['detailResId'] !== "undefined") {
+            if (typeof params['detailResId'] !== 'undefined') {
                 this.initDetailPage(params);
             } else {
                 this.initProcessPage(params);
@@ -196,7 +198,7 @@ export class ProcessComponent implements OnInit {
         });
 
 
-        // Event after process action 
+        // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(message => {
             this.actionEnded = true;
             clearInterval(this.currentResourceLock);
@@ -248,7 +250,7 @@ export class ProcessComponent implements OnInit {
             icon: 'fa fa-inbox',
             label: this.lang.backBasket,
             route: `/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`
-        }
+        };
 
         await this.checkAccesDocument(this.currentResourceInformations.resId);
 
@@ -270,7 +272,7 @@ export class ProcessComponent implements OnInit {
                         label: action.label,
                         component: action.component,
                         categoryUse: action.categories
-                    }
+                    };
                 });
                 return data;
             }),
@@ -299,7 +301,7 @@ export class ProcessComponent implements OnInit {
             icon: 'fas fa-arrow-left',
             label: this.lang.back,
             route: `__GOBACK`
-        }
+        };
 
         await this.checkAccesDocument(this.currentResourceInformations.resId);
 
@@ -317,7 +319,7 @@ export class ProcessComponent implements OnInit {
         return this.actionEnded;
     }
 
-    loadResource() {
+    loadResource(redirectDefautlTool: boolean = true) {
         this.http.get(`../../rest/resources/${this.currentResourceInformations.resId}?light=true`).pipe(
             tap((data: any) => {
                 this.currentResourceInformations = data;
@@ -327,7 +329,10 @@ export class ProcessComponent implements OnInit {
                 } else {
                     this.loadRecipients();
                 }
-                this.setEditDataPrivilege();
+                if (redirectDefautlTool) {
+                    this.setEditDataPrivilege();
+                }
+
                 this.loadAvaibleIntegrations(data.integrations);
                 this.headerService.setHeader(this.detailMode ? this.lang.detailDoc : this.lang.eventProcessDoc, this.lang[this.currentResourceInformations.categoryId]);
             }),
@@ -358,6 +363,7 @@ export class ProcessComponent implements OnInit {
                             this.currentTool = data.listEventData.defaultTab;
                         }
                         this.canEditData = data.listEventData.canUpdate;
+                        this.canChangeModel = data.listEventData.canUpdateModel;
                     }
                 }),
                 catchError((err: any) => {
@@ -377,7 +383,7 @@ export class ProcessComponent implements OnInit {
                     if (connectionId === 'maileva') {
                         this.integrationsInfo['inShipping'] = {
                             icon: 'fas fa-shipping-fast'
-                        }
+                        };
                     }
                 });
             }),
@@ -420,7 +426,7 @@ export class ProcessComponent implements OnInit {
         if (this.currentResourceInformations.senders === undefined || this.currentResourceInformations.senders.length === 0) {
             this.hasContact = false;
             this.senderLightInfo = { 'displayName': this.lang.noSelectedContact, 'filling': null };
-        } else if (this.currentResourceInformations.senders.length == 1) {
+        } else if (this.currentResourceInformations.senders.length === 1) {
             this.hasContact = true;
             if (this.currentResourceInformations.senders[0].type === 'contact') {
                 this.http.get('../../rest/contacts/' + this.currentResourceInformations.senders[0].id).pipe(
@@ -448,13 +454,13 @@ export class ProcessComponent implements OnInit {
                         }
                     })
                 ).subscribe();
-            } else if (this.currentResourceInformations.senders[0].type == 'entity') {
+            } else if (this.currentResourceInformations.senders[0].type === 'entity') {
                 this.http.get('../../rest/entities/' + this.currentResourceInformations.senders[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.entity_label, 'filling': null };
                     })
                 ).subscribe();
-            } else if (this.currentResourceInformations.senders[0].type == 'user') {
+            } else if (this.currentResourceInformations.senders[0].type === 'user') {
                 this.http.get('../../rest/users/' + this.currentResourceInformations.senders[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.firstname + ' ' + data.lastname, 'filling': null };
@@ -472,7 +478,7 @@ export class ProcessComponent implements OnInit {
         if (this.currentResourceInformations.recipients === undefined || this.currentResourceInformations.recipients.length === 0) {
             this.hasContact = false;
             this.senderLightInfo = { 'displayName': this.lang.noSelectedContact, 'filling': null };
-        } else if (this.currentResourceInformations.recipients.length == 1) {
+        } else if (this.currentResourceInformations.recipients.length === 1) {
             this.hasContact = true;
             if (this.currentResourceInformations.recipients[0].type === 'contact') {
                 this.http.get('../../rest/contacts/' + this.currentResourceInformations.recipients[0].id).pipe(
@@ -500,13 +506,13 @@ export class ProcessComponent implements OnInit {
                         }
                     })
                 ).subscribe();
-            } else if (this.currentResourceInformations.recipients[0].type == 'entity') {
+            } else if (this.currentResourceInformations.recipients[0].type === 'entity') {
                 this.http.get('../../rest/entities/' + this.currentResourceInformations.recipients[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.entity_label, 'filling': null };
                     })
                 ).subscribe();
-            } else if (this.currentResourceInformations.recipients[0].type == 'user') {
+            } else if (this.currentResourceInformations.recipients[0].type === 'user') {
                 this.http.get('../../rest/users/' + this.currentResourceInformations.recipients[0].id).pipe(
                     tap((data: any) => {
                         this.senderLightInfo = { 'displayName': data.firstname + ' ' + data.lastname, 'filling': null };
@@ -530,7 +536,7 @@ export class ProcessComponent implements OnInit {
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
                 catchError((err: any) => {
-                    if (err.status == 403) {
+                    if (err.status === 403) {
                         clearInterval(this.currentResourceLock);
                     }
                     this.notify.handleErrors(err);
@@ -604,7 +610,7 @@ export class ProcessComponent implements OnInit {
                             await this.appDocumentViewer.saveMainDocument();
                         }
 
-                        this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false)
+                        this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
@@ -626,9 +632,9 @@ export class ProcessComponent implements OnInit {
     showActionInCurrentCategory(action: any) {
 
         if (this.selectedAction.categoryUse.indexOf(this.currentResourceInformations.categoryId) === -1) {
-            const newAction = this.actionsList.filter(action => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1)[0];
+            const newAction = this.actionsList.filter(actionItem => actionItem.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1)[0];
             if (newAction !== undefined) {
-                this.selectedAction = this.actionsList.filter(action => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1)[0];
+                this.selectedAction = this.actionsList.filter(actionItem => actionItem.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1)[0];
             } else {
                 this.selectedAction = {
                     id: 0,
@@ -664,7 +670,7 @@ export class ProcessComponent implements OnInit {
                 tap(() => {
                     this.indexingForm.saveData();
                     setTimeout(() => {
-                        this.loadResource();
+                        this.loadResource(false);
                     }, 400);
                     this.modalModule.splice(index, 1);
                 }),
@@ -702,7 +708,7 @@ export class ProcessComponent implements OnInit {
                 tap(() => {
                     this.saveTool();
                     setTimeout(() => {
-                        this.loadResource();
+                        this.loadResource(false);
                     }, 400);
                     this.currentTool = tabId;
                 }),
@@ -723,7 +729,7 @@ export class ProcessComponent implements OnInit {
     confirmModification() {
         this.indexingForm.saveData();
         setTimeout(() => {
-            this.loadResource();
+            this.loadResource(false);
         }, 400);
     }
 
@@ -780,6 +786,9 @@ export class ProcessComponent implements OnInit {
     async saveTool() {
         if (this.currentTool === 'info' && this.indexingForm !== undefined) {
             await this.indexingForm.saveData();
+            setTimeout(() => {
+                this.loadResource(false);
+            }, 400);
         } else if (this.currentTool === 'diffusionList' && this.appDiffusionsList !== undefined) {
             await this.appDiffusionsList.saveListinstance();
             this.loadBadges();
@@ -835,7 +844,7 @@ export class ProcessComponent implements OnInit {
     isToolEnabled(id: string) {
         if (id === 'history') {
             if (!this.privilegeService.hasCurrentUserPrivilege('view_full_history') && !this.privilegeService.hasCurrentUserPrivilege('view_doc_history')) {
-                return false
+                return false;
             } else {
                 return true;
             }

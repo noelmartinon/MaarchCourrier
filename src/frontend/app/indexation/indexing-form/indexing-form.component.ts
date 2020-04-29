@@ -498,7 +498,7 @@ export class IndexingFormComponent implements OnInit {
             return {
                 id: entity.id,
                 label: entity.entity_label
-            }
+            };
         });
     }
 
@@ -576,7 +576,7 @@ export class IndexingFormComponent implements OnInit {
         });
     }
 
-    async initElemForm() {
+    async initElemForm(saveResourceState: boolean = true) {
         this.loading = true;
 
         if (!this.adminMode) {
@@ -625,27 +625,26 @@ export class IndexingFormComponent implements OnInit {
         }));
 
         if (this.resId !== null) {
-            await this.setResource();
+
+            await this.setResource(saveResourceState);
         }
 
         this.loading = false;
     }
 
-    setResource() {
+    setResource(saveResourceState: boolean = true) {
         return new Promise((resolve, reject) => {
             this.http.get(`../../rest/resources/${this.resId}`).pipe(
                 tap(async (data: any) => {
                     await Promise.all(this.fieldCategories.map(async (element: any) => {
 
-                        //this.fieldCategories.forEach(async element => {
+                        // this.fieldCategories.forEach(async element => {
                         await Promise.all(this['indexingModels_' + element].map(async (elem: any) => {
-
-                            //this['indexingModels_' + element].forEach((elem: any) => {
+                            // this['indexingModels_' + element].forEach((elem: any) => {
                             const customId: any = Object.keys(data.customFields).filter(index => index === elem.identifier.split('indexingCustomField_')[1])[0];
 
                             if (Object.keys(data).indexOf(elem.identifier) > -1 || customId !== undefined) {
                                 let fieldValue: any = '';
-
                                 if (customId !== undefined) {
                                     fieldValue = data.customFields[customId];
                                 } else {
@@ -669,14 +668,21 @@ export class IndexingFormComponent implements OnInit {
                                     fieldValue = new Date(fieldValue);
                                 }
                                 this.arrFormControl[elem.identifier].setValue(fieldValue);
+                            } else if (!saveResourceState && elem.identifier === 'destination') {
+                                this.arrFormControl[elem.identifier].disable();
+                                this.arrFormControl[elem.identifier].setValidators([]);
+                                this.arrFormControl['diffusionList'].disable();
                             }
+
                             if (!this.canEdit) {
                                 this.arrFormControl[elem.identifier].disable();
                             }
                         }));
                     }));
                     this.arrFormControl['mail­tracking'].setValue(data.followed);
-                    this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
+                    if (saveResourceState) {
+                        this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
+                    }
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -723,7 +729,7 @@ export class IndexingFormComponent implements OnInit {
         }
     }
 
-    async loadForm(indexModelId: number) {
+    async loadForm(indexModelId: number, saveResourceState: boolean = true) {
         this.loading = true;
 
         this.indexingFormId = indexModelId;
@@ -798,7 +804,7 @@ export class IndexingFormComponent implements OnInit {
                     });
                 }
 
-                await this.initElemForm();
+                await this.initElemForm(saveResourceState);
                 this.createForm();
 
             }),

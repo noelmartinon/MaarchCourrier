@@ -324,23 +324,6 @@ export class ActionsService {
             filter((resIds: any) => !this.functions.empty(resIds)),
             tap((resIds: any) => {
                 this.endAction(resIds);
-                let firstGroup: number = 0;
-                let redirectAfterClose = '';
-                this.headerService.user.groups.filter((group: any) => group.can_index === true).forEach((group: any) => {
-                    if (firstGroup == 0) {
-                        firstGroup = group.id;
-                    }
-                    if (group.id == this.currentGroupId) {
-                        redirectAfterClose = '/indexing/' + this.currentGroupId;
-                    }
-                });
-                if (redirectAfterClose != '') {
-                    this.router.navigate([redirectAfterClose], { queryParams: { refresh: new Date().getTime() } });
-                } else if (firstGroup == 0) {
-                    this.router.navigate(['/home']);
-                } else {
-                    this.router.navigate(['/indexing/' + firstGroup], { queryParams: { refresh: new Date().getTime() } });
-                }
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

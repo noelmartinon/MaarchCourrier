@@ -52,19 +52,19 @@ $theme: mat-light-theme($primary, $accent, $warn);
 // apply theme
 @include angular-material-theme($theme);
 
-[color=primary] {
+[color=primary], .primary {
     color: mat-color($primary, 500);
 }
 
-[color=secondary] {
+[color=secondary], .secondary {
   color: $secondary;
 }
 
-[color=warn] {
+[color=warn], .warn {
     color: mat-color($warn, 500);
 }
 
-[color=accent] {
+[color=accent], .accent {
     color: mat-color($accent, 500);
 }
 
