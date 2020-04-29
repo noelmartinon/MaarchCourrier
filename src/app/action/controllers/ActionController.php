@@ -97,7 +97,7 @@ class ActionController
             }
         }
         if (empty($body['action_page'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Data actionPageId does not exist']);
+            $body['component'] = 'noConfirmAction';
         }
 
         unset($body['actionPageId']);
@@ -141,7 +141,7 @@ class ActionController
             }
         }
         if (empty($body['action_page'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Data actionPageId does not exist']);
+            $body['component'] = 'noConfirmAction';
         }
 
         ActionModel::update($body);
@@ -217,9 +217,9 @@ class ActionController
             !Validator::length(1, 255)->validate($aArgs['label_action'])) {
             $errors[] = 'Invalid label action';
         }
-        if (!Validator::stringType()->notEmpty()->validate($aArgs['actionPageId'])) {
+        /*if (!Validator::stringType()->notEmpty()->validate($aArgs['actionPageId'])) {
             $errors[] = 'Invalid page action';
-        }
+        }*/
 
         if (!Validator::notEmpty()->validate($aArgs['id_status'])) {
             $errors[] = 'id_status is empty';

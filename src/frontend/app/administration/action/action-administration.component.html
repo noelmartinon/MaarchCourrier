@@ -37,6 +37,7 @@
                         <div class="col-sm-12">
                             <mat-form-field>
                                 <mat-select id="actionPageId" name="actionPageId" title="{{lang.actionCarriedOut}}" placeholder="{{lang.actionCarriedOut}}" [(ngModel)]="action.actionPageId">
+                                    <mat-option [value]="null"></mat-option>
                                     <mat-option *ngFor="let action of actionPages" [value]="action.id">
                                         {{action.label}}
                                     </mat-option>

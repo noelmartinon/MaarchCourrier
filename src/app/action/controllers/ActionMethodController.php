@@ -47,7 +47,8 @@ class ActionMethodController
         'sendExternalNoteBookAction'            => 'sendExternalNoteBookAction',
         'createAcknowledgementReceiptsAction'   => 'createAcknowledgementReceipts',
         'updateAcknowledgementSendDateAction'   => 'updateAcknowledgementSendDateAction',
-        'sendShippingAction'                    => 'createMailevaShippings'
+        'sendShippingAction'                    => 'createMailevaShippings',
+        'noConfirmAction'                       => null
     ];
 
     public static function terminateAction(array $aArgs)
