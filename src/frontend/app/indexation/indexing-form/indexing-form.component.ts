@@ -742,6 +742,7 @@ export class IndexingFormComponent implements OnInit {
 
         this.http.get(`../../rest/indexingModels/${indexModelId}`).pipe(
             tap(async (data: any) => {
+                this.indexingFormId =  data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
