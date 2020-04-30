@@ -21,6 +21,7 @@ use CustomField\models\CustomFieldModel;
 use Doctype\models\DoctypeModel;
 use Entity\models\EntityModel;
 use Folder\controllers\FolderController;
+use Group\controllers\PrivilegeController;
 use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
 use Priority\models\PriorityModel;
@@ -133,6 +134,20 @@ class ResourceControlController
             return ['errors' => 'Resource can not be modified because of status'];
         }
 
+        if (!empty($body['modelId'])) {
+            if (!PrivilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => $args['resId'], 'canUpdate' => true, 'canUpdateModel' => true])) {
+                return ['errors' => 'Model can not be modified'];
+            }
+            $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
+            if (empty($indexingModel)) {
+                return ['errors' => 'Body modelId does not exist'];
+            } elseif (!$indexingModel['enabled']) {
+                return ['errors' => 'Body modelId is disabled'];
+            } elseif (!empty($indexingModel['master'])) {
+                return ['errors' => 'Body modelId is not public'];
+            }
+        }
+
         if ($args['onlyDocument'] && empty($body['encodedFile'])) {
             return ['errors' => 'Body encodedFile is not set or empty'];
         } elseif (!empty($body['encodedFile'])) {
@@ -165,7 +180,9 @@ class ResourceControlController
             return ['errors' => $control['errors']];
         }
 
-        $body['modelId'] = $resource['model_id'];
+        if (empty($body['modelId'])) {
+            $body['modelId'] = $resource['model_id'];
+        }
         $control = ResourceControlController::controlIndexingModelFields(['body' => $body, 'isUpdating' => true]);
         if (!empty($control['errors'])) {
             return ['errors' => $control['errors']];
