@@ -77,13 +77,13 @@ export class AuthService {
         this.localStorage.remove('MaarchCourrierRefreshToken');
     }
 
-    logout(cleanUrl: boolean = true) {
+    async logout(cleanUrl: boolean = true) {
         if ( this.getToken() !== null && cleanUrl) {
             this.cleanUrl(JSON.parse(atob(this.getToken().split('.')[1])).user.id);
         }
-        this.clearTokens();
         this.headerService.setUser();
-        this.router.navigate(['/login']);
+        await this.router.navigate(['/login']);
+        this.clearTokens();
     }
 
     saveTokens(token: string, refreshToken: string) {

@@ -13,10 +13,39 @@ class ResourceListControllerTest extends TestCase
 {
     public function testGet()
     {
+        $listDisplay = \Basket\models\GroupBasketModel::get([
+            'select' => ['list_display'],
+            'where' => ['basket_id = ?', 'group_id = ?'],
+            'data'  => ['MyBasket', 'AGENT']
+        ]);
+        $listDisplay = json_decode($listDisplay[0]['list_display'], true);
+        $listDisplay[] = ['value' => 'getVisaWorkflow', 'cssClasses' => ['align_leftData'], 'icon' => 'fa-list-ol'];
+        $listDisplay[] = ['value' => 'getSignatories', 'cssClasses' => ['align_leftData'], 'icon' => 'fa-list-ol'];
+        $listDisplay[] = ['value' => 'getParallelOpinionsNumber', 'cssClasses' => ['align_leftData'], 'icon' => 'fa-list-ol'];
+
+        \Basket\models\GroupBasketModel::update([
+            'set'   => ['list_display' => json_encode($listDisplay)],
+            'where' => ['basket_id = ?', 'group_id = ?'],
+            'data'  => ['MyBasket', 'AGENT']
+        ]);
+
+        $userInfo = \User\models\UserModel::getByLogin(['login' => 'bbain', 'select' => ['id']]);
+
+        \Entity\models\ListInstanceModel::create([
+            'res_id'              => $GLOBALS['resources'][0],
+            'sequence'            => 0,
+            'item_id'             => $userInfo['id'],
+            'item_type'           => 'user_id',
+            'item_mode'           => 'dest',
+            'added_by_user'       => $GLOBALS['id'],
+            'viewed'              => 0,
+            'difflist_type'       => 'VISA_CIRCUIT',
+            'requested_signature' => true,
+        ]);
+
         $GLOBALS['login'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
-        $myBasket = \Basket\models\BasketModel::getByBasketId(['basketId' => 'MyBasket', 'select' => ['id']]);
+        $myBasket = \Basket\models\BasketModel::getByBasketId(['basketId' => 'MyBasket', 'select' => ['id', 'basket_id']]);
 
         $resListController = new \Resource\controllers\ResourceListController();
 
@@ -181,6 +210,31 @@ class ResourceListControllerTest extends TestCase
         $this->assertIsArray($responseBody->statuses);
         $this->assertIsArray($responseBody->entitiesChildren);
 
+        $aArgs = [
+            'priorities'       => 'poiuytre1379nbvc,poiuytre1391nbvc',
+            'categories'       => 'incoming',
+            'entitiesChildren' => 'PJS',
+            'doctypes' => 102,
+            'entities' => 'PJS',
+            'folders' => '1'
+        ];
+        $fullRequest = $request->withQueryParams($aArgs);
+
+        $response     = $resListController->getFilters($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertIsArray($responseBody->entities);
+        $this->assertIsArray($responseBody->priorities);
+        $this->assertIsArray($responseBody->categories);
+        $this->assertIsArray($responseBody->statuses);
+        $this->assertIsArray($responseBody->entitiesChildren);
+
+        // Errors
+        $response     = $resListController->getFilters($request, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id'] * 1000]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Group or basket does not exist', $responseBody['errors']);
+
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
@@ -199,11 +253,201 @@ class ResourceListControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $response     = $resListController->getActions($request, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
-        $responseBody = json_decode((string)$response->getBody());
+        $queryParams = ['resId' => $GLOBALS['resources'][0]];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $response     = $resListController->getActions($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
 
-        $this->assertIsArray($responseBody->actions);
-        $this->assertNotNull($responseBody->actions);
+        $this->assertIsArray($responseBody['actions']);
+        $this->assertNotNull($responseBody['actions']);
+
+        // Errors
+        $response     = $resListController->getActions($request, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id'] * 1000]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Group or basket does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testSetAction()
+    {
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $resListController = new \Resource\controllers\ResourceListController();
+        $myBasket = \Basket\models\BasketModel::getByBasketId(['basketId' => 'MyBasket', 'select' => ['id']]);
+
+        // GET
+        // ERROR
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $resListController->setAction($request, new \Slim\Http\Response(), []);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Data resources is empty or not an array', $responseBody['errors']);
+
+
+        $body = [
+            'resources' => [1]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 10000 ]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Group or basket does not exist', $responseBody->errors);
+
+        $body = [
+            'resources' => [1]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 1 ]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Group is not linked to this user', $responseBody->errors);
+
+        $body = [
+            'resources' => [1]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2, 'actionId' => 2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Action is not linked to this group basket', $responseBody->errors);
+
+        $body = [
+            'resources' => [1]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2, 'actionId' => 400]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Resources out of perimeter', $responseBody->errors);
+
+        // Success
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => 'NEW'],
+            'where' => ['res_id = ?'],
+            'data'  => [$GLOBALS['resources'][2]]
+        ]);
+
+        $body = [
+            'resources' => [$GLOBALS['resources'][2]]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2, 'actionId' => '20']);
+        $this->assertSame(204, $response->getStatusCode());
+
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => 'NEW'],
+            'where' => ['res_id = ?'],
+            'data'  => [$GLOBALS['resources'][2]]
+        ]);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testLock()
+    {
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $resListController = new \Resource\controllers\ResourceListController();
+        $myBasket = \Basket\models\BasketModel::getByBasketId(['basketId' => 'MyBasket', 'select' => ['id']]);
+
+        // GET
+        // ERROR
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $resListController->lock($request, new \Slim\Http\Response(), []);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Data resources is empty or not an array', $responseBody['errors']);
+
+        $body = [
+            'resources' => [1]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->lock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 10000 ]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Group or basket does not exist', $responseBody['errors']);
+
+        $response     = $resListController->lock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2 ]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resources out of perimeter', $responseBody['errors']);
+
+        // Success
+        $body = [
+            'resources' => [$GLOBALS['resources'][1]]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->lock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2 ]);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame(0, $responseBody['countLockedResources']);
+        $this->assertIsArray($responseBody['lockers']);
+        $this->assertEmpty($responseBody['lockers']);
+        $this->assertIsArray($responseBody['resourcesToProcess']);
+        $this->assertNotEmpty($responseBody['resourcesToProcess']);
+        $this->assertSame($GLOBALS['resources'][1], $responseBody['resourcesToProcess'][0]);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testUnLock()
+    {
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $resListController = new \Resource\controllers\ResourceListController();
+        $myBasket = \Basket\models\BasketModel::getByBasketId(['basketId' => 'MyBasket', 'select' => ['id']]);
+
+        // GET
+        // ERROR
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response     = $resListController->unlock($request, new \Slim\Http\Response(), []);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Data resources is empty or not an array', $responseBody['errors']);
+
+        $body = [
+            'resources' => [1]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->unlock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 10000 ]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Group or basket does not exist', $responseBody['errors']);
+
+        $response     = $resListController->unlock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2 ]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resources out of perimeter', $responseBody['errors']);
+
+        // Success
+        $body = [
+            'resources' => [$GLOBALS['resources'][1]]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resListController->unlock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2 ]);
+        $this->assertSame(204, $response->getStatusCode());
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

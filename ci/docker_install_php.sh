@@ -25,4 +25,5 @@ apt-get install -y libpq-dev libxml2-dev libxslt1-dev libpng-dev unoconv xpdf-ut
 && echo "AllowOverride All" >> directory.txt \
 && echo "Require all granted" >> directory.txt \
 && echo "</Directory>" >> directory.txt \
-&& sed -i -e '/CustomLog/r directory.txt' /etc/apache2/sites-available/000-default.conf
+&& sed -i -e '/CustomLog/r directory.txt' /etc/apache2/sites-available/000-default.conf \
+&& cp ci/php.ini /usr/local/etc/php/conf.d/php.ini

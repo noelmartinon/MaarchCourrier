@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
+import { map } from 'rxjs/internal/operators/map';
 
 @Component({
     selector: 'app-alfresco',
@@ -136,9 +137,25 @@ export class AlfrescoAdministrationComponent implements OnInit {
 
     getEntities() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/administration/shippings/new`).pipe(
-                tap((data: any) => {
-                    this.entities = data['entities'];
+            this.http.get(`../rest/entities`).pipe(
+                map((data: any) => {
+                    data.entities = data.entities.map((entity: any) => {
+                        return {
+                            text: entity.entity_label,
+                            icon: entity.icon,
+                            parent: entity.parentSerialId,
+                            id: entity.serialId.toString(),
+                            state: {
+                                opened: true
+                            }
+                        };
+                    });
+                    return data.entities;
+                }),
+                tap((entities: any) => {
+                    console.log(entities);
+
+                    this.entities = entities;
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -152,9 +169,23 @@ export class AlfrescoAdministrationComponent implements OnInit {
     initAccount() {
         return new Promise((resolve, reject) => {
             if (this.creationMode) {
-                this.http.get('../rest/administration/shippings/new').pipe(
-                    tap((data: any) => {
-                        this.entities = data['entities'];
+                this.http.get('../rest/entities').pipe(
+                    map((data: any) => {
+                        data.entities = data.entities.map((entity: any) => {
+                            return {
+                                text: entity.entity_label,
+                                icon: entity.icon,
+                                parent: entity.parentSerialId,
+                                id: entity.serialId.toString(),
+                                state: {
+                                    opened: true
+                                }
+                            };
+                        });
+                        return data.entities;
+                    }),
+                    tap((entities: any) => {
+                        this.entities = entities;
 
                         this.entities.forEach(element => {
                             if (this.availableEntities.indexOf(+element.id) > -1) {
@@ -246,5 +277,17 @@ export class AlfrescoAdministrationComponent implements OnInit {
         } else {
             return true;
         }
+    }
+
+    checkAccount() {
+        this.http.post(`../rest/alfresco/checkAccounts`, { login: this.alfresco.account.id, password: this.alfresco.account.password, nodeId : this.alfresco.rootFolder }).pipe(
+            tap(() => {
+                this.notify.success(this.lang.testSucceeded);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

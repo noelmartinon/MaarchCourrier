@@ -15,6 +15,10 @@ class EntityControllerTest extends TestCase
 
     public function testCreate()
     {
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
         $entityController = new \Entity\controllers\EntityController();
 
         //  CREATE
@@ -34,6 +38,8 @@ class EntityControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->entities);
@@ -53,10 +59,65 @@ class EntityControllerTest extends TestCase
         $this->assertSame('Service', $responseBody->entity_type);
         $this->assertSame('Y', $responseBody->enabled);
         $this->assertSame(null, $responseBody->parent_entity_id);
+
+        // ERRORS
+
+        $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame(_ENTITY_ID_ALREADY_EXISTS, $responseBody['errors']);
+
+        unset($aArgs['entity_label']);
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Bad Request', $responseBody['errors']);
+
+        unset($aArgs['entity_id']);
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Bad Request', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testGetUsersById()
+    {
+        $entityController = new \Entity\controllers\EntityController();
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $response     = $entityController->getUsersById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsArray($responseBody['users']);
+        $this->assertNotEmpty($responseBody['users']);
+        $this->assertSame('bblier', $responseBody['users'][0]['user_id']);
+
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $response     = $entityController->getUsersById($request, new \Slim\Http\Response(), ['id' => 99999999]);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity not found', $responseBody['errors']);
     }
 
     public function testUpdate()
     {
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
         $entityController = new \Entity\controllers\EntityController();
 
         //  UPDATE
@@ -67,11 +128,14 @@ class EntityControllerTest extends TestCase
             'short_label'       => 'TEST-ENTITY123-SHORTLABEL-UP',
             'entity_type'       => 'Direction',
             'email'             => 'paris@isMagic2.fr',
-            'adrs_2'            => '2 rue des princes'
+            'adrs_2'            => '2 rue des princes',
+            'toto'              => 'toto'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(200, $response->getStatusCode());
+
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->entities);
@@ -88,6 +152,26 @@ class EntityControllerTest extends TestCase
         $this->assertSame('Direction', $responseBody->entity_type);
         $this->assertSame('Y', $responseBody->enabled);
         $this->assertSame(null, $responseBody->parent_entity_id);
+
+        $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => '12345678923456789']);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity not found', $responseBody['errors']);
+
+        unset($aArgs['entity_label']);
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Bad Request', $responseBody['errors']);
+
+        \User\models\UserEntityModel::deleteUserEntity(['id' => $GLOBALS['id'], 'entityId' => 'TEST-ENTITY123']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testUpdateStatus()
@@ -103,6 +187,7 @@ class EntityControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $entityController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);
@@ -111,6 +196,7 @@ class EntityControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertSame('TEST-ENTITY123', $responseBody->entity_id);
@@ -129,14 +215,24 @@ class EntityControllerTest extends TestCase
 
         $this->assertSame('success', $responseBody->success);
 
-        //  READ
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $entityController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
-        $responseBody   = json_decode((string)$response->getBody());
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $this->assertSame('TEST-ENTITY123', $responseBody->entity_id);
-        $this->assertSame('Y', $responseBody->enabled);
+        $response     = $entityController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-9999999']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+
+        $this->assertSame('Entity not found', $responseBody->errors);
+
+
+        $fullRequest = \httpRequestCustom::addContentInBody([], $request);
+
+        $response     = $entityController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Bad Request', $responseBody['errors']);
     }
 
     public function testGet()
@@ -147,6 +243,7 @@ class EntityControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->get($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->entities);
@@ -161,6 +258,7 @@ class EntityControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->getDetailledById($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertSame('TEST-ENTITY123', $responseBody->entity->entity_id);
@@ -185,6 +283,46 @@ class EntityControllerTest extends TestCase
         $this->assertSame(0, $responseBody->entity->redirects);
     }
 
+    public function testReassignEntity()
+    {
+        $entityController = new \Entity\controllers\EntityController();
+
+        //  CREATE
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $aArgs = [
+            'entity_id'         => 'R2-D2',
+            'entity_label'      => 'TEST-ENTITY123-LABEL',
+            'short_label'       => 'TEST-ENTITY123-SHORTLABEL',
+            'entity_type'       => 'Service',
+            'email'             => 'paris@isMagic.fr',
+            'adrs_1'            => '1 rue du parc des princes',
+            'zipcode'           => '75016',
+            'city'              => 'PARIS',
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $response       = $entityController->reassignEntity($request, new \Slim\Http\Response(), ['id' => 'R2-D2', 'newEntityId' => 'TEST-ENTITY123']);
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody   = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsArray($responseBody['entities']);
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $response       = $entityController->reassignEntity($request, new \Slim\Http\Response(), ['id' => 'R2-D29999999', 'newEntityId' => 'TEST-ENTITY123']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody   = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame('Entity does not exist', $responseBody['errors']);
+    }
+
     public function testDelete()
     {
         $entityController = new \Entity\controllers\EntityController();
@@ -193,6 +331,7 @@ class EntityControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->delete($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(200, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertIsArray($responseBody->entities);
@@ -201,8 +340,25 @@ class EntityControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->getById($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertSame('Entity not found', $responseBody->errors);
+    }
+
+    public function testGetTypes()
+    {
+        $entityController = new \Entity\controllers\EntityController();
+
+        //  DELETE
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $response       = $entityController->getTypes($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+
+        $responseBody   = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsArray($responseBody['types']);
+        $this->assertNotEmpty($responseBody['types']);
     }
 }

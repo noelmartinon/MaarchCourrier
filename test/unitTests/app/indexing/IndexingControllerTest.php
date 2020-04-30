@@ -276,6 +276,27 @@ class IndexingControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Resource does not exist', $responseBody->errors);
 
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => ''],
+            'where' => ['res_id = ?'],
+            'data'  => [$GLOBALS['resources'][2]]
+        ]);
+
+        $body = [
+            'resource' => $GLOBALS['resources'][2]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $indexingController->setAction($fullRequest, new \Slim\Http\Response(), ['groupId' => 2, 'actionId' => '20']);
+        $responseBody = json_decode((string)$response->getBody());
+        print_r($responseBody);
+        $this->assertSame(204, $response->getStatusCode());
+
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => 'NEW'],
+            'where' => ['res_id = ?'],
+            'data'  => [$GLOBALS['resources'][2]]
+        ]);
+
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];

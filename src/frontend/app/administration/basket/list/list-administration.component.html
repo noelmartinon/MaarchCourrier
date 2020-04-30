@@ -6,7 +6,10 @@
         </mat-option>
     </mat-select>
 </mat-form-field>
-<div style="display: grid;grid-template-columns: 1fr auto;grid-gap: 10px;align-items: center;" *ngIf="selectedListEvent === 'processDocument'">
+<div class="formType ratio-2 col-sm-12" *ngIf="selectedListEvent === 'processDocument'">
+    <div class="formType-title">
+        {{lang.options}}
+    </div>
     <mat-form-field class="eventList" appearance="outline">
         <mat-label>{{lang.tabProcessPosition}}</mat-label>
         <mat-select [(ngModel)]="selectedProcessTool.defaultTab">
@@ -15,9 +18,13 @@
             </mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdate">{{lang.canUpdateData}}</mat-slide-toggle>
+    <div style="padding: 10px;">
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdate" (change)="toggleCanUpdate($event.checked)">{{lang.canUpdateData}}</mat-slide-toggle>
+    </div>
+    <div style="padding: 10px;">
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateModel" [disabled]="!selectedProcessTool.canUpdate">{{lang.canUpdateIndexingModel}}</mat-slide-toggle>
+    </div> 
 </div>
-
 <hr />
 <mat-toolbar class="editorTool">
     <span>

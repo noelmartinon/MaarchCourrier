@@ -7,10 +7,10 @@ import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../service/auth.service';
 
 @Component({
-    templateUrl: 'updatePassword.component.html',
-    styleUrls: ['updatePassword.component.scss'],
+    templateUrl: 'reset-password.component.html',
+    styleUrls: ['reset-password.component.scss'],
 })
-export class UpdatePasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit {
 
     lang: any = LANG;
     loadingForm: boolean = false;

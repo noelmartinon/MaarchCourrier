@@ -36,22 +36,6 @@ class UserFollowedResourceModel
         return $followedResources;
     }
 
-    public static function getByUserId(array $args)
-    {
-        ValidatorModel::notEmpty($args, ['userId']);
-        ValidatorModel::intVal($args, ['userId']);
-        ValidatorModel::arrayType($args, ['select']);
-
-        $followedResources = DatabaseModel::select([
-            'select'    => empty($args['select']) ? ['*'] : $args['select'],
-            'table'     => ['users_followed_resources'],
-            'where'     => ['user_id = ?'],
-            'data'      => [$args['userId']]
-        ]);
-
-        return $followedResources;
-    }
-
     public static function create(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId', 'userId']);
@@ -63,21 +47,6 @@ class UserFollowedResourceModel
                 'res_id'    => $args['resId'],
                 'user_id'   => $args['userId'],
             ]
-        ]);
-
-        return true;
-    }
-
-    public static function update(array $args)
-    {
-        ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
-        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
-
-        DatabaseModel::update([
-            'table' => 'users_followed_resources',
-            'set'   => $args['set'],
-            'where' => $args['where'],
-            'data'  => $args['data']
         ]);
 
         return true;

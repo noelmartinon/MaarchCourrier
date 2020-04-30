@@ -11,7 +11,7 @@ stages:
   - test
 
 before_script:
-  - apt-get update > /dev/null
+  - apt-get update -yqq > /dev/null
   - mkdir -p /usr/share/man/man1
   - mkdir -p /usr/share/man/man7
   #- apt-cache search chromium
@@ -25,8 +25,6 @@ before_script:
   #- mv wkhtmltox/bin/wkhtmlto* /usr/bin
   #- chmod +x /usr/bin/wkhtmlto*
   #- apt-get install libreoffice -yqq > /dev/null
-  #- apt-get install poppler-utils -yqq > /dev/null
-  #- apt-get install imagemagick -yqq > /dev/null
   #- apt-get install npm -yqq > /dev/null 
   - apt-get install git -yqq > /dev/null
   - bash ci/docker_install_php.sh > /dev/null
@@ -36,6 +34,7 @@ job_e2e:
  image: php:7.4-apache
  stage: test
  script:
+   - echo $CI_PROJECT_DIR
    - service apache2 start
    - mkdir -p /opt/maarch/docservers/indexes/{letterbox_coll,attachments_coll,version_attachments_coll}
    - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates,acknowledgement_receipts}
@@ -43,10 +42,9 @@ job_e2e:
    - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
    - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
    - mkdir -p /var/www/html/
-   - cp -R /builds/maarch/MaarchCourrier/ /var/www/html/
+   - ln -s /builds/maarch/MaarchCourrier/ /var/www/html/MaarchCourrier
    - cd /var/www/html/MaarchCourrier
    - touch installed.lck
-   - mkdir -p /var/www/html/MaarchCourrier
    - chown -R www-data. /opt/maarch/
    - chown -R www-data. /var/www/html/
    - chmod -R 775 /opt/maarch/
@@ -62,9 +60,16 @@ job_e2e:
    - curl -o /dev/null --silent --head --write-out '%{http_code}\n' http://127.0.0.1/MaarchCourrier
    - firefox --version
    - npm run ee-launch
+ artifacts:
+   paths:
+     - package.json
+     - queries_error.log
+     - test/e2e/screenshots/
+   expire_in: 1 week
+   when: always
  allow_failure: true
- only:
-   - schedules
+#  only:
+#    - schedules
 
 job_php-7.4:
  image: php:7.4-apache
@@ -76,9 +81,8 @@ job_php-7.4:
    - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
    - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
    - mkdir -p /var/www/html/
-   - cp -R /builds/maarch/MaarchCourrier/ /var/www/html/
+   - ln -s /builds/maarch/MaarchCourrier/ /var/www/html/MaarchCourrier
    - cd /var/www/html/MaarchCourrier
-   - mkdir -p /var/www/html/MaarchCourrier
    - sed 's/<databaseserver>.*<\/databaseserver>/<databaseserver>postgres<\/databaseserver>/;s/<databasepassword>.*<\/databasepassword>/<databasepassword><\/databasepassword>/;s/<databasename>.*<\/databasename>/<databasename>MaarchCourrier<\/databasename>/;s/<databaseuser>.*<\/databaseuser>/<databaseuser>maarch<\/databaseuser>/' apps/maarch_entreprise/xml/config.xml.default > apps/maarch_entreprise/xml/config.xml
    - cp modules/visa/xml/remoteSignatoryBooks.xml.default modules/visa/xml/remoteSignatoryBooks.xml
    - curl --location -s --output /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-9.phar
@@ -88,6 +92,13 @@ job_php-7.4:
    - develop
  except:
    - schedules
+ artifacts:
+   paths:
+     - test/unitTests/build/
+     - test/unitTests/build/tests-phpunit.xml
+   reports:
+     junit: test/unitTests/build/tests-phpunit.xml
+   expire_in: 1 week
 
 job_php-7.3:
  image: php:7.3-apache
@@ -99,9 +110,8 @@ job_php-7.3:
    - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
    - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
    - mkdir -p /var/www/html/
-   - cp -R /builds/maarch/MaarchCourrier/ /var/www/html/
+   - ln -s /builds/maarch/MaarchCourrier/ /var/www/html/MaarchCourrier
    - cd /var/www/html/MaarchCourrier
-   - mkdir -p /var/www/html/MaarchCourrier
    - sed 's/<databaseserver>.*<\/databaseserver>/<databaseserver>postgres<\/databaseserver>/;s/<databasepassword>.*<\/databasepassword>/<databasepassword><\/databasepassword>/;s/<databasename>.*<\/databasename>/<databasename>MaarchCourrier<\/databasename>/;s/<databaseuser>.*<\/databaseuser>/<databaseuser>maarch<\/databaseuser>/' apps/maarch_entreprise/xml/config.xml.default > apps/maarch_entreprise/xml/config.xml
    - cp modules/visa/xml/remoteSignatoryBooks.xml.default modules/visa/xml/remoteSignatoryBooks.xml
    - curl --location -s --output /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-9.phar
@@ -122,9 +132,8 @@ job_php-7.2:
     - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
     - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
     - mkdir -p /var/www/html/
-    - cp -R /builds/maarch/MaarchCourrier/ /var/www/html/
+    - ln -s /builds/maarch/MaarchCourrier/ /var/www/html/MaarchCourrier
     - cd /var/www/html/MaarchCourrier
-    - mkdir -p /var/www/html/MaarchCourrier
     - sed 's/<databaseserver>.*<\/databaseserver>/<databaseserver>postgres<\/databaseserver>/;s/<databasepassword>.*<\/databasepassword>/<databasepassword><\/databasepassword>/;s/<databasename>.*<\/databasename>/<databasename>MaarchCourrier<\/databasename>/;s/<databaseuser>.*<\/databaseuser>/<databaseuser>maarch<\/databaseuser>/' apps/maarch_entreprise/xml/config.xml.default > apps/maarch_entreprise/xml/config.xml
     - cp modules/visa/xml/remoteSignatoryBooks.xml.default modules/visa/xml/remoteSignatoryBooks.xml
     - curl --location -s --output /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-8.phar

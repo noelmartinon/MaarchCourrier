@@ -98,8 +98,6 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         public appService: AppService) { }
 
     ngOnInit() {
-        console.log(this.formControlSelect);
-
         // set custom panel class
         const panelClass = 'mat-select-search-panel';
         if (this.matSelect.panelClass) {

@@ -7,7 +7,7 @@
  */
 
 /**
- * @brief Notifications Controller
+ * @brief DiffusionTypes Controller
  *
  * @author dev@maarch.org
  * @ingroup notifications
@@ -210,10 +210,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view
@@ -261,10 +265,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view
@@ -306,10 +314,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view
@@ -357,10 +369,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view
@@ -402,10 +418,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view
@@ -453,10 +473,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view
@@ -498,10 +522,14 @@ class DiffusionTypesController
                     $where[]    = "listinstance_id = :recordid";
             }
 
-            if ($args['notification']['diffusion_properties'] != '') {
+            if (!empty($args['notification']['diffusion_properties'])) {
                 $aStatus    = explode(',', $args['notification']['diffusion_properties']);
-                $where[]    = 'lb.status in (:statustab)';
-                $arrayPDO[] = [':statustab' => $aStatus];
+                foreach ($aStatus as $key => $status) {
+                    $inQuestion[] = ':statustab'.$key;
+                    $arrayPDO[':statustab'.$key] = $status;
+                }
+                $inQuestion = implode(', ', $inQuestion);
+                $where[]    = 'lb.status in ('.$inQuestion.')';
             }
         
             // Main document resource from view

@@ -35,9 +35,9 @@ class EntitySeparatorController
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['type'])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Body type is not set or empty']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body type is not set or empty']);
         } elseif (!in_array($body['type'], ['barcode', 'qrcode'])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Body type value must be qrcode or barcode']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body type value must be qrcode or barcode']);
         }
 
         $entitiesList = [];
@@ -45,7 +45,7 @@ class EntitySeparatorController
             $entitiesList['GENERIQUE'] = 'Maarch Courrier';
         } else {
             if (!Validator::arrayType()->notEmpty()->validate($body['entities'])) {
-                return $response->withStatus(403)->withJson(['errors' => 'entities is not set or empty']);
+                return $response->withStatus(400)->withJson(['errors' => 'Body entities is not set or empty']);
             }
 
             $entitiesInfo = EntityModel::get([
@@ -86,7 +86,7 @@ class EntitySeparatorController
                     -4,                         // bar width (use absolute or negative value as multiplication factor)
                     -100,                         // bar height (use absolute or negative value as multiplication factor)
                     'black',                    // foreground color
-                    array(-2, -2, -2, -2)       // padding (use absolute or negative values as multiplication factors)
+                    [-2, -2, -2, -2]       // padding (use absolute or negative values as multiplication factors)
                 )->setBackgroundColor('white'); // background color
                 
                 $pdf->Image('@'.$bobj->getPngData(), 0, 40, 200, '', '', '', '', false, 300, 'C');

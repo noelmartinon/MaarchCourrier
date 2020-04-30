@@ -13,6 +13,7 @@ class ResControllerTest extends TestCase
 {
     private static $id = null;
     private static $id2 = null;
+    private static $id3 = null;
 
     public function testGetDepartmentById()
     {
@@ -39,54 +40,82 @@ class ResControllerTest extends TestCase
         $fileContent = file_get_contents('test/unitTests/samples/test.txt');
         $encodedFile = base64_encode($fileContent);
 
-        $aArgs = [
-            'modelId'       => 1,
-            'status'        => 'NEW',
-            'encodedFile'   => $encodedFile,
-            'format'        => 'txt',
-            'confidentiality'   => false,
-            'documentDate'  => '2019-01-01 17:18:47',
-            'arrivalDate'   => '2019-01-01 17:18:47',
-            'processLimitDate'  => '2029-01-01',
-            'doctype'       => 102,
-            'destination'   => 15,
-            'initiator'     => 15,
-            'subject'       => 'Breaking News : Superman is alive - PHP unit',
-            'typist'        => 19,
-            'priority'      => 'poiuytre1357nbvc',
-            'senders'       => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
+        $body = [
+            'modelId'          => 1,
+            'status'           => 'NEW',
+            'encodedFile'      => $encodedFile,
+            'format'           => 'txt',
+            'confidentiality'  => false,
+            'documentDate'     => '2019-01-01 17:18:47',
+            'arrivalDate'      => '2019-01-01 17:18:47',
+            'processLimitDate' => '2029-01-01',
+            'doctype'          => 102,
+            'destination'      => 15,
+            'initiator'        => 15,
+            'subject'          => 'Breaking News : Superman is alive - PHP unit',
+            'typist'           => 19,
+            'priority'         => 'poiuytre1357nbvc',
+            'senders'          => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
         ];
 
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
         $responseBody = json_decode((string)$response->getBody());
         self::$id = $responseBody->resId;
         $this->assertIsInt(self::$id);
 
-        $aArgs = [
-            'modelId'       => 2,
-            'status'        => 'NEW',
-            'confidentiality'   => false,
-            'documentDate'  => '2019-01-01 17:18:47',
-            'arrivalDate'   => '2019-01-01 17:18:47',
-            'processLimitDate'  => '2029-01-01',
-            'doctype'       => 102,
-            'destination'   => 15,
-            'initiator'     => 15,
-            'subject'       => 'Breaking News : Superman is alive - PHP unit',
-            'typist'        => 19,
-            'priority'      => 'poiuytre1357nbvc',
-            'senders'       => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
+        $body = [
+            'modelId'          => 2,
+            'status'           => 'NEW',
+            'confidentiality'  => false,
+            'documentDate'     => '2019-01-01 17:18:47',
+            'arrivalDate'      => '2019-01-01 17:18:47',
+            'processLimitDate' => '2029-01-01',
+            'doctype'          => 102,
+            'destination'      => 15,
+            'initiator'        => 15,
+            'subject'          => 'Breaking News : Superman is alive - PHP unit',
+            'typist'           => 19,
+            'priority'         => 'poiuytre1357nbvc',
+            'senders'          => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
         ];
 
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertIsInt($responseBody['resId']);
         self::$id2 = $responseBody['resId'];
+
+        $fileContent = file_get_contents('modules/templates/templates/styles/AR_Masse_Simple.docx');
+        $encodedFile = base64_encode($fileContent);
+
+        $body = [
+            'modelId'          => 2,
+            'status'           => 'NEW',
+            'confidentiality'  => false,
+            'encodedFile'      => $encodedFile,
+            'format'           => 'docx',
+            'arrivalDate'      => '2019-01-01 17:18:47',
+            'processLimitDate' => '2029-01-01',
+            'doctype'          => 102,
+            'destination'      => 15,
+            'initiator'        => 15,
+            'subject'          => 'Breaking News : Superman is alive (again) - PHP unit',
+            'typist'           => 19,
+            'priority'         => 'poiuytre1357nbvc',
+            'senders'          => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
+        ];
+
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertIsInt($responseBody['resId']);
+        self::$id3 = $responseBody['resId'];
 
         //  READ
         $res = \Resource\models\ResModel::getById(['resId' => self::$id, 'select' => ['*']]);
@@ -108,7 +137,7 @@ class ResControllerTest extends TestCase
         $fileContent = file_get_contents('test/unitTests/samples/test.txt');
         $encodedFile = base64_encode($fileContent);
 
-        $aArgs = [
+        $body = [
             'status'        => 'NEW',
             'encodedFile'   => $encodedFile,
             'format'        => 'txt',
@@ -126,12 +155,352 @@ class ResControllerTest extends TestCase
             'folders'       => [1, 2],
         ];
 
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
-        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body modelId is empty or not an integer', $responseBody['errors']);
 
-        $this->assertSame('Body modelId is empty or not an integer', $responseBody->errors);
+        // Errors from ResourceControlController::controlResource
+        $body = [];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body is not set or empty', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body doctype is empty or not an integer', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 1 // wrong format
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body status is empty or not a string', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102000000,
+            'modelId' => 1,
+            'status'  => 'NEW'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body doctype does not exist', $responseBody['errors']);
+
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1000,
+            'status'  => 'NEW'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body modelId does not exist', $responseBody['errors']);
+
+        $body = [
+            'doctype'     => 102,
+            'modelId'     => 1,
+            'status'      => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'      => 'docx'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Format with this mimeType is not allowed : docx text/plain', $responseBody['errors']);
+
+        $body = [
+            'doctype'      => 102,
+            'modelId'      => 1,
+            'status'       => 'NEW',
+            'customFields' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype'      => 102,
+            'modelId'      => 1,
+            'status'       => 'NEW',
+            'customFields' => [1000]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields : One or more custom fields do not exist', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'folders' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body folders is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'folders' => [100000]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body folders : One or more folders do not exist or are out of perimeter', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'tags'    => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body tags is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'tags'    => [100000]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body tags : One or more tags do not exist', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'senders' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body senders is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'senders' => ['wrong format']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body senders[0] is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'senders' => [['type' => 'alien']]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body senders[0] type is not valid', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'senders' => [['type' => 'user', 'id' => 1000]]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body senders[0] id does not exist', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'recipients' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body recipients is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'recipients' => ['wrong format']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body recipients[0] is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'recipients' => [['type' => 'alien']]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body recipients[0] type is not valid', $responseBody['errors']);
+
+        $body = [
+            'doctype' => 102,
+            'modelId' => 1,
+            'status'  => 'NEW',
+            'recipients' => [['type' => 'user', 'id' => 1000]]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body recipients[0] id does not exist', $responseBody['errors']);
+
+        $body = [
+            'doctype'      => 102,
+            'modelId'      => 1,
+            'status'       => 'NEW',
+            'documentDate' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body documentDate is not a date', $responseBody['errors']);
+
+        $dateInTheFuture = new \DateTime('tomorrow');
+        $dateInTheFuture->add(new \DateInterval('P10D'));
+        $dateInTheFuture = $dateInTheFuture->format('d-m-Y');
+        
+        $body = [
+            'doctype'      => 102,
+            'modelId'      => 1,
+            'status'       => 'NEW',
+            'documentDate' => $dateInTheFuture
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body documentDate is not a valid date', $responseBody['errors']);
+
+        $body = [
+            'doctype'     => 102,
+            'modelId'     => 1,
+            'status'      => 'NEW',
+            'arrivalDate' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body arrivalDate is not a date', $responseBody['errors']);
+
+        $body = [
+            'doctype'     => 102,
+            'modelId'     => 1,
+            'status'      => 'NEW',
+            'arrivalDate' => $dateInTheFuture
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body arrivalDate is not a valid date', $responseBody['errors']);
+
+        $body = [
+            'doctype'       => 102,
+            'modelId'       => 1,
+            'status'        => 'NEW',
+            'departureDate' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body departureDate is not a date', $responseBody['errors']);
+
+        $body = [
+            'doctype'       => 102,
+            'modelId'       => 1,
+            'status'        => 'NEW',
+            'documentDate'  => '2020-02-01',
+            'departureDate' => '2020-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body departureDate is not a valid date', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $body = [
+            'modelId'       => 1,
+            'status'        => 'NEW',
+            'confidentiality'   => false,
+            'documentDate'  => '2019-01-01 17:18:47',
+            'arrivalDate'   => '2019-01-01 17:18:47',
+            'processLimitDate'  => '2029-01-01',
+            'doctype'       => 102,
+            'destination'   => 15,
+            'initiator'     => 15,
+            'subject'       => 'Breaking News : Superman is alive - PHP unit',
+            'typist'        => 19,
+            'priority'      => 'poiuytre1357nbvc',
+            'senders'       => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
+            'diffusionList' => [
+                ['id' => 19, 'mode' => 'dest']
+            ]
+        ];
+
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $resController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body initiator does not belong to your entities', $responseBody['errors']);
 
         $GLOBALS['login'] = 'ddur';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -252,7 +621,6 @@ class ResControllerTest extends TestCase
         ]);
 
         $aArgs = [
-            'modelId'          => 1,
             'status'           => 'NEW',
             'encodedFile'      => $encodedFile,
             'format'           => 'txt',
@@ -277,7 +645,6 @@ class ResControllerTest extends TestCase
         $this->assertSame(204, $response->getStatusCode());
 
         $aArgs = [
-            'modelId'          => 1,
             'status'           => 'NEW',
             'encodedFile'      => $encodedFile,
             'format'           => 'txt',
@@ -318,7 +685,6 @@ class ResControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'modelId'          => 1,
             'status'           => 'NEW',
             'encodedFile'      => $encodedFile,
             'confidentiality'  => true,
@@ -369,6 +735,429 @@ class ResControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Route resId is not an integer',  $responseBody['errors']);
 
+        // Errors from ResourceControlControllers->controlUpdateResource
+        $body = [];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body is not set or empty', $responseBody['errors']);
+
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => ''],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+
+        $body = [
+            'doctype'  => 102
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resource status is empty. It can not be modified', $responseBody['errors']);
+
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => 'TMP'],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+
+        $body = [
+            'doctype'  => 102
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resource can not be modified because of status', $responseBody['errors']);
+
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => 'NEW'],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+
+        $body = [
+            'doctype'  => 102000
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body doctype does not exist', $responseBody['errors']);
+
+        $body = [
+            'encodedFile' => ''
+        ];
+        $queryParams = ['onlyDocument' => true ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $fullRequest);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body encodedFile is not set or empty', $responseBody['errors']);
+
+        $externalId = ['signatureBookId' => 42];
+        \Resource\models\ResModel::update([
+            'set'   => ['external_id' => json_encode($externalId)],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+
+        $body = [
+            'encodedFile' => $encodedFile
+        ];
+        $queryParams = ['onlyDocument' => true ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $fullRequest);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resource is in external signature book, file can not be modified', $responseBody['errors']);
+
+
+        $externalId = [];
+        \Resource\models\ResModel::update([
+            'set'   => ['external_id' => json_encode($externalId)],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+        \Convert\models\AdrModel::createDocumentAdr([
+            'resId'         => self::$id,
+            'type'          => 'SIGN',
+            'docserverId'   => 'docserver_id',
+            'path'          => 'directory',
+            'filename'      => 'file_destination_name',
+            'version'       => 2,
+            'fingerprint'   => '1'
+        ]);
+
+        $body = [
+            'encodedFile' => $encodedFile
+        ];
+        $queryParams = ['onlyDocument' => true ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $fullRequest);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resource is signed, file can not be modified', $responseBody['errors']);
+
+        \Convert\models\AdrModel::deleteDocumentAdr([
+            'where' => ['res_id = ?', 'type = ?'],
+            'data' => [self::$id, 'SIGN']
+        ]);
+
+        \Resource\models\ResModel::update([
+            'set'   => ['format' => 'css'],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+
+        $body = [
+            'encodedFile' => $encodedFile
+        ];
+        $queryParams = ['onlyDocument' => true ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $fullRequest);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resource is not convertible, file can not be modified', $responseBody['errors']);
+
+        \Resource\models\ResModel::update([
+            'set'   => ['format' => 'txt'],
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id]
+        ]);
+
+        $body = [
+            'doctype' => 102,
+            'tags'    => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body tags is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype'   => 102,
+            'initiator' => 10000
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body priority is not set', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'initiator'        => 10000,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body initiator does not exist', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'initiator'        => 10,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body initiator does not belong to your entities', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body documentDate is not a date', $responseBody['errors']);
+
+        // test control custom fields
+        \IndexingModel\models\IndexingModelFieldModel::create([
+            'model_id'   => 1,
+            'identifier' => 'indexingCustomField_1',
+            'mandatory'  => 'true',
+            'unit'       => 'mail'
+        ]);
+        \IndexingModel\models\IndexingModelFieldModel::create([
+            'model_id'   => 1,
+            'identifier' => 'indexingCustomField_2',
+            'mandatory'  => 'false',
+            'unit'       => 'mail'
+        ]);
+        \IndexingModel\models\IndexingModelFieldModel::create([
+            'model_id'   => 1,
+            'identifier' => 'indexingCustomField_3',
+            'mandatory'  => 'false',
+            'unit'       => 'mail'
+        ]);
+        \IndexingModel\models\IndexingModelFieldModel::create([
+            'model_id'   => 1,
+            'identifier' => 'indexingCustomField_4',
+            'mandatory'  => 'false',
+            'unit'       => 'mail'
+        ]);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[1] is empty', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [1 => 'wrong format']
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[1] is not a date', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                3 => 'Mail printed with Paper form Dunder Mifflin Paper Company Inc.'
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[3] has wrong value', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                4 => 42 // wrong format
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[4] is not a string', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                2 => ['wrong format']
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[2] is not an array', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                2 => [['address' => 'yes']]
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[2] longitude is empty', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                2 => [
+                    [
+                        'longitude' => '1'
+                    ]
+                ]
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[2] latitude is empty', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                2 => [
+                    [
+                        'longitude' => '1',
+                        'latitude' => '1'
+                    ]
+                ]
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[2] addressTown is empty', $responseBody['errors']);
+
+        $body = [
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01',
+            'customFields'     => [
+                1 => '2029-01-01',
+                2 => [
+                    [
+                        'longitude'   => '1',
+                        'latitude'    => '1',
+                        'addressTown' => '1'
+                    ]
+                ]
+            ]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body customFields[2] addressPostcode is empty', $responseBody['errors']);
+
         $GLOBALS['login'] = 'ddur';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
@@ -385,6 +1174,11 @@ class ResControllerTest extends TestCase
         \Folder\models\FolderModel::delete([
             'where' => ['id = ?'],
             'data'  => [$folder]
+        ]);
+
+        \IndexingModel\models\IndexingModelFieldModel::delete([
+            'where' => ['identifier in (?)', 'model_id = ?'],
+            'data'  => [['indexingCustomField_1', 'indexingCustomField_2', 'indexingCustomField_3', 'indexingCustomField_4'], 1]
         ]);
     }
       
@@ -1078,7 +1872,7 @@ class ResControllerTest extends TestCase
         $this->assertIsString($responseBody['information']['fingerprint']);
         $this->assertNotEmpty($responseBody['information']['fingerprint']);
         $this->assertSame(46, $responseBody['information']['filesize']);
-        $this->assertIsString($responseBody['information']['fulltext_result']);
+        $this->assertSame('SUCCESS', $responseBody['information']['fulltext_result']);
         $this->assertSame(true, $responseBody['information']['canConvert']);
     }
 
@@ -1192,10 +1986,19 @@ class ResControllerTest extends TestCase
 
         \Resource\models\ResModel::delete([
             'where' => ['res_id = ?'],
-            'data' => [self::$id2]
+            'data'  => [self::$id2]
         ]);
 
         $res = \Resource\models\ResModel::getById(['resId' => self::$id2, 'select' => ['*']]);
+        $this->assertIsArray($res);
+        $this->assertEmpty($res);
+
+        \Resource\models\ResModel::delete([
+            'where' => ['res_id = ?'],
+            'data'  => [self::$id3]
+        ]);
+
+        $res = \Resource\models\ResModel::getById(['resId' => self::$id3, 'select' => ['*']]);
         $this->assertIsArray($res);
         $this->assertEmpty($res);
     }
@@ -1268,5 +2071,43 @@ class ResControllerTest extends TestCase
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testGetBytesSizeFromPhpIni()
+    {
+        $size = '1K';
+        $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
+        $this->assertSame(1024, $byteSize );
+
+        $size = '1M';
+        $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
+        $this->assertSame(1048576, $byteSize );
+
+        $size = '1G';
+        $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
+        $this->assertSame(1073741824, $byteSize );
+
+        $size = 1;
+        $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
+        $this->assertSame(1, $byteSize );
+    }
+
+    public function testGetFormattedSizeFromBytes()
+    {
+        $size = 1073741824 + 1;
+        $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
+        $this->assertSame(round($size / 1073741824) . ' Go', $formatted );
+
+        $size = 1048576 + 1;
+        $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
+        $this->assertSame(round($size / 1048576) . ' Mo', $formatted );
+
+        $size = 1024 + 1;
+        $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
+        $this->assertSame(round($size / 1024) . ' Ko', $formatted );
+
+        $size = 1;
+        $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
+        $this->assertSame('1 o', $formatted );
     }
 }

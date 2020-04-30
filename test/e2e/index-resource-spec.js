@@ -1,27 +1,24 @@
-var fs = require('fs');
+var ScreenshotReporter = require('./screenshotReporter.js');
 
-// abstract writing screen shot to a file
-function writeScreenShot(data, filename) {
-    var stream = fs.createWriteStream(filename+'.png');
-    stream.write(new Buffer.from(data, 'base64'));
-    stream.end();
-    // var stream = fs.createWriteStream(filename+'.txt');
-    // stream.write(data);
-    // stream.end();
-    // console.log(data);
-}
+afterEach(function() {
+    if (browser.browserName === 'chrome') {
+        browser.manage().logs().get('browser').then(function(browserLog) {
+          console.log('log: ' + require('util').inspect(browserLog));
+        });
+    }
+});
 
 describe('index resource page', function () {
     it('index a document whitout file', function () {
         browser.sleep(2000);
         expect(browser.getCurrentUrl()).toEqual(browser.baseUrl + "/dist/index.html#/home");
         browser.takeScreenshot().then(function (png) {
-            writeScreenShot(png, 'test/e2e/screenshots/home_' + browser.browserName);
+            ScreenshotReporter(png, 'test/e2e/screenshots/home_' + browser.browserName);
         });
         element(by.id('indexing')).click();
         browser.sleep(500);
         browser.takeScreenshot().then(function (png) {
-            writeScreenShot(png, 'test/e2e/screenshots/index_a_document_' + browser.browserName);
+            ScreenshotReporter(png, 'test/e2e/screenshots/index_a_document_' + browser.browserName);
         });
         element(by.id('doctype')).click();
         browser.sleep(500);
@@ -52,6 +49,10 @@ describe('index resource page', function () {
         element(by.css('[placeholder="Ajouter une annotation"]')).sendKeys('test ee');
         browser.sleep(500);
         element(by.cssContainingText('.mat-dialog-content-container .mat-button-wrapper', 'Valider')).click();
+        browser.sleep(100);
+        browser.takeScreenshot().then(function (png) {
+            ScreenshotReporter(png, 'test/e2e/screenshots/validate_indexation_' + browser.browserName);
+        });
         browser.sleep(500);
         expect(browser.getCurrentUrl()).toContain('/resources/');
         browser.sleep(4000);

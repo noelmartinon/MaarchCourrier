@@ -11,8 +11,74 @@ use PHPUnit\Framework\TestCase;
 
 class SummarySheetControllerTest extends TestCase
 {
+    private static $noteId = null;
+
     public function testCreateList()
     {
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $noteController = new \Note\controllers\NoteController();
+
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $body = [
+            'value'     => "Test d'ajout d'une note par php unit",
+            'entities'  => ['COU', 'CAB', 'PJS'],
+            'resId'     => $GLOBALS['resources'][0]
+        ];
+
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $noteController->create($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsInt($responseBody['noteId']);
+        self::$noteId = $responseBody['noteId'];
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+        $userInfo = \User\models\UserModel::getByLogin(['login' => 'bbain', 'select' => ['id']]);
+
+        \IndexingModel\models\IndexingModelFieldModel::create([
+            'model_id'   => 1,
+            'identifier' => 'indexingCustomField_4',
+            'mandatory'  => 'false',
+            'unit'       => 'mail'
+        ]);
+
+        \IndexingModel\models\IndexingModelFieldModel::create([
+            'model_id'   => 1,
+            'identifier' => 'recipients',
+            'mandatory'  => 'false',
+            'unit'       => 'mail'
+        ]);
+
+        \Entity\models\ListInstanceModel::create([
+            'res_id'          => $GLOBALS['resources'][0],
+            'sequence'        => 0,
+            'item_id'         => $userInfo['id'],
+            'item_type'       => 'user_id',
+            'item_mode'       => 'dest',
+            'added_by_user'   => $GLOBALS['id'],
+            'viewed'          => 0,
+            'difflist_type'   => 'VISA_CIRCUIT'
+        ]);
+
+        \Entity\models\ListInstanceModel::create([
+            'res_id'          => $GLOBALS['resources'][0],
+            'sequence'        => 0,
+            'item_id'         => $userInfo['id'],
+            'item_type'       => 'user_id',
+            'item_mode'       => 'dest',
+            'added_by_user'   => $GLOBALS['id'],
+            'viewed'          => 0,
+            'difflist_type'   => 'AVIS_CIRCUIT'
+        ]);
+
         $GLOBALS['login'] = 'bbain';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
@@ -24,11 +90,12 @@ class SummarySheetControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $aArgs = [
+        $body = [
             "resources" => $GLOBALS['resources'],
             "units" => [
                 ['label' => 'Informations', 'unit' => 'primaryInformations'],
                 ['label' => 'Informations Secondaires', 'unit' => 'secondaryInformations'],
+                ["label" => "Informations de destination", "unit" => "senderRecipientInformations"],
                 ['label' => 'Liste de diffusion', 'unit' => 'diffusionList'],
                 ['label' => 'Ptit avis les potos.', 'unit' => 'freeField'],
                 ['label' => 'Annotation(s)', 'unit' => 'notes'],
@@ -38,7 +105,7 @@ class SummarySheetControllerTest extends TestCase
                 ['unit' => 'qrcode']
             ],
         ];
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
         $responseBody = json_decode((string)$response->getBody());
@@ -50,14 +117,47 @@ class SummarySheetControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        unset($aArgs['resources']);
-        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        unset($body['resources']);
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
         $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
-        $responseBody = json_decode((string)$response->getBody());
-        $this->assertSame('Resources is not set or empty', $responseBody->errors);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resources is not set or empty', $responseBody['errors']);
+
+        $body = [
+            "resources" => $GLOBALS['resources'],
+            "units" => [
+                ['label' => 'Informations', 'unit' => 'primaryInformations']
+            ],
+        ];
+
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id'] * 1000]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Group or basket does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'groupId' => 8, 'basketId' => $myBasket['id']]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Resources out of perimeter', $responseBody['errors']);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
+
+        \IndexingModel\models\IndexingModelFieldModel::delete([
+            'where' => ['identifier in (?)', 'model_id = ?'],
+            'data'  => [['indexingCustomField_4', 'recipients'], 1]
+        ]);
+
+        \Entity\models\ListInstanceModel::delete([
+            'where' => ['res_id = ?', 'difflist_type in (?)'],
+            'data'  => [$GLOBALS['resources'][0], ['AVIS_CIRCUIT', 'VISA_CIRCUIT']]
+        ]);
     }
 }

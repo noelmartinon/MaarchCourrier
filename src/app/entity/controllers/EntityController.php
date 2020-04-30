@@ -41,9 +41,9 @@ class EntityController
         return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']])]);
     }
 
-    public function getById(Request $request, Response $response, array $aArgs)
+    public function getById(Request $request, Response $response, array $args)
     {
-        $entity = EntityModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'entity_label', 'short_label', 'entity_full_name', 'entity_type', 'entity_id', 'enabled', 'parent_entity_id']]);
+        $entity = EntityModel::getById(['id' => $args['id'], 'select' => ['id', 'entity_label', 'short_label', 'entity_full_name', 'entity_type', 'entity_id', 'enabled', 'parent_entity_id']]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
@@ -132,10 +132,6 @@ class EntityController
             'entities'  => [$aArgs['id']]
         ]);
 
-        $entity['externalId'] = json_decode($entity['external_id'], true);
-        unset($entity['externalId']['alfrescoPassword'], $entity['external_id']);
-
-
         $entity['users'] = EntityModel::getUsersById(['id' => $entity['entity_id'], 'select' => ['users.id','users.user_id', 'users.firstname', 'users.lastname', 'users.status']]);
         $children = EntityModel::get(['select' => [1], 'where' => ['parent_entity_id = ?'], 'data' => [$aArgs['id']]]);
         $entity['hasChildren'] = count($children) > 0;
@@ -159,56 +155,47 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $data = $request->getParams();
+        $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->notEmpty()->validate($data['entity_id']) && preg_match("/^[\w-]*$/", $data['entity_id']) && (strlen($data['entity_id']) < 33);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['entity_label']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['short_label']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['entity_type']);
-        if (!empty($data['email'])) {
-            $check = $check && preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/", $data['email']);
+        $check = Validator::stringType()->notEmpty()->validate($body['entity_id']) && preg_match("/^[\w-]*$/", $body['entity_id']) && (strlen($body['entity_id']) < 33);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['entity_label']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['short_label']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['entity_type']);
+        if (!empty($body['email'])) {
+            $check = $check && preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/", $body['email']);
         }
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $existingEntity = EntityModel::getByEntityId(['entityId' => $data['entity_id'], 'select' => [1]]);
+        $existingEntity = EntityModel::getByEntityId(['entityId' => $body['entity_id'], 'select' => [1]]);
         if (!empty($existingEntity)) {
             return $response->withStatus(400)->withJson(['errors' => _ENTITY_ID_ALREADY_EXISTS]);
         }
 
-        $externalId = [];
-        if (!empty($data['externalId'])) {
-            $externalId = $data['externalId'];
-            if (!empty($data['externalId']['alfrescoPassword'])) {
-                $externalId['alfrescoPassword'] = PasswordModel::encrypt(['password' => $data['externalId']['alfrescoPassword']]);
-            }
-        }
-        $data['external_id'] = json_encode($externalId);
-
-        EntityModel::create($data);
+        EntityModel::create($body);
         HistoryController::add([
             'tableName' => 'entities',
-            'recordId'  => $data['entity_id'],
+            'recordId'  => $body['entity_id'],
             'eventType' => 'ADD',
-            'info'      => _ENTITY_CREATION . " : {$data['entity_id']}",
+            'info'      => _ENTITY_CREATION . " : {$body['entity_id']}",
             'moduleId'  => 'entity',
             'eventId'   => 'entityCreation',
         ]);
 
-        if (empty($data['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
+        if (empty($body['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
             $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
             $pEntity = 'N';
             if (empty($primaryEntity)) {
                 $pEntity = 'Y';
             }
 
-            UserEntityModel::addUserEntity(['id' => $GLOBALS['id'], 'entityId' => $data['entity_id'], 'role' => '', 'primaryEntity' => $pEntity]);
+            UserEntityModel::addUserEntity(['id' => $GLOBALS['id'], 'entityId' => $body['entity_id'], 'role' => '', 'primaryEntity' => $pEntity]);
             HistoryController::add([
                 'tableName' => 'users',
                 'recordId'  => $GLOBALS['id'],
                 'eventType' => 'UP',
-                'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['login']} {$data['entity_id']}",
+                'info'      => _USER_ENTITY_CREATION . " : {$GLOBALS['login']} {$body['entity_id']}",
                 'moduleId'  => 'user',
                 'eventId'   => 'userModification',
             ]);
@@ -235,17 +222,17 @@ class EntityController
             }
         }
 
-        $data = $request->getParams();
+        $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->notEmpty()->validate($data['entity_label']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['short_label']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['entity_type']);
+        $check = Validator::stringType()->notEmpty()->validate($body['entity_label']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['short_label']);
+        $check = $check && Validator::stringType()->notEmpty()->validate($body['entity_type']);
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
         $fatherAndSons = EntityModel::getEntityChildren(['entityId' => $aArgs['id']]);
-        if (in_array($data['parent_entity_id'], $fatherAndSons)) {
+        if (in_array($body['parent_entity_id'], $fatherAndSons)) {
             return $response->withStatus(400)->withJson(['errors' => _CAN_NOT_MOVE_IN_CHILD_ENTITY]);
         }
 
@@ -254,22 +241,13 @@ class EntityController
             'zipcode', 'city', 'country', 'email', 'business_id', 'parent_entity_id',
             'ldap_id', 'archival_agreement', 'archival_agency', 'entity_full_name'
         ];
-        foreach ($data as $key => $value) {
+        foreach ($body as $key => $value) {
             if (!in_array($key, $neededData)) {
-                unset($data[$key]);
+                unset($body[$key]);
             }
         }
 
-        $externalId = $entity['external_id'];
-        if (!empty($data['externalId'])) {
-            $externalId = array_merge($externalId, $data['externalId']);
-            if (!empty($data['externalId']['alfrescoPassword'])) {
-                $externalId['alfrescoPassword'] = PasswordModel::encrypt(['password' => $data['externalId']['alfrescoPassword']]);
-            }
-        }
-        $data['external_id'] = json_encode($externalId);
-
-        EntityModel::update(['set' => $data, 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
+        EntityModel::update(['set' => $body, 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
         HistoryController::add([
             'tableName' => 'entities',
             'recordId'  => $aArgs['id'],
@@ -279,8 +257,8 @@ class EntityController
             'eventId'   => 'entityModification',
         ]);
 
-        if (empty($data['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
-            $hasEntity = UserEntityModel::get(['select' => [1], 'where' => ['user_id = ?', 'entity_id = ?'], 'data' => [$GLOBALS['login'], $aArgs['id']]]);
+        if (empty($body['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
+            $hasEntity = UserEntityModel::get(['select' => [1], 'where' => ['user_id = ?', 'entity_id = ?'], 'data' => [$GLOBALS['id'], $aArgs['id']]]);
             if (empty($hasEntity)) {
                 $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
                 $pEntity = 'N';

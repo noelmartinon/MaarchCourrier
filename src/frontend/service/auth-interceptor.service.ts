@@ -12,7 +12,7 @@ import { FunctionsService } from './functions.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
     lang: any = LANG;
-    excludeUrls: any[] = [
+    byPassToken: any[] = [
         {
             route: '../rest/authenticate',
             method : ['POST']
@@ -26,12 +26,14 @@ export class AuthInterceptor implements HttpInterceptor {
             method : ['GET']
         },
         {
-            route: '../rest/password',
-            method : ['GET']
-        },
-        {
             route: '../rest/passwordRules',
             method : ['GET']
+        }
+    ];
+    byPassHandleErrors: any[] = [
+        {
+            route: '/password',
+            method : ['PUT']
         }
     ];
     constructor(
@@ -60,8 +62,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
 
-        // We don't want to intercept some routes
-        if ((this.excludeUrls.filter(url => url.route === request.url && url.method.indexOf(request.method) > -1).length > 0)) {
+        if (this.byPassToken.filter(url => request.url.indexOf(url.route) > -1 && url.method.indexOf(request.method) > -1).length > 0) {
             return next.handle(request);
         } else {
             // Add current token in header request
@@ -76,7 +77,9 @@ export class AuthInterceptor implements HttpInterceptor {
                 ),*/
                 catchError(error => {
                     // Disconnect user if bad token process
-                    if (error.status === 401) {
+                    if (this.byPassHandleErrors.filter(url => request.url.indexOf(url.route) > -1 && url.method.indexOf(request.method) > -1).length > 0) {
+                        return next.handle(request);
+                    } else if (error.status === 401) {
                         this.functionsService.debug('Auth error', request.url);
                         return this.http.get('../rest/authenticate/token', {
                             params: {
@@ -103,7 +106,6 @@ export class AuthInterceptor implements HttpInterceptor {
                                         }
                                     })
                                 );
-
                             }
                             ),
                             catchError(err => {

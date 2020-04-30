@@ -229,6 +229,12 @@ class StoreController
 
         $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination']]);
 
+        if (!empty($args['modelId'])) {
+            $preparedData['model_id'] = $args['modelId'];
+            $indexingModel = IndexingModelModel::getById(['id' => $args['modelId'], 'select' => ['category']]);
+            $preparedData['category_id'] = $indexingModel['category'];
+            $resource['category_id'] = $indexingModel['category'];
+        }
         if (empty($resource['alt_identifier'])) {
             $chrono = ChronoModel::getChrono(['id' => $resource['category_id'], 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $args['resId']]);
             $preparedData['alt_identifier'] = $chrono;

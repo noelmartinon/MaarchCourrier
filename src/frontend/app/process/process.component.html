@@ -101,6 +101,7 @@
                     [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" [target]="'process'"
                     (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
+                <app-select-indexing-model *ngIf="currentTool === 'info' && !loading" #appSelectIndexingModel [defaultIndexingModelId]="currentResourceInformations.modelId" [adminMode]="canChangeModel" [indexingForm]="indexingForm" (afterSelectedListModel)="this.currentIndexingModel = $event;indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
                 <app-indexing-form *ngIf="currentTool === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [resId]="currentResourceInformations.resId" [indexingFormId]="currentResourceInformations.modelId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
@@ -286,6 +287,7 @@
                 <app-attachments-list *ngIf="modal.id === 'attachments'  && !loading" #appAttachmentsList
                     [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
+                <app-select-indexing-model *ngIf="modal.id === 'info' && !loading" #appSelectIndexingModel [adminMode]="canChangeModel" [indexingForm]="indexingForm" [defaultIndexingModelId]="currentResourceInformations.modelId" (afterSelectedListModel)="this.currentIndexingModel = $event;indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
                 <app-indexing-form *ngIf="modal.id === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [indexingFormId]="currentResourceInformations.modelId" [resId]="currentResourceInformations.resId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"

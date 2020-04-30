@@ -56,11 +56,11 @@ export class PrintedFolderModalComponent implements OnInit {
             this.selectedPrintedFolderElement[element] = new FormControl({ value: [], disabled: false });
         });
 
-        await this.getMainDocInfo();
-        await this.getAttachments();
-        await this.getEmails();
-        await this.getAcknowledgementReceips();
-        await this.getNotes();
+        this.getMainDocInfo();
+        this.getAttachments();
+        this.getEmails();
+        this.getAcknowledgementReceips();
+        this.getNotes();
         await this.getLinkedResources();
 
         this.loading = false;
@@ -337,28 +337,7 @@ export class PrintedFolderModalComponent implements OnInit {
             resource[element] = this.selectedPrintedFolderElement[element].value.length === this.printedFolderElement[element].length ? 'ALL' : this.selectedPrintedFolderElement[element].value;
         });
 
-        // for Linked ressource (complex array)
-        if (!this.functions.empty(resource['linkedResourcesAttachments'])) {
-            resource['linkedResourcesAttachments'] = [];
-            this.selectedPrintedFolderElement['linkedResourcesAttachments'].value.forEach((item: any) => {
-                const resIdMaster = this.printedFolderElement.linkedResources.filter((res: any) => res.id === item)[0].resIdMaster;
-                if (resource['linkedResourcesAttachments'].filter((res: any) => res.resId === resIdMaster).length > 0) {
-                    resource['linkedResourcesAttachments'].filter((res: any) => res.resId === resIdMaster)[0].attachments.push(item);
-                } else {
-                    resource['linkedResourcesAttachments'].push(
-                        {
-                            resId : resIdMaster,
-                            attachments : [
-                                item
-                            ]
-                        }
-                    );
-                }
-            });
-        }
-
         printedFolder.resources.push(resource);
-
 
         return printedFolder;
     }

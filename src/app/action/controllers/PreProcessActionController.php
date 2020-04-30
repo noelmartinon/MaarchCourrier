@@ -1515,11 +1515,11 @@ class PreProcessActionController
 
         $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
         if (empty($entity)) {
-            return $response->withJson(['fatalError' => 'User has no primary entity', 'reason' => 'userHasNoPrimaryEntity']);
+            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity', 'lang' => 'userHasNoPrimaryEntity']);
         }
         $entityInformations = json_decode($entity['external_id'], true);
         if (empty($entityInformations['alfresco'])) {
-            return $response->withJson(['fatalError' => 'User primary entity has not enough alfresco informations', 'reason' => 'notEnoughAlfrescoInformations']);
+            return $response->withStatus(400)->withJson(['errors' => 'User primary entity has not enough alfresco informations', 'lang' => 'notEnoughAlfrescoInformations']);
         }
 
         $resourcesInformations = [];

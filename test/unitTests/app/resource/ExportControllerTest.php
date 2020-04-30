@@ -163,8 +163,15 @@ class ExportControllerTest extends TestCase
 
         $response     = $ExportController->updateExport($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
         $responseBody = json_decode((string)$response->getBody());
-
         $this->assertSame(null, $responseBody);
+        $headers = $response->getHeaders();
+        $this->assertSame('application/pdf', $headers['Content-Type'][0]);
+
+        $response     = $ExportController->updateExport($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame(null, $responseBody);
+        $headers = $response->getHeaders();
+        $this->assertSame('application/pdf', $headers['Content-Type'][0]);
 
         //  GET
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);

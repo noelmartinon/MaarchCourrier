@@ -19,21 +19,6 @@ use SrcCore\models\ValidatorModel;
 
 class ResourceContactModel
 {
-    public static function getByResId(array $aArgs)
-    {
-        ValidatorModel::notEmpty($aArgs, ['resId']);
-        ValidatorModel::intVal($aArgs, ['resId']);
-
-        $aContacts = DatabaseModel::select([
-            'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['resource_contacts'],
-            'where'     => ['res_id = ?'],
-            'data'      => [$aArgs['resId']],
-        ]);
-
-        return $aContacts;
-    }
-
     public static function get(array $args)
     {
         ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy']);

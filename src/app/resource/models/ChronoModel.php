@@ -81,6 +81,9 @@ class ChronoModel
         return implode('', $chronoNumber);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getChronoGlobal()
     {
         $chronoId = 'chrono_global_' . date('Y');
@@ -99,6 +102,9 @@ class ChronoModel
         return $chrono;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getChronoEntity($entityId)
     {
         $chronoId = "chrono_{$entityId}_" . date('Y');

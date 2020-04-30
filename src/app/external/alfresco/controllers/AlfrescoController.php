@@ -56,7 +56,7 @@ class AlfrescoController
 
         $body = $request->getParsedBody();
 
-        if (!Validator::stringType()->notEmpty()->validate($body['uri'])) {
+        if (!Validator::stringType()->validate($body['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body uri is empty or not a string']);
         }
 
@@ -272,6 +272,72 @@ class AlfrescoController
             'where'     => ['id in (?)'],
             'data'      => [$entitiesToRemove]
         ]);
+
+        return $response->withStatus(204);
+    }
+
+    public function checkAccount(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_alfresco', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
+        }
+
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        if (empty($configuration)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
+        }
+        $configuration = json_decode($configuration['value'], true);
+        if (empty($configuration['uri'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration URI is empty']);
+        }
+        $alfrescoUri = rtrim($configuration['uri'], '/');
+
+        if (empty($body['nodeId'])) {
+            $requestBody = [
+                'query' => [
+                    'query'     => "select * from cmis:folder",
+                    'language'  => 'cmis',
+                ],
+                "paging" => [
+                    'maxItems' => '1'
+                ],
+                'fields' => ['id', 'name']
+            ];
+            $curlResponse = CurlModel::execSimple([
+                'url'           => "{$alfrescoUri}/search/versions/1/search",
+                'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
+                'headers'       => ['content-type:application/json', 'Accept: application/json'],
+                'method'        => 'POST',
+                'body'          => json_encode($requestBody)
+            ]);
+
+        } else {
+            $curlResponse = CurlModel::execSimple([
+                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$body['nodeId']}/children",
+                'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
+                'headers'       => ['content-type:application/json'],
+                'method'        => 'GET',
+                'queryParams'   => ['where' => '(isFolder=true)']
+            ]);
+        }
+
+        if ($curlResponse['code'] != 200) {
+            if (!empty($curlResponse['response']['error']['briefSummary'])) {
+                return $response->withStatus(400)->withJson(['errors' => $curlResponse['response']['error']['briefSummary']]);
+            } elseif ($curlResponse['code'] == 404) {
+                return $response->withStatus(400)->withJson(['errors' => 'Page not found', 'lang' => 'pageNotFound']);
+            } else {
+                return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+            }
+        }
 
         return $response->withStatus(204);
     }

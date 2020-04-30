@@ -299,6 +299,10 @@ class PrivilegeController
                 $where[] = "list_event_data->>'canUpdate' = ?";
                 $data[] = 'true';
             }
+            if (!empty($args['canUpdateModel'])) {
+                $where[] = "list_event_data->>'canUpdateModel' = ?";
+                $data[] = 'true';
+            }
             $baskets = GroupBasketModel::get(['select' => ['basket_id'], 'where' => $where, 'data' => $data]);
             $baskets = array_column($baskets, 'basket_id');
             if (!empty($baskets)) {
@@ -320,6 +324,10 @@ class PrivilegeController
             $data = [$basket['basket_id'], $basket['oldGroupId'], 'processDocument'];
             if (!empty($args['canUpdate'])) {
                 $where[] = "list_event_data->>'canUpdate' = ?";
+                $data[] = 'true';
+            }
+            if (!empty($args['canUpdateModel'])) {
+                $where[] = "list_event_data->>'canUpdateModel' = ?";
                 $data[] = 'true';
             }
             $hasSB = GroupBasketModel::get(['select' => [1], 'where' => $where, 'data' => $data]);

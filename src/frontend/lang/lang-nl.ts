@@ -1658,7 +1658,7 @@ export const LANG_NL = {
     "accountLocked": "Too many connections attemps. Retry in", //_TO_TRANSLATE
     "modelUsedByResources": "This model is used by resources, you can't delete it.", //_TO_TRANSLATE
     "mustChangePassword": "Please, you must change your password.", //_TO_TRANSLATE
-    "linkedResources": "Linked mails", //_TO_TRANSLATE
+    "linkedResources": "Main document (Linked mails)", //_TO_TRANSLATE
     "linkedResourcesAttachments": "Attachments (linked mails)", //_TO_TRANSLATE
     "accessNotFound": "Access not found", //_TO_TRANSLATE
     "moreOneCustom": "This url is not an available instance of this application, please verify your address.", //_TO_TRANSLATE
@@ -1673,4 +1673,8 @@ export const LANG_NL = {
     "rootFolder": "Root folder", //_TO_TRANSLATE
     "chooseEntityAssociationAccount": "Choose entities who will be able to use this account", //_TO_TRANSLATE
     "alfrescoAPI": "API Alfresco address", //_TO_TRANSLATE
+    "testSucceeded": "Test succeeded",  //_TO_TRANSLATE
+    "test": "Test", //_TO_TRANSLATE
+    "canUpdateIndexingModel": "Can change indexing model", //_TO_TRANSLATE
+    "options": "Options", //_TO_TRANSLATE
 };

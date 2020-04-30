@@ -14,7 +14,7 @@ import { AppGuard, AfterProcessGuard } from '../service/app.guard';
 import { FolderDocumentListComponent } from './folder/document-list/folder-document-list.component';
 import { IndexationComponent } from './indexation/indexation.component';
 import { ForgotPasswordComponent } from './login/forgotPassword/forgotPassword.component';
-import { UpdatePasswordComponent } from './login/updatePassword/updatePassword.component';
+import { ResetPasswordComponent } from './login/resetPassword/reset-password.component';
 import { ProcessComponent } from './process/process.component';
 import { FollowedDocumentListComponent } from './home/followed-list/followed-document-list.component';
 import { LoginComponent } from './login/login.component';
@@ -37,7 +37,7 @@ import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.
             { path: 'signatureBook/users/:userId/groups/:groupId/baskets/:basketId/resources/:resId', canActivate: [AppGuard], component: SignatureBookComponent },
             { path: 'indexing/:groupId', canActivate: [AppGuard], component: IndexationComponent },
             { path: 'forgot-password', component: ForgotPasswordComponent },
-            { path: 'update-password', component: UpdatePasswordComponent },
+            { path: 'reset-password', component: ResetPasswordComponent },
             { path: 'followed', canActivate: [AppGuard], component: FollowedDocumentListComponent },
             { path: 'resources/:detailResId', canActivate: [AppGuard], canDeactivate: [AfterProcessGuard], component: ProcessComponent },
             { path: 'resources/:resId/content', canActivate: [AppGuard], component: DocumentViewerPageComponent },

@@ -359,7 +359,7 @@ class AuthenticationController
         $resetToken = AuthenticationController::getResetJWT(['id' => $args['userId'], 'expirationTime' => 1209600]); // 14 days
         UserModel::update(['set' => ['reset_token' => $resetToken], 'where' => ['id = ?'], 'data' => [$args['userId']]]);
 
-        $url = UrlController::getCoreUrl() . 'dist/index.html#/update-password?token=' . $resetToken;
+        $url = UrlController::getCoreUrl() . 'dist/index.html#/reset-password?token=' . $resetToken;
 
         $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
         $configuration = json_decode($configuration['value'], true);

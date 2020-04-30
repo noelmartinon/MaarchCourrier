@@ -341,15 +341,24 @@ abstract class EntityModelAbstract
             $entitiesAllowed = EntityModel::getAllEntitiesByUserId(['userId' => $aArgs['userId']]);
         }
 
-        $allEntities = EntityModel::get(['select' => ['id', 'entity_id', 'entity_label', 'parent_entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y'], 'orderBy' => ['parent_entity_id']]);
+        $allEntities = EntityModel::get([
+            'select'    => ['e1.id', 'e1.entity_id', 'e1.entity_label', 'e1.parent_entity_id', 'e2.id as parent_id'],
+            'table'     => ['entities e1', 'entities e2'],
+            'left_join' => ['e1.parent_entity_id = e2.entity_id'],
+            'where'     => ['e1.enabled = ?'],
+            'data'      => ['Y'],
+            'orderBy'   => ['e1.parent_entity_id']
+        ]);
 
         foreach ($allEntities as $key => $value) {
             $allEntities[$key]['serialId'] = $value['id'];
             $allEntities[$key]['id'] = $value['entity_id'];
             if (empty($value['parent_entity_id'])) {
+                $allEntities[$key]['parentSerialId'] = '#';
                 $allEntities[$key]['parent'] = '#';
                 $allEntities[$key]['icon'] = "fa fa-building";
             } else {
+                $allEntities[$key]['parentSerialId'] = $value['parent_id'];
                 $allEntities[$key]['parent'] = $value['parent_entity_id'];
                 $allEntities[$key]['icon'] = "fa fa-sitemap";
             }

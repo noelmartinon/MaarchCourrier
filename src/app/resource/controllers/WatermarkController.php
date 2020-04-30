@@ -95,6 +95,9 @@ class WatermarkController
         return $fileContent;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function watermarkAttachment(array $args)
     {
         ValidatorModel::notEmpty($args, ['attachmentId', 'path']);

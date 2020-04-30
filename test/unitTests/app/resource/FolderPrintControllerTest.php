@@ -13,6 +13,7 @@ class FolderPrintControllerTest extends TestCase
 {
     private static $noteId = null;
     private static $attachmentId = null;
+    private static $attachmentIdLinked = null;
     private static $emailId = null;
     private static $acknowledgementReceiptId = null;
 
@@ -66,6 +67,24 @@ class FolderPrintControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody());
         self::$attachmentId = $responseBody->id;
         $this->assertIsInt(self::$attachmentId);
+
+        $body = [
+            'title'         => 'Nulle pierre ne peut être polie sans friction, nul homme ne peut parfaire son expérience sans épreuve.',
+            'type'          => 'response_project',
+            'chrono'        => 'MAARCH/2019D/15',
+            'resIdMaster'   => $GLOBALS['resources'][1],
+            'encodedFile'   => $encodedFile,
+            'format'        => 'txt',
+            'recipientId'   => 1,
+            'recipientType' => 'contact'
+        ];
+
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response     = $attachmentController->create($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertIsInt($responseBody['id']);
+        self::$attachmentIdLinked = $responseBody['id'];
 
         // CREATE EMAIL
         self::$emailId = \Email\controllers\EmailController::createEmail([
@@ -134,12 +153,7 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [self::$noteId],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1],
-                            'document' => true
-                        ]
-                    ],
+                    "linkedResources"         => [$GLOBALS['resources'][1]],
                 ], [
                     "resId"                   => $GLOBALS['resources'][0] * 1000,
                     "document"                => true,
@@ -147,12 +161,7 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [self::$noteId],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1],
-                            'document' => true
-                        ]
-                    ],
+                    "linkedResources"         => [$GLOBALS['resources'][1]],
                 ]
             ]
         ];
@@ -347,12 +356,7 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [self::$noteId],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => 'wrong format',
-                            'document' => true
-                        ]
-                    ],
+                    "linkedResources"         => ['wrong format']
                 ]
             ]
         ];
@@ -360,9 +364,9 @@ class FolderPrintControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
         $response     = $folderPrintController->generateFile($fullRequest, new \Slim\Http\Response());
-        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('LinkedResources resId is not an integer', $responseBody['errors']);
+        $this->assertSame('LinkedResources out of perimeter', $responseBody['errors']);
 
         $body = [
             "resources" => [
@@ -373,12 +377,7 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [self::$noteId],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][2],
-                            'document' => true
-                        ]
-                    ],
+                    "linkedResources"         => [$GLOBALS['resources'][2]]
                 ]
             ]
         ];
@@ -399,12 +398,7 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1] * 1000,
-                            'document' => true
-                        ]
-                    ],
+                    "linkedResources"         => [$GLOBALS['resources'][1] * 1000]
                 ]
             ]
         ];
@@ -429,12 +423,7 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1] * 1000,
-                            'document' => true
-                        ]
-                    ],
+                    "linkedResources"         => [$GLOBALS['resources'][1] * 1000]
                 ]
             ]
         ];
@@ -460,13 +449,8 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1],
-                            'document' => true,
-                            'attachments' => ['wrong format']
-                        ]
-                    ],
+                    "linkedResources" => [],
+                    "linkedResourcesAttachments" => ['wrong format'],
                 ]
             ]
         ];
@@ -487,13 +471,8 @@ class FolderPrintControllerTest extends TestCase
                     "notes"                   => [],
                     "acknowledgementReceipts" => [],
                     "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1],
-                            'document' => true,
-                            'attachments' => [self::$attachmentId * 1000]
-                        ]
-                    ],
+                    "linkedResources" => [],
+                    "linkedResourcesAttachments" => [self::$attachmentId * 1000],
                 ]
             ]
         ];
@@ -504,33 +483,6 @@ class FolderPrintControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('LinkedResources attachments not found', $responseBody['errors']);
-
-        $body = [
-            "resources" => [
-                [
-                    "resId"                   => $GLOBALS['resources'][0],
-                    "document"                => true,
-                    "attachments"             => [],
-                    "notes"                   => [],
-                    "acknowledgementReceipts" => [],
-                    "emails"                  => [],
-                    "linkedResources"         => [
-                        [
-                            'resId'    => $GLOBALS['resources'][1],
-                            'document' => true,
-                            'attachments' => [self::$attachmentId]
-                        ]
-                    ],
-                ]
-            ]
-        ];
-
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response     = $folderPrintController->generateFile($fullRequest, new \Slim\Http\Response());
-        $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('LinkedResources attachment is not linked to resource', $responseBody['errors']);
 
         // Acknowledgement receipt errors
         $body = [
@@ -662,20 +614,18 @@ class FolderPrintControllerTest extends TestCase
 
         // Success
         $body = [
-            "resources" => [[
-                "resId"                   => $GLOBALS['resources'][0],
-                "document"                => true,
-                "attachments"             => [self::$attachmentId],
-                "notes"                   => [self::$noteId],
-                "acknowledgementReceipts" => [self::$acknowledgementReceiptId],
-                "emails"                  => [self::$emailId],
-                "linkedResources"         => [
-                    [
-                        'resId'     => $GLOBALS['resources'][1],
-                        'document'  => true
-                    ]
-                ],
-            ]],
+            "resources" => [
+                [
+                    "resId"                      => $GLOBALS['resources'][0],
+                    "document"                   => true,
+                    "attachments"                => [self::$attachmentId],
+                    "notes"                      => [self::$noteId],
+                    "acknowledgementReceipts"    => [self::$acknowledgementReceiptId],
+                    "emails"                     => [self::$emailId],
+                    "linkedResources"            => [$GLOBALS['resources'][1]],
+                    "linkedResourcesAttachments" => 'ALL',
+                ]
+            ],
             "summarySheet" => [
                 [
                     "unit" => "qrcode",
@@ -790,15 +740,8 @@ class FolderPrintControllerTest extends TestCase
         $response     = $attachmentController->delete($request, new \Slim\Http\Response(), ['id' => self::$attachmentId]);
         $this->assertSame(204, $response->getStatusCode());
 
-        // //ERRORS
-        // $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
-        // $request        = \Slim\Http\Request::createFromEnvironment($environment);
-
-        // unset($body['data'][2]['label']);
-        // $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-        // $response = $ExportController->updateExport($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
-        // $responseBody = json_decode((string)$response->getBody());
-        // $this->assertSame('One data is not set well', $responseBody->errors);
+        $response     = $attachmentController->delete($request, new \Slim\Http\Response(), ['id' => self::$attachmentIdLinked]);
+        $this->assertSame(204, $response->getStatusCode());
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

@@ -86,7 +86,7 @@ import { PrintSeparatorComponent } from './separator/print-separator/print-separ
 
 import { IndexationComponent } from './indexation/indexation.component';
 import { ForgotPasswordComponent } from './login/forgotPassword/forgotPassword.component';
-import { UpdatePasswordComponent } from './login/updatePassword/updatePassword.component';
+import { ResetPasswordComponent } from './login/resetPassword/reset-password.component';
 import { HistoryWorkflowResumeComponent } from './history/history-workflow-resume/history-workflow-resume.component';
 import { NoteResumeComponent } from './notes/note-resume/note-resume.component';
 import { AttachmentsResumeComponent } from './attachments/attachments-resume/attachments-resume.component';
@@ -115,6 +115,7 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
 import { SentNumericPackagePageComponent } from './sentResource/sent-numeric-package-page/sent-numeric-package-page.component';
 import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-create-modal.component';
 import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.component';
+import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
 
 
 
@@ -191,7 +192,7 @@ import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.
         FolderActionListComponent,
         IndexationComponent,
         ForgotPasswordComponent,
-        UpdatePasswordComponent,
+        ResetPasswordComponent,
         HistoryWorkflowResumeComponent,
         NoteResumeComponent,
         AttachmentsResumeComponent,
@@ -218,7 +219,8 @@ import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.
         SentNumericPackagePageComponent,
         FolderCreateModalComponent,
         ReconcileActionComponent,
-        DocumentViewerPageComponent
+        DocumentViewerPageComponent,
+        SelectIndexingModelComponent
     ],
     entryComponents: [
         InfoChangePasswordModalComponent,
