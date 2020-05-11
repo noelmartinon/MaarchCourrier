@@ -55,8 +55,8 @@ class SignatureBookController
         }
 
         $documents = SignatureBookController::getIncomingMailAndAttachmentsForSignatureBook(['resId' => $resId]);
-        if (!empty($documents['error'])) {
-            return $response->withJson($documents);
+        if (!empty($documents['errors'])) {
+            return $response->withStatus(400)->withJson($documents);
         }
 
         $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_id', 'basket_clause']]);
@@ -117,7 +117,7 @@ class SignatureBookController
             'select'    => ['res_id', 'subject', 'alt_identifier', 'category_id', 'filename', 'integrations']
         ]);
         if (empty($incomingMail)) {
-            return ['error' => 'No Document Found'];
+            return ['errors' => 'No Document Found'];
         }
 
         $integrations = json_decode($incomingMail['integrations'], true);
@@ -429,7 +429,7 @@ class SignatureBookController
         $height = (int)$loadedXml->CONFIG->height_blocsign ?? 100;
         $tmpPath = CoreConfigModel::getTmpPath();
 
-        $command = "java -jar modules/visa/dist/SignPdf.jar {$pathToDocument} {$signaturePath} {$width} {$height} {$tmpPath}";
+        $command = "java -jar modules/visa/dist/SignPdf.jar {$pathToDocument} {$signaturePath} {$width} {$height} {$tmpPath} 2> /dev/null";
         exec($command, $output, $return);
 
         $signedDocument = @file_get_contents($tmpPath.$convertedDocument['filename']);
@@ -568,7 +568,7 @@ class SignatureBookController
         $height = (int)$loadedXml->CONFIG->height_blocsign ?? 100;
         $tmpPath = CoreConfigModel::getTmpPath();
 
-        $command = "java -jar modules/visa/dist/SignPdf.jar {$pathToDocument} {$signaturePath} {$width} {$height} {$tmpPath}";
+        $command = "java -jar modules/visa/dist/SignPdf.jar {$pathToDocument} {$signaturePath} {$width} {$height} {$tmpPath} 2> /dev/null";
         exec($command, $output, $return);
 
         $signedDocument = @file_get_contents($tmpPath.$convertedDocument['filename']);

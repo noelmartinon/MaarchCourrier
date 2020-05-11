@@ -55,7 +55,8 @@ import { TagAdministrationComponent } from './tag/tag-administration.component';
 import { TemplateFileEditorModalComponent } from './template/templateFileEditorModal/template-file-editor-modal.component';
 import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-administration.component';
 import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administration.component';
-
+import { ContactDuplicateComponent } from './contact/contact-duplicate/contact-duplicate.component';
+import { ManageDuplicateComponent } from './contact/contact-duplicate/manage-duplicate/manage-duplicate.component';
 
 
 @NgModule({
@@ -123,7 +124,9 @@ import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administrat
         TagAdministrationComponent,
         TemplateFileEditorModalComponent,
         AlfrescoAdministrationComponent,
-        AlfrescoListAdministrationComponent
+        AlfrescoListAdministrationComponent,
+        ContactDuplicateComponent,
+        ManageDuplicateComponent,
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,
@@ -136,7 +139,8 @@ import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administrat
         ContactsListAdministrationRedirectModalComponent,
         TemplateAdministrationCheckEntitiesModalComponent,
         AccountLinkComponent,
-        TemplateFileEditorModalComponent
+        TemplateFileEditorModalComponent,
+        ManageDuplicateComponent
     ],
 })
 export class AdministrationModule { }

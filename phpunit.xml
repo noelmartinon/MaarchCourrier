@@ -19,7 +19,6 @@
             <file>test/unitTests/app/entity/EntitySeparatorControllerTest.php</file>
             <file>test/unitTests/app/group/GroupControllerTest.php</file>
             <file>test/unitTests/app/group/PrivilegeControllerTest.php</file>
-            <file>test/unitTests/app/entity/ListTemplateControllerTest.php</file>
             <file>test/unitTests/app/indexingModel/IndexingModelControllerTest.php</file>
             <file>test/unitTests/app/notification/NotificationControllerTest.php</file>
             <file>test/unitTests/app/notification/NotificationScheduleControllerTest.php</file>
@@ -27,6 +26,7 @@
             <file>test/unitTests/app/priority/PriorityControllerTest.php</file>
             <file>test/unitTests/app/resource/ResControllerTest.php</file>
             <file>test/unitTests/app/resource/ResourceListControllerTest.php</file>
+            <file>test/unitTests/app/entity/ListTemplateControllerTest.php</file>
             <file>test/unitTests/app/indexing/IndexingControllerTest.php</file>
             <file>test/unitTests/app/resource/ExportControllerTest.php</file>
             <file>test/unitTests/app/resource/LinkControllerTest.php</file>
@@ -45,6 +45,7 @@
             <file>test/unitTests/app/resource/FolderPrintControllerTest.php</file>
             <file>test/unitTests/app/search/SearchControllerTest.php</file>
             <file>test/unitTests/app/template/DatasourceControllerTest.php</file>
+            <file>test/unitTests/app/signatureBook/SignatureBookControllerTest.php</file>
             <file>test/unitTests/app/acknowledgementReceipt/AcknowledgementReceiptControllerTest.php</file>
             <file>test/unitTests/app/notification/DiffusionTypesControllerTest.php</file>
             <!-- The last one should be history -->

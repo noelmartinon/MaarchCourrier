@@ -231,8 +231,10 @@ class ContactCustomFieldControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-
         $response     = $contactCustomFieldController->delete($request, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(204, $response->getStatusCode());
+
+        $response     = $contactCustomFieldController->delete($request, new \Slim\Http\Response(), ['id' => self::$id2]);
         $this->assertSame(204, $response->getStatusCode());
 
         // Fail

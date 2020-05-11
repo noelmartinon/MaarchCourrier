@@ -16,7 +16,7 @@ import { tap, catchError, map, finalize, filter } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
+import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { DiffusionsListComponent } from '../diffusions/diffusions-list.component';
 
 import { ContactService } from '../../service/contact.service';
@@ -752,7 +752,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     openContact() {
         if (this.hasContact) {
-            this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${this.currentResourceInformations.chrono} - ${this.currentResourceInformations.subject}`, mode: this.currentResourceInformations.categoryId !== 'outgoing' ? 'senders' : 'recipients', resId: this.currentResourceInformations.resId } });
+            this.dialog.open(ContactResourceModalComponent, { panelClass: 'maarch-modal', data: { title: `${this.currentResourceInformations.chrono} - ${this.currentResourceInformations.subject}`, mode: this.currentResourceInformations.categoryId !== 'outgoing' ? 'senders' : 'recipients', resId: this.currentResourceInformations.resId } });
         }
     }
 

@@ -1,0 +1,13 @@
+<div class="mat-dialog-content-container">
+    <div mat-dialog-content class="contact-list-container" [class.contact-list-container-1]="data.duplicate.length == 1" [class.contact-list-container-2]="data.duplicate.length == 2">
+        <div *ngFor="let contact of data.duplicate;let i=index">
+            <app-contact-detail #appContactDetail [class.merged]="contactSelected!==i && contactSelected!==null" [contact]="contact" [selectable]="contactSelected===i || contactSelected===null" (afterSelectedEvent)="mergeContact($event, i)" (afterDeselectedEvent)="resetContact($event, i)"></app-contact-detail>
+        </div>        
+    </div>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions class="actions">
+        <button mat-raised-button mat-button color="primary" [disabled]="contactSelected===null"
+            (click)="onSubmit()">{{lang.merge}}</button>
+        <button mat-raised-button mat-button [mat-dialog-close]="">{{lang.cancel}}</button>
+    </div>
+</div>

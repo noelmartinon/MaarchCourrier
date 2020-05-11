@@ -162,6 +162,7 @@ class DatabasePDO
                 $file = fopen('queries_error.log', 'a');
                 fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $queryString . PHP_EOL);
                 fwrite($file, '[' . date('Y-m-d H:i:s') . "] [{$param}]" . PHP_EOL);
+                fwrite($file, '[' . date('Y-m-d H:i:s') . "] [{$PDOException->getMessage()}]" . PHP_EOL);
                 fclose($file);
 
                 throw new \Exception($PDOException->getMessage());

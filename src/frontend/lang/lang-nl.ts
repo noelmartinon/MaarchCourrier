@@ -1677,4 +1677,11 @@ export const LANG_NL = {
     "test": "Test", //_TO_TRANSLATE
     "canUpdateIndexingModel": "Can change indexing model", //_TO_TRANSLATE
     "options": "Options", //_TO_TRANSLATE
+    "contactsDuplicates": "Contacts duplicates",  //_TO_TRANSLATE
+    "contactsMerged": "Contacts merged", //_TO_TRANSLATE
+    "addCriteria": "Add a criteria", //_TO_TRANSLATE
+    "launchSearch": "Launch search", //_TO_TRANSLATE
+    "duplicatesContactDisplayed": "{0} duplicates ({1} displayed)", //_TO_TRANSLATE
+    "duplicatesContactsAdmin": "Manage contacts duplicates", //_TO_TRANSLATE
+    "merge": "Merge", //_TO_TRANSLATE
 };

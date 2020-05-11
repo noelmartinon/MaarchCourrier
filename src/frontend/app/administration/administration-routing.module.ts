@@ -48,6 +48,7 @@ import { TagsAdministrationComponent } from './tag/tags-administration.component
 import { TagAdministrationComponent } from './tag/tag-administration.component';
 import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administration.component';
 import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-administration.component';
+import { ContactDuplicateComponent } from './contact/contact-duplicate/contact-duplicate.component';
 
 @NgModule({
     imports: [
@@ -86,6 +87,7 @@ import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-ad
             { path: 'administration/history-batch', canActivate: [AppGuard], component: HistoryBatchAdministrationComponent },
             { path: 'administration/update-status', canActivate: [AppGuard], component: UpdateStatusAdministrationComponent },
             { path: 'administration/contacts', canActivate: [AppGuard], component: ContactsListAdministrationComponent },
+            { path: 'administration/contacts/duplicates', canActivate: [AppGuard], component: ContactDuplicateComponent },
             { path: 'administration/contacts/list', redirectTo: 'administration/contacts', pathMatch: 'full' },
             { path: 'administration/contacts/list/new', canActivate: [AppGuard], component: ContactsPageAdministrationComponent },
             { path: 'administration/contacts/list/:id', canActivate: [AppGuard], component: ContactsPageAdministrationComponent },

@@ -40,6 +40,7 @@ class EmailScript
 
         $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
         $GLOBALS['login'] = $currentUser['user_id'];
+        $GLOBALS['id']    = $args['userId'];
         $_SERVER['MAARCH_ENCRYPT_KEY'] = $args['encryptKey'];
 
         $isSent = EmailController::sendEmail(['emailId' => $args['emailId'], 'userId' => $args['userId']]);

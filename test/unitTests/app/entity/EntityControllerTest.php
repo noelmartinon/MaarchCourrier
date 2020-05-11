@@ -84,6 +84,15 @@ class EntityControllerTest extends TestCase
 
         $this->assertSame('Bad Request', $responseBody['errors']);
 
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $entityController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Service forbidden', $responseBody->errors);
+
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
@@ -129,7 +138,8 @@ class EntityControllerTest extends TestCase
             'entity_type'       => 'Direction',
             'email'             => 'paris@isMagic2.fr',
             'adrs_2'            => '2 rue des princes',
-            'toto'              => 'toto'
+            'toto'              => 'toto',
+            'parent_entity_id' => 'COU'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -151,8 +161,32 @@ class EntityControllerTest extends TestCase
         $this->assertSame('TEST-ENTITY123-SHORTLABEL-UP', $responseBody->short_label);
         $this->assertSame('Direction', $responseBody->entity_type);
         $this->assertSame('Y', $responseBody->enabled);
-        $this->assertSame(null, $responseBody->parent_entity_id);
+        $this->assertSame('COU', $responseBody->parent_entity_id);
 
+        // test setting entity as user's primary entity when user does not have any
+        \User\models\UserEntityModel::deleteUserEntity(['id' => $GLOBALS['id'], 'entityId' => 'TEST-ENTITY123']);
+        \User\models\UserEntityModel::update([
+            'set'   => ['primary_entity' => 'N'],
+            'where' => ['user_id = ?'],
+            'data'  => [$GLOBALS['id']]
+        ]);
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+        $aArgs = [
+            'entity_label'      => 'TEST-ENTITY123-LABEL',
+            'short_label'       => 'TEST-ENTITY123-SHORTLABEL-UP',
+            'entity_type'       => 'Direction',
+            'email'             => 'paris@isMagic2.fr',
+            'adrs_2'            => '2 rue des princes',
+            'toto'              => 'toto',
+            'parent_entity_id'  => null
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(200, $response->getStatusCode());
+
+        // Errors
         $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => '12345678923456789']);
         $this->assertSame(400, $response->getStatusCode());
 
@@ -167,7 +201,47 @@ class EntityControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Bad Request', $responseBody['errors']);
 
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'CAB']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity out of perimeter', $responseBody['errors']);
+
         \User\models\UserEntityModel::deleteUserEntity(['id' => $GLOBALS['id'], 'entityId' => 'TEST-ENTITY123']);
+
+        \User\models\UserEntityModel::update([
+            'set'   => ['primary_entity' => 'Y'],
+            'where' => ['user_id = ?', 'entity_id = ?'],
+            'data'  => [$GLOBALS['id'], 'COU']
+        ]);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $aArgs = [
+            'entity_label'     => 'TEST-ENTITY123-LABEL',
+            'short_label'      => 'TEST-ENTITY123-SHORTLABEL-UP',
+            'entity_type'      => 'Direction',
+            'email'            => 'paris@isMagic2.fr',
+            'adrs_2'           => '2 rue des princes',
+            'toto'             => 'toto',
+            'parent_entity_id' => 'SP'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+        $response     = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'PJS']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(_CAN_NOT_MOVE_IN_CHILD_ENTITY, $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $entityController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Service forbidden', $responseBody->errors);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -215,6 +289,7 @@ class EntityControllerTest extends TestCase
 
         $this->assertSame('success', $responseBody->success);
 
+        // Errors
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -231,8 +306,29 @@ class EntityControllerTest extends TestCase
         $response     = $entityController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-
         $this->assertSame('Bad Request', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $entityController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => 'PJS']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity out of perimeter', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $entityController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Service forbidden', $responseBody->errors);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGet()
@@ -254,33 +350,136 @@ class EntityControllerTest extends TestCase
     {
         $entityController = new \Entity\controllers\EntityController();
 
+        $visaTemplateId = \Entity\models\ListTemplateModel::create([
+            'title'       => 'TEMPLATE TEST',
+            'description' => 'TEMPLATE TEST will be deleted when entity is deleted',
+            'type'        => 'visaCircuit',
+            'entity_id'   => self::$id,
+            'owner'       => $GLOBALS['id']
+        ]);
+        \Entity\models\ListTemplateItemModel::create([
+            'list_template_id' => $visaTemplateId,
+            'item_id'          => $GLOBALS['id'],
+            'item_type'        => 'user',
+            'item_mode'        => 'sign',
+            'sequence'         => 0,
+        ]);
+        $templateId = \Entity\models\ListTemplateModel::create([
+            'title'       => 'TEMPLATE TEST',
+            'description' => 'TEMPLATE TEST will be deleted when entity is deleted',
+            'type'        => 'diffusionList',
+            'entity_id'   => self::$id,
+            'owner'       => $GLOBALS['id']
+        ]);
+        \Entity\models\ListTemplateItemModel::create([
+            'list_template_id' => $templateId,
+            'item_id'          => $GLOBALS['id'],
+            'item_type'        => 'user',
+            'item_mode'        => 'dest',
+            'sequence'         => 0,
+        ]);
+        \Entity\models\ListTemplateItemModel::create([
+            'list_template_id' => $templateId,
+            'item_id'          => 13,
+            'item_type'        => 'entity',
+            'item_mode'        => 'cc',
+            'sequence'         => 1,
+        ]);
+
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->getDetailledById($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
         $this->assertSame(200, $response->getStatusCode());
-        $responseBody   = json_decode((string)$response->getBody());
+        $responseBody   = json_decode((string)$response->getBody(), true);
 
-        $this->assertSame('TEST-ENTITY123', $responseBody->entity->entity_id);
-        $this->assertSame('TEST-ENTITY123-LABEL', $responseBody->entity->entity_label);
-        $this->assertSame('TEST-ENTITY123-SHORTLABEL-UP', $responseBody->entity->short_label);
-        $this->assertSame('Direction', $responseBody->entity->entity_type);
-        $this->assertSame('Y', $responseBody->entity->enabled);
-        $this->assertSame('paris@isMagic2.fr', $responseBody->entity->email);
-        $this->assertSame('1 rue du parc des princes', $responseBody->entity->adrs_1);
-        $this->assertSame('2 rue des princes', $responseBody->entity->adrs_2);
-        $this->assertSame(null, $responseBody->entity->adrs_3);
-        $this->assertSame('75016', $responseBody->entity->zipcode);
-        $this->assertSame('PARIS', $responseBody->entity->city);
-        $this->assertSame(null, $responseBody->entity->parent_entity_id);
-        $this->assertIsArray((array) $responseBody->entity->listTemplate);
-        $this->assertIsArray($responseBody->entity->visaCircuit);
-        $this->assertSame(false, $responseBody->entity->hasChildren);
-        $this->assertSame(0, $responseBody->entity->documents);
-        $this->assertIsArray($responseBody->entity->users);
-        $this->assertIsArray($responseBody->entity->templates);
-        $this->assertSame(0, $responseBody->entity->instances);
-        $this->assertSame(0, $responseBody->entity->redirects);
+        $this->assertSame('TEST-ENTITY123', $responseBody['entity']['entity_id']);
+        $this->assertSame('TEST-ENTITY123-LABEL', $responseBody['entity']['entity_label']);
+        $this->assertSame('TEST-ENTITY123-SHORTLABEL-UP', $responseBody['entity']['short_label']);
+        $this->assertSame('Direction', $responseBody['entity']['entity_type']);
+        $this->assertSame('Y', $responseBody['entity']['enabled']);
+        $this->assertSame('paris@isMagic2.fr', $responseBody['entity']['email']);
+        $this->assertSame('1 rue du parc des princes', $responseBody['entity']['adrs_1']);
+        $this->assertSame('2 rue des princes', $responseBody['entity']['adrs_2']);
+        $this->assertSame(null, $responseBody['entity']['adrs_3']);
+        $this->assertSame('75016', $responseBody['entity']['zipcode']);
+        $this->assertSame('PARIS', $responseBody['entity']['city']);
+        $this->assertSame(null, $responseBody['entity']['parent_entity_id']);
+        $this->assertIsArray($responseBody['entity']['listTemplate']);
+        $this->assertNotEmpty($responseBody['entity']['listTemplate']);
+
+        $this->assertSame($templateId, $responseBody['entity']['listTemplate']['id']);
+        $this->assertSame('TEMPLATE TEST', $responseBody['entity']['listTemplate']['title']);
+        $this->assertSame('TEMPLATE TEST will be deleted when entity is deleted', $responseBody['entity']['listTemplate']['description']);
+        $this->assertSame('diffusionList', $responseBody['entity']['listTemplate']['type']);
+        $this->assertIsArray($responseBody['entity']['listTemplate']['items']);
+
+        $this->assertIsArray($responseBody['entity']['listTemplate']['items']['dest'][0]);
+        $this->assertSame($GLOBALS['id'], $responseBody['entity']['listTemplate']['items']['dest'][0]['id']);
+        $this->assertSame('user', $responseBody['entity']['listTemplate']['items']['dest'][0]['type']);
+        $this->assertSame(0, $responseBody['entity']['listTemplate']['items']['dest'][0]['sequence']);
+        $this->assertIsString($responseBody['entity']['listTemplate']['items']['dest'][0]['labelToDisplay']);
+        $this->assertEmpty($responseBody['entity']['listTemplate']['items']['dest'][0]['descriptionToDisplay']);
+
+        $this->assertIsArray($responseBody['entity']['listTemplate']['items']['cc'][0]);
+        $this->assertSame(13, $responseBody['entity']['listTemplate']['items']['cc'][0]['id']);
+        $this->assertSame('entity', $responseBody['entity']['listTemplate']['items']['cc'][0]['type']);
+        $this->assertSame(1, $responseBody['entity']['listTemplate']['items']['cc'][0]['sequence']);
+        $this->assertIsString($responseBody['entity']['listTemplate']['items']['cc'][0]['labelToDisplay']);
+        $this->assertEmpty($responseBody['entity']['listTemplate']['items']['cc'][0]['descriptionToDisplay']);
+
+        $this->assertIsArray($responseBody['entity']['visaCircuit']);
+        $this->assertNotEmpty($responseBody['entity']['visaCircuit']);
+
+        $this->assertSame($visaTemplateId, $responseBody['entity']['visaCircuit']['id']);
+        $this->assertSame('TEMPLATE TEST', $responseBody['entity']['visaCircuit']['title']);
+        $this->assertSame('TEMPLATE TEST will be deleted when entity is deleted', $responseBody['entity']['visaCircuit']['description']);
+        $this->assertSame('visaCircuit', $responseBody['entity']['visaCircuit']['type']);
+        $this->assertIsArray($responseBody['entity']['visaCircuit']['items']);
+
+        $this->assertIsArray($responseBody['entity']['visaCircuit']['items'][0]);
+        $this->assertSame($GLOBALS['id'], $responseBody['entity']['visaCircuit']['items'][0]['id']);
+        $this->assertSame('user', $responseBody['entity']['visaCircuit']['items'][0]['type']);
+        $this->assertSame('sign', $responseBody['entity']['visaCircuit']['items'][0]['mode']);
+        $this->assertSame(0, $responseBody['entity']['visaCircuit']['items'][0]['sequence']);
+        $this->assertIsString($responseBody['entity']['visaCircuit']['items'][0]['idToDisplay']);
+        $this->assertEmpty($responseBody['entity']['visaCircuit']['items'][0]['descriptionToDisplay']);
+
+        $this->assertSame(false, $responseBody['entity']['hasChildren']);
+        $this->assertSame(0, $responseBody['entity']['documents']);
+        $this->assertIsArray($responseBody['entity']['users']);
+        $this->assertIsArray($responseBody['entity']['templates']);
+        $this->assertSame(0, $responseBody['entity']['instances']);
+        $this->assertSame(0, $responseBody['entity']['redirects']);
+
+        // Errors
+        $response     = $entityController->getDetailledById($request, new \Slim\Http\Response(), ['id' => 'SECRET-SERVICE']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity not found', $responseBody['errors']);
+
+
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $entityController->getDetailledById($request, new \Slim\Http\Response(), ['id' => 'PJS']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity out of perimeter', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $entityController->getDetailledById($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Service forbidden', $responseBody->errors);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testReassignEntity()
@@ -314,6 +513,7 @@ class EntityControllerTest extends TestCase
 
         $this->assertIsArray($responseBody['entities']);
 
+        // Errors
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->reassignEntity($request, new \Slim\Http\Response(), ['id' => 'R2-D29999999', 'newEntityId' => 'TEST-ENTITY123']);
@@ -321,6 +521,28 @@ class EntityControllerTest extends TestCase
         $responseBody   = json_decode((string)$response->getBody(), true);
 
         $this->assertSame('Entity does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $entityController->reassignEntity($request, new \Slim\Http\Response(), ['id' => 'PJS', 'newEntityId' => 'TEST-ENTITY123']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity out of perimeter', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $entityController->reassignEntity($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123', 'newEntityId' => 'TEST-ENTITY123']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Service forbidden', $responseBody->errors);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDelete()
@@ -344,6 +566,40 @@ class EntityControllerTest extends TestCase
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertSame('Entity not found', $responseBody->errors);
+
+        // Errors
+        $response     = $entityController->delete($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity not found', $responseBody['errors']);
+
+        $response     = $entityController->delete($request, new \Slim\Http\Response(), ['id' => 'PJS']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity is still used', $responseBody['errors']);
+
+
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response     = $entityController->delete($request, new \Slim\Http\Response(), ['id' => 'PJS']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Entity out of perimeter', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddur';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $entityController->delete($request, new \Slim\Http\Response(), ['id' => 'TEST-ENTITY123']);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody());
+        $this->assertSame('Service forbidden', $responseBody->errors);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetTypes()

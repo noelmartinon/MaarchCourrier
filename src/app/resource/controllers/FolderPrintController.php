@@ -392,13 +392,16 @@ class FolderPrintController
                 } else {
                     $oLinkedResources = ResModel::getById(['resId' => $resource['resId'], 'select' => ['linked_resources']]);
                     $linkedResources = json_decode($oLinkedResources['linked_resources'], true);
-                    $attachments = AttachmentModel::get([
-                        'select'  => ['res_id', 'res_id_master', 'recipient_type', 'recipient_id', 'typist', 'status', 'attachment_type',
-                            'creation_date', 'identifier', 'title', 'format', 'docserver_id', 'origin'],
-                        'where'   => ['res_id_master in (?)', 'status not in (?)'],
-                        'data'    => [$linkedResources, ['DEL', 'OBS']],
-                        'orderBy' => ['creation_date desc']
-                    ]);
+                    $attachments = [];
+                    if (!empty($linkedResources)) {
+                        $attachments = AttachmentModel::get([
+                            'select'  => ['res_id', 'res_id_master', 'recipient_type', 'recipient_id', 'typist', 'status', 'attachment_type',
+                                'creation_date', 'identifier', 'title', 'format', 'docserver_id', 'origin'],
+                            'where'   => ['res_id_master in (?)', 'status not in (?)'],
+                            'data'    => [$linkedResources, ['DEL', 'OBS']],
+                            'orderBy' => ['creation_date desc']
+                        ]);
+                    }
                 }
 
                 $attachmentsIds = array_column($attachments, 'res_id');
@@ -447,7 +450,7 @@ class FolderPrintController
                 if (!is_array($resource['linkedResources'])) {
                     $resource['linkedResources'] = $controlResource['linked_resources'];
                 }
-                if (!ResController::hasRightByResId(['resId' => $resource['linkedResources'], 'userId' => $GLOBALS['id']])) {
+                if (!empty($resource['linkedResources']) && !ResController::hasRightByResId(['resId' => $resource['linkedResources'], 'userId' => $GLOBALS['id']])) {
                     return $response->withStatus(403)->withJson(['errors' => 'LinkedResources out of perimeter']);
                 }
                 foreach ($resource['linkedResources'] as $linkedResource) {

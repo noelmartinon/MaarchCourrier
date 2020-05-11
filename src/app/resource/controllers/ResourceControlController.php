@@ -471,6 +471,10 @@ class ResourceControlController
                 }
             }
         } elseif (!empty($body['priority'])) {
+            if (!Validator::stringType()->validate($body['priority'])) {
+                return ['errors' => "Body priority is not a string"];
+            }
+            
             $priority = PriorityModel::getById(['id' => $body['priority'], 'select' => [1]]);
             if (empty($priority)) {
                 return ['errors' => "Body priority does not exist"];

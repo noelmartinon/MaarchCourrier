@@ -643,17 +643,11 @@ class EmailController
         $phpmailer->SMTPDebug = 1;
         $phpmailer->Debugoutput = function ($str) {
             if (strpos($str, 'SMTP ERROR') !== false) {
-                if (!empty($GLOBALS['id'])) {
-                    $user = $GLOBALS['id'];
-                } else {
-                    $user = UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1])[0]['id'];
-                }
                 HistoryController::add([
                     'tableName'    => 'emails',
                     'recordId'     => 'email',
                     'eventType'    => 'ERROR',
                     'eventId'      => 'sendEmail',
-                    'userId'       => $user,
                     'info'         => $str
                 ]);
             }

@@ -97,8 +97,7 @@ import { AddPrivateIndexingModelModalComponent } from './indexation/private-inde
 import { FoldersService } from './folder/folders.service';
 import { PrivilegeService } from '../service/privileges.service';
 import { ActionsService } from './actions/actions.service';
-import { ContactsListComponent } from './contact/list/contacts-list.component';
-import { ContactsListModalComponent } from './contact/list/modal/contacts-list-modal.component';
+import { ContactResourceModalComponent } from './contact/contact-resource/modal/contact-resource-modal.component';
 import { ContactModalComponent } from './administration/contact/modal/contact-modal.component';
 import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
 import { AddVisaModelModalComponent } from './visa/addVisaModel/add-visa-model-modal.component';
@@ -200,8 +199,7 @@ import { SelectIndexingModelComponent } from './indexation/select-indexing-model
         AttachmentCreateComponent,
         AddPrivateIndexingModelModalComponent,
         MailResumeComponent,
-        ContactsListComponent,
-        ContactsListModalComponent,
+        ContactResourceModalComponent,
         ContactModalComponent,
         FollowedDocumentListComponent,
         FollowedActionListComponent,
@@ -220,7 +218,7 @@ import { SelectIndexingModelComponent } from './indexation/select-indexing-model
         FolderCreateModalComponent,
         ReconcileActionComponent,
         DocumentViewerPageComponent,
-        SelectIndexingModelComponent
+        SelectIndexingModelComponent,
     ],
     entryComponents: [
         InfoChangePasswordModalComponent,
@@ -257,7 +255,7 @@ import { SelectIndexingModelComponent } from './indexation/select-indexing-model
         AddPrivateIndexingModelModalComponent,
         AttachmentPageComponent,
         AttachmentCreateComponent,
-        ContactsListModalComponent,
+        ContactResourceModalComponent,
         ContactModalComponent,
         VisaWorkflowModalComponent,
         AddVisaModelModalComponent,

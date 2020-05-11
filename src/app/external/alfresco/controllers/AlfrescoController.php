@@ -286,8 +286,20 @@ class AlfrescoController
 
         if (!Validator::stringType()->notEmpty()->validate($body['login'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['password']) && !Validator::stringType()->notEmpty()->validate($body['accountId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
+        }
+
+        if (empty($body['password'])) {
+            $account = EntityModel::get(['select' => ['external_id'], 'where' => ["external_id->'alfresco'->>'id' = ?"], 'data' => [$body['accountId']], 'limit' => 1]);
+            if (empty($account[0])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Account not found']);
+            }
+            $alfresco = json_decode($account[0]['external_id'], true);
+            if (empty($alfresco['alfresco']['password'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Account has no password']);
+            }
+            $body['password'] = PasswordModel::decrypt(['cryptedPassword' => $alfresco['alfresco']['password']]);
         }
 
         $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
@@ -334,8 +346,10 @@ class AlfrescoController
                 return $response->withStatus(400)->withJson(['errors' => $curlResponse['response']['error']['briefSummary']]);
             } elseif ($curlResponse['code'] == 404) {
                 return $response->withStatus(400)->withJson(['errors' => 'Page not found', 'lang' => 'pageNotFound']);
-            } else {
+            } elseif (!empty($curlResponse['response'])) {
                 return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+            } else {
+                return $response->withStatus(400)->withJson(['errors' => $curlResponse['errors']]);
             }
         }
 

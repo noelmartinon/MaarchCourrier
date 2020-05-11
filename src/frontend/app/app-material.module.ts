@@ -38,18 +38,18 @@ export class AppDateAdapter extends NativeDateAdapter {
 }
 
 export const APP_DATE_FORMATS =
-    {
-        parse: {
-            dateInput: { month: 'short', year: 'numeric', day: 'numeric' }
-        },
-        display: {
-            // dateInput: { month: 'short', year: 'numeric', day: 'numeric' },
-            dateInput: 'input',
-            monthYearLabel: { month: 'short', year: 'numeric', day: 'numeric' },
-            dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
-            monthYearA11yLabel: { year: 'numeric', month: 'long' },
-        }
-    };
+{
+    parse: {
+        dateInput: { month: 'short', year: 'numeric', day: 'numeric' }
+    },
+    display: {
+        // dateInput: { month: 'short', year: 'numeric', day: 'numeric' },
+        dateInput: 'input',
+        monthYearLabel: { month: 'short', year: 'numeric', day: 'numeric' },
+        dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
+        monthYearA11yLabel: { year: 'numeric', month: 'long' },
+    }
+};
 
 
 import { NgModule } from '@angular/core';
@@ -86,10 +86,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {MatRippleModule} from '@angular/material/core';
+import { MatRippleModule } from '@angular/material/core';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
-import {MatTreeModule} from '@angular/material/tree';
-import {getFrenchPaginatorIntl, getTranslatedPaginator} from './french-paginator-intl';
+import { MatTreeModule } from '@angular/material/tree';
+import { getFrenchPaginatorIntl, getTranslatedPaginator } from './french-paginator-intl';
 
 @NgModule({
     imports: [
@@ -127,6 +128,7 @@ import {getFrenchPaginatorIntl, getTranslatedPaginator} from './french-paginator
         MatBottomSheetModule,
         MatTreeModule,
         MatRippleModule,
+        ScrollingModule,
         DndModule.forRoot()
     ],
     exports: [
@@ -164,6 +166,7 @@ import {getFrenchPaginatorIntl, getTranslatedPaginator} from './french-paginator
         MatBottomSheetModule,
         MatRippleModule,
         MatTreeModule,
+        ScrollingModule,
         DndModule
     ],
     providers: [

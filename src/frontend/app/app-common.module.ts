@@ -76,7 +76,8 @@ import { DocumentViewerComponent } from './viewer/document-viewer.component';
 import { HeaderService } from '../service/header.service';
 import { VisaWorkflowComponent } from './visa/visa-workflow.component';
 import { AvisWorkflowComponent } from './avis/avis-workflow.component';
-
+import { ContactResourceComponent } from './contact/contact-resource/contact-resource.component';
+import { ContactDetailComponent } from './contact/contact-detail/contact-detail.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -136,7 +137,9 @@ export class MyHammerConfig extends HammerGestureConfig {
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
         AvisWorkflowComponent,
-        MaarchTreeComponent
+        MaarchTreeComponent,
+        ContactResourceComponent,
+        ContactDetailComponent,
     ],
     exports: [
         CommonModule,
@@ -183,7 +186,9 @@ export class MyHammerConfig extends HammerGestureConfig {
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
         AvisWorkflowComponent,
-        MaarchTreeComponent
+        MaarchTreeComponent,
+        ContactResourceComponent,
+        ContactDetailComponent,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

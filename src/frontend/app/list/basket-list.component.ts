@@ -18,7 +18,7 @@ import { PanelListComponent } from './panel/panel-list.component';
 import { AppService } from '../../service/app.service';
 import { FoldersService } from '../folder/folders.service';
 import { ActionsService } from '../actions/actions.service';
-import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
+import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { Subject } from 'rxjs/internal/Subject';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { merge } from 'rxjs/internal/observable/merge';
@@ -482,7 +482,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
     }
 
     openContact(row: any, mode: string) {
-        this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+        this.dialog.open(ContactResourceModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
     }
 
     viewDocument(row: any) {

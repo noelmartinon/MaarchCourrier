@@ -550,7 +550,7 @@ class DiffusionTypesController
         if ($args['request'] == 'recipients') {
             $aEntities  = explode(",", $args['notification']['diffusion_properties']);
             $recipients = DatabaseModel::select([
-                'select'    => ['users.*'],
+                'select'    => ['distinct users.*'],
                 'table'     => ['users_entities, users'],
                 'where'     => ['users_entities.entity_id in (?)', 'users_entities.user_id = users.id', 'users.status != ?'],
                 'data'      => [$aEntities, 'DEL']
@@ -566,7 +566,7 @@ class DiffusionTypesController
         if ($args['request'] == 'recipients') {
             $aGroups  = explode(",", $args['notification']['diffusion_properties']);
             $recipients = DatabaseModel::select([
-                'select'    => ['us.*'],
+                'select'    => ['distinct us.*'],
                 'table'     => ['usergroup_content ug, users us, usergroups'],
                 'where'     => ['us.id = ug.user_id', 'ug.group_id = usergroups.id', 'usergroups.group_id in (?)', 'us.status != ?'],
                 'data'      => [$aGroups, 'DEL']
@@ -581,7 +581,7 @@ class DiffusionTypesController
     {
         if ($args['request'] == 'recipients') {
             $aUsers     = explode(",", $args['notification']['diffusion_properties']);
-            $recipients = UserModel::get(['select' => ['*'], 'where' => ['id in (?)'], 'data' => [$aUsers]]);
+            $recipients = UserModel::get(['select' => ['distinct *'], 'where' => ['id in (?)'], 'data' => [$aUsers]]);
             return $recipients;
         } else {
             return [];

@@ -14,6 +14,7 @@ class ContactControllerTest extends TestCase
     private static $id = null;
     private static $id2 = null;
     private static $resId = null;
+    private static $duplicateId = null;
 
     public function testCreate()
     {
@@ -86,7 +87,6 @@ class ContactControllerTest extends TestCase
             'addressPostcode'    => '18505',
             'addressTown'        => 'Scranton',
             'addressCountry'     => 'USA',
-            'email'              => 'dschrute@dundermifflin.com',
             'phone'              => '5705551212',
             'notes'              => 'Assistant to the regional manager',
             'communicationMeans' => 'dschrute@dundermifflin.com',
@@ -102,6 +102,15 @@ class ContactControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertIsInt($responseBody['id']);
         self::$id2 = $responseBody['id'];
+
+        $args2['email'] = 'dschrute@dundermifflin.com';
+        $fullRequest = \httpRequestCustom::addContentInBody($args2, $request);
+
+        $response     = $contactController->create($fullRequest, new \Slim\Http\Response());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertIsInt($responseBody['id']);
+        self::$duplicateId = $responseBody['id'];
 
         //  GET
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
@@ -327,6 +336,129 @@ class ContactControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
     }
 
+    public function testGetDuplicatedContacts()
+    {
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $contactController = new \Contact\controllers\ContactController();
+
+        $queryParams = [
+            'criteria' => ['company']
+        ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $response = $contactController->getDuplicatedContacts($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame(11, $responseBody['realCount']);
+        $this->assertSame(11, $responseBody['returnedCount']);
+
+        $this->assertIsArray($responseBody['contacts']);
+        $this->assertNotEmpty($responseBody['contacts']);
+        $this->assertSame(11, count($responseBody['contacts']));
+
+        $dunderMifflinDuplicates = array_filter($responseBody['contacts'], function ($contact) {
+            return $contact['company'] == 'Dunder Mifflin Paper Company Inc.';
+        });
+
+        $this->assertSame(2, count($dunderMifflinDuplicates));
+
+        // Errors
+        $response = $contactController->getDuplicatedContacts($request, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Query criteria is empty or not an array', $responseBody['errors']);
+
+        $queryParams = [
+            'criteria' => ['contactCustomField_1000']
+        ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $response = $contactController->getDuplicatedContacts($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Custom criteria does not exist', $responseBody['errors']);
+
+        $queryParams = [
+            'criteria' => ['fieldThatDoesNotExist']
+        ];
+        $fullRequest = $request->withQueryParams($queryParams);
+        $response = $contactController->getDuplicatedContacts($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('criteria does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $contactController->getDuplicatedContacts($request, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
+    public function testMergeContacts()
+    {
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $contactController = new \Contact\controllers\ContactController();
+
+        $body = [
+            'duplicates' => [self::$duplicateId]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $contactController->mergeContacts($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(204, $response->getStatusCode());
+
+        // Errors
+        $response = $contactController->mergeContacts($request, new \Slim\Http\Response(), ['id' => 'wrong format']);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Route id is not an integer', $responseBody['errors']);
+
+        $response = $contactController->mergeContacts($request, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body duplicates is empty or not an array', $responseBody['errors']);
+
+        $body = [
+            'duplicates' => [self::$duplicateId * 1000]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $contactController->mergeContacts($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2 * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('master does not exist', $responseBody['errors']);
+
+        $body = [
+            'duplicates' => [self::$duplicateId * 1000]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $contactController->mergeContacts($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('duplicates do not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $contactController->mergeContacts($request, new \Slim\Http\Response(), ['id' => self::$id2]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+    }
+
     public function testUpdate()
     {
         $contactController = new \Contact\controllers\ContactController();
@@ -543,14 +675,6 @@ class ContactControllerTest extends TestCase
         $contactController = new \Contact\controllers\ContactController();
 
         //  GET
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-
-        $queryParams = [
-            'orderBy' => 'filling'
-        ];
-        $fullRequest = $request->withQueryParams($queryParams);
-
         $contact = \Contact\models\ContactModel::getById([
             'select' => [
                 'company', 'firstname', 'lastname', 'civility', 'address_additional1', 'address_additional2', 'address_number',

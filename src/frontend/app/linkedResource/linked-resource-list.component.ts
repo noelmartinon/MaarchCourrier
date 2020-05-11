@@ -11,7 +11,7 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { LinkResourceModalComponent } from './linkResourceModal/link-resource-modal.component';
 import { FunctionsService } from '../../service/functions.service';
-import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
+import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { of } from 'rxjs/internal/observable/of';
 import { PrivilegeService } from '../../service/privileges.service';
 
@@ -154,6 +154,6 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     openContact(row: any, mode: string) {
-        this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+        this.dialog.open(ContactResourceModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
     }
 }

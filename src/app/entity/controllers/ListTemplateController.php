@@ -24,8 +24,6 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\CoreConfigModel;
-use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -252,6 +250,8 @@ class ListTemplateController
         if (empty($listTemplate)) {
             return $response->withStatus(400)->withJson(['errors' => 'List template not found']);
         }
+
+        $listTemplate['entityId'] = $listTemplate['entity_id'];
         if (empty($listTemplate['owner'])) {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']]) && !empty($listTemplate['entityId'])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);

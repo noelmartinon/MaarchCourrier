@@ -18,6 +18,10 @@ apt-get install -y libpq-dev libxml2-dev libxslt1-dev libpng-dev unoconv xpdf-ut
 && curl --silent --show-error --location --fail --retry 3 --output /tmp/firefox.tar.bz2 $ACTUAL_URL \
 && tar -xvjf /tmp/firefox.tar.bz2 -C /opt \
 && ln -s /opt/firefox/firefox /usr/local/bin/firefox \
+&& curl --silent --show-error --location --fail --retry 3 --output /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+&& (dpkg -i /tmp/google-chrome-stable_current_amd64.deb || apt-get -fy install)  \
+&& rm -rf /tmp/google-chrome-stable_current_amd64.deb \
+&& sed -i 's|HERE/chrome"|HERE/chrome" --disable-setuid-sandbox --no-sandbox|g' "/opt/google/chrome/google-chrome" \
 && a2enmod rewrite \
 && touch directory.txt \
 && echo "<Directory /var/www/html>" >> directory.txt \
