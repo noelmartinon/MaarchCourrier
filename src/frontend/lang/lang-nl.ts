@@ -800,7 +800,6 @@ export const LANG_NL = {
     "resId"                                 : "GED gebruikersnaam",
     "restrictedEntity"                      : "Restricted entity", //_TO_TRANSLATE
     "resultPage"                            : "Resultaatpagina",
-    "resultPageUpdated"                     : "Gewijzigde resultaatpagina",
     "retentionFinalDisposition"             : "Uiteindelijke lot",
     "retentionRule"                         : "Bewaringsregel",
     "returnDate"                            : "Datum van terugkeer", //_TO_TRANSLATE
@@ -1670,4 +1669,5 @@ export const LANG_NL = {
     "test": "Test", //_TO_TRANSLATE
     "canUpdateIndexingModel": "Can change indexing model", //_TO_TRANSLATE
     "options": "Options", //_TO_TRANSLATE
+    "modificationsProcessed": "Modifications processed", //_TO_TRANSLATE
 };

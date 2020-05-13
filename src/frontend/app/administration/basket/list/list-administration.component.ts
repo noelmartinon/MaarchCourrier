@@ -331,7 +331,7 @@ export class ListAdministrationComponent implements OnInit {
                 this.basketGroup.list_event = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
-                this.notify.success(this.lang.resultPageUpdated);
+                this.notify.success(this.lang.modificationsProcessed);
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
