@@ -282,7 +282,23 @@ export class AlfrescoAdministrationComponent implements OnInit {
     }
 
     checkAccount() {
-        this.http.post(`../../rest/alfresco/checkAccounts`, { login: this.alfresco.account.id, password: this.alfresco.account.password, nodeId : this.alfresco.rootFolder }).pipe(
+        let alfresco  = {};
+        if (!this.creationMode) {
+            alfresco = {
+                accountId : this.alfresco.id,
+                login: this.alfresco.account.id,
+                password: this.alfresco.account.password,
+                nodeId : this.alfresco.rootFolder
+            };
+        } else {
+            alfresco = {
+                login: this.alfresco.account.id,
+                password: this.alfresco.account.password,
+                nodeId : this.alfresco.rootFolder
+            };
+        }
+
+        this.http.post(`../../rest/alfresco/checkAccounts`, alfresco).pipe(
             tap(() => {
                 this.notify.success(this.lang.testSucceeded);
             }),
