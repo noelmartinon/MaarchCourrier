@@ -117,7 +117,7 @@ export class IndexationComponent implements OnInit {
         this.route.params.subscribe(params => {
             this.currentGroupId = params['groupId'];
 
-            this.http.get('../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
+            this.http.get('../../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
                 map((data: any) => {
                     data.actions = data.actions.map((action: any, index: number) => {
                         return {
