@@ -259,7 +259,57 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['alt_identifier', 'filename', 'docserver_id', 'path', 'fingerprint', 'version']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['alt_identifier', 'filename', 'docserver_id', 'path', 'fingerprint', 'version', 'model_id', 'custom_fields']]);
+
+        if ($resource['model_id'] != $body['modelId']) {
+            $resourceModelFields = IndexingModelFieldModel::get([
+                'select' => ['identifier'],
+                'where'  => ['model_id = ?'],
+                'data'   => [$resource['model_id']]
+            ]);
+            $resourceModelFields = array_column($resourceModelFields, 'identifier');
+
+            $newModelFields = IndexingModelFieldModel::get([
+                'select' => ['identifier'],
+                'where'  => ['model_id = ?'],
+                'data'   => [$body['modelId']]
+            ]);
+            $newModelFields = array_column($newModelFields, 'identifier');
+
+            $set = [];
+            $setToNull = [
+                'confidentiality'    => 'confidentiality',
+                'admission_date'     => 'arrivalDate',
+                'departure_date'     => 'departureDate',
+                'doc_date'           => 'documentDate',
+                'process_limit_date' => 'processLimitDate',
+                'initiator'          => 'initiator',
+                'destination'        => 'destination',
+                'priority'           => 'priority'
+            ];
+            foreach ($setToNull as $key => $field) {
+                if (in_array($field, $resourceModelFields) && !in_array($field, $newModelFields)) {
+                    $set[$key] = null;
+                }
+            }
+
+            $newModelHasCustomFields = false;
+            foreach ($newModelFields as $newModelField) {
+                if (strpos($newModelField, 'indexingCustomField_') !== false) {
+                    $newModelHasCustomFields = true;
+                    break;
+                }
+            }
+
+            if (!empty($resource['custom_fields']) && !$newModelHasCustomFields) {
+                $set['custom_fields'] = '{}';
+            }
+
+            if (!empty($set)) {
+                ResModel::update(['set' => $set, 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+            }
+        }
+
         if (!empty($resource['filename']) && !empty($body['encodedFile'])) {
             AdrModel::createDocumentAdr([
                 'resId'         => $args['resId'],
