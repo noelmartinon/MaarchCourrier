@@ -81,6 +81,20 @@ abstract class business_app_tools_Abstract extends Database
                 'index.php', '', $url
             );
 
+            $i = 0;
+            $_SESSION['config']['databases'] = [];
+            while (!empty($config->databaseserver[$i])) {
+                $_SESSION['config']['databases'][] = [
+                    'server' => (string) $config->databaseserver[$i],
+                    'port' => (string) $config->databaseserverport[$i],
+                    'driver' => (string) $config->databasetype[$i],
+                    'database' => (string) $config->databasename[$i],
+                    'user' => (string) $config->databaseuser[$i],
+                    'password' => (string) $config->databasepassword[$i]
+                ];
+                $i++;
+            }
+
             $_SESSION['config']['databaseserver'] =
                 (string) $config->databaseserver;
             $_SESSION['config']['databaseserverport'] =

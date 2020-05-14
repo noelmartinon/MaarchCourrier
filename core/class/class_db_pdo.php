@@ -136,9 +136,69 @@ class Database extends functions
             } elseif (is_string($args[0]) && file_exists($args[0])) {
                 $xmlconfig = simplexml_load_file($args[0]);
                 $config = $xmlconfig->CONFIG_BASE;
-                $this->server = (string) $config->databaseserver;
-                $this->port = (string) $config->databaseserverport;
-                $this->driver = (string) $config->databasetype;
+
+                $_SESSION['config']['databases'] = [];
+                $i = 0;
+                while (!empty($config->databaseserver[$i])) {
+                    $_SESSION['config']['databases'][] = [
+                        'server' => (string) $config->databaseserver[$i],
+                        'port' => (string) $config->databaseserverport[$i],
+                        'driver' => (string) $config->databasetype[$i],
+                        'database' => (string) $config->databasename[$i],
+                        'user' => (string) $config->databaseuser[$i],
+                        'password' => (string) $config->databasepassword[$i]
+                    ];
+                    $i++;
+                }
+                $errorArgs = false;
+            }
+        }
+
+        if (empty($_SESSION['config']['databases'])) {
+            if ($this->driver == 'oci') {
+                $tns = "(DESCRIPTION = "
+                        . "(ADDRESS_LIST ="
+                            . "(ADDRESS = (PROTOCOL = TCP)(HOST = " . $this->server . ")(PORT = " . $this->port . "))"
+                        . ")"
+                        . "(CONNECT_DATA ="
+                            . "(SERVICE_NAME = " . $this->database . ")"
+                        . ")"
+                    . ")";
+                $this->dsn = "oci:dbname=" . $tns . ";charset=utf8";
+            } else {
+                $this->dsn = $this->driver
+                    . ':host=' . $this->server
+                    . ';port=' . $this->port
+                    . ';dbname=' . $this->database;
+            }
+
+
+            if (!isset(self::$preparedStmt[$this->dsn])) {
+                self::$preparedStmt[$this->dsn] = array();
+            }
+
+            // Set options
+            $options = array(
+                PDO::ATTR_PERSISTENT    => true,
+                PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_CASE          => PDO::CASE_LOWER
+            );
+            // Create a new PDO instance
+            try {
+                $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
+            } catch (PDOException $PDOException) {
+                try {
+                    $options[PDO::ATTR_PERSISTENT] = false;
+                    $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
+                } catch (\PDOException $PDOException) {
+                    $this->error = $PDOException->getMessage();
+                }
+            }
+        } else {
+            foreach ($_SESSION['config']['databases'] as $key => $database) {
+                $this->server = $database['server'];
+                $this->port = $database['port'];
+                $this->driver = $database['driver'];
                 switch ($this->driver) {
                     case 'POSTGRESQL':
                         $this->driver = 'pgsql';
@@ -155,54 +215,58 @@ class Database extends functions
                         print_r('DRIVER ERROR: Unknown database driver '
                             . $_SESSION['config']['databasetype']);
                 }
-                $this->database = (string) $config->databasename;
-                $this->user = (string) $config->databaseuser;
-                $this->password = (string) $config->databasepassword;
-                $errorArgs = false;
-            }
-        }
-
-        // Set DSN
-        if ($this->driver == 'oci') {
-            $tns = "(DESCRIPTION = "
-                    . "(ADDRESS_LIST ="
+                $this->database = $database['database'];
+                $this->user = $database['user'];
+                $this->password = $database['password'];
+                if ($this->driver == 'oci') {
+                    $tns = "(DESCRIPTION = "
+                        . "(ADDRESS_LIST ="
                         . "(ADDRESS = (PROTOCOL = TCP)(HOST = " . $this->server . ")(PORT = " . $this->port . "))"
-                    . ")"
-                    . "(CONNECT_DATA ="
+                        . ")"
+                        . "(CONNECT_DATA ="
                         . "(SERVICE_NAME = " . $this->database . ")"
-                    . ")"
-                . ")";
-            $this->dsn = "oci:dbname=" . $tns . ";charset=utf8";
-        } else {
-            $this->dsn = $this->driver
-                . ':host=' . $this->server
-                . ';port=' . $this->port
-                . ';dbname=' . $this->database;
-        }
+                        . ")"
+                        . ")";
+                    $this->dsn = "oci:dbname=" . $tns . ";charset=utf8";
+                } else {
+                    $this->dsn = $this->driver
+                        . ':host=' . $this->server
+                        . ';port=' . $this->port
+                        . ';dbname=' . $this->database;
+                }
 
 
-        if (!isset(self::$preparedStmt[$this->dsn])) {
-            self::$preparedStmt[$this->dsn] = array();
-        }
+                if (!isset(self::$preparedStmt[$this->dsn])) {
+                    self::$preparedStmt[$this->dsn] = array();
+                }
 
-        // Set options
-        $options = array(
-            PDO::ATTR_PERSISTENT    => true,
-            PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_CASE          => PDO::CASE_LOWER
-        );
-        // Create a new PDO instance
-        try {
-            $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
-        } catch (PDOException $PDOException) {
-            try {
-                $options[PDO::ATTR_PERSISTENT] = false;
-                $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
-            } catch (\PDOException $PDOException) {
-                $this->error = $PDOException->getMessage();
+                // Set options
+                $options = array(
+                    PDO::ATTR_PERSISTENT    => true,
+                    PDO::ATTR_ERRMODE       => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_CASE          => PDO::CASE_LOWER
+                );
+                // Create a new PDO instance
+                try {
+                    $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
+                    break;
+                } catch (PDOException $PDOException) {
+                    try {
+                        $options[PDO::ATTR_PERSISTENT] = false;
+                        $this->pdo = new PDO($this->dsn, $this->user, $this->password, $options);
+                        break;
+                    } catch (\PDOException $PDOException) {
+                        if (!empty($_SESSION['config']['databases'][$key + 1])) {
+                            continue;
+                        } else {
+                            $this->error = $PDOException->getMessage();
+                            break;
+                        }
+                    }
+                }
             }
         }
-        
+
         if ($this->error && strstr($this->error, '08006') <> '') {
             $this->xecho('Database connection failed');
         } elseif ($this->error && $_SESSION['config']['debug'] == 'true') {
