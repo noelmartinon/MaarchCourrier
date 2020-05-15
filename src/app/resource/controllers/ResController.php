@@ -261,7 +261,7 @@ class ResController extends ResourceControlController
 
         $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['alt_identifier', 'filename', 'docserver_id', 'path', 'fingerprint', 'version', 'model_id', 'custom_fields']]);
 
-        if ($resource['model_id'] != $body['modelId']) {
+        if (!empty($body['modelId']) && $resource['model_id'] != $body['modelId']) {
             $resourceModelFields = IndexingModelFieldModel::get([
                 'select' => ['identifier'],
                 'where'  => ['model_id = ?'],
