@@ -31,7 +31,7 @@ class LDAP {
 	protected $_bind;
 
 	
-	function __construct($domain,$login,$password,$ssl='false',$hostname){
+	function __construct($domain,$login,$password,$ssl='false',$hostname=null){
 		
 		$this->_domain = $domain;
 		$this->_login = $login;
