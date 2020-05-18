@@ -134,7 +134,7 @@ class ResourceControlController
             return ['errors' => 'Resource can not be modified because of status'];
         }
 
-        if (!empty($body['modelId'])) {
+        if (!empty($body['modelId']) && $resource['model_id'] != $body['modelId']) {
             if (!PrivilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => $args['resId'], 'canUpdate' => true, 'canUpdateModel' => true])) {
                 return ['errors' => 'Model can not be modified'];
             }
