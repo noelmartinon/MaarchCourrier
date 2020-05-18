@@ -62,11 +62,11 @@ export class SendAlfrescoActionComponent implements OnInit {
                             'data': (node: any) => {
                                 return { 'id': node.id };
                             }
-                        }
+                        };
                         $j('#jstreeAlfresco').jstree("refresh");
                     }
                 }),
-                filter(value => value.length > 2),
+                filter((value: any) => value.length > 2),
                 tap((data: any) => {
 
                     $j('#jstreeAlfresco').jstree(true).settings.core.data =
@@ -78,7 +78,7 @@ export class SendAlfrescoActionComponent implements OnInit {
                         'data': (node: any) => {
                             return { 'id': node.id };
                         }
-                    }
+                    };
                     $j('#jstreeAlfresco').jstree("refresh");
                 })
             ).subscribe();
