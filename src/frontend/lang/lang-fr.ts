@@ -1516,7 +1516,7 @@ export const LANG_FR = {
     "templateType":                                "Type de modèle",
     "templateUpdated":                             "Modèle mis à jour",
     "test":                                        "Tester",
-    "testSucceeded":                               "Le test à réussi",
+    "testSucceeded":                               "Le test a réussi",
     "thanksToCommunity":                           "Et toute la communauté Maarch !",
     "thanksToExtDev":                              "Maarch Courrier s'appuie sur quelques composants externes. Merci à leurs développeurs !",
     "theTag":                                      "Le mot-clé",
