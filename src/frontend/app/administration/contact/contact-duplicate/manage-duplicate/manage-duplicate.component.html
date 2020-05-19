@@ -6,7 +6,7 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="contactSelected===null"
+        <button mat-raised-button mat-button color="primary" [disabled]="contactSelected===null || loading"
             (click)="onSubmit()">{{lang.merge}}</button>
         <button mat-raised-button mat-button [mat-dialog-close]="">{{lang.cancel}}</button>
     </div>

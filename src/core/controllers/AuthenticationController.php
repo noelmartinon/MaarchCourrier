@@ -298,11 +298,11 @@ class AuthenticationController
     {
         $sessionTime = AuthenticationController::MAX_DURATION_TOKEN;
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
-        if ($loadedXml) {
-            if (!empty($loadedXml->CONFIG->cookieTime)) {
-                if ($sessionTime > (int)$loadedXml->CONFIG->cookieTime) {
-                    $sessionTime = (int)$loadedXml->CONFIG->cookieTime;
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        if ($file) {
+            if (!empty($file['config']['cookieTime'])) {
+                if ($sessionTime > (int)$file['config']['cookieTime']) {
+                    $sessionTime = (int)$file['config']['cookieTime'];
                 }
             }
         }
@@ -323,9 +323,9 @@ class AuthenticationController
     {
         $sessionTime = AuthenticationController::MAX_DURATION_TOKEN;
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
-        if ($loadedXml) {
-            $sessionTime = (int)$loadedXml->CONFIG->cookieTime;
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        if ($file) {
+            $sessionTime = (int)$file['config']['cookieTime'];
         }
 
         $token = [

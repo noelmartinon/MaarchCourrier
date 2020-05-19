@@ -318,8 +318,10 @@ export class BasketListComponent implements OnInit, OnDestroy {
                     if (key.displayValue.length > 1) {
                         key.displayTitle = key.displayValue.join(' - ');
                         key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.lang.contactsAlt;
-                    } else {
+                    } else if (key.displayValue.length === 1) {
                         key.displayValue = key.displayValue[0];
+                    } else {
+                        key.displayValue = this.lang.undefined;
                     }
                 } else if (key.value === 'getCreationAndProcessLimitDates') {
                     key.icon = '';
@@ -474,7 +476,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
 
     launchEventSubData(data: any, row: any) {
         if (data.event) {
-            if (['getSenders', 'getRecipients'].indexOf(data.value) > -1) {
+            if (['getSenders', 'getRecipients'].indexOf(data.value) > -1 && data.displayValue !== this.lang.undefined) {
                 const mode = data.value === 'getSenders' ? 'senders' : 'recipients';
                 this.openContact(row, mode);
             }

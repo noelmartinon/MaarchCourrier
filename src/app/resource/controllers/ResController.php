@@ -15,6 +15,7 @@
 namespace Resource\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
+use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
@@ -259,7 +260,26 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['alt_identifier', 'filename', 'docserver_id', 'path', 'fingerprint', 'version']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['alt_identifier', 'filename', 'docserver_id', 'path', 'fingerprint', 'version', 'model_id', 'custom_fields']]);
+
+        if (!empty($body['modelId']) && $resource['model_id'] != $body['modelId']) {
+            $resourceModelFields = IndexingModelFieldModel::get([
+                'select' => ['identifier'],
+                'where'  => ['model_id = ?'],
+                'data'   => [$resource['model_id']]
+            ]);
+            $resourceModelFields = array_column($resourceModelFields, 'identifier');
+
+            $newModelFields = IndexingModelFieldModel::get([
+                'select' => ['identifier'],
+                'where'  => ['model_id = ?'],
+                'data'   => [$body['modelId']]
+            ]);
+            $newModelFields = array_column($newModelFields, 'identifier');
+
+            ResController::resetResourceFields(['oldFieldList' => $resourceModelFields, 'newFieldList' => $newModelFields, 'resId' => $args['resId']]);
+        }
+
         if (!empty($resource['filename']) && !empty($body['encodedFile'])) {
             AdrModel::createDocumentAdr([
                 'resId'         => $args['resId'],
@@ -344,6 +364,14 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
+        $closedActions = ActionModel::get([
+            'select' => ['distinct id_status'],
+            'where'  => ['component in (?)'],
+            'data'   => [['closeMailAction', 'closeMailWithAttachmentsOrNotesAction', 'closeAndIndexAction']]
+        ]);
+        $closedStatus  = array_column($closedActions, 'id_status');
+        $closingDate   = in_array($data['status'], $closedStatus) ? 'CURRENT_TIMESTAMP' : null;
+
         $identifiers = !empty($data['chrono']) ? $data['chrono'] : $data['resId'];
         foreach ($identifiers as $id) {
             if (!empty($data['chrono'])) {
@@ -357,8 +385,8 @@ class ResController extends ResourceControlController
             if (!ResController::hasRightByResId(['resId' => [$document['res_id']], 'userId' => $GLOBALS['id']])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
             }
-    
-            ResModel::update(['set' => ['status' => $data['status']], 'where' => ['res_id = ?'], 'data' => [$document['res_id']]]);
+
+            ResModel::update(['set' => ['status' => $data['status'], 'closing_date' => $closingDate], 'where' => ['res_id = ?'], 'data' => [$document['res_id']]]);
     
             HistoryController::add([
                 'tableName' => 'res_letterbox',
@@ -437,7 +465,6 @@ class ResController extends ResourceControlController
         if ($data['mode'] == 'base64') {
             return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'originalFormat' => $originalFormat, 'mimeType' => $mimeType,'originalCreatorId' => $creatorId]);
         } else {
-
             $pathInfo = pathinfo($pathToDocument);
 
             $response->write($fileContent);
@@ -1294,5 +1321,64 @@ class ResController extends ResourceControlController
         $resource['canConvert'] = !empty($allowedFiles[$format]);
 
         return $response->withJson(['information' => $resource]);
+    }
+
+    public static function resetResourceFields(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['oldFieldList', 'newFieldList']);
+        ValidatorModel::arrayType($args, ['oldFieldList', 'newFieldList']);
+        ValidatorModel::intVal($args, ['resId', 'modelId']);
+
+        if (empty($args['resId']) && empty($args['modelId'])) {
+            return false;
+        }
+
+        $resourceModelFields = $args['oldFieldList'];
+        $newModelFields = $args['newFieldList'];
+
+        // Set res_letterbox fields to null
+        $set = [];
+        $setToNull = [
+            'confidentiality'    => 'confidentiality',
+            'admission_date'     => 'arrivalDate',
+            'departure_date'     => 'departureDate',
+            'doc_date'           => 'documentDate',
+            'process_limit_date' => 'processLimitDate',
+            'initiator'          => 'initiator',
+            'destination'        => 'destination',
+            'priority'           => 'priority'
+        ];
+        foreach ($setToNull as $key => $field) {
+            if (in_array($field, $resourceModelFields) && !in_array($field, $newModelFields)) {
+                $set[$key] = null;
+            }
+        }
+
+        // Checking if model has a custom field. If yes, the customs are reset in the update, if not, we set it to an empty JSON object
+        $newModelHasCustomFields = false;
+        foreach ($newModelFields as $newModelField) {
+            if (strpos($newModelField, 'indexingCustomField_') !== false) {
+                $newModelHasCustomFields = true;
+                break;
+            }
+        }
+        if (!empty($resource['custom_fields']) && !$newModelHasCustomFields) {
+            $set['custom_fields'] = '{}';
+        }
+
+        if (!empty($set)) {
+            $where = [];
+            $data = [];
+            if (!empty($args['resId'])) {
+                $where = ['res_id = ?'];
+                $data = [$args['resId']];
+            } elseif (!empty($args['modelId'])) {
+                $where = ['model_id = ?'];
+                $data = [$args['modelId']];
+            }
+            ResModel::update(['set' => $set, 'where' => $where, 'data' => $data]);
+        }
+
+        return true;
     }
 }

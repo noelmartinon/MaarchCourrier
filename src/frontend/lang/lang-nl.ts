@@ -801,7 +801,6 @@ export const LANG_NL = {
     "resId"                                 : "GED gebruikersnaam",
     "restrictedEntity"                      : "Restricted entity", //_TO_TRANSLATE
     "resultPage"                            : "Resultaatpagina",
-    "resultPageUpdated"                     : "Gewijzigde resultaatpagina",
     "retentionFinalDisposition"             : "Uiteindelijke lot",
     "retentionRule"                         : "Bewaringsregel",
     "returnDate"                            : "Datum van terugkeer", //_TO_TRANSLATE
@@ -1684,4 +1683,8 @@ export const LANG_NL = {
     "duplicatesContactDisplayed": "{0} duplicates ({1} displayed)", //_TO_TRANSLATE
     "duplicatesContactsAdmin": "Manage contacts duplicates", //_TO_TRANSLATE
     "merge": "Merge", //_TO_TRANSLATE
+    "associatedElements": "associated elements", //_TO_TRANSLATE
+    "selectedContact": "selected contact", //_TO_TRANSLATE
+    "modificationsProcessed": "Modifications processed", //_TO_TRANSLATE,
+    'updateIndexingFieldWarning': 'Warning:  if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?', //_TO_TRANSLATE
 };

@@ -1,0 +1,21 @@
+{
+    "config": {
+        "lang": "fr",
+        "applicationName": "MAARCH DEV",
+        "cookieTime": 200,
+        "timezone": "Europe/Paris",
+        "maarchDirectory" : "/var/www/html/MaarchCourrier/",
+        "customID" : "",
+        "maarchUrl" : "http://preview.maarchcourrier.com/"
+    },
+    "database": [
+        {
+            "server": "127.0.0.1",
+            "port": "5432",
+            "type": "POSTGRESQL",
+            "name": "MaarchCourrier",
+            "user": "maarch",
+            "password": "maarch"
+        }
+    ]
+}

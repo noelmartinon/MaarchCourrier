@@ -200,7 +200,7 @@ class ListInstanceController
             }
             if (!$recipientFound) {
                 DatabaseModel::rollbackTransaction();
-                return ['errors' => 'Dest is missing', 'code' => 403];
+                return ['errors' => 'Dest is missing', 'code' => 400];
             }
 
             ListInstanceModel::delete([

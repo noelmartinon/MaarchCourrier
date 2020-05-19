@@ -134,8 +134,8 @@ class ResourceControlController
             return ['errors' => 'Resource can not be modified because of status'];
         }
 
-        if (!empty($body['modelId'])) {
-            if (!PrivilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => $args['resId'], 'canUpdate' => true, 'canUpdateModel' => true])) {
+        if (!empty($body['modelId']) && $resource['model_id'] != $body['modelId']) {
+            if (!PrivilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => $args['resId'], 'canUpdateData' => true, 'canUpdateModel' => true])) {
                 return ['errors' => 'Model can not be modified'];
             }
             $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
@@ -352,9 +352,6 @@ class ResourceControlController
             if (!$destFound) {
                 return ['errors' => 'Body diffusion has no dest'];
             }
-        }
-        if (!$args['isWebServiceUser'] && !empty($body['destination']) && empty($destFound)) {
-            return ['errors' => 'Body diffusion has no dest'];
         }
 
         return true;

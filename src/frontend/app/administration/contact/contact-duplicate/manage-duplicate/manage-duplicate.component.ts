@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { FunctionsService } from '../../../../../service/functions.service';
 import { ContactDetailComponent } from '../../../../contact/contact-detail/contact-detail.component';
 import { LANG } from '../../../../translate.component';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { NotificationService } from '../../../../notification.service';
 
@@ -16,6 +16,7 @@ import { NotificationService } from '../../../../notification.service';
 })
 export class ManageDuplicateComponent implements OnInit {
 
+    loading: boolean = false;
     lang: any = LANG;
 
     contactSelected: number = null;
@@ -55,16 +56,18 @@ export class ManageDuplicateComponent implements OnInit {
     }
 
     onSubmit() {
+        this.loading = true;
         const masterContact: number = this.data.duplicate.filter((contact: any, index: number) => index === this.contactSelected).map((contact: any) => contact.id)[0];
         const slaveContacts: number[] = this.data.duplicate.filter((contact: any, index: number) => index !== this.contactSelected).map((contact: any) => contact.id);
 
         console.log(masterContact);
         console.log(slaveContacts);
 
-        this.http.post('../rest/contacts/merged', { master : masterContact, saves : slaveContacts}).pipe(
+        this.http.put(`../rest/contacts/${masterContact}/merge`, { duplicates : slaveContacts}).pipe(
             tap(() => {
                 this.dialogRef.close('success');
             }),
+            finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);

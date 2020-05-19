@@ -139,14 +139,7 @@ class ContactController
         if (!empty($control['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
-
-        if (!empty($body['email'])) {
-            $contact = ContactModel::get(['select' => ['id'], 'where' => ['email = ?'], 'data' => [$body['email']]]);
-            if (!empty($contact[0]['id'])) {
-                return $response->withJson(['id' => $contact[0]['id']]);
-            }
-        }
-
+        
         if (!empty($body['communicationMeans'])) {
             if (filter_var($body['communicationMeans'], FILTER_VALIDATE_EMAIL)) {
                 $body['communicationMeans'] = ['email' => $body['communicationMeans']];
@@ -277,6 +270,29 @@ class ContactController
 
         $filling = ContactController::getFillingRate(['contactId' => $rawContact['id']]);
         $contact['fillingRate'] = empty($filling) ? null : $filling;
+
+        $queryParams = $request->getQueryParams();
+        if (!empty($queryParams['resourcesCount'])) {
+            $inResources = ResourceContactModel::get([
+                'select' => ['item_id'],
+                'where'  => ['item_id = ?', 'type = ?'],
+                'data'   => [$args['id'], 'contact']
+            ]);
+
+            $inAcknowledgementReceipts = AcknowledgementReceiptModel::get([
+                'select' => ['contact_id'],
+                'where'  => ['contact_id = ?'],
+                'data'   => [$args['id']]
+            ]);
+
+            $inAttachments = AttachmentModel::get([
+                'select' => ['recipient_id'],
+                'where'  => ['recipient_id = ?', 'recipient_type = ?'],
+                'data'   => [$args['id'], 'contact']
+            ]);
+
+            $contact['resourcesCount'] = count($inResources) + count($inAcknowledgementReceipts) + count($inAttachments);
+        }
 
         return $response->withJson($contact);
     }
@@ -970,8 +986,8 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => 'Body duplicates is empty or not an array']);
         }
 
-        $fields = ['firstname', 'lastname', 'company', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
-                   'address_postcode', 'address_town', 'address_country', 'department', 'function', 'email', 'phone'];
+        $fields = ['civility', 'firstname', 'lastname', 'company', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
+                   'address_postcode', 'address_town', 'address_country', 'department', 'function', 'email', 'phone', 'custom_fields', 'external_id'];
 
         $master = ContactModel::getById([
             'select' => $fields,
@@ -994,7 +1010,21 @@ class ContactController
 
         $set = [];
         foreach ($fields as $field) {
-            if (empty($master[$field])) {
+            if ($field == 'custom_fields' || $field == 'external_id') {
+                $master[$field] = json_decode($master[$field], true);
+                $masterCustomsKeys = array_keys($master[$field]);
+                $set[$field] = $master[$field];
+
+                foreach ($duplicates as $duplicate) {
+                    $duplicateCustoms = json_decode($duplicate[$field], true);
+                    foreach ($duplicateCustoms as $key => $duplicateCustom) {
+                        if (!in_array($key, $masterCustomsKeys)) {
+                            $set[$field][$key] = $duplicateCustom;
+                        }
+                    }
+                }
+                $set[$field] = json_encode($set[$field]);
+            } elseif (empty($master[$field])) {
                 foreach ($duplicates as $duplicate) {
                     if (!empty($duplicate[$field])) {
                         $set[$field] = $duplicate[$field];

@@ -26,97 +26,71 @@ class DatabasePDO
             return;
         }
 
-        $server = '';
-        $port = '';
-        $name = '';
-        $user = '';
-        $password = '';
-        $formattedDriver = '';
-
-        if (!empty($args['server'])) {
-            $server     = $args['server'];
-            $port       = $args['port'];
-            $name       = $args['name'];
-            $user       = $args['user'];
-            $password   = $args['password'];
-            self::$type = $args['type'];
+        if (!empty($args['customId'])) {
+            $customId = $args['customId'];
         } else {
-            if (!empty($args['customId'])) {
-                $customId = $args['customId'];
-            } else {
-                $customId = CoreConfigModel::getCustomId();
-            }
-
-            if (!empty($customId) && file_exists("custom/{$customId}/apps/maarch_entreprise/xml/config.xml")) {
-                $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.xml";
-            } else {
-                $path = 'apps/maarch_entreprise/xml/config.xml';
-            }
-
-            if (!file_exists($path)) {
-                if (file_exists("{$GLOBALS['MaarchDirectory']}custom/{$customId}/apps/maarch_entreprise/xml/config.xml")) {
-                    $path = "{$GLOBALS['MaarchDirectory']}custom/{$customId}/apps/maarch_entreprise/xml/config.xml";
-                } else {
-                    $path = "{$GLOBALS['MaarchDirectory']}apps/maarch_entreprise/xml/config.xml";
-                }
-            }
-
-            if (file_exists($path)) {
-                $loadedXml = simplexml_load_file($path);
-                if ($loadedXml) {
-                    $server     = (string)$loadedXml->CONFIG->databaseserver;
-                    $port       = (string)$loadedXml->CONFIG->databaseserverport;
-                    $name       = (string)$loadedXml->CONFIG->databasename;
-                    $user       = (string)$loadedXml->CONFIG->databaseuser;
-                    $password   = (string)$loadedXml->CONFIG->databasepassword;
-                    self::$type = (string)$loadedXml->CONFIG->databasetype;
-                }
-            }
+            $customId = CoreConfigModel::getCustomId();
         }
 
-        if (self::$type == 'POSTGRESQL') {
+        if (!empty($customId) && file_exists("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
+            $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.json";
+        } else {
+            $path = 'apps/maarch_entreprise/xml/config.json';
+        }
+
+        if (!file_exists($path)) {
+            throw new \Exception('No configuration file found');
+        }
+        $jsonFile = file_get_contents($path);
+        $jsonFile = json_decode($jsonFile, true);
+        if (empty($jsonFile['database'])) {
+            throw new \Exception('No database part found in configuration file');
+        }
+
+        foreach ($jsonFile['database'] as $key => $database) {
+            $server     = $database['server'];
+            $port       = $database['port'];
+            $name       = $database['name'];
+            $user       = $database['user'];
+            $password   = $database['password'];
+            self::$type = $database['type'];
+
+            ValidatorModel::notEmpty(['server' => $server, 'port' => $port, 'name' => $name, 'user' => $user], ['server', 'port', 'name', 'user']);
+            ValidatorModel::stringType(['server' => $server, 'name' => $name, 'user' => $user], ['server', 'name', 'user']);
+            ValidatorModel::intVal(['port' => $port], ['port']);
+
             $formattedDriver = 'pgsql';
-        } elseif (self::$type == 'MYSQL') {
-            $formattedDriver = 'mysql';
-        } elseif (self::$type == 'ORACLE') {
-            $formattedDriver = 'oci';
-        }
-
-        ValidatorModel::notEmpty(
-            ['driver' => $formattedDriver, 'server' => $server, 'port' => $port, 'name' => $name, 'user' => $user],
-            ['driver', 'server', 'port', 'name', 'user']
-        );
-        ValidatorModel::stringType(
-            ['driver' => $formattedDriver, 'server' => $server, 'name' => $name, 'user' => $user],
-            ['driver', 'server', 'name', 'user']
-        );
-        ValidatorModel::intVal(['port' => $port], ['port']);
-
-        if (self::$type == 'ORACLE') {
-            $dsn = "oci:dbname=(DESCRIPTION = (ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = {$server})(PORT = {$port})))(CONNECT_DATA =(SERVICE_NAME = {$name})))";
-        } else {
-            $dsn = "{$formattedDriver}:host={$server};port={$port};dbname={$name}";
-        }
-
-        $options = [
-            \PDO::ATTR_PERSISTENT   => true,
-            \PDO::ATTR_ERRMODE      => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_CASE         => \PDO::CASE_NATURAL
-        ];
-
-        try {
-            self::$pdo = new \PDO($dsn, $user, $password, $options);
-        } catch (\PDOException $PDOException) {
-            try {
-                $options[\PDO::ATTR_PERSISTENT] = false;
-                self::$pdo = new \PDO($dsn, $user, $password, $options);
-            } catch (\PDOException $PDOException) {
-                throw new \Exception($PDOException->getMessage());
+            if (self::$type == 'POSTGRESQL') {
+                $formattedDriver = 'pgsql';
+            } elseif (self::$type == 'MYSQL') {
+                $formattedDriver = 'mysql';
+            } elseif (self::$type == 'ORACLE') {
+                $formattedDriver = 'oci';
             }
-        }
 
-        if (self::$type == 'ORACLE') {
-            $this->query("alter session set nls_date_format='dd-mm-yyyy HH24:MI:SS'");
+            $options = [
+                \PDO::ATTR_PERSISTENT   => true,
+                \PDO::ATTR_ERRMODE      => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_CASE         => \PDO::CASE_NATURAL
+            ];
+
+            $dsn = "{$formattedDriver}:host={$server};port={$port};dbname={$name}";
+            try {
+                self::$pdo = new \PDO($dsn, $user, $password, $options);
+                break;
+            } catch (\PDOException $PDOException) {
+                try {
+                    $options[\PDO::ATTR_PERSISTENT] = false;
+                    self::$pdo = new \PDO($dsn, $user, $password, $options);
+                    break;
+                } catch (\PDOException $PDOException) {
+                    if (!empty($jsonFile['database'][$key + 1])) {
+                        continue;
+                    } else {
+                        throw new \Exception($PDOException->getMessage());
+                    }
+                }
+            }
         }
     }
 
@@ -197,11 +171,6 @@ class DatabasePDO
     {
         self::$pdo = null;
         self::$preparedQueries = [];
-    }
-
-    public function getType()
-    {
-        return self::$type;
     }
 
     public function beginTransaction()

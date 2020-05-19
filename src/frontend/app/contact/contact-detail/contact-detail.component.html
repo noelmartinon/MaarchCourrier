@@ -5,14 +5,16 @@
 </ng-container>
 <ng-template #elseTemplate>
     <mat-card class="contact-card">
+        <div *ngIf="selectable" class="selectable" [class.selected]="contact.selected">
+            <button style="line-height: 15px;padding: 5px;" *ngIf="!contact.selected" mat-raised-button color="primary" (click)="toggleContact(contact)"><span>selectionner</span><br><small style="font-size:80%">{{contact.resourcesCount}} {{lang.associatedElements}}</small></button>
+            <button style="line-height: 15px;padding: 10px;" *ngIf="contact.selected" mat-raised-button color="primary" (click)="toggleContact(contact)"><i class="far fa-check-circle"></i> {{lang.selectedContact}}</button>
+        </div>
         <mat-card-header>
             <div mat-card-avatar class="contact-header-image fa"
-                [class.fa-address-card]="contact.type === 'contact' && !selectable"
-                [class.fa-users]="contact.type ==='contactGroup' && !selectable"
+                [class.fa-address-card]="contact.type === 'contact'"
+                [class.fa-users]="contact.type ==='contactGroup'"
                 [class.fa-sitemap]="contact.type ==='entity'"
-                [class.fa-user]="contact.type ==='user' && !selectable" [title]="lang['contact_'+contact.type]">
-                <mat-checkbox *ngIf="selectable" color="primary" (change)="toggleContact($event.checked, contact);">
-                </mat-checkbox>
+                [class.fa-user]="contact.type ==='user'" [title]="lang['contact_'+contact.type]">
             </div>
             <mat-card-title *ngIf="!functionsService.empty(contact.firstname) || !functionsService.empty(contact.lastname)"
                 [title]="contact.civility.label + ' ' + contact.firstname + ' ' + contact.lastname">
@@ -74,7 +76,7 @@
                         [class.newData]="isNewValue('addressCountry')"> {{contact.addressCountry}} </p>
                 </mat-list-item>
             </mat-list>
-            <mat-expansion-panel *ngIf="!emptyOtherInfo(contact)">
+            <mat-expansion-panel *ngIf="!emptyOtherInfo(contact)" [expanded]="selectable">
                 <mat-expansion-panel-header>
                     <mat-panel-title>
                         {{lang.othersInfos}}

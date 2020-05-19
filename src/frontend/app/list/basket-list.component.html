@@ -64,7 +64,7 @@
                                     overflow: hidden;
                                     text-overflow: ellipsis;
                                     padding-left: 5px;
-                                    padding-right: 5px;" [class.hasEvent]="data.event" (click)="launchEventSubData(data, row)">
+                                    padding-right: 5px;" [class.hasEvent]="data.event && data.displayValue !== this.lang.undefined" (click)="launchEventSubData(data, row)">
                                             <ng-container *ngIf="data.value == 'getCreationAndProcessLimitDates'">
                                                 <ng-container *ngIf="row.closing_date != lang.undefined">
                                                     <i class="fa fa-lock" title="{{lang.closingDate}}"></i>&nbsp;<span

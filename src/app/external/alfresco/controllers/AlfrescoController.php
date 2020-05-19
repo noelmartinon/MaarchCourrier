@@ -60,7 +60,7 @@ class AlfrescoController
             return $response->withStatus(400)->withJson(['errors' => 'Body uri is empty or not a string']);
         }
 
-        $value = json_encode(['uri' => $body['uri']]);
+        $value = json_encode(['uri' => trim($body['uri'])]);
 
         $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {

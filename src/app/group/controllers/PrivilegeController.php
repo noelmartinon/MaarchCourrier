@@ -295,8 +295,8 @@ class PrivilegeController
 
             $where = ['group_id in (?)', 'list_event = ?'];
             $data = [$groups, 'processDocument'];
-            if (!empty($args['canUpdate'])) {
-                $where[] = "list_event_data->>'canUpdate' = ?";
+            if (!empty($args['canUpdateData'])) {
+                $where[] = "list_event_data->>'canUpdateData' = ?";
                 $data[] = 'true';
             }
             if (!empty($args['canUpdateModel'])) {
@@ -322,8 +322,8 @@ class PrivilegeController
         foreach ($assignedBaskets as $basket) {
             $where = ['basket_id = ?', 'group_id = ?', 'list_event = ?'];
             $data = [$basket['basket_id'], $basket['oldGroupId'], 'processDocument'];
-            if (!empty($args['canUpdate'])) {
-                $where[] = "list_event_data->>'canUpdate' = ?";
+            if (!empty($args['canUpdateData'])) {
+                $where[] = "list_event_data->>'canUpdateData' = ?";
                 $data[] = 'true';
             }
             if (!empty($args['canUpdateModel'])) {

@@ -1308,7 +1308,6 @@ export const LANG_FR = {
     "restrictedEntity":                            "Entité restreinte",
     "restrictions":                                "Restrictions",
     "resultPage":                                  "Liste de résultats",
-    "resultPageUpdated":                           "Liste de résultats modifiée",
     "retentionFinalDisposition":                   "Sort final",
     "retentionRule":                               "Règle de conservation",
     "returnDate":                                  "Date de retour",
@@ -1699,7 +1698,11 @@ export const LANG_FR = {
     "contactsMerged": "Contacts fusionnés",
     "addCriteria": "Ajouter un critère",
     "launchSearch": "Lancer la recherche",
-    "duplicatesContactDisplayed": "{0} doulons ({1} affichés)",
+    "duplicatesContactDisplayed": "{0} doublons ({1} affichés)",
     "duplicatesContactsAdmin": "Gérer les doublons de contacts",
     "merge": "Fusionner",
+    "associatedElements": "élément(s) associé(s)",
+    "selectedContact": "contact sélectionné",
+    "modificationsProcessed": "Modifications effectuées",
+    'updateIndexingFieldWarning': 'Attention si vous supprimez un champ du modèle, ce champ sera réinitialisé pour <b>TOUS</b> les courriers associés au modèle. Voulez-vous continuer ?'
 };

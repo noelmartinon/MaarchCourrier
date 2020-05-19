@@ -59,10 +59,10 @@ class CoreConfigModel
     public static function getConfigPath()
     {
         $customId = CoreConfigModel::getCustomId();
-        if (!empty($customId) && is_file("custom/{$customId}/apps/maarch_entreprise/xml/config.xml")) {
-            $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.xml";
+        if (!empty($customId) && is_file("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
+            $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.json";
         } else {
-            $path = 'apps/maarch_entreprise/xml/config.xml';
+            $path = 'apps/maarch_entreprise/xml/config.json';
         }
 
         return $path;
@@ -76,10 +76,10 @@ class CoreConfigModel
             return $applicationName;
         }
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
 
-        if ($loadedXml) {
-            $applicationName = (string)$loadedXml->CONFIG->applicationname;
+        if (!empty($file['config']['applicationName'])) {
+            $applicationName = $file['config']['applicationName'];
             return $applicationName;
         }
 
@@ -99,10 +99,10 @@ class CoreConfigModel
     {
         $availableLanguages = ['en', 'fr', 'nl'];
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
 
-        if ($loadedXml) {
-            $lang = (string)$loadedXml->CONFIG->lang;
+        if ($file) {
+            $lang = $file['config']['lang'];
             if (in_array($lang, $availableLanguages)) {
                 return $lang;
             }
@@ -140,11 +140,11 @@ class CoreConfigModel
     {
         $timezone = 'Europe/Paris';
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
 
-        if ($loadedXml) {
-            if (!empty((string)$loadedXml->CONFIG->timezone)) {
-                $timezone = (string)$loadedXml->CONFIG->timezone;
+        if ($file) {
+            if (!empty($file['config']['timezone'])) {
+                $timezone = $file['config']['timezone'];
             }
         }
 
@@ -246,48 +246,26 @@ class CoreConfigModel
         return $xmlfile;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
-    public static function initAngularStructure()
+    public static function getJsonLoaded(array $args)
     {
-        $lang = CoreConfigModel::getLanguage();
-        $appName = CoreConfigModel::getApplicationName();
+        ValidatorModel::notEmpty($args, ['path']);
+        ValidatorModel::stringType($args, ['path']);
 
-        $structure = '<!doctype html>';
-        $structure .= "<html lang='{$lang}'>";
-        $structure .= '<head>';
-        $structure .= "<meta charset='utf-8'>";
-        $structure .= "<title>{$appName}</title>";
-        $structure .= "<link rel='icon' type=\"image/svg+xml\" href='static.php?filename=logo_only.svg' />";
+        $customId = CoreConfigModel::getCustomId();
 
-        /* CSS PARTS */
-        $structure .= '<link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.css" media="screen" />';
-        $structure .= '<link rel="stylesheet" href="css/font-awesome-maarch/css/font-maarch.css" media="screen" />';
-        $structure .= '<link rel="stylesheet" href="../../node_modules/jstree-bootstrap-theme/dist/themes/proton/style.min.css" media="screen" />';
+        if (is_file("custom/{$customId}/{$args['path']}")) {
+            $path = "custom/{$customId}/{$args['path']}";
+        } else {
+            $path = $args['path'];
+        }
 
-        $structure .= '</head>';
+        $file = null;
+        if (file_exists($path)) {
+            $file = file_get_contents($path);
+            $file = json_decode($file, true);
+        }
 
-        /* SCRIPS PARTS */
-        $structure .= "<script src='../../node_modules/jquery/dist/jquery.min.js'></script>";
-        $structure .= "<script src='../../node_modules/zone.js/dist/zone.min.js'></script>";
-        $structure .= "<script src='../../node_modules/bootstrap/dist/js/bootstrap.min.js'></script>";
-        $structure .= "<script src='../../node_modules/tinymce/tinymce.min.js'></script>";
-        $structure .= "<script src='../../node_modules/jquery.nicescroll/dist/jquery.nicescroll.min.js'></script>";
-        $structure .= "<script src='../../node_modules/tooltipster/dist/js/tooltipster.bundle.min.js'></script>";
-        $structure .= "<script src='../../node_modules/jquery-typeahead/dist/jquery.typeahead.min.js'></script> ";
-        $structure .= "<script src='../../node_modules/chosen-js/chosen.jquery.min.js'></script>";
-        $structure .= "<script src='../../node_modules/jstree-bootstrap-theme/dist/jstree.js'></script>";
-        $structure .= "<script src='js/angularFunctions.js'></script>";
-
-        /* AUTO DISCONNECT */
-        $structure .= "<script>checkCookieAuth();</script>";
-        
-        $structure .= '<body>';
-        $structure .= '</body>';
-        $structure .= '</html>';
-
-        return $structure;
+        return $file;
     }
 
     /**

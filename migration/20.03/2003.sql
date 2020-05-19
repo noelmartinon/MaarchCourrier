@@ -87,10 +87,12 @@ UPDATE groupbasket SET list_event_data = '{"defaultTab":"info"}'
 WHERE list_event = 'processDocument' AND (list_event_data IS NULL OR list_event_data::text = '');
 
 -- /!\ Do not move : update actions AFTER all updates on groupbasket
-DELETE FROM actions_categories WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
-DELETE FROM actions_groupbaskets WHERE id_action in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
-DELETE FROM groupbasket_redirect WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail'));
-DELETE FROM actions WHERE component = 'viewDoc' OR action_page in ('view', 'validate_mail', 'process', 'visa_mail');
+UPDATE actions SET component = 'confirmAction', action_page = null  WHERE action_page in ('validate_mail', 'process', 'visa_mail');
+
+DELETE FROM actions_categories WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view'));
+DELETE FROM actions_groupbaskets WHERE id_action in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view'));
+DELETE FROM groupbasket_redirect WHERE action_id in (SELECT id FROM actions WHERE component = 'viewDoc' OR action_page in ('view'));
+DELETE FROM actions WHERE component = 'viewDoc' OR action_page in ('view');
 
 ALTER TABLE actions DROP COLUMN IF EXISTS parameters;
 ALTER TABLE actions ADD COLUMN parameters jsonb NOT NULL DEFAULT '{}';

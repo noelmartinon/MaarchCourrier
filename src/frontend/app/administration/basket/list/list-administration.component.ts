@@ -212,7 +212,7 @@ export class ListAdministrationComponent implements OnInit {
     ];
     selectedProcessTool: any = {
         defaultTab: null,
-        canUpdate: false,
+        canUpdateData: false,
         canUpdateModel: false,
     };
     selectedProcessToolClone: string = null;
@@ -242,7 +242,7 @@ export class ListAdministrationComponent implements OnInit {
 
         if (this.basketGroup.list_event === 'processDocument') {
             this.selectedProcessTool.defaultTab = this.basketGroup.list_event_data === null ? 'dashboard' : this.basketGroup.list_event_data.defaultTab;
-            this.selectedProcessTool.canUpdate = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdate;
+            this.selectedProcessTool.canUpdateData = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateData;
             this.selectedProcessTool.canUpdateModel = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateModel;
         }
 
@@ -331,7 +331,7 @@ export class ListAdministrationComponent implements OnInit {
                 this.basketGroup.list_event = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
-                this.notify.success(this.lang.resultPageUpdated);
+                this.notify.success(this.lang.modificationsProcessed);
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

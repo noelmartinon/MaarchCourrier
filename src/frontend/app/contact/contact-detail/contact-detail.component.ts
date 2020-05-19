@@ -71,7 +71,8 @@ export class ContactDetailComponent implements OnInit {
     loadContact(contactId: number, type: string) {
 
         if (type === 'contact') {
-            this.http.get('../rest/contacts/' + contactId).pipe(
+            const queryParam: string = this.selectable ? '?resourcesCount=true' : '';
+            this.http.get('../rest/contacts/' + contactId + queryParam).pipe(
                 tap((contact: any) => {
                     this.contact = {
                         ...contact,
@@ -154,8 +155,10 @@ export class ContactDetailComponent implements OnInit {
         }
     }
 
-    toggleContact(state: boolean, contact: any) {
-        if (state) {
+    toggleContact(contact: any) {
+        contact.selected = !contact.selected;
+
+        if (contact.selected) {
             this.afterSelectedEvent.emit(contact);
         } else {
             this.afterDeselectedEvent.emit(contact);

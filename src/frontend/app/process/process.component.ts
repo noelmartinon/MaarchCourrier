@@ -362,7 +362,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                         if (this.isToolEnabled(data.listEventData.defaultTab)) {
                             this.currentTool = data.listEventData.defaultTab;
                         }
-                        this.canEditData = data.listEventData.canUpdate;
+                        this.canEditData = data.listEventData.canUpdateData;
                         this.canChangeModel = data.listEventData.canUpdateModel;
                     }
                 }),

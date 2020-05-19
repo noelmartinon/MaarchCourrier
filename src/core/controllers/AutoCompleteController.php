@@ -467,8 +467,7 @@ class AutoCompleteController
             'table'     => ['users, usergroup_content, usergroups, usergroups_services'],
             'where'     => $requestData['where'],
             'data'      => $requestData['data'],
-            'order_by'  => ['users.lastname'],
-            'limit'     => self::LIMIT
+            'order_by'  => ['users.lastname']
         ]);
 
         $data = [];

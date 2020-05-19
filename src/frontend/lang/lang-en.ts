@@ -1308,7 +1308,6 @@ export const LANG_EN = {
     "restrictedEntity":                            "Restricted entity",
     "restrictions":                                "Restrictions",
     "resultPage":                                  "Result page",
-    "resultPageUpdated":                           "Result page updated",
     "retentionFinalDisposition":                   "Fate",
     "retentionRule":                               "Retention rules",
     "returnDate":                                  "Return date",
@@ -1700,4 +1699,8 @@ export const LANG_EN = {
     "duplicatesContactDisplayed": "{0} duplicates ({1} displayed)",
     "duplicatesContactsAdmin": "Manage contacts duplicates",
     "merge": "Merge",
+    "associatedElements": "associated elements",
+    "selectedContact": "selected contact",
+    "modificationsProcessed": "Modifications processed",
+    'updateIndexingFieldWarning': 'Warning:  if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?',
 };

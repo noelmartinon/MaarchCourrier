@@ -94,7 +94,7 @@ class ResControllerTest extends TestCase
 
         $body = [
             'modelId'          => 2,
-            'status'           => 'NEW',
+            'status'           => 'INIT',
             'confidentiality'  => false,
             'encodedFile'      => $encodedFile,
             'format'           => 'docx',
@@ -665,6 +665,42 @@ class ResControllerTest extends TestCase
         $response     = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
         $this->assertSame(204, $response->getStatusCode());
 
+        \Basket\models\GroupBasketModel::update([
+            'set'   => ['list_event_data' => '{"canUpdateData": true, "defaultTab": "info", "canUpdateModel": true}'],
+            'where' => ['group_id = ?', 'basket_id = ?'],
+            'data'  => ['COURRIER', 'QualificationBasket']
+        ]);
+
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $aArgs = [
+            'modelId'          => 3,
+            'status'           => 'NEW',
+            'encodedFile'      => $encodedFile,
+            'format'           => 'txt',
+            'confidentiality'  => true,
+            'documentDate'     => '2019-01-01 17:18:47',
+            'arrivalDate'      => '2019-01-01 17:18:47',
+            'processLimitDate' => '2030-01-01',
+            'doctype'          => 102,
+            'destination'      => 15,
+            'initiator'        => 15,
+            'subject'          => 'Breaking News : Superman is alive - PHP unit',
+            'typist'           => 19,
+            'priority'         => 'poiuytre1357nbvc',
+            'senders'          => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id3]);
+        $this->assertSame(204, $response->getStatusCode());
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
         //  READ
         $res = \Resource\models\ResModel::getById(['resId' => self::$id, 'select' => ['*']]);
 
@@ -1157,6 +1193,48 @@ class ResControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Body customFields[2] addressPostcode is empty', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'bblier';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $body = [
+            'modelId'          => 10000,
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id3]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Body modelId does not exist', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $body = [
+            'modelId'          => 4,
+            'doctype'          => 102,
+            'priority'         => 'poiuytre1357nbvc',
+            'documentDate'     => 'wrong format',
+            'arrivalDate'      => 'wrong format',
+            'subject'          => 'Permit to expend Slaughter house in  Schrute Farms',
+            'senders'          => [['type' => 'contact', 'id' => 1]],
+            'destination'      => 15,
+            'processLimitDate' => '2029-01-01'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+        $response = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id3]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Model can not be modified', $responseBody['errors']);
 
         $GLOBALS['login'] = 'ddur';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

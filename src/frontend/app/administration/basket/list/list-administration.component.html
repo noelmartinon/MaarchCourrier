@@ -19,10 +19,10 @@
         </mat-select>
     </mat-form-field>
     <div style="padding: 10px;">
-        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdate" (change)="toggleCanUpdate($event.checked)">{{lang.canUpdateData}}</mat-slide-toggle>
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateData" (change)="toggleCanUpdate($event.checked)">{{lang.canUpdateData}}</mat-slide-toggle>
     </div>
     <div style="padding: 10px;">
-        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateModel" [disabled]="!selectedProcessTool.canUpdate">{{lang.canUpdateIndexingModel}}</mat-slide-toggle>
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateModel" [disabled]="!selectedProcessTool.canUpdateData">{{lang.canUpdateIndexingModel}}</mat-slide-toggle>
     </div> 
 </div>
 <hr />

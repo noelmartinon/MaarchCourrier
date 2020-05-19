@@ -494,7 +494,7 @@ class BasketController
         $data['list_display'] = json_encode($data['list_display']);
         if ($data['list_event'] == 'processDocument') {
             $listEventData = [
-                'canUpdate'         => !empty($data['list_event_data']['canUpdate']),
+                'canUpdateData'     => !empty($data['list_event_data']['canUpdateData']),
                 'canUpdateModel'    => !empty($data['list_event_data']['canUpdateModel']),
                 'defaultTab'        => $data['list_event_data']['defaultTab'] ?? 'dashboard'
             ];

@@ -1,6 +1,7 @@
 composer.lock
 installed.lck
 apps/maarch_entreprise/xml/config.xml
+apps/maarch_entreprise/xml/config.json
 apps/maarch_entreprise/xml/mailevaConfig.xml
 apps/maarch_entreprise/xml/log4php.xml
 *.log

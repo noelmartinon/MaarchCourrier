@@ -78,7 +78,7 @@
                         </div>
                         <div class="col-sm-12 text-center" style="padding:10px;">
                             <button mat-raised-button type="button" color="primary" (click)="checkAccount()"
-                                [disabled]="functionsService.empty(alfresco.account.id) || functionsService.empty(alfresco.account.password)">{{lang.test}}</button>
+                                [disabled]="functionsService.empty(alfresco.account.id) || (functionsService.empty(alfresco.account.password) && creationMode)">{{lang.test}}</button>
 
                             <button mat-raised-button type="submit" color="primary"
                                 [disabled]="!alfrescoForm.valid || !validAccount()">{{lang.validate}}</button>

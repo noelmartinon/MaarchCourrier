@@ -24,10 +24,13 @@ use History\controllers\HistoryController;
 use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
 use Resource\controllers\IndexingController;
+use Resource\controllers\ResController;
 use Resource\models\ResModel;
+use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Tag\models\ResourceTagModel;
 
 class IndexingModelController
 {
@@ -334,6 +337,30 @@ class IndexingModelController
                     'moduleId'  => 'indexingModel',
                     'eventId'   => 'indexingModelModification',
                 ]);
+            }
+        }
+
+        $allResourcesUsingModel = ResModel::get(['select' => ['res_id'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+        $allResourcesUsingModel = array_column($allResourcesUsingModel, 'res_id');
+
+        if (!empty($allResourcesUsingModel)) {
+            $oldFieldList = IndexingModelFieldModel::get(['select' => ['identifier'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+            $oldFieldList = array_column($oldFieldList, 'identifier');
+
+            $newFieldList = array_column($body['fields'], 'identifier');
+
+            ResController::resetResourceFields(['oldFieldList' => $oldFieldList, 'newFieldList' => $newFieldList, 'modelId' => $args['id']]);
+
+            $fieldsToDelete = array_diff($oldFieldList, $newFieldList);
+
+            if (in_array('senders', $fieldsToDelete)) {
+                ResourceContactModel::delete(['where' => ['res_id in (?)',  'mode = ?'], 'data' => [$allResourcesUsingModel, 'sender']]);
+            }
+            if (in_array('recipients', $fieldsToDelete)) {
+                ResourceContactModel::delete(['where' => ['res_id in (?)',  'mode = ?'], 'data' => [$allResourcesUsingModel, 'recipient']]);
+            }
+            if (in_array('tags', $fieldsToDelete)) {
+                ResourceTagModel::delete(['where' => ['res_id in (?)'], 'data' => [$allResourcesUsingModel]]);
             }
         }
 

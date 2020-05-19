@@ -253,6 +253,9 @@ $app->get('/pinnedFolders', \Folder\controllers\FolderController::class . ':getP
 $app->post('/folders/{id}/pin', \Folder\controllers\FolderController::class . ':pinFolder');
 $app->delete('/folders/{id}/unpin', \Folder\controllers\FolderController::class . ':unpinFolder');
 
+// Git commit information
+$app->get('/commitInformation', \SrcCore\controllers\CoreController::class . ':getGitCommitInformation');
+
 //Groups
 $app->get('/groups', \Group\controllers\GroupController::class . ':get');
 $app->post('/groups', \Group\controllers\GroupController::class . ':create');
