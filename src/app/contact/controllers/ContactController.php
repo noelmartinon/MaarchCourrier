@@ -139,7 +139,8 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
 
-        if (!empty($body['email'])) {
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['loginmode']]);
+        if (!empty($body['email']) && $currentUser['loginmode'] == 'restMode') {
             $contact = ContactModel::get(['select' => ['id'], 'where' => ['email = ?'], 'data' => [$body['email']]]);
             if (!empty($contact[0]['id'])) {
                 return $response->withJson(['id' => $contact[0]['id']]);
@@ -659,7 +660,7 @@ class ContactController
         return $response->withJson(['contact' => $contact]);
     }
 
-    public static function getCivilities(Request $request, Response $response)
+    public function getCivilities(Request $request, Response $response)
     {
         $civilities = ContactModel::getCivilities();
 
