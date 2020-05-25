@@ -386,8 +386,12 @@ class ResController extends ResourceControlController
                 return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
             }
 
-            ResModel::update(['set' => ['status' => $data['status'], 'closing_date' => $closingDate], 'where' => ['res_id = ?'], 'data' => [$document['res_id']]]);
-    
+            if ($closingDate == null) {
+                ResModel::update(['set' => ['status' => $data['status'], 'closing_date' => $closingDate], 'where' => ['res_id = ?'], 'data' => [$document['res_id']]]);
+            } else {
+                ResModel::update(['set' => ['status' => $data['status'], 'closing_date' => $closingDate], 'where' => ['res_id = ?', 'closing_date is null'], 'data' => [$document['res_id']]]);
+            }
+
             HistoryController::add([
                 'tableName' => 'res_letterbox',
                 'recordId'  => $document['res_id'],

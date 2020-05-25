@@ -60,9 +60,6 @@ export class ManageDuplicateComponent implements OnInit {
         const masterContact: number = this.data.duplicate.filter((contact: any, index: number) => index === this.contactSelected).map((contact: any) => contact.id)[0];
         const slaveContacts: number[] = this.data.duplicate.filter((contact: any, index: number) => index !== this.contactSelected).map((contact: any) => contact.id);
 
-        console.log(masterContact);
-        console.log(slaveContacts);
-
         this.http.put(`../rest/contacts/${masterContact}/merge`, { duplicates : slaveContacts}).pipe(
             tap(() => {
                 this.dialogRef.close('success');

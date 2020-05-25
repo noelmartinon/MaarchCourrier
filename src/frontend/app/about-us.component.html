@@ -20,6 +20,7 @@
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <div class="col-sm-8">
                         <h3>Maarch Courrier {{applicationVersion}} </h3>
+                        <em>Version : <a target="blank" href="https://labs.maarch.org/maarch/MaarchCourrier/commit/{{commitHash}}">{{commitHash}}</a></em>
                         <hr />
                         <p><em>Copyright &copy; 2008-2020 Maarch SAS {{lang.groupeCompany}}</em></p>
                         <p>{{lang.maarchLicence}}
@@ -74,7 +75,6 @@
                         <div class="img_credits_maarch_box">
                             <mat-icon svgIcon="maarchBox" style="width: 100%;height: auto;"></mat-icon>
                         </div>
-                        <p><em>Version : {{commitHash}}</em></p>
                     </div>
                 </mat-card>
             </div>

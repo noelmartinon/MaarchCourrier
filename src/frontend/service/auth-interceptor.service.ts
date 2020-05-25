@@ -117,7 +117,7 @@ export class AuthInterceptor implements HttpInterceptor {
                                 return of(false);
                             })
                         );
-                    } else if (error.status === 405) {
+                    } else if (error.error.errors === 'User must change his password') {
                         return this.router.navigate(['/password-modification']);
                     } else {
                         return next.handle(request);

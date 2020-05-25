@@ -8,7 +8,6 @@ use Basket\models\RedirectBasketModel;
 use Group\models\GroupModel;
 use Group\models\PrivilegeModel;
 use Resource\controllers\ResController;
-use Resource\controllers\ResourceListController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -275,7 +274,7 @@ class PrivilegeController
             return ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $args['userId']]);
         }
 
-        return PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdate' => true]);
+        return PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdateData' => true]);
     }
 
     public static function isResourceInProcess(array $args)

@@ -421,7 +421,6 @@ class IndexingModelController
             'where'     => ['model_id = ?'],
             'data'      => [$args['id']]
         ]);
-
         if (!empty($resources)) {
             return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource', 'lang' => 'modelUsedByResources']);
         }

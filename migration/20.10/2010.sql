@@ -156,6 +156,10 @@ DO $$ BEGIN
     END IF;
 END$$;
 
+/* GROUPBASKET */
+UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
+UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
+UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

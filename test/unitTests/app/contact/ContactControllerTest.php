@@ -52,6 +52,12 @@ class ContactControllerTest extends TestCase
         $this->assertIsInt($responseBody['id']);
         self::$id = $responseBody['id'];
 
+        \User\models\UserModel::update([
+            'set'   => ['loginmode' => 'restMode'],
+            'where' => ['id = ?'],
+            'data'  => [$GLOBALS['id']]
+        ]);
+
         $args = [
             'civility'        => 'title1',
             'firstname'       => 'Hal',
@@ -71,6 +77,13 @@ class ContactControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 
         $response     = $contactController->create($fullRequest, new \Slim\Http\Response());
+
+        \User\models\UserModel::update([
+            'set'   => ['loginmode' => 'standard'],
+            'where' => ['id = ?'],
+            'data'  => [$GLOBALS['id']]
+        ]);
+
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame(self::$id, $responseBody['id']);

@@ -1684,7 +1684,9 @@ export const LANG_NL = {
     "duplicatesContactsAdmin": "Manage contacts duplicates", //_TO_TRANSLATE
     "merge": "Merge", //_TO_TRANSLATE
     "associatedElements": "associated elements", //_TO_TRANSLATE
-    "selectedContact": "selected contact", //_TO_TRANSLATE
+    'selectedContact': 'Target contact selected', //_TO_TRANSLATE
     "modificationsProcessed": "Modifications processed", //_TO_TRANSLATE,
     'updateIndexingFieldWarning': 'Warning:  if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?', //_TO_TRANSLATE
+    'selectDuplicatedContact': 'Merge with this contact', // _TO_TRANSLATE
+    'noDuplicatesFound': 'No duplicates found', // _TO_TRANSLATE
 };

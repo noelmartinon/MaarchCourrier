@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../service/app.service';
 import {tap, catchError, finalize, exhaustMap, filter} from 'rxjs/operators';
@@ -11,7 +11,6 @@ import { SortPipe } from '../../../plugins/sorting.pipe';
 import { IndexingFormComponent } from '../../indexation/indexing-form/indexing-form.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs/internal/observable/of';
-import {ConfirmComponent} from '../../../plugins/modal/confirm.component';
 
 @Component({
     templateUrl: 'indexing-model-administration.component.html',
@@ -48,8 +47,6 @@ export class IndexingModelAdministrationComponent implements OnInit {
     creationMode: boolean = true;
 
     categoriesList: any[];
-
-    dialogRef: MatDialogRef<any>;
 
     constructor(
         public http: HttpClient,
@@ -118,13 +115,13 @@ export class IndexingModelAdministrationComponent implements OnInit {
 
     onSubmit() {
         const fields = this.indexingForm.getDatas();
-        // fields.forEach((element, key) => {
-        //     delete fields[key].event;
-        //     delete fields[key].label;
-        //     delete fields[key].system;
-        //     delete fields[key].type;
-        //     delete fields[key].values;
-        // });
+        fields.forEach((element, key) => {
+            delete fields[key].event;
+            delete fields[key].label;
+            delete fields[key].system;
+            delete fields[key].type;
+            delete fields[key].values;
+        });
         this.indexingModel.fields = fields;
 
         if (this.creationMode) {
@@ -142,11 +139,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.indexingModelModification, msg: this.lang.updateIndexingFieldWarning } });
-
-            this.dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.put('../rest/indexingModels/' + this.indexingModel.id, this.indexingModel)),
+            this.http.put('../rest/indexingModels/' + this.indexingModel.id, this.indexingModel).pipe(
                 tap((data: any) => {
                     this.indexingForm.setModification();
                     this.setModification();

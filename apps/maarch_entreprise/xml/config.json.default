@@ -2,7 +2,7 @@
     "config": {
         "lang": "fr",
         "applicationName": "MAARCH DEV",
-        "cookieTime": 200,
+        "cookieTime": 10080,
         "timezone": "Europe/Paris",
         "maarchDirectory" : "/var/www/html/MaarchCourrier/",
         "customID" : "",

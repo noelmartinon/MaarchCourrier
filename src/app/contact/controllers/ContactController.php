@@ -139,7 +139,15 @@ class ContactController
         if (!empty($control['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
-        
+
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['loginmode']]);
+        if (!empty($body['email']) && $currentUser['loginmode'] == 'restMode') {
+            $contact = ContactModel::get(['select' => ['id'], 'where' => ['email = ?'], 'data' => [$body['email']]]);
+            if (!empty($contact[0]['id'])) {
+                return $response->withJson(['id' => $contact[0]['id']]);
+            }
+        }
+
         if (!empty($body['communicationMeans'])) {
             if (filter_var($body['communicationMeans'], FILTER_VALIDATE_EMAIL)) {
                 $body['communicationMeans'] = ['email' => $body['communicationMeans']];
@@ -843,6 +851,7 @@ class ContactController
 
         // [fieldNameInFront] => field_name_in_db
         $allowedFields = [
+            'civility'           => 'civility',
             'firstname'          => 'firstname',
             'lastname'           => 'lastname',
             'company'            => 'company',
@@ -938,6 +947,8 @@ class ContactController
         $contactIds = array_column($duplicates, 'id');
         $contactsUsed = ContactController::isContactUsed(['ids' => $contactIds]);
 
+
+        $civilities = ContactModel::getCivilities();
         $contacts = [];
         foreach ($duplicates as $key => $contact) {
             unset($duplicates[$key]['count']);
@@ -964,6 +975,7 @@ class ContactController
                 'isUsed'             => $contactsUsed[$contact['id']],
                 'filling'            => $filling,
                 'customFields'       => !empty($contact['custom_fields']) ? json_decode($contact['custom_fields'], true) : null,
+                'civility'           => !empty($contact['civility']) ? $civilities[$contact['civility']]['label'] : null
             ];
         }
         $count = $duplicates[0]['total'];

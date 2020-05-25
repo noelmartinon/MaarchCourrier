@@ -12,6 +12,20 @@ if (file_exists($path)) {
         $loadedXml = simplexml_load_file($path);
 
         if ($loadedXml) {
+            $i = 0;
+            $database = [];
+            while (!empty($loadedXml->CONFIG->databaseserver[$i])) {
+                $database[] = [
+                    "server"    => (string)$loadedXml->CONFIG->databaseserver[$i],
+                    "port"      => (string)$loadedXml->CONFIG->databaseserverport[$i],
+                    "type"      => (string)$loadedXml->CONFIG->databasetype[$i],
+                    "name"      => (string)$loadedXml->CONFIG->databasename[$i],
+                    "user"      => (string)$loadedXml->CONFIG->databaseuser[$i],
+                    "password"  => (string)$loadedXml->CONFIG->databasepassword[$i]
+                ];
+                ++$i;
+            }
+
             $jsonFile = [
                 'config'    => [
                     'lang'              => (string)$loadedXml->CONFIG->lang,
@@ -22,16 +36,7 @@ if (file_exists($path)) {
 //                    'customID'          => (string)$loadedXml->CONFIG->customID,
 //                    'maarchUrl'         => (string)$loadedXml->CONFIG->maarchUrl,
                 ],
-                'database'  => [
-                    [
-                        "server"    => (string)$loadedXml->CONFIG->databaseserver,
-                        "port"      => (string)$loadedXml->CONFIG->databaseserverport,
-                        "type"      => (string)$loadedXml->CONFIG->databasetype,
-                        "name"      => (string)$loadedXml->CONFIG->databasename,
-                        "user"      => (string)$loadedXml->CONFIG->databaseuser,
-                        "password"  => (string)$loadedXml->CONFIG->databasepassword
-                    ]
-                ]
+                'database'  => $database
             ];
 
             $fp = fopen("apps/maarch_entreprise/xml/config.json", 'w');

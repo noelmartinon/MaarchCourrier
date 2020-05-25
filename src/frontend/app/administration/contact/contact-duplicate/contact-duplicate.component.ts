@@ -68,7 +68,7 @@ export class ContactDuplicateComponent implements OnInit {
 
     duplicatesContacts: any[] = [];
 
-    duplicatesContactsCount: number = 0;
+    duplicatesContactsCount: number = -1;
     duplicatesContactsRealCount: number = 0;
 
     displayedColumns = ['lastname', 'company', 'address'];

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { NotificationService } from '../../../notification.service';
@@ -218,6 +218,7 @@ export class ListAdministrationComponent implements OnInit {
     selectedProcessToolClone: string = null;
 
     @Input('currentBasketGroup') private basketGroup: any;
+    @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
 
     constructor(public http: HttpClient, private notify: NotificationService) { }
 
@@ -330,8 +331,10 @@ export class ListAdministrationComponent implements OnInit {
                 this.basketGroup.list_display = template;
                 this.basketGroup.list_event = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
+                this.basketGroup.list_event_data = this.selectedProcessTool;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
                 this.notify.success(this.lang.modificationsProcessed);
+                this.refreshBasketGroup.emit(this.basketGroup);
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -359,7 +362,7 @@ export class ListAdministrationComponent implements OnInit {
     cancelModification() {
         this.displayedSecondaryData = JSON.parse(JSON.stringify(this.displayedSecondaryDataClone));
         this.selectedListEvent = this.selectedListEventClone;
-        this.selectedProcessTool = this.selectedProcessToolClone;
+        this.selectedProcessTool = JSON.parse(JSON.stringify(this.selectedProcessToolClone));
         this.availableData = JSON.parse(JSON.stringify(this.availableDataClone));
 
         let indexData: number = 0;
