@@ -179,14 +179,27 @@ class CoreConfigModel
     public static function getEncryptKey()
     {
         if (isset($_SERVER['MAARCH_ENCRYPT_KEY'])) {
-            $enc_key = $_SERVER['MAARCH_ENCRYPT_KEY'];
+            $encryptKey = $_SERVER['MAARCH_ENCRYPT_KEY'];
         } elseif (isset($_SERVER['REDIRECT_MAARCH_ENCRYPT_KEY'])) {
-            $enc_key = $_SERVER['REDIRECT_MAARCH_ENCRYPT_KEY'];
+            $encryptKey = $_SERVER['REDIRECT_MAARCH_ENCRYPT_KEY'];
         } else {
-            $enc_key = "Security Key Maarch Courrier #2008";
+            $encryptKey = "Security Key Maarch Courrier #2008";
         }
 
-        return $enc_key;
+        return $encryptKey;
+    }
+
+    public static function getLibrariesDirectory()
+    {
+        if (isset($_SERVER['LIBRARIES_DIR'])) {
+            $librariesDirectory = rtrim($_SERVER['LIBRARIES_DIR'], '/') . '/';
+        } elseif (isset($_SERVER['REDIRECT_LIBRARIES_DIR'])) {
+            $librariesDirectory = rtrim($_SERVER['REDIRECT_LIBRARIES_DIR'], '/') . '/';
+        } else {
+            $librariesDirectory = null;
+        }
+
+        return $librariesDirectory;
     }
 
     public static function getLoggingMethod()
