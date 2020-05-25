@@ -72,8 +72,9 @@ class WatermarkController
             $position = count($rawPosition) == 4 ? $rawPosition : $position;
         }
 
-        if (is_file('vendor/SetaPDF-FormFiller-Full_2.33.0.1425/library/SetaPDF/Autoload.php')) {
-            require_once 'vendor/SetaPDF-FormFiller-Full_2.33.0.1425/library/SetaPDF/Autoload.php';
+        $libDir = CoreConfigModel::getLibrariesDirectory();
+        if (!empty($libDir) && is_file($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php')) {
+            require_once ($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
 
             $flattenedFile = CoreConfigModel::getTmpPath() . "tmp_file_{$GLOBALS['id']}_" .rand(). "_watermark.pdf";
             $writer = new \SetaPDF_Core_Writer_File($flattenedFile);
