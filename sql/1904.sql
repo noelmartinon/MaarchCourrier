@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '19.04.13' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '19.04.14' WHERE id = 'database_version';
 
 DELETE FROM parameters WHERE id = 'QrCodePrefix';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('QrCodePrefix', 'Si activé (1), ajoute "Maarch_" dans le contenu des QrCode générés. (Utilisable avec MaarchCapture >= 1.4)', 0);
@@ -326,6 +326,8 @@ DO $$ BEGIN
     ALTER TABLE res_letterbox ADD COLUMN scan_postmark CHARACTER VARYING (50) DEFAULT NULL::character varying;
   END IF;
 END$$;
+
+DELETE FROM usergroups WHERE enabled = 'N';
 
 /* RE-CREATE VIEW*/
 CREATE OR REPLACE VIEW res_view_letterbox AS

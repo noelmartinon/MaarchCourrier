@@ -403,7 +403,11 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
                             this.notify.success(this.lang.entityDeleted);
 
                         }, (err) => {
-                            this.notify.error(err.error.errors);
+                            if (err.error.errors == 'Entity does not exist') {
+                                this.notify.error(this.lang.noEntity);
+                            } else {
+                                this.notify.error(err.error.errors);
+                            }
                         });
                 }
                 this.dialogRef = null;
@@ -720,7 +724,7 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
                     user_id : newUser.otherInfo,
                     firstname : displayName[0],
                     lastname : displayName[1]
-                }
+                };
                 this.currentEntity.users.push(user);
                 this.dataSourceUsers = new MatTableDataSource(this.currentEntity.users);
                 this.dataSourceUsers.paginator = this.paginatorUsers;
