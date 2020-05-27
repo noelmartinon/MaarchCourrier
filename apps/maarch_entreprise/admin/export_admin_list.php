@@ -74,7 +74,7 @@ for ($i_export=0;$i_export<count($tab_export);$i_export++) {
                     array_push($list_row, _NO);
                 }
             } else {
-                array_push($list_row, $tab_export[$i_export][$j_export]['value']);
+                array_push($list_row, html_entity_decode($tab_export[$i_export][$j_export]['value'], ENT_QUOTES));
             }
         }
     }
