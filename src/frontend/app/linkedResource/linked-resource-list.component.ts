@@ -12,14 +12,14 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material';
 import { LinkResourceModalComponent } from './linkResourceModal/link-resource-modal.component';
 import { FunctionsService } from '../../service/functions.service';
-import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
+import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { PrivilegeService } from '../../service/privileges.service';
 
 declare function $j(selector: any): any;
 
 @Component({
     selector: 'app-linked-resource-list',
-    templateUrl: "linked-resource-list.component.html",
+    templateUrl: 'linked-resource-list.component.html',
     styleUrls: ['linked-resource-list.component.scss'],
     providers: [AppService]
 })
@@ -34,7 +34,7 @@ export class LinkedResourceListComponent implements OnInit {
 
     thumbnailUrl: string = '';
 
-    @Input('resId') resId: number;
+    @Input() resId: number;
     @Output() reloadBadgeLinkedResources = new EventEmitter<string>();
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -46,7 +46,7 @@ export class LinkedResourceListComponent implements OnInit {
         public appService: AppService,
         public dialog: MatDialog,
         public functions: FunctionsService,
-        private privilegeService: PrivilegeService
+        public privilegeService: PrivilegeService
     ) { }
 
     ngOnInit(): void {
@@ -68,7 +68,7 @@ export class LinkedResourceListComponent implements OnInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err)
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -78,12 +78,12 @@ export class LinkedResourceListComponent implements OnInit {
 
         data.forEach((linkeRes: any) => {
             Object.keys(linkeRes).forEach((key) => {
-                if (key == 'statusImage' && this.functions.empty(linkeRes[key])) {
+                if (key === 'statusImage' && this.functions.empty(linkeRes[key])) {
                     linkeRes[key] = 'fa-question undefined';
                 } else if (this.functions.empty(linkeRes[key]) && ['senders', 'recipients', 'attachments', 'hasDocument', 'confidentiality', 'visaCircuit'].indexOf(key) === -1) {
                     linkeRes[key] = this.lang.undefined;
                 }
-                
+
                 if (key === 'senders' && linkeRes[key].length > 1) {
                     if (linkeRes[key].length > 1) {
                         linkeRes[key] = linkeRes[key].length + ' ' + this.lang.contactsAlt;
@@ -93,7 +93,7 @@ export class LinkedResourceListComponent implements OnInit {
                 }
             });
         });
-        
+
         return data;
     }
 
@@ -103,7 +103,7 @@ export class LinkedResourceListComponent implements OnInit {
         } else {
             return '';
         }
-        
+
     }
 
     unlinkResource(row: any) {
@@ -139,7 +139,7 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     openSearchResourceModal() {
-        const dialogRef =  this.dialog.open(LinkResourceModalComponent, { panelClass: 'maarch-full-height-modal', minWidth: '80%',data: { resId: this.resId, currentLinkedRes : this.linkedResources.map(res => res.resId) } });
+        const dialogRef = this.dialog.open(LinkResourceModalComponent, { panelClass: 'maarch-full-height-modal', minWidth: '80%', data: { resId: this.resId, currentLinkedRes: this.linkedResources.map(res => res.resId) } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),
             tap(() => {
@@ -154,6 +154,6 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     openContact(row: any, mode: string) {
-        this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+        this.dialog.open(ContactResourceModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
     }
 }

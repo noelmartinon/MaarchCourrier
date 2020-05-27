@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-    templateUrl: "contacts-page-administration.component.html",
+    templateUrl: 'contacts-page-administration.component.html',
     styleUrls: ['contacts-page-administration.component.scss'],
     providers: [AppService]
 })
@@ -20,33 +20,39 @@ export class ContactsPageAdministrationComponent implements OnInit {
 
     creationMode: boolean = true;
 
-    subMenus:any [] = [
+    subMenus: any[] = [
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
+            current: false
+        },
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label : this.lang.contactsList,
+            label: this.lang.contactsList,
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label : this.lang.customFieldsAdmin,
+            label: this.lang.customFieldsAdmin,
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label : this.lang.contactsParameters,
+            label: this.lang.contactsParameters,
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label : this.lang.contactsGroups,
+            label: this.lang.contactsGroups,
             current: false
         },
     ];
-    
+
     contactId: number = null;
 
     constructor(
@@ -66,7 +72,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
 
         this.route.params.subscribe((params: any) => {
 
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
                 this.headerService.setHeader(this.lang.contactCreation);
                 this.creationMode = true;
                 this.loading = false;
@@ -85,6 +91,6 @@ export class ContactsPageAdministrationComponent implements OnInit {
     }
 
     goToList() {
-        this.router.navigate(["/administration/contacts/list"]);
+        this.router.navigate(['/administration/contacts/list']);
     }
 }

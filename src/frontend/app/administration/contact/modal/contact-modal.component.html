@@ -11,7 +11,7 @@
             <mat-sidenav-content>
                 <app-contact-form *ngIf="mode === 'update'" [creationMode]="creationMode" [contactId]="data.contactId"
                     (onSubmitEvent)="dialogRef.close($event)"></app-contact-form>
-                <app-contacts-list *ngIf="mode === 'read'" [contact]="contact"></app-contacts-list>
+                <app-contact-detail *ngIf="mode === 'read'" [contact]="contact"></app-contact-detail>
             </mat-sidenav-content>
             <mat-sidenav #drawer position='end' mode="side" style="overflow-x:hidden;width: 50%;" autoFocus="false">
                 <app-document-viewer *ngIf="loadedDocument" #appDocumentViewer

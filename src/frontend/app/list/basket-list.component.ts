@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
 import { merge, Observable, of as observableOf, Subject, Subscription, of } from 'rxjs';
@@ -7,31 +7,29 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { startWith, switchMap, map, catchError, takeUntil, tap, finalize } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../service/header.service';
 import { FiltersListService } from '../../service/filtersList.service';
 import { FiltersToolComponent } from './filters/filters-tool.component';
-
 import { ActionsListComponent } from '../actions/actions-list.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { PanelListComponent } from './panel/panel-list.component';
 import { AppService } from '../../service/app.service';
 import { FoldersService } from '../folder/folders.service';
 import { ActionsService } from '../actions/actions.service';
-import { ContactsListModalComponent } from '../contact/list/modal/contacts-list-modal.component';
+import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 
 
 declare function $j(selector: any): any;
 
 @Component({
-    templateUrl: "basket-list.component.html",
+    templateUrl: 'basket-list.component.html',
     styleUrls: ['basket-list.component.scss'],
     providers: [AppService],
 })
-export class BasketListComponent implements OnInit {
+export class BasketListComponent implements OnInit, OnDestroy {
 
     lang: any = LANG;
 
@@ -120,7 +118,7 @@ export class BasketListComponent implements OnInit {
             params => this.specificChrono = params.chrono
         );
 
-        // Event after process action 
+        // Event after process action
         this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
             if (result.type === 'function') {
                 this[result.content]();
@@ -195,7 +193,7 @@ export class BasketListComponent implements OnInit {
                     return this.resultListDatabase!.getRepoIssues(
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters(), this.paginator.pageSize);
                 }),
-                map(data => {
+                map((data: any) => {
                     // Flip flag to show that loading has finished.
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
@@ -211,7 +209,7 @@ export class BasketListComponent implements OnInit {
                     this.notify.handleErrors(err);
                     this.router.navigate(['/home']);
                     this.isLoadingResults = false;
-                    return observableOf([]);
+                    return of(false);
                 })
             ).subscribe(data => this.data = data);
     }
@@ -224,8 +222,8 @@ export class BasketListComponent implements OnInit {
             this.docUrl = '../../rest/resources/' + row.resId + '/content';
             this.currentChrono = row.chrono;
             this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
-                "<iframe style='height:100%;width:100%;' src='" + this.docUrl + "' class='embed-responsive-item'>" +
-                "</iframe>");
+                '<iframe style=\'height:100%;width:100%;\' src=\'' + this.docUrl + '\' class=\'embed-responsive-item\'>' +
+                '</iframe>');
             this.sidenavRight.open();
         }
     }
@@ -239,15 +237,15 @@ export class BasketListComponent implements OnInit {
     }
 
     togglePanel(mode: string, row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         const previousRes = this.currentResource;
         row.checked = true;
 
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
 
-        if (previousRes.resId == row.resId && this.sidenavRight.opened && this.currentMode == mode) {
+        if (previousRes.resId === row.resId && this.sidenavRight.opened && this.currentMode === mode) {
             this.sidenavRight.close();
         } else {
             this.currentMode = mode;
@@ -283,16 +281,16 @@ export class BasketListComponent implements OnInit {
 
     viewThumbnail(row: any) {
         if (row.hasDocument) {
-            let timeStamp = +new Date();
+            const timeStamp = +new Date();
             this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail?tsp=' + timeStamp;
             $j('#viewThumbnail').show();
-            $j('#listContent').css({ "overflow": "hidden" });
+            $j('#listContent').css({ 'overflow': 'hidden' });
         }
     }
 
     closeThumbnail() {
         $j('#viewThumbnail').hide();
-        $j('#listContent').css({ "overflow": "auto" });
+        $j('#listContent').css({ 'overflow': 'auto' });
     }
 
     processPostData(data: any) {
@@ -300,9 +298,9 @@ export class BasketListComponent implements OnInit {
         data.resources.forEach((element: any) => {
             // Process main datas
             Object.keys(element).forEach((key) => {
-                if (key == 'statusImage' && element[key] == null) {
+                if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
-                } else if ((element[key] == null || element[key] == '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'folders', 'hasDocument', 'integrations', 'mailTracking'].indexOf(key) === -1) {
+                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'folders', 'hasDocument', 'integrations', 'mailTracking'].indexOf(key) === -1) {
                     element[key] = this.lang.undefined;
                 }
             });
@@ -311,10 +309,10 @@ export class BasketListComponent implements OnInit {
             element.display.forEach((key: any) => {
                 key.event = false;
                 key.displayTitle = key.displayValue;
-                if ((key.displayValue == null || key.displayValue == '') && ['getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
+                if ((key.displayValue == null || key.displayValue === '') && ['getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
                     key.displayValue = this.lang.undefined;
                     key.displayTitle = '';
-                } else if (["getSenders", "getRecipients"].indexOf(key.value) > -1) {
+                } else if (['getSenders', 'getRecipients'].indexOf(key.value) > -1) {
                     key.event = true;
                     if (key.displayValue.length > 1) {
                         key.displayTitle = key.displayValue.join(' - ');
@@ -322,29 +320,29 @@ export class BasketListComponent implements OnInit {
                     } else {
                         key.displayValue = key.displayValue[0];
                     }
-                } else if (key.value == 'getCreationAndProcessLimitDates') {
+                } else if (key.value === 'getCreationAndProcessLimitDates') {
                     key.icon = '';
-                } else if (key.value == 'getVisaWorkflow') {
+                } else if (key.value === 'getVisaWorkflow') {
                     let formatWorkflow: any = [];
                     let content = '';
                     let user = '';
-                    let displayTitle: string[] = [];
+                    const displayTitle: string[] = [];
 
-                    key.displayValue.forEach((visa: any, key: number) => {
+                    key.displayValue.forEach((visa: any, keyVis: number) => {
                         content = '';
                         user = visa.user;
                         displayTitle.push(user);
 
-                        if (visa.mode == 'sign') {
+                        if (visa.mode === 'sign') {
                             user = '<u>' + user + '</u>';
                         }
-                        if (visa.date == '') {
+                        if (visa.date === '') {
                             content = '<i class="fa fa-hourglass-half"></i> <span title="' + this.lang[visa.mode + 'User'] + '">' + user + '</span>';
                         } else {
                             content = '<span color="accent" style=""><i class="fa fa-check"></i> <span title="' + this.lang[visa.mode + 'User'] + '">' + user + '</span></span>';
                         }
 
-                        if (visa.current && key >= 0) {
+                        if (visa.current && keyVis >= 0) {
                             content = '<b color="primary">' + content + '</b>';
                         }
 
@@ -352,12 +350,12 @@ export class BasketListComponent implements OnInit {
 
                     });
 
-                    //TRUNCATE DISPLAY LIST
-                    const index = key.displayValue.map((e: any) => { return e.current; }).indexOf(true);
+                    // TRUNCATE DISPLAY LIST
+                    const index = key.displayValue.map((e: any) => e.current).indexOf(true);
                     if (index > 0) {
                         formatWorkflow = formatWorkflow.slice(index - 1);
                         formatWorkflow = formatWorkflow.reverse();
-                        const indexReverse = key.displayValue.map((e: any) => { return e.current; }).reverse().indexOf(true);
+                        const indexReverse = key.displayValue.map((e: any) => e.current).reverse().indexOf(true);
                         if (indexReverse > 1) {
                             formatWorkflow = formatWorkflow.slice(indexReverse - 1);
                         }
@@ -369,23 +367,23 @@ export class BasketListComponent implements OnInit {
                     } else if (index === -1) {
                         formatWorkflow = formatWorkflow.slice(formatWorkflow.length - 2);
                     }
-                    if (index >= 2 || (index == -1 && key.displayValue.length >= 3)) {
+                    if (index >= 2 || (index === -1 && key.displayValue.length >= 3)) {
                         formatWorkflow.unshift('...');
                     }
-                    if (index != -1 && index - 2 <= key.displayValue.length && index + 2 < key.displayValue.length && key.displayValue.length >= 3) {
+                    if (index !== -1 && index - 2 <= key.displayValue.length && index + 2 < key.displayValue.length && key.displayValue.length >= 3) {
                         formatWorkflow.push('...');
                     }
 
                     key.displayValue = formatWorkflow.join(' <i class="fas fa-long-arrow-alt-right"></i> ');
                     key.displayTitle = displayTitle.join(' - ');
-                } else if (key.value == 'getSignatories') {
-                    let userList: any[] = [];
+                } else if (key.value === 'getSignatories') {
+                    const userList: any[] = [];
                     key.displayValue.forEach((visa: any) => {
                         userList.push(visa.user);
                     });
                     key.displayValue = userList.join(', ');
                     key.displayTitle = userList.join(', ');
-                } else if (key.value == 'getParallelOpinionsNumber') {
+                } else if (key.value === 'getParallelOpinionsNumber') {
                     key.displayTitle = key.displayValue + ' ' + this.lang.opinionsSent;
 
                     if (key.displayValue > 0) {
@@ -414,7 +412,7 @@ export class BasketListComponent implements OnInit {
                 row.checked = true;
             }
         } else {
-            let index = this.selectedRes.indexOf(row.resId);
+            const index = this.selectedRes.indexOf(row.resId);
             this.selectedRes.splice(index, 1);
             row.checked = false;
         }
@@ -435,8 +433,8 @@ export class BasketListComponent implements OnInit {
     }
 
     selectSpecificRes(row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
 
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
@@ -444,22 +442,22 @@ export class BasketListComponent implements OnInit {
 
     open({ x, y }: MouseEvent, row: any) {
 
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         if (row.checked === false) {
             row.checked = true;
             this.toggleAllRes(thisDeselect);
             this.toggleRes(thisSelect, row);
         }
-        this.actionsList.open(x, y, row)
+        this.actionsList.open(x, y, row);
 
         // prevents default
         return false;
     }
 
     launch(action: any, row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         row.checked = true;
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
@@ -475,7 +473,7 @@ export class BasketListComponent implements OnInit {
 
     launchEventSubData(data: any, row: any) {
         if (data.event) {
-            if (["getSenders", "getRecipients"].indexOf(data.value) > -1) {
+            if (['getSenders', 'getRecipients'].indexOf(data.value) > -1) {
                 const mode = data.value === 'getSenders' ? 'senders' : 'recipients';
                 this.openContact(row, mode);
             }
@@ -483,7 +481,7 @@ export class BasketListComponent implements OnInit {
     }
 
     openContact(row: any, mode: string) {
-        this.dialog.open(ContactsListModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+        this.dialog.open(ContactResourceModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
     }
 
     viewDocument(row: any) {
@@ -516,10 +514,10 @@ export interface BasketList {
     displayFolderTags: boolean;
     resources: any[];
     count: number;
-    basketLabel: string,
-    basket_id: string,
+    basketLabel: string;
+    basket_id: string;
     defaultAction: any;
-    allResources: number[]
+    allResources: number[];
 }
 
 export class ResultListHttpDao {
@@ -529,7 +527,7 @@ export class ResultListHttpDao {
     getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number): Observable<BasketList> {
         this.filtersListService.updateListsPropertiesPage(page);
         this.filtersListService.updateListsPropertiesPageSize(pageSize);
-        let offset = page * pageSize;
+        const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}${filters}`;
 
         return this.http.get<BasketList>(requestUrl);
