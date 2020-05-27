@@ -131,6 +131,8 @@ $app->put('/contacts/{id}/activation', \Contact\controllers\ContactController::c
 $app->get('/formattedContacts/{id}/types/{type}', \Contact\controllers\ContactController::class . ':getLightFormattedContact');
 $app->get('/ban/availableDepartments', \Contact\controllers\ContactController::class . ':getAvailableDepartments');
 $app->post('/contacts/formatV1', \Contact\controllers\ContactController::class . ':getFormattedContactsForSearchV1');
+$app->get('/duplicatedContacts', \Contact\controllers\ContactController::class . ':getDuplicatedContacts');
+$app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');

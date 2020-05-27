@@ -33,6 +33,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\AutoCompleteController;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -888,6 +889,249 @@ class ContactController
         $defaultDepartment = ParameterModel::getById(['id' => 'defaultDepartment', 'select' => ['param_value_int']]);
 
         return $response->withJson(['departments' => $departments, 'default' => empty($defaultDepartment['param_value_int']) ? null : $defaultDepartment['param_value_int']]);
+    }
+
+    public function getDuplicatedContacts(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $queryParams = $request->getQueryParams();
+
+        // [fieldNameInFront] => field_name_in_db
+        $allowedFields = [
+            'civility'           => 'civility',
+            'firstname'          => 'firstname',
+            'lastname'           => 'lastname',
+            'company'            => 'company',
+            'addressNumber'      => 'address_number',
+            'addressStreet'      => 'address_street',
+            'addressAdditional1' => 'address_additional1',
+            'addressAdditional2' => 'address_additional2',
+            'addressPostcode'    => 'address_postcode',
+            'addressTown'        => 'address_town',
+            'addressCountry'     => 'address_country',
+            'department'         => 'department',
+            'function'           => 'function',
+            'email'              => 'email',
+            'phone'              => 'phone'
+        ];
+
+        if (!Validator::arrayType()->notEmpty()->validate($queryParams['criteria'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query criteria is empty or not an array']);
+        }
+
+        $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id']]);
+        $contactCustoms = array_column($contactCustoms, 'id');
+
+        $allowedFieldsKeys = array_keys($allowedFields);
+        foreach ($queryParams['criteria'] as $criterion) {
+            if (strpos($criterion, 'contactCustomField_') !== false) {
+                $customId = explode('_', $criterion)[1];
+                if (!in_array($customId, $contactCustoms)) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Custom criteria does not exist']);
+                }
+            } else {
+                if (!in_array($criterion, $allowedFieldsKeys)) {
+                    return $response->withStatus(400)->withJson(['errors' => 'criteria does not exist']);
+                }
+            }
+        }
+
+        // Construct the query to get all duplicates on criteria
+        $criteria = [];
+        $order = [];
+        foreach ($queryParams['criteria'] as $criterion) {
+            if (strpos($criterion, 'contactCustomField_') !== false) {
+                if (!in_array('custom_fields', $order)) {
+                    $order[] = 'custom_fields';
+                }
+                $customId = explode('_', $criterion)[1];
+                $criteria[] = "replace(lower(translate(custom_fields->>'" . $customId . "', 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ',
+                           'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr') ), ' ', '')";
+            } else {
+                $order[] = $allowedFields[$criterion];
+                $criteria[] = "replace(lower(translate(" . $allowedFields[$criterion] . ", 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ',
+                           'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr') ), ' ', '')";
+            }
+        }
+
+        $fields = ['distinct(id)', 'enabled', 'dense_rank() over (order by ' . implode(',', $criteria) . ') duplicate_id', 'custom_fields'];
+        foreach ($allowedFields as $field) {
+            $fields[] = $field;
+        }
+
+        $where = [];
+
+        foreach ($criteria as $criterion) {
+            $subQuery = "SELECT " . $criterion . ' as field FROM contacts c GROUP BY field HAVING count(*) > 1';
+
+            $where[] = $criterion . " in (" . $subQuery . ") ";
+        }
+
+        $duplicatesQuery = "SELECT " . implode(', ', $fields) . ' FROM contacts WHERE ' . implode(' AND ', $where);
+
+        // Create a query that will have the number of duplicates for each duplicate group
+        // this is needed to avoid getting result that only appears once in the result list (and the function dense_rank cannot be used in group by)
+        $duplicatesCountQuery = 'SELECT duplicate_id, count(*) as duplicate_count FROM (' . $duplicatesQuery . ') as duplicates_id group by duplicate_id';
+
+        $fields = ['distinct(id)', 'count(*) over () as total', 'duplicates_info.duplicate_id', 'enabled', 'custom_fields'];
+        foreach ($allowedFields as $field) {
+            $fields[] = $field;
+        }
+
+        // Get all the duplicates
+        $duplicates = DatabaseModel::select([
+            'select'   => $fields,
+            'table'    => ['( ' . $duplicatesQuery . ') as duplicates_info, (' . $duplicatesCountQuery . ') as duplicates_ids'],
+            'where'    => ['duplicates_ids.duplicate_id = duplicates_info.duplicate_id', 'duplicate_count > 1'],
+            'order_by' => $order,
+            'limit'    => 500
+        ]);
+
+        if (empty($duplicates)) {
+            return $response->withJson(['returnedCount' => 0, 'realCount' => 0, 'contacts' => []]);
+        }
+
+        $contactIds = array_column($duplicates, 'id');
+        $contactsUsed = ContactController::isContactUsed(['ids' => $contactIds]);
+
+
+        $civilities = ContactModel::getCivilities();
+        $contacts = [];
+        foreach ($duplicates as $key => $contact) {
+            unset($duplicates[$key]['count']);
+            $filling = ContactController::getFillingRate(['contactId' => $contact['id']]);
+
+            $contacts[] = [
+                'duplicateId'        => $contact['duplicate_id'],
+                'id'                 => $contact['id'],
+                'firstname'          => $contact['firstname'],
+                'lastname'           => $contact['lastname'],
+                'company'            => $contact['company'],
+                'addressNumber'      => $contact['address_number'],
+                'addressStreet'      => $contact['address_street'],
+                'addressAdditional1' => $contact['address_additional1'],
+                'addressAdditional2' => $contact['address_additional2'],
+                'addressPostcode'    => $contact['address_postcode'],
+                'addressTown'        => $contact['address_town'],
+                'addressCountry'     => $contact['address_country'],
+                'enabled'            => $contact['enabled'],
+                'function'           => $contact['function'],
+                'department'         => $contact['department'],
+                'email'              => $contact['email'],
+                'phone'              => $contact['phone'],
+                'isUsed'             => $contactsUsed[$contact['id']],
+                'filling'            => $filling,
+                'customFields'       => !empty($contact['custom_fields']) ? json_decode($contact['custom_fields'], true) : null,
+                'civility'           => !empty($contact['civility']) ? $civilities[$contact['civility']]['label'] : null
+            ];
+        }
+        $count = $duplicates[0]['total'];
+
+        return $response->withJson(['returnedCount' => count($contacts), 'realCount' => $count, 'contacts' => $contacts]);
+    }
+
+    public function mergeContacts(Request $request, Response $response, array $args)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        if (!Validator::intVal()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route id is not an integer']);
+        }
+
+        $body = $request->getParsedBody();
+        if (!Validator::arrayType()->notEmpty()->validate($body['duplicates'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body duplicates is empty or not an array']);
+        }
+
+        $fields = ['civility', 'firstname', 'lastname', 'company', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
+                   'address_postcode', 'address_town', 'address_country', 'department', 'function', 'email', 'phone', 'custom_fields', 'external_id'];
+
+        $master = ContactModel::getById([
+            'select' => $fields,
+            'id'     => $args['id']
+        ]);
+
+        if (empty($master)) {
+            return $response->withStatus(400)->withJson(['errors' => 'master does not exist']);
+        }
+
+        $duplicates = ContactModel::get([
+            'select' => $fields,
+            'where'  => ['id in (?)'],
+            'data'   => [$body['duplicates']]
+        ]);
+
+        if (count($duplicates) != count($body['duplicates'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'duplicates do not exist']);
+        }
+
+        $set = [];
+        foreach ($fields as $field) {
+            if ($field == 'custom_fields' || $field == 'external_id') {
+                $master[$field] = json_decode($master[$field], true);
+                $masterCustomsKeys = array_keys($master[$field]);
+                $set[$field] = $master[$field];
+
+                foreach ($duplicates as $duplicate) {
+                    $duplicateCustoms = json_decode($duplicate[$field], true);
+                    foreach ($duplicateCustoms as $key => $duplicateCustom) {
+                        if (!in_array($key, $masterCustomsKeys)) {
+                            $set[$field][$key] = $duplicateCustom;
+                        }
+                    }
+                }
+                $set[$field] = json_encode($set[$field]);
+            } elseif (empty($master[$field])) {
+                foreach ($duplicates as $duplicate) {
+                    if (!empty($duplicate[$field])) {
+                        $set[$field] = $duplicate[$field];
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!empty($set)) {
+            ContactModel::update([
+                'set'   => $set,
+                'where' => ['id = ?'],
+                'data'  => [$args['id']]
+            ]);
+        }
+
+        ResourceContactModel::update([
+            'set'   => ['item_id' => $args['id']],
+            'where' => ['item_id in (?)', "type = 'contact'"],
+            'data'  => [$body['duplicates']]
+        ]);
+
+        AcknowledgementReceiptModel::update([
+            'set'   => ['contact_id' => $args['id']],
+            'where' => ['contact_id in (?)'],
+            'data'  => [$body['duplicates']]
+        ]);
+
+        AttachmentModel::update([
+            'set'   => ['recipient_id' => $args['id']],
+            'where' => ['recipient_id in (?)', "recipient_type = 'contact'"],
+            'data'  => [$body['duplicates']]
+        ]);
+
+        foreach ($body['duplicates'] as $duplicate) {
+            ContactGroupModel::deleteByContactId(['contactId' => $duplicate]);
+        }
+
+        ContactModel::delete([
+            'where' => ['id in (?)'],
+            'data'  => [$body['duplicates']]
+        ]);
+
+        return $response->withStatus(204);
     }
 
     public static function getParsedContacts(array $args)
