@@ -27,12 +27,6 @@ export class ContactDuplicateComponent implements OnInit {
 
     subMenus: any[] = [
         {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
-            current: true
-        },
-        {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
             label: this.lang.contactsList,
@@ -55,6 +49,12 @@ export class ContactDuplicateComponent implements OnInit {
             route: '/administration/contacts/contacts-groups',
             label: this.lang.contactsGroups,
             current: false
+        },
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
+            current: true
         },
     ];
 
@@ -84,7 +84,8 @@ export class ContactDuplicateComponent implements OnInit {
         public dialog: MatDialog,
         public functions: FunctionsService,
         private sortPipe: SortPipe,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        private functionsService: FunctionsService
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -183,15 +184,21 @@ export class ContactDuplicateComponent implements OnInit {
                     tmpFormatedAddress.push(element.addressTown);
                     tmpFormatedAddress.push(element.addressCountry);
                     element.address = tmpFormatedAddress.filter(address => !this.functions.empty(address)).join(' ');
+
+                    if (!this.functionsService.empty(element.customFields)) {
+                        Object.keys(element.customFields).forEach((customIndex: any) => {
+                            element[customIndex] = element.customFields[customIndex];
+                        });
+                    }
                 });
                 return data.contacts;
             }),
             tap((contacts: any) => {
-                console.log(contacts);
-
                 this.duplicatesContacts = contacts;
+
                 setTimeout(() => {
-                    this.displayedColumns = this.currentFieldsSearch.map((field: any) => field.identifier);
+                    const regex = /contactCustomField_[.]*/g;
+                    this.displayedColumns = this.currentFieldsSearch.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => field.identifier).concat(this.currentFieldsSearch.filter((field: any) => field.identifier.match(regex) !== null).map((field: any) => field.identifier.replace('contactCustomField_', '')));
                     this.displayedColumns.push('address');
                     this.openedSearchTool = false;
                 }, 0);
@@ -226,5 +233,15 @@ export class ContactDuplicateComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    getLabel(item: any) {
+        if (this.lang['contactsParameters_' + item] !== undefined) {
+            return this.lang['contactsParameters_' + item];
+        } else if (this.lang[item] !== undefined) {
+            return this.lang[item];
+        } else {
+            return this.contactFields.filter((field: any) => field.id === 'contactCustomField_' + item)[0].label;
+        }
     }
 }

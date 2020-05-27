@@ -20,6 +20,7 @@ export class ManageDuplicateComponent implements OnInit {
     lang: any = LANG;
 
     contactSelected: number = null;
+    contactsExcluded: number[] = [];
 
     @ViewChildren('appContactDetail') appContactDetail: QueryList<ContactDetailComponent>;
 
@@ -47,6 +48,15 @@ export class ManageDuplicateComponent implements OnInit {
         });
     }
 
+    toggleExcludeContact(contact: any) {
+        const index = this.contactsExcluded.indexOf(contact.id);
+        if (index === -1) {
+            this.contactsExcluded.push(contact.id);
+        } else {
+            this.contactsExcluded.splice(index, 1);
+        }
+    }
+
     resetContact(contact: any, index: number) {
 
         this.contactSelected = null;
@@ -58,7 +68,7 @@ export class ManageDuplicateComponent implements OnInit {
     onSubmit() {
         this.loading = true;
         const masterContact: number = this.data.duplicate.filter((contact: any, index: number) => index === this.contactSelected).map((contact: any) => contact.id)[0];
-        const slaveContacts: number[] = this.data.duplicate.filter((contact: any, index: number) => index !== this.contactSelected).map((contact: any) => contact.id);
+        const slaveContacts: number[] = this.data.duplicate.filter((contact: any, index: number) => index !== this.contactSelected).filter((contact: any, index: number) => this.contactsExcluded.indexOf(contact.id) === -1).map((contact: any) => contact.id);
 
         this.http.put(`../rest/contacts/${masterContact}/merge`, { duplicates : slaveContacts}).pipe(
             tap(() => {

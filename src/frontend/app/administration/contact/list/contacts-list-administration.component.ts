@@ -48,12 +48,6 @@ export class ContactsListAdministrationComponent implements OnInit {
 
     subMenus: any[] = [
         {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
-            current: false
-        },
-        {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
             label: this.lang.contactsList,
@@ -75,6 +69,12 @@ export class ContactsListAdministrationComponent implements OnInit {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
             label: this.lang.contactsGroups,
+            current: false
+        },
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
             current: false
         },
     ];

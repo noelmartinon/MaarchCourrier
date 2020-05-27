@@ -1,15 +1,17 @@
 <div class="mat-dialog-content-container">
     <div mat-dialog-content class="contact-list-container" [class.contact-list-container-1]="data.duplicate.length == 1" [class.contact-list-container-2]="data.duplicate.length == 2">
-        <div *ngFor="let contact of data.duplicate;let i=index">
+        <div *ngFor="let contact of data.duplicate;let i=index" style="position: relative;">
             <app-contact-detail #appContactDetail [class.merged]="contactSelected!==i && contactSelected!==null" [contact]="contact"
                                 [selectable]="contactSelected===i || contactSelected===null" (afterSelectedEvent)="mergeContact($event, i)"
                                 (afterDeselectedEvent)="resetContact($event, i)" style="height: 100%">
             </app-contact-detail>
+            <button mat-raised-button mat-button style="position: absolute;bottom: 0px;left: 50%;transform: translateX(-50%);" *ngIf="contactSelected!==i && contactSelected!==null && contactsExcluded.indexOf(contact.id) === -1" (click)="toggleExcludeContact(contact)">{{lang.exludeContact}}</button>
+            <button mat-raised-button mat-button color="primary" style="position: absolute;bottom: 0px;left: 50%;transform: translateX(-50%);" *ngIf="contactSelected!==i && contactSelected!==null && contactsExcluded.indexOf(contact.id) > -1" (click)="toggleExcludeContact(contact)">{{lang.contactExcluded}}</button>
         </div>        
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="contactSelected===null || loading"
+        <button mat-raised-button mat-button color="primary" [disabled]="contactSelected===null || loading || contactsExcluded.length === data.duplicate.length -1"
             (click)="onSubmit()">{{lang.merge}}</button>
         <button mat-raised-button mat-button [mat-dialog-close]="">{{lang.cancel}}</button>
     </div>

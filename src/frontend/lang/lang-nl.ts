@@ -1678,7 +1678,9 @@ export const LANG_NL = {
     "duplicatesContactsAdmin": "Manage contacts duplicates", //_TO_TRANSLATE
     "merge": "Merge", //_TO_TRANSLATE
     "associatedElements": "associated elements", //_TO_TRANSLATE
-    'selectedContact': 'Target contact selected', //_TO_TRANSLATE
-    'selectDuplicatedContact': 'Merge with this contact', // _TO_TRANSLATE
-    'noDuplicatesFound': 'No duplicates found', // _TO_TRANSLATE
+    "selectedContact": "Target contact selected", //_TO_TRANSLATE
+    "selectDuplicatedContact": "Merge with this contact", // _TO_TRANSLATE
+    "noDuplicatesFound": "No duplicates found", // _TO_TRANSLATE
+    "exludeContact": "Exclude contact", // _TO_TRANSLATE
+    "contactExcluded": "Contact excluded" // _TO_TRANSLATE
 };

@@ -338,6 +338,7 @@ export const LANG_EN = {
     "contactDetails":                              "Details",
     "contactDisabled":                             "Contact disabled",
     "contactEnabled":                              "Contact enabled",
+    "contactExcluded":                             "Contact excluded",
     "contactFilledTo":                             "Contact filled at", // Would be better to use a variable here -> 'Contact <var> filled'
     "contactGroupCreate":                          "Create contacts group",
     "contactGroupCreation":                        "Contacts group creation",
@@ -635,6 +636,7 @@ export const LANG_EN = {
     "eventViewDoc":                                "View document",
     "eventVisaMail":                               "Electronic signature book",
     "EXE":                                         "Community representative",
+    "exludeContact":                               "Exclude contact",
     "expectedReturnDate":                          "Expected return date",
     "export_seda":                                 "Seda export",
     "exportDatas":                                 "Export data",

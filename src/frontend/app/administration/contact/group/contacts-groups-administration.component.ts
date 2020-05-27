@@ -35,12 +35,6 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
 
     subMenus: any[] = [
         {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
-            current: false
-        },
-        {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
             label: this.lang.contactsList,
@@ -63,6 +57,12 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
             route: '/administration/contacts/contacts-groups',
             label: this.lang.contactsGroups,
             current: true
+        },
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
+            current: false
         },
     ];
 

@@ -5,7 +5,6 @@ import { NotificationService } from '../../../../notification.service';
 import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../../service/app.service';
-import { Observable, of} from 'rxjs';
 import { MatDialog } from '@angular/material';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
@@ -13,6 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ContactService } from '../../../../../service/contact.service';
 import { FunctionsService } from '../../../../../service/functions.service';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { Observable, of} from 'rxjs';
 
 declare var angularGlobals: any;
 
