@@ -1134,6 +1134,108 @@ class ContactController
         return $response->withStatus(204);
     }
 
+    public function exportContacts(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['delimiter']) || !in_array($body['delimiter'], [',', ';', 'TAB'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Delimiter is empty or not a string between [\',\', \';\', \'TAB\']']);
+        } elseif (!Validator::arrayType()->notEmpty()->validate($body['data'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Data data is empty or not an array']);
+        }
+
+        $existingFields = [
+            'id'                 => 'id',
+            'civility'           => 'civility',
+            'firstname'          => 'firstname',
+            'lastname'           => 'lastname',
+            'company'            => 'company',
+            'department'         => 'department',
+            'function'           => 'function',
+            'addressNumber'      => 'address_number',
+            'addressStreet'      => 'address_street',
+            'addressAdditional1' => 'address_additional1',
+            'addressAdditional2' => 'address_additional2',
+            'addressPostcode'    => 'address_postcode',
+            'addressTown'        => 'address_town',
+            'addressCountry'     => 'address_country',
+            'email'              => 'email',
+            'phone'              => 'phone',
+            'communicationMeans' => 'communication_means',
+            'notes'              => 'notes',
+            'creator'            => 'creator',
+            'creationDate'       => 'creation_date',
+            'modificationDate'   => 'modification_date',
+            'enabled'            => 'enabled',
+            'customFields'       => 'custom_fields',
+            'externalId'         => 'external_id',
+        ];
+
+        $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id']]);
+        $contactCustoms = array_column($contactCustoms, 'id');
+
+        $existingFieldsKeys = array_keys($existingFields);
+        foreach ($body['data'] as $field) {
+            if (!Validator::stringType()->notEmpty()->validate($field['value'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'field value is empty or not a string']);
+            }
+            if (!Validator::stringType()->notEmpty()->validate($field['label'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'field label is empty or not a string']);
+            }
+            if (strpos($field['value'], 'contactCustomField_') !== false) {
+                $customId = explode('_', $field['value'])[1];
+                if (!in_array($customId, $contactCustoms)) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Custom field does not exist']);
+                }
+            } else {
+                if (!in_array($field['value'], $existingFieldsKeys) && $field['value'] != 'creatorLabel') {
+                    return $response->withStatus(400)->withJson(['errors' => 'field does not exist']);
+                }
+            }
+        }
+
+        $fields = [];
+        $csvHead = [];
+        foreach ($body['data'] as $field) {
+            if (strpos($field['value'], 'contactCustomField_') !== false) {
+                $customId = explode('_', $field['value'])[1];
+                $fields[] = "custom_fields->>'" . $customId . "'";
+            } elseif ($field['value'] == 'creatorLabel') {
+                $fields[] = "creator as creator_label";
+            } else {
+                $fields[] = $existingFields[$field['value']];
+            }
+            $csvHead[] = $field['label'];
+        }
+
+        $file = fopen('php://temp', 'w');
+        $delimiter = ($body['delimiter'] == 'TAB' ? "\t" : $body['delimiter']);
+
+        fputcsv($file, $csvHead, $delimiter);
+
+        $contacts = ContactModel::get(['select' => $fields]);
+
+        foreach ($contacts as $contact) {
+            if (!empty($contact['creator_label'])) {
+                $contact['creator_label'] = UserModel::getLabelledUserById(['id' => $contact['creator_label']]);
+            }
+            fputcsv($file, $contact, $delimiter);
+        }
+
+        rewind($file);
+
+        $response->write(stream_get_contents($file));
+        $response = $response->withAddedHeader('Content-Disposition', 'attachment; filename=export_maarch.csv');
+        $contentType = 'application/vnd.ms-excel';
+        fclose($file);
+
+        return $response->withHeader('Content-Type', $contentType);
+    }
+
     public static function getParsedContacts(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId', 'mode']);
