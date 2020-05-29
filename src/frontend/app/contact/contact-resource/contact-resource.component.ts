@@ -53,7 +53,7 @@ export class ContactResourceComponent implements OnInit {
 
     getCustomFields() {
         return new Promise((resolve, reject) => {
-            this.http.get('../rest/contactsCustomFields').pipe(
+            this.http.get('../../rest/contactsCustomFields').pipe(
                 tap((data: any) => {
                     this.customFields = data.customFields.map((custom: any) => {
                         return {
@@ -68,7 +68,7 @@ export class ContactResourceComponent implements OnInit {
     }
 
     loadContactsOfResource(resId: number, mode: string) {
-        this.http.get(`../rest/resources/${resId}/contacts?type=${mode}`).pipe(
+        this.http.get(`../../rest/resources/${resId}/contacts?type=${mode}`).pipe(
             tap((data: any) => {
                 this.contacts = data.contacts.map((contact: any) => {
                     return {

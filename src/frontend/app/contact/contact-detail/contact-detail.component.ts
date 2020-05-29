@@ -54,7 +54,7 @@ export class ContactDetailComponent implements OnInit {
 
     getCustomFields() {
         return new Promise((resolve, reject) => {
-            this.http.get('../rest/contactsCustomFields').pipe(
+            this.http.get('../../rest/contactsCustomFields').pipe(
                 tap((data: any) => {
                     this.customFields = data.customFields.map((custom: any) => {
                         return {
@@ -72,7 +72,7 @@ export class ContactDetailComponent implements OnInit {
 
         if (type === 'contact') {
             const queryParam: string = this.selectable ? '?resourcesCount=true' : '';
-            this.http.get('../rest/contacts/' + contactId + queryParam).pipe(
+            this.http.get('../../rest/contacts/' + contactId + queryParam).pipe(
                 tap((contact: any) => {
                     this.contact = {
                         ...contact,
@@ -90,7 +90,7 @@ export class ContactDetailComponent implements OnInit {
                 })
             ).subscribe();
         } else if (type === 'user') {
-            this.http.get('../rest/users/' + contactId).pipe(
+            this.http.get('../../rest/users/' + contactId).pipe(
                 tap((data: any) => {
                     this.contact = {
                         type: 'user',
@@ -109,7 +109,7 @@ export class ContactDetailComponent implements OnInit {
                 })
             ).subscribe();
         } else if (type === 'entity') {
-            this.http.get('../rest/entities/' + contactId).pipe(
+            this.http.get('../../rest/entities/' + contactId).pipe(
                 tap((data: any) => {
                     this.contact = {
                         type: 'entity',
