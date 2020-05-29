@@ -99,7 +99,7 @@ export class ContactDuplicateComponent implements OnInit {
 
     getContactFields() {
         return new Promise((resolve, reject) => {
-            this.http.get('../rest/contactsParameters').pipe(
+            this.http.get('../../rest/contactsParameters').pipe(
                 map((data: any) => {
                     const regex = /contactCustomField_[.]*/g;
                     data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
@@ -113,7 +113,7 @@ export class ContactDuplicateComponent implements OnInit {
                 tap((fields: any) => {
                     this.contactFields = fields;
                 }),
-                exhaustMap(() => this.http.get('../rest/contactsCustomFields')),
+                exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
                 map((data: any) => {
                     data.customFields = data.customFields.map((field: any) => {
                         return {
@@ -165,7 +165,7 @@ export class ContactDuplicateComponent implements OnInit {
         this.duplicatesContacts = [];
         this.isLoadingResults = true;
         const queryParam = '?criteria[]=' + this.currentFieldsSearch.map((field: any) => field.identifier).join('&criteria[]=');
-        this.http.get(`../rest/duplicatedContacts${queryParam}`).pipe(
+        this.http.get(`../../rest/duplicatedContacts${queryParam}`).pipe(
             map((data: any) => {
                 this.duplicatesContactsRealCount = data.realCount;
                 this.duplicatesContactsCount = data.returnedCount;

@@ -50,7 +50,7 @@ export class ContactExportComponent implements OnInit {
 
     getContactFields() {
         return new Promise((resolve, reject) => {
-            this.http.get('../rest/contactsParameters').pipe(
+            this.http.get('../../rest/contactsParameters').pipe(
                 map((data: any) => {
                     const regex = /contactCustomField_[.]*/g;
                     data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
@@ -64,7 +64,7 @@ export class ContactExportComponent implements OnInit {
                 tap((fields: any) => {
                     this.dataAvailable = fields;
                 }),
-                exhaustMap(() => this.http.get('../rest/contactsCustomFields')),
+                exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
                 map((data: any) => {
                     data.customFields = data.customFields.map((field: any) => {
                         return {
@@ -115,7 +115,7 @@ export class ContactExportComponent implements OnInit {
 
     exportData() {
         this.loadingExport = true;
-        this.http.put('../rest/exportContacts', this.exportModel, { responseType: 'blob' }).pipe(
+        this.http.put('../../rest/exportContacts', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');
