@@ -641,6 +641,7 @@ export const LANG_FR = {
     "exludeContact":                               "Exclure ce contact",
     "expectedReturnDate":                          "Date de retour attendue",
     "export_seda":                                 "Export seda",
+    "exportContacts":                              "Exporter les contacts",
     "exportDatas":                                 "Exporter les données",
     "externalComponents":                          "Composants externes",
     "externalVisaWorkflow":                        "Circuit de visa Maarch Parapheur",

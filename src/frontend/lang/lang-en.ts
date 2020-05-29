@@ -639,6 +639,7 @@ export const LANG_EN = {
     "exludeContact":                               "Exclude contact",
     "expectedReturnDate":                          "Expected return date",
     "export_seda":                                 "Seda export",
+    "exportContacts":                              "Export contacts",
     "exportDatas":                                 "Export data",
     "externalComponents":                          "External components",
     "externalVisaWorkflow":                        "Maarch Parapheur visa workflow",

@@ -43,6 +43,7 @@
                             <input type="text" #autoCompleteInput [placeholder]="lang.filterBy" matInput
                                 [formControl]="searchContact" (click)="$event.stopPropagation()" maxlength="128">
                         </mat-form-field>
+                        <button mat-raised-button mat-button color="primary" (click)="openContactExport()">{{lang.exportContacts}}</button>
                     </div>
                     <div class="table-head-tool">
                         <mat-paginator #paginatorContactList [length]="resultsLength" [hidePageSize]="true"

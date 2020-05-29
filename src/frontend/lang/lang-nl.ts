@@ -1682,5 +1682,6 @@ export const LANG_NL = {
     "selectDuplicatedContact": "Merge with this contact", // _TO_TRANSLATE
     "noDuplicatesFound": "No duplicates found", // _TO_TRANSLATE
     "exludeContact": "Exclude contact", // _TO_TRANSLATE
-    "contactExcluded": "Contact excluded" // _TO_TRANSLATE
+    "contactExcluded": "Contact excluded", // _TO_TRANSLATE
+    "exportContacts": "Export contacts",  // _TO_TRANSLATE
 };
