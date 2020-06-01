@@ -5,15 +5,16 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FormControl } from '@angular/forms';
-import { Observable, of } from 'rxjs';
 import { startWith } from 'rxjs/internal/operators/startWith';
 import { map, tap, finalize, catchError } from 'rxjs/operators';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
+import { Observable, of } from 'rxjs';
+import { FunctionsService } from '../../../service/functions.service';
 
 declare function $j(selector: any): any;
 
 @Component({
-    templateUrl: "redirect-action.component.html",
+    templateUrl: 'redirect-action.component.html',
     styleUrls: ['redirect-action.component.scss'],
 })
 export class RedirectActionComponent implements OnInit {
@@ -45,54 +46,97 @@ export class RedirectActionComponent implements OnInit {
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
-    constructor(public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<RedirectActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<RedirectActionComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
+        private functionsService: FunctionsService
+    ) { }
 
-    ngOnInit(): void {
-        let noEntity = true;
+    async ngOnInit(): Promise<void> {
+
         this.loading = true;
-        this.http.get("../../rest/resourcesList/users/" + this.data.userId + "/groups/" + this.data.groupId + "/baskets/" + this.data.basketId + "/actions/" + this.data.action.id + "/getRedirect")
-            .subscribe((data: any) => {
-                this.entities = data['entities'];
-                this.userListRedirect = data.users;
-                this.keepDestForRedirection = data.keepDestForRedirection;
-                this.injectDatasParam.keepDestForRedirection = data.keepDestForRedirection;
 
-                this.entities.forEach(entity => {
-                    if (entity.state.selected) {
-                        this.currentEntity = entity;
-                    }
-                    if (entity.allowed) {
-                        noEntity = false;
-                    }
-                });
+        await this.getEntities();
+        await this.getDefaultEntity();
 
-                if (this.userListRedirect.length == 0 && noEntity) {
-                    this.redirectMode = 'none';
-                    this.loading = false;
-                } else if (this.userListRedirect.length == 0 && !noEntity) {
-                    this.loadEntities();
-                } else if (this.userListRedirect.length > 0 && noEntity) {
-                    this.loadDestUser();
-                } else {
-                    this.loading = false;
-                }
+        if (this.userListRedirect.length === 0 && this.entities.filter((entity: any) => entity.allowed).length === 0) {
+            this.redirectMode = 'none';
+            this.loading = false;
+        } else if (this.userListRedirect.length === 0 && this.entities.filter((entity: any) => entity.allowed).length > 0) {
+            this.loadEntities();
+        } else if (this.userListRedirect.length > 0 && this.entities.filter((entity: any) => entity.allowed).length === 0) {
+            this.loadDestUser();
+        } else {
+            this.loading = false;
+        }
+    }
 
-            }, (err) => {
-                this.notify.handleErrors(err);
-            });
+    getEntities() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../../rest/resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}/actions/${this.data.action.id}/getRedirect`).pipe(
+                tap((data: any) => {
+                    this.entities = data['entities'];
+                    this.userListRedirect = data.users;
+                    this.keepDestForRedirection = data.keepDestForRedirection;
+                    this.injectDatasParam.keepDestForRedirection = data.keepDestForRedirection;
+
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    getDefaultEntity() {
+        return new Promise((resolve, reject) => {
+            if (this.data.resIds.length === 1) {
+                this.http.get(`../../rest/resources/${this.data.resIds[0]}/fields/destination?alt=true`).pipe(
+                    tap((data: any) => {
+                        if (!this.functionsService.empty(data.field)) {
+                            this.currentEntity = this.entities.filter((entity: any) => entity.serialId === data.field)[0];
+                            this.entities = this.entities.map((entity: any) => {
+                                return {
+                                    ...entity,
+                                    state : {
+                                        selected : false,
+                                        opened: false
+                                    }
+                                };
+                            });
+                        } else {
+                            if (this.entities.filter((entity: any) => entity.state.selected).length > 0) {
+                                this.currentEntity = this.entities.filter((entity: any) => entity.state.selected)[0];
+                            }
+                        }
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else {
+                this.currentEntity = this.entities.filter((entity: any) => entity.state.selected)[0];
+            }
+        });
     }
 
     loadEntities() {
         this.redirectMode = 'entity';
-        if (this.data.resIds.length == 1) {
+        if (this.data.resIds.length === 1) {
             this.injectDatasParam.resId = this.data.resIds[0];
         }
         this.loading = false;
         setTimeout(() => {
             $j('#jstree').jstree({
-                "checkbox": {
+                'checkbox': {
                     'deselect_all': true,
-                    "three_state": false //no cascade selection
+                    'three_state': false // no cascade selection
                 },
                 'core': {
                     force_text: true,
@@ -103,13 +147,13 @@ export class RedirectActionComponent implements OnInit {
                     'multiple': false,
                     'data': this.entities,
                 },
-                "plugins": ["checkbox", "search", "sort"]
+                'plugins': ['checkbox', 'search', 'sort']
             });
-            var to: any = false;
+            let to: any = false;
             $j('#jstree_search').keyup(function () {
                 if (to) { clearTimeout(to); }
                 to = setTimeout(function () {
-                    var v = $j('#jstree_search').val();
+                    const v: any = $j('#jstree_search').val();
                     $j('#jstree').jstree(true).search(v);
                 }, 250);
             });
@@ -124,11 +168,13 @@ export class RedirectActionComponent implements OnInit {
                 // create the instance
                 .jstree();
         }, 0);
-        setTimeout(() => {
-            $j('#jstree').jstree('select_node', this.currentEntity);
-            this.selectEntity(this.currentEntity);
 
-        }, 200);
+        if (this.currentEntity.serialId > 0) {
+            setTimeout(() => {
+                $j('#jstree').jstree('select_node', this.currentEntity);
+                this.selectEntity(this.currentEntity, true);
+            }, 200);
+        }
     }
 
     loadDestUser() {
@@ -140,12 +186,12 @@ export class RedirectActionComponent implements OnInit {
             );
 
         this.loading = false;
-        if (this.data.resIds.length == 1) {
-            this.http.get("../../rest/resources/" + this.data.resIds[0] + "/listInstance").subscribe((data: any) => {
+        if (this.data.resIds.length === 1) {
+            this.http.get('../../rest/resources/' + this.data.resIds[0] + '/listInstance').subscribe((data: any) => {
                 this.diffusionListDestRedirect = data.listInstance;
                 Object.keys(data).forEach(diffusionRole => {
                     data[diffusionRole].forEach((line: any) => {
-                        if (line.item_mode == 'dest') {
+                        if (line.item_mode === 'dest') {
                             this.oldUser = line;
                         }
                     });
@@ -163,20 +209,19 @@ export class RedirectActionComponent implements OnInit {
     }
 
     changeDest(event: any) {
-        this.currentDiffusionListDestRedirect = this.diffusionListDestRedirect
-        let user = event.option.value;
-
+        this.currentDiffusionListDestRedirect = this.diffusionListDestRedirect;
+        const user = event.option.value;
 
         this.destUser = {
-            difflist_type: "entity_id",
-            item_mode: "dest",
-            item_type: "user_id",
+            difflist_type: 'entity_id',
+            item_mode: 'dest',
+            item_type: 'user_id',
             item_id: user.user_id,
             labelToDisplay: user.labelToDisplay,
             descriptionToDisplay: user.descriptionToDisplay
         };
 
-        if (this.data.resIds.length == 1) {
+        if (this.data.resIds.length === 1) {
             this.isDestinationChanging = false;
             this.http.get('../../rest/resources/' + this.data.resIds[0] + '/users/' + user.id + '/isDestinationChanging')
                 .subscribe((data: any) => {
@@ -189,7 +234,7 @@ export class RedirectActionComponent implements OnInit {
                 let isInCopy = false;
                 let newCopy = null;
                 this.currentDiffusionListDestRedirect.forEach((element: any) => {
-                    if (element.item_mode == 'cc' && element.item_id == this.oldUser.item_id) {
+                    if (element.item_mode === 'cc' && element.item_id === this.oldUser.item_id) {
                         isInCopy = true;
                     }
                 });
@@ -200,7 +245,7 @@ export class RedirectActionComponent implements OnInit {
                     this.currentDiffusionListDestRedirect.push(newCopy);
                 }
             }
-            this.currentDiffusionListDestRedirect.splice(this.currentDiffusionListDestRedirect.map((e: any) => { return e.item_mode; }).indexOf('dest'), 1);
+            this.currentDiffusionListDestRedirect.splice(this.currentDiffusionListDestRedirect.map((e: any) => e.item_mode).indexOf('dest'), 1);
         } else {
             this.isDestinationChanging = true;
         }
@@ -217,9 +262,9 @@ export class RedirectActionComponent implements OnInit {
         }
     }
 
-    selectEntity(entity: any) {
+    selectEntity(entity: any, initLoad: boolean = false) {
         this.currentEntity = entity;
-        this.appDiffusionsList.loadListModel(entity.serialId);
+        this.appDiffusionsList.loadListModel(entity.serialId, initLoad);
     }
 
     onSubmit() {
@@ -230,7 +275,7 @@ export class RedirectActionComponent implements OnInit {
     }
 
     executeAction() {
-        if (this.redirectMode == 'user') {
+        if (this.redirectMode === 'user') {
             this.http.put(this.data.processActionRoute, { resources: this.data.resIds, data: { onlyRedirectDest: true, listInstances: this.currentDiffusionListDestRedirect }, note: this.noteEditor.getNote() }).pipe(
                 tap((data: any) => {
                     if (data && data.errors != null) {
@@ -263,9 +308,9 @@ export class RedirectActionComponent implements OnInit {
     }
 
     checkValidity() {
-        if (this.redirectMode == 'entity' && this.appDiffusionsList && this.appDiffusionsList.getDestUser().length > 0 && this.currentEntity.serialId > 0 && !this.loading) {
+        if (this.redirectMode === 'entity' && this.appDiffusionsList && this.appDiffusionsList.getDestUser().length > 0 && this.currentEntity.serialId > 0 && !this.loading) {
             return false;
-        } if (this.redirectMode == 'user' && this.currentDiffusionListDestRedirect.length > 0 && this.destUser != null && !this.loading) {
+        } if (this.redirectMode === 'user' && this.currentDiffusionListDestRedirect.length > 0 && this.destUser != null && !this.loading) {
             return false;
         } else {
             return true;

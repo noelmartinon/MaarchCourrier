@@ -119,7 +119,7 @@ export class DiffusionsListComponent implements OnInit {
         return true;
     }
 
-    async loadListModel(entityId: number) {
+    async loadListModel(entityId: number, destResource: boolean = false) {
         this.loading = true;
         this.currentEntityId = entityId;
         this.userDestList = [];
@@ -137,6 +137,9 @@ export class DiffusionsListComponent implements OnInit {
 
             if (listInstance !== undefined) {
                 listInstance.forEach((element: any) => {
+                    if (destResource && element.item_mode == "dest") {
+                        this.diffList[element.item_mode].items = [element];
+                    }
                     if (this.keepRoles.indexOf(element.item_mode) > -1 && this.diffList[element.item_mode].items.filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type).length === 0) {
                         this.diffList[element.item_mode].items.push(element);
                     }
