@@ -9,6 +9,7 @@
             <button style="line-height: 15px;padding: 5px;" *ngIf="!contact.selected" mat-raised-button color="primary" (click)="toggleContact(contact)"><span>{{lang.selectDuplicatedContact}}</span><br><small style="font-size:80%">{{contact.resourcesCount}} {{lang.associatedElements}}</small></button>
             <button style="line-height: 15px;padding: 10px;" *ngIf="contact.selected" mat-raised-button color="primary" (click)="toggleContact(contact)"><i class="far fa-check-circle"></i> {{lang.selectedContact}}</button>
         </div>
+        <div *ngIf="!contact.enabled" class="disabledContact">{{lang.contactDisabled}}</div>
         <mat-card-header>
             <div mat-card-avatar class="contact-header-image fa"
                 [class.fa-address-card]="contact.type === 'contact'"

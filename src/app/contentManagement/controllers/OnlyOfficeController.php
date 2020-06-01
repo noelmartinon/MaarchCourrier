@@ -16,8 +16,10 @@ namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Firebase\JWT\JWT;
 use Resource\controllers\ResController;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -137,17 +139,29 @@ class OnlyOfficeController
             if (!ResController::hasRightByResId(['resId' => [$body['objectId']], 'userId' => $GLOBALS['id']])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Resource out of perimeter']);
             }
-            $resource = ResModel::getById(['resId' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename']]);
+            $resource = ResModel::getById(['resId' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'fingerprint']]);
             if (empty($resource['filename'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Resource has no file']);
             }
 
-            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template']]);
+            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
 
             $path = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $path, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($resource['fingerprint'])) {
+                ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$body['objectId']]]);
+                $resource['fingerprint'] = $fingerprint;
+            }
+
+            if ($resource['fingerprint'] != $fingerprint) {
+                return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
+            }
+
             $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'attachmentModification') {
-            $attachment = AttachmentModel::getById(['id' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'res_id_master']]);
+            $attachment = AttachmentModel::getById(['id' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint']]);
             if (empty($attachment)) {
                 return $response->withStatus(400)->withJson(['errors' => 'Attachment does not exist']);
             }
@@ -155,9 +169,21 @@ class OnlyOfficeController
                 return $response->withStatus(400)->withJson(['errors' => 'Attachment out of perimeter']);
             }
 
-            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template']]);
+            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
 
             $path = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachment['path']) . $attachment['filename'];
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $path, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($attachment['fingerprint'])) {
+                AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$body['objectId']]]);
+                $attachment['fingerprint'] = $fingerprint;
+            }
+
+            if ($attachment['fingerprint'] != $fingerprint) {
+                return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
+            }
+
             $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'encodedResource') {
             if (empty($body['format'])) {

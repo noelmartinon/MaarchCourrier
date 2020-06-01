@@ -57,6 +57,7 @@ import { AlfrescoListAdministrationComponent } from './alfresco/alfresco-list-ad
 import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administration.component';
 import { ContactDuplicateComponent } from './contact/contact-duplicate/contact-duplicate.component';
 import { ManageDuplicateComponent } from './contact/contact-duplicate/manage-duplicate/manage-duplicate.component';
+import { ContactExportComponent } from './contact/list/export/contact-export.component';
 
 
 @NgModule({
@@ -127,6 +128,7 @@ import { ManageDuplicateComponent } from './contact/contact-duplicate/manage-dup
         AlfrescoListAdministrationComponent,
         ContactDuplicateComponent,
         ManageDuplicateComponent,
+        ContactExportComponent
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,
@@ -140,7 +142,8 @@ import { ManageDuplicateComponent } from './contact/contact-duplicate/manage-dup
         TemplateAdministrationCheckEntitiesModalComponent,
         AccountLinkComponent,
         TemplateFileEditorModalComponent,
-        ManageDuplicateComponent
+        ManageDuplicateComponent,
+        ContactExportComponent
     ],
 })
 export class AdministrationModule { }

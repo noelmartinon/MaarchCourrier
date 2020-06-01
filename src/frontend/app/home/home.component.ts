@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         public appService: AppService,
         private router: Router
     ) {
-        (<any>window).pdfWorkerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.min.js';
+        (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
 
     ngOnInit(): void {

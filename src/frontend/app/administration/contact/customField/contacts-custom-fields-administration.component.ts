@@ -8,13 +8,13 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
-import { of } from 'rxjs';
 import { SortPipe } from '../../../../plugins/sorting.pipe';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
-    templateUrl: "contacts-custom-fields-administration.component.html",
+    templateUrl: 'contacts-custom-fields-administration.component.html',
     styleUrls: [
-        'contacts-custom-fields-administration.component.scss', 
+        'contacts-custom-fields-administration.component.scss',
         '../../../indexation/indexing-form/indexing-form.component.scss'
     ],
     providers: [AppService, SortPipe]
@@ -29,29 +29,35 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
     loading: boolean = true;
 
-    subMenus:any [] = [
+    subMenus: any[] = [
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label : this.lang.contactsList,
+            label: this.lang.contactsList,
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label : this.lang.customFieldsAdmin,
+            label: this.lang.customFieldsAdmin,
             current: true
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label : this.lang.contactsParameters,
+            label: this.lang.contactsParameters,
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label : this.lang.contactsGroups,
+            label: this.lang.contactsGroups,
+            current: false
+        },
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
             current: false
         },
     ];
@@ -87,7 +93,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
     incrementCreation: number = 1;
 
-    sampleIncrement: number[] = [1,2,3,4];
+    sampleIncrement: number[] = [1, 2, 3, 4];
 
 
     dialogRef: MatDialogRef<any>;
@@ -106,17 +112,17 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFields + ' ' + this.lang.contacts);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
-        this.http.get("../rest/contactsCustomFields").pipe(
+        this.http.get('../rest/contactsCustomFields').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
                     element.values = element.values.map((info: any) => {
                         return {
                             label: info
-                        }
+                        };
                     });
 
                 });
@@ -147,11 +153,11 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
                     label: this.lang.newField + ' ' + this.incrementCreation,
                     type: customFieldType.type,
                     values: []
-                }
+                };
             }),
             exhaustMap((data) => this.http.post('../rest/contactsCustomFields', newCustomField)),
             tap((data: any) => {
-                newCustomField.id = data.id
+                newCustomField.id = data.id;
                 this.customFields.push(newCustomField);
                 this.notify.success(this.lang.customFieldAdded);
                 this.incrementCreation++;
@@ -194,14 +200,14 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
     updateCustomField(customField: any, indexCustom: number) {
 
-        customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) == i);
+        customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
 
         // TO FIX DATA BINDING SIMPLE ARRAY VALUES
         const customFieldToUpdate = { ...customField };
-        
-        customFieldToUpdate.values = customField.values.map((data: any) => data.label)
 
-        const alreadyExists = this.customFields.filter(customField => customField.label == customFieldToUpdate.label );
+        customFieldToUpdate.values = customField.values.map((data: any) => data.label);
+
+        const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
         if (alreadyExists.length > 1) {
             this.notify.handleErrors(this.lang.customFieldAlreadyExists);
             return of(false);

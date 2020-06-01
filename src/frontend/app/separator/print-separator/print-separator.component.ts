@@ -40,7 +40,7 @@ export class PrintSeparatorComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService
     ) {
-        (<any>window).pdfWorkerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.min.js';
+        (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
 
     ngOnInit(): void {

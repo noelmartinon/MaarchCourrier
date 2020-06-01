@@ -387,16 +387,16 @@ class StoreController
         return $preparedData;
     }
 
-    public static function getFingerPrint(array $aArgs)
+    public static function getFingerPrint(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['filePath']);
-        ValidatorModel::stringType($aArgs, ['filePath', 'mode']);
+        ValidatorModel::notEmpty($args, ['filePath']);
+        ValidatorModel::stringType($args, ['filePath', 'mode']);
 
-        if (empty($aArgs['mode']) || $aArgs['mode'] == 'NONE') {
-            $aArgs['mode'] = 'sha512';
+        if (empty($args['mode']) || $args['mode'] == 'NONE') {
+            $args['mode'] = 'sha512';
         }
 
-        return hash_file(strtolower($aArgs['mode']), $aArgs['filePath']);
+        return hash_file(strtolower($args['mode']), $args['filePath']);
     }
 
     public static function isFileAllowed(array $args)

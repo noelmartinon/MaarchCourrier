@@ -13,6 +13,7 @@ import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, t
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../../service/functions.service';
+import { ContactExportComponent } from './export/contact-export.component';
 
 @Component({
     selector: 'contact-list',
@@ -50,12 +51,6 @@ export class ContactsListAdministrationComponent implements OnInit {
 
     subMenus: any[] = [
         {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
-            current: false
-        },
-        {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
             label: this.lang.contactsList,
@@ -79,6 +74,12 @@ export class ContactsListAdministrationComponent implements OnInit {
             label: this.lang.contactsGroups,
             current: false
         },
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
+            current: false
+        },
     ];
 
     constructor(
@@ -89,7 +90,7 @@ export class ContactsListAdministrationComponent implements OnInit {
         public dialog: MatDialog,
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef) { }
-        
+
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
@@ -207,6 +208,10 @@ export class ContactsListAdministrationComponent implements OnInit {
         ).subscribe();
     }
 
+    openContactExport() {
+        this.dialog.open(ContactExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
+    }
+
     refreshDao() {
         this.filtersChange.emit();
     }
@@ -268,7 +273,7 @@ export class ContactListHttpDao {
     }
 }
 @Component({
-    templateUrl: "contacts-list-administration-redirect-modal.component.html",
+    templateUrl: 'contacts-list-administration-redirect-modal.component.html',
     styleUrls: [],
     providers: [NotificationService]
 })

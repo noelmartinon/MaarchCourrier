@@ -144,7 +144,7 @@ export class DocumentViewerComponent implements OnInit {
         public functions: FunctionsService,
         public privilegeService: PrivilegeService,
     ) {
-        (<any>window).pdfWorkerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.min.js';
+        (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
 
     ngOnInit() {

@@ -40,7 +40,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
             if (!empty($currentRoute)) {
                 $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute]);
                 if (!$r['isRouteAvailable']) {
-                    return $response->withStatus(405)->withJson(['errors' => $r['errors']]);
+                    return $response->withStatus(403)->withJson(['errors' => $r['errors']]);
                 }
             }
         } elseif ($currentMethod.$currentRoute != 'GET/initialize') {
@@ -138,6 +138,7 @@ $app->get('/formattedContacts/{id}/types/{type}', \Contact\controllers\ContactCo
 $app->get('/ban/availableDepartments', \Contact\controllers\ContactController::class . ':getAvailableDepartments');
 $app->get('/duplicatedContacts', \Contact\controllers\ContactController::class . ':getDuplicatedContacts');
 $app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
+$app->put('/exportContacts', \Contact\controllers\ContactController::class . ':exportContacts');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');

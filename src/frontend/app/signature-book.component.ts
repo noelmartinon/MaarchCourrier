@@ -113,7 +113,7 @@ export class SignatureBookComponent implements OnInit {
         public actionService: ActionsService,
         public headerService: HeaderService,
     ) {
-        (<any>window).pdfWorkerSrc = '../../node_modules/pdfjs-dist/build/pdf.worker.min.js';
+        (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
 
         // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(message => {

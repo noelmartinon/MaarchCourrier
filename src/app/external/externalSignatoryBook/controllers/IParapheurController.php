@@ -18,7 +18,9 @@ namespace ExternalSignatoryBook\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\ListInstanceModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
@@ -96,7 +98,7 @@ class IParapheurController
         }
 
         $attachments = AttachmentModel::get([
-            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'],
+            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint'],
             'where'  => ['res_id_master = ?', 'attachment_type not in (?)', "status NOT IN ('DEL','OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
             'data'   => [$aArgs['resIdMaster'], ['signed_response']]
         ]);
@@ -107,6 +109,13 @@ class IParapheurController
                 $adrInfo              = AdrModel::getConvertedDocumentById(['resId' => $value['res_id'], 'collId' => 'attachments_coll', 'type' => 'PDF']);
                 $annexeAttachmentPath = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
                 $value['filePath']    = $annexeAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
+
+                $docserverType = DocserverTypeModel::getById(['id' => $annexeAttachmentPath['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $value['filePath'], 'mode' => $docserverType['fingerprint_mode']]);
+                if ($value['fingerprint'] != $fingerprint) {
+                    return ['error' => 'Fingerprints do not match'];
+                }
+
                 unset($attachments[$key]);
                 $annexes['attachments'][] = $value;
             }

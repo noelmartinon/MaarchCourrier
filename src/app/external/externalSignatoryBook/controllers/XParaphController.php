@@ -17,8 +17,10 @@ namespace ExternalSignatoryBook\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use History\controllers\HistoryController;
 use Noxxie\PdfParser\Parser;
+use Resource\controllers\StoreController;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -69,7 +71,13 @@ class XParaphController
             $adrInfo       = ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => $collId]);
             $docserverInfo = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
             $filePath      = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
-            
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserverInfo['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $filePath, 'mode' => $docserverType['fingerprint_mode']]);
+            if ($adrInfo['fingerprint'] != $fingerprint) {
+                return ['error' => 'Fingerprints do not match'];
+            }
+
             $documentToSend = XParaphController::replaceXParaphSignatureField(['pdf' => $filePath, 'attachmentInfo' => $value]);
             $filePath = $documentToSend['documentPath'];
             if ($documentToSend['remat']) {

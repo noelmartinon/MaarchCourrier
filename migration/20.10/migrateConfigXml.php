@@ -26,12 +26,15 @@ if (file_exists($path)) {
                 ++$i;
             }
 
+            $timezone = (string)$loadedXml->CONFIG->timezone;
+            $timezone = !empty($timezone) ? $timezone : 'Europe/Paris';
+
             $jsonFile = [
                 'config'    => [
                     'lang'              => (string)$loadedXml->CONFIG->lang,
                     'applicationName'   => (string)$loadedXml->CONFIG->applicationname,
                     'cookieTime'        => 10080,
-                    'timezone'          => (string)$loadedXml->CONFIG->timezone,
+                    'timezone'          => $timezone,
 //                    'maarchDirectory'   => (string)$loadedXml->CONFIG->maarchDirectory,
 //                    'customID'          => (string)$loadedXml->CONFIG->customID,
 //                    'maarchUrl'         => (string)$loadedXml->CONFIG->maarchUrl,
@@ -63,13 +66,16 @@ foreach ($customs as $custom) {
         }
         $loadedXml = simplexml_load_file($path);
 
+        $timezone = (string)$loadedXml->CONFIG->timezone;
+        $timezone = !empty($timezone) ? $timezone : 'Europe/Paris';
+
         if ($loadedXml) {
             $jsonFile = [
                 'config'    => [
                     'lang'              => (string)$loadedXml->CONFIG->lang,
                     'applicationName'   => (string)$loadedXml->CONFIG->applicationname,
                     'cookieTime'        => 10080,
-                    'timezone'          => (string)$loadedXml->CONFIG->timezone,
+                    'timezone'          => $timezone,
                 ],
                 'database'  => [
                     [

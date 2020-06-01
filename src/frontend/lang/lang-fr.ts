@@ -1702,9 +1702,12 @@ export const LANG_FR = {
     "duplicatesContactsAdmin": "Gérer les doublons de contacts",
     "merge": "Fusionner",
     "associatedElements": "élément(s) associé(s)",
-    'selectedContact': 'Contact cible sélectionné',
+    "selectedContact": "Contact cible sélectionné",
     "modificationsProcessed": "Modifications effectuées",
-    'updateIndexingFieldWarning': 'Attention si vous supprimez un champ du modèle, ce champ sera réinitialisé pour <b>TOUS</b> les courriers associés au modèle. Voulez-vous continuer ?',
-    'selectDuplicatedContact': 'Fusionner vers ce contact',
-    'noDuplicatesFound': 'Aucun doublons trouvés'
+    "updateIndexingFieldWarning": "Attention si vous supprimez un champ du modèle, ce champ sera réinitialisé pour <b>TOUS</b> les courriers associés au modèle. Voulez-vous continuer ?",
+    "selectDuplicatedContact": "Fusionner vers ce contact",
+    "noDuplicatesFound": "Aucun doublon trouvé",
+    "exludeContact": "Exclure ce contact",
+    "contactExcluded": "Contact exclu",
+    "exportContacts": "Exporter les contacts",
 };

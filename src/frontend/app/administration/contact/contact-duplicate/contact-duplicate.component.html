@@ -64,7 +64,7 @@
                             style="font-size:80%;display: grid;grid-gap: 10px;">
                             <span class="primary" *ngFor="let item of displayedColumns"
                                 style="overflow: hidden;text-overflow: ellipsis;">
-                                {{lang['contactsParameters_' + item] !== undefined ? lang['contactsParameters_' + item] : lang[item]}}
+                                {{getLabel(item)}}
                             </span>
                         </p>
                     </mat-list-item>
@@ -73,7 +73,7 @@
                     <cdk-virtual-scroll-viewport itemSize="48" class="example-viewport">
                         <mat-list role="list">
                             <ng-container *cdkVirtualFor="let element of duplicatesContacts;let i=index">
-                                <mat-list-item role="listitem" style="cursor: pointer;font-size: 14px;" [class.test]="element.odd"
+                                <mat-list-item role="listitem" style="cursor: pointer;font-size: 14px;" [class.odd]="duplicatesContacts[i+1] !== undefined && element.odd !== duplicatesContacts[i+1].odd"
                                     [class.hovered]="element.duplicateId === currentDuplicateId"
                                     (mouseover)="selectDuplicates(element.duplicateId)"
                                     (click)="manageDuplicate(element.duplicateId)">

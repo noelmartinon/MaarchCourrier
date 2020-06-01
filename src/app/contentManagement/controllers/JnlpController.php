@@ -16,7 +16,9 @@ namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Resource\controllers\ResController;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -271,19 +273,33 @@ class JnlpController
                     $response->write($xmlResponse);
                     return $response->withHeader('Content-Type', 'application/xml');
                 }
-                $resource = ResModel::getById(['resId' => $queryParams['objectId'], 'select' => ['docserver_id', 'path', 'filename']]);
+                $resource = ResModel::getById(['resId' => $queryParams['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'fingerprint']]);
                 if (empty($resource['filename'])) {
                     $xmlResponse = JnlpController::generateResponse(['type' => 'ERROR', 'data' => ['ERROR' => "Resource has no file"]]);
                     $response->write($xmlResponse);
                     return $response->withHeader('Content-Type', 'application/xml');
                 }
 
-                $docserver  = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template']]);
+                $docserver  = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
                 $pathToCopy = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+
+                $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToCopy, 'mode' => $docserverType['fingerprint_mode']]);
+                if (empty($resource['fingerprint'])) {
+                    ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$queryParams['objectId']]]);
+                    $resource['fingerprint'] = $fingerprint;
+                }
+
+                if ($resource['fingerprint'] != $fingerprint) {
+                    $xmlResponse = JnlpController::generateResponse(['type' => 'ERROR', 'data' => ['ERROR' => "Fingerprints do not match"]]);
+                    $response->write($xmlResponse);
+                    return $response->withHeader('Content-Type', 'application/xml');
+                }
+
                 $extension  = pathinfo($pathToCopy, PATHINFO_EXTENSION);
                 $newFileOnTmp = "tmp_file_{$GLOBALS['id']}_{$args['jnlpUniqueId']}.{$extension}";
             } elseif ($queryParams['objectType'] == 'attachmentModification') {
-                $attachment = AttachmentModel::getById(['id' => $queryParams['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'res_id_master']]);
+                $attachment = AttachmentModel::getById(['id' => $queryParams['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint']]);
                 if (empty($attachment)) {
                     $xmlResponse = JnlpController::generateResponse(['type' => 'ERROR', 'data' => ['ERROR' => "Attachment does not exist"]]);
                     $response->write($xmlResponse);
@@ -295,8 +311,22 @@ class JnlpController
                     return $response->withHeader('Content-Type', 'application/xml');
                 }
 
-                $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template']]);
+                $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template', 'fingerprint_mode']]);
                 $pathToCopy = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachment['path']) . $attachment['filename'];
+
+                $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToCopy, 'mode' => $docserverType['fingerprint_mode']]);
+                if (empty($attachment['fingerprint'])) {
+                    AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$queryParams['objectId']]]);
+                    $attachment['fingerprint'] = $fingerprint;
+                }
+
+                if ($attachment['fingerprint'] != $fingerprint) {
+                    $xmlResponse = JnlpController::generateResponse(['type' => 'ERROR', 'data' => ['ERROR' => "Fingerprints do not match"]]);
+                    $response->write($xmlResponse);
+                    return $response->withHeader('Content-Type', 'application/xml');
+                }
+
                 $extension  = pathinfo($pathToCopy, PATHINFO_EXTENSION);
                 $newFileOnTmp = "tmp_file_{$GLOBALS['id']}_{$args['jnlpUniqueId']}.{$extension}";
             } else {

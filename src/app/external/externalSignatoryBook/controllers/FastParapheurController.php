@@ -18,7 +18,9 @@ namespace ExternalSignatoryBook\controllers;
 use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\ListInstanceModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
@@ -147,7 +149,7 @@ class FastParapheurController
 
         $attachments = AttachmentModel::get([
             'select'    => [
-                'res_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'
+                'res_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint'
             ],
             'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
             'data'      => [$aArgs['resIdMaster'], ['signed_response']]
@@ -156,8 +158,15 @@ class FastParapheurController
         $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
         foreach ($attachments as $key => $value) {
             if (!$attachmentTypes[$value['attachment_type']]['sign']) {
-                $annexeAttachmentPath = DocserverModel::getByDocserverId(['docserverId' => $value['docserver_id'], 'select' => ['path_template']]);
+                $annexeAttachmentPath = DocserverModel::getByDocserverId(['docserverId' => $value['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
                 $value['filePath']    = $annexeAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $value['path']) . $value['filename'];
+
+                $docserverType = DocserverTypeModel::getById(['id' => $annexeAttachmentPath['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $value['filePath'], 'mode' => $docserverType['fingerprint_mode']]);
+                if ($value['fingerprint'] != $fingerprint) {
+                    return ['error' => 'Fingerprints do not match'];
+                }
+
                 unset($attachments[$key]);
                 $annexes['attachments'][] = $value;
             }

@@ -18,6 +18,7 @@ use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -192,20 +193,40 @@ class ConvertPdfController
             $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version']]);
 
             $convertedDocument = AdrModel::getDocuments([
-                'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
+                'select'    => ['id', 'docserver_id', 'path', 'filename', 'fingerprint'],
                 'where'     => ['res_id = ?', 'type in (?)', 'version = ?'],
                 'data'      => [$args['resId'], ['PDF', 'SIGN'], $resource['version']],
                 'orderBy'   => ["type='SIGN' DESC"],
                 'limit'     => 1
             ]);
             $convertedDocument = $convertedDocument[0] ?? null;
+            if (!empty($convertedDocument) && empty($convertedDocument['fingerprint'])) {
+                $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+                $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+                if (is_file($pathToDocument)) {
+                    $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                    $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+                    AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                    $convertedDocument['fingerprint'] = $fingerprint;
+                }
+            }
         } else {
             $convertedDocument = AdrModel::getConvertedDocumentById([
-                'select'    => ['docserver_id','path', 'filename', 'fingerprint'],
+                'select'    => ['id', 'docserver_id','path', 'filename', 'fingerprint'],
                 'resId'     => $args['resId'],
                 'collId'    => 'attachment',
                 'type'      => 'PDF'
             ]);
+            if (!empty($convertedDocument) && empty($convertedDocument['fingerprint'])) {
+                $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+                $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+                if (is_file($pathToDocument)) {
+                    $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                    $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+                    AdrModel::updateAttachmentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                    $convertedDocument['fingerprint'] = $fingerprint;
+                }
+            }
         }
 
         if (empty($convertedDocument)) {
