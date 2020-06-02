@@ -32,7 +32,24 @@ export class ContactExportComponent implements OnInit {
 
     exportModelList: any;
 
-    dataAvailable: any[] = [];
+    dataAvailable: any[] = [
+        {
+            value: 'id',
+            label: this.lang.id
+        },
+        {
+            value: 'externalId',
+            label: 'External Id'
+        },
+        {
+            value: 'enabled',
+            label: this.lang.status
+        },
+        {
+            value: 'communicationMeans',
+            label: this.lang.communicationMean
+        }
+    ];
 
     @ViewChild('listFilter', { static: true }) private listFilter: any;
 
@@ -62,7 +79,7 @@ export class ContactExportComponent implements OnInit {
                     return data.contactsParameters;
                 }),
                 tap((fields: any) => {
-                    this.dataAvailable = fields;
+                    this.dataAvailable = this.dataAvailable.concat(fields);
                 }),
                 exhaustMap(() => this.http.get('../../rest/contactsCustomFields')),
                 map((data: any) => {
