@@ -1,3 +1,5 @@
+@import '../../../../../css/vars.scss';
+
 .merged {
     opacity: 0.5;
 }
@@ -15,4 +17,12 @@
 
 .contact-list-container-2 {
     grid-template-columns: repeat(2, 1fr);
+}
+
+.excludeLogo {
+    position: absolute;
+    top: 50%;left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 80px;
+    color: $warn;
 }

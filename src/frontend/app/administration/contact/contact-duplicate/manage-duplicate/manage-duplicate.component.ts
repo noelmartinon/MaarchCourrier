@@ -35,16 +35,25 @@ export class ManageDuplicateComponent implements OnInit {
 
     ngOnInit(): void { }
 
-    mergeContact(contact: any, index: number) {
+    mergeContact(index: number = this.contactSelected) {
 
-        this.contactSelected = index;
+        this.appContactDetail.toArray()[index].resetContact();
+        this.appContactDetail.toArray()[index].contact.selected = true;
 
+        if (!this.functionsService.empty(index)) {
+            this.contactSelected = index;
+        }
         this.data.duplicate.forEach((contactItem: any, indexContact: number) => {
-            Object.keys(this.appContactDetail.toArray()[indexContact].getContactInfo()).forEach(element => {
-                if (this.functionsService.empty(this.appContactDetail.toArray()[index].getContactInfo()[element]) && this.appContactDetail.toArray()[index].getContactInfo()[element] !== this.appContactDetail.toArray()[indexContact].getContactInfo()[element]) {
-                    this.appContactDetail.toArray()[index].setContactInfo(element, this.appContactDetail.toArray()[indexContact].getContactInfo()[element]);
-                }
-            });
+            if (this.contactsExcluded.indexOf(this.appContactDetail.toArray()[indexContact].getContactInfo().id) === -1) {
+                Object.keys(this.appContactDetail.toArray()[indexContact].getContactInfo()).forEach(element => {
+                    if (
+                        this.functionsService.empty(this.appContactDetail.toArray()[index].getContactInfo()[element]) &&
+                        this.appContactDetail.toArray()[index].getContactInfo()[element] !== this.appContactDetail.toArray()[indexContact].getContactInfo()[element]
+                    ) {
+                        this.appContactDetail.toArray()[index].setContactInfo(element, this.appContactDetail.toArray()[indexContact].getContactInfo()[element]);
+                    }
+                });
+            }
         });
     }
 
@@ -72,7 +81,11 @@ export class ManageDuplicateComponent implements OnInit {
 
         this.http.put(`../../rest/contacts/${masterContact}/merge`, { duplicates : slaveContacts}).pipe(
             tap(() => {
-                this.dialogRef.close('success');
+                if (slaveContacts.length === this.data.duplicate.length - 1) {
+                    this.dialogRef.close('removeAll');
+                } else {
+                    this.dialogRef.close(slaveContacts);
+                }
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
