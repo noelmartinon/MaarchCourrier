@@ -8,6 +8,12 @@
                     {{lang.add}}
                 </p>
             </a>
+            <a mat-list-item (click)="openContactExport()">
+                <mat-icon color="primary" mat-list-icon class="fa fa-file-export"></mat-icon>
+                <p mat-line>
+                    {{lang.exportContacts}}
+                </p>
+            </a>
         </mat-nav-list>
         <mat-divider></mat-divider>
         <mat-nav-list>
@@ -43,7 +49,6 @@
                             <input type="text" #autoCompleteInput [placeholder]="lang.filterBy" matInput
                                 [formControl]="searchContact" (click)="$event.stopPropagation()" maxlength="128">
                         </mat-form-field>
-                        <button mat-raised-button mat-button color="primary" (click)="openContactExport()">{{lang.exportContacts}}</button>
                     </div>
                     <div class="table-head-tool">
                         <mat-paginator #paginatorContactList [length]="resultsLength" [hidePageSize]="true"
