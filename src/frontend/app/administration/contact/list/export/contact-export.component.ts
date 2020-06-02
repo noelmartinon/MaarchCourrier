@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SortPipe } from '../../../../../plugins/sorting.pipe';
 import { catchError, map, tap, finalize, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
+import { LocalStorageService } from '../../../../../service/local-storage.service';
 
 declare var $: any;
 
@@ -58,11 +59,13 @@ export class ContactExportComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        private sortPipe: SortPipe
+        private sortPipe: SortPipe,
+        private localStorage: LocalStorageService
     ) { }
 
     async ngOnInit(): Promise<void> {
         await this.getContactFields();
+        this.setConfiguration();
     }
 
     getContactFields() {
@@ -72,7 +75,7 @@ export class ContactExportComponent implements OnInit {
                     const regex = /contactCustomField_[.]*/g;
                     data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
                         return {
-                            value : field.identifier,
+                            value: field.identifier,
                             label: this.lang['contactsParameters_' + field.identifier]
                         };
                     });
@@ -131,6 +134,7 @@ export class ContactExportComponent implements OnInit {
     }
 
     exportData() {
+        this.localStorage.save('exportContactFields', JSON.stringify(this.exportModel));
         this.loadingExport = true;
         this.http.put('../../rest/exportContacts', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
@@ -202,5 +206,11 @@ export class ContactExportComponent implements OnInit {
             this.dataAvailable.pop();
         }
         this.listFilter.nativeElement.value = '';
+    }
+
+    setConfiguration() {
+        JSON.parse(this.localStorage.get('exportContactFields')).data.forEach((element: any) => {
+            this.addData(element);
+        });
     }
 }
