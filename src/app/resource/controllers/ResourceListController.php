@@ -441,7 +441,11 @@ class ResourceListController
             if (!empty($actionRequiredFields)) {
                 $requiredFieldsValid = ActionController::checkRequiredFields(['resId' => $resId, 'actionRequiredFields' => $actionRequiredFields]);
                 if (!empty($requiredFieldsValid['errors'])) {
-                    return $response->withStatus(400)->withJson($requiredFieldsValid);
+                    if (empty($methodResponses['errors'])) {
+                        $methodResponses['errors'] = [];
+                    }
+                    $methodResponses['errors'] = array_merge($methodResponses['errors'], [$requiredFieldsValid['errors']]);
+                    continue;
                 }
             }
 
