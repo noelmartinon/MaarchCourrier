@@ -32,7 +32,7 @@ class AuthenticationController
             if (AuthenticationModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
                 $loginMethod = CoreConfigModel::getLoggingMethod();
                 if ($loginMethod['id'] != 'standard') {
-                    $user = UserModel::getByLogin(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
+                    $user = UserModel::getByLogin(['select' => ['loginmode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
                     if ($user['loginmode'] == 'restMode') {
                         $userId = $_SERVER['PHP_AUTH_USER'];
                     }
