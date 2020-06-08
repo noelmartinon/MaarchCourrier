@@ -23,6 +23,9 @@ use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Contact\controllers\ContactController;
+use Convert\models\AdrModel;
+use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Folder\models\FolderModel;
@@ -439,8 +442,20 @@ class ResourceListController
             if (!empty($actionRequiredFields)) {
                 $requiredFieldsValid = ActionController::checkRequiredFields(['resId' => $resId, 'actionRequiredFields' => $actionRequiredFields]);
                 if (!empty($requiredFieldsValid['errors'])) {
-                    return $response->withStatus(400)->withJson($requiredFieldsValid);
+                    if (empty($methodResponses['errors'])) {
+                        $methodResponses['errors'] = [];
+                    }
+                    $methodResponses['errors'] = array_merge($methodResponses['errors'], [$requiredFieldsValid['errors']]);
+                    continue;
                 }
+            }
+            $control = ResourceListController::controlFingerprints(['resId' => $resId]);
+            if (!$control) {
+                if (empty($methodResponses['errors'])) {
+                    $methodResponses['errors'] = [];
+                }
+                $methodResponses['errors'] = array_merge($methodResponses['errors'], ['Fingerprints do not match for resource ' . $resId]);
+                continue;
             }
 
             if (!empty($method)) {
@@ -1226,5 +1241,66 @@ class ResourceListController
             return 1;
         }
         return 0;
+    }
+
+    public static function controlFingerprints(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $convertedDocument = AdrModel::getDocuments([
+            'select'    => ['id', 'docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+            'where'     => ['res_id = ?', 'type in (?)'],
+            'data'      => [$args['resId'], ['PDF', 'SIGN']],
+            'orderBy'   => ["type='SIGN' DESC", 'version DESC'],
+            'limit'     => 1
+        ]);
+
+        $convertedDocument = $convertedDocument[0] ?? null;
+        if (!empty($convertedDocument)) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+            if (!is_file($pathToDocument)) {
+                return false;
+            }
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($convertedDocument['fingerprint'])) {
+                AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                $convertedDocument['fingerprint'] = $fingerprint;
+            }
+            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                return false;
+            }
+        }
+        $allAttachments = AttachmentModel::get(['select' => ['res_id'], 'where' => ['res_id_master = ?'], 'data' => [$args['resId']]]);
+        $allAttachments = array_column($allAttachments, 'res_id');
+        $convertedDocuments = [];
+        if (!empty($allAttachments)) {
+            $convertedDocuments = AdrModel::getAttachments([
+                'select'    => ['id', 'docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'     => ['res_id in (?)', 'type = ?'],
+                'data'      => [$allAttachments, 'PDF']
+            ]);
+        }
+
+        foreach ($convertedDocuments as $convertedDocument) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+            if (!is_file($pathToDocument)) {
+                return false;
+            }
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($convertedDocument['fingerprint'])) {
+                AdrModel::updateAttachmentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                $convertedDocument['fingerprint'] = $fingerprint;
+            }
+            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

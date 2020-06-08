@@ -17,7 +17,7 @@ foreach ($customs as $custom) {
     new \SrcCore\models\DatabasePDO(['customId' => $custom]);
     $GLOBALS['customId'] = $custom;
 
-    $configPath             = "custom/{$custom}/apps/maarch_entreprise/xml/config.xml";
+    $configPath             = "custom/{$custom}/apps/maarch_entreprise/xml/config.json";
     $visaConfigPath         = "modules/visa/batch/config/config.xml";
     if (file_exists($configPath)) {
         if (!is_readable($configPath) || !is_writable($configPath)) {
@@ -32,26 +32,29 @@ foreach ($customs as $custom) {
             printf("Aucun fichier de configuration de parapheur externe trouvé pour le custom {$custom}\n");
             continue;
         }
-        $loadedXml     = simplexml_load_file($configPath);
         $loadedVisaXml = simplexml_load_file($visaFilePath);
         
-        if ($loadedXml && $loadedVisaXml) {
-            $loadedXml->SIGNATUREBOOK->validatedStatus          = (string)$loadedVisaXml->CONFIG->validatedStatus;
-            $loadedXml->SIGNATUREBOOK->validatedStatusOnlyVisa  = (string)$loadedVisaXml->CONFIG->validatedStatusOnlyVisa;
-            $loadedXml->SIGNATUREBOOK->refusedStatus            = (string)$loadedVisaXml->CONFIG->refusedStatus;
-            $loadedXml->SIGNATUREBOOK->validatedStatusAnnot     = (string)$loadedVisaXml->CONFIG->validatedStatusAnnot;
-            $loadedXml->SIGNATUREBOOK->refusedStatusAnnot       = (string)$loadedVisaXml->CONFIG->refusedStatusAnnot;
-            $loadedXml->SIGNATUREBOOK->userWS                   = (string)$loadedVisaXml->CONFIG->userWS;
-            $loadedXml->SIGNATUREBOOK->passwordWS               = (string)$loadedVisaXml->CONFIG->passwordWS;
-            if (empty($loadedXml->CONFIG->maarchUrl)) {
-                $loadedXml->CONFIG->maarchUrl = (string)$loadedVisaXml->CONFIG->applicationUrl;
+        if ($loadedVisaXml) {
+            $file = file_get_contents($configPath);
+            $file = json_decode($file, true);
+
+            $signatureBook = [];
+            $signatureBook['validatedStatus']          = (string)$loadedVisaXml->CONFIG->validatedStatus;
+            $signatureBook['validatedStatusOnlyVisa']  = (string)$loadedVisaXml->CONFIG->validatedStatusOnlyVisa;
+            $signatureBook['refusedStatus']            = (string)$loadedVisaXml->CONFIG->refusedStatus;
+            $signatureBook['validatedStatusAnnot']     = (string)$loadedVisaXml->CONFIG->validatedStatusAnnot;
+            $signatureBook['refusedStatusAnnot']       = (string)$loadedVisaXml->CONFIG->refusedStatusAnnot;
+            $signatureBook['userWS']                   = (string)$loadedVisaXml->CONFIG->userWS;
+            $signatureBook['passwordWS']               = (string)$loadedVisaXml->CONFIG->passwordWS;
+            $file['signatureBook'] = $signatureBook;
+
+            if (empty($file['config']['maarchUrl'])) {
+                $file['config']['maarchUrl'] = (string)$loadedVisaXml->CONFIG->applicationUrl;
             }
 
-            $res = formatXml($loadedXml);
-            $fp  = fopen($configPath, "w+");
-            if ($fp) {
-                fwrite($fp, $res);
-            }
+            $fp = fopen($configPath, 'a+');
+            fwrite($fp, json_encode($file, JSON_PRETTY_PRINT));
+            fclose($fp);
 
             createScript();
 

@@ -1153,7 +1153,7 @@ class ContactController
         foreach ($body['data'] as $field) {
             if (strpos($field['value'], 'contactCustomField_') !== false) {
                 $customId = explode('_', $field['value'])[1];
-                $fields[] = "custom_fields->>'" . $customId . "'";
+                $fields[] = "custom_fields->>'" . $customId . "' as contact_custom_field_" . $customId;
             } elseif ($field['value'] == 'creatorLabel') {
                 $fields[] = "creator as creator_label";
             } else {
@@ -1170,10 +1170,22 @@ class ContactController
         fputcsv($file, $csvHead, $delimiter);
 
         $contacts = ContactModel::get(['select' => $fields]);
+        $civilities = ContactModel::getCivilities();
 
         foreach ($contacts as $contact) {
+            foreach ($contact as $field => $value) {
+                if (strpos($field, 'contactCustomField_') !== false) {
+                    $decoded = json_decode($value, true);
+                    if (is_array($decoded)) {
+                        $contact[$field] = implode("\n", $decoded);
+                    }
+                }
+            }
             if (!empty($contact['creator_label'])) {
                 $contact['creator_label'] = UserModel::getLabelledUserById(['id' => $contact['creator_label']]);
+            }
+            if (!empty($contact['civility'])) {
+                $contact['civility'] = $civilities[$contact['civility']]['label'];
             }
             fputcsv($file, $contact, $delimiter);
         }

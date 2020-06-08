@@ -1,7 +1,10 @@
 <form>
     <input type="hidden" [formControl]="controlAutocomplete">
     <mat-form-field floatLabel="never" class="input-form" *ngIf="!controlAutocomplete.disabled">
-        <mat-icon color="primary" class="fa fa-search" matPrefix style="padding-left: 20px;font-size: 15px;"></mat-icon>
+        <button style="left: 20px;z-index: 1;" color="primary" type="button" matPrefix mat-icon-button (click)="$event.stopPropagation();openThesaurus()">
+            <mat-icon class="fa fa-search" style="font-size: 15px;" [title]="lang.openThesaurus"></mat-icon>
+        </button>
+        <!--<mat-icon color="primary" class="fa fa-search" matPrefix style="padding-left: 20px;font-size: 15px;cursor: pointer;" (click)="openThesaurus()"></mat-icon>-->
         <input type="text" #autoCompleteInput [placeholder]="lang.searchTag" matInput [formControl]="myControl"
             [matAutocomplete]="auto" (click)="$event.stopPropagation()" (focus)="resetAutocomplete()" maxlength="128">
         <button [disabled]="!canAdd" type="button" matSuffix mat-icon-button (click)="addItem()">
@@ -24,8 +27,8 @@
     <div class="itemList">
         <mat-chip-list *ngIf="controlAutocomplete.value.length > 0" class="mat-chip-list-stacked itemChip" color="default">
             <mat-chip *ngFor="let item of controlAutocomplete.value;let i=index" class="listAutocomplete"
-                color="default" [removable]="!controlAutocomplete.disabled" (removed)="removeItem(i)">
-                <span style="display: flex;flex: 1;align-items: center;" [title]="this.valuesToDisplay[item]">
+                color="default" [removable]="!controlAutocomplete.disabled" (removed)="removeItem(i)" (click)="openThesaurus(item)">
+                <span style="display: flex;flex: 1;align-items: center;cursor: pointer;" [title]="this.valuesToDisplay[item]">
                     <i class="fa fa-tag" style="padding-right:5px;"></i>&nbsp;{{this.valuesToDisplay[item]}}
                 </span>
                 <mat-icon matChipRemove class="fa fa-times" *ngIf="!controlAutocomplete.disabled"></mat-icon>

@@ -546,7 +546,7 @@ class ResController extends ResourceControlController
         }
 
         $convertedDocument = AdrModel::getDocuments([
-            'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
+            'select'    => ['id', 'docserver_id', 'path', 'filename', 'fingerprint'],
             'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
             'data'      => [$args['resId'], $type, $args['version']]
         ]);
@@ -568,6 +568,10 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+        if (empty($convertedDocument['fingerprint'])) {
+            AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+            $convertedDocument['fingerprint'] = $fingerprint;
+        }
         if ($convertedDocument['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
@@ -938,7 +942,7 @@ class ResController extends ResourceControlController
         ValidatorModel::intVal($aArgs, ['resId']);
         ValidatorModel::boolType($aArgs, ['original']);
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'subject'], 'resId' => $aArgs['resId']]);
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'subject', 'fingerprint'], 'resId' => $aArgs['resId']]);
 
         if (empty($aArgs['original'])) {
             $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
@@ -963,7 +967,11 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if (empty($convertedDocument) && empty($document['fingerprint'])) {
+            ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$aArgs['resId']]]);
+            $document['fingerprint'] = $fingerprint;
+        }
+        if ($document['fingerprint'] != $fingerprint) {
             ['errors' => 'Fingerprints do not match'];
         }
 

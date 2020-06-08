@@ -138,7 +138,7 @@ $app->get('/formattedContacts/{id}/types/{type}', \Contact\controllers\ContactCo
 $app->get('/ban/availableDepartments', \Contact\controllers\ContactController::class . ':getAvailableDepartments');
 $app->get('/duplicatedContacts', \Contact\controllers\ContactController::class . ':getDuplicatedContacts');
 $app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
-$app->put('/exportContacts', \Contact\controllers\ContactController::class . ':exportContacts');
+$app->post('/contacts/export', \Contact\controllers\ContactController::class . ':exportContacts');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');
@@ -184,6 +184,7 @@ $app->get('/customFields', \CustomField\controllers\CustomFieldController::class
 $app->post('/customFields', \CustomField\controllers\CustomFieldController::class . ':create');
 $app->put('/customFields/{id}', \CustomField\controllers\CustomFieldController::class . ':update');
 $app->delete('/customFields/{id}', \CustomField\controllers\CustomFieldController::class . ':delete');
+$app->get('/customFieldsWhiteList', \CustomField\controllers\CustomFieldController::class . ':getWhiteList');
 
 //Docservers
 $app->get('/docservers', \Docserver\controllers\DocserverController::class . ':get');

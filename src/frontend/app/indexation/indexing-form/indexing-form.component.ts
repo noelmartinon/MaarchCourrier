@@ -12,7 +12,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { FormControl, Validators, FormGroup, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FunctionsService } from '../../../service/functions.service';
-import {ConfirmComponent} from '../../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 
 @Component({
     selector: 'app-indexing-form',
@@ -233,11 +233,24 @@ export class IndexingFormComponent implements OnInit {
                     this.availableCustomFields = data.customFields.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
-                        info.default_value = null;
+                        info.bddMode = true;
+                        // FOR TEST
+                        /*info.values = [
+                            {
+                                key: 'azerty',
+                                label: 'tata'
+                            },
+                            {
+                                key: 'bidule',
+                                label: 'chouette'
+                            }
+                        ];*/
+
+                        info.default_value = ['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values) ? info.values[0].key : null;
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
                             return {
-                                id: custVal,
-                                label: custVal
+                                id: custVal.key,
+                                label: custVal.label
                             }
                         }) : info.values;
                         return info;
@@ -756,7 +769,7 @@ export class IndexingFormComponent implements OnInit {
 
         this.http.get(`../rest/indexingModels/${indexModelId}`).pipe(
             tap(async (data: any) => {
-                this.indexingFormId =  data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
+                this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
@@ -782,8 +795,10 @@ export class IndexingFormComponent implements OnInit {
 
                         if (indexFound > -1) {
                             field.label = this.availableCustomFields[indexFound].label;
+                            field.default_value = this.availableCustomFields[indexFound].default_value;
                             field.values = this.availableCustomFields[indexFound].values;
                             field.type = this.availableCustomFields[indexFound].type;
+                            field.bddMode = this.availableCustomFields[indexFound].bddMode;
                             this.availableCustomFields.splice(indexFound, 1);
                             fieldExist = true;
                         }
@@ -832,7 +847,16 @@ export class IndexingFormComponent implements OnInit {
 
     initValidator(field: any) {
         let valArr: ValidatorFn[] = [];
-        this.arrFormControl[field.identifier] = new FormControl({ value: field.default_value, disabled: (field.today && this.adminMode) ? true : false });
+
+        let disabledState: boolean = false;
+
+        console.log(field);
+
+        if (this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || (field.today && this.adminMode))) {
+            disabledState = true;
+        }
+
+        this.arrFormControl[field.identifier] = new FormControl({ value: field.default_value, disabled: disabledState });
 
         if (field.type === 'integer') {
             valArr.push(this.regexValidator(new RegExp('[+-]?([0-9]*[.])?[0-9]+'), { 'floatNumber': '' }));

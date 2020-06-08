@@ -53,7 +53,7 @@ foreach (array_keys($options) as $key) {
 print($txt . "\n");
 $GLOBALS['configFile'] = $options['config'];
 
-print("Load xml config file:" . $GLOBALS['configFile'] . "\n");
+print("Load json config file:" . $GLOBALS['configFile'] . "\n");
 // Tests existence of config file
 if (!file_exists($GLOBALS['configFile'])) {
     print(
@@ -63,28 +63,29 @@ if (!file_exists($GLOBALS['configFile'])) {
     exit(102);
 }
 
-$xmlconfig = simplexml_load_file($GLOBALS['configFile']);
+$file = file_get_contents($GLOBALS['configFile']);
+$file = json_decode($file, true);
 
-if ($xmlconfig == false) {
+if (empty($file)) {
     print("Error on loading config file:" . $GLOBALS['configFile'] . "\n");
     exit(103);
 }
 
 // Load config
-$config = $xmlconfig->CONFIG;
-$GLOBALS['MaarchDirectory']        = (string)$config->maarchDirectory;
-$GLOBALS['customId']               = (string)$config->customID;
-$GLOBALS['applicationUrl']         = (string)$config->maarchUrl;
+$config = $file['config'];
+$GLOBALS['MaarchDirectory']        = $config['maarchDirectory'];
+$GLOBALS['customId']               = $config['customID'];
+$GLOBALS['applicationUrl']         = $config['maarchUrl'];
 
-$config = $xmlconfig->SIGNATUREBOOK;
-$GLOBALS['userWS']                 = (string)$config->userWS;
-$GLOBALS['passwordWS']             = (string)$config->passwordWS;
+$config = $file['signatureBook'];
+$GLOBALS['userWS']                 = $config['userWS'];
+$GLOBALS['passwordWS']             = $config['passwordWS'];
 $GLOBALS['batchDirectory']         = $GLOBALS['MaarchDirectory'] . 'bin/signatureBook';
-$validatedStatus                   = (string)$config->validatedStatus;
-$validatedStatusOnlyVisa           = (string)$config->validatedStatusOnlyVisa;
-$refusedStatus                     = (string)$config->refusedStatus;
-$validatedStatusAnnot              = (string)$config->validatedStatusAnnot;
-$refusedStatusAnnot                = (string)$config->refusedStatusAnnot;
+$validatedStatus                   = $config['validatedStatus'];
+$validatedStatusOnlyVisa           = $config['validatedStatusOnlyVisa'];
+$refusedStatus                     = $config['refusedStatus'];
+$validatedStatusAnnot              = $config['validatedStatusAnnot'];
+$refusedStatusAnnot                = $config['refusedStatusAnnot'];
 
 chdir($GLOBALS['MaarchDirectory']);
 

@@ -34,10 +34,7 @@ if (file_exists($path)) {
                     'lang'              => (string)$loadedXml->CONFIG->lang,
                     'applicationName'   => (string)$loadedXml->CONFIG->applicationname,
                     'cookieTime'        => 10080,
-                    'timezone'          => $timezone,
-//                    'maarchDirectory'   => (string)$loadedXml->CONFIG->maarchDirectory,
-//                    'customID'          => (string)$loadedXml->CONFIG->customID,
-//                    'maarchUrl'         => (string)$loadedXml->CONFIG->maarchUrl,
+                    'timezone'          => $timezone
                 ],
                 'database'  => $database
             ];
@@ -46,7 +43,7 @@ if (file_exists($path)) {
             fwrite($fp, json_encode($jsonFile, JSON_PRETTY_PRINT));
             fclose($fp);
 
-            //            unlink($path);
+            unlink($path);
             printf("[SUCCESS] Fichier apps/maarch_entreprise/xml/config.xml migré.\n");
         }
     }
@@ -93,7 +90,7 @@ foreach ($customs as $custom) {
             fwrite($fp, json_encode($jsonFile, JSON_PRETTY_PRINT));
             fclose($fp);
 
-//            unlink($path);
+            unlink($path);
             printf("[SUCCESS] Fichier custom/{$custom}/apps/maarch_entreprise/xml/config.xml migré.\n");
         }
     }

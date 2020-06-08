@@ -8,9 +8,11 @@ import { AppService } from '../../../service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError } from 'rxjs/operators';
+import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { PrivilegeService } from '../../../service/privileges.service';
+import { FunctionsService } from '../../../service/functions.service';
+import { ThesaurusModalComponent } from './thesaurus/thesaurus-modal.component';
 
 @Component({
     selector: 'app-tag-input',
@@ -40,6 +42,8 @@ export class TagInputComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
     newIds: number[] = [];
 
+    tags: any[] = [];
+
 
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
@@ -55,7 +59,8 @@ export class TagInputComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         private latinisePipe: LatinisePipe,
-        private privilegeService: PrivilegeService
+        private privilegeService: PrivilegeService,
+        private functionsService: FunctionsService
     ) {
 
     }
@@ -177,6 +182,35 @@ export class TagInputComponent implements OnInit {
                 }
                 this.setFormValue(newElem);
                 this.myControl.setValue('');
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    openThesaurus(tagId: number = null) {
+        
+        const dialogRef = this.dialog.open(ThesaurusModalComponent, {
+            panelClass: 'maarch-modal',
+            width: '600px',
+            data: {
+                id : tagId
+            }
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => !this.functionsService.empty(data)),
+            map((data: any) => {
+                return {
+                    id : data.id,
+                    idToDisplay : data.label
+                };
+            }),
+            tap((tagItem: any) => {
+                console.log(tagItem);
+
+                this.setFormValue(tagItem);
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

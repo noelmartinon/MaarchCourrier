@@ -221,12 +221,16 @@ export class ContactDuplicateComponent implements OnInit {
             data: { duplicate: this.duplicatesContacts.filter((contact: any) => contact.duplicateId === duplicateId).map((contact: any) => ({ id: contact.id, type: 'contact'})) }
         });
         dialogRef.afterClosed().pipe(
-            filter((data: any) => data === 'success'),
-            tap(() => {
+            filter((data: any) => !this.functionsService.empty(data)),
+            tap((data) => {
                 this.notify.success(this.lang.contactsMerged);
                 this.duplicatesContactsCount--;
                 this.duplicatesContactsRealCount--;
-                this.duplicatesContacts = this.duplicatesContacts.filter((contact: any) => contact.duplicateId !== duplicateId);
+                if (data !== 'removeAll') {
+                    this.duplicatesContacts = this.duplicatesContacts.filter((contact: any) => data.indexOf(contact.id) === -1);
+                } else {
+                    this.duplicatesContacts = this.duplicatesContacts.filter((contact: any) => contact.duplicateId !== duplicateId);
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

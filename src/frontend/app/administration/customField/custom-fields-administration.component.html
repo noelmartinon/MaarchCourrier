@@ -21,7 +21,7 @@
                     <mat-tab-group>
                         <mat-tab [label]="lang.usableFields">
                             <div class="alert-message alert-message-info" role="alert" *ngIf="customFields.length === 0"
-                                 [innerHTML]="lang.noCustomFieldInfo">
+                                [innerHTML]="lang.noCustomFieldInfo">
                             </div>
                             <mat-accordion>
                                 <mat-expansion-panel *ngFor="let custom of customFields;index as indexCustom">
@@ -36,54 +36,115 @@
                                     <div class="col-md-12">
                                         <mat-form-field>
                                             <input matInput name="id" [(ngModel)]="custom.id" disabled
-                                                   [placeholder]="lang.technicalId" [value]="custom.id">
+                                                [placeholder]="lang.technicalId" [value]="custom.id">
                                         </mat-form-field>
                                         <mat-form-field>
                                             <input matInput name="label" [(ngModel)]="custom.label"
-                                                   [placeholder]="lang.label" [value]="custom.label">
+                                                [placeholder]="lang.label" [value]="custom.label">
                                         </mat-form-field>
                                     </div>
-                                    <div class="col-md-12"
-                                         *ngIf="['select', 'radio', 'checkbox'].indexOf(custom.type) > -1">
-                                        <mat-expansion-panel class="customFieldValues" opened>
-                                            <mat-expansion-panel-header>
-                                                <mat-panel-title [matBadge]="custom.values.length" matBadgeSize="small">
-                                                    {{lang.valuesList}}
-                                                </mat-panel-title>
-                                            </mat-expansion-panel-header>
-                                            <div class="actionValuesCustom">
-                                                <div style="flex: 1;">
-                                                    <button mat-raised-button color="primary"
+                                    <div class="col-md-12" style="display: flex;align-items: center;">
+                                        <div style="flex:1;"
+                                            *ngIf="['select', 'radio', 'checkbox'].indexOf(custom.type) > -1">
+                                            <mat-expansion-panel *ngIf="!custom.bddMode" class="customFieldValues" opened>
+                                                <mat-expansion-panel-header>
+                                                    <mat-panel-title [matBadge]="custom.values.length"
+                                                        matBadgeSize="small">
+                                                        {{lang.valuesList}}
+                                                    </mat-panel-title>
+                                                </mat-expansion-panel-header>
+                                                <div class="actionValuesCustom">
+                                                    <div style="flex: 1;">
+                                                        <button mat-raised-button color="primary"
                                                             (click)="addValue(indexCustom)">
-                                                        {{lang.addValue}}</button>
-                                                </div>
-                                                <div>
-                                                    <button mat-mini-fab color="default" *ngIf="custom.values.length > 0"
+                                                            {{lang.addValue}}</button>
+                                                    </div>
+                                                    <div>
+                                                        <button mat-mini-fab color="default"
+                                                            *ngIf="custom.values.length > 0"
                                                             (click)="sortValues(custom)" [title]="lang.orderValues">
-                                                        <mat-icon color="primary" class="fas fa-sort-alpha-down"
-                                                                  style="height:auto;"></mat-icon>
-                                                    </button>
+                                                            <mat-icon color="primary" class="fas fa-sort-alpha-down"
+                                                                style="height:auto;"></mat-icon>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <mat-form-field *ngFor="let value of custom.values;let i=index;"
-                                                                floatLabel="never">
-                                                    <input matInput [(ngModel)]="value.label"
-                                                           [placeholder]="this.lang.newValue">
-                                                    <button color="warn" mat-icon-button matSuffix [title]="lang.delete"
-                                                            (click)="removeValue(custom, i)">
-                                                        <mat-icon class="fa fa-trash"></mat-icon>
-                                                    </button>
-                                                </mat-form-field>
-                                            </div>
-                                        </mat-expansion-panel>
+                                                <div class="col-md-12">
+                                                    <mat-form-field *ngFor="let value of custom.values;let i=index;"
+                                                        floatLabel="never">
+                                                        <input matInput [(ngModel)]="value.label"
+                                                            [placeholder]="this.lang.newValue">
+                                                        <button color="warn" mat-icon-button matSuffix
+                                                            [title]="lang.delete" (click)="removeValue(custom, i)">
+                                                            <mat-icon class="fa fa-trash"></mat-icon>
+                                                        </button>
+                                                    </mat-form-field>
+                                                </div>
+                                            </mat-expansion-panel>
+                                        </div>
+                                        <div>
+                                            <button *ngIf="!custom.bddMode" mat-mini-fab color="primary" (click)="switchBddMode(custom)">
+                                                <mat-icon class="fas fa-database" style="height: auto;"></mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="custom.bddMode" class="col-md-12" style="display: flex;align-items: center;">
+                                        <div style="flex:1;">
+                                            <mat-expansion-panel *ngIf="custom.bddMode" class="customFieldValues" opened>
+                                                <mat-expansion-panel-header>
+                                                    <mat-panel-title>
+                                                        Base de données
+                                                    </mat-panel-title>
+                                                </mat-expansion-panel-header>
+                                                <div class="col-md-12">
+                                                    <div style="display: flex;">
+                                                        <mat-form-field>
+                                                            <mat-label>Table cible</mat-label>
+                                                            <mat-select [(ngModel)]="custom.values.table">
+                                                                <mat-option *ngFor="let table of availaibleTables"
+                                                                    [value]="table">
+                                                                    {{lang[table]}}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                        </mat-form-field>
+                                                        <mat-form-field>
+                                                            <mat-label>Label cible</mat-label>
+                                                            <mat-select [(ngModel)]="custom.values.label">
+                                                                <mat-option *ngFor="let column of availaibleColumns"
+                                                                    [value]="column">
+                                                                    {{column}}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                        </mat-form-field>
+                                                        <mat-form-field>
+                                                            <mat-label>Identifiant cible</mat-label>
+                                                            <mat-select [(ngModel)]="custom.values.key">
+                                                                <mat-option *ngFor="let column of availaibleColumns"
+                                                                    [value]="column">
+                                                                    {{column}}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <mat-form-field>
+                                                        <mat-label>Clause where</mat-label>
+                                                        <textarea matInput [(ngModel)]="custom.values.clause"
+                                                            placeholder="Ex. status='OK'"></textarea>
+                                                    </mat-form-field>
+                                                </div>
+                                            </mat-expansion-panel>
+                                        </div>
+                                        <div>
+                                            <button mat-mini-fab color="primary" (click)="switchBddMode(custom)">
+                                                <mat-icon class="fas fa-list-ol" style="height: auto;"></mat-icon>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="col-md-12 text-center">
                                         <button mat-raised-button color="primary"
-                                                (click)="updateCustomField(custom,indexCustom)"
-                                                [disabled]="isModified(custom,indexCustom)">{{lang.update}}</button>
+                                            (click)="updateCustomField(custom,indexCustom)"
+                                            [disabled]="isModified(custom,indexCustom)">{{lang.update}}</button>
                                         <button mat-raised-button color="warn"
-                                                (click)="removeCustomField(indexCustom)">{{lang.delete}}</button>
+                                            (click)="removeCustomField(indexCustom)">{{lang.delete}}</button>
                                     </div>
                                 </mat-expansion-panel>
                             </mat-accordion>
@@ -94,15 +155,14 @@
         </div>
     </mat-sidenav-content>
 
-    <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'"
-                 [fixedInViewport]="appService.getViewMode()" fixedTopGap="56" position='end' opened
-                 class="col-md-4 col-sm-12 customFielsdPanel">
+    <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
+        fixedTopGap="56" position='end' opened class="col-md-4 col-sm-12 customFielsdPanel">
         <mat-tab-group>
             <mat-tab [label]="lang.customFieldsTypesAvailable">
                 <div class="customFieldsTypesItem" *ngFor="let customField of customFieldsTypes">
                     <div class="addCustomFieldTypeContainer">
                         <button mat-icon-button color="primary" (click)="addCustomField(customField)"
-                                [title]="lang.add">
+                            [title]="lang.add">
                             <mat-icon class="fas fa-plus-circle fa-2x"></mat-icon>
                         </button>
                     </div>
@@ -110,8 +170,8 @@
                         <div style="color: rgba(0,0,0,0.54);">{{customField.label}} :</div>
                         <ng-container *ngIf="customField.type === 'string' || customField.type === 'banAutocomplete'">
                             <mat-form-field class="input-form" floatLabel="never">
-                                    <textarea matInput [placeholder]="lang[customField.type + 'Input']"
-                                              matTextareaAutosize matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>
+                                <textarea matInput [placeholder]="lang[customField.type + 'Input']" matTextareaAutosize
+                                    matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="customField.type === 'integer'">
@@ -131,7 +191,7 @@
                         <ng-container *ngIf="customField.type === 'date'">
                             <mat-form-field class="input-form" floatLabel="never">
                                 <input matInput [matDatepicker]="picker"
-                                       [placeholder]="lang[customField.type + 'Input']" (click)="picker.open()" disabled>
+                                    [placeholder]="lang[customField.type + 'Input']" (click)="picker.open()" disabled>
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
                             </mat-form-field>
@@ -147,7 +207,7 @@
                             <div class="input-form checkbox-form">
                                 <mat-selection-list #sampleList class="div-list" disabled>
                                     <mat-list-option *ngFor="let sample of sampleIncrement" [value]="sample"
-                                                     checkboxPosition="before">
+                                        checkboxPosition="before">
                                         {{lang.choice}} {{sample}}
                                     </mat-list-option>
                                 </mat-selection-list>

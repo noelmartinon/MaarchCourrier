@@ -557,7 +557,7 @@ class FolderPrintController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if ($document['fingerprint'] != $fingerprint) {
             return ['errors' => 'Fingerprints do not match', 'code' => 400];
         }
 

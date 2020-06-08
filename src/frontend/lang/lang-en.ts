@@ -1708,4 +1708,10 @@ export const LANG_EN = {
     "exludeContact": "Exclude contact",
     "contactExcluded": "Contact excluded",
     "exportContacts": "Export contacts",
+    "advancedMode": "Advanced mode",
+    "defaultMode": "Default mode",
+    "linkedTags": "Linked tags",
+    "selectParentTag": "Select a parent tag",
+    "openThesaurus": "Open the thesaurus",
+    "bddModeCustomFieldMsg": "This field use database values (see the custom's configration in custom fields administration)"
 };

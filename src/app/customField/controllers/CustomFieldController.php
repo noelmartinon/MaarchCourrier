@@ -26,15 +26,30 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\CoreConfigModel;
 
 class CustomFieldController
 {
     public function get(Request $request, Response $response)
     {
+        $queryParams = $request->getQueryParams();
+
         $customFields = CustomFieldModel::get(['orderBy' => ['label']]);
 
         foreach ($customFields as $key => $customField) {
             $customFields[$key]['values'] = json_decode($customField['values'], true);
+            $customFields[$key]['SQLMode'] = !empty($customFields[$key]['values']['table']);
+            if (empty($queryParams['admin']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_custom_fields', 'userId' => $GLOBALS['id']])) {
+                if (!empty($customFields[$key]['values']['table'])) {
+                    $customFields[$key]['values'] = CustomFieldModel::getValuesSQL($customFields[$key]['values']);
+                } elseif (!empty($customFields[$key]['values'])) {
+                    $values = $customFields[$key]['values'];
+                    $customFields[$key]['values'] = [];
+                    foreach ($values as $value) {
+                        $customFields[$key]['values'][] = ['key' => $value, 'label' => $value];
+                    }
+                }
+            }
         }
 
         return $response->withJson(['customFields' => $customFields]);
@@ -59,6 +74,13 @@ class CustomFieldController
         $fields = CustomFieldModel::get(['select' => [1], 'where' => ['label = ?'], 'data' => [$body['label']]]);
         if (!empty($fields)) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom field with this label already exists']);
+        }
+
+        if (!empty($body['values']['table'])) {
+            $control = CustomFieldController::controlSQLMode(['body' => $body]);
+            if (!empty($control['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+            }
         }
 
         $id = CustomFieldModel::create([
@@ -111,31 +133,43 @@ class CustomFieldController
             return $response->withStatus(400)->withJson(['errors' => 'Custom field with this label already exists']);
         }
 
-        if (in_array($field['type'], ['checkbox'])) {
-            $values = json_decode($field['values'], true);
-            foreach ($values as $key => $value) {
-                if (!empty($body['values'][$key]) && $body['values'][$key] != $value) {
-                    ResModel::update([
-                        'postSet'   => ['custom_fields' => "jsonb_insert(custom_fields, '{{$args['id']}, 0}', '\"{$body['values'][$key]}\"')"],
-                        'where'     => ["custom_fields->'{$args['id']}' @> ?"],
-                        'data'      => ["\"{$value}\""]
-                    ]);
-                    ResModel::update([
-                        'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', (custom_fields->'{$args['id']}') - '{$value}')"],
-                        'where'     => ['1 = ?'],
-                        'data'      => [1]
-                    ]);
-                }
+        if (!empty($body['values']['table'])) {
+            $control = CustomFieldController::controlSQLMode(['body' => $body]);
+            if (!empty($control['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
             }
-        } elseif (in_array($field['type'], ['select', 'radio'])) {
-            $values = json_decode($field['values'], true);
-            foreach ($values as $key => $value) {
-                if (!empty($body['values'][$key]) && $body['values'][$key] != $value) {
-                    ResModel::update([
-                        'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', '\"{$body['values'][$key]}\"')"],
-                        'where'     => ['1 = ?'],
-                        'data'      => [1]
-                    ]);
+        } else {
+            if (count(array_unique($body['values'])) < count($body['values'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Some values have the same name']);
+            }
+        }
+
+        $values = json_decode($field['values'], true);
+        if (empty($body['values']['table']) && empty($values['table'])) {
+            if (in_array($field['type'], ['checkbox'])) {
+                foreach ($values as $key => $value) {
+                    if (!empty($body['values'][$key]) && $body['values'][$key] != $value) {
+                        ResModel::update([
+                            'postSet'   => ['custom_fields' => "jsonb_insert(custom_fields, '{{$args['id']}, 0}', '\"{$body['values'][$key]}\"')"],
+                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
+                            'data'      => ["\"{$value}\""]
+                        ]);
+                        ResModel::update([
+                            'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', (custom_fields->'{$args['id']}') - '{$value}')"],
+                            'where'     => ['1 = ?'],
+                            'data'      => [1]
+                        ]);
+                    }
+                }
+            } elseif (in_array($field['type'], ['select', 'radio'])) {
+                foreach ($values as $key => $value) {
+                    if (!empty($body['values'][$key]) && $body['values'][$key] != $value) {
+                        ResModel::update([
+                            'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', '\"{$body['values'][$key]}\"')"],
+                            'where'     => ['1 = ?'],
+                            'data'      => [1]
+                        ]);
+                    }
                 }
             }
         }
@@ -197,5 +231,58 @@ class CustomFieldController
         ]);
 
         return $response->withStatus(204);
+    }
+
+    public function getWhiteList(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_custom_fields', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $allowedTables = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/customFieldsWhiteList.json']);
+
+        return $response->withJson(['allowedTables' => $allowedTables]);
+    }
+
+    public static function controlSQLMode(array $args)
+    {
+        $body = $args['body'];
+
+        if ($body['type'] == 'banAutocomplete') {
+            return ['errors' => 'SQL is not allowed for type BAN'];
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['values']['key'])) {
+            return ['errors' => 'Body values[key] is empty or not a string'];
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['values']['label'])) {
+            return ['errors' => 'Body values[label] is empty or not a string'];
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['values']['table'])) {
+            return ['errors' => 'Body values[table] is empty or not a string'];
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['values']['clause'])) {
+            return ['errors' => 'Body values[clause] is empty or not a string'];
+        }
+        if (strpos($body['values']['key'], 'password') !== false || strpos($body['values']['key'], 'token') !== false) {
+            return ['errors' => 'Body values[key] is not allowed'];
+        } elseif (strpos($body['values']['label'], 'password') !== false || strpos($body['values']['label'], 'token') !== false) {
+            return ['errors' => 'Body values[key] is not allowed'];
+        }
+        $allowedTables = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/customFieldsWhiteList.json']);
+        if (!in_array($body['values']['table'], $allowedTables)) {
+            return ['errors' => 'Body values[table] is not allowed'];
+        }
+        if (in_array($body['values']['type'], ['string', 'date', 'int'])) {
+            $limitPos = stripos($body['values']['clause'], 'limit');
+            if (!empty($limitPos)) {
+                $body['values']['clause'] = substr_replace($body['values']['clause'], 'LIMIT 1', $limitPos);
+            } else {
+                $body['values']['clause'] .= ' LIMIT 1';
+            }
+        }
+        try {
+            CustomFieldModel::getValuesSQL($body['values']);
+        } catch (\Exception $e) {
+            return ['errors' => 'Clause is not valid'];
+        }
+
+        return true;
     }
 }

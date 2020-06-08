@@ -9,12 +9,14 @@ import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { tap, finalize, filter, exhaustMap, catchError } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import {FunctionsService} from "../../../service/functions.service";
+import {FunctionsService} from '../../../service/functions.service';
+import { of } from 'rxjs/internal/observable/of';
+
+declare var tinymce: any;
 
 @Component({
-    templateUrl: "tags-administration.component.html",
+    templateUrl: 'tags-administration.component.html',
     providers: [AppService]
 })
 export class TagsAdministrationComponent implements OnInit {
@@ -52,9 +54,9 @@ export class TagsAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.tags);
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
-        
+
         this.loadList();
     }
 
@@ -74,7 +76,7 @@ export class TagsAdministrationComponent implements OnInit {
 
             }),
             finalize(() => this.loading = false)
-        ).subscribe()
+        ).subscribe();
     }
 
     deleteTag(item: any) {

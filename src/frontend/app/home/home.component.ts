@@ -9,6 +9,9 @@ import { HeaderService } from '../../service/header.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AppService } from '../../service/app.service';
 import { Router } from '@angular/router';
+import { tap } from 'rxjs/internal/operators/tap';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { of } from 'rxjs/internal/observable/of';
 
 declare var $: any;
 
@@ -78,14 +81,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../rest/resources/${row.res_id}/content?mode=view`, { responseType: 'blob' })
-            .subscribe((data: any) => {
+        this.http.get(`../rest/resources/${row.res_id}/content?mode=view`, { responseType: 'blob' }).pipe(
+            tap((data: any) => {
                 const file = new Blob([data], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);
                 const newWindow = window.open();
                 newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
                 newWindow.document.title = row.alt_identifier;
-            });
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     viewThumbnail(row: any) {

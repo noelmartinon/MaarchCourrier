@@ -27,20 +27,54 @@
                         <mat-form-field>
                             <input matInput type="text" [formControl]="tag.usage" [placeholder]="lang.usage">
                         </mat-form-field>
+                        <mat-form-field *ngIf="advancedMode">
+                            <mat-chip-list #chipList>
+                                <mat-chip *ngFor="let linkedTag of tag.links.value" [selectable]="selectable"
+                                    (click)="remove(linkedTag)" style="cursor: pointer;">
+                                    {{getTagLabel(linkedTag)}}
+                                    <mat-icon matChipRemove class="fa fa-times-circle"></mat-icon>
+                                </mat-chip>
+                                <input [placeholder]="lang.linkedTags" #linkedTagInput [formControl]="myControl"
+                                    [matAutocomplete]="auto" [matChipInputFor]="chipList">
+                            </mat-chip-list>
+                            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                                <mat-option *ngFor="let tag of filteredOptions | async" [value]="tag"  [disabled]="isSelected(tag)">
+                                    {{tag.label}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+
                         <div *ngIf="!creationMode && !tag.canMerge.value" class="alert-message alert-message-danger">
                             {{this.lang.cannotMergeTags}}
                         </div>
-                        <plugin-select-search *ngIf="!loadingTags && tag.canMerge.value" [label]="this.lang.mergeTagWith" [placeholderLabel]="this.lang.mergeTagWith"
-                                [formControlSelect]="selectMergeTag" [datas]="tags" (afterOpened)="getTags()"
-                                (afterSelected)="mergeTag($event)" style="width:100%;">
-                         </plugin-select-search>
+                        <plugin-select-search *ngIf="!loadingTags && tag.canMerge.value"
+                            [label]="this.lang.mergeTagWith" [placeholderLabel]="this.lang.mergeTagWith"
+                            [formControlSelect]="selectMergeTag" [datas]="tags" (afterOpened)="getTags()"
+                            (afterSelected)="mergeTag($event)" style="width:100%;">
+                        </plugin-select-search>
                         <div class="text-center">
                             <button mat-raised-button [disabled]="!tagFormGroup.valid"
                                 color="primary">{{lang.validate}}</button>
+                            <button type="button" mat-raised-button color="default" (click)="toggleAdvancedTag()">
+                                {{advancedMode ? lang.defaultMode : lang.advancedMode}}
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </mat-sidenav-content>
+    <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
+        fixedTopGap="56" position='end' [opened]="advancedMode" style="overflow-x:hidden;width:450px;">
+        <mat-list>
+            <h3 mat-subheader>{{lang.selectParentTag}} :</h3>
+            <div style="padding:10px;">
+                <mat-form-field>
+                    <input matInput id="jstree_search" name="jstree_search" type="text"
+                        placeholder="{{lang.searchTag}}">
+                </mat-form-field>
+                <div id="jstree"></div>
+            </div>
+        </mat-list>
+    </mat-sidenav>
 </mat-sidenav-container>

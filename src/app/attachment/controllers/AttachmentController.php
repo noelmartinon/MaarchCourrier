@@ -668,7 +668,7 @@ class AttachmentController
         ValidatorModel::intVal($args, ['id']);
         ValidatorModel::boolType($args, ['original']);
 
-        $document = AttachmentModel::getById(['select' => ['docserver_id', 'path', 'filename', 'title', 'status'], 'id' => $args['id']]);
+        $document = AttachmentModel::getById(['select' => ['docserver_id', 'path', 'filename', 'title', 'status', 'fingerprint'], 'id' => $args['id']]);
 
         if (empty($args['original'])) {
             if ($document['status'] == 'SIGN') {
@@ -703,7 +703,11 @@ class AttachmentController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if (empty($convertedDocument) && empty($document['fingerprint'])) {
+            AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
+            $document['fingerprint'] = $fingerprint;
+        }
+        if ($document['fingerprint'] != $fingerprint) {
             ['errors' => 'Fingerprints do not match'];
         }
 

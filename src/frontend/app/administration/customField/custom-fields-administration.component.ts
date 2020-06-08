@@ -10,6 +10,7 @@ import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operato
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     templateUrl: 'custom-fields-administration.component.html',
@@ -29,12 +30,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     loading: boolean = true;
 
     customFieldsTypes: any[] = [
-        {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
-            current: false
-        },
         {
             label: this.lang.stringInput,
             type: 'string'
@@ -71,6 +66,15 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     sampleIncrement: number[] = [1, 2, 3, 4];
 
+    bddMode: boolean = false;
+    availaibleTables: string[] = [];
+
+    availaibleColumns: string[] = [
+        'id',
+        'firstname',
+        'lastname',
+    ];
+
 
     dialogRef: MatDialogRef<any>;
 
@@ -80,7 +84,8 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
-        private sortPipe: SortPipe
+        private sortPipe: SortPipe,
+        private functionsService: FunctionsService
     ) {
 
     }
@@ -88,16 +93,22 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFieldsAdmin);
 
-        this.http.get('../rest/customFields').pipe(
+        this.getTables();
+
+        this.http.get('../rest/customFields?admin=true').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
-                    element.values = element.values.map((info: any) => {
-                        return {
-                            label: info
-                        };
-                    });
-
+                    if (this.functionsService.empty(element.values.key)) {
+                        element.bddMode = false;
+                        element.values = Object.values(element.values).map((info: any) => {
+                            return {
+                                label: info
+                            };
+                        });
+                    } else {
+                        element.bddMode = true;
+                    }
                 });
                 return data;
             }),
@@ -173,17 +184,19 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     updateCustomField(customField: any, indexCustom: number) {
 
-        customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
-
-        // TO FIX DATA BINDING SIMPLE ARRAY VALUES
+        console.log(customField);
         const customFieldToUpdate = { ...customField };
 
-        customFieldToUpdate.values = customField.values.map((data: any) => data.label);
+        if (!customField.bddMode) {
+            customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
 
-        const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
-        if (alreadyExists.length > 1) {
-            this.notify.handleErrors(this.lang.customFieldAlreadyExists);
-            return of(false);
+            // TO FIX DATA BINDING SIMPLE ARRAY VALUES
+            customFieldToUpdate.values = customField.values.map((data: any) => data.label);
+            const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
+            if (alreadyExists.length > 1) {
+                this.notify.handleErrors(this.lang.customFieldAlreadyExists);
+                return of(false);
+            }
         }
 
         this.http.put('../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
@@ -203,10 +216,34 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     isModified(customField: any, indexCustomField: number) {
-        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '') {
+        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.bddMode) {
             return true;
         } else {
             return false;
         }
+    }
+
+    switchBddMode(custom: any) {
+        custom.bddMode = !custom.bddMode;
+        if (custom.bddMode) {
+            custom.values = {
+                key: '',
+                label: '',
+                table: '',
+                clause: ''
+            };
+        }
+    }
+
+    getTables() {
+        this.http.get('../rest/customFieldsWhiteList').pipe(
+            tap((data: any) => {
+                this.availaibleTables = data.allowedTables;
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

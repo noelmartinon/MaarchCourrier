@@ -43,6 +43,10 @@ class TagController
         $countResources = array_column($countResources, 'count', 'tag_id');
 
         foreach ($tags as $key => $tag) {
+            $tags[$key]['parentId'] = $tags[$key]['parent_id'];
+            $tags[$key]['creationDate'] = $tags[$key]['creation_date'];
+            unset($tags[$key]['parent_id']);
+            unset($tags[$key]['creation_date']);
             $tags[$key]['countResources'] = $countResources[$tag['id']] ?? 0;
             $tags[$key]['links'] = json_decode($tags[$key]['links'], true);
         }
@@ -76,6 +80,11 @@ class TagController
         ]);
 
         $tag['canMerge'] = empty($tag['parent_id']) && empty($childTags);
+        $tag['parentId'] = $tag['parent_id'];
+        $tag['creationDate'] = $tag['creation_date'];
+
+        unset($tag['parent_id']);
+        unset($tag['creation_date']);
 
         return $response->withJson($tag);
     }

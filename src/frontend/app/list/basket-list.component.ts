@@ -488,14 +488,19 @@ export class BasketListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' })
-            .subscribe((data: any) => {
+        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
+            tap((data: any) => {
                 const file = new Blob([data], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);
                 const newWindow = window.open();
                 newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
                 newWindow.document.title = row.chrono;
-            });
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     toggleMailTracking(row: any) {

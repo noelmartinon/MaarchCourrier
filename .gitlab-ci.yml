@@ -38,7 +38,6 @@ before_script:
   - ln -s $CI_PROJECT_DIR /var/www/html/MaarchCourrier
   - cd /var/www/html/MaarchCourrier
   - sed 's/127.0.0.1/postgres/' apps/maarch_entreprise/xml/config.json.default > apps/maarch_entreprise/xml/config.json
-  - sed 's/<databaseserver>.*<\/databaseserver>/<databaseserver>postgres<\/databaseserver>/;s/<databasepassword>.*<\/databasepassword>/<databasepassword><\/databasepassword>/;s/<databasename>.*<\/databasename>/<databasename>MaarchCourrier<\/databasename>/;s/<databaseuser>.*<\/databaseuser>/<databaseuser>maarch<\/databaseuser>/' apps/maarch_entreprise/xml/config.xml.default > apps/maarch_entreprise/xml/config.xml
   - cp modules/visa/xml/remoteSignatoryBooks.xml.default modules/visa/xml/remoteSignatoryBooks.xml
   - apt-get install -yqq openjdk-11-jdk > /dev/null
 

@@ -17,7 +17,7 @@ foreach ($customs as $custom) {
     new \SrcCore\models\DatabasePDO(['customId' => $custom]);
     $GLOBALS['customId'] = $custom;
 
-    $configPath             = "custom/{$custom}/apps/maarch_entreprise/xml/config.xml";
+    $configPath             = "custom/{$custom}/apps/maarch_entreprise/xml/config.json";
     $notificationConfigPath = "modules/notifications/batch/config/config.xml";
     if (file_exists($configPath)) {
         if (!is_readable($configPath) || !is_writable($configPath)) {
@@ -34,21 +34,21 @@ foreach ($customs as $custom) {
             printf("Aucun fichier de configuration de notification trouvé pour le custom {$custom}\n");
             continue;
         }
-        $loadedXml             = simplexml_load_file($configPath);
         $loadedNotificationXml = simplexml_load_file($notificationFilePath);
         
-        if ($loadedXml && $loadedNotificationXml) {
-            $loadedXml->CONFIG->maarchDirectory = (string)$loadedNotificationXml->CONFIG->MaarchDirectory;
-            $loadedXml->CONFIG->customID        = (string)$loadedNotificationXml->CONFIG->customID;
-            if (empty($loadedXml->CONFIG->maarchUrl)) {
-                $loadedXml->CONFIG->maarchUrl = (string)$loadedNotificationXml->CONFIG->MaarchUrl;
+        if ($loadedNotificationXml) {
+            $file = file_get_contents($configPath);
+            $file = json_decode($file, true);
+
+            $file['config']['maarchDirectory'] = (string)$loadedNotificationXml->CONFIG->MaarchDirectory;
+            $file['config']['customID'] = (string)$loadedNotificationXml->CONFIG->customID;
+            if (empty($file['config']['maarchUrl'])) {
+                $file['config']['maarchUrl'] = (string)$loadedNotificationXml->CONFIG->applicationUrl;
             }
 
-            $res = formatXml($loadedXml);
-            $fp  = fopen($configPath, "w+");
-            if ($fp) {
-                fwrite($fp, $res);
-            }
+            $fp = fopen("apps/maarch_entreprise/xml/config.json", 'a+');
+            fwrite($fp, json_encode($file, JSON_PRETTY_PRINT));
+            fclose($fp);
 
             $notifications = \Notification\models\NotificationModel::get(['select' => ['notification_sid', 'notification_id']]);
             $user          = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
