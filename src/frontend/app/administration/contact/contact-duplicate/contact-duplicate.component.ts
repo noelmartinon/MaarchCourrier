@@ -71,7 +71,7 @@ export class ContactDuplicateComponent implements OnInit {
     duplicatesContactsCount: number = -1;
     duplicatesContactsRealCount: number = 0;
 
-    displayedColumns = ['lastname', 'company', 'address'];
+    displayedColumns = ['companyLastname', 'lastname', 'company'];
     dataSource: any;
     isLoadingResults: boolean = false;
     openedSearchTool: boolean = true;
@@ -177,13 +177,10 @@ export class ContactDuplicateComponent implements OnInit {
                     } else {
                         element.odd = !data.contacts[index - 1].odd;
                     }
-                    const tmpFormatedAddress = [];
-                    tmpFormatedAddress.push(element.addressNumber);
-                    tmpFormatedAddress.push(element.addressStreet);
-                    tmpFormatedAddress.push(element.addressPostcode);
-                    tmpFormatedAddress.push(element.addressTown);
-                    tmpFormatedAddress.push(element.addressCountry);
-                    element.address = tmpFormatedAddress.filter(address => !this.functions.empty(address)).join(' ');
+                    const tmpFormated = [];
+                    tmpFormated.push(element.company);
+                    tmpFormated.push(element.lastname);
+                    element.companyLastname = tmpFormated.filter(item => !this.functions.empty(item)).join(' / ');
 
                     if (!this.functionsService.empty(element.customFields)) {
                         Object.keys(element.customFields).forEach((customIndex: any) => {
@@ -199,7 +196,7 @@ export class ContactDuplicateComponent implements OnInit {
                 setTimeout(() => {
                     const regex = /contactCustomField_[.]*/g;
                     this.displayedColumns = this.currentFieldsSearch.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => field.identifier).concat(this.currentFieldsSearch.filter((field: any) => field.identifier.match(regex) !== null).map((field: any) => field.identifier.replace('contactCustomField_', '')));
-                    this.displayedColumns.push('address');
+                    this.displayedColumns.unshift('companyLastname');
                     this.openedSearchTool = false;
                 }, 0);
             }),
@@ -239,7 +236,7 @@ export class ContactDuplicateComponent implements OnInit {
         ).subscribe();
     }
 
-    getLabel(item: any) {
+    getLabel(item: any) {        
         if (this.lang['contactsParameters_' + item] !== undefined) {
             return this.lang['contactsParameters_' + item];
         } else if (this.lang[item] !== undefined) {

@@ -200,7 +200,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     preDelete(row: any) {
-        let r = confirm(this.lang.reallyWantToDeleteContactFromGroup);
+        const r = confirm(this.lang.reallyWantToDeleteContactFromGroup);
 
         if (r) {
             this.removeContact(this.contactsGroup.contacts[row], row);

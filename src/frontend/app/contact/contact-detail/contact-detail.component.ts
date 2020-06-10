@@ -174,10 +174,20 @@ export class ContactDetailComponent implements OnInit {
     }
 
     setContactInfo(identifier: string, value: string) {
-        this.contact[identifier] = value;
+        if (identifier === 'customFields') {
+            this.contact[identifier].push(value);
+        } else {
+            this.contact[identifier] = value;
+        }
     }
 
-    isNewValue(identifier: string) {
-        return this.contact[identifier] !== this.contactClone[identifier];
+    isNewValue(identifier: any) {
+        const isCustomField = typeof identifier === 'object';
+
+        if (isCustomField) {
+            return this.contactClone['customFields'].filter((custom: any) => custom.label === identifier.value.label).length === 0;
+        } else {
+            return this.contact[identifier] !== this.contactClone[identifier];
+        }
     }
 }

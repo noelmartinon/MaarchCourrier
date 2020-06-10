@@ -1684,4 +1684,5 @@ export const LANG_NL = {
     "exludeContact": "Exclude contact", // _TO_TRANSLATE
     "contactExcluded": "Contact excluded", // _TO_TRANSLATE
     "exportContacts": "Export contacts",  // _TO_TRANSLATE
+    "companyLastname": "Company / Lastname", // _TO_TRANSLATE
 };

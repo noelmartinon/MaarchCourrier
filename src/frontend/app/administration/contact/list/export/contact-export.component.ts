@@ -8,6 +8,7 @@ import { SortPipe } from '../../../../../plugins/sorting.pipe';
 import { catchError, map, tap, finalize, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { LocalStorageService } from '../../../../../service/local-storage.service';
+import { HeaderService } from '../../../../../service/header.service';
 
 declare var $: any;
 
@@ -60,7 +61,8 @@ export class ContactExportComponent implements OnInit {
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private sortPipe: SortPipe,
-        private localStorage: LocalStorageService
+        private localStorage: LocalStorageService,
+        private headerService: HeaderService
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -134,7 +136,7 @@ export class ContactExportComponent implements OnInit {
     }
 
     exportData() {
-        this.localStorage.save('exportContactFields', JSON.stringify(this.exportModel));
+        this.localStorage.save(`exportContactFields_${this.headerService.user.id}`, JSON.stringify(this.exportModel));
         this.loadingExport = true;
         this.http.post('../../rest/contacts/export', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
@@ -209,8 +211,10 @@ export class ContactExportComponent implements OnInit {
     }
 
     setConfiguration() {
-        JSON.parse(this.localStorage.get('exportContactFields')).data.forEach((element: any) => {
-            this.addData(element);
-        });
+        if (this.localStorage.get(`exportContactFields_${this.headerService.user.id}`) !== null) {
+            JSON.parse(this.localStorage.get(`exportContactFields_${this.headerService.user.id}`)).data.forEach((element: any) => {
+                this.addData(element);
+            });
+        }
     }
 }

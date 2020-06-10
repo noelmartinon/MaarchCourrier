@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

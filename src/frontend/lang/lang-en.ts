@@ -296,6 +296,7 @@ export const LANG_EN = {
     "communicationMean":                           "Communication mean",
     "communicationMeanDesc":                       "Link a contact with another Maarch instance",
     "community":                                   "Community",
+    "companyLastname":                             "Company / Lastname",
     "complementaryFields":                         "Complementary fields",
     "confidential":                                "Confidential",
     "confidentiality":                             "Confidentiality",

@@ -298,6 +298,7 @@ export const LANG_FR = {
     "communicationMean":                           "Moyen de communication",
     "communicationMeanDesc":                       "Lie un contact à une autre instance de maarch",
     "community":                                   "Communauté",
+    "companyLastname":                             "Organisation / Nom",
     "complementaryFields":                         "Champs complémentaires",
     "confidential":                                "Confidentiel",
     "confidentiality":                             "Confidentialité",

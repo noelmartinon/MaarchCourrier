@@ -9,6 +9,7 @@
             <button style="line-height: 15px;padding: 5px;" *ngIf="!contact.selected" mat-raised-button color="primary" (click)="toggleContact(contact)"><span>{{lang.selectDuplicatedContact}}</span><br><small style="font-size:80%">{{contact.resourcesCount}} {{lang.associatedElements}}</small></button>
             <button style="line-height: 15px;padding: 10px;" *ngIf="contact.selected" mat-raised-button color="primary" (click)="toggleContact(contact)"><i class="far fa-check-circle"></i> {{lang.selectedContact}}</button>
         </div>
+        <div *ngIf="!contact.enabled" class="disabledContact">{{lang.contactDisabled}}</div>
         <mat-card-header>
             <div mat-card-avatar class="contact-header-image fa"
                 [class.fa-address-card]="contact.type === 'contact'"
@@ -86,7 +87,7 @@
                     <mat-list-item class="contact-item" *ngIf="!functionsService.empty(contact.communicationMeans)"
                         [title]="lang.communicationMean">
                         <mat-icon mat-list-icon class="contact-group fas fa-hashtag"></mat-icon>
-                        <p mat-line class="contact-content" [title]="contact.communicationMeans">
+                        <p mat-line class="contact-content" [class.newData]="isNewValue('communicationMeans')" [title]="contact.communicationMeans">
                             {{contact.communicationMeans}} </p>
                     </mat-list-item>
                     <mat-list-item class="contact-item"
@@ -101,7 +102,7 @@
                             <mat-icon mat-list-icon class="contact-group fas fa-hashtag"
                                 [title]="keyVal.value.label">
                             </mat-icon>
-                            <p mat-line class="contact-content" [title]="keyVal.value.value"> {{keyVal.value.value}}
+                            <p mat-line class="contact-content" [class.newData]="isNewValue(keyVal)" [title]="keyVal.value.value"> {{keyVal.value.value}}
                             </p>
                         </mat-list-item>
                     </ng-container>

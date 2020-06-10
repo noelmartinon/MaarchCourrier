@@ -46,7 +46,13 @@ export class ManageDuplicateComponent implements OnInit {
         this.data.duplicate.forEach((contactItem: any, indexContact: number) => {
             if (this.contactsExcluded.indexOf(this.appContactDetail.toArray()[indexContact].getContactInfo().id) === -1) {
                 Object.keys(this.appContactDetail.toArray()[indexContact].getContactInfo()).forEach(element => {
-                    if (
+                    if (element === 'customFields' && !this.functionsService.empty(this.appContactDetail.toArray()[indexContact].getContactInfo()[element])) {
+                        this.appContactDetail.toArray()[indexContact].getContactInfo()[element].forEach((custom: any) => {
+                            if (this.appContactDetail.toArray()[index].getContactInfo()[element].filter((custom2: any) => custom2.label === custom.label).length === 0) {
+                                this.appContactDetail.toArray()[index].setContactInfo(element, custom);
+                            }
+                        });
+                    } else if (
                         this.functionsService.empty(this.appContactDetail.toArray()[index].getContactInfo()[element]) &&
                         this.appContactDetail.toArray()[index].getContactInfo()[element] !== this.appContactDetail.toArray()[indexContact].getContactInfo()[element]
                     ) {

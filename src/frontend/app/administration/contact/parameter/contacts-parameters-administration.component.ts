@@ -44,6 +44,12 @@ export class ContactsParametersAdministrationComponent implements OnInit {
             label: this.lang.contactsGroups,
             current: false
         },
+        {
+            icon: 'fas fa-magic',
+            route: '/administration/contacts/duplicates',
+            label: this.lang.duplicatesContactsAdmin,
+            current: false
+        },
     ];
 
     contactsFilling: any = {
