@@ -967,7 +967,7 @@ class ContactController
         foreach ($criteria as $criterion) {
             $subQuery = "SELECT " . $criterion . ' as field FROM contacts c GROUP BY field HAVING count(*) > 1';
 
-            $where[] = $criterion . " in (" . $subQuery . ") ";
+            $where[] = $criterion . " in (" . $subQuery . ") AND " . $criterion . " != '' AND " . $criterion . " is not null";
         }
 
         $duplicatesQuery = "SELECT " . implode(', ', $fields) . ' FROM contacts WHERE ' . implode(' AND ', $where);
