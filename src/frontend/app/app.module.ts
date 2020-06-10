@@ -113,6 +113,7 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
 import { SentNumericPackagePageComponent } from './sentResource/sent-numeric-package-page/sent-numeric-package-page.component';
 import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-create-modal.component';
 import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
+import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-modal.component';
 
 
 
@@ -214,7 +215,8 @@ import { SelectIndexingModelComponent } from './indexation/select-indexing-model
         SentNumericPackagePageComponent,
         FolderCreateModalComponent,
         ReconcileActionComponent,
-        SelectIndexingModelComponent
+        SelectIndexingModelComponent,
+        ThesaurusModalComponent
     ],
     entryComponents: [
         InfoChangePasswordModalComponent,
@@ -262,7 +264,8 @@ import { SelectIndexingModelComponent } from './indexation/select-indexing-model
         PrintedFolderModalComponent,
         SentNumericPackagePageComponent,
         FolderCreateModalComponent,
-        ReconcileActionComponent
+        ReconcileActionComponent,
+        ThesaurusModalComponent
     ],
     providers: [FiltersListService, FoldersService, ActionsService, PrivilegeService],
     bootstrap: [AppComponent]

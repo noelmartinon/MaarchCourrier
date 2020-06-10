@@ -1685,4 +1685,10 @@ export const LANG_NL = {
     "contactExcluded": "Contact excluded", // _TO_TRANSLATE
     "exportContacts": "Export contacts",  // _TO_TRANSLATE
     "companyLastname": "Company / Lastname", // _TO_TRANSLATE
+    "advancedMode": "Advanced mode", // _TO_TRANSLATE
+    "defaultMode": "Default mode", // _TO_TRANSLATE
+    "linkedTags": "Linked tags", // _TO_TRANSLATE
+    "selectParentTag": "Select a parent tag", // _TO_TRANSLATE
+    "openThesaurus": "Open the thesaurus", // _TO_TRANSLATE
+    "bddModeCustomFieldMsg": "This field use database values (see the custom's configration in custom fields administration)", // _TO_TRANSLATE
 };
