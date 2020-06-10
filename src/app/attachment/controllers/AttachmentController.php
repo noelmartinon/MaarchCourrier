@@ -118,8 +118,8 @@ class AttachmentController
         if (!empty($attachment['originId'])) {
             $oldVersions = AttachmentModel::get([
                 'select'    => ['res_id as "resId"', 'relation'],
-                'where'     => ['(origin_id = ? OR res_id = ?)', 'res_id != ?', 'status not in (?)', 'attachment_type not in (?)'],
-                'data'      => [$attachment['originId'], $attachment['originId'], $args['id'], ['DEL'], $excludeAttachmentTypes],
+                'where'     => ['(origin_id = ? OR res_id = ?)', 'res_id != ?', 'status not in (?)'],
+                'data'      => [$attachment['originId'], $attachment['originId'], $args['id'], ['DEL']],
                 'orderBy'   => ['relation DESC']
             ]);
         }
