@@ -138,7 +138,7 @@ export class ContactExportComponent implements OnInit {
     exportData() {
         this.localStorage.save(`exportContactFields_${this.headerService.user.id}`, JSON.stringify(this.exportModel));
         this.loadingExport = true;
-        this.http.post('../../rest/contacts/export', this.exportModel, { responseType: 'blob' }).pipe(
+        this.http.put('../../rest/contacts/export', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');

@@ -125,6 +125,7 @@ $app->put('/configurations/{service}', \Configuration\controllers\ConfigurationC
 $app->get('/contacts', \Contact\controllers\ContactController::class . ':get');
 $app->post('/contacts', \Contact\controllers\ContactController::class . ':create');
 $app->get('/contacts/{id}', \Contact\controllers\ContactController::class . ':getById');
+$app->put('/contacts/export', \Contact\controllers\ContactController::class . ':exportContacts');
 $app->put('/contacts/{id}', \Contact\controllers\ContactController::class . ':update');
 $app->delete('/contacts/{id}', \Contact\controllers\ContactController::class . ':delete');
 $app->put('/contacts/{id}/activation', \Contact\controllers\ContactController::class . ':updateActivation');
@@ -133,7 +134,6 @@ $app->get('/ban/availableDepartments', \Contact\controllers\ContactController::c
 $app->post('/contacts/formatV1', \Contact\controllers\ContactController::class . ':getFormattedContactsForSearchV1');
 $app->get('/duplicatedContacts', \Contact\controllers\ContactController::class . ':getDuplicatedContacts');
 $app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
-$app->post('/contacts/export', \Contact\controllers\ContactController::class . ':exportContacts');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');
