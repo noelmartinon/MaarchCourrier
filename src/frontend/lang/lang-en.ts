@@ -661,6 +661,7 @@ export const LANG_EN = {
     "filteredFrom":                                "filtered on",
     "filters":                                     "Filters",
     "fingerprint":                                 "Digital fingerprint",
+    "fingerprintsDoNotMatch":                      "Fingerprints do not match",
     "firstLevelAdded":                             "Folder added",
     "firstLevelAttached":                          "Attach to folder",
     "firstLevelDeleted":                           "Folder deleted",

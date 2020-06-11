@@ -23,6 +23,7 @@ use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
 use CustomField\models\CustomFieldModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
@@ -34,6 +35,7 @@ use Note\models\NoteModel;
 use Parameter\models\ParameterModel;
 use Resource\controllers\ResController;
 use Resource\controllers\ResourceListController;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
@@ -221,7 +223,7 @@ class PreProcessActionController
             $lock = true;
             if (empty($resource['locker_user_id'] || empty($resource['locker_time']))) {
                 $lock = false;
-            } elseif ($resource['locker_user_id'] == $currentUser['id']) {
+            } elseif ($resource['locker_user_id'] == $GLOBALS['id']) {
                 $lock = false;
             } elseif (strtotime($resource['locker_time']) < time()) {
                 $lock = false;
@@ -735,6 +737,20 @@ class PreProcessActionController
                         ]);
                         if (empty($convertedDocument['docserver_id']) || strtolower(pathinfo($convertedDocument['filename'], PATHINFO_EXTENSION)) != 'pdf') {
                             $canNotSend[] = ['resId' => $valueResId, 'chrono' => $resourcesChrono[$valueResId], 'reason' => 'noAttachmentConversion', 'attachmentIdentifier' => $attachment['chrono']];
+                            unset($aAttachments[$key]);
+                            break;
+                        }
+                        $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+                        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+                        if (!is_file($pathToDocument)) {
+                            $canNotSend[] = ['resId' => $valueResId, 'chrono' => $resourcesChrono[$valueResId], 'reason' => 'noAttachmentConversion', 'attachmentIdentifier' => $attachment['chrono']];
+                            unset($aAttachments[$key]);
+                            break;
+                        }
+                        $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                        $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+                        if ($convertedDocument['fingerprint'] != $fingerprint) {
+                            $canNotSend[] = ['resId' => $valueResId, 'chrono' => $resourcesChrono[$valueResId], 'reason' => 'fingerprintsDoNotMatch', 'attachmentIdentifier' => $attachment['chrono']];
                             unset($aAttachments[$key]);
                             break;
                         }

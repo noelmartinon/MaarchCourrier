@@ -23,6 +23,9 @@ use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Contact\controllers\ContactController;
+use Convert\models\AdrModel;
+use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Folder\models\FolderModel;
@@ -448,6 +451,14 @@ class ResourceListController
                     continue;
                 }
             }
+            $control = ResourceListController::controlFingerprints(['resId' => $resId]);
+            if (!$control) {
+                if (empty($methodResponses['errors'])) {
+                    $methodResponses['errors'] = [];
+                }
+                $methodResponses['errors'] = array_merge($methodResponses['errors'], ['Fingerprints do not match for resource ' . $resId]);
+                continue;
+            }
 
             if (!empty($method)) {
                 $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'parameters' => $parameters]);
@@ -516,7 +527,7 @@ class ResourceListController
             $lock = true;
             if (empty($resource['locker_user_id'] || empty($resource['locker_time']))) {
                 $lock = false;
-            } elseif ($resource['locker_user_id'] == $currentUser['id']) {
+            } elseif ($resource['locker_user_id'] == $GLOBALS['id']) {
                 $lock = false;
             } elseif (strtotime($resource['locker_time']) < time()) {
                 $lock = false;
@@ -532,7 +543,7 @@ class ResourceListController
 
         if (!empty($resourcesToLock)) {
             ResModel::update([
-                'set'   => ['locker_user_id' => $currentUser['id'], 'locker_time' => 'CURRENT_TIMESTAMP + interval \'1\' MINUTE'],
+                'set'   => ['locker_user_id' => $GLOBALS['id'], 'locker_time' => 'CURRENT_TIMESTAMP + interval \'1\' MINUTE'],
                 'where' => ['res_id in (?)'],
                 'data'  => [$resourcesToLock]
             ]);
@@ -581,7 +592,7 @@ class ResourceListController
 
         $resourcesToUnlock = [];
         foreach ($resources as $resource) {
-            if (!(!empty($resource['locker_user_id']) && $resource['locker_user_id'] != $currentUser['id'] && strtotime($resource['locker_time']) > time())) {
+            if (!(!empty($resource['locker_user_id']) && $resource['locker_user_id'] != $GLOBALS['id'] && strtotime($resource['locker_time']) > time())) {
                 $resourcesToUnlock[] = $resource['res_id'];
             }
         }
@@ -1236,5 +1247,66 @@ class ResourceListController
             return 1;
         }
         return 0;
+    }
+
+    public static function controlFingerprints(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $convertedDocument = AdrModel::getDocuments([
+            'select'    => ['id', 'docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+            'where'     => ['res_id = ?', 'type in (?)'],
+            'data'      => [$args['resId'], ['PDF', 'SIGN']],
+            'orderBy'   => ["type='SIGN' DESC", 'version DESC'],
+            'limit'     => 1
+        ]);
+
+        $convertedDocument = $convertedDocument[0] ?? null;
+        if (!empty($convertedDocument)) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+            if (!is_file($pathToDocument)) {
+                return false;
+            }
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($convertedDocument['fingerprint'])) {
+                AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                $convertedDocument['fingerprint'] = $fingerprint;
+            }
+            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                return false;
+            }
+        }
+        $allAttachments = AttachmentModel::get(['select' => ['res_id'], 'where' => ['res_id_master = ?'], 'data' => [$args['resId']]]);
+        $allAttachments = array_column($allAttachments, 'res_id');
+        $convertedDocuments = [];
+        if (!empty($allAttachments)) {
+            $convertedDocuments = AdrModel::getAttachments([
+                'select'    => ['id', 'docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'     => ['res_id in (?)', 'type = ?'],
+                'data'      => [$allAttachments, 'PDF']
+            ]);
+        }
+
+        foreach ($convertedDocuments as $convertedDocument) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+            if (!is_file($pathToDocument)) {
+                return false;
+            }
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($convertedDocument['fingerprint'])) {
+                AdrModel::updateAttachmentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                $convertedDocument['fingerprint'] = $fingerprint;
+            }
+            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

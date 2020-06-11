@@ -24,6 +24,7 @@ use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\ListInstanceModel;
 use Group\controllers\PrivilegeController;
 use Group\models\GroupModel;
@@ -198,8 +199,7 @@ class SignatureBookController
                 continue;
             }
 
-            $realId = $value['res_id'];
-
+            $realId         = $value['res_id'];
             $viewerId       = $realId;
             $viewerNoSignId = $realId;
             $pathToFind     = $value['path'] . str_replace(strrchr($value['filename'], '.'), '.pdf', $value['filename']);
@@ -248,10 +248,10 @@ class SignatureBookController
                 $attachments[$key]['doc_date'] = date(DATE_ATOM, strtotime($attachments[$key]['doc_date']));
             }
             $attachments[$key]['isConverted']     = ConvertPdfController::canConvert(['extension' => $attachments[$key]['format']]);
-            $attachments[$key]['viewerNoSignId'] = $viewerNoSignId;
+            $attachments[$key]['viewerNoSignId']  = $viewerNoSignId;
             $attachments[$key]['attachment_type'] = $attachmentTypes[$value['attachment_type']]['label'];
-            $attachments[$key]['icon'] = $attachmentTypes[$value['attachment_type']]['icon'];
-            $attachments[$key]['sign'] = $attachmentTypes[$value['attachment_type']]['sign'];
+            $attachments[$key]['icon']            = $attachmentTypes[$value['attachment_type']]['icon'];
+            $attachments[$key]['sign']            = $attachmentTypes[$value['attachment_type']]['sign'];
 
             if ($value['status'] == 'SIGN') {
                 $attachments[$key]['viewerLink'] = "../../rest/attachments/{$viewerId}/content?".rand();
@@ -406,7 +406,7 @@ class SignatureBookController
         }
 
         $convertedDocument = AdrModel::getDocuments([
-            'select'    => ['docserver_id', 'path', 'filename', 'type'],
+            'select'    => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
             'where'     => ['res_id = ?', 'type in (?)'],
             'data'      => [$args['resId'], ['PDF', 'SIGN']],
             'orderBy'   => ["type='SIGN' DESC", 'version DESC'],
@@ -426,6 +426,11 @@ class SignatureBookController
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
         if (!file_exists($pathToDocument)) {
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        }
+        $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+        $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+        if ($convertedDocument['fingerprint'] != $fingerprint) {
+            return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/config.xml']);
@@ -468,7 +473,6 @@ class SignatureBookController
             'where' => ['res_id = ?', 'item_id = ?', 'difflist_type = ?'],
             'data'  => [$args['resId'], $GLOBALS['userId'], 'VISA_CIRCUIT']
         ]);
-
 
         HistoryController::add([
             'tableName' => 'res_letterbox',
@@ -550,7 +554,7 @@ class SignatureBookController
         }
 
         $convertedDocument = AdrModel::getAttachments([
-            'select'    => ['docserver_id', 'path', 'filename', 'type'],
+            'select'    => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
             'where'     => ['res_id = ?', 'type = ?'],
             'data'      => [$args['id'], 'PDF']
         ]);
@@ -566,6 +570,12 @@ class SignatureBookController
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
         if (!file_exists($pathToDocument)) {
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        }
+
+        $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+        $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+        if ($convertedDocument['fingerprint'] != $fingerprint) {
+            return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/config.xml']);

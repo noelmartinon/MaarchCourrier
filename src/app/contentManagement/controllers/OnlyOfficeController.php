@@ -16,8 +16,10 @@ namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Firebase\JWT\JWT;
 use Resource\controllers\ResController;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -75,7 +77,6 @@ class OnlyOfficeController
 
         return $response->withJson($jwt);
     }
-
 
     public static function saveMergedFile(Request $request, Response $response)
     {
@@ -138,17 +139,29 @@ class OnlyOfficeController
             if (!ResController::hasRightByResId(['resId' => [$body['objectId']], 'userId' => $GLOBALS['id']])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Resource out of perimeter']);
             }
-            $resource = ResModel::getById(['resId' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename']]);
+            $resource = ResModel::getById(['resId' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'fingerprint']]);
             if (empty($resource['filename'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Resource has no file']);
             }
 
-            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template']]);
+            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
 
             $path = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $path, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($resource['fingerprint'])) {
+                ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$body['objectId']]]);
+                $resource['fingerprint'] = $fingerprint;
+            }
+
+            if ($resource['fingerprint'] != $fingerprint) {
+                return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
+            }
+
             $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'attachmentModification') {
-            $attachment = AttachmentModel::getById(['id' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'res_id_master']]);
+            $attachment = AttachmentModel::getById(['id' => $body['objectId'], 'select' => ['docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint']]);
             if (empty($attachment)) {
                 return $response->withStatus(400)->withJson(['errors' => 'Attachment does not exist']);
             }
@@ -156,17 +169,29 @@ class OnlyOfficeController
                 return $response->withStatus(400)->withJson(['errors' => 'Attachment out of perimeter']);
             }
 
-            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template']]);
+            $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
 
             $path = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachment['path']) . $attachment['filename'];
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $path, 'mode' => $docserverType['fingerprint_mode']]);
+            if (empty($attachment['fingerprint'])) {
+                AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$body['objectId']]]);
+                $attachment['fingerprint'] = $fingerprint;
+            }
+
+            if ($attachment['fingerprint'] != $fingerprint) {
+                return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
+            }
+
             $fileContent = file_get_contents($path);
         } elseif ($body['objectType'] == 'encodedResource') {
             if (empty($body['format'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body format is empty']);
             }
-            $path = null;
+            $path        = null;
             $fileContent = base64_decode($body['objectId']);
-            $extension = $body['format'];
+            $extension   = $body['format'];
         } else {
             return $response->withStatus(400)->withJson(['errors' => 'Query param objectType does not exist']);
         }
@@ -196,7 +221,7 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Query params filename forbidden']);
         }
 
-        $tmpPath = CoreConfigModel::getTmpPath();
+        $tmpPath  = CoreConfigModel::getTmpPath();
         $filename = "onlyOffice_{$queryParams['filename']}";
 
         $fileContent = file_get_contents($tmpPath . $filename);
@@ -204,8 +229,8 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'No content found']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $finfo     = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType  = $finfo->buffer($fileContent);
         $extension = pathinfo($tmpPath . $filename, PATHINFO_EXTENSION);
         unlink($tmpPath . $filename);
 
@@ -228,13 +253,13 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice is not enabled']);
         }
 
-        $checkUrl = str_replace('http://', '', $queryParams['url']);
-        $checkUrl = str_replace('https://', '', $checkUrl);
-        $uri = (string)$loadedXml->onlyoffice->server_uri;
-        $uriPaths = explode('/', $uri, 2);
+        $checkUrl   = str_replace('http://', '', $queryParams['url']);
+        $checkUrl   = str_replace('https://', '', $checkUrl);
+        $uri        = (string)$loadedXml->onlyoffice->server_uri;
+        $uriPaths   = explode('/', $uri, 2);
         $masterPath = $uriPaths[0];
         $lastPath   = !empty($uriPaths[1]) ? rtrim("/{$uriPaths[1]}", '/') : '';
-        $port = (string)$loadedXml->onlyoffice->server_port;
+        $port       = (string)$loadedXml->onlyoffice->server_port;
 
         if (strpos($checkUrl, "{$masterPath}:{$port}{$lastPath}/cache/files/") !== 0 && (($port != 80 && $port != 443) || strpos($checkUrl, "{$masterPath}{$lastPath}/cache/files/") !== 0)) {
             return $response->withStatus(400)->withJson(['errors' => 'Query params url is not allowed']);
@@ -259,7 +284,7 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice server_port is empty', 'lang' => 'portIsEmpty']);
         }
 
-        $uri = (string)$loadedXml->onlyoffice->server_uri;
+        $uri  = (string)$loadedXml->onlyoffice->server_uri;
         $port = (string)$loadedXml->onlyoffice->server_port;
 
         $aUri = explode("/", $uri);

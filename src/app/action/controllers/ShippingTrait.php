@@ -18,7 +18,9 @@ use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Shipping\controllers\ShippingTemplateController;
@@ -38,8 +40,6 @@ trait ShippingTrait
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
         ValidatorModel::arrayType($args, ['data']);
-
-        $currentUser = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id']]);
 
         $resource = ResModel::getById(['select' => ['destination', 'integrations', 'subject as title', 'external_id', 'res_id', 'version'], 'resId' => $args['resId']]);
         $integrations = json_decode($resource['integrations'], true);
@@ -212,7 +212,7 @@ trait ShippingTrait
                 }
             }
             $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $resourceIdToFind, 'collId' => ($resource['type'] == 'resource' ? 'letterbox_coll' : 'attachments_coll')]);
-            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template']]);
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
             if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
                 $errors[] = "Docserver does not exist for {$resource['type']} {$resId}";
                 continue;
@@ -220,6 +220,13 @@ trait ShippingTrait
             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
             if (!file_exists($pathToDocument) || !is_file($pathToDocument)) {
                 $errors[] = "Document not found on docserver for {$resource['type']} {$resId}";
+                continue;
+            }
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                $errors[] = "Fingerprints do not match for {$resource['type']} {$resId}";
                 continue;
             }
 
@@ -323,7 +330,7 @@ trait ShippingTrait
             ]);
 
             ShippingModel::create([
-                'userId'            => $currentUser['id'],
+                'userId'            => $GLOBALS['id'],
                 'documentId'        => $resId,
                 'documentType'      => $resource['type'],
                 'options'           => json_encode($shippingTemplate['options']),

@@ -663,6 +663,7 @@ export const LANG_FR = {
     "filteredFrom":                                "filtré sur un ensemble de",
     "filters":                                     "Filtres",
     "fingerprint":                                 "Empreinte numérique",
+    "fingerprintsDoNotMatch":                      "Les empreintes numériques ne correspondent pas",
     "firstLevelAdded":                             "Chemise créée",
     "firstLevelAttached":                          "Rattacher à la chemise",
     "firstLevelDeleted":                           "Chemise supprimée",

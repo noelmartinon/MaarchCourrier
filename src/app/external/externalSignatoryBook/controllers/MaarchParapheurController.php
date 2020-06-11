@@ -19,12 +19,14 @@ use Contact\controllers\ContactController;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use History\controllers\HistoryController;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
 use Resource\controllers\ResController;
+use Resource\controllers\StoreController;
 use Resource\controllers\SummarySheetController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -233,7 +235,12 @@ class MaarchParapheurController
                             return ['error' => 'Docserver does not exist ' . $adrInfo['docserver_id']];
                         }
                         $filePath = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
-            
+                        $docserverType = DocserverTypeModel::getById(['id' => $docserverInfo['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                        $fingerprint = StoreController::getFingerPrint(['filePath' => $filePath, 'mode' => $docserverType['fingerprint_mode']]);
+                        if ($adrInfo['fingerprint'] != $fingerprint) {
+                            return ['error' => 'Fingerprints do not match'];
+                        }
+
                         $encodedZipDocument = MaarchParapheurController::createZip(['filepath' => $filePath, 'filename' => $adrInfo['filename']]);
 
                         $nonSignableAttachments[] = [

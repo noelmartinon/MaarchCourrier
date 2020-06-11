@@ -242,7 +242,7 @@ class ResController extends ResourceControlController
     public function update(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['resId'])) {
-            return ['errors' => 'Route resId is not an integer'];
+            return $response->withStatus(400)->withJson(['errors' => 'Route resId is not an integer']);
         } elseif (!PrivilegeController::canUpdateResource(['userId' => $GLOBALS['id'], 'resId' => $args['resId']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
@@ -415,7 +415,7 @@ class ResController extends ResourceControlController
                 'recordId'  => $document['res_id'],
                 'eventType' => 'UP',
                 'info'      => $data['historyMessage'],
-                'moduleId'  => 'res',
+                'moduleId'  => 'resource',
                 'eventId'   => 'resup',
             ]);
         }
@@ -457,7 +457,7 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if ($document['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -475,7 +475,7 @@ class ResController extends ResourceControlController
             'recordId'  => $aArgs['resId'],
             'eventType' => 'VIEW',
             'info'      => _DOC_DISPLAYING . " : {$aArgs['resId']}",
-            'moduleId'  => 'res',
+            'moduleId'  => 'resource',
             'eventId'   => 'resview',
         ]);
 
@@ -562,7 +562,7 @@ class ResController extends ResourceControlController
         }
 
         $convertedDocument = AdrModel::getDocuments([
-            'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
+            'select'    => ['id', 'docserver_id', 'path', 'filename', 'fingerprint'],
             'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
             'data'      => [$args['resId'], $type, $args['version']]
         ]);
@@ -584,7 +584,11 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($convertedDocument['fingerprint']) && $convertedDocument['fingerprint'] != $fingerprint) {
+        if (empty($convertedDocument['fingerprint'])) {
+            AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+            $convertedDocument['fingerprint'] = $fingerprint;
+        }
+        if ($convertedDocument['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -605,7 +609,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'category_id', 'version'], 'resId' => $args['resId']]);
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'category_id', 'version', 'fingerprint'], 'resId' => $args['resId']]);
         if (empty($document)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
         }
@@ -634,7 +638,12 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if (empty($convertedDocument) && empty($document['fingerprint'])) {
+            ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+            $document['fingerprint'] = $fingerprint;
+        }
+
+        if ($document['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -655,7 +664,7 @@ class ResController extends ResourceControlController
             'recordId'  => $args['resId'],
             'eventType' => 'VIEW',
             'info'      => _DOC_DISPLAYING . " : {$args['resId']}",
-            'moduleId'  => 'res',
+            'moduleId'  => 'resource',
             'eventId'   => 'resview',
         ]);
 
@@ -944,7 +953,7 @@ class ResController extends ResourceControlController
         ValidatorModel::intVal($aArgs, ['resId']);
         ValidatorModel::boolType($aArgs, ['original']);
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'subject'], 'resId' => $aArgs['resId']]);
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'subject', 'fingerprint'], 'resId' => $aArgs['resId']]);
 
         if (empty($aArgs['original'])) {
             $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
@@ -969,8 +978,12 @@ class ResController extends ResourceControlController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
-            ['errors' => 'Fingerprints do not match'];
+        if (empty($convertedDocument) && empty($document['fingerprint'])) {
+            ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$aArgs['resId']]]);
+            $document['fingerprint'] = $fingerprint;
+        }
+        if ($document['fingerprint'] != $fingerprint) {
+            return ['errors' => 'Fingerprints do not match'];
         }
 
         $fileContent = file_get_contents($pathToDocument);
@@ -1287,7 +1300,7 @@ class ResController extends ResourceControlController
     public function getProcessingData(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['groupId'])) {
-            return $response->withStatus(403)->withJson(['errors' => 'resId param is not an integer']);
+            return $response->withStatus(403)->withJson(['errors' => 'groupId param is not an integer']);
         }
         if (!Validator::intVal()->validate($args['userId'])) {
             return $response->withStatus(403)->withJson(['errors' => 'userId param is not an integer']);
