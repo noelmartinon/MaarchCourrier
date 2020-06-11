@@ -1232,7 +1232,7 @@ export const LANG_FR = {
     "pricesInformations":                          "Tarifs indicatifs",
     "primary":                                     "Primaire",
     "primaryEntity":                               "Entité primaire",
-    "primaryInformations":                         "Informations pricipales",
+    "primaryInformations":                         "Informations principales",
     "printDate":                                   "Date d'impression",
     "printedFolder":                               "Dossier d'impression",
     "printFolderDoc":                              "Imprimer le dossier complet",

@@ -184,7 +184,7 @@ class SummarySheetController
             ],
             [
                 "unit" => "primaryInformations",
-                "label" => "Informations pricipales"
+                "label" => "Informations principales"
             ],
             [
                 "unit" => "senderRecipientInformations",
