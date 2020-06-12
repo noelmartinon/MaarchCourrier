@@ -18,7 +18,9 @@ use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Shipping\controllers\ShippingTemplateController;
 use Shipping\models\ShippingModel;
@@ -159,6 +161,13 @@ trait ShippingTrait
             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
             if (!file_exists($pathToDocument) || !is_file($pathToDocument)) {
                 $errors[] = "Document not found on docserver for attachment {$attachmentId}";
+                continue;
+            }
+
+            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                $errors[] = "Fingerprints do not match for attachment {$attachmentId}";
                 continue;
             }
 

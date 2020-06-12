@@ -18,6 +18,8 @@ use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
@@ -169,13 +171,30 @@ class ConvertPdfController
         ValidatorModel::boolType($aArgs, ['isVersion']);
 
         $convertedDocument = AdrModel::getConvertedDocumentById([
-            'select'    => ['docserver_id','path', 'filename', 'fingerprint'],
+            'select'    => ['id', 'docserver_id','path', 'filename', 'fingerprint'],
             'resId'     => $aArgs['resId'],
             'collId'    => $aArgs['collId'],
             'type'      => 'PDF',
             'isVersion' => $aArgs['isVersion']
         ]);
-        
+        if (!empty($convertedDocument) && empty($convertedDocument['fingerprint'])) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+            if (is_file($pathToDocument)) {
+                $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+                if ($aArgs['collId'] == 'letterbox_coll') {
+                    AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                } else if ($aArgs['isVersion']) {
+                    AdrModel::updateAttachmentVersionAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                } else {
+                    AdrModel::updateAttachmentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                }
+
+                $convertedDocument['fingerprint'] = $fingerprint;
+            }
+        }
+
         if (empty($convertedDocument)) {
             $convertedDocument = ConvertPdfController::convert([
                 'resId'     => $aArgs['resId'],
