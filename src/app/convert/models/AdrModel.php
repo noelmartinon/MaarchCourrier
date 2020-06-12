@@ -190,6 +190,51 @@ class AdrModel
         return true;
     }
 
+    public static function updateDocumentAdr(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
+
+        DatabaseModel::update([
+            'table' => 'adr_letterbox',
+            'set'   => $args['set'],
+            'where' => $args['where'],
+            'data'  => $args['data']
+        ]);
+
+        return true;
+    }
+
+    public static function updateAttachmentAdr(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
+
+        DatabaseModel::update([
+            'table' => 'adr_attachments',
+            'set'   => $args['set'],
+            'where' => $args['where'],
+            'data'  => $args['data']
+        ]);
+
+        return true;
+    }
+
+    public static function updateAttachmentVersionAdr(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
+
+        DatabaseModel::update([
+            'table' => 'adr_attachments_version',
+            'set'   => $args['set'],
+            'where' => $args['where'],
+            'data'  => $args['data']
+        ]);
+
+        return true;
+    }
+
     public static function deleteDocumentAdr(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['where', 'data']);
