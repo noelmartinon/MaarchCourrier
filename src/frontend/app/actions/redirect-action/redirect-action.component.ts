@@ -167,14 +167,14 @@ export class RedirectActionComponent implements OnInit {
                 })
                 // create the instance
                 .jstree();
-        }, 0);
 
-        if (this.currentEntity.serialId > 0) {
-            setTimeout(() => {
-                $j('#jstree').jstree('select_node', this.currentEntity);
-                this.selectEntity(this.currentEntity, true);
-            }, 200);
-        }
+            if (this.currentEntity.serialId > 0) {
+                setTimeout(() => {
+                    $j('#jstree').jstree('select_node', this.currentEntity);
+                    this.selectEntity(this.currentEntity, true);
+                }, 300);
+            }
+        }, 0);
     }
 
     loadDestUser() {
