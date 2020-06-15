@@ -52,15 +52,12 @@ class IndexingModelController
         $models = IndexingModelModel::get(['where' => $where, 'data' => [$GLOBALS['id'], 'false']]);
 
         foreach ($models as $key => $value) {
-            $models[$key]['used'] = false;
             $resources = ResModel::get([
                 'select'    => [1],
                 'where'     => ['model_id = ?'],
-                'data'      => [$value['model_id']]
+                'data'      => [$value['id']]
             ]);
-            if (!empty($resources)) {
-                $models[$key]['used'] = true;
-            }
+            $models[$key]['used'] = !empty($resources);
         }
 
         return $response->withJson(['indexingModels' => $models]);
