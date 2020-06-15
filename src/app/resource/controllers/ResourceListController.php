@@ -448,6 +448,7 @@ class ResourceListController
                         $methodResponses['errors'] = [];
                     }
                     $methodResponses['errors'] = array_merge($methodResponses['errors'], [$requiredFieldsValid['errors']]);
+                    unset($resourcesForAction[$key]);
                     continue;
                 }
             }
@@ -457,6 +458,7 @@ class ResourceListController
                     $methodResponses['errors'] = [];
                 }
                 $methodResponses['errors'] = array_merge($methodResponses['errors'], ['Fingerprints do not match for resource ' . $resId]);
+                unset($resourcesForAction[$key]);
                 continue;
             }
 
