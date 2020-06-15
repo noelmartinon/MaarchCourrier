@@ -159,7 +159,12 @@ export class RedirectActionComponent implements OnInit {
             });
             $j('#jstree')
                 // listen for event
-                .on('select_node.jstree', (e: any, data: any) => {
+                .on('loaded.jstree', (e: any, data: any) => {
+                    if (this.currentEntity.serialId > 0) {
+                        $j('#jstree').jstree('select_node', this.currentEntity);
+                        this.selectEntity(this.currentEntity, true);
+                    }
+                }).on('select_node.jstree', (e: any, data: any) => {
                     this.selectEntity(data.node.original);
 
                 }).on('deselect_node.jstree', (e: any, data: any) => {
@@ -167,13 +172,6 @@ export class RedirectActionComponent implements OnInit {
                 })
                 // create the instance
                 .jstree();
-
-            if (this.currentEntity.serialId > 0) {
-                setTimeout(() => {
-                    $j('#jstree').jstree('select_node', this.currentEntity);
-                    this.selectEntity(this.currentEntity, true);
-                }, 300);
-            }
         }, 0);
     }
 
