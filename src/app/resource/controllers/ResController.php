@@ -405,7 +405,7 @@ class ResController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename'], 'resId' => $aArgs['resId']]);
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'fingerprint'], 'resId' => $aArgs['resId']]);
         $extDocument = ResModel::getExtById(['select' => ['category_id', 'alt_identifier'], 'resId' => $aArgs['resId']]);
         if (empty($document) || empty($extDocument)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
