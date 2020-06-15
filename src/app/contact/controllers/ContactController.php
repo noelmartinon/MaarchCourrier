@@ -279,6 +279,29 @@ class ContactController
         $filling = ContactController::getFillingRate(['contactId' => $rawContact['id']]);
         $contact['fillingRate'] = empty($filling) ? null : $filling;
 
+        $queryParams = $request->getQueryParams();
+        if (!empty($queryParams['resourcesCount'])) {
+            $inResources = ResourceContactModel::get([
+                'select' => ['item_id'],
+                'where'  => ['item_id = ?', 'type = ?'],
+                'data'   => [$args['id'], 'contact']
+            ]);
+
+            $inAcknowledgementReceipts = AcknowledgementReceiptModel::get([
+                'select' => ['contact_id'],
+                'where'  => ['contact_id = ?'],
+                'data'   => [$args['id']]
+            ]);
+
+            $inAttachments = AttachmentModel::get([
+                'select' => ['recipient_id'],
+                'where'  => ['recipient_id = ?', 'recipient_type = ?'],
+                'data'   => [$args['id'], 'contact']
+            ]);
+
+            $contact['resourcesCount'] = count($inResources) + count($inAcknowledgementReceipts) + count($inAttachments);
+        }
+
         return $response->withJson($contact);
     }
 
