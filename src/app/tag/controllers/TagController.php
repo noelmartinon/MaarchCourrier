@@ -227,11 +227,13 @@ class TagController
             }
 
             $newLinks = array_diff($links, $tag['links']);
-            TagModel::update([
-                'postSet'   => ['links' => "jsonb_insert(links, '{0}', '\"{$args['id']}\"')"],
-                'where'     => ['id in (?)', "(links @> ?) = false"],
-                'data'      => [$newLinks, "\"{$args['id']}\""]
-            ]);
+            if (!empty($newLinks)) {
+                TagModel::update([
+                    'postSet' => ['links' => "jsonb_insert(links, '{0}', '\"{$args['id']}\"')"],
+                    'where'   => ['id in (?)', "(links @> ?) = false"],
+                    'data'    => [$newLinks, "\"{$args['id']}\""]
+                ]);
+            }
         }
 
         if (!empty($tag['links'])) {
