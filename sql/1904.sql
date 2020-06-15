@@ -327,7 +327,6 @@ DO $$ BEGIN
   END IF;
 END$$;
 
-DELETE FROM usergroups WHERE enabled = 'N';
 DELETE FROM groupbasket where group_id in (select group_id from usergroups where enabled = 'N');
 DELETE FROM groupbasket_redirect where group_id in (select group_id from usergroups where enabled = 'N');
 DELETE FROM usergroup_content where group_id in (select group_id from usergroups where enabled = 'N');
