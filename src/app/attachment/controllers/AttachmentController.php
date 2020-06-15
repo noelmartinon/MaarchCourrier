@@ -280,7 +280,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::getOnView([
-            'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename'],
+            'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename', 'fingerprint'],
             'where'     => ['res_id = ? or res_id_version = ?', 'res_id_master = ?', 'status not in (?)'],
             'data'      => [$aArgs['resId'], $aArgs['resId'], $aArgs['resIdMaster'], ['DEL']],
             'limit'     => 1
