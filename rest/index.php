@@ -460,8 +460,6 @@ $app->get('/tags/{id}', \Tag\controllers\TagController::class . ':getById');
 $app->put('/tags/{id}', \Tag\controllers\TagController::class . ':update');
 $app->put('/mergeTags', \Tag\controllers\TagController::class . ':merge');
 $app->delete('/tags/{id}', \Tag\controllers\TagController::class . ':delete');
-$app->put('/tags/{id}/link', \Tag\controllers\TagController::class . ':link');
-$app->delete('/tags/{tagId}/link/{id}', \Tag\controllers\TagController::class . ':unLink');
 
 //Templates
 $app->get('/templates', \Template\controllers\TemplateController::class . ':get');
