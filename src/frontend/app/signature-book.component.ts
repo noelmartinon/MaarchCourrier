@@ -596,7 +596,7 @@ export class SignatureBookComponent implements OnInit {
         this.http.get(viewerLink)
             .pipe(
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe()

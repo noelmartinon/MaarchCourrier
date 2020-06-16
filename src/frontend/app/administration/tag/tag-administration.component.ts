@@ -49,7 +49,7 @@ export class TagAdministrationComponent implements OnInit {
 
     currTagChildren: any = [];
 
-    @ViewChild('linkedTagInput', { static: true }) linkedTagInput: ElementRef<HTMLInputElement>;
+    @ViewChild('linkedTagInput', { static: false }) linkedTagInput: ElementRef<HTMLInputElement>;
 
     constructor(
         public http: HttpClient,
