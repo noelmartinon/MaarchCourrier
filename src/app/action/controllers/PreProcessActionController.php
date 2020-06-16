@@ -802,37 +802,53 @@ class PreProcessActionController
                             'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailConversion'
                         ];
                     } else {
-                        $resourceContacts = ResourceContactModel::get([
-                            'where' => ['res_id = ?', 'mode = ?', 'type = ?'],
-                            'data'  => [$valueResId, 'recipient', 'contact']
-                        ]);
-                        if (empty($resourceContacts)) {
+                        $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+                        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+                        if (!is_file($pathToDocument)) {
                             $canNotSend[] = [
-                                'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailContact'
+                                'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailConversion'
                             ];
                         } else {
-                            foreach ($resourceContacts as $resourceContact) {
-                                $contact = ContactModel::getById(['select' => ['*'], 'id' => $resourceContact['item_id']]);
-                                if (empty($contact)) {
+                            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+                            if ($convertedDocument['fingerprint'] != $fingerprint) {
+                                $canNotSend[] = [
+                                    'resId' => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'fingerprintsDoNotMatch'
+                                ];
+                            } else {
+                                $resourceContacts = ResourceContactModel::get([
+                                    'where' => ['res_id = ?', 'mode = ?', 'type = ?'],
+                                    'data' => [$valueResId, 'recipient', 'contact']
+                                ]);
+                                if (empty($resourceContacts)) {
                                     $canNotSend[] = [
-                                        'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailContact'
-                                    ];
-                                } elseif (!empty($contact['address_country']) && strtoupper(trim($contact['address_country'])) != 'FRANCE') {
-                                    $canNotSend[] = [
-                                        'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noFranceContact'
+                                        'resId' => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailContact'
                                     ];
                                 } else {
-                                    $afnorAddress = ContactController::getContactAfnor($contact);
-                                    if ((empty($afnorAddress[1]) && empty($afnorAddress[2])) || empty($afnorAddress[6]) || !preg_match("/^\d{5}\s/", $afnorAddress[6])) {
-                                        $canNotSend[] = [
-                                            'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'incompleteAddressForPostal'
-                                        ];
+                                    foreach ($resourceContacts as $resourceContact) {
+                                        $contact = ContactModel::getById(['select' => ['*'], 'id' => $resourceContact['item_id']]);
+                                        if (empty($contact)) {
+                                            $canNotSend[] = [
+                                                'resId' => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailContact'
+                                            ];
+                                        } elseif (!empty($contact['address_country']) && strtoupper(trim($contact['address_country'])) != 'FRANCE') {
+                                            $canNotSend[] = [
+                                                'resId' => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noFranceContact'
+                                            ];
+                                        } else {
+                                            $afnorAddress = ContactController::getContactAfnor($contact);
+                                            if ((empty($afnorAddress[1]) && empty($afnorAddress[2])) || empty($afnorAddress[6]) || !preg_match("/^\d{5}\s/", $afnorAddress[6])) {
+                                                $canNotSend[] = [
+                                                    'resId' => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'incompleteAddressForPostal'
+                                                ];
+                                            }
+                                        }
                                     }
                                 }
+                                $resInfo['type'] = 'mail';
+                                $resources[] = $resInfo;
                             }
                         }
-                        $resInfo['type'] = 'mail';
-                        $resources[] = $resInfo;
                     }
                 }
                 if (!$documentToSend) {
