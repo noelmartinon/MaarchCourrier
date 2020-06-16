@@ -215,6 +215,7 @@ export class ContactExportComponent implements OnInit {
             JSON.parse(this.localStorage.get(`exportContactFields_${this.headerService.user.id}`)).data.forEach((element: any) => {
                 this.addData(element);
             });
+            this.exportModel.delimiter = JSON.parse(this.localStorage.get(`exportContactFields_${this.headerService.user.id}`)).delimiter;
         }
     }
 }
