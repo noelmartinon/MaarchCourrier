@@ -38,7 +38,7 @@
                                     [matAutocomplete]="auto" [matChipInputFor]="chipList">
                             </mat-chip-list>
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                                <mat-option *ngFor="let tag of filteredOptions | async" [value]="tag"  [disabled]="isSelected(tag)">
+                                <mat-option *ngFor="let tag of filteredOptions | async" [value]="tag"  [disabled]="isSelected(tag) || tag.id == id">
                                     {{tag.label}}
                                 </mat-option>
                             </mat-autocomplete>

@@ -63,19 +63,19 @@ export class TagAdministrationComponent implements OnInit {
     ) {
     }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
         this.loading = true;
 
-        await this.getTags();
 
-        this.route.params.subscribe((params) => {
+        this.route.params.subscribe(async (params) => {
+            this.id = params['id'];
+            await this.getTags();
             if (typeof params['id'] === 'undefined') {
                 this.headerService.setHeader(this.lang.tagCreation);
                 this.creationMode = true;
                 this.loading = false;
             } else {
                 this.creationMode = false;
-                this.id = params['id'];
                 this.http.get(`../../rest/tags/${this.id}`).pipe(
                     tap((data: any) => {
                         Object.keys(this.tag).forEach(element => {
@@ -148,12 +148,13 @@ export class TagAdministrationComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../../rest/tags').pipe(
                 tap((data: any) => {
-                    this.tags = data.tags.filter((tag: any) => tag.id !== this.id).map((tag: any) => {
+                    this.tags = data.tags.map((tag: any) => {
                         return {
                             id: tag.id,
                             label: tag.label,
                             parentId: tag.parentId,
-                            countResources: tag.countResources
+                            countResources: tag.countResources,
+                            disabled: tag.id == this.id
                         };
                     });
                     resolve(true);
