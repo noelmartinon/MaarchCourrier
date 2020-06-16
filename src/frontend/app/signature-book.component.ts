@@ -434,6 +434,7 @@ export class SignatureBookComponent implements OnInit {
                     this.showSignaturesPanel = false;
                     this.loadingSign = false;
                 }, (error: any) => {
+                    this.notify.handleSoftErrors(error);
                     this.loadingSign = false;
                 });
         }
@@ -589,5 +590,9 @@ export class SignatureBookComponent implements OnInit {
     ngOnDestroy() {
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();
+    }
+
+    pdfViewerError() {
+        this.notify.error('Fingerprints do not match');
     }
 }
