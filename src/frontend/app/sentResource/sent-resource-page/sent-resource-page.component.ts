@@ -3,9 +3,8 @@ import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core'
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
-import { Observable, of } from 'rxjs';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatChipInputEvent } from '@angular/material';
-import { switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../service/functions.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -14,13 +13,14 @@ import { AppService } from '../../../service/app.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { PrivilegeService } from '../../../service/privileges.service';
 import { HeaderService } from '../../../service/header.service';
+import { Observable, of } from 'rxjs';
 
 declare function $j(selector: any): any;
 declare var tinymce: any;
 
 @Component({
     selector: 'app-sent-resource-page',
-    templateUrl: "sent-resource-page.component.html",
+    templateUrl: 'sent-resource-page.component.html',
     styleUrls: ['sent-resource-page.component.scss'],
     providers: [ContactService, AppService],
 })
@@ -132,7 +132,7 @@ export class SentResourcePageComponent implements OnInit {
                 this.setDefaultInfo();
             }
         }
-        //this.loading = false;
+        // this.loading = false;
         setTimeout(() => {
             this.initMce();
         }, 0);
@@ -140,7 +140,7 @@ export class SentResourcePageComponent implements OnInit {
 
     initMce() {
         tinymce.init({
-            selector: "textarea#emailSignature",
+            selector: 'textarea#emailSignature',
             base_url: '../../node_modules/tinymce/',
             setup: (editor: any) => {
                 editor.on('init', (e: any) => {
@@ -158,7 +158,7 @@ export class SentResourcePageComponent implements OnInit {
                 'autolink'
             ],
             external_plugins: {
-                'maarch_b64image': "../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js"
+                'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
             },
             toolbar_sticky: true,
             toolbar_drawer: 'floating',
@@ -209,7 +209,7 @@ export class SentResourcePageComponent implements OnInit {
                         return {
                             label: contact.contact,
                             email: contact.email
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -236,7 +236,7 @@ export class SentResourcePageComponent implements OnInit {
         this.http.post(`../../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resId } }).pipe(
             tap((data: any) => {
 
-                var div = document.createElement('div');
+                const div = document.createElement('div');
 
                 div.innerHTML = tinymce.get('emailSignature').getContent();
 
@@ -268,7 +268,7 @@ export class SentResourcePageComponent implements OnInit {
 
         this.http.get(`../../rest/currentUser/emailSignatures/${templateId}`).pipe(
             tap((data: any) => {
-                var div = document.createElement('div');
+                const div = document.createElement('div');
 
                 div.innerHTML = tinymce.get('emailSignature').getContent();
 
@@ -312,21 +312,21 @@ export class SentResourcePageComponent implements OnInit {
                             label: item,
                             email: item,
                             badFormat: this.isBadEmailFormat(item)
-                        }
+                        };
                     });
                     this.copies = data.cc.map((item: any) => {
                         return {
                             label: item,
                             email: item,
                             badFormat: this.isBadEmailFormat(item)
-                        }
+                        };
                     });
                     this.invisibleCopies = data.cci.map((item: any) => {
                         return {
                             label: item,
                             email: item,
                             badFormat: this.isBadEmailFormat(item)
-                        }
+                        };
                     });
 
                     this.showCopies = this.copies.length > 0;
@@ -355,7 +355,7 @@ export class SentResourcePageComponent implements OnInit {
                                             format: dataAttach.original || dataAttach.original === undefined ? item.format : 'pdf',
                                             original: dataAttach.original,
                                             size: dataAttach.original || dataAttach.original === undefined ? item.size : item.convertedDocument.size
-                                        }
+                                        };
                                     }));
                                 }
                             });
@@ -363,7 +363,7 @@ export class SentResourcePageComponent implements OnInit {
                             this.emailAttach.document.isLinked = true;
                             this.emailAttach.document.format = data.document.original || data.document.original === undefined ? this.emailAttachTool.document.list[0].format : 'pdf',
                                 this.emailAttach.document.original = data.document.original;
-                            this.emailAttach.document.size = this.emailAttach.document.original ? this.emailAttachTool.document.list[0].size : this.emailAttachTool.document.list[0].convertedDocument.size
+                            this.emailAttach.document.size = this.emailAttach.document.original ? this.emailAttachTool.document.list[0].size : this.emailAttachTool.document.list[0].convertedDocument.size;
                         }
                     });
 
@@ -455,7 +455,7 @@ export class SentResourcePageComponent implements OnInit {
                             label: this.contactService.formatContact(data),
                             email: data.email
                         }
-                    )
+                    );
                 }
             }),
             catchError((err) => {
@@ -500,7 +500,7 @@ export class SentResourcePageComponent implements OnInit {
                                     ...item,
                                     original: item.original !== undefined ? item.original : true,
                                     title: item.chrono !== undefined ? `${item.chrono} - ${item.label} (${item.typeLabel})` : `${item.label} (${item.typeLabel})`
-                                }
+                                };
                             });
                         }
                     });
@@ -527,7 +527,7 @@ export class SentResourcePageComponent implements OnInit {
             }),
             filter(value => value.length > 2),
             distinctUntilChanged(),
-            switchMap(data => this.http.get('../../rest/autocomplete/correspondents', { params: { "search": data, "searchEmails": 'true' } })),
+            switchMap(data => this.http.get('../../rest/autocomplete/correspondents', { params: { 'search': data, 'searchEmails': 'true' } })),
             tap((data: any) => {
                 data = data.filter((contact: any) => !this.functions.empty(contact.email) || contact.type === 'contactGroup').map((contact: any) => {
                     let label = '';
@@ -547,7 +547,7 @@ export class SentResourcePageComponent implements OnInit {
                         type: contact.type,
                         label: label,
                         email: contact.email
-                    }
+                    };
                 });
                 this.filteredEmails = of(data);
             }),
@@ -623,7 +623,11 @@ export class SentResourcePageComponent implements OnInit {
                 if (closeModal) {
                     this.closeModal('success');
                 }
-
+            }),
+            finalize(() => {
+                if (this.emailStatus === 'DRAFT') {
+                    this.closeModal('success');
+                }
             }),
             catchError((err) => {
                 this.notify.handleSoftErrors(err);
@@ -659,6 +663,11 @@ export class SentResourcePageComponent implements OnInit {
                 }
 
                 if (closeModal) {
+                    this.closeModal('success');
+                }
+            }),
+            finalize(() => {
+                if (this.emailStatus === 'DRAFT') {
                     this.closeModal('success');
                 }
             }),
@@ -755,21 +764,21 @@ export class SentResourcePageComponent implements OnInit {
                         id: this.emailAttach[element].id,
                         isLinked: this.emailAttach[element].isLinked,
                         original: this.emailAttach[element].original
-                    }
+                    };
                 } else if (element === 'notes') {
-                    objAttach[element] = this.emailAttach[element].map((item: any) => item.id)
+                    objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
                 } else {
                     objAttach[element] = this.emailAttach[element].map((item: any) => {
                         return {
                             id: item.id,
                             original: item.original
-                        }
-                    })
+                        };
+                    });
                 }
             }
         });
 
-        let formatSender = {
+        const formatSender = {
             email: this.currentSender.email,
             entityId: !this.functions.empty(this.currentSender.entityId) ? this.currentSender.entityId : null
         };
@@ -831,13 +840,13 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     onPaste(event: ClipboardEvent, type: string) {
-        let clipboardData = event.clipboardData;
-        let pastedText = clipboardData.getData('text');
+        const clipboardData = event.clipboardData;
+        const pastedText = clipboardData.getData('text');
         this.formatEmailAddress(pastedText, type);
     }
 
     formatEmailAddress(rawAddresses: string, type: string) {
-        let arrRawAdd: string[] = rawAddresses.split(/[,;]+/);
+        const arrRawAdd: string[] = rawAddresses.split(/[,;]+/);
 
         if (!this.functions.empty(arrRawAdd)) {
 
