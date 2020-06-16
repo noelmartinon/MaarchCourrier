@@ -10,7 +10,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { LocalStorageService } from '../../../../../service/local-storage.service';
 import { HeaderService } from '../../../../../service/header.service';
 
-declare var $: any;
+declare function $j(selector: any): any;
 
 @Component({
     templateUrl: 'contact-export.component.html',
@@ -116,8 +116,8 @@ export class ContactExportComponent implements OnInit {
             let realIndex = event.previousIndex;
             if (event.container.id === 'selectedElements') {
                 realIndex = 0;
-                if ($('.available-data .columns')[event.previousIndex] !== undefined) {
-                    const fakeIndex = $('.available-data .columns')[event.previousIndex].id;
+                if ($j('.available-data .columns')[event.previousIndex] !== undefined) {
+                    const fakeIndex = $j('.available-data .columns')[event.previousIndex].id;
                     realIndex = this.dataAvailable.map((dataAv: any) => (dataAv.value)).indexOf(fakeIndex);
                 }
             }
