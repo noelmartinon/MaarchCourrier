@@ -5,7 +5,7 @@ import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../service/functions.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -625,7 +625,11 @@ export class SentResourcePageComponent implements OnInit {
                 if (closeModal) {
                     this.closeModal('success');
                 }
-
+            }),
+            finalize(() => {
+                if (this.emailStatus === 'DRAFT') {
+                    this.closeModal('success');
+                }
             }),
             catchError((err) => {
                 this.notify.handleSoftErrors(err);
@@ -661,6 +665,11 @@ export class SentResourcePageComponent implements OnInit {
                 }
 
                 if (closeModal) {
+                    this.closeModal('success');
+                }
+            }),
+            finalize(() => {
+                if (this.emailStatus === 'DRAFT') {
                     this.closeModal('success');
                 }
             }),

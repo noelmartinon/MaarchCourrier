@@ -116,6 +116,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
     onSubmit() {
         const fields = this.indexingForm.getDatas();
         fields.forEach((element, key) => {
+            fields[key].default_value = ['string', 'integer', 'date'].indexOf(fields[key].type) > -1 && fields[key].SQLMode ? null : fields[key].default_value;
             delete fields[key].event;
             delete fields[key].label;
             delete fields[key].system;

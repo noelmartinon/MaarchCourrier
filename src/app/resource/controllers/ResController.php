@@ -972,7 +972,7 @@ class ResController extends ResourceControlController
             $document['fingerprint'] = $fingerprint;
         }
         if ($document['fingerprint'] != $fingerprint) {
-            ['errors' => 'Fingerprints do not match'];
+            return ['errors' => 'Fingerprints do not match'];
         }
 
         $fileContent = file_get_contents($pathToDocument);
@@ -1351,7 +1351,7 @@ class ResController extends ResourceControlController
             return false;
         }
 
-        $resourceModelFields = $args['oldFieldList'];
+        $oldFieldList = $args['oldFieldList'];
         $newModelFields = $args['newFieldList'];
 
         // Set res_letterbox fields to null
@@ -1367,7 +1367,7 @@ class ResController extends ResourceControlController
             'priority'           => 'priority'
         ];
         foreach ($setToNull as $key => $field) {
-            if (in_array($field, $resourceModelFields) && !in_array($field, $newModelFields)) {
+            if (in_array($field, $oldFieldList) && !in_array($field, $newModelFields)) {
                 $set[$key] = null;
             }
         }
@@ -1380,11 +1380,34 @@ class ResController extends ResourceControlController
                 break;
             }
         }
-        if (!empty($resource['custom_fields']) && !$newModelHasCustomFields) {
-            $set['custom_fields'] = '{}';
+
+        $oldModelHasCustomFields = false;
+        foreach ($oldFieldList as $oldModelField) {
+            if (strpos($oldModelField, 'indexingCustomField_') !== false) {
+                $oldModelHasCustomFields = true;
+                break;
+            }
         }
 
-        if (!empty($set)) {
+        $postSet = [];
+        if ($oldModelHasCustomFields && !$newModelHasCustomFields) {
+            $set['custom_fields'] = '{}';
+        } else {
+            $customFieldsToDelete = array_diff($oldFieldList, $newModelFields);
+            $customFieldsToDelete = array_filter($customFieldsToDelete, function ($field) {
+                return strpos($field, 'indexingCustomField_') !== false;
+            });
+            $customFieldsToDelete = array_map(function ($field) {
+                return explode('_', $field)[1];
+            }, $customFieldsToDelete);
+
+            $postSet['custom_fields'] = 'custom_fields ';
+            foreach ($customFieldsToDelete as $item) {
+                $postSet['custom_fields'] .= " - '$item'";
+            }
+        }
+
+        if (!empty($set) || !empty($postSet)) {
             $where = [];
             $data = [];
             if (!empty($args['resId'])) {
@@ -1394,7 +1417,7 @@ class ResController extends ResourceControlController
                 $where = ['model_id = ?'];
                 $data = [$args['modelId']];
             }
-            ResModel::update(['set' => $set, 'where' => $where, 'data' => $data]);
+            ResModel::update(['set' => $set, 'postSet' => $postSet, 'where' => $where, 'data' => $data]);
         }
 
         return true;

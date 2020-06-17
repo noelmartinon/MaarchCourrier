@@ -1,0 +1,49 @@
+<div class="stepContent">
+    <h2 class="stepContentTitle"><i class="fa fa-database"></i> Base de données</h2>
+    <p>
+        Maarch Courrier nécessite une connexion à une base de données afin de stocker les métas-données des documents
+        stockés ainsi que la configuration de l'application.
+    </p>
+    <form [formGroup]="stepFormGroup" style="display: contents;">
+        <mat-accordion>
+            <mat-expansion-panel [expanded]="!connectionState">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Connexion à la base de données
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-form-field appearance="outline" style="color: initial;">
+                    <mat-label>Serveur</mat-label>
+                    <input matInput formControlName="dbHostCtrl">
+                </mat-form-field>
+                <mat-form-field appearance="outline" style="color: initial;">
+                    <mat-label>Port</mat-label>
+                    <input matInput formControlName="dbPortCtrl">
+                </mat-form-field>
+                <mat-form-field appearance="outline" style="color: initial;">
+                    <mat-label>Utilisateur</mat-label>
+                    <input matInput formControlName="dbLoginCtrl">
+                </mat-form-field>
+                <mat-form-field appearance="outline" style="color: initial;">
+                    <mat-label>Mot de passe</mat-label>
+                    <input matInput formControlName="dbPasswordCtrl">
+                </mat-form-field>
+                <div style="text-align: center;">
+                    <button mat-raised-button type="button" color="default" (click)="checkConnection()">Tester la
+                        connexion</button>
+                </div>
+            </mat-expansion-panel>
+            <mat-expansion-panel [disabled]="!connectionState" [expanded]="connectionState">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Base de donnée de l'application
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-form-field appearance="outline" style="color: moccasin;">
+                    <mat-label>Nom de la base de données</mat-label>
+                    <input matInput formControlName="dbNameCtrl">
+                </mat-form-field>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </form>
+</div>

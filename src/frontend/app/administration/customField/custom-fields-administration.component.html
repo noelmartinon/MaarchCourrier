@@ -46,7 +46,8 @@
                                     <div class="col-md-12" style="display: flex;align-items: center;">
                                         <div style="flex:1;"
                                             *ngIf="['select', 'radio', 'checkbox'].indexOf(custom.type) > -1">
-                                            <mat-expansion-panel *ngIf="!custom.bddMode" class="customFieldValues" opened>
+                                            <mat-expansion-panel *ngIf="!custom.SQLMode" class="customFieldValues"
+                                                opened>
                                                 <mat-expansion-panel-header>
                                                     <mat-panel-title [matBadge]="custom.values.length"
                                                         matBadgeSize="small">
@@ -82,43 +83,63 @@
                                             </mat-expansion-panel>
                                         </div>
                                         <div>
-                                            <button *ngIf="!custom.bddMode" mat-mini-fab color="primary" (click)="switchBddMode(custom)">
+                                            <button *ngIf="!custom.SQLMode && 'banAutocomplete' !== custom.type"
+                                                mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
                                                 <mat-icon class="fas fa-database" style="height: auto;"></mat-icon>
                                             </button>
                                         </div>
                                     </div>
-                                    <div *ngIf="custom.bddMode" class="col-md-12" style="display: flex;align-items: center;">
+                                    <div *ngIf="custom.SQLMode" class="col-md-12"
+                                        style="display: flex;align-items: center;">
                                         <div style="flex:1;">
-                                            <mat-expansion-panel *ngIf="custom.bddMode" class="customFieldValues" opened>
+                                            <mat-expansion-panel *ngIf="custom.SQLMode" class="customFieldValues"
+                                                opened>
                                                 <mat-expansion-panel-header>
                                                     <mat-panel-title>
-                                                        Base de données
+                                                        {{lang.database}}
                                                     </mat-panel-title>
                                                 </mat-expansion-panel-header>
                                                 <div class="col-md-12">
-                                                    <div style="display: flex;">
+                                                    <div style="display: flex;flex-direction: column;">
                                                         <mat-form-field>
-                                                            <mat-label>Table cible</mat-label>
-                                                            <mat-select [(ngModel)]="custom.values.table">
-                                                                <mat-option *ngFor="let table of availaibleTables"
-                                                                    [value]="table">
-                                                                    {{lang[table]}}
+                                                            <mat-label>{{lang.targetTable}}</mat-label>
+                                                            <mat-select [(ngModel)]="custom.values.table" required>
+                                                                <mat-option *ngFor="let table of availaibleTables | keyvalue"
+                                                                    [value]="table.key">
+                                                                    {{lang[table.key]}}
                                                                 </mat-option>
                                                             </mat-select>
                                                         </mat-form-field>
-                                                        <mat-form-field>
-                                                            <mat-label>Label cible</mat-label>
-                                                            <mat-select [(ngModel)]="custom.values.label">
-                                                                <mat-option *ngFor="let column of availaibleColumns"
-                                                                    [value]="column">
-                                                                    {{column}}
-                                                                </mat-option>
-                                                            </mat-select>
-                                                        </mat-form-field>
-                                                        <mat-form-field>
-                                                            <mat-label>Identifiant cible</mat-label>
-                                                            <mat-select [(ngModel)]="custom.values.key">
-                                                                <mat-option *ngFor="let column of availaibleColumns"
+                                                        <div style="width:100%;padding-bottom: 20px;" *ngIf="custom.values.table">
+                                                            <mat-label
+                                                                style="font-size: 75%;color: rgba(0,0,0,0.54);width: 100%;display: block;">
+                                                                {{lang.targetLabel}} *</mat-label>
+                                                            <span *ngFor="let item of custom.values.label;let i=index">
+                                                                <input style="min-width: 8px;"
+                                                                    [style.width.px]="(item.delimiterStart.length + 1) * 8"
+                                                                    [(ngModel)]="item.delimiterStart" />
+                                                                <mat-chip (removed)="removeColumnLabel(custom.values.label, i)">
+                                                                    {{item.column}}
+                                                                    <mat-icon matChipRemove class="fa fa-times-circle">
+                                                                    </mat-icon>
+                                                                </mat-chip>
+                                                                <input style="min-width: 8px;"
+                                                                    [style.width.px]="(item.delimiterEnd.length + 1) * 8"
+                                                                    [(ngModel)]="item.delimiterEnd" />
+                                                            </span>
+                                                            <button mat-button [matMenuTriggerFor]="menu" color="primary">
+                                                                <i class="fa fa-plus-circle"></i> Ajouter une colonne
+                                                            </button>
+                                                            <mat-menu #menu="matMenu">
+                                                                <button mat-menu-item
+                                                                    *ngFor="let column of availaibleTables[custom.values.table]" (click)="addColumnLabel(custom.values.label, column)">{{column}}</button>
+                                                            </mat-menu>
+
+                                                        </div>
+                                                        <mat-form-field *ngIf="custom.values.table">
+                                                            <mat-label>{{lang.targetIdentifier}}</mat-label>
+                                                            <mat-select [(ngModel)]="custom.values.key" required>
+                                                                <mat-option *ngFor="let column of availaibleTables[custom.values.table]"
                                                                     [value]="column">
                                                                     {{column}}
                                                                 </mat-option>
@@ -126,15 +147,15 @@
                                                         </mat-form-field>
                                                     </div>
                                                     <mat-form-field>
-                                                        <mat-label>Clause where</mat-label>
+                                                        <mat-label>{{lang.clause}}</mat-label>
                                                         <textarea matInput [(ngModel)]="custom.values.clause"
-                                                            placeholder="Ex. status='OK'"></textarea>
+                                                            placeholder="Ex. status='OK'" required></textarea>
                                                     </mat-form-field>
                                                 </div>
                                             </mat-expansion-panel>
                                         </div>
                                         <div>
-                                            <button mat-mini-fab color="primary" (click)="switchBddMode(custom)">
+                                            <button mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
                                                 <mat-icon class="fas fa-list-ol" style="height: auto;"></mat-icon>
                                             </button>
                                         </div>
@@ -142,7 +163,7 @@
                                     <div class="col-md-12 text-center">
                                         <button mat-raised-button color="primary"
                                             (click)="updateCustomField(custom,indexCustom)"
-                                            [disabled]="isModified(custom,indexCustom)">{{lang.update}}</button>
+                                            [disabled]="isModified(custom,indexCustom) || !isValidField(custom)">{{lang.update}}</button>
                                         <button mat-raised-button color="warn"
                                             (click)="removeCustomField(indexCustom)">{{lang.delete}}</button>
                                     </div>

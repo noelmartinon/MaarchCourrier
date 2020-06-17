@@ -372,12 +372,12 @@ class ContactControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
 
-        $this->assertSame(11, $responseBody['realCount']);
-        $this->assertSame(11, $responseBody['returnedCount']);
+        $this->assertSame(6, $responseBody['realCount']);
+        $this->assertSame(6, $responseBody['returnedCount']);
 
         $this->assertIsArray($responseBody['contacts']);
         $this->assertNotEmpty($responseBody['contacts']);
-        $this->assertSame(11, count($responseBody['contacts']));
+        $this->assertSame(6, count($responseBody['contacts']));
 
         $dunderMifflinDuplicates = array_filter($responseBody['contacts'], function ($contact) {
             return $contact['company'] == 'Dunder Mifflin Paper Company Inc.';

@@ -149,7 +149,7 @@ class ConvertPdfController
             ]);
         }
 
-        return ['docserver_id' => $storeResult['docserver_id'], 'path' => $storeResult['destination_dir'], 'filename' => $storeResult['file_destination_name']];
+        return ['docserver_id' => $storeResult['docserver_id'], 'path' => $storeResult['destination_dir'], 'filename' => $storeResult['file_destination_name'], 'fingerprint' => $storeResult['fingerPrint']];
     }
 
     public static function convertFromEncodedResource(array $aArgs)

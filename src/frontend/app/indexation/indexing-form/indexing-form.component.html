@@ -50,7 +50,7 @@
                             </div>
                             <div class="fieldInput" [class.textareaInput]="field.type === 'string'" [class.checkboxInput]="field.type === 'checkbox'">
                                 <ng-container *ngIf="field.type === 'string'">
-                                    <button mat-button color="primary" *ngIf="field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
                                         disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
@@ -66,7 +66,7 @@
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'integer'">
-                                    <button mat-button color="primary" *ngIf="field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
                                         disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
@@ -81,7 +81,7 @@
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'select'">
-                                    <button mat-button color="primary" *ngIf="field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
                                         disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
@@ -94,13 +94,13 @@
                                     </plugin-select-search>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'date'">
-                                    <button mat-button color="primary" *ngIf="field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
                                         disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
                                     </button>
-                                    <button mat-button color="primary" *ngIf="adminMode && !field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary" *ngIf="adminMode && !field.SQLMode" matPrefix mat-icon-button
                                         (click)="$event.stopPropagation();toggleTodayDate(field);"
                                         [matTooltip]="lang.todayDate" style="position: absolute;left: -40px;">
                                         <mat-icon color="primary"
@@ -130,7 +130,7 @@
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'radio'">
-                                    <button mat-button color="primary" *ngIf="field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
                                         disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
@@ -149,7 +149,7 @@
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'checkbox'">
-                                    <button mat-button color="primary" *ngIf="field.bddMode" matPrefix mat-icon-button
+                                    <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
                                         disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
@@ -158,7 +158,7 @@
                                     <div class="input-form checkbox-form">
                                         <mat-selection-list #shoes class="div-list"
                                             [formControl]="arrFormControl[field.identifier]">
-                                            <mat-list-option *ngFor="let value of field.values" [value]="value.id"
+                                            <mat-list-option color="primary" *ngFor="let value of field.values" [value]="value.id"
                                                 checkboxPosition="before">
                                                 {{value.label}}
                                             </mat-list-option>
@@ -167,7 +167,7 @@
                                     <mat-chip-list class="checkbox-selected-list"
                                         [disabled]="field.system && adminMode">
                                         <mat-chip *ngFor="let chip of shoes.selectedOptions.selected" selected>
-                                            {{chip.value}}
+                                            {{getCheckboxListLabel(chip.value, field.values)}}
                                         </mat-chip>
                                     </mat-chip-list>
                                 </ng-container>

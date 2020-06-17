@@ -333,6 +333,8 @@ class ContactController
                 $body['communicationMeans'] = ['email' => $body['communicationMeans']];
             } elseif (filter_var($body['communicationMeans'], FILTER_VALIDATE_URL)) {
                 $body['communicationMeans'] = ['url' => $body['communicationMeans']];
+            } else {
+                unset($body['communicationMeans']);
             }
         }
 
@@ -917,7 +919,7 @@ class ContactController
         foreach ($criteria as $criterion) {
             $subQuery = "SELECT " . $criterion . ' as field FROM contacts c GROUP BY field HAVING count(*) > 1';
 
-            $where[] = $criterion . " in (" . $subQuery . ") ";
+            $where[] = $criterion . " in (" . $subQuery . ") AND " . $criterion . " != '' AND " . $criterion . " is not null";
         }
 
         $duplicatesQuery = "SELECT " . implode(', ', $fields) . ' FROM contacts WHERE ' . implode(' AND ', $where);
@@ -1174,11 +1176,14 @@ class ContactController
 
         foreach ($contacts as $contact) {
             foreach ($contact as $field => $value) {
-                if (strpos($field, 'contactCustomField_') !== false) {
+                if (strpos($field, 'contact_custom_field_') !== false) {
                     $decoded = json_decode($value, true);
                     if (is_array($decoded)) {
                         $contact[$field] = implode("\n", $decoded);
                     }
+                }
+                if (Validator::boolType()->validate($value)) {
+                    $contact[$field] = $value ? 'TRUE' : 'FALSE';
                 }
             }
             if (!empty($contact['creator_label'])) {

@@ -116,6 +116,14 @@ import { FolderCreateModalComponent } from './folder/folder-create-modal/folder-
 import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.component';
 import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
 import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-modal.component';
+import { InstallerComponent } from './installer/installer.component';
+import { WelcomeComponent } from './installer/welcome/welcome.component';
+import { PrerequisiteComponent } from './installer/prerequisite/prerequisite.component';
+import { DatabaseComponent } from './installer/database/database.component';
+import { DocserversComponent } from './installer/docservers/docservers.component';
+import { CustomizationComponent } from './installer/customization/customization.component';
+import { UseradminComponent } from './installer/useradmin/useradmin.component';
+import {RedirectIndexingModelComponent} from './administration/indexingModel/redirectIndexingModel/redirect-indexing-model.component';
 
 
 
@@ -220,7 +228,15 @@ import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-moda
         ReconcileActionComponent,
         DocumentViewerPageComponent,
         SelectIndexingModelComponent,
-        ThesaurusModalComponent
+        ThesaurusModalComponent,
+        InstallerComponent,
+        WelcomeComponent,
+        PrerequisiteComponent,
+        DatabaseComponent,
+        DocserversComponent,
+        CustomizationComponent,
+        UseradminComponent,
+        RedirectIndexingModelComponent
     ],
     entryComponents: [
         InfoChangePasswordModalComponent,
@@ -269,7 +285,8 @@ import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-moda
         SentNumericPackagePageComponent,
         FolderCreateModalComponent,
         ReconcileActionComponent,
-        ThesaurusModalComponent
+        ThesaurusModalComponent,
+        RedirectIndexingModelComponent
     ],
     providers: [FiltersListService, FoldersService, ActionsService, PrivilegeService],
     bootstrap: [AppComponent]

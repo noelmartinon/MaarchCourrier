@@ -1,0 +1,48 @@
+.stepContent {
+    max-width: 850px;
+    margin: auto;
+    
+    .stepContentTitle {
+        margin-bottom: 30px;
+        border-bottom: solid 1px;
+        padding: 0;
+    }
+}
+
+
+.iconCheckPackage {
+    background: white;
+    font-size: 15px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 20px;
+    height: 35px;
+    width: 35px;
+}
+
+.icon_ok {
+    color: green;
+}
+
+.icon_ok:before {
+    content: "\f111";
+}
+
+.icon_warning {
+    color: orange;
+}
+
+.icon_warning:before {
+    content: "\f111";
+}
+
+
+.icon_ko {
+    color: red;
+}
+
+.icon_ko:before {
+    content: "\f111";
+}

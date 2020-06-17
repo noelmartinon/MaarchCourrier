@@ -14,6 +14,10 @@ export class AuthInterceptor implements HttpInterceptor {
     lang: any = LANG;
     byPassToken: any[] = [
         {
+            route: '../rest/prerequisites',
+            method : ['GET']
+        },
+        {
             route: '../rest/authenticate',
             method : ['POST']
         },

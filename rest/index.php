@@ -131,6 +131,7 @@ $app->put('/configurations/{service}', \Configuration\controllers\ConfigurationC
 $app->get('/contacts', \Contact\controllers\ContactController::class . ':get');
 $app->post('/contacts', \Contact\controllers\ContactController::class . ':create');
 $app->get('/contacts/{id}', \Contact\controllers\ContactController::class . ':getById');
+$app->put('/contacts/export', \Contact\controllers\ContactController::class . ':exportContacts');
 $app->put('/contacts/{id}', \Contact\controllers\ContactController::class . ':update');
 $app->delete('/contacts/{id}', \Contact\controllers\ContactController::class . ':delete');
 $app->put('/contacts/{id}/activation', \Contact\controllers\ContactController::class . ':updateActivation');
@@ -138,7 +139,6 @@ $app->get('/formattedContacts/{id}/types/{type}', \Contact\controllers\ContactCo
 $app->get('/ban/availableDepartments', \Contact\controllers\ContactController::class . ':getAvailableDepartments');
 $app->get('/duplicatedContacts', \Contact\controllers\ContactController::class . ':getDuplicatedContacts');
 $app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
-$app->post('/contacts/export', \Contact\controllers\ContactController::class . ':exportContacts');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');
@@ -308,6 +308,10 @@ $app->put('/indexingModels/{id}/disable', \IndexingModel\controllers\IndexingMod
 $app->put('/indexingModels/{id}/enable', \IndexingModel\controllers\IndexingModelController::class . ':enable');
 $app->delete('/indexingModels/{id}', \IndexingModel\controllers\IndexingModelController::class . ':delete');
 
+//Installer
+$app->get('/installer/prerequisites', \SrcCore\controllers\InstallerController::class . ':getPrerequisites');
+$app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerController::class . ':checkDatabaseConnection');
+
 //ListInstances
 $app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');
 
@@ -461,8 +465,6 @@ $app->get('/tags/{id}', \Tag\controllers\TagController::class . ':getById');
 $app->put('/tags/{id}', \Tag\controllers\TagController::class . ':update');
 $app->put('/mergeTags', \Tag\controllers\TagController::class . ':merge');
 $app->delete('/tags/{id}', \Tag\controllers\TagController::class . ':delete');
-$app->put('/tags/{id}/link', \Tag\controllers\TagController::class . ':link');
-$app->delete('/tags/{tagId}/link/{id}', \Tag\controllers\TagController::class . ':unLink');
 
 //Templates
 $app->get('/templates', \Template\controllers\TemplateController::class . ':get');

@@ -10,11 +10,15 @@ import { PrivilegeService } from './privileges.service';
 import { AuthService } from './auth.service';
 import { LocalStorageService } from './local-storage.service';
 import { FunctionsService } from './functions.service';
+import {AlertComponent} from '../plugins/modal/alert.component';
+import {MatDialog} from '@angular/material/dialog';
+import {LANG} from '../app/translate.component';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppGuard implements CanActivate {
+    lang: any = LANG;
 
     constructor(
         public http: HttpClient,
@@ -23,7 +27,8 @@ export class AppGuard implements CanActivate {
         private localStorage: LocalStorageService,
         private functionService: FunctionsService,
         public headerService: HeaderService,
-        private privilegeService: PrivilegeService
+        private privilegeService: PrivilegeService,
+        private dialog: MatDialog,
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
@@ -111,13 +116,26 @@ export class AppGuard implements CanActivate {
                     map((data: any) => {
                         this.authService.setAppSession(data.instanceId);
                         // this.authService.authMode = data.connection;
-                        // this.authService.changeKey = data.changeKey;
+                        this.authService.changeKey = data.changeKey;
                         this.localStorage.setAppSession(data.instanceId);
                         tokenInfo = this.authService.getToken();
 
                         if (tokenInfo !== null) {
                             this.authService.setUrl(route.url.join('/'));
                             this.functionService.debug('', route.url.join('/'));
+
+                            if (this.authService.changeKey) {
+                                this.dialog.open(AlertComponent, {
+                                    panelClass: 'maarch-modal',
+                                    autoFocus: false,
+                                    disableClose: true,
+                                    data: {
+                                        mode: 'danger',
+                                        title: this.lang.warnPrivateKeyTitle,
+                                        msg: this.lang.warnPrivateKey
+                                    } });
+                            }
+
                             return tokenInfo;
                         } else {
                             this.authService.setCachedUrl(state.url.replace(/^\//g, ''));

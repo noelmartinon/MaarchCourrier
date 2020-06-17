@@ -335,4 +335,14 @@ class CoreConfigModel
 
         return $keycloakConfig;
     }
+
+    public static function getColumns(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['table']);
+        ValidatorModel::stringType($args, ['table']);
+
+        $columns = DatabaseModel::getColumns(['table' => $args['table']]);
+
+        return $columns;
+    }
 }

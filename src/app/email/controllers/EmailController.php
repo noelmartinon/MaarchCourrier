@@ -31,6 +31,7 @@ use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
 use PHPMailer\PHPMailer\PHPMailer;
 use Resource\controllers\ResController;
+use Resource\controllers\ResourceListController;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -779,6 +780,9 @@ class EmailController
             }
             if (!ResController::hasRightByResId(['resId' => [$args['data']['document']['id']], 'userId' => $args['userId']])) {
                 return ['errors' => 'Document out of perimeter', 'code' => 403];
+            }
+            if (!ResourceListController::controlFingerprints(['resId' => $args['data']['document']['id']])) {
+                return ['errors' => 'Document has fingerprints which do not match', 'code' => 400];
             }
             if (!empty($args['data']['document']['attachments'])) {
                 if (!is_array($args['data']['document']['attachments'])) {

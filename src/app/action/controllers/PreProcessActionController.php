@@ -742,7 +742,7 @@ class PreProcessActionController
                         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
                         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
                         if ($convertedDocument['fingerprint'] != $fingerprint) {
-                            $canNotSend[] = ['resId' => $valueResId, 'chrono' => $resourcesChrono[$valueResId], 'reason' => 'noAttachmentConversion', 'attachmentIdentifier' => $attachment['chrono']];
+                            $canNotSend[] = ['resId' => $valueResId, 'chrono' => $resourcesChrono[$valueResId], 'reason' => 'fingerprintsDoNotMatch', 'attachmentIdentifier' => $attachment['chrono']];
                             unset($aAttachments[$key]);
                             break;
                         }
@@ -805,7 +805,7 @@ class PreProcessActionController
                             $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
                             if ($convertedDocument['fingerprint'] != $fingerprint) {
                                 $canNotSend[] = [
-                                    'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'noMailConversion'
+                                    'resId'  => $valueResId, 'chrono' => $resInfo['chrono'], 'reason' => 'fingerprintsDoNotMatch'
                                 ];
                             } else {
                                 $resourceContacts = ResourceContactModel::get([

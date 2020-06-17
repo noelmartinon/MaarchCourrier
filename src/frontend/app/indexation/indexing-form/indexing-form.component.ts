@@ -233,18 +233,7 @@ export class IndexingFormComponent implements OnInit {
                     this.availableCustomFields = data.customFields.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
-                        info.bddMode = true;
-                        // FOR TEST
-                        /*info.values = [
-                            {
-                                key: 'azerty',
-                                label: 'tata'
-                            },
-                            {
-                                key: 'bidule',
-                                label: 'chouette'
-                            }
-                        ];*/
+                        info.SQLMode = info.SQLMode;
 
                         info.default_value = ['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values) ? info.values[0].key : null;
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
@@ -795,10 +784,10 @@ export class IndexingFormComponent implements OnInit {
 
                         if (indexFound > -1) {
                             field.label = this.availableCustomFields[indexFound].label;
-                            field.default_value = this.availableCustomFields[indexFound].default_value;
+                            field.default_value = !this.functions.empty(field.default_value) ? field.default_value : this.availableCustomFields[indexFound].default_value;
                             field.values = this.availableCustomFields[indexFound].values;
                             field.type = this.availableCustomFields[indexFound].type;
-                            field.bddMode = this.availableCustomFields[indexFound].bddMode;
+                            field.SQLMode = this.availableCustomFields[indexFound].SQLMode;
                             this.availableCustomFields.splice(indexFound, 1);
                             fieldExist = true;
                         }
@@ -849,8 +838,6 @@ export class IndexingFormComponent implements OnInit {
         let valArr: ValidatorFn[] = [];
 
         let disabledState: boolean = false;
-
-        console.log(field);
 
         if (this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || (field.today && this.adminMode))) {
             disabledState = true;
@@ -1058,5 +1045,9 @@ export class IndexingFormComponent implements OnInit {
         if (!this.functions.empty(this.appDiffusionsList)) {
             this.appDiffusionsList.loadListModel(value);
         }
+    }
+
+    getCheckboxListLabel(selectedItemId: any, items: any) {
+        return items.filter((item: any) => item.id === selectedItemId)[0].label;
     }
 }

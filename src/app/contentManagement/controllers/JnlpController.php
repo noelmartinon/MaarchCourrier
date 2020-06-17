@@ -311,7 +311,7 @@ class JnlpController
                     return $response->withHeader('Content-Type', 'application/xml');
                 }
 
-                $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template', 'fingerprint_mode']]);
+                $docserver  = DocserverModel::getByDocserverId(['docserverId' => $attachment['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
                 $pathToCopy = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $attachment['path']) . $attachment['filename'];
 
                 $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);

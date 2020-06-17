@@ -1,13 +1,12 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
         <span style="flex: 1;">{{lang.tags}}</span>
-        <span class="divider-modal"></span>
         <button title="{{lang.close}}" mat-icon-button [mat-dialog-close]="">
             <mat-icon class="fa fa-times-circle fa-2x"></mat-icon>
         </button>
     </h1>
-    <mat-dialog-content>
-        <div class="col-md-6" [class.col-md-12]="!functionsService.empty(tag)">
+    <div mat-dialog-content>
+        <div class="col-md-6" [class.col-md-12]="!functionsService.empty(tag)" style="overflow: auto;">
             <div id="jstree"></div>
         </div>
         <div class="col-md-6" *ngIf="!functionsService.empty(tag)">
@@ -25,7 +24,7 @@
                 </ng-container>
             </div>
         </div>
-    </mat-dialog-content>
+    </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions" *ngIf="functionsService.empty(data.id)">
         <button mat-raised-button mat-button color="primary" [disabled]="loading || functionsService.empty(tag)"

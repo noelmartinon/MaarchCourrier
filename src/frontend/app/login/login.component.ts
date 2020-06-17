@@ -107,9 +107,21 @@ export class LoginComponent implements OnInit {
             tap((data: any) => {
                 this.authService.setAppSession(data.instanceId);
                 // this.authService.authMode = data.connection;
-                // this.authService.changeKey = data.changeKey;
+                this.authService.changeKey = data.changeKey;
                 this.applicationName = data.applicationName;
                 this.loginMessage = data.loginMessage;
+
+                if (this.authService.changeKey) {
+                    this.dialog.open(AlertComponent, {
+                        panelClass: 'maarch-modal',
+                        autoFocus: false,
+                        disableClose: true,
+                        data: {
+                            mode: 'danger',
+                            title: this.lang.warnPrivateKeyTitle,
+                            msg: this.lang.warnPrivateKey
+                        } });
+                }
             }),
             finalize(() => this.showForm = true),
             catchError((err: any) => {

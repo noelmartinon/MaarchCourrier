@@ -55,15 +55,13 @@ class IndexingModelController
         $models = IndexingModelModel::get(['where' => $where, 'data' => [$GLOBALS['id'], 'false']]);
 
         foreach ($models as $key => $value) {
-            $models[$key]['used'] = false;
             $resources = ResModel::get([
-                'select'    => [1],
-                'where'     => ['model_id = ?'],
-                'data'      => [$value['model_id']]
+                'select'  => ['status', 'count(1)'],
+                'where'   => ['model_id = ?'],
+                'data'    => [$value['id']],
+                'groupBy' => ['status']
             ]);
-            if (!empty($resources)) {
-                $models[$key]['used'] = true;
-            }
+            $models[$key]['used'] = $resources;
         }
 
         return $response->withJson(['indexingModels' => $models]);
@@ -417,12 +415,45 @@ class IndexingModelController
         }
 
         $resources = ResModel::get([
-            'select'    => [1],
-            'where'     => ['model_id = ?'],
-            'data'      => [$args['id']]
+            'select' => ['res_id'],
+            'where'  => ['model_id = ?'],
+            'data'   => [$args['id']]
         ]);
+        $resources = array_column($resources, 'res_id');
         if (!empty($resources)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource', 'lang' => 'modelUsedByResources']);
+            $body = $request->getParsedBody();
+
+            // No targetId provided, trying to delete without redirection
+            if (!Validator::intVal()->notEmpty()->validate($body['targetId'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Model is used by at least one resource', 'lang' => 'modelUsedByResources']);
+            }
+
+            // targetId provided, redirect model before deleting
+            $oldFieldList = IndexingModelFieldModel::get(['select' => ['identifier'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+            $oldFieldList = array_column($oldFieldList, 'identifier');
+
+            $newFieldList = IndexingModelFieldModel::get(['select' => ['identifier'], 'where' => ['model_id = ?'], 'data' => [$body['targetId']]]);
+            $newFieldList = array_column($newFieldList, 'identifier');
+
+            ResController::resetResourceFields(['oldFieldList' => $oldFieldList, 'newFieldList' => $newFieldList, 'modelId' => $args['id']]);
+
+            $fieldsToDelete = array_diff($oldFieldList, $newFieldList);
+
+            if (in_array('senders', $fieldsToDelete)) {
+                ResourceContactModel::delete(['where' => ['res_id in (?)',  'mode = ?'], 'data' => [$resources, 'sender']]);
+            }
+            if (in_array('recipients', $fieldsToDelete)) {
+                ResourceContactModel::delete(['where' => ['res_id in (?)',  'mode = ?'], 'data' => [$resources, 'recipient']]);
+            }
+            if (in_array('tags', $fieldsToDelete)) {
+                ResourceTagModel::delete(['where' => ['res_id in (?)'], 'data' => [$resources]]);
+            }
+
+            ResModel::update([
+                'set'   => ['model_id' => $body['targetId']],
+                'where' => ['model_id = ?'],
+                'data'  => [$args['id']]
+            ]);
         }
 
         $childrenModels = IndexingModelModel::get(['select' => ['id', 'label'], 'where' => ['"master" = ?'], 'data' => [$args['id']]]);

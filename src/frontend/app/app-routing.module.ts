@@ -19,10 +19,13 @@ import { ProcessComponent } from './process/process.component';
 import { FollowedDocumentListComponent } from './home/followed-list/followed-document-list.component';
 import { LoginComponent } from './login/login.component';
 import { DocumentViewerPageComponent } from './viewer/page/document-viewer-page.component';
+import { InstallerComponent } from './installer/installer.component';
+
 
 @NgModule({
     imports: [
         RouterModule.forRoot([
+            { path: 'install', component: InstallerComponent },
             { path: 'login', component: LoginComponent },
             { path: 'activate-user', component: ActivateUserComponent },
             { path: 'password-modification', component: PasswordModificationComponent },

@@ -14,13 +14,16 @@
 
 namespace Template\controllers;
 
+use Attachment\models\AttachmentModel;
 use ContentManagement\controllers\MergeController;
 use Convert\controllers\ConvertPdfController;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
+use Entity\models\EntityModel;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use Resource\controllers\ResController;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -29,13 +32,12 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use Template\models\TemplateAssociationModel;
 use Template\models\TemplateModel;
-use Attachment\models\AttachmentModel;
-use Entity\models\EntityModel;
 use User\models\UserModel;
 
 class TemplateController
 {
     const AUTHORIZED_MIMETYPES = [
+        'application/zip',
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -139,7 +141,7 @@ class TemplateController
             $fileContent = base64_decode($content);
             $finfo    = new \finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->buffer($fileContent);
-            if (!in_array($mimeType, self::AUTHORIZED_MIMETYPES)) {
+            if (!StoreController::isFileAllowed(['extension' => $format, 'type' => $mimeType]) || !in_array($mimeType, self::AUTHORIZED_MIMETYPES)) {
                 return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE . ' : '.$mimeType]);
             }
 
@@ -216,7 +218,7 @@ class TemplateController
             $fileContent = base64_decode($content);
             $finfo    = new \finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->buffer($fileContent);
-            if (!in_array($mimeType, self::AUTHORIZED_MIMETYPES)) {
+            if (!StoreController::isFileAllowed(['extension' => $format, 'type' => $mimeType]) || !in_array($mimeType, self::AUTHORIZED_MIMETYPES)) {
                 return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE . ' : '.$mimeType]);
             }
 

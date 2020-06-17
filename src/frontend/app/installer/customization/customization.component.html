@@ -1,0 +1,30 @@
+<div style="background: url('assets/1.jpg')">
+</div>
+<div class="stepContent">
+    <h2 class="stepContentTitle"><i class="fas fa-tools"></i> Personnalisation</h2>
+    <p>
+        Maarch Courrier vous permet de personnaliser votre application afin de l'intégrer parfaitement à votre environnement de travail.
+    </p>
+    <br/>
+    <mat-form-field appearance="outline">
+        <mat-label>Nom de l'application</mat-label>
+        <input matInput [(ngModel)]="appName" style="color: moccasin;">
+    </mat-form-field>
+    <div>Message écran de connexion : </div>
+    <textarea style="padding-top: 10px;" name="loginMsg" id="loginMsg" [(ngModel)]="loginMsg"></textarea>
+    <br/>
+    <br/>
+    <div>Message d'accueil : </div>
+    <textarea style="padding-top: 10px;" name="homeMsg" id="homeMsg" [(ngModel)]="homeMsg"></textarea>
+    <br/>
+    <br/>
+    <div>Choisissez le fond d'écran de l'écran de connexion : </div>
+    <div class="backgroundList">
+        <mat-card (click)="selectedBackground='bodylogin.jpg'" style="opacity: 0.3;" class="backgroundItem" [class.selected]="selectedBackground === 'bodylogin.jpg'">
+            <img src="assets/bodylogin.jpg" style="width:100%;"/> 
+        </mat-card>
+        <mat-card *ngFor="let background of backgroundList" (click)="selectedBackground=background.filename" style="opacity: 0.3;" class="backgroundItem" [class.selected]="background.filename === selectedBackground">
+            <img src="assets/{{background.filename}}" style="width:100%;"/> 
+        </mat-card>
+    </div>
+</div>

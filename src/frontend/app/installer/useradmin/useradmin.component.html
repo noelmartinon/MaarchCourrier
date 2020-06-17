@@ -1,0 +1,20 @@
+<div class="stepContent">
+    <h2 class="stepContentTitle"><i class="fas fa-user"></i> Utilisateur système</h2>
+    <p>
+        Définissez un utilisateur système afin de vous connecter à l'application.
+    </p>
+    <form [formGroup]="stepFormGroup" style="display: contents;">
+        <mat-form-field appearance="outline" style="color: initial;">
+            <mat-label>Identifiant</mat-label>
+            <input matInput formControlName="login" style="color: moccasin;" disabled>
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="color: initial;">
+            <mat-label>Mot de passe</mat-label>
+            <input matInput formControlName="password" style="color: moccasin;">
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="color: initial;">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" style="color: moccasin;">
+        </mat-form-field>
+    </form>
+</div>

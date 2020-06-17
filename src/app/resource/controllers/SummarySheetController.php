@@ -318,16 +318,13 @@ class SummarySheetController
                 if (!empty($customFieldsIds)) {
                     // get the label of the custom fields
                     $customFields = CustomFieldModel::get([
-                        'select' => ['id', 'label'],
+                        'select' => ['id', 'label', 'values'],
                         'where'  => ['id in (?)'],
                         'data'   => [$customFieldsIds]
                     ]);
 
-                    $tmp = [];
-                    foreach ($customFields as $customField) {
-                        $tmp[$customField['id']] = $customField['label'];
-                    }
-                    $customFields = $tmp;
+                    $customFieldsRawValues = array_column($customFields, 'values', 'id');
+                    $customFields = array_column($customFields, 'label', 'id');
 
                     $customFieldsValues = $customFieldsValues[0]['custom_fields'] ?? null;
                     $customFieldsValues = json_decode($customFieldsValues, true);
@@ -359,6 +356,19 @@ class SummarySheetController
                 if (!empty($customFieldsIds)) {
                     foreach ($customFieldsIds as $customFieldsId) {
                         $label = $customFields[$customFieldsId];
+                        $rawValues = json_decode($customFieldsRawValues[$customFieldsId], true);
+                        if (!empty($rawValues['table'])) {
+                            $rawValues = CustomFieldModel::getValuesSQL($rawValues);
+
+                            $rawValues = array_column($rawValues, 'label', 'key');
+                            if (is_array($customFieldsValues[$customFieldsId])) {
+                                foreach ($customFieldsValues[$customFieldsId] as $key => $value) {
+                                    $customFieldsValues[$customFieldsId][$key] = $rawValues[$value];
+                                }
+                            } else {
+                                $customFieldsValues[$customFieldsId] = $rawValues[$customFieldsValues[$customFieldsId]];
+                            }
+                        }
                         if (is_array($customFieldsValues[$customFieldsId])) {
                             if (!empty($customFieldsValues[$customFieldsId])) {
                                 if (is_array($customFieldsValues[$customFieldsId][0])) { //Custom BAN

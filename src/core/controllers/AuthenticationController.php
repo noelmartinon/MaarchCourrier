@@ -33,7 +33,8 @@ class AuthenticationController
     const MAX_DURATION_TOKEN = 30; //Minutes
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
-        'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate'
+        'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
+        'GET/installer/prerequisites', 'GET/installer/databaseConnection'
     ];
 
     public function getInformations(Request $request, Response $response)
@@ -44,7 +45,14 @@ class AuthenticationController
         $appName = CoreConfigModel::getApplicationName();
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
 
-        return $response->withJson(['instanceId' => $hashedPath, 'applicationName' => $appName, 'loginMessage' => $parameter['param_value_string'] ?? null]);
+        $encryptKey = CoreConfigModel::getEncryptKey();
+
+        return $response->withJson([
+            'instanceId'      => $hashedPath,
+            'applicationName' => $appName,
+            'loginMessage'    => $parameter['param_value_string'] ?? null,
+            'changeKey'       => $encryptKey == 'Security Key Maarch Courrier #2008'
+        ]);
     }
 
     public function getValidUrl(Request $request, Response $response)
@@ -126,7 +134,11 @@ class AuthenticationController
         ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::stringType($args, ['currentRoute']);
 
-        $user = UserModel::getById(['select' => ['status', 'password_modification_date'], 'id' => $args['userId']]);
+        $user = UserModel::getById(['select' => ['status', 'password_modification_date', 'loginmode'], 'id' => $args['userId']]);
+
+        if ($user['loginmode'] == 'restMode') {
+            return ['isRouteAvailable' => true];
+        }
 
         if ($user['status'] == 'ABS' && !in_array($args['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
             return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];

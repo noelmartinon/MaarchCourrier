@@ -76,6 +76,7 @@
                 <pdf-viewer *ngIf="leftViewerLink != '' && (leftSelectedThumbnail == 0 || signatureBook.documents[leftSelectedThumbnail].format == 'pdf' || signatureBook.documents[leftSelectedThumbnail].isConverted)" id="leftPanelShowDocumentIframe" #leftPanelShowDocumentIframe [src]="leftViewerLink | secureUrl | async" 
                     [render-text]="true" [fit-to-page]="false" [original-size]="true" 
                     [ngStyle]="{'height': showTopLeftPanel ? '84%' : '99%'}" [show-all]="true"
+                    (error)="pdfViewerError()"
                 ></pdf-viewer>
                 <!-- <iframe *ngIf="leftViewerLink != '' && (leftSelectedThumbnail == 0 || signatureBook.documents[leftSelectedThumbnail].format == 'pdf' || signatureBook.documents[leftSelectedThumbnail].isConverted)" id="leftPanelShowDocumentIframe" [src]="leftViewerLink | safeUrl" [ngStyle]="{'height': showTopLeftPanel ? '84%' : '99%'}"></iframe> -->
                 <div *ngIf="leftSelectedThumbnail > 0 && signatureBook.documents[leftSelectedThumbnail].format != 'pdf' && !signatureBook.documents[leftSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopLeftPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
@@ -175,6 +176,7 @@
                         [render-text]="true" [autoresize]="true" [original-size]="false"
                         [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}" [show-all]="true"
                         *ngIf="signatureBook.attachments[rightSelectedThumbnail].isConverted"
+                        (error)="pdfViewerError()"
                     ></pdf-viewer>
                     <!-- <iframe id="rightPanelShowDocumentIframe" [src]="rightViewerLink | safeUrl" [ngStyle]="{'height': showTopRightPanel ? '84%' : '99%'}"></iframe> -->
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted" [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">

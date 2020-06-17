@@ -10,9 +10,9 @@ import { AppService } from '../../../service/app.service';
 import { tap, finalize, catchError, filter, exhaustMap, map } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { FunctionsService } from '../../../service/functions.service';
 import { of } from 'rxjs/internal/observable/of';
+import {RedirectIndexingModelComponent} from './redirectIndexingModel/redirect-indexing-model.component';
 
 @Component({
     templateUrl: 'indexing-models-administration.component.html',
@@ -91,7 +91,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
     delete(indexingModel: any) {
 
-        if (!indexingModel.used) {
+        if (indexingModel.used.length === 0) {
             this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
 
             this.dialogRef.afterClosed().pipe(
@@ -114,7 +114,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: indexingModel.label, msg: this.lang.canNotDeleteIndexingModel } });
+            this.dialogRef = this.dialog.open(RedirectIndexingModelComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction, indexingModel: indexingModel } });
         }
     }
 

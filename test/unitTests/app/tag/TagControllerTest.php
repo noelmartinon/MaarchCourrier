@@ -194,6 +194,19 @@ class TagControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertIsInt(self::$id);
         self::$idToMerge = $responseBody['id'];
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response         = $tagController->create($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody     = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testGetById()
@@ -259,6 +272,11 @@ class TagControllerTest extends TestCase
             'label'    => ''
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
+
+        $response     = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $this->assertSame(400, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Tag does not exist', $responseBody['errors']);
 
         $response     = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
 
@@ -369,6 +387,55 @@ class TagControllerTest extends TestCase
 
         $response     = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$idGrandChild]);
         $this->assertSame(204, $response->getStatusCode());
+
+        // Link tags
+        $body = [
+            'label' => 'TEST_LABEL',
+            'links' => 'wrong format'
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response         = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $responseBody     = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame('Body links is not an array', $responseBody['errors']);
+
+        $body = [
+            'label' => 'TEST_LABEL',
+            'links' => [self::$id]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response         = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $responseBody     = json_decode((string)$response->getBody(), true);
+
+        $this->assertSame(400, $response->getStatusCode());
+        $this->assertSame('Body links contains tag', $responseBody['errors']);
+
+        // Success
+        $body = [
+            'label' => 'TEST_LABEL',
+            'links' => [self::$idGrandChild]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
+
+        $response         = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+
+        $this->assertSame(204, $response->getStatusCode());
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response         = $tagController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody     = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testMerge()
@@ -469,81 +536,19 @@ class TagControllerTest extends TestCase
         $response         = $tagController->merge($fullRequest, new \Slim\Http\Response());
 
         $this->assertSame(204, $response->getStatusCode());
-    }
 
-    public function testLink()
-    {
-        $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
-        $request      = \Slim\Http\Request::createFromEnvironment($environment);
-        $tagController = new \Tag\controllers\TagController();
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
 
-        // FAIL
-        $body = [
-            'idMaster' => 'wrong format'
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response         = $tagController->link($fullRequest, new \Slim\Http\Response(), ['id' => 'wrong format']);
+        $response         = $tagController->merge($fullRequest, new \Slim\Http\Response());
+        $this->assertSame(403, $response->getStatusCode());
         $responseBody     = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
 
-        $this->assertSame(400, $response->getStatusCode());
-        $this->assertSame('Route id is not an integer', $responseBody['errors']);
-
-        $body = [
-            'links' => []
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response         = $tagController->link($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
-        $responseBody     = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame(400, $response->getStatusCode());
-        $this->assertSame('Body links is empty or not an array', $responseBody['errors']);
-
-        $body = [
-            'links' => [self::$id]
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response         = $tagController->link($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
-        $responseBody     = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame(400, $response->getStatusCode());
-        $this->assertSame('Body links contains tag', $responseBody['errors']);
-
-        // Success
-        $body = [
-            'links' => [self::$idGrandChild]
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response         = $tagController->link($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
-
-        $this->assertSame(204, $response->getStatusCode());
-    }
-
-    public function testUnLink()
-    {
-        $environment  = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
-        $request      = \Slim\Http\Request::createFromEnvironment($environment);
-        $tagController = new \Tag\controllers\TagController();
-
-        // FAIL
-        $response         = $tagController->unLink($request, new \Slim\Http\Response(), ['id' => 'wrong format']);
-        $responseBody     = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame(400, $response->getStatusCode());
-        $this->assertSame('Route tagId or id is not an integer', $responseBody['errors']);
-
-        $response         = $tagController->unLink($request, new \Slim\Http\Response(), ['id' => self::$id, 'tagId' => 'wrong format']);
-        $responseBody     = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame(400, $response->getStatusCode());
-        $this->assertSame('Route tagId or id is not an integer', $responseBody['errors']);
-
-        // Success
-        $response         = $tagController->unLink($request, new \Slim\Http\Response(), ['id' => self::$id, 'tagId' => self::$idGrandChild]);
-        $this->assertSame(204, $response->getStatusCode());
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
     }
 
     public function testDelete()
@@ -553,6 +558,34 @@ class TagControllerTest extends TestCase
 
         // FAIL
         $tagController = new \Tag\controllers\TagController();
+
+        $GLOBALS['login'] = 'bbain';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        \Tag\models\ResourceTagModel::create([
+            'res_id' => $GLOBALS['resources'][0],
+            'tag_id' => self::$idGrandChild
+        ]);
+
+        $response = $tagController->delete($request, new \Slim\Http\Response(), ['id' => self::$idGrandChild]);
+        $this->assertSame(403, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'ddaull';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
+        $response = $tagController->delete($request, new \Slim\Http\Response(), ['id' => self::$idGrandChild]);
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame('Service forbidden', $responseBody['errors']);
+
+        $GLOBALS['login'] = 'superadmin';
+        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
+        $GLOBALS['id'] = $userInfo['id'];
+
         $response         = $tagController->delete($request, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
         $responseBody     = json_decode((string)$response->getBody(), true);
 

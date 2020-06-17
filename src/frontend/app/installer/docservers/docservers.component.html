@@ -1,0 +1,16 @@
+<div class="stepContent">
+    <h2 class="stepContentTitle"><i class="fa fa-hdd"></i> Zone de stockage</h2>
+    <p>
+        N'importe quel système de stockage peut être utilisé, à partir du moment où celui-ci présente un « système de
+        fichiers » à accès direct. Ce peut être le cas d'un attachement direct ou indirect de type NFS sur une baie SAN,
+        NAS, ou pour les cas simples un ensemble de disques RAID.
+    </p>
+    <br />
+    <mat-form-field appearance="outline" style="color: initial;">
+        <mat-label>Chemin de la zone de stockage</mat-label>
+        <input matInput [(ngModel)]="docserversPath" style="color: moccasin;">
+    </mat-form-field>
+    <div style="text-align: center;">
+        <button mat-raised-button type="button" color="default" (click)="checkAvailability()">Vérifier la disponibilité</button>
+    </div>
+</div>

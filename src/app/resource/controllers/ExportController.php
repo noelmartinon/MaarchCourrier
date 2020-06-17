@@ -738,13 +738,26 @@ class ExportController
             return null;
         }
 
-        $field = CustomFieldModel::getById(['select' => ['type'], 'id' => $customFieldId]);
+        $field = CustomFieldModel::getById(['select' => ['type', 'values'], 'id' => $customFieldId]);
+        $values = json_decode($field['values'], true);
 
         if ($field['type'] == 'banAutocomplete') {
             $line = "{$customValues[0]['addressNumber']} {$customValues[0]['addressStreet']} {$customValues[0]['addressTown']} ({$customValues[0]['addressPostcode']})";
             $line .= "\n";
             $line .= "{$customValues[0]['latitude']},{$customValues[0]['longitude']}";
             $customValues = $line;
+        } elseif (!empty($values['table'])) {
+            $values = CustomFieldModel::getValuesSQL($values);
+
+            $values = array_column($values, 'label', 'key');
+            if (is_array($customValues)) {
+                foreach ($customValues as $key => $value) {
+                    $customValues[$key] = $values[$value];
+                }
+                $customValues = implode("\n", $customValues);
+            } else {
+                $customValues = $values[$customValues];
+            }
         } elseif (is_array($customValues)) {
             $customValues = implode("\n", $customValues);
         }

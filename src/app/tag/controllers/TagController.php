@@ -179,6 +179,11 @@ class TagController
             return $response->withStatus(400)->withJson(['errors' => 'Route id must be an integer val']);
         }
 
+        $tag = TagModel::getById(['id' => $args['id']]);
+        if (empty($tag)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Tag does not exist']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
@@ -210,15 +215,52 @@ class TagController
             }
         }
 
+        $links = [];
+        $tag['links'] = json_decode($tag['links']);
+
+        if (!empty($body['links'])) {
+            if (!Validator::arrayType()->validate($body['links'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body links is not an array']);
+            } elseif (in_array($args['id'], $body['links'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body links contains tag']);
+            }
+
+            foreach ($body['links'] as $link) {
+                $links[] = (string)$link;
+            }
+
+            $newLinks = array_diff($links, $tag['links']);
+            if (!empty($newLinks)) {
+                TagModel::update([
+                    'postSet' => ['links' => "jsonb_insert(links, '{0}', '\"{$args['id']}\"')"],
+                    'where'   => ['id in (?)', "(links @> ?) = false"],
+                    'data'    => [$newLinks, "\"{$args['id']}\""]
+                ]);
+            }
+        }
+
+        if (!empty($tag['links'])) {
+            $linksToDelete = array_diff($tag['links'], $links);
+
+            if (!empty($linksToDelete)) {
+                TagModel::update([
+                    'postSet' => ['links' => "links - '{$tag['id']}'"],
+                    'where'   => ['id in (?)'],
+                    'data'    => [$linksToDelete]
+                ]);
+            }
+        }
+
         TagModel::update([
-            'set' => [
+            'set'   => [
                 'label'       => $body['label'],
                 'description' => $body['description'] ?? null,
                 'parent_id'   => $parent,
-                'usage'       => $body['usage'] ?? null
+                'usage'       => $body['usage'] ?? null,
+                'links'       => json_encode($links)
             ],
             'where' => ['id = ?'],
-            'data' => [$args['id']]
+            'data'  => [$args['id']]
         ]);
 
         HistoryController::add([
@@ -373,116 +415,6 @@ class TagController
             'eventType' => 'DEL',
             'info'      =>  _TAG_MERGED . " : {$tagMerge['label']} vers {$tagMaster['label']}",
             'eventId'   => 'tagSuppression',
-        ]);
-
-        return $response->withStatus(204);
-    }
-
-    public static function link(Request $request, Response $response, array $args)
-    {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_tag', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
-        if (!Validator::intVal()->validate($args['id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Route id is not an integer']);
-        }
-
-        $body = $request->getParsedBody();
-
-        if (!Validator::arrayType()->notEmpty()->validate($body['links'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body links is empty or not an array']);
-        } elseif (in_array($args['id'], $body['links'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body links contains tag']);
-        }
-
-        $tag = TagModel::getById(['id' => $args['id']]);
-        $linkedTags = json_decode($tag['links'], true);
-        $linkedTags = array_merge($linkedTags, $body['links']);
-        $linkedTags = array_unique($linkedTags);
-        foreach ($linkedTags as $key => $linkedTag) {
-            $linkedTags[$key] = (string)$linkedTag;
-        }
-
-        TagModel::update([
-            'set'       => ['links' => json_encode($linkedTags)],
-            'where'     => ['id = ?'],
-            'data'      => [$args['id']]
-        ]);
-        TagModel::update([
-            'postSet'   => ['links' => "jsonb_insert(links, '{0}', '\"{$args['id']}\"')"],
-            'where'     => ['id in (?)', "(links @> ?) = false"],
-            'data'      => [$body['links'], "\"{$args['id']}\""]
-        ]);
-
-        $linkedTagsInfo = TagModel::get([
-            'select' => ['label', 'id'],
-            'where'  => ['id in (?)'],
-            'data'   => [$body['links']]
-        ]);
-        $linkedTagsInfo = array_column($linkedTagsInfo, 'label', 'id');
-
-        foreach ($body['links'] as $value) {
-            HistoryController::add([
-                'tableName' => 'tags',
-                'recordId'  => $args['id'],
-                'eventType' => 'UP',
-                'info'      => _LINK_ADDED_TAG . " : {$linkedTagsInfo[$value]}",
-                'eventId'   => 'tagModification'
-            ]);
-            HistoryController::add([
-                'tableName' => 'tags',
-                'recordId'  => $value,
-                'eventType' => 'UP',
-                'info'      => _LINK_ADDED_TAG . " : {$tag['label']}",
-                'eventId'   => 'tagModification'
-            ]);
-        }
-
-        return $response->withStatus(204);
-    }
-
-    public static function unLink(Request $request, Response $response, array $args)
-    {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_tag', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
-        if (!Validator::intVal()->validate($args['tagId']) || !Validator::intVal()->validate($args['id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Route tagId or id is not an integer']);
-        }
-
-        TagModel::update([
-            'postSet'   => ['links' => "links - '{$args['id']}'"],
-            'where'     => ['id = ?'],
-            'data'      => [$args['tagId']]
-        ]);
-        TagModel::update([
-            'postSet'   => ['links' => "links - '{$args['tagId']}'"],
-            'where'     => ['id = ?'],
-            'data'      => [$args['id']]
-        ]);
-
-        $linkedTagsInfo = TagModel::get([
-            'select' => ['label', 'id'],
-            'where'  => ['id in (?)'],
-            'data'   => [[$args['tagId'], $args['id']]]
-        ]);
-        $linkedTagsInfo = array_column($linkedTagsInfo, 'label', 'id');
-
-        HistoryController::add([
-            'tableName' => 'tags',
-            'recordId'  => $args['tagId'],
-            'eventType' => 'UP',
-            'info'      => _LINK_DELETED_TAG . " : {$linkedTagsInfo[$args['id']]}",
-            'eventId'   => 'tagModification'
-        ]);
-        HistoryController::add([
-            'tableName' => 'tags',
-            'recordId'  => $args['id'],
-            'eventType' => 'UP',
-            'info'      => _LINK_DELETED_TAG . " : {$linkedTagsInfo[$args['tagId']]}",
-            'eventId'   => 'tagModification'
         ]);
 
         return $response->withStatus(204);

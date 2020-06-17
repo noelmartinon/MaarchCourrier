@@ -38,13 +38,13 @@
                                     [matAutocomplete]="auto" [matChipInputFor]="chipList">
                             </mat-chip-list>
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                                <mat-option *ngFor="let tag of filteredOptions | async" [value]="tag"  [disabled]="isSelected(tag)">
+                                <mat-option *ngFor="let tag of filteredOptions | async" [value]="tag"  [disabled]="isSelected(tag) || tag.id == id">
                                     {{tag.label}}
                                 </mat-option>
                             </mat-autocomplete>
                         </mat-form-field>
 
-                        <div *ngIf="!creationMode && !tag.canMerge.value" class="alert-message alert-message-danger">
+                        <div *ngIf="!creationMode && !tag.canMerge.value" class="alert-message alert-message-danger" style="min-width: 100%;">
                             {{this.lang.cannotMergeTags}}
                         </div>
                         <plugin-select-search *ngIf="!loadingTags && tag.canMerge.value"
