@@ -30,7 +30,7 @@
                         <mat-form-field *ngIf="advancedMode">
                             <mat-chip-list #chipList>
                                 <mat-chip *ngFor="let linkedTag of tag.links.value" [selectable]="selectable"
-                                    (click)="remove(linkedTag)" style="cursor: pointer;">
+                                    (click)="remove(linkedTag)" (removed)="remove(linkedTag)" style="cursor: pointer;">
                                     {{getTagLabel(linkedTag)}}
                                     <mat-icon matChipRemove class="fa fa-times-circle"></mat-icon>
                                 </mat-chip>

@@ -179,6 +179,11 @@ class TagController
             return $response->withStatus(400)->withJson(['errors' => 'Route id must be an integer val']);
         }
 
+        $tag = TagModel::getById(['id' => $args['id']]);
+        if (empty($tag)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Tag does not exist']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
@@ -211,8 +216,6 @@ class TagController
         }
 
         $links = [];
-
-        $tag = TagModel::getById(['id' => $args['id']]);
         $tag['links'] = json_decode($tag['links']);
 
         if (!empty($body['links'])) {
