@@ -1,20 +1,37 @@
 <div class="stepContent">
-    <h2 class="stepContentTitle"><i class="fas fa-user"></i> Utilisateur système</h2>
-    <p>
-        Définissez un utilisateur système afin de vous connecter à l'application.
-    </p>
-    <form [formGroup]="stepFormGroup" style="display: contents;">
-        <mat-form-field appearance="outline" style="color: initial;">
-            <mat-label>Identifiant</mat-label>
-            <input matInput formControlName="login" style="color: moccasin;" disabled>
+    <h2 class="stepContentTitle"><i class="fas fa-user"></i> {{lang.userAdmin}}</h2>
+    <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;min-width: 100%;">
+        {{lang.stepUserAdmin_desc}}
+    </div>
+    <form [formGroup]="stepFormGroup" style="width: 850px;margin: auto;">
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.id}}</mat-label>
+            <input matInput formControlName="login">
         </mat-form-field>
-        <mat-form-field appearance="outline" style="color: initial;">
-            <mat-label>Mot de passe</mat-label>
-            <input matInput formControlName="password" style="color: moccasin;">
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.password}}</mat-label>
+            <input [type]="hide ? 'password' : 'text'" matInput formControlName="password">
+            <button mat-icon-button matSuffix color="primary" (click)="hide = !hide">
+                <mat-icon class="fa {{hide ? 'fa-eye-slash' : 'fa-eye'}}"></mat-icon>
+            </button>
+            <mat-error>{{lang.passwordNotMatch}}</mat-error>
         </mat-form-field>
-        <mat-form-field appearance="outline" style="color: initial;">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" style="color: moccasin;">
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.retypeNewPassword}}</mat-label>
+            <input [type]="hide ? 'password' : 'text'" matInput formControlName="passwordConfirm">
+            <button mat-icon-button matSuffix color="primary" (click)="hide = !hide">
+                <mat-icon class="fa {{hide ? 'fa-eye-slash' : 'fa-eye'}}"></mat-icon>
+            </button>
+            <mat-error>{{lang.passwordNotMatch}}</mat-error>
         </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.mail}}</mat-label>
+            <input matInput formControlName="email">
+        </mat-form-field>
+        <div style="text-align:center;">
+            <button mat-raised-button type="button" color="primary" (click)="launchInstall()" *ngIf="stepFormGroup.valid" style="font-size: 35px;padding: 20px;">
+                <i class=" far fa-hdd"></i> {{lang.launchInstall}}
+            </button>
+        </div>
     </form>
 </div>

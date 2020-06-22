@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { FormControl, Validators } from '@angular/forms';
 import { AppService } from '../../../service/app.service';
 
 @Component({
-    templateUrl: 'status-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'status-administration.component.html'
 })
 export class StatusAdministrationComponent implements OnInit {
 

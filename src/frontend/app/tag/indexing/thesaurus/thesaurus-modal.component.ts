@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { of } from 'rxjs/internal/observable/of';
 import { FunctionsService } from '../../../../service/functions.service';
 

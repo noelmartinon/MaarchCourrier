@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { tap, finalize, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { HeaderService } from '../../service/header.service';
@@ -13,7 +13,6 @@ import { FunctionsService } from '../../service/functions.service';
     selector: 'app-notes-list',
     templateUrl: 'notes-list.component.html',
     styleUrls: ['notes-list.component.scss'],
-    providers: [NotificationService]
 })
 export class NotesListComponent implements OnInit {
 

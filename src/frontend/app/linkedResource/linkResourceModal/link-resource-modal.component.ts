@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { SearchAdvListComponent } from '../../adv-search/list/search-adv-list.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 

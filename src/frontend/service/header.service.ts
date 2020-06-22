@@ -7,7 +7,9 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { FoldersService } from '../app/folder/folders.service';
 import { DomPortalHost, TemplatePortal } from '@angular/cdk/portal';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class HeaderService {
     sideBarForm: boolean = false;
     sideBarAdmin: boolean = false;

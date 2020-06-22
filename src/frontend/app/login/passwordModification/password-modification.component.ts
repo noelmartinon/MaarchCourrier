@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { FormBuilder, FormGroup, Validators, ValidationErrors, AbstractControl, ValidatorFn } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
@@ -10,8 +10,7 @@ import { HeaderService } from '../../../service/header.service';
 import { AuthService } from '../../../service/auth.service';
 
 @Component({
-    templateUrl: 'password-modification.component.html',
-    providers: [AppService]
+    templateUrl: 'password-modification.component.html'
 })
 export class PasswordModificationComponent implements OnInit {
 

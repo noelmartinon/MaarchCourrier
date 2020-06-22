@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService }        from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
@@ -15,8 +15,7 @@ import { FunctionsService } from '../../../service/functions.service';
 @Component({
     selector: 'search-adv-list',
     templateUrl: "search-adv-list.component.html",
-    styleUrls: ['search-adv-list.component.scss'],
-    providers: [AppService]
+    styleUrls: ['search-adv-list.component.scss']
 })
 export class SearchAdvListComponent implements OnInit {
 

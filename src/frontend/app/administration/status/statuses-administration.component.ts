@@ -4,14 +4,13 @@ import { LANG } from '../../translate.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: 'statuses-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'statuses-administration.component.html'
 })
 export class StatusesAdministrationComponent implements OnInit {
 

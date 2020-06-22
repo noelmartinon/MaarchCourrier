@@ -5,15 +5,14 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     templateUrl: 'users-administration.component.html',
-    styleUrls: ['users-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['users-administration.component.scss']
 })
 export class UsersAdministrationComponent implements OnInit {
 

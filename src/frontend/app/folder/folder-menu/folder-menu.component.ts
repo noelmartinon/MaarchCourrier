@@ -3,7 +3,7 @@ import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, filter, exhaustMap, debounceTime, switchMap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
@@ -15,7 +15,6 @@ import { FunctionsService } from '../../../service/functions.service';
     selector: 'folder-menu',
     templateUrl: "folder-menu.component.html",
     styleUrls: ['folder-menu.component.scss'],
-    providers: [NotificationService],
 })
 export class FolderMenuComponent implements OnInit {
 

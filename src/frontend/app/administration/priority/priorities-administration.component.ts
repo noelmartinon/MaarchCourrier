@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
@@ -11,8 +11,7 @@ import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: 'priorities-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'priorities-administration.component.html'
 })
 export class PrioritiesAdministrationComponent implements OnInit {
 

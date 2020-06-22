@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { AppService } from '../../../service/app.service';
 
 @Component({
     templateUrl: 'update-status-administration.component.html',
-    styleUrls: ['update-status-administration.component.css'],
-    providers: [AppService]
+    styleUrls: ['update-status-administration.component.css']
 })
 export class UpdateStatusAdministrationComponent implements OnInit {
 

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormControl } from '@angular/forms';
 import { catchError, map, tap, elementAt } from 'rxjs/operators';

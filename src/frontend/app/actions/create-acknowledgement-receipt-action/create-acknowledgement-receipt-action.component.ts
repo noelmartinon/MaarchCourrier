@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, OnDestroy } from '@angular/core';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
@@ -14,7 +14,6 @@ declare var tinymce: any;
 @Component({
     templateUrl: "create-acknowledgement-receipt-action.component.html",
     styleUrls: ['create-acknowledgement-receipt-action.component.scss'],
-    providers: [AppService],
 })
 export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDestroy {
 

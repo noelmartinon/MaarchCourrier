@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
-import { NotificationService } from './notification.service';
+import { NotificationService } from '../service/notification/notification.service';
 import { HeaderService } from '../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../service/app.service';
@@ -10,8 +10,7 @@ declare var $: any;
 
 @Component({
     templateUrl: 'save-numeric-package.component.html',
-    styleUrls: ['profile.component.css'],
-    providers: [NotificationService, AppService]
+    styleUrls: ['profile.component.css']
 })
 export class SaveNumericPackageComponent implements OnInit {
 

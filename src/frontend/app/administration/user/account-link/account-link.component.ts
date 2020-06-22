@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LANG } from '../../../translate.component';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 
 @Component({
     templateUrl: 'account-link.component.html',

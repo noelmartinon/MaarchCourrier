@@ -1,11 +1,13 @@
 import { Injectable, ChangeDetectorRef } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class AppService {
 
-    private _mobileQueryListener    : () => void;
-    mobileQuery                     : MediaQueryList;
+    private _mobileQueryListener: () => void;
+    mobileQuery: MediaQueryList;
 
     currentUser: any;
 
@@ -16,11 +18,11 @@ export class AppService {
     }
 
     initService() {
-        
+
     }
 
     getViewMode() {
-        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true;
         } else {
             return this.mobileQuery.matches;

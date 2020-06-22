@@ -4,6 +4,8 @@ import { SharedModule } from '../app-common.module';
 
 import { AdministrationRoutingModule } from './administration-routing.module';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { DocumentViewerModule } from '../viewer/document-viewer.module';
+
 
 import { AdministrationComponent } from './home/administration.component';
 import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent } from './user/users-administration.component';
@@ -58,13 +60,16 @@ import { AlfrescoAdministrationComponent } from './alfresco/alfresco-administrat
 import { ContactDuplicateComponent } from './contact/contact-duplicate/contact-duplicate.component';
 import { ManageDuplicateComponent } from './contact/contact-duplicate/manage-duplicate/manage-duplicate.component';
 import { ContactExportComponent } from './contact/list/export/contact-export.component';
+import { DocumentFormModule } from '../document-form.module';
 
 
 @NgModule({
     imports: [
         SharedModule,
         NgxChartsModule,
-        AdministrationRoutingModule
+        DocumentFormModule,
+        AdministrationRoutingModule,
+        DocumentViewerModule
     ],
     declarations: [
         AdministrationComponent,
@@ -128,7 +133,7 @@ import { ContactExportComponent } from './contact/list/export/contact-export.com
         AlfrescoListAdministrationComponent,
         ContactDuplicateComponent,
         ManageDuplicateComponent,
-        ContactExportComponent
+        ContactExportComponent,
     ],
     entryComponents: [
         UsersAdministrationRedirectModalComponent,

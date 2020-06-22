@@ -5,7 +5,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { AppService } from '../../../service/app.service';
@@ -14,7 +14,6 @@ import { of } from 'rxjs/internal/observable/of';
 @Component({
     templateUrl: 'versions-update-administration.component.html',
     styleUrls: ['versions-update-administration.component.scss'],
-    providers: [AppService],
 })
 export class VersionsUpdateAdministrationComponent implements OnInit {
 

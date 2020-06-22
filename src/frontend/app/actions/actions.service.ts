@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../app/translate.component';
 import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
 import { of, Subject, Observable } from 'rxjs';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { ConfirmActionComponent } from './confirm-action/confirm-action.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CloseMailActionComponent } from './close-mail-action/close-mail-action.component';

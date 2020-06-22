@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LocalStorageService } from './local-storage.service';
-import { NotificationService } from '../app/notification.service';
+import { NotificationService } from './notification/notification.service';
 import { HeaderService } from './header.service';
 
 @Injectable({

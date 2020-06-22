@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../../translate.component';
-import { NotificationService } from '../../../../notification.service';
+import { NotificationService } from '../../../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SortPipe } from '../../../../../plugins/sorting.pipe';

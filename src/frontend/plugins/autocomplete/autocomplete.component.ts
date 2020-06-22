@@ -7,8 +7,8 @@ import { LatinisePipe } from 'ngx-pipes';
 import { LANG } from '../../app/translate.component';
 import { HttpClient } from '@angular/common/http';
 import { ConfirmComponent } from '../modal/confirm.component';
-import { NotificationService } from '../../app/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { NotificationService } from '../../service/notification/notification.service';
 
 @Component({
     selector: 'plugin-autocomplete',

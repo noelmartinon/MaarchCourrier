@@ -5,7 +5,9 @@ import { AuthService } from './auth.service';
 import { HeaderService } from './header.service';
 import { TimeLimitPipe } from '../plugins/timeLimit.pipe';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class FunctionsService {
 
     lang: any = LANG;

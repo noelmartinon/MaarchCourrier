@@ -1,7 +1,7 @@
 import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -14,8 +14,7 @@ import { FunctionsService } from '../../../../service/functions.service';
     templateUrl: 'contacts-groups-administration.component.html',
     styleUrls: [
         'contacts-groups-administration.component.scss'
-    ],
-    providers: [AppService]
+    ]
 })
 
 export class ContactsGroupsAdministrationComponent implements OnInit {

@@ -3,7 +3,9 @@ import { LANG_EN } from '../../frontend/lang/lang-en';
 import { LANG_FR } from '../../frontend/lang/lang-fr';
 import { LANG_NL } from '../../frontend/lang/lang-nl';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class LangService {
 
     lang: string = 'FR';

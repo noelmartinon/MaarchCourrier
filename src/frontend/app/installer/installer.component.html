@@ -1,158 +1,113 @@
-<mat-horizontal-stepper linear #stepper style="height: 100vh;overflow: auto;" (selectionChange)="initStep($event)">
-    <mat-step>
-        <ng-template matStepLabel>Installation</ng-template>
-        <div class="stepContainer">
-            <div class="stepContent">
-                <app-welcome></app-welcome>
-            </div>
-            <div style="display: flex;padding: 10px;">
-                <div style="flex: 1;text-align: left;">
-
-                </div>
-                <div style="flex: 1;text-align: right;">
-                    <button mat-button matStepperNext style="font-size: 35px;">
-                        suivant <i class="fa fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="appPrerequisite.getFormGroup()">
-        <ng-template matStepLabel>Prérequis</ng-template>
-        <div class="stepContainer">
-            <div class="stepContent">
-                <app-prerequisite #appPrerequisite></app-prerequisite>
-            </div>
-            <div style="display: flex;padding: 10px;">
-                <div style="flex: 1;text-align: left;">
-                    <button mat-button matStepperPrevious style="font-size: 35px;">
-                        <i class="fa fa-arrow-circle-left"></i> précédent
-                    </button>
-                </div>
-                <div style="flex: 1;text-align: right;">
-                    <button mat-button matStepperNext style="font-size: 35px;"
-                        [disabled]="!appPrerequisite.isValidStep()">
-                        suivant <i class="fa fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="appDatabase.getFormGroup()">
-        <ng-template matStepLabel>Base de données</ng-template>
-        <div class="stepContainer">
-            <div class="stepContent">
-                <app-database #appDatabase></app-database>
-            </div>
-            <div style="display: flex;padding: 10px;">
-                <div style="flex: 1;text-align: left;">
-                    <button mat-button matStepperPrevious style="font-size: 35px;">
-                        <i class="fa fa-arrow-circle-left"></i> précédent
-                    </button>
-                </div>
-                <div style="flex: 1;text-align: right;">
-                    <button mat-button matStepperNext style="font-size: 35px;"
-                        [disabled]="!appDatabase.isValidStep()">
-                        suivant <i class="fa fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="appDocservers.getFormGroup()">
-        <ng-template matStepLabel>Stockage</ng-template>
-        <div class="stepContainer">
-            <div class="stepContent">
-                <app-docservers #appDocservers></app-docservers>
-            </div>
-            <div style="display: flex;padding: 10px;">
-                <div style="flex: 1;text-align: left;">
-                    <button mat-button matStepperPrevious style="font-size: 35px;">
-                        <i class="fa fa-arrow-circle-left"></i> précédent
-                    </button>
-                </div>
-                <div style="flex: 1;text-align: right;">
-                    <button mat-button matStepperNext style="font-size: 35px;"
-                        [disabled]="!appDocservers.isValidStep()">
-                        suivant <i class="fa fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="appCustomization.getFormGroup()">
-        <ng-template matStepLabel>Personnalisation</ng-template>
-        <div class="stepContainer">
-            <div class="stepContent">
-                <app-customization #appCustomization></app-customization>
-            </div>
-            <div style="display: flex;padding: 10px;">
-                <div style="flex: 1;text-align: left;">
-                    <button mat-button matStepperPrevious style="font-size: 35px;">
-                        <i class="fa fa-arrow-circle-left"></i> précédent
-                    </button>
-                </div>
-                <div style="flex: 1;text-align: right;">
-                    <button mat-button matStepperNext style="font-size: 35px;"
-                        [disabled]="!appCustomization.isValidStep()">
-                        suivant <i class="fa fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="appUseradmin.getFormGroup()">
-        <ng-template matStepLabel>Utilisateur système</ng-template>
-        <div class="stepContainer">
-            <div class="stepContent">
-                <app-useradmin #appUseradmin></app-useradmin>
-            </div>
-            <div style="display: flex;padding: 10px;">
-                <div style="flex: 1;text-align: left;">
-                    <button mat-button matStepperPrevious style="font-size: 35px;">
-                        <i class="fa fa-arrow-circle-left"></i> précédent
-                    </button>
-                </div>
-                <div style="flex: 1;text-align: right;">
-                    <button (click)="endInstall();" mat-button style="font-size: 35px;"
-                        [disabled]="!appUseradmin.isValidStep()">
-                        suivant <i class="fa fa-arrow-circle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </mat-step>
-    <mat-step optional>
-        <ng-template matStepLabel>Serveur mail</ng-template>
-        Bonjour
-        <div>
-            <button mat-button matStepperPrevious>Back</button>
-        </div>
-    </mat-step>
-    <ng-template matStepperIcon="edit">
-        <mat-icon class="fa fa-check stepIcon"></mat-icon>
-    </ng-template>
-
-    <ng-template matStepperIcon="done">
-        <mat-icon class="fa fa-check stepIcon"></mat-icon>
-    </ng-template>
-
-    <ng-template matStepperIcon="error">
-        <mat-icon class="fa fa-times stepIcon" style="color: red;font-size: 15px !important;"></mat-icon>
-    </ng-template>
-</mat-horizontal-stepper>
-
-<!--<mat-sidenav-container autosize class="maarch-container">
+<mat-sidenav-container autosize class="maarch-container">
     <mat-sidenav-content>
         <div class="bg-head">
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
-                toto
             </div>
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
-            <div class="container-content">
-                toto
+            <div class="container-content" style="overflow: hidden;">
+                <mat-horizontal-stepper [@.disabled]="true" linear #stepper style="height: 100vh;overflow: auto;" (selectionChange)="initStep($event)">
+                    <mat-step>
+                        <ng-template matStepLabel>Installation</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-welcome #stepContent></app-welcome>
+                            </div>
+                            <button mat-fab matStepperNext class="nextStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+                    <mat-step [stepControl]="appPrerequisite.getFormGroup()">
+                        <ng-template matStepLabel>{{lang.prerequisite}}</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-prerequisite #appPrerequisite #stepContent></app-prerequisite>
+                            </div>
+                            <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-left"></mat-icon>
+                            </button>
+                            <button mat-fab matStepperNext class="nextStepButton" color="primary" [disabled]="!appPrerequisite.isValidStep()">
+                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+                    <mat-step [stepControl]="appDatabase.getFormGroup()">
+                        <ng-template matStepLabel>{{lang.database}}</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-database #appDatabase #stepContent></app-database>
+                            </div>
+                            <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-left"></mat-icon>
+                            </button>
+                            <button mat-fab matStepperNext class="nextStepButton" color="primary" [disabled]="!appDatabase.isValidStep()">
+                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+                    <mat-step [stepControl]="appDocservers.getFormGroup()">
+                        <ng-template matStepLabel>{{lang.docserver}}</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-docservers #appDocservers #stepContent></app-docservers>
+                            </div>
+                            <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-left"></mat-icon>
+                            </button>
+                            <button mat-fab matStepperNext class="nextStepButton" color="primary" [disabled]="!appDocservers.isValidStep()">
+                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+                    <mat-step [stepControl]="appCustomization.getFormGroup()">
+                        <ng-template matStepLabel>{{lang.customization}}</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-customization #appCustomization #stepContent></app-customization>
+                            </div>
+                            <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-left"></mat-icon>
+                            </button>
+                            <button mat-fab matStepperNext class="nextStepButton" color="primary" [disabled]="!appCustomization.isValidStep()">
+                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+                    <mat-step [stepControl]="appUseradmin.getFormGroup()">
+                        <ng-template matStepLabel>{{lang.userAdmin}}</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-useradmin #appUseradmin #stepContent (tiggerInstall)="endInstall()"></app-useradmin>
+                            </div>
+                            <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-left"></mat-icon>
+                            </button>
+                            <button mat-fab matStepperNext class="nextStepButton" color="primary" [disabled]="!appUseradmin.isValidStep()">
+                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            </button>
+                        </div>
+                    </mat-step>
+                    <mat-step optional>
+                        <ng-template matStepLabel>Serveur mail</ng-template>
+                        Bonjour
+                        <div>
+                            <button mat-button matStepperPrevious>Back</button>
+                        </div>
+                    </mat-step>
+                    <ng-template matStepperIcon="edit">
+                        <mat-icon class="fa fa-check stepIcon"></mat-icon>
+                    </ng-template>
+                
+                    <ng-template matStepperIcon="done">
+                        <mat-icon class="fa fa-check stepIcon"></mat-icon>
+                    </ng-template>
+                
+                    <ng-template matStepperIcon="error">
+                        <mat-icon class="fa fa-times stepIcon" style="color: red;font-size: 15px !important;"></mat-icon>
+                    </ng-template>
+                </mat-horizontal-stepper>
             </div>
         </div>
     </mat-sidenav-content>
-</mat-sidenav-container>-->
+</mat-sidenav-container>

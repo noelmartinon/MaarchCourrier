@@ -12,8 +12,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 @Component({
     selector: 'app-criteria-tool',
     templateUrl: "criteria-tool.component.html",
-    styleUrls: ['criteria-tool.component.scss'],
-    providers: [AppService]
+    styleUrls: ['criteria-tool.component.scss']
 })
 export class CriteriaToolComponent implements OnInit {
 

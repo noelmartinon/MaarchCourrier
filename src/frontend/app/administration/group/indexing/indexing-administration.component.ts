@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { map, catchError, filter, exhaustMap, finalize } from 'rxjs/operators';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';

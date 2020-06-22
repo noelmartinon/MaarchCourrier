@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 
@@ -15,7 +15,6 @@ import {MenuShortcutComponent} from "../../menu/menu-shortcut.component";
     selector: 'app-followed-action-list',
     templateUrl: "followed-action-list.component.html",
     styleUrls: ['followed-action-list.component.scss'],
-    providers: [NotificationService],
 })
 export class FollowedActionListComponent implements OnInit {
 

@@ -245,7 +245,7 @@ class CoreConfigModel
 
         $customId = CoreConfigModel::getCustomId();
 
-        if (is_file("custom/{$customId}/{$args['path']}")) {
+        if (!empty($customId) && is_file("custom/{$customId}/{$args['path']}")) {
             $path = "custom/{$customId}/{$args['path']}";
         } else {
             $path = $args['path'];
@@ -266,7 +266,7 @@ class CoreConfigModel
 
         $customId = CoreConfigModel::getCustomId();
 
-        if (is_file("custom/{$customId}/{$args['path']}")) {
+        if (!empty($customId) && is_file("custom/{$customId}/{$args['path']}")) {
             $path = "custom/{$customId}/{$args['path']}";
         } else {
             $path = $args['path'];

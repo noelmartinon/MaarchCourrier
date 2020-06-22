@@ -283,16 +283,17 @@ class MergeController
         $customFieldsIds = array_keys($customs);
         if (!empty($customFieldsIds)) {
             $customFields = CustomFieldModel::get([
-                'select' => ['id', 'values'],
+                'select' => ['id', 'values', 'type'],
                 'where'  => ['id in (?)'],
                 'data'   => [$customFieldsIds]
             ]);
             $customFieldsValues = array_column($customFields, 'values', 'id');
+            $customFieldsTypes = array_column($customFields, 'type', 'id');
 
             foreach ($customs as $customId => $custom) {
                 $rawValues = json_decode($customFieldsValues[$customId], true);
 
-                if (!empty($rawValues['table'])) {
+                if (!empty($rawValues['table']) && in_array($customFieldsTypes[$customId], ['radio', 'select', 'checkbox'])) {
                     $rawValues = CustomFieldModel::getValuesSQL($rawValues);
                     $rawValues = array_column($rawValues, 'label', 'key');
                     if (is_array($custom)) {

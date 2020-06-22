@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { ContactService } from '../../../service/contact.service';
 import { FunctionsService } from '../../../service/functions.service';

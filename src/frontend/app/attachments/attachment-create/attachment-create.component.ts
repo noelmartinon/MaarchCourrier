@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { catchError, tap, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
@@ -20,7 +20,7 @@ import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact
         'attachment-create.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, SortPipe, ContactService],
+    providers: [SortPipe, ContactService],
 })
 
 export class AttachmentCreateComponent implements OnInit {

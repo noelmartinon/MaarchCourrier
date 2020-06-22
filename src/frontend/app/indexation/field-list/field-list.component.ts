@@ -13,7 +13,7 @@ import { moveItemInArray, CdkDragDrop, transferArrayItem } from '@angular/cdk/dr
         'field-list.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, SortPipe]
+    providers: [SortPipe]
 })
 
 export class FieldListComponent implements OnInit {

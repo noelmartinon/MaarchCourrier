@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -16,8 +16,7 @@ import { of } from 'rxjs/internal/observable/of';
 declare var tinymce: any;
 
 @Component({
-    templateUrl: 'tags-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'tags-administration.component.html'
 })
 export class TagsAdministrationComponent implements OnInit {
 

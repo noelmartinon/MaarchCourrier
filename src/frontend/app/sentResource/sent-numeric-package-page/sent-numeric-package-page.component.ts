@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
@@ -20,7 +20,7 @@ import { environment } from '../../../environments/environment';
     selector: 'app-sent-numeric-package-page',
     templateUrl: './sent-numeric-package-page.component.html',
     styleUrls: ['./sent-numeric-package-page.component.scss'],
-    providers: [ContactService, AppService, StripTagsPipe, ReversePipe],
+    providers: [ContactService, StripTagsPipe, ReversePipe],
 })
 export class SentNumericPackagePageComponent implements OnInit {
 

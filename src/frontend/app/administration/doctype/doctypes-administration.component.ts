@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -10,8 +10,7 @@ import { MatSort } from '@angular/material/sort';
 import { AppService } from '../../../service/app.service';
 
 @Component({
-    templateUrl: 'doctypes-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'doctypes-administration.component.html'
 })
 
 export class DoctypesAdministrationComponent implements OnInit {

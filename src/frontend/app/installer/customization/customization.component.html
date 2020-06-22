@@ -1,30 +1,50 @@
-<div style="background: url('assets/1.jpg')">
-</div>
 <div class="stepContent">
-    <h2 class="stepContentTitle"><i class="fas fa-tools"></i> Personnalisation</h2>
-    <p>
-        Maarch Courrier vous permet de personnaliser votre application afin de l'intégrer parfaitement à votre environnement de travail.
-    </p>
-    <br/>
-    <mat-form-field appearance="outline">
-        <mat-label>Nom de l'application</mat-label>
-        <input matInput [(ngModel)]="appName" style="color: moccasin;">
-    </mat-form-field>
-    <div>Message écran de connexion : </div>
-    <textarea style="padding-top: 10px;" name="loginMsg" id="loginMsg" [(ngModel)]="loginMsg"></textarea>
-    <br/>
-    <br/>
-    <div>Message d'accueil : </div>
-    <textarea style="padding-top: 10px;" name="homeMsg" id="homeMsg" [(ngModel)]="homeMsg"></textarea>
-    <br/>
-    <br/>
-    <div>Choisissez le fond d'écran de l'écran de connexion : </div>
-    <div class="backgroundList">
-        <mat-card (click)="selectedBackground='bodylogin.jpg'" style="opacity: 0.3;" class="backgroundItem" [class.selected]="selectedBackground === 'bodylogin.jpg'">
-            <img src="assets/bodylogin.jpg" style="width:100%;"/> 
-        </mat-card>
-        <mat-card *ngFor="let background of backgroundList" (click)="selectedBackground=background.filename" style="opacity: 0.3;" class="backgroundItem" [class.selected]="background.filename === selectedBackground">
-            <img src="assets/{{background.filename}}" style="width:100%;"/> 
-        </mat-card>
+    <h2 class="stepContentTitle"><i class="fas fa-tools"></i> {{lang.customization}}</h2>
+    <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;min-width: 100%;">
+        {{lang.stepCustomization_desc}}
+    </div>
+    <div class="col-md-6">
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.instanceName}}</mat-label>
+            <input matInput [(ngModel)]="customId">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.applicationName}}</mat-label>
+            <input matInput [(ngModel)]="appName">
+        </mat-form-field>
+        <div>{{lang.loginMsg}} : </div>
+        <textarea style="padding-top: 10px;" name="loginMsg" id="loginMsg" [(ngModel)]="loginMsg"></textarea>
+        <br />
+        <br />
+        <div>{{lang.homeMsg}} : </div>
+        <textarea style="padding-top: 10px;" name="homeMsg" id="homeMsg" [(ngModel)]="homeMsg"></textarea>
+        <br />
+        <br />
+    </div>
+    <div class="col-md-6">
+        <div>{{lang.chooseLogo}} : </div>
+        <div>
+            <mat-card style="width: 350px;background-size: 100%;cursor: pointer;" matRipple>
+                <img [src]="logoURL()" (click)="uploadLogo.click()" style="width: 100%;"/>
+                <input type="file" name="files[]" #uploadLogo (change)="uploadTrigger($event, 'logo')" accept="image/svg+xml" style="display: none;">
+            </mat-card>
+        </div>
+        <br />
+        <div>{{lang.chooseLoginBg}} : </div>
+        <div class="backgroundList">
+            <mat-card (click)="selectedBackground='bodylogin.jpg'" style="opacity: 0.3;" class="backgroundItem"
+                [class.selected]="selectedBackground === 'bodylogin.jpg'"
+                style="background:url(assets/bodylogin.jpg);background-size: cover;">
+            </mat-card>
+            <mat-card *ngFor="let background of backgroundList" (click)="selectedBackground=background.filename"
+                style="opacity: 0.3;" class="backgroundItem"
+                [class.selected]="background.filename === selectedBackground"
+                [style.background]="'url('+background.url+')'">
+            </mat-card>
+            <mat-card style="opacity: 0.3;display: flex;align-items: center;justify-content: center;" class="backgroundItem" (click)="uploadFile.click()">
+                <input type="file" name="files[]" #uploadFile (change)="uploadTrigger($event, 'bg')" accept="image/jpg" style="display: none;">
+                <i class="fa fa-plus" style="font-size: 30px;color: #666;"></i>
+            </mat-card>
+        </div>
     </div>
 </div>

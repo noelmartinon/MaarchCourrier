@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@an
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { FormControl } from '@angular/forms';
 import { debounceTime, switchMap, distinctUntilChanged, filter } from 'rxjs/operators';
@@ -19,8 +19,7 @@ declare var $: any;
     templateUrl: 'contacts-group-administration.component.html',
     styleUrls: [
         'contacts-group-administration.component.scss'
-    ],
-    providers: [AppService]
+    ]
 })
 export class ContactsGroupAdministrationComponent implements OnInit {
 

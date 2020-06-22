@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 
@@ -35,7 +35,7 @@ import { of } from 'rxjs/internal/observable/of';
         'process.component.scss',
         '../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, ActionsService, ContactService],
+    providers: [ActionsService, ContactService],
 })
 export class ProcessComponent implements OnInit, OnDestroy {
 

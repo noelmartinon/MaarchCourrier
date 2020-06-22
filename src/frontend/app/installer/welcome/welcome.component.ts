@@ -14,7 +14,16 @@ export class WelcomeComponent implements OnInit {
 
     constructor() { }
 
-    ngOnInit(): void {
+    ngOnInit(): void { }
+
+    getInfoToInstall(): any[] {
+        return [];
+        /*return {
+            body : {
+                lang: this.selectedLang,
+            },
+            route : '/installer/lang'
+        };*/
     }
 
 }

@@ -2,15 +2,14 @@ import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@an
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatSidenav } from '@angular/material/sidenav';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { NgForm } from '@angular/forms';
 
 @Component({
     templateUrl: 'sendmail-administration.component.html',
-    styleUrls: ['sendmail-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['sendmail-administration.component.scss']
 })
 export class SendmailAdministrationComponent implements OnInit {
 

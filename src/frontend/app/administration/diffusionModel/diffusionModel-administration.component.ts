@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../service/app.service';
@@ -13,8 +13,7 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 
 @Component({
     templateUrl: "diffusionModel-administration.component.html",
-    styleUrls: ['diffusionModel-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['diffusionModel-administration.component.scss']
 })
 export class DiffusionModelAdministrationComponent implements OnInit {
 

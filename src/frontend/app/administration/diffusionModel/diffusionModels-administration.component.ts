@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -16,8 +16,7 @@ import {FunctionsService} from "../../../service/functions.service";
 import {LatinisePipe} from "ngx-pipes";
 
 @Component({
-    templateUrl: "diffusionModels-administration.component.html",
-    providers: [AppService]
+    templateUrl: "diffusionModels-administration.component.html"
 })
 export class DiffusionModelsAdministrationComponent implements OnInit {
 

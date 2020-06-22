@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -19,8 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'alfresco-list-administration.component.html',
-    styleUrls: ['./alfresco-list-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['./alfresco-list-administration.component.scss']
 })
 export class AlfrescoListAdministrationComponent implements OnInit {
 

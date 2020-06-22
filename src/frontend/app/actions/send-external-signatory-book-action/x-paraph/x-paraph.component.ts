@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';

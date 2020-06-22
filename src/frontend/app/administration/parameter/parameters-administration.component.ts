@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -10,8 +10,7 @@ import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: 'parameters-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'parameters-administration.component.html'
 })
 export class ParametersAdministrationComponent implements OnInit {
 

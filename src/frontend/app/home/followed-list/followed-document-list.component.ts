@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -29,8 +29,7 @@ declare var $: any;
 
 @Component({
     templateUrl: 'followed-document-list.component.html',
-    styleUrls: ['followed-document-list.component.scss'],
-    providers: [AppService]
+    styleUrls: ['followed-document-list.component.scss']
 })
 export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 

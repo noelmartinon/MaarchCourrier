@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone, ViewChild, QueryList, ViewChildren, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
-import { NotificationService } from './notification.service';
+import { NotificationService } from '../service/notification/notification.service';
 import { HeaderService } from '../service/header.service';
 import { debounceTime, switchMap, distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -23,8 +23,7 @@ declare var tinymce: any;
 
 @Component({
     templateUrl: 'profile.component.html',
-    styleUrls: ['profile.component.css'],
-    providers: [AppService]
+    styleUrls: ['profile.component.css']
 })
 export class ProfileComponent implements OnInit {
 

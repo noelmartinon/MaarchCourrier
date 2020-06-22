@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { of } from 'rxjs/internal/observable/of';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { LANG } from '../../translate.component';
@@ -100,11 +100,7 @@ export class PrerequisiteComponent implements OnInit {
             {
                 label: 'displayErrors',
                 required: true
-            },
-            {
-                label: 'shortOpenTag',
-                required: true
-            },
+            }
         ],
     };
 
@@ -163,5 +159,9 @@ export class PrerequisiteComponent implements OnInit {
 
     getFormGroup() {
         return this.stepFormGroup;
+    }
+
+    getInfoToInstall(): any[] {
+        return [];
     }
 }

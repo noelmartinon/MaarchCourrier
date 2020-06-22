@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,7 +27,7 @@ import { SelectIndexingModelComponent } from './select-indexing-model/select-ind
         'indexation.component.scss',
         'indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, ActionsService, SortPipe],
+    providers: [ActionsService, SortPipe],
 })
 export class IndexationComponent implements OnInit {
 

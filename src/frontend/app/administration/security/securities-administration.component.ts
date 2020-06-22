@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 
 @Component({
-    templateUrl: 'securities-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'securities-administration.component.html'
 })
 export class SecuritiesAdministrationComponent implements OnInit {
 

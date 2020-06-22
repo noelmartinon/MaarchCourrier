@@ -34,7 +34,7 @@ class AuthenticationController
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
-        'GET/installer/prerequisites', 'GET/installer/databaseConnection'
+        'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'POST/installer/custom', 'POST/installer/database'
     ];
 
     public function getInformations(Request $request, Response $response)

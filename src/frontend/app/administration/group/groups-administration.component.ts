@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -12,8 +12,7 @@ import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: 'groups-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'groups-administration.component.html'
 })
 export class GroupsAdministrationComponent implements OnInit {
 

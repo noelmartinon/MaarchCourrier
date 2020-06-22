@@ -1,14 +1,20 @@
 <div class="stepContent">
     <h2 class="stepContentTitle"><i class="fas fa-check-square"></i> {{lang.prerequisite}}</h2>
-    <p>
-        {{lang.stepPrerequisite_desc}} : <a href="{{docMaarchUrl}}" target="_blank" style="text-decoration: underline;color: white !important;">{{docMaarchUrl}}</a>
-    </p>
+    <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;min-width: 100%;">
+        {{lang.stepPrerequisite_desc}} : <a href="{{docMaarchUrl}}" target="_blank" class="link">{{docMaarchUrl}}</a>
+    </div>
     <mat-list style="background: white;" *ngFor="let groupPackage of packagesList | keyvalue">
         <div mat-subheader>{{lang[groupPackage.key]}}</div>
-        <mat-list-item *ngFor="let package of packagesList[groupPackage.key]">
-            <mat-icon mat-list-icon class="fa iconCheckPackage icon_{{package.state}}"></mat-icon>
-            <div mat-line style="font-size: 120%;">{{lang['install_'+package.label]}}</div>
-            <div mat-line style="color:#666;">{{lang['install_'+package.label+'_desc']}}</div>
-        </mat-list-item>
+        <mat-grid-list cols="3" rowHeight="50px">
+            <mat-grid-tile *ngFor="let package of packagesList[groupPackage.key]">
+                <mat-list-item>
+                    <mat-icon mat-list-icon class="fa iconCheckPackage icon_{{package.state}}"></mat-icon>
+                    <div mat-line class="packageName">{{lang['install_'+package.label]}} <i class="fa fa-info-circle" [title]="lang['install_'+package.label+'_desc']"></i></div>
+                </mat-list-item>  
+            </mat-grid-tile>
+          </mat-grid-list>
     </mat-list>
+    <div style="text-align: center;">
+        <button mat-raised-button type="button" color="primary" (click)="getStepData()">{{lang.updateInformations}}</button>
+    </div>
 </div>

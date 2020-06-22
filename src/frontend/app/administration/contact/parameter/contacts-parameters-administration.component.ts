@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
 import { MatPaginator } from '@angular/material/paginator';
@@ -10,8 +10,7 @@ import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
     templateUrl: 'contacts-parameters-administration.component.html',
-    styleUrls: ['contacts-parameters-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['contacts-parameters-administration.component.scss']
 })
 export class ContactsParametersAdministrationComponent implements OnInit {
 

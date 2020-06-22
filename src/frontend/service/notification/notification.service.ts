@@ -2,10 +2,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Injectable, Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { LANG } from './translate.component';
+import { LANG } from '../../app/translate.component';
+
 @Component({
     selector: 'custom-snackbar',
-    templateUrl: "notification.service.html",
+    templateUrl: 'notification.service.html',
     styleUrls: ['notification.service.scss'],
 })
 export class CustomSnackbarComponent {

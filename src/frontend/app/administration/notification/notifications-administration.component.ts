@@ -5,14 +5,13 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: 'notifications-administration.component.html',
-    providers: [AppService]
+    templateUrl: 'notifications-administration.component.html'
 })
 export class NotificationsAdministrationComponent implements OnInit {
 

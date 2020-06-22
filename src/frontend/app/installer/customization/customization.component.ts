@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
+import { StepAction } from '../types';
+import { DomSanitizer } from '@angular/platform-browser';
 
 declare var tinymce: any;
 
@@ -11,28 +13,31 @@ declare var tinymce: any;
     styleUrls: ['./customization.component.scss']
 })
 export class CustomizationComponent implements OnInit {
-
+    lang: any = LANG;
     stepFormGroup: FormGroup;
 
-    docserversPath: string = '/opt/maaarch/docservers/';
-
+    customId: string = 'cs_maarchcourrier';
     appName: string = 'Maarch Courrier 20.10';
     loginMsg: string = '<span style="color:#24b0ed"><strong>Découvrez votre application via</strong></span>&nbsp;<a title="le guide de visite" href="https://docs.maarch.org/gitbook/html/MaarchCourrier/19.04/guu/home.html" target="_blank"><span style="color:#f99830;"><strong>le guide de visite en ligne</strong></span></a>';
     homeMsg: string = '<p>D&eacute;couvrez <strong>Maarch Courrier 20.10</strong> avec <a title="notre guide de visite" href="https://docs.maarch.org/" target="_blank"><span style="color:#f99830;"><strong>notre guide de visite en ligne</strong></span></a>.</p>';
     selectedBackground: string = 'bodylogin.jpg';
+    uploadedImg: string = '';
+    uploadedLogo: string = '../rest/images?image=logo';
 
     backgroundList: any[] = [];
 
     constructor(
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
+        private sanitizer: DomSanitizer
     ) {
         this.stepFormGroup = this._formBuilder.group({
             firstCtrl: ['success', Validators.required],
         });
         this.backgroundList = Array.from({ length: 16 }).map((_, i) => {
             return {
-              filename: `${i + 1}.jpg`,
+                filename: `${i + 1}.jpg`,
+                url: `assets/${i + 1}.jpg`,
             };
           });
     }
@@ -82,4 +87,38 @@ export class CustomizationComponent implements OnInit {
         });
     }
 
+    getInfoToInstall(): StepAction[] {
+        return [{
+            body : {
+                customName: this.customId,
+            },
+            description : 'Initialisation de l\'instance',
+            route : '../rest/installer/custom',
+            installPriority : 1
+        }];
+    }
+
+    uploadTrigger(fileInput: any, mode: string) {
+        if (fileInput.target.files && fileInput.target.files[0]) {
+            const reader = new FileReader();
+
+            reader.readAsDataURL(fileInput.target.files[0]);
+
+            reader.onload = (value: any) => {
+                if (mode === 'logo') {
+                    this.uploadedLogo = value.target.result;
+                } else {
+                    this.backgroundList.push({
+                        filename: value.target.result,
+                        url: value.target.result,
+                    });
+                    this.selectedBackground = value.target.result;
+                }
+            };
+        }
+    }
+
+    logoURL() {
+        return this.sanitizer.bypassSecurityTrustUrl(this.uploadedLogo);
+      }
 }

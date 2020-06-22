@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { AuthService } from '../../service/auth.service';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { environment } from '../../environments/environment';
 import { LangService } from '../../service/app-lang.service';
 import { of } from 'rxjs/internal/observable/of';

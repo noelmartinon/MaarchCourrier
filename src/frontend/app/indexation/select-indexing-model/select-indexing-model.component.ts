@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewEncapsulation, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { finalize, catchError, exhaustMap, filter } from 'rxjs/operators';

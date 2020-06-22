@@ -30,6 +30,8 @@ use SrcCore\models\CoreConfigModel;
 
 class CustomFieldController
 {
+    const NUMERIC_TYPES = ['smallint', 'integer', 'bigint', 'decimal', 'numeric', 'real', 'double precision', 'serial', 'bigserial'];
+
     public function get(Request $request, Response $response)
     {
         $queryParams = $request->getQueryParams();
@@ -42,6 +44,11 @@ class CustomFieldController
             if (empty($queryParams['admin']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_custom_fields', 'userId' => $GLOBALS['id']])) {
                 if (!empty($customFields[$key]['values']['table'])) {
                     $customFields[$key]['values'] = CustomFieldModel::getValuesSQL($customFields[$key]['values']);
+                    if ($customField['type'] == 'string') {
+                        $customFields[$key]['values'][0]['key'] = (string)$customFields[$key]['values'][0]['key'];
+                    } elseif ($customField['type'] == 'integer') {
+                        $customFields[$key]['values'][0]['key'] = (int)$customFields[$key]['values'][0]['key'];
+                    }
                 } elseif (!empty($customFields[$key]['values'])) {
                     $values = $customFields[$key]['values'];
                     $customFields[$key]['values'] = [];
@@ -308,8 +315,18 @@ class CustomFieldController
                 return ['errors' => 'Body values[label] column is not allowed'];
             }
             if ($body['type'] == 'date' && stripos($columns[$value['column']], 'timestamp') === false) {
-                return ['errors' => 'Body values[label] column is not a date'];
+                return ['errors' => 'Body values[label] column is not a date', 'lang' => 'invalidColumnType'];
+            } elseif ($body['type'] == 'integer' && !in_array($columns[$value['column']], self::NUMERIC_TYPES)) {
+                return ['errors' => 'Body values[label] column is not an integer', 'lang' => 'invalidColumnType'];
+            } elseif (in_array($body['type'], ['date', 'integer']) && (!empty($value['delimiterStart']) || !empty($value['delimiterEnd']))) {
+                return ['errors' => 'Delimiters are forbidden for this type', 'lang' => 'forbiddenDelimiterType'];
             }
+        }
+        if ($body['type'] == 'date' && stripos($columns[$body['values']['key']], 'timestamp') === false) {
+            return ['errors' => 'Body values[label] column is not a date', 'lang' => 'invalidColumnType'];
+        }
+        if ($body['type'] == 'integer' && !in_array($columns[$body['values']['key']], self::NUMERIC_TYPES)) {
+            return ['errors' => 'Body values[label] column is not an integer', 'lang' => 'invalidColumnType'];
         }
         if (stripos($body['values']['clause'], 'select') !== false) {
             return ['errors' => 'Clause is not valid', 'lang' => 'invalidClause'];

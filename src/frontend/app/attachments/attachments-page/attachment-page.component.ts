@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { catchError, tap, finalize, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
@@ -21,7 +21,7 @@ import { FunctionsService } from '../../../service/functions.service';
         'attachment-page.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, SortPipe],
+    providers: [SortPipe],
 })
 
 export class AttachmentPageComponent implements OnInit {

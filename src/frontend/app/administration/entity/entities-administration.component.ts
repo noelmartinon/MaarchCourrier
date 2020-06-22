@@ -6,7 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { Router } from '@angular/router';
 import { AppService } from '../../../service/app.service';
@@ -21,8 +21,7 @@ import { of } from 'rxjs/internal/observable/of';
 declare var $: any;
 @Component({
     templateUrl: 'entities-administration.component.html',
-    styleUrls: ['entities-administration.component.css'],
-    providers: [AppService]
+    styleUrls: ['entities-administration.component.css']
 })
 export class EntitiesAdministrationComponent implements OnInit {
     /*HEADER*/

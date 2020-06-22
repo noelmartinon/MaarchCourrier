@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { AppService } from '../../../service/app.service';
 import { HeaderService } from '../../../service/header.service';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { FunctionsService } from '../../../service/functions.service';
 import { ActivatedRoute, Router } from '@angular/router';

@@ -1,28 +1,30 @@
 <div class="mat-dialog-content-container">
-  <h1 mat-dialog-title>Réaffection du modèle d'enregistrement</h1>
+  <h1 mat-dialog-title>{{lang.indexingModelReassign}}</h1>
   <div mat-dialog-content>
     <div class="alert-message alert-message-info">
-      Ce modèle est déjà utilisé par :
+      {{lang.indexingModelUsedBy}}
       <ul>
         <li *ngFor="let usage of mainIndexingModel.used">
-          <b>{{usage.count}}</b> courrier(s) avec le statut <b>{{usage.status}}</b>
+          <b>{{usage.count}}</b> {{lang.mailsWithStatus}} <b>{{usage.status}}</b>
         </li>
       </ul>
-      Pour le supprimer vous devez le remplacer par autre modèle.
+      {{lang.indexingModelReplaceToDelete}}
     </div>
     <div *ngIf="!loading">
-      <mat-select name="model" [(ngModel)]="modelIds" style="padding: 10px; margin: 10px"
-                  [placeholder]="lang.indexingModel" required (selectionChange)="changeModel($event)">
-        <mat-option *ngFor="let model of indexingModels;let i=index" [value]="model.id" [disabled]="model.id === mainIndexingModel.id">
-          {{model.label}}
-        </mat-option>
-      </mat-select>
+      <mat-form-field style="padding: 10px; margin-top: 15px">
+        <mat-select name="model" [(ngModel)]="modelIds"
+                    [placeholder]="lang.indexingModel" required (selectionChange)="changeModel($event)">
+          <mat-option *ngFor="let model of indexingModels;let i=index" [value]="model.id" [disabled]="model.id === mainIndexingModel.id">
+            {{model.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
     <div class="alert-message alert-message-danger" *ngIf="resetFields.length !== 0">
-      Les champs suivants ne sont pas dans le modèle sélectionné et seront réinitialisé pour tous les courriers :
+      {{lang.indexingModelFieldsReset}}
       <ul>
         <li *ngFor="let field of resetFields">
-          {{field.identifier}}
+          {{field.label}}
         </li>
       </ul>
 
@@ -31,7 +33,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions>
       <button class="actions" color="primary" mat-raised-button [disabled]="selectedModelId === undefined"
-        (click)="onSubmit()">{{this.lang.ok}}</button>
+        (click)="onSubmit()">{{this.lang.validate}}</button>
       <button class="actions" color="" mat-raised-button (click)="this.dialogRef.close('');">{{this.lang.cancel}}</button>
     </div>
   </div>

@@ -1,0 +1,22 @@
+<div class="mat-dialog-content-container">
+    <div mat-dialog-content>
+        <mat-list-item *ngFor="let step of steps">
+            <div mat-line class="step" [class.endStep]="step.state==='OK' || step.state==='KO'"
+                [class.currentStep]="step.state==='inProgress'">{{step.label}} <ng-container
+                    *ngIf="step.state==='inProgress'">...</ng-container>
+                <i *ngIf="step.state==='OK'" class="fa fa-check" style="color: green"></i>
+                <i *ngIf="step.state==='KO'" class="fa fa-times" style="color: red"></i>
+                <div *ngIf="step.msgErr!==''" class="alert-message alert-message-danger" role="alert" style="margin-top: 30px;min-width: 100%;">
+                    {{step.msgErr}}
+                </div>
+            </div>
+        </mat-list-item>
+    </div>
+    <ng-container *ngIf="isInstallComplete()">
+        <span class="divider-modal"></span>
+        <div mat-dialog-actions class="actions">
+            <button *ngIf="!isInstallError()" mat-raised-button mat-button color="primary" [mat-dialog-close]="">Accéder à la nouvelle instance</button>
+            <button *ngIf="isInstallError()" mat-raised-button mat-button [mat-dialog-close]="">{{lang.cancel}}</button>
+        </div>
+    </ng-container>
+</div>

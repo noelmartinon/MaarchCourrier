@@ -5,7 +5,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../service/app.service';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { ActionsService } from '../actions/actions.service';
 import { Subscription } from 'rxjs/internal/Subscription';

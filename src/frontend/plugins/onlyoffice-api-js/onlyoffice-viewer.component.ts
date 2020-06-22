@@ -14,10 +14,10 @@ import { catchError, tap, filter, finalize } from 'rxjs/operators';
 import { LANG } from '../../app/translate.component';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { NotificationService } from '../../app/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { Subject } from 'rxjs/internal/Subject';
 import { of } from 'rxjs/internal/observable/of';
+import { NotificationService } from '../../service/notification/notification.service.js';
 
 declare var $: any;
 declare var DocsAPI: any;

@@ -318,12 +318,13 @@ class SummarySheetController
                 if (!empty($customFieldsIds)) {
                     // get the label of the custom fields
                     $customFields = CustomFieldModel::get([
-                        'select' => ['id', 'label', 'values'],
+                        'select' => ['id', 'label', 'values', 'type'],
                         'where'  => ['id in (?)'],
                         'data'   => [$customFieldsIds]
                     ]);
 
                     $customFieldsRawValues = array_column($customFields, 'values', 'id');
+                    $customFieldsRawTypes = array_column($customFields, 'type', 'id');
                     $customFields = array_column($customFields, 'label', 'id');
 
                     $customFieldsValues = $customFieldsValues[0]['custom_fields'] ?? null;
@@ -357,7 +358,7 @@ class SummarySheetController
                     foreach ($customFieldsIds as $customFieldsId) {
                         $label = $customFields[$customFieldsId];
                         $rawValues = json_decode($customFieldsRawValues[$customFieldsId], true);
-                        if (!empty($rawValues['table'])) {
+                        if (!empty($rawValues['table']) && in_array($customFieldsRawTypes[$customFieldsId], ['radio', 'select', 'checkbox'])) {
                             $rawValues = CustomFieldModel::getValuesSQL($rawValues);
 
                             $rawValues = array_column($rawValues, 'label', 'key');

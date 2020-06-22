@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -17,8 +17,7 @@ import { of } from 'rxjs/internal/observable/of';
 
 @Component({
     templateUrl: 'group-administration.component.html',
-    styleUrls: ['group-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['group-administration.component.scss']
 })
 export class GroupAdministrationComponent implements OnInit {
 

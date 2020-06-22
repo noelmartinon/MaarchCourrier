@@ -10,13 +10,12 @@ import { Observable, of } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { startWith, map, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     templateUrl: 'administration.component.html',
-    styleUrls: ['administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['administration.component.scss']
 })
 export class AdministrationComponent implements OnInit {
 

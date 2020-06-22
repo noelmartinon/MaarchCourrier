@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
-import { NotificationService } from './notification.service';
+import { NotificationService } from '../service/notification/notification.service';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AppService } from '../service/app.service';
@@ -12,7 +12,6 @@ declare var $: any;
 
 @Component({
     templateUrl: 'activate-user.component.html',
-    providers: [AppService],
 })
 
 export class ActivateUserComponent implements OnInit {

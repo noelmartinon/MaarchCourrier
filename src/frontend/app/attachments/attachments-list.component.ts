@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { tap, finalize, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -18,7 +18,6 @@ import { AppService } from '../../service/app.service';
     selector: 'app-attachments-list',
     templateUrl: 'attachments-list.component.html',
     styleUrls: ['attachments-list.component.scss'],
-    providers: [AppService],
     animations: [
         trigger(
             'myAnimation',

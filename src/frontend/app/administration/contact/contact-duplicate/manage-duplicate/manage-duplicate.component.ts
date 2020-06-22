@@ -7,7 +7,7 @@ import { ContactDetailComponent } from '../../../../contact/contact-detail/conta
 import { LANG } from '../../../../translate.component';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
-import { NotificationService } from '../../../../notification.service';
+import { NotificationService } from '../../../../../service/notification/notification.service';
 
 @Component({
     selector: 'app-manage-duplicate',

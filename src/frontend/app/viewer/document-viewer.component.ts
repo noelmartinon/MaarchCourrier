@@ -1,7 +1,7 @@
 import {Component, OnInit, Input, ViewChild, EventEmitter, Output, ElementRef} from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { AppService } from '../../service/app.service';
 import { tap, catchError, filter, map, exhaustMap } from 'rxjs/operators';
@@ -26,7 +26,7 @@ import { of } from 'rxjs/internal/observable/of';
         'document-viewer.component.scss',
         '../indexation/indexing-form/indexing-form.component.scss',
     ],
-    providers: [AppService, SortPipe]
+    providers: [SortPipe]
 })
 
 export class DocumentViewerComponent implements OnInit {

@@ -8,8 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     templateUrl: 'contacts-page-administration.component.html',
-    styleUrls: ['contacts-page-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['contacts-page-administration.component.scss']
 })
 export class ContactsPageAdministrationComponent implements OnInit {
 

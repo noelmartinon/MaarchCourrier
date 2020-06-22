@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatSidenav } from '@angular/material/sidenav';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '../../../service/app.service';
@@ -13,8 +13,7 @@ declare var $: any;
 
 @Component({
     templateUrl: 'shipping-administration.component.html',
-    styleUrls: ['shipping-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['shipping-administration.component.scss']
 })
 export class ShippingAdministrationComponent implements OnInit {
 

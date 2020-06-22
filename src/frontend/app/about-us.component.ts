@@ -6,12 +6,11 @@ import { environment } from '../environments/environment';
 import {catchError, tap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {of} from 'rxjs/internal/observable/of';
-import {NotificationService} from './notification.service';
+import {NotificationService} from '../service/notification/notification.service';
 
 @Component({
     templateUrl: 'about-us.component.html',
-    styleUrls: ['about-us.component.css'],
-    providers: [AppService]
+    styleUrls: ['about-us.component.css']
 })
 export class AboutUsComponent implements OnInit {
 

@@ -10,8 +10,7 @@ import { HeaderService } from '../../../service/header.service';
 @Component({
     selector: 'admin-history',
     templateUrl: "history-administration.component.html",
-    styleUrls: ['history-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['history-administration.component.scss']
 })
 export class HistoryAdministrationComponent implements OnInit {
 

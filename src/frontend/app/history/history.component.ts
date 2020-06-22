@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ElementRef, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';

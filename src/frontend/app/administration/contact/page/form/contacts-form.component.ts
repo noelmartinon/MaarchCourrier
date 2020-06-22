@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../../translate.component';
-import { NotificationService } from '../../../../notification.service';
+import { NotificationService } from '../../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../../service/app.service';
@@ -20,7 +20,7 @@ import { environment } from '../../../../../environments/environment';
     selector: 'app-contact-form',
     templateUrl: 'contacts-form.component.html',
     styleUrls: ['contacts-form.component.scss'],
-    providers: [NotificationService, AppService, ContactService],
+    providers: [ContactService],
     animations: [
         trigger('hideShow', [
             transition(

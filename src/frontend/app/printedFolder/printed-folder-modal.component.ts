@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { LANG } from '../translate.component';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { map, tap, catchError, finalize } from 'rxjs/operators';
 import { FunctionsService } from '../../service/functions.service';
 import { FormControl } from '@angular/forms';

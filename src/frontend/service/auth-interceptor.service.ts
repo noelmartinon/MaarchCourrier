@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpHandler, HttpInterceptor, HttpRequest, HttpClient } from '@angular/common/http';
+import { HttpHandler, HttpInterceptor, HttpRequest, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LANG } from '../app/translate.component';
 import { catchError, switchMap } from 'rxjs/operators';
-import { NotificationService } from '../app/notification.service';
+import { NotificationService } from './notification/notification.service';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
@@ -124,7 +124,14 @@ export class AuthInterceptor implements HttpInterceptor {
                     } else if (error.error.errors === 'User must change his password') {
                         return this.router.navigate(['/password-modification']);
                     } else {
-                        return next.handle(request);
+                        const response = new HttpErrorResponse({
+                            error: error.error,
+                            status: error.status,
+                            statusText: error.statusText,
+                            headers: error.headers,
+                            url: error.url,
+                        });
+                        return Promise.reject(response);
                     }
                 })
             );

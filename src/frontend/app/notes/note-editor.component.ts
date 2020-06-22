@@ -1,7 +1,7 @@
 import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { catchError, tap, debounceTime, filter } from 'rxjs/operators';
 import { HeaderService } from '../../service/header.service';
 import { of } from 'rxjs';
@@ -13,7 +13,6 @@ import { LatinisePipe } from 'ngx-pipes';
     selector: 'app-note-editor',
     templateUrl: 'note-editor.component.html',
     styleUrls: ['note-editor.component.scss'],
-    providers: [NotificationService]
 })
 export class NoteEditorComponent implements OnInit {
 

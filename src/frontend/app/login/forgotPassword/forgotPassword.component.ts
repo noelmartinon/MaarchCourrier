@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { finalize } from 'rxjs/operators';
 import { LANG } from '../../translate.component';
 import { HeaderService } from '../../../service/header.service';

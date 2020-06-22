@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { LANG } from '../../../translate.component';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,7 +16,7 @@ import { ManageDuplicateComponent } from './manage-duplicate/manage-duplicate.co
     selector: 'app-contact-duplicate',
     templateUrl: './contact-duplicate.component.html',
     styleUrls: ['./contact-duplicate.component.scss'],
-    providers: [AppService, SortPipe]
+    providers: [SortPipe]
 })
 export class ContactDuplicateComponent implements OnInit {
 

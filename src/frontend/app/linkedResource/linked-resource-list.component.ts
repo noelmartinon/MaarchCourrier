@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -20,8 +20,7 @@ declare var $: any;
 @Component({
     selector: 'app-linked-resource-list',
     templateUrl: 'linked-resource-list.component.html',
-    styleUrls: ['linked-resource-list.component.scss'],
-    providers: [AppService]
+    styleUrls: ['linked-resource-list.component.scss']
 })
 export class LinkedResourceListComponent implements OnInit {
 

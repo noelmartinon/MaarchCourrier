@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -30,7 +30,6 @@ declare var $: any;
 @Component({
     templateUrl: 'basket-list.component.html',
     styleUrls: ['basket-list.component.scss'],
-    providers: [AppService],
 })
 export class BasketListComponent implements OnInit, OnDestroy {
 

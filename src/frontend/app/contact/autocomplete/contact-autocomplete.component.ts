@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
@@ -23,7 +23,7 @@ import { FunctionsService } from '../../../service/functions.service';
         'contact-autocomplete.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, SortPipe, ContactService]
+    providers: [SortPipe, ContactService]
 })
 
 export class ContactAutocompleteComponent implements OnInit {

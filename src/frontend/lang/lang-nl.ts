@@ -165,6 +165,7 @@ export const LANG_NL = {
     "city"                                  : "Gemeente",
     "classifying"                           : "STANDEN",
     "clause"                                : "Clausule",
+    "fingerprintsDoNotMatch":                      "Fingerprints do not match",
     "clauseGroup"                           : "Documentaire perimeter",
     "clickOn"                               : "Klik op",
     "close"                                 : "Afsluiten",
@@ -1657,6 +1658,9 @@ export const LANG_NL = {
     "accountLocked": "Too many connections attemps. Retry in", //_TO_TRANSLATE
     "modelUsedByResources": "This model is used by resources, you can't delete it.", //_TO_TRANSLATE
     "mustChangePassword": "Please, you must change your password.", //_TO_TRANSLATE
+    "invalidClause" : "Invalid clause",//_TO_TRANSLATE
+    "invalidColumnType" : "One of selected columns does not match type",//_TO_TRANSLATE
+    "forbiddenDelimiterType" : "Delimiters are forbidden for this type", //_TO_TRANSLATE
     "linkedResources": "Main document (Linked mails)", //_TO_TRANSLATE
     "linkedResourcesAttachments": "Attachments (linked mails)", //_TO_TRANSLATE
     "accessNotFound": "Access not found", //_TO_TRANSLATE
@@ -1703,4 +1707,11 @@ export const LANG_NL = {
     "targetTable": "Target table", // _TO_TRANSLATE
     "targetIdentifier": "Target identifier", // _TO_TRANSLATE
     "companyLastname": "Company / Lastname", // _TO_TRANSLATE
+    "warnPrivateKeyTitle": "Security alert", // _TO_TRANSLATE
+    "warnPrivateKey": "<b>The private key has not been updated !</b> <br>This compromises the security of the application.", // _TO_TRANSLATE
+    "indexingModelUsedBy": "This model is already used by : ", // _TO_TRANSLATE
+    "mailsWithStatus": " mail(s) with the status ", // _TO_TRANSLATE
+    "indexingModelReplaceToDelete": "To delete this model you have to replace it by another.", // _TO_TRANSLATE
+    "indexingModelFieldsReset": "The following fields are not in the selected model and will be reset for all mails : ", // _TO_TRANSLATE
+    "indexingModelReassign": "Reassign indexing model", // _TO_TRANSLATE
 };

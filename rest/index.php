@@ -311,6 +311,8 @@ $app->delete('/indexingModels/{id}', \IndexingModel\controllers\IndexingModelCon
 //Installer
 $app->get('/installer/prerequisites', \SrcCore\controllers\InstallerController::class . ':getPrerequisites');
 $app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerController::class . ':checkDatabaseConnection');
+$app->post('/installer/custom', \SrcCore\controllers\InstallerController::class . ':createCustom');
+$app->post('/installer/database', \SrcCore\controllers\InstallerController::class . ':createDatabase');
 
 //ListInstances
 $app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');

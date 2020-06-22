@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
@@ -18,7 +18,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
     selector: 'app-indexing-form',
     templateUrl: "indexing-form.component.html",
     styleUrls: ['indexing-form.component.scss'],
-    providers: [NotificationService, AppService, SortPipe]
+    providers: [SortPipe]
 })
 
 export class IndexingFormComponent implements OnInit {

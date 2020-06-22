@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ElementRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
@@ -16,8 +16,7 @@ import { PrivilegeService } from '../../../../service/privileges.service';
 
 @Component({
     templateUrl: "history-batch-administration.component.html",
-    styleUrls: ['history-batch-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['history-batch-administration.component.scss']
 })
 export class HistoryBatchAdministrationComponent implements OnInit {
 

@@ -4,7 +4,7 @@ import { LANG } from '../translate.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../notification.service';
+import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AppService } from '../../service/app.service';
@@ -17,8 +17,7 @@ declare var $: any;
 
 @Component({
     templateUrl: 'home.component.html',
-    styleUrls: ['home.component.scss'],
-    providers: [AppService]
+    styleUrls: ['home.component.scss']
 })
 export class HomeComponent implements OnInit, AfterViewInit {
 

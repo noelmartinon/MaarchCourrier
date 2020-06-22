@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FunctionsService } from '../../../service/functions.service';
 import { of } from 'rxjs/internal/observable/of';

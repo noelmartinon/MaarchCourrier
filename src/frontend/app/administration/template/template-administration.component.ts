@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, On
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
@@ -18,8 +18,7 @@ declare var tinymce: any;
 
 @Component({
     templateUrl: 'template-administration.component.html',
-    styleUrls: ['template-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['template-administration.component.scss']
 })
 export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 

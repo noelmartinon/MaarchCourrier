@@ -8,7 +8,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
-import { NotificationService } from '../../notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AccountLinkComponent } from './account-link/account-link.component';
@@ -19,8 +19,7 @@ declare var $: any;
 
 @Component({
     templateUrl: 'user-administration.component.html',
-    styleUrls: ['user-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['user-administration.component.scss']
 })
 export class UserAdministrationComponent implements OnInit {
 

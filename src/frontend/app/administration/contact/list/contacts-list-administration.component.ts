@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../service/app.service';
@@ -18,8 +18,7 @@ import { ContactExportComponent } from './export/contact-export.component';
 @Component({
     selector: 'contact-list',
     templateUrl: "contacts-list-administration.component.html",
-    styleUrls: ['contacts-list-administration.component.scss'],
-    providers: [AppService]
+    styleUrls: ['contacts-list-administration.component.scss']
 })
 export class ContactsListAdministrationComponent implements OnInit {
 
@@ -275,7 +274,6 @@ export class ContactListHttpDao {
 @Component({
     templateUrl: 'contacts-list-administration-redirect-modal.component.html',
     styleUrls: [],
-    providers: [NotificationService]
 })
 export class ContactsListAdministrationRedirectModalComponent {
     lang: any = LANG;

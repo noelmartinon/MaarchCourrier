@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
-import { NotificationService } from '../../../notification.service';
+import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -17,7 +17,7 @@ import { of } from 'rxjs/internal/observable/of';
         'contacts-custom-fields-administration.component.scss',
         '../../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [AppService, SortPipe]
+    providers: [SortPipe]
 })
 
 export class ContactsCustomFieldsAdministrationComponent implements OnInit {
