@@ -15,6 +15,7 @@
 namespace SrcCore\controllers;
 
 use Resource\controllers\StoreController;
+use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
@@ -141,5 +142,42 @@ class CoreController
         $maximumSize = min($uploadMaxFilesize, $postMaxSize, $memoryLimit);
 
         return $maximumSize;
+    }
+
+    public static function getErrorReportingFromPhpIni()
+    {
+        $bits = ini_get('error_reporting');
+
+        $errorReporting = [];
+        while ($bits > 0) {
+            $end = 0;
+            for ($i = 0, $n = 0; $i <= $bits; $i = 1 * pow(2, $n), $n++) {
+                $end = $i;
+            }
+            $errorReporting[] = $end;
+            $bits = $bits - $end;
+        }
+
+        return $errorReporting;
+    }
+
+    //TODO REVOIR
+    public function generateLang(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['langId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body langId is empty or not a string']);
+        }
+
+        $content = 'export const LANG_'.strtoupper($body['langId']).' = '.json_encode($body['jsonContent'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES).';';
+
+        if($fp = @fopen("src/frontend/lang/lang-{$body['langId']}.ts", 'w')) {
+            fwrite($fp, $content);
+            fclose($fp);
+            return $response->withStatus(204);
+        } else {
+            return $response->withStatus(400)->withJson(['errors' => "Cannot open file : src/frontend/lang/lang-{$body['langId']}.ts"]);
+        }
     }
 }

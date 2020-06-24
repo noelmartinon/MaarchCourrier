@@ -17,6 +17,7 @@ import { DocumentViewerModalComponent } from './modal/document-viewer-modal.comp
 import { PrivilegeService } from '../../service/privileges.service';
 import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
 import { of } from 'rxjs/internal/observable/of';
+import {CollaboraOnlineViewerComponent} from '../../plugins/collabora-online/collabora-online-viewer.component';
 
 
 @Component({
@@ -131,6 +132,7 @@ export class DocumentViewerComponent implements OnInit {
 
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     docToUploadValue: any;
 
@@ -470,6 +472,8 @@ export class DocumentViewerComponent implements OnInit {
     getFile() {
         if (this.editor.mode === 'onlyoffice' && this.onlyofficeViewer !== undefined) {
             return this.onlyofficeViewer.getFile();
+        } else if (this.editor.mode === 'collaboraOnline' && this.onlyofficeViewer !== undefined) {
+            return this.onlyofficeViewer.getFile();
         } else {
             const objFile = JSON.parse(JSON.stringify(this.file));
             objFile.content = objFile.contentMode === 'route' ? null : objFile.content;
@@ -783,13 +787,21 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     editMainDocument() {
-
         if (this.editor.mode === 'onlyoffice') {
             this.editor.async = false;
             this.editor.options = {
                 objectType: 'resourceModification',
                 objectId: this.resId,
                 docUrl: `rest/onlyOffice/mergedFile`
+            };
+            this.editInProgress = true;
+
+        } else if (this.editor.mode === 'collaboraOnline') {
+            this.editor.async = false;
+            this.editor.options = {
+                objectType: 'resourceModification',
+                objectId: this.resId,
+                docUrl: `rest/wopi/files/`
             };
             this.editInProgress = true;
 
@@ -835,6 +847,8 @@ export class DocumentViewerComponent implements OnInit {
 
     isEditingTemplate() {
         if (this.editor.mode === 'onlyoffice') {
+            return this.onlyofficeViewer !== undefined;
+        } else if (this.editor.mode === 'collaboraOnline') {
             return this.onlyofficeViewer !== undefined;
         } else {
             return this.editInProgress;
@@ -985,6 +999,9 @@ export class DocumentViewerComponent implements OnInit {
             this.editor.async = true;
         } else if (this.headerService.user.preferences.documentEdition === 'onlyoffice') {
             this.editor.mode = 'onlyoffice';
+            this.editor.async = false;
+        } else if (this.headerService.user.preferences.documentEdition === 'collaboraonline') {
+            this.editor.mode = 'collaboraOnline';
             this.editor.async = false;
         }
     }

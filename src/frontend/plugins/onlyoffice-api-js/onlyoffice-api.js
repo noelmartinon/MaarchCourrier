@@ -643,7 +643,7 @@ var onlyofficetesturl = '';
         return '5.4.2';
     };
 
-    MessageDispatcher = function(fn, scope) {
+    var MessageDispatcher = function(fn, scope) {
         var _fn     = fn,
             _scope  = scope || window,
             eventFn = function(msg) {

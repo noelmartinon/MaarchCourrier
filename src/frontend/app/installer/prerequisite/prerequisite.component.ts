@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -7,6 +7,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { LANG } from '../../translate.component';
 import { environment } from '../../../environments/environment';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-prerequisite',
@@ -63,7 +64,7 @@ export class PrerequisiteComponent implements OnInit {
             {
                 label: 'fileinfo',
                 required: true
-            },            {
+            }, {
                 label: 'pdoPgsql',
                 required: true
             },
@@ -106,6 +107,8 @@ export class PrerequisiteComponent implements OnInit {
 
     docMaarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_prerequisites/home.html`;
 
+    @ViewChildren('toto') toto: QueryList<any>;
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -139,6 +142,18 @@ export class PrerequisiteComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    initStep() {
+        let i = 0;
+        Object.keys(this.packagesList).forEach(group => {
+            this.packagesList[group].forEach((item: any, key: number) => {
+                if (this.packagesList[group][key].state === 'ko') {
+                    this.toto.toArray().filter((itemKo: any) => itemKo._elementRef.nativeElement.id === this.packagesList[group][key].label)[0].toggle();
+                }
+                i++;
+            });
+        });
     }
 
     checkStep() {

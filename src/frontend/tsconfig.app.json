@@ -4,17 +4,14 @@
     "outDir": "../out-tsc/app",
     "baseUrl": "../../apps/maarch_entreprise/",
   },
-  "angularCompilerOptions": {
-    "enableIvy": false
-  },
   "files": [
     "main.ts",
     "polyfills.ts"
   ],
-  "exclude": [
-    "../../node_modules/*"
-  ],
   "include": [
     "../../src/frontend/**/*.d.ts"
+  ],
+  "exclude": [
+    "../../src/**/*.spec.ts"
   ]
 }

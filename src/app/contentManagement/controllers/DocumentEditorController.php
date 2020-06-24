@@ -20,7 +20,7 @@ use SrcCore\models\CoreConfigModel;
 
 class DocumentEditorController
 {
-    const DOCUMENT_EDITION_METHODS = ['java', 'onlyoffice'];
+    const DOCUMENT_EDITION_METHODS = ['java', 'onlyoffice', 'collaboraonline'];
 
     public static function get(Request $request, Response $response)
     {

@@ -7,6 +7,7 @@ import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
 import { LANG } from '../../translate.component';
 import { StepAction } from '../types';
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     selector: 'app-database',
@@ -19,16 +20,15 @@ export class DatabaseComponent implements OnInit {
     hide: boolean = true;
 
     connectionState: boolean = false;
+    dbExist: boolean = false;
 
-    dataSamples: string[] = [
-        'data_fr',
-        'data_en'
-    ];
+    dataFiles: string[] = [];
 
     constructor(
         public http: HttpClient,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
+        private functionsService: FunctionsService,
     ) {
         this.stepFormGroup = this._formBuilder.group({
             dbHostCtrl: ['localhost', Validators.required],
@@ -57,6 +57,20 @@ export class DatabaseComponent implements OnInit {
         this.stepFormGroup.controls['dbNameCtrl'].valueChanges.pipe(
             tap(() => this.stepFormGroup.controls['stateStep'].setValue(''))
         ).subscribe();
+
+        this.getDataFiles();
+    }
+
+    getDataFiles() {
+        this.http.get(`../rest/installer/sqlDataFiles`).pipe(
+            tap((data: any) => {
+                this.dataFiles = data.dataFiles;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     isValidConnection() {
@@ -75,8 +89,15 @@ export class DatabaseComponent implements OnInit {
 
         this.http.get(`../rest/installer/databaseConnection`, { params: info }).pipe(
             tap((data: any) => {
-                this.notify.success(this.lang.rightInformations);
-                this.stepFormGroup.controls['stateStep'].setValue('success');
+                console.log(this.functionsService.empty(data.warning));
+                if (!this.functionsService.empty(data.warning)) {
+                    this.dbExist = true;
+                    this.stepFormGroup.controls['stateStep'].setValue('');
+                } else {
+                    this.dbExist = false;
+                    this.notify.success(this.lang.rightInformations);
+                    this.stepFormGroup.controls['stateStep'].setValue('success');
+                }
             }),
             catchError((err: any) => {
                 this.notify.error(this.lang.badInformations);

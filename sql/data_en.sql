@@ -711,37 +711,29 @@ VALUES ('ACKNOWLEDGEMENT_RECEIPTS', 'Acknowledgement Receipts', 'Y');
 
 TRUNCATE TABLE docservers;
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FASTHD_AI', 'DOC', 'Dépôt documentaire issue d''imports de masse', 'Y', 50000000000, 1, '/opt/maarch/docservers/DDS1/ai/', '2011-01-07 13:43:48.696644', 'letterbox_coll');
+VALUES ('FASTHD_AI', 'DOC', 'Dépôt documentaire issue d''imports de masse', 'Y', 50000000000, 1, '/opt/maarch/docservers/ai/', '2011-01-07 13:43:48.696644', 'letterbox_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FASTHD_MAN', 'DOC', 'Dépôt documentaire de numérisation manuelle', 'N', 50000000000, 1290730, '/opt/maarch/docservers/DDS1/manual/', '2011-01-13 14:47:49.197164', 'letterbox_coll');
+VALUES ('FASTHD_MAN', 'DOC', 'Dépôt documentaire de numérisation manuelle', 'N', 50000000000, 1290730, '/opt/maarch/docservers/resources/', '2011-01-13 14:47:49.197164', 'letterbox_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FASTHD_ATTACH', 'FASTHD', 'Dépôt des pièces jointes', 'N', 50000000000, 1, '/opt/maarch/docservers/DDS1/manual_attachments/', '2011-01-13 14:47:49.197164', 'attachments_coll');
+VALUES ('FASTHD_ATTACH', 'DOC', 'Dépôt des pièces jointes', 'N', 50000000000, 1, '/opt/maarch/docservers/attachments/', '2011-01-13 14:47:49.197164', 'attachments_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FASTHD_ATTACH_VERSION', 'FASTHD', 'Dépôt des pièces jointes versionnées', 'N', 50000000000, 1, '/opt/maarch/docservers/DDS1/manual_attachments_version/', '2011-01-13 14:47:49.197164', 'attachments_version_coll');
+VALUES ('CONVERT_MLB', 'CONVERT', 'Dépôt des formats des documents numérisés', 'N', 50000000000, 0, '/opt/maarch/docservers/convert_resources/', '2015-03-16 14:47:49.197164', 'letterbox_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('CONVERT_MLB', 'CONVERT', 'Dépôt des formats des documents numérisés', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/convert_mlb/', '2015-03-16 14:47:49.197164', 'letterbox_coll');
+VALUES ('CONVERT_ATTACH', 'CONVERT', 'Dépôt des formats des pièces jointes', 'N', 50000000000, 0, '/opt/maarch/docservers/convert_attachments/', '2015-03-16 14:47:49.197164', 'attachments_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('CONVERT_ATTACH', 'CONVERT', 'Dépôt des formats des pièces jointes', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/convert_attachments/', '2015-03-16 14:47:49.197164', 'attachments_coll');
+VALUES ('TNL_MLB', 'TNL', 'Dépôt des maniatures des documents numérisés', 'N', 50000000000, 0, '/opt/maarch/docservers/thumbnails_resources/', '2015-03-16 14:47:49.197164', 'letterbox_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('CONVERT_ATTACH_VERSION', 'CONVERT', 'Dépôt des formats des pièces jointes versionnées', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/convert_attachments_version/', '2015-03-16 14:47:49.197164', 'attachments_version_coll');
+VALUES ('TNL_ATTACH', 'TNL', 'Dépôt des maniatures des pièces jointes', 'N', 50000000000, 0, '/opt/maarch/docservers/thumbnails_attachments/', '2015-03-16 14:47:49.197164', 'attachments_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('TNL_MLB', 'TNL', 'Dépôt des maniatures des documents numérisés', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/thumbnails_mlb/', '2015-03-16 14:47:49.197164', 'letterbox_coll');
+VALUES ('FULLTEXT_MLB', 'FULLTEXT', 'Dépôt de l''extraction plein texte des documents numérisés', 'N', 50000000000, 0, '/opt/maarch/docservers/fulltext_resources/', '2015-03-16 14:47:49.197164', 'letterbox_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('TNL_ATTACH', 'TNL', 'Dépôt des maniatures des pièces jointes', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/thumbnails_attachments/', '2015-03-16 14:47:49.197164', 'attachments_coll');
+VALUES ('FULLTEXT_ATTACH', 'FULLTEXT', 'Dépôt de l''extraction plein texte des pièces jointes', 'N', 50000000000, 0, '/opt/maarch/docservers/fulltext_attachments/', '2015-03-16 14:47:49.197164', 'attachments_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('TNL_ATTACH_VERSION', 'TNL', 'Dépôt des maniatures des pièces jointes versionnées', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/thumbnails_attachments_version/', '2015-03-16 14:47:49.197164', 'attachments_version_coll');
+VALUES ('TEMPLATES', 'TEMPLATES', 'Dépôt des modèles de documents', 'N', 50000000000, 71511, '/opt/maarch/docservers/templates/', '2012-04-01 14:49:05.095119', 'templates');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FULLTEXT_MLB', 'FULLTEXT', 'Dépôt de l''extraction plein texte des documents numérisés', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/fulltext_mlb/', '2015-03-16 14:47:49.197164', 'letterbox_coll');
+VALUES ('ARCHIVETRANSFER', 'ARCHIVETRANSFER', 'Dépôt des archives numériques', 'N', 50000000000, 1, '/opt/maarch/docservers/archive_transfer/', '2017-01-13 14:47:49.197164', 'archive_transfer_coll');
 INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FULLTEXT_ATTACH', 'FULLTEXT', 'Dépôt de l''extraction plein texte des pièces jointes', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/fulltext_attachments/', '2015-03-16 14:47:49.197164', 'attachments_coll');
-INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('FULLTEXT_ATTACH_VERSION', 'FULLTEXT', 'Dépôt de l''extraction plein texte des pièces jointes versionnées', 'N', 50000000000, 0, '/opt/maarch/docservers/DDS1/fulltext_attachments_version/', '2015-03-16 14:47:49.197164', 'attachments_version_coll');
-INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('TEMPLATES', 'TEMPLATES', 'Dépôt des modèles de documents', 'N', 50000000000, 71511, '/opt/maarch/docservers/DDS1/templates/', '2012-04-01 14:49:05.095119', 'templates');
-INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('ARCHIVETRANSFER', 'ARCHIVETRANSFER', 'Dépôt des archives numériques', 'N', 50000000000, 1, '/opt/maarch/docservers/DDS1/archive_transfer/', '2017-01-13 14:47:49.197164', 'archive_transfer_coll');
-INSERT INTO docservers (docserver_id, docserver_type_id, device_label, is_readonly, size_limit_number, actual_size_number, path_template, creation_date, coll_id)
-VALUES ('ACKNOWLEDGEMENT_RECEIPTS', 'ACKNOWLEDGEMENT_RECEIPTS', 'Acknowledgement Receipts', 'N', 50000000000, 0, '/opt/maarch/docservers/acknowledgement_receipts/', '2019-04-19 22:22:22.201904', 'letterbox_coll');
+VALUES ('ACKNOWLEDGEMENT_RECEIPTS', 'ACKNOWLEDGEMENT_RECEIPTS', 'Dépôt des AR', 'N', 50000000000, 0, '/opt/maarch/docservers/acknowledgement_receipts/', '2019-04-19 22:22:22.201904', 'letterbox_coll');
 
 ------------
 --SUPERADMIN USER

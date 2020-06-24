@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-
 import { SharedModule } from '../app-common.module';
-
 import { InstallerComponent } from './installer.component';
 import { InstallActionComponent } from './install-action/install-action.component';
 import { WelcomeComponent } from './welcome/welcome.component';

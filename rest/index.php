@@ -311,8 +311,13 @@ $app->delete('/indexingModels/{id}', \IndexingModel\controllers\IndexingModelCon
 //Installer
 $app->get('/installer/prerequisites', \SrcCore\controllers\InstallerController::class . ':getPrerequisites');
 $app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerController::class . ':checkDatabaseConnection');
+$app->get('/installer/sqlDataFiles', \SrcCore\controllers\InstallerController::class . ':getSQLDataFiles');
 $app->post('/installer/custom', \SrcCore\controllers\InstallerController::class . ':createCustom');
 $app->post('/installer/database', \SrcCore\controllers\InstallerController::class . ':createDatabase');
+$app->post('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':createDocservers');
+
+//TODO REWORK
+$app->put('/dev/lang', \SrcCore\controllers\CoreController::class . ':generateLang');
 
 //ListInstances
 $app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');
@@ -582,5 +587,12 @@ $app->post('/alfresco/checkAccounts', \Alfresco\controllers\AlfrescoController::
 $app->get('/alfresco/rootFolders', \Alfresco\controllers\AlfrescoController::class . ':getRootFolders');
 $app->get('/alfresco/folders/{id}/children', \Alfresco\controllers\AlfrescoController::class . ':getChildrenFoldersById');
 $app->get('/alfresco/autocomplete/folders', \Alfresco\controllers\AlfrescoController::class . ':getFolders');
+
+// Collabora Online
+$app->get('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':getFileContent');
+$app->get('/wopi/files/{id}', \ContentManagement\controllers\CollaboraOnlineController::class . ':getCheckFileInfo');
+$app->post('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':getCheckFileInfo');
+$app->post('/collaboraOnline/configuration', \ContentManagement\controllers\CollaboraOnlineController::class . ':getConfiguration');
+$app->get('/collaboraOnline/available', \ContentManagement\controllers\CollaboraOnlineController::class . ':isAvailable');
 
 $app->run();

@@ -1,0 +1,45 @@
+<div class="mat-dialog-content-container lang-container">
+  <h1 mat-dialog-title>Lang checking</h1>
+  <div mat-dialog-content>
+    <mat-tab-group (selectedTabChange)="setActiveLang($event)">
+      <mat-tab label="en">
+        <ng-template mat-tab-label>
+          en&nbsp;<p [matBadge]="enMissing.length">&nbsp;</p>
+        </ng-template>
+        <div style="display: grid;">
+          <ng-container *ngFor="let lang of enMissing">
+            <mat-form-field appearance="fill">
+              <mat-label>{{lang.id}}</mat-label>
+              <input matInput #toto [(ngModel)]="lang.value">
+              <button mat-button color="primary" matSuffix mat-icon-button (click)="toto.select();openTranslation(lang.value)">
+                <mat-icon class="fas fa-language"></mat-icon>
+              </button>
+            </mat-form-field>
+          </ng-container>
+        </div>
+      </mat-tab>
+      <mat-tab label="nl">
+        <ng-template mat-tab-label>
+          nl&nbsp;<p [matBadge]="nlMissing.length">&nbsp;</p>
+        </ng-template>
+        <div style="display: grid;">
+          <ng-container *ngFor="let lang of nlMissing">
+            <mat-form-field appearance="fill">
+              <mat-label>{{lang.id}}</mat-label>
+              <input matInput [(ngModel)]="lang.value">
+              <button mat-button color="primary" matSuffix mat-icon-button (click)="openTranslation(lang.value)">
+                <mat-icon class="fas fa-language"></mat-icon>
+              </button>
+            </mat-form-field>
+          </ng-container>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <span class="divider-modal"></span>
+  <div mat-dialog-actions>
+    <button mat-raised-button class="actions" color="primary" (click)="generateMissingLang(false)">Generate lang variables</button>
+    <button mat-raised-button class="actions" color="primary" (click)="generateMissingLang(true)">Generate lang variables (IGNORE __TO_TRANSLATE)</button>
+    <button mat-raised-button class="actions" color="" mat-dialog-close cdkFocusInitial>Close</button>
+  </div>
+</div>

@@ -30,10 +30,10 @@ before_script:
   - bash ci/docker_install_php.sh > /dev/null
   - bash ci/docker_install_database.sh > /dev/null
   - mkdir -p /opt/maarch/docservers/indexes/{letterbox_coll,attachments_coll,version_attachments_coll}
-  - mkdir -p /opt/maarch/docservers/{ai,manual,manual_attachments,templates,acknowledgement_receipts}
-  - mkdir -p /opt/maarch/docservers/{convert_attachments,convert_attachments_version,convert_mlb}
-  - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_attachments_version,fulltext_mlb}
-  - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_attachments_version,thumbnails_mlb}
+  - mkdir -p /opt/maarch/docservers/{ai,resources,attachments,templates,acknowledgement_receipts}
+  - mkdir -p /opt/maarch/docservers/{convert_attachments,convert_resources}
+  - mkdir -p /opt/maarch/docservers/{fulltext_attachments,fulltext_resources}
+  - mkdir -p /opt/maarch/docservers/{thumbnails_attachments,thumbnails_resources}
   - mkdir -p /var/www/html/
   - ln -s $CI_PROJECT_DIR /var/www/html/MaarchCourrier
   - cd /var/www/html/MaarchCourrier

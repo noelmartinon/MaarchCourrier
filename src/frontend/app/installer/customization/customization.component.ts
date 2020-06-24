@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { LANG } from '../../translate.component';
 import { StepAction } from '../types';
 import { DomSanitizer } from '@angular/platform-browser';
+import { NotificationService } from '../../../service/notification/notification.service';
 
 declare var tinymce: any;
 
@@ -25,14 +25,20 @@ export class CustomizationComponent implements OnInit {
     uploadedLogo: string = '../rest/images?image=logo';
 
     backgroundList: any[] = [];
-
     constructor(
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private sanitizer: DomSanitizer
     ) {
+        const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_\-]*$/), Validators.required];
+
         this.stepFormGroup = this._formBuilder.group({
             firstCtrl: ['success', Validators.required],
+            customId: ['cs_maarchcourrier', valIdentifier],
+            appName: ['Maarch Courrier 20.10', Validators.required],
+            loginMsg: ['<span style="color:#24b0ed"><strong>Découvrez votre application via</strong></span>&nbsp;<a title="le guide de visite" href="https://docs.maarch.org/gitbook/html/MaarchCourrier/19.04/guu/home.html" target="_blank"><span style="color:#f99830;"><strong>le guide de visite en ligne</strong></span></a>'],
+            homeMsg: ['<p>D&eacute;couvrez <strong>Maarch Courrier 20.10</strong> avec <a title="notre guide de visite" href="https://docs.maarch.org/" target="_blank"><span style="color:#f99830;"><strong>notre guide de visite en ligne</strong></span></a>.</p>'],
+            selectedBackground: ['bodylogin.jpg'],
         });
         this.backgroundList = Array.from({ length: 16 }).map((_, i) => {
             return {
@@ -90,7 +96,7 @@ export class CustomizationComponent implements OnInit {
     getInfoToInstall(): StepAction[] {
         return [{
             body : {
-                customName: this.customId,
+                customId: this.customId,
             },
             description : 'Initialisation de l\'instance',
             route : '../rest/installer/custom',

@@ -7,11 +7,6 @@ import { AppGuard, AfterProcessGuard } from '../../service/app.guard';
 
 const routes: Routes = [
   {
-    path: 'indexing/:groupId',
-    canActivate: [AppGuard],
-    component: IndexationComponent
-  },
-  {
     path: 'process/users/:userSerialId/groups/:groupSerialId/baskets/:basketId/resId/:resId',
     canActivate: [AppGuard],
     canDeactivate: [AfterProcessGuard],
@@ -22,7 +17,12 @@ const routes: Routes = [
     canActivate: [AppGuard],
     canDeactivate: [AfterProcessGuard],
     component: ProcessComponent
-  }
+  },
+  {
+    path: 'indexing/:groupId',
+    canActivate: [AppGuard],
+    component: IndexationComponent
+  },
 ];
 
 @NgModule({

@@ -7,8 +7,8 @@ import { AppService } from '../service/app.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { LangService } from '../service/app-lang.service';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/internal/operators/map';
 import { AuthService } from '../service/auth.service';
+import { environment } from '../environments/environment';
 
 /** Custom options the configure the tooltip's default show/hide delays. */
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
@@ -27,7 +27,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     ],
 })
 export class AppComponent implements OnInit {
-
+    debugMode: boolean = false;
     @ViewChild('snavLeft', { static: true }) snavLeft: MatSidenav;
 
     constructor(
@@ -37,19 +37,20 @@ export class AppComponent implements OnInit {
         sanitizer: DomSanitizer,
         public appService: AppService,
         public headerService: HeaderService,
-        private authService: AuthService
+        private authService: AuthService,
     ) {
-
         iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=onlyLogo'));
         iconReg.addSvgIcon('maarchLogoFull', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=logo'));
         iconReg.addSvgIcon('maarchLogoWhite', sanitizer.bypassSecurityTrustResourceUrl('assets/logo_only_white.svg'));
         iconReg.addSvgIcon('maarchLogoWhiteFull', sanitizer.bypassSecurityTrustResourceUrl('assets/logo_white.svg'));
         iconReg.addSvgIcon('maarchBox', sanitizer.bypassSecurityTrustResourceUrl('assets/maarch_box.svg'));
         iconReg.addSvgIcon('alfresco', sanitizer.bypassSecurityTrustResourceUrl('assets/alfresco.svg'));
-
+        if (!environment.production) {
+            this.debugMode = true;
+        }
     }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit() {
         this.headerService.hideSideBar = true;
         this.headerService.sideNavLeft = this.snavLeft;
     }

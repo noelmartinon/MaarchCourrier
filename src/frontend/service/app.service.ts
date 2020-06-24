@@ -1,5 +1,4 @@
-import { Injectable, ChangeDetectorRef } from '@angular/core';
-import { MediaMatcher } from '@angular/cdk/layout';
+import { Injectable } from '@angular/core';
 
 @Injectable({
     providedIn: 'root'
@@ -11,17 +10,14 @@ export class AppService {
 
     currentUser: any;
 
-    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
-        this.mobileQuery = media.matchMedia('(max-width: 768px)');
+    constructor() {
+        /*this.mobileQuery = media.matchMedia('(max-width: 768px)');
         this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-        this.mobileQuery.addListener(this._mobileQueryListener);
-    }
-
-    initService() {
-
+        this.mobileQuery.addListener(this._mobileQueryListener);*/
     }
 
     getViewMode() {
+        return false;
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true;
         } else {
@@ -29,7 +25,7 @@ export class AppService {
         }
     }
 
-    ngOnDestroy(): void {
+    /*ngOnDestroy(): void {
         this.mobileQuery.removeListener(this._mobileQueryListener);
-    }
+    }*/
 }

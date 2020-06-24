@@ -7,6 +7,7 @@
         <mat-form-field appearance="outline" style="color: initial;">
             <mat-label>{{lang.docserverPath}}</mat-label>
             <input matInput formControlName="docserversPath">
+            <span matSuffix>/__CUSTOM_iD__/</span>
         </mat-form-field>
         <div style="text-align: center;">
             <button mat-raised-button type="button" color="primary" (click)="checkAvailability()" [disabled]="!this.stepFormGroup.controls['docserversPath'].valid">{{lang.checkInformations}}</button>

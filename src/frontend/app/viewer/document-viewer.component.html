@@ -1,4 +1,4 @@
-<ng-container *ngIf="editInProgress && editor.mode !== 'onlyoffice'">
+<ng-container *ngIf="editInProgress && editor.mode !== 'onlyoffice' && editor.mode !== 'collaboraOnline'">
     <div class="editInProgress">
         <i class="fas fa-file-word bounce"></i>
         <div>
@@ -112,6 +112,11 @@
     <onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
         [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
         (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></onlyoffice-viewer>
+</ng-container>
+<ng-container *ngIf="editInProgress && editor.mode === 'collaboraOnline'">
+    <app-collabora-online-viewer #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
+        [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
+        (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></app-collabora-online-viewer>
 </ng-container>
 <button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null" color="accent"
     [title]="lang.saveModifications" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"

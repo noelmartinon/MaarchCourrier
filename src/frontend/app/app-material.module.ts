@@ -1,6 +1,7 @@
 // import { LANG } from '../app/translate.component';
 import { NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from "@angular/material/core";
 
+@Injectable()
 export class AppDateAdapter extends NativeDateAdapter {
     // lang: any = LANG;
     parse(value: any): Date | null {
@@ -52,7 +53,7 @@ export const APP_DATE_FORMATS =
 };
 
 
-import { NgModule } from '@angular/core';
+import { NgModule, Injectable } from '@angular/core';
 import { DndModule } from 'ng2-dnd';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';

@@ -32,13 +32,14 @@ import { SortPipe } from '../plugins/sorting.pipe';
         FullDatePipe,
         SafeHtmlPipe,
         SecureUrlPipe,
-        SortPipe
+        SortPipe,
     ],
     entryComponents: [
     ],
     providers: [
         LatinisePipe,
         CookieService,
+        SortPipe
     ],
 })
-export class AppServiceModule { }
+export class AppServiceModule {}

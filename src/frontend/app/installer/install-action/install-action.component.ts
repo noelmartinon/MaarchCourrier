@@ -30,9 +30,9 @@ export class InstallActionComponent implements OnInit {
     initSteps() {
         this.data.forEach((step: any, index: number) => {
             if (index === 0) {
-                this.customId = step.body.customName;
+                this.customId = step.body.customId;
             } else {
-                step.body.customName = this.customId;
+                step.body.customId = this.customId;
             }
             this.steps.push(
                 {

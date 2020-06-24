@@ -7,7 +7,7 @@
         <div class="container" [class.fullContainer]="appService.getViewMode()">
             <div class="container-content" style="overflow: hidden;">
                 <mat-horizontal-stepper [@.disabled]="true" linear #stepper style="height: 100vh;overflow: auto;" (selectionChange)="initStep($event)">
-                    <mat-step>
+                    <mat-step label="install">
                         <ng-template matStepLabel>Installation</ng-template>
                         <div class="stepContainer">
                             <div class="stepContent">

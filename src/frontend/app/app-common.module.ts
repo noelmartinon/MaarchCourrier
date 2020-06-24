@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
+
 /*PLUGINS IMPORTS*/
 import { AppServiceModule } from './app-service.module';
 import { NotificationModule } from '../service/notification/notification.module';
@@ -122,6 +123,8 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         ReactiveFormsModule,
         RouterModule,
         AppMaterialModule,
+        AppServiceModule,
+        NotificationModule,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialTrigger,
         SmdFabSpeedDialActions,
@@ -145,7 +148,6 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         FolderMenuComponent,
         FolderActionListComponent,
         LinkedResourceListComponent,
-        AppServiceModule
     ],
     providers: [],
     entryComponents: [

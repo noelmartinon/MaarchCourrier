@@ -110,7 +110,7 @@
                                                                 </mat-option>
                                                             </mat-select>
                                                         </mat-form-field>
-                                                        <div style="width:100%;padding-bottom: 20px;" *ngIf="custom.values.table">
+                                                        <div style="width:100%;padding-bottom: 20px;" *ngIf="['string', 'integer', 'date'].indexOf(custom.type) === -1 && custom.values.table">
                                                             <mat-label
                                                                 style="font-size: 75%;color: rgba(0,0,0,0.54);width: 100%;display: block;">
                                                                 {{lang.targetLabel}} *</mat-label>
@@ -128,7 +128,7 @@
                                                                     [(ngModel)]="item.delimiterEnd" />
                                                             </span>
                                                             <button mat-button [matMenuTriggerFor]="menu" color="primary">
-                                                                <i class="fa fa-plus-circle"></i> Ajouter une colonne
+                                                                <i class="fa fa-plus-circle"></i> {{lang.addColumn}}
                                                             </button>
                                                             <mat-menu #menu="matMenu">
                                                                 <button mat-menu-item

@@ -32,7 +32,8 @@ export class AppGuard implements CanActivate {
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-        console.clear();
+        const urlArr = state.url.replace(/^\/+|\/+$/g, '').split('/')
+
         console.log('== ROUTE GUARD ==');
         this.headerService.resetSideNavSelection();
 
@@ -65,12 +66,13 @@ export class AppGuard implements CanActivate {
                             if (this.headerService.user.status === 'ABS') {
                                 return this.router.navigate(['/activate-user']);
                             } else {
-                                if (route.url.map((url: any) => url.path).filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
+                                if (urlArr.filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
+
                                     this.headerService.hideSideBar = true;
                                 } else {
                                     this.headerService.hideSideBar = false;
                                 }
-                                if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                                if (urlArr.filter((url: any) => url === 'administration').length > 0 || urlArr.filter((url: any) => url === 'profile').length > 0) {
                                     this.headerService.sideBarAdmin = true;
                                 } else {
                                     this.headerService.sideBarAdmin = false;
@@ -95,12 +97,12 @@ export class AppGuard implements CanActivate {
                     this.router.navigate(['/activate-user']);
                     return of(false);
                 } else {
-                    if (route.url.map((url: any) => url.path).filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
+                    if (urlArr.filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
                         this.headerService.hideSideBar = true;
                     } else {
                         this.headerService.hideSideBar = false;
                     }
-                    if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                    if (urlArr.filter((url: any) => url === 'administration').length > 0 || urlArr.filter((url: any) => url === 'profile').length > 0) {
                         this.headerService.sideBarAdmin = true;
                     } else {
                         this.headerService.sideBarAdmin = false;
@@ -165,12 +167,12 @@ export class AppGuard implements CanActivate {
                         if (this.headerService.user.status === 'ABS') {
                             return this.router.navigate(['/activate-user']);
                         } else {
-                            if (route.url.map((url: any) => url.path).filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
+                            if (urlArr.filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
                                 this.headerService.hideSideBar = true;
                             } else {
                                 this.headerService.hideSideBar = false;
                             }
-                            if (route.url.map((url: any) => url.path).filter((url: any) => url === 'administration').length > 0 || route.url.map((url: any) => url.path).filter((url: any) => url === 'profile').length > 0) {
+                            if (urlArr.filter((url: any) => url === 'administration').length > 0 || urlArr.filter((url: any) => url === 'profile').length > 0) {
                                 this.headerService.sideBarAdmin = true;
                             } else {
                                 this.headerService.sideBarAdmin = false;
