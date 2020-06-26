@@ -154,6 +154,7 @@ class Install extends functions
             return false;
             exit;
         }
+
         return true;
     }
 
@@ -163,6 +164,7 @@ class Install extends functions
             return false;
             exit;
         }
+
         return true;
     }
 
@@ -183,6 +185,7 @@ class Install extends functions
                 exit;
             }
         }
+
         return false;
     }
 
@@ -912,6 +915,7 @@ class Install extends functions
         
         pg_close();
 
+        $_SESSION['installeurLock'] = true;
         $db = new Database();
         
         if (!$db) {
@@ -941,7 +945,6 @@ class Install extends functions
             return false;
             exit;
         }
-
 
         if (!$this->setConfigXml()) {
             return false;

@@ -41,7 +41,7 @@ include_once '../../core/class/class_functions.php';
 include_once '../../core/class/class_db_pdo.php';
 include_once '../../core/init.php';
 include_once 'apps/maarch_entreprise/define.php';
-
+unset($_SESSION['installeurLock']);
 if ($_SESSION['config']['usePHPIDS'] == 'true') {
     include 'apps/maarch_entreprise/phpids_control.php';
 }

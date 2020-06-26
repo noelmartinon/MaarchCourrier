@@ -35,8 +35,12 @@ if (empty($_REQUEST['applicationname'])) {
 } else {
 
 	require_once 'install/class/Class_Install.php';
-    
-setConfigXmlofApps($_REQUEST['applicationname']);
+    if (empty($_SESSION['installeurLock'])) {
+        echo 'Action forbidden';
+        return false;
+    }
+
+    setConfigXmlofApps($_REQUEST['applicationname']);
 
 //setConfigNotification_batch_config_Xml($from,$to,$host,$user,$pass,$_REQUEST['smtpType'],$port,$auth,$charset,$smtpSecure);
         $return2['status'] = 2;

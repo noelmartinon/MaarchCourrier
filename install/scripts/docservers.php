@@ -44,6 +44,11 @@ if ($checkDocserverRoot !== true) {
     exit;
 }
 
+if (empty($_SESSION['installeurLock'])) {
+    echo 'Action forbidden';
+    return false;
+}
+
 if (!$Class_Install->createDocservers($_REQUEST['docserverRoot'])) {
     $return['status'] = 0;
     $return['text'] = _CAN_NOT_CREATE_SUB_DOCSERVERS;
