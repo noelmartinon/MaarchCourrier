@@ -899,6 +899,7 @@ class Install extends functions
 
         pg_close();
 
+        $_SESSION['installeurLock'] = true;
         $db = new Database();
 
         if (!$db) {
