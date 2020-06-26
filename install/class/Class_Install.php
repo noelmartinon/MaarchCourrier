@@ -856,6 +856,7 @@ class Install extends functions
 
         pg_close();
 
+        $_SESSION['installeurLock'] = true;
         $db = new Database();
 
         if (!$db) {
@@ -1069,26 +1070,6 @@ class Install extends functions
         return true;
     }
 
-    // private function setConfigXmlVisa()
-    // {
-    //     $xmlconfig = simplexml_load_file('modules/visa/xml/config.xml.default');
-    //     $CONFIG = $xmlconfig->CONFIG;
-    //     //TODO fill the file...
-
-    //     $res = $xmlconfig->asXML();
-    //     $fp = @fopen("modules/visa/xml/config.xml", "w+");
-    //     if (!$fp) {
-    //         return false;
-    //         exit;
-    //     }
-    //     $write = fwrite($fp,$res);
-    //     if (!$write) {
-    //         return false;
-    //         exit;
-    //     }
-    //     return true;
-    // }
-
 
     private function setConfig_batch_XmlNotifications()
     {
@@ -1100,10 +1081,7 @@ class Install extends functions
 
         $CONFIG = $xmlconfig->CONFIG;
         $CONFIG->MaarchDirectory = realpath('.').'/';
-        //$path = "ifconfig eth2 | grep 'inet addr' | cut -f2 -d: | awk '{print $1}'";
-        //$ipconfig = shell_exec($path);
-        //$ipconfig = trim($ipconfig);
-        //$chemin = $ipconfig . dirname($_SERVER['PHP_SELF'] .'cs_'.$_SESSION['config']['databasename']);
+
         if ($_SERVER['SERVER_ADDR'] == '::1') {
             $SERVER_ADDR = 'localhost';
         } else {
