@@ -32,6 +32,11 @@
     include_once '../../core/init.php';
     require_once('install/class/Class_Install.php');
     $Class_Install = new Install;
+    if (empty($_SESSION['installeurLock'])) {
+        echo 'Action forbidden';
+        return false;
+    }
+
 //CONTROLLER
     $trimmedPassword=rtrim($_REQUEST['newSuperadminPass']);
     if (!isset($_REQUEST['newSuperadminPass']) || empty($trimmedPassword)) {
@@ -40,6 +45,7 @@
     $resp=$Class_Install->setSuperadminPass(
         $_REQUEST['newSuperadminPass']
     );
-    
+    unset($_SESSION['installeurLock']);
 
-    header("Location: ../index.php?step=config");
+
+header("Location: ../index.php?step=config");
