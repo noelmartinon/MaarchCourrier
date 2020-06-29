@@ -29,6 +29,7 @@ export class UserAdministrationComponent implements OnInit {
     lang: any = LANG;
     loading: boolean = false;
     dialogRef: MatDialogRef<any>;
+    highlightMe: boolean = false;
     config: any = {};
     serialId: number;
     userId: string;
@@ -368,7 +369,7 @@ export class UserAdministrationComponent implements OnInit {
         this.selectedSignatureLabel = this.user.signatures[index].signature_label;
     }
 
-    resendActivationNotification(user: any) {
+    resendActivationNotification() {
         let r = confirm(this.lang.confirmAction + ' ' + this.lang.sendActivationNotification);
 
         if (r) {

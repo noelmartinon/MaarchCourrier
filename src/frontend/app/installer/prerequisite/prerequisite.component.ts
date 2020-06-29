@@ -107,7 +107,7 @@ export class PrerequisiteComponent implements OnInit {
 
     docMaarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_prerequisites/home.html`;
 
-    @ViewChildren('toto') toto: QueryList<any>;
+    @ViewChildren('packageItem') packageItem: QueryList<any>;
 
     constructor(
         public http: HttpClient,
@@ -149,7 +149,7 @@ export class PrerequisiteComponent implements OnInit {
         Object.keys(this.packagesList).forEach(group => {
             this.packagesList[group].forEach((item: any, key: number) => {
                 if (this.packagesList[group][key].state === 'ko') {
-                    this.toto.toArray().filter((itemKo: any) => itemKo._elementRef.nativeElement.id === this.packagesList[group][key].label)[0].toggle();
+                    this.packageItem.toArray().filter((itemKo: any) => itemKo._elementRef.nativeElement.id === this.packagesList[group][key].label)[0].toggle();
                 }
                 i++;
             });

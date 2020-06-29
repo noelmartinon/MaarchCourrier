@@ -34,7 +34,8 @@ class AuthenticationController
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
-        'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers',
+        'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers',
+        'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
         'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents',
     ];
 

@@ -962,6 +962,7 @@ class FolderController
             $userEntities = [0];
         }
 
+        $args['edition'] = $args['edition'] ?? false;
         if ($args['edition']) {
             $edition = [1];
         } else {

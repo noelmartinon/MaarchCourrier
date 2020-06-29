@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, SecurityContext} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, SecurityContext, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, filter, tap} from 'rxjs/operators';
 import {LANG} from '../../app/translate.component';
@@ -11,7 +11,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 // import { NotificationService } from '../../service/notification/notification.service.js';
 
 declare var $: any;
-declare var DocsAPI: any;
 
 @Component({
     selector: 'app-collabora-online-viewer',
@@ -43,9 +42,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     tmpFilename: string = '';
 
-    appUrl: string = '';
-    onlyOfficeUrl: string = '';
-
     allowedExtension: string[] = [
         'doc',
         'docx',
@@ -68,16 +64,28 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     editorUrl: any = '';
 
+    @ViewChild('collaboraFrame', { static: false }) collaboraFrame: any;
 
     @HostListener('window:message', ['$event'])
     onMessage(e: any) {
-        // console.log(e);
+        console.log(e);
         const response = JSON.parse(e.data);
         // EVENT TO CONSTANTLY UPDATE CURRENT DOCUMENT
-        if (response.event === 'onDownloadAs') {
-            this.getEncodedDocument(response.data);
-        } else if (response.event === 'onDocumentReady') {
+        console.log(response);
+        if (response.MessageId === 'Action_Save_Resp') {
+            console.log('got message : action save response -> doc is saving');
+        } else if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === false && this.isSaving) {
+            console.log('got message = doc is not modified -> finished saving');
+            this.triggerAfterUpdatedDoc.emit();
+            this.eventAction.next(true);
+        } else if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === true) {
+            console.log('got message = doc is modified');
             this.triggerModifiedDocument.emit();
+        } else if (response.MessageId === 'App_LoadingStatus' && response.Values.Status === 'Document_Loaded') {
+            console.log('got message = doc is loaded');
+            const message = {'MessageId': 'Host_PostmessageReady'};
+            console.log('getConfiguration, sending message : ' + JSON.stringify(message));
+            this.collaboraFrame.nativeElement.contentWindow.postMessage(JSON.stringify(message), '*');
         }
     }
 
@@ -94,7 +102,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
-                // this.docEditor.destroyEditor();
                 this.closeEditor();
             })
         ).subscribe();
@@ -106,55 +113,42 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         }
         $('iframe[name=\'frameEditor\']').css('position', 'initial');
         this.fullscreenMode = false;
+
+        // const message = {
+        //     'MessageId': 'Action_Close',
+        //     'Values': null
+        // };
+        // this.collaboraFrame.nativeElement.contentWindow.postMessage(JSON.stringify(message), '*');
+
         this.triggerAfterUpdatedDoc.emit();
         this.triggerCloseEditor.emit();
     }
 
     getDocument() {
         this.isSaving = true;
-        // this.docEditor.downloadAs(this.file.format);
-    }
 
-    getEncodedDocument(data: any) {
-        this.http.get('../rest/onlyOffice/encodedFile', { params: { url: data } }).pipe(
-            tap((result: any) => {
-                this.file.content = result.encodedFile;
-                this.isSaving = false;
-                this.triggerAfterUpdatedDoc.emit();
-                this.eventAction.next(this.file);
-            })
-        ).subscribe();
+        const message = {
+            'MessageId': 'Action_Save',
+            'Values': {
+                'Notify': true,
+                'ExtendedData': 'FinalSave=True',
+                'DontTerminateEdit': true,
+                'DontSaveIfUnmodified': true
+            }
+        };
+        console.log('getDocument, sending message : ' + JSON.stringify(message));
+        this.collaboraFrame.nativeElement.contentWindow.postMessage(JSON.stringify(message), '*');
     }
-
-    getEditorMode(extension: string) {
-        if (['csv', 'fods', 'ods', 'ots', 'xls', 'xlsm', 'xlsx', 'xlt', 'xltm', 'xltx'].indexOf(extension) > -1) {
-            return 'spreadsheet';
-        } else if (['fodp', 'odp', 'otp', 'pot', 'potm', 'potx', 'pps', 'ppsm', 'ppsx', 'ppt', 'pptm', 'pptx'].indexOf(extension) > -1) {
-            return 'presentation';
-        } else {
-            return 'text';
-        }
-    }
-
 
     async ngOnInit() {
         this.key = this.generateUniqueId();
 
-        console.log('in collabora init');
         if (this.canLaunchCollaboraOnline()) {
-            console.log('can launch collabora');
-            // await this.getServerConfiguration();
-
             await this.checkServerStatus();
-            console.log('before token');
-            // await this.getMergedFileTemplate();
 
             await this.getConfiguration();
-            console.log('got token + url');
 
             this.loading = false;
-        } else {
-            console.log('cannot launch collabora');
         }
     }
 
@@ -166,36 +160,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             this.triggerCloseEditor.emit();
             return false;
         }
-    }
-
-    getServerConfiguration() {
-        return new Promise((resolve) => {
-            this.http.get(`../rest/onlyOffice/configuration`).pipe(
-                tap((data: any) => {
-                    if (data.enabled) {
-
-                        const serverUriArr = data.serverUri.split('/');
-                        const protocol = data.serverSsl ? 'https://' : 'http://';
-                        const domain = data.serverUri.split('/')[0];
-                        const path = serverUriArr.slice(1).join('/');
-                        const port = data.serverPort ? `:${data.serverPort}` : ':80';
-
-                        const serverUri = [domain + port, path].join('/');
-
-                        this.onlyOfficeUrl = `${protocol}${serverUri}`;
-                        this.appUrl = data.coreUrl;
-                        resolve(true);
-                    } else {
-                        this.triggerCloseEditor.emit();
-                    }
-                }),
-                catchError((err) => {
-                    // this.notify.handleErrors(err);
-                    this.triggerCloseEditor.emit();
-                    return of(false);
-                }),
-            ).subscribe();
-        });
     }
 
     checkServerStatus() {
@@ -266,7 +230,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     getConfiguration() {
         return new Promise((resolve) => {
-            this.http.post('../rest/collaboraOnline/configuration', { resId: 206, type: 'resource', documentExtension: 'docx' }).pipe(
+            this.http.post('../rest/collaboraOnline/configuration', { resId: this.params.objectId, type: this.params.objectType, mode: this.params.objectMode}).pipe(
                 tap((data: any) => {
                     this.editorUrl = data.url;
                     // this.editorUrl = this.sanitizer.sanitize(SecurityContext.RESOURCE_URL, this.editorUrl);
@@ -287,11 +251,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     }
 
     isLocked() {
-        if (this.isSaving) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.isSaving;
     }
 
     getFile() {

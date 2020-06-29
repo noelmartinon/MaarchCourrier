@@ -287,14 +287,11 @@ class OnlyOfficeController
         $uri  = (string)$loadedXml->onlyoffice->server_uri;
         $port = (string)$loadedXml->onlyoffice->server_port;
 
-        $aUri = explode("/", $uri);
-        $exec = shell_exec("nc -vz -w 5 {$aUri[0]} {$port} 2>&1");
+        $isAvailable = DocumentEditorController::isAvailable(['uri' => $uri, 'port' => $port]);
 
-        if (strpos($exec, 'not found') !== false) {
-            return $response->withStatus(400)->withJson(['errors' => 'Netcat command not found', 'lang' => 'preRequisiteMissing']);
+        if (!empty($isAvailable['errors'])) {
+            return $response->withStatus(400)->withJson($isAvailable);
         }
-
-        $isAvailable = strpos($exec, 'succeeded!') !== false || strpos($exec, 'open') !== false || strpos($exec, 'Connected') !== false;
 
         return $response->withJson(['isAvailable' => $isAvailable]);
     }

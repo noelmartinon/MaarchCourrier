@@ -312,11 +312,14 @@ $app->delete('/indexingModels/{id}', \IndexingModel\controllers\IndexingModelCon
 $app->get('/installer/prerequisites', \SrcCore\controllers\InstallerController::class . ':getPrerequisites');
 $app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerController::class . ':checkDatabaseConnection');
 $app->get('/installer/sqlDataFiles', \SrcCore\controllers\InstallerController::class . ':getSQLDataFiles');
+$app->get('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':checkDocservers');
 $app->post('/installer/custom', \SrcCore\controllers\InstallerController::class . ':createCustom');
 $app->post('/installer/database', \SrcCore\controllers\InstallerController::class . ':createDatabase');
 $app->post('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':createDocservers');
+$app->post('/installer/customization', \SrcCore\controllers\InstallerController::class . ':createCustomization');
 
 //TODO REWORK
+$app->get('/dev/lang', \SrcCore\controllers\CoreController::class . ':getAvailableCoreLanguages');
 $app->put('/dev/lang', \SrcCore\controllers\CoreController::class . ':generateLang');
 
 //ListInstances
@@ -591,7 +594,7 @@ $app->get('/alfresco/autocomplete/folders', \Alfresco\controllers\AlfrescoContro
 // Collabora Online
 $app->get('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':getFileContent');
 $app->get('/wopi/files/{id}', \ContentManagement\controllers\CollaboraOnlineController::class . ':getCheckFileInfo');
-$app->post('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':getCheckFileInfo');
+$app->post('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveFile');
 $app->post('/collaboraOnline/configuration', \ContentManagement\controllers\CollaboraOnlineController::class . ':getConfiguration');
 $app->get('/collaboraOnline/available', \ContentManagement\controllers\CollaboraOnlineController::class . ':isAvailable');
 

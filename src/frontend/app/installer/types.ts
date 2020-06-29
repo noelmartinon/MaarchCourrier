@@ -7,6 +7,7 @@
  * @param installPriority action order (/!\ NEVER USE 1 IT IS FOR ROUTE /installer/initCustom)
  */
 export class StepAction {
+    idStep: string;
     route: string;
     body: any;
     description: any;

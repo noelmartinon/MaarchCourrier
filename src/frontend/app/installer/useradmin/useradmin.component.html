@@ -25,13 +25,8 @@
             <mat-error>{{lang.passwordNotMatch}}</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
-            <mat-label>{{lang.mail}}</mat-label>
+            <mat-label>{{lang.email}}</mat-label>
             <input matInput formControlName="email">
         </mat-form-field>
-        <div style="text-align:center;">
-            <button mat-raised-button type="button" color="primary" (click)="launchInstall()" *ngIf="stepFormGroup.valid" style="font-size: 35px;padding: 20px;">
-                <i class=" far fa-hdd"></i> {{lang.launchInstall}}
-            </button>
-        </div>
     </form>
 </div>

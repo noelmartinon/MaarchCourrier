@@ -10,7 +10,7 @@
                 <mat-list-item>
                     <mat-icon mat-list-icon class="fa iconCheckPackage icon_{{package.state}}"></mat-icon>
                     <div mat-line class="packageName">
-                        {{lang['install_'+package.label]}} <i #toto="matTooltip" [id]="package.label" class="fa fa-info-circle" [matTooltip]="lang['install_'+package.label+'_desc']"
+                        {{lang['install_'+package.label]}} <i #packageItem="matTooltip" [id]="package.label" class="fa fa-info-circle" [matTooltip]="lang['install_'+package.label+'_desc']"
                         [matTooltipClass]="package.state !== 'ok' ? 'tooltip-red' : ''" matTooltipPosition="right"></i>
                     </div>
                 </mat-list-item>  

@@ -69,7 +69,7 @@ export class GroupAdministrationComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        private privilegeService: PrivilegeService,
+        public privilegeService: PrivilegeService,
         private dialog: MatDialog
     ) { }
 

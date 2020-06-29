@@ -39,7 +39,6 @@ import { SortPipe } from '../plugins/sorting.pipe';
     providers: [
         LatinisePipe,
         CookieService,
-        SortPipe
     ],
 })
 export class AppServiceModule {}

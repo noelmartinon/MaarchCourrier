@@ -41,7 +41,7 @@
                         <div class="form-group"
                              *ngIf="!this.functions.empty(availableCustomFields) && action.actionPageId=='close_mail'">
                             <div class="col-sm-12">
-                                <plugin-select-search [showLabel]="true" [class]="input-form-filled"
+                                <plugin-select-search [showLabel]="true" [class]="''"
                                                       [label]="lang.checkEmptyFields" [placeholderLabel]="lang.checkEmptyFields"
                                                       [formControlSelect]="customFieldsFormControl" [datas]="availableCustomFields"
                                                       (afterSelected)="getSelectedFields()" style="width:100%;">

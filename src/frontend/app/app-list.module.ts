@@ -9,13 +9,11 @@ import { PrintedFolderModalComponent } from './printedFolder/printed-folder-moda
 import { ActionsListComponent } from './actions/actions-list.component';
 import { FollowedActionListComponent } from './home/followed-action-list/followed-action-list.component';
 import { NgPipesModule } from 'ngx-pipes';
-import { NoteModule } from './notes/note.module';
 
 @NgModule({
     imports: [
         SharedModule,
         NgPipesModule,
-        NoteModule
     ],
     declarations: [
         FiltersToolComponent,
@@ -26,9 +24,9 @@ import { NoteModule } from './notes/note.module';
         PrintedFolderModalComponent,
         ActionsListComponent,
         FollowedActionListComponent,
-
     ],
     exports: [
+        SharedModule,
         FiltersToolComponent,
         PanelListComponent,
         SummarySheetComponent,

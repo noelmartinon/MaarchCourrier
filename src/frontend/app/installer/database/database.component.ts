@@ -8,6 +8,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { LANG } from '../../translate.component';
 import { StepAction } from '../types';
 import { FunctionsService } from '../../../service/functions.service';
+import { InstallerService } from '../installer.service';
 
 @Component({
     selector: 'app-database',
@@ -29,6 +30,7 @@ export class DatabaseComponent implements OnInit {
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private functionsService: FunctionsService,
+        private installerService: InstallerService
     ) {
         this.stepFormGroup = this._formBuilder.group({
             dbHostCtrl: ['localhost', Validators.required],
@@ -48,7 +50,7 @@ export class DatabaseComponent implements OnInit {
         this.stepFormGroup.controls['dbLoginCtrl'].valueChanges.pipe(
             tap(() => this.stepFormGroup.controls['stateStep'].setValue(''))
         ).subscribe();
-        this.stepFormGroup.controls['dbLoginCtrl'].valueChanges.pipe(
+        this.stepFormGroup.controls['dbPortCtrl'].valueChanges.pipe(
             tap(() => this.stepFormGroup.controls['stateStep'].setValue(''))
         ).subscribe();
         this.stepFormGroup.controls['dbPasswordCtrl'].valueChanges.pipe(
@@ -77,6 +79,12 @@ export class DatabaseComponent implements OnInit {
         return false;
     }
 
+    initStep() {
+        if (this.installerService.isStepAlreadyLaunched('database')) {
+            this.stepFormGroup.disable();
+        }
+    }
+
     checkConnection() {
 
         const info = {
@@ -87,20 +95,19 @@ export class DatabaseComponent implements OnInit {
             name: this.stepFormGroup.controls['dbNameCtrl'].value
         };
 
-        this.http.get(`../rest/installer/databaseConnection`, { params: info }).pipe(
+        this.http.get(`../rest/installer/databaseConnection`, { observe: 'response', params: info }).pipe(
             tap((data: any) => {
-                console.log(this.functionsService.empty(data.warning));
-                if (!this.functionsService.empty(data.warning)) {
-                    this.dbExist = true;
-                    this.stepFormGroup.controls['stateStep'].setValue('');
-                } else {
-                    this.dbExist = false;
-                    this.notify.success(this.lang.rightInformations);
-                    this.stepFormGroup.controls['stateStep'].setValue('success');
-                }
+                this.dbExist = data.status === 200;
+                this.notify.success(this.lang.rightInformations);
+                this.stepFormGroup.controls['stateStep'].setValue('success');
             }),
             catchError((err: any) => {
-                this.notify.error(this.lang.badInformations);
+                this.dbExist = false;
+                if (err.error.errors === 'Given database has tables') {
+                    this.notify.error(this.lang.dbNotEmpty);
+                } else {
+                    this.notify.error(this.lang.badInformations);
+                }
                 this.stepFormGroup.markAllAsTouched();
                 this.stepFormGroup.controls['stateStep'].setValue('');
                 return of(false);
@@ -113,16 +120,7 @@ export class DatabaseComponent implements OnInit {
     }
 
     isValidStep() {
-        /*Object.keys(this.stepFormGroup.controls).forEach(key => {
-
-            const controlErrors: ValidationErrors = this.stepFormGroup.get(key).errors;
-            if (controlErrors != null) {
-                Object.keys(controlErrors).forEach(keyError => {
-                    console.log('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
-                });
-            }
-        });*/
-        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid;
+        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid || this.installerService.isStepAlreadyLaunched('database');
     }
 
     isEmptyConnInfo() {
@@ -139,6 +137,7 @@ export class DatabaseComponent implements OnInit {
 
     getInfoToInstall(): StepAction[] {
         return [{
+            idStep : 'database',
             body: {
                 server: this.stepFormGroup.controls['dbHostCtrl'].value,
                 port: this.stepFormGroup.controls['dbPortCtrl'].value,

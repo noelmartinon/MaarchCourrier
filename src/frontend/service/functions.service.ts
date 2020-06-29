@@ -120,18 +120,27 @@ export class FunctionsService {
     }
 
     debug(msg: string, route: string) {
-        const info: any = {
+        let info: any = {
             route : route,
-            session : {
-                id : this.authService.getAppSession(),
-                expireIn : new Date((JSON.parse(atob(this.authService.getToken().split('.')[1])).exp) * 1000)
-            },
-            refreshSession : {
-                id : this.authService.getAppSession(),
-                expireIn : new Date((JSON.parse(atob(this.authService.getRefreshToken().split('.')[1])).exp) * 1000)
-            },
-            user : this.headerService.user,
+            session : 'No user logged !',
+            refreshSession : 'No user logged !',
+            user : 'No user logged !'
         };
+        if (this.authService.getToken() != null) {
+            info = {
+                route : route,
+                session : {
+                    id : this.authService.getAppSession(),
+                    expireIn : new Date((JSON.parse(atob(this.authService.getToken().split('.')[1])).exp) * 1000)
+                },
+                refreshSession : {
+                    id : this.authService.getAppSession(),
+                    expireIn : new Date((JSON.parse(atob(this.authService.getRefreshToken().split('.')[1])).exp) * 1000)
+                },
+                user : this.headerService.user,
+            };
+        }
+
         if (msg !== '') {
             console.log(msg, info);
         } else {

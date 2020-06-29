@@ -180,4 +180,30 @@ class CoreController
             return $response->withStatus(400)->withJson(['errors' => "Cannot open file : src/frontend/lang/lang-{$body['langId']}.ts"]);
         }
     }
+
+    public static function getAvailableCoreLanguages(Request $request, Response $response)
+    {
+        $files = array_diff(scandir('src/frontend/lang'), ['..', '.']);
+        $languages = [];
+        $arrLanguages = [];
+        foreach ($files as $value) {
+            $languages[] = str_replace('.ts','', $value) ;
+        }
+
+        foreach ($languages as $file) {
+            $langName = explode('-', $file)[1];
+            $path = 'src/frontend/lang/' . $file . '.ts';
+            $fileContent = file_get_contents($path);
+            $fileContent = str_replace('export const LANG_'.strtoupper($langName).' =', '', $fileContent);
+            $fileContent = trim($fileContent);
+            $fileContent = str_replace(PHP_EOL, '', $fileContent);
+            $fileContent = str_replace("\",   ", "\",", $fileContent);
+            $fileContent = str_replace("  ", "", $fileContent);
+            $fileContent = str_replace(",};", "}", $fileContent);
+            $fileContent = rtrim($fileContent, ";");
+            $fileContent =  json_decode($fileContent);
+            $arrLanguages[$langName] = $fileContent;
+        }
+        return $response->withJson(['langs' => $arrLanguages]);
+    }
 }

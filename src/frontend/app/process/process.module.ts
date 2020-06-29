@@ -18,7 +18,6 @@ import { SentNumericPackagePageComponent } from '../sentResource/sent-numeric-pa
 import { ThesaurusModalComponent } from '../tag/indexing/thesaurus/thesaurus-modal.component';
 import { SelectIndexingModelComponent } from '../indexation/select-indexing-model/select-indexing-model.component';
 import { DocumentFormModule } from '../document-form.module';
-import { NoteModule } from '../notes/note.module';
 
 @NgModule({
     imports: [
@@ -26,7 +25,6 @@ import { NoteModule } from '../notes/note.module';
         ActionsModule,
         ProcessRoutingModule,
         DocumentFormModule,
-        NoteModule
     ],
     declarations: [
         ProcessComponent,
@@ -41,6 +39,9 @@ import { NoteModule } from '../notes/note.module';
         SentNumericPackagePageComponent,
         ThesaurusModalComponent,
         SelectIndexingModelComponent,
+    ],
+    exports: [
+        SharedModule,
     ],
     entryComponents: [
         LinkResourceModalComponent,

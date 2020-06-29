@@ -10,7 +10,7 @@
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectOpt($event)">
             <ng-container *ngIf="options.length > 0 && !loading">
                 <mat-option *ngFor="let option of filteredOptions | async | sortBy: key" [value]="option" [title]="option[key]">
-                    <span color="primary">{{option[key]}}</span>&nbsp;<small>{{option[subInfoKey]}}</small>
+                    <span color="primary">{{option[key]}}</span>
                 </mat-option>
             </ng-container>
             <mat-option class="autoCompleteInfoResult smallInputInfo" *ngIf="options.length === 0 && !loading" disabled

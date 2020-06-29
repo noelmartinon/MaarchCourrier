@@ -6,14 +6,14 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { ActionsService } from './actions.service';
-import { Subscription } from 'rxjs';
-import {ConfirmComponent} from "../../plugins/modal/confirm.component";
-import {exhaustMap, filter, tap} from "rxjs/operators";
-import {HeaderService} from "../../service/header.service";
+import { ConfirmComponent } from '../../plugins/modal/confirm.component';
+import { exhaustMap, filter, tap } from 'rxjs/operators';
+import { HeaderService } from '../../service/header.service';
+import { FunctionsService } from '../../service/functions.service';
 
 @Component({
     selector: 'app-actions-list',
-    templateUrl: "actions-list.component.html",
+    templateUrl: 'actions-list.component.html',
     styleUrls: ['actions-list.component.scss']
 })
 export class ActionsListComponent implements OnInit {
@@ -51,7 +51,8 @@ export class ActionsListComponent implements OnInit {
         public dialog: MatDialog,
         private router: Router,
         private actionService: ActionsService,
-        private headerService: HeaderService
+        private headerService: HeaderService,
+        private functionService: FunctionsService
     ) { }
 
     dialogRef: MatDialogRef<any>;
@@ -78,7 +79,7 @@ export class ActionsListComponent implements OnInit {
         return false;
     }
 
-    launchEvent(action: any, row: any) {
+    launchEvent(action: any, row: any = null) {
         this.arrRes = [];
         this.currentAction = action;
 
@@ -90,7 +91,7 @@ export class ActionsListComponent implements OnInit {
             this.contextResId = 0;
         }
 
-        if (row !== undefined) {
+        if (!this.functionService.empty(row)) {
             this.contextMenuTitle = row.chrono;
             this.currentResource = row;
         }
@@ -108,7 +109,7 @@ export class ActionsListComponent implements OnInit {
             this.http.get('../rest/resourcesList/users/' + this.currentBasketInfo.ownerId + '/groups/' + this.currentBasketInfo.groupId + '/baskets/' + this.currentBasketInfo.basketId + '/actions')
                 .subscribe((data: any) => {
                     if (data.actions.length > 0) {
-                        this.actionsList = data.actions;    
+                        this.actionsList = data.actions;
                     } else {
                         this.actionsList = [{
                             id: 0,
@@ -136,7 +137,7 @@ export class ActionsListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: this.selectedRes } })),
             tap((data: any) => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.headerService.nbResourcesFollowed -= data.unFollowed;

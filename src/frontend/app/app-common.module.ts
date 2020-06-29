@@ -40,6 +40,9 @@ import { AlertComponent } from '../plugins/modal/alert.component';
 import { ConfirmComponent } from '../plugins/modal/confirm.component';
 
 /*PLUGIN COMPONENT*/
+import { NotesListComponent } from './notes/notes.component';
+import { NoteEditorComponent } from './notes/note-editor.component';
+
 import { PluginAutocomplete } from '../plugins/autocomplete/autocomplete.component';
 import { PluginSelectSearchComponent } from '../plugins/select-search/select-search.component';
 
@@ -108,6 +111,8 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         FolderMenuComponent,
         FolderActionListComponent,
         LinkedResourceListComponent,
+        NotesListComponent,
+        NoteEditorComponent,
 
     ],
     exports: [
@@ -148,6 +153,8 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         FolderMenuComponent,
         FolderActionListComponent,
         LinkedResourceListComponent,
+        NotesListComponent,
+        NoteEditorComponent,
     ],
     providers: [],
     entryComponents: [

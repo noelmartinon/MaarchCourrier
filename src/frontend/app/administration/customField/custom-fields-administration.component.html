@@ -44,6 +44,12 @@
                                         </mat-form-field>
                                     </div>
                                     <div class="col-md-12" style="display: flex;align-items: center;">
+                                        <div>
+                                            <button *ngIf="!custom.SQLMode && 'banAutocomplete' !== custom.type"
+                                                mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
+                                                <mat-icon class="fas fa-database" style="height: auto;"></mat-icon>
+                                            </button>
+                                        </div>
                                         <div style="flex:1;"
                                             *ngIf="['select', 'radio', 'checkbox'].indexOf(custom.type) > -1">
                                             <mat-expansion-panel *ngIf="!custom.SQLMode" class="customFieldValues"
@@ -82,15 +88,14 @@
                                                 </div>
                                             </mat-expansion-panel>
                                         </div>
-                                        <div>
-                                            <button *ngIf="!custom.SQLMode && 'banAutocomplete' !== custom.type"
-                                                mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
-                                                <mat-icon class="fas fa-database" style="height: auto;"></mat-icon>
-                                            </button>
-                                        </div>
                                     </div>
                                     <div *ngIf="custom.SQLMode" class="col-md-12"
                                         style="display: flex;align-items: center;">
+                                        <div>
+                                            <button mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
+                                                <mat-icon class="fas fa-list-ol" style="height: auto;"></mat-icon>
+                                            </button>
+                                        </div>
                                         <div style="flex:1;">
                                             <mat-expansion-panel *ngIf="custom.SQLMode" class="customFieldValues"
                                                 opened>
@@ -153,11 +158,6 @@
                                                     </mat-form-field>
                                                 </div>
                                             </mat-expansion-panel>
-                                        </div>
-                                        <div>
-                                            <button mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
-                                                <mat-icon class="fas fa-list-ol" style="height: auto;"></mat-icon>
-                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-md-12 text-center">

@@ -37,7 +37,7 @@ export class ContactDetailComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         private contactService: ContactService,
-        private functionsService: FunctionsService
+        public functionsService: FunctionsService
     ) { }
 
     async ngOnInit(): Promise<void> {

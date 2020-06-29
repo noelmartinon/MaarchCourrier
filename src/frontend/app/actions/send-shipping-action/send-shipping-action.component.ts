@@ -43,7 +43,7 @@ export class SendShippingActionComponent implements OnInit {
             icon: 'fas fa-shipping-fast'
         }
     };
-    fatalError: any[] = [];
+    fatalError: any = '';
 
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 

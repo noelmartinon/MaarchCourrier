@@ -30,6 +30,7 @@ export class ProfileComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
     lang: any = LANG;
 
+    highlightMe: boolean = false;
     user: any = {
         baskets: []
     };

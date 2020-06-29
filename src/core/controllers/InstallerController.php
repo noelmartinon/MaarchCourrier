@@ -99,25 +99,32 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is empty or not a string']);
         }
 
-        $name = $queryParams['name'];
-        $connection = "host={$queryParams['server']} port={$queryParams['port']} user={$queryParams['user']} password={$queryParams['password']} dbname={$name}";
-        $connected = @pg_connect($connection);
+        $options = [
+            \PDO::ATTR_PERSISTENT   => false,
+            \PDO::ATTR_ERRMODE      => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_CASE         => \PDO::CASE_NATURAL
+        ];
 
-        if (!$connected) {
-            $name = 'postgres';
-            $connection = "host={$queryParams['server']} port={$queryParams['port']} user={$queryParams['user']} password={$queryParams['password']} dbname={$name}";
-            if (!@pg_connect($connection)) {
+        $firstTry = true;
+        $dsn = "pgsql:host={$queryParams['server']};port={$queryParams['port']};dbname={$queryParams['name']}";
+        try {
+            $db = new \PDO($dsn, $queryParams['user'], $queryParams['password'], $options);
+        } catch (\PDOException $PDOException) {
+            $firstTry = false;
+            $dsn = "pgsql:host={$queryParams['server']};port={$queryParams['port']};dbname=postgres";
+            try {
+                $db = new \PDO($dsn, $queryParams['user'], $queryParams['password'], $options);
+            } catch (\PDOException $PDOException) {
                 return $response->withStatus(400)->withJson(['errors' => 'Database connection failed']);
             }
         }
 
-        $request = "select datname from pg_database where datname = '{$name}'";
-        $result = @pg_query($request);
-        if (!$result) {
-            return $response->withStatus(400)->withJson(['errors' => 'Database request failed']);
-        }
-
-        if ($connected) {
+        if ($firstTry) {
+            $query = $db->query("SELECT table_name FROM information_schema.tables WHERE table_schema not in ('pg_catalog', 'information_schema')");
+            $row = $query->fetch(\PDO::FETCH_ASSOC);
+            if (!empty($row)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Given database has tables']);
+            }
             return $response->withJson(['warning' => 'Database exists']);
         }
 
@@ -139,6 +146,36 @@ class InstallerController
         }
 
         return $response->withJson(['dataFiles' => $dataFiles]);
+    }
+
+    public function checkDocservers(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['path'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Queryparams path is empty or not a string']);
+        }
+
+        $path = urldecode($queryParams['path']);
+        $path = rtrim($path, '/');
+
+        $multiplesPaths = explode('/', $path);
+
+        while (!empty($multiplesPaths)) {
+            $pathToTest = implode('/', $multiplesPaths);
+            if (empty($pathToTest)) {
+                $pathToTest = '/';
+            }
+            if (is_dir($pathToTest)) {
+                if (!is_readable($pathToTest) || !is_writable($pathToTest)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Queryparams path is not readable or writable"]);
+                }
+                break;
+            }
+            unset($multiplesPaths[count($multiplesPaths) - 1]);
+        }
+
+        return $response->withStatus(204);
     }
 
     public function createCustom(Request $request, Response $response)
@@ -264,7 +301,7 @@ class InstallerController
             if (!is_file("sql/{$body['data']}.sql")) {
                 return $response->withStatus(400)->withJson(['errors' => "File sql/{$body['data']}.sql does not exist"]);
             }
-            $fileContent = @file_get_contents("sql/{$body['data']}.sql");
+            $fileContent = file_get_contents("sql/{$body['data']}.sql");
             $result = $db->exec($fileContent);
             if ($result ===  false) {
                 return $response->withStatus(400)->withJson(['errors' => "Request failed : run {$body['data']}.sql"]);
@@ -296,10 +333,6 @@ class InstallerController
 
         if (!Validator::stringType()->notEmpty()->validate($body['path'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body path is empty or not a string']);
-        } elseif (!is_dir($body['path'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body path does not exist']);
-        } elseif (!is_writable($body['path'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body path is not writable']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
@@ -309,6 +342,15 @@ class InstallerController
         }
 
         $body['path'] = rtrim($body['path'], '/');
+
+        if (!is_dir($body['path'])) {
+            if (!@mkdir($body['path'], 0755, true)) {
+                return $response->withStatus(400)->withJson(['errors' => "Folder creation failed for path : {$body['path']}"]);
+            }
+        } elseif (!is_readable($body['path']) || !is_writable($body['path'])) {
+            return $response->withStatus(400)->withJson(['errors' => "Body path is not readable or writable"]);
+        }
+
         $docservers = [
             'AI'                        => 'ai',
             'RESOURCES'                 => 'resources',
@@ -380,9 +422,9 @@ class InstallerController
             //TODO check jpg
             $tmpPath = CoreConfigModel::getTmpPath();
             $tmpFileName = $tmpPath . 'installer_body_' . rand() . '_file.jpg';
-            file_put_contents($tmpFileName, $body['encodedBodyLogin']);
+            file_put_contents($tmpFileName, base64_decode($body['encodedBodyLogin']));
             $imageSizes = getimagesize($tmpFileName);
-            if ($imageSizes[0] < 1920 || $imageSizes[1] < 1000) {
+            if ($imageSizes[0] < 1920 || $imageSizes[1] < 1080) {
                 return $response->withStatus(400)->withJson(['errors' => 'BodyLogin image is not wide enough']);
             }
             copy($tmpFileName, "custom/{$body['customId']}/img/bodylogin.jpg");

@@ -333,7 +333,7 @@ export class SignatureBookComponent implements OnInit {
         }
     }
 
-    refreshAttachments(mode: string) {
+    refreshAttachments(mode: string = 'rightContent') {
         if (mode === 'rightContent') {
             this.http.get('../rest/signatureBook/' + this.resId + '/incomingMailAttachments')
                 .subscribe((data: any) => {

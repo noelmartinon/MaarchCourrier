@@ -19,7 +19,7 @@ export class NotesListComponent implements OnInit {
     lang: any = LANG;
     notes: any[] = [];
     loading: boolean = true;
-    resIds : number[] = [];
+    resIds: number[] = [];
 
     @Input('injectDatas') injectDatas: any;
 
@@ -33,7 +33,7 @@ export class NotesListComponent implements OnInit {
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         public dialog: MatDialog,
         public functions: FunctionsService
     ) { }
@@ -58,11 +58,11 @@ export class NotesListComponent implements OnInit {
         this.resIds[0] = resId;
         this.loading = true;
         this.http.get("../rest/resources/" + this.resIds[0] + "/notes")
-        .subscribe((data: any) => {
-            this.notes = data['notes'];
-            this.reloadBadgeNotes.emit(`${this.notes.length}`);
-            this.loading = false;
-        });
+            .subscribe((data: any) => {
+                this.notes = data['notes'];
+                this.reloadBadgeNotes.emit(`${this.notes.length}`);
+                this.loading = false;
+            });
     }
 
     getRestrictionEntitiesId(entities: any) {

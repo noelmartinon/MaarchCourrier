@@ -17,4 +17,4 @@
     </mat-sidenav-content>
 </mat-sidenav-container>
 
-<app-dev-tool *ngIf="debugMode"></app-dev-tool>
+<app-dev-tool *ngIf="debugMode && authService.isAuth()"></app-dev-tool>

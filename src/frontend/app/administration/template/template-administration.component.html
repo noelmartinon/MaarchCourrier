@@ -59,7 +59,7 @@
                                         <mat-select [disabled]="!creationMode" name="target" required
                                             title="{{lang.templateTarget}}" placeholder="{{lang.templateTarget}}"
                                             [(ngModel)]="template.target"
-                                            (selectionChange)="updateTemplateType($event)">
+                                            (selectionChange)="updateTemplateType()">
                                             <mat-option *ngFor="let target of targetTypes" [value]="target">
                                                 {{lang[target]}}</mat-option>
                                         </mat-select>
@@ -121,7 +121,7 @@
                                     <mat-form-field *ngIf="creationMode || template.file.name">
                                         <mat-select id="template_style" [disabled]="!creationMode" name="template_style"
                                             title="{{lang.defaultTemplate}}" placeholder="{{lang.chosenModel}}"
-                                            [(ngModel)]="selectedModelFile" (selectionChange)="changeModel($event)"
+                                            [(ngModel)]="selectedModelFile" (selectionChange)="changeModel()"
                                             [required]="template.target!='acknowledgementReceipt'">
                                             <mat-optgroup label="{{lang.loadedFile}} :">
                                                 <mat-option class="selectFile" (click)="uploadSignFileOffice.click()"

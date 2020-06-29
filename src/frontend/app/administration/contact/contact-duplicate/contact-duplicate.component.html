@@ -56,7 +56,7 @@
                     <em>{{lang.noDuplicatesFound}}</em>
                 </div>
                 <div *ngIf="duplicatesContacts.length > 0" style="padding: 10px;text-align: right;color: rgba(0,0,0,0.54);">
-                    {{lang.duplicatesContactDisplayed | scan: [duplicatesContactsRealCount, duplicatesContactsCount]}}
+                    {{lang.duplicatesContactDisplayed | scan: [''+duplicatesContactsRealCount+'', ''+duplicatesContactsCount+'']}}
                 </div>
                 <mat-list role="list" *ngIf="duplicatesContacts.length > 0">
                     <mat-list-item role="listitem">

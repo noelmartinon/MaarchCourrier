@@ -22,6 +22,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     loadingInit: boolean = false;
 
     emailsubject: string = '';
+    emailContent: string = '';
     availableEmailModels: any[] = [];
     availableSignEmailModels: any[] = [];
     emailSignListForm = new FormControl();

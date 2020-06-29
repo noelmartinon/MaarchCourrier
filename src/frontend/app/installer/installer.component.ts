@@ -17,6 +17,7 @@ import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
 import { FunctionsService } from '../../service/functions.service';
+import { InstallerService } from './installer.service';
 
 @Component({
     templateUrl: './installer.component.html',
@@ -42,7 +43,8 @@ export class InstallerComponent implements OnInit, AfterViewInit {
         public appService: AppService,
         private sortPipe: SortPipe,
         public dialog: MatDialog,
-        private functionService: FunctionsService
+        private functionService: FunctionsService,
+        private installerService: InstallerService
     ) { }
 
     ngOnInit(): void {
@@ -66,7 +68,6 @@ export class InstallerComponent implements OnInit, AfterViewInit {
     }
 
     initStep(ev: any) {
-        console.log((ev));
         this.stepContent.toArray()[ev.selectedIndex].initStep();
     }
 

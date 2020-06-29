@@ -1,8 +1,9 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
 import { tap } from 'rxjs/internal/operators/tap';
+import { InstallerService } from '../installer.service';
 
 @Component({
     selector: 'app-useradmin',
@@ -20,15 +21,17 @@ export class UseradminComponent implements OnInit {
     constructor(
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
+        private installerService: InstallerService
     ) {
+
+        const valLogin: ValidatorFn[] = [Validators.pattern(/^[\w.@-]*$/), Validators.required];
+
         this.stepFormGroup = this._formBuilder.group({
-            login: [{ value: 'superadmin', disabled: true }, Validators.required],
+            login: ['superadmin', valLogin],
             password: ['', Validators.required],
             passwordConfirm: ['', Validators.required],
             email: ['dev@maarch.org', Validators.required],
         });
-
-
     }
 
     ngOnInit(): void {
@@ -58,8 +61,14 @@ export class UseradminComponent implements OnInit {
         ).subscribe();
     }
 
+    initStep() {
+        if (this.installerService.isStepAlreadyLaunched('userAdmin')) {
+            this.stepFormGroup.disable();
+        }
+    }
+
     isValidStep() {
-        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid;
+        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid || this.installerService.isStepAlreadyLaunched('userAdmin');
     }
 
     getFormGroup() {
@@ -69,11 +78,15 @@ export class UseradminComponent implements OnInit {
     getInfoToInstall(): any[] {
         return [];
         /*return {
+            idStep : 'userAdmin',
             body : {
                 login: this.stepFormGroup.controls['login'].value,
                 password: this.stepFormGroup.controls['password'].value,
+                email: this.stepFormGroup.controls['email'].value,
             },
-            route : '/installer/useradmin'
+            route : '/installer/useradmin',
+            description: this.lang.stepUserAdminActionDesc,
+            installPriority: 3
         };*/
     }
 

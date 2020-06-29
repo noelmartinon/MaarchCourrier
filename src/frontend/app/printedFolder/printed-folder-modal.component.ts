@@ -28,7 +28,7 @@ export class PrintedFolderModalComponent implements OnInit {
     withSeparator: boolean = false;
     isLoadingResults: boolean = false;
 
-    mainDocumentInformation: {};
+    mainDocumentInformation: any = {};
 
     printedFolderElement: any = {
         attachments: [],

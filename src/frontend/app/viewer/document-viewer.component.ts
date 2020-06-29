@@ -472,8 +472,8 @@ export class DocumentViewerComponent implements OnInit {
     getFile() {
         if (this.editor.mode === 'onlyoffice' && this.onlyofficeViewer !== undefined) {
             return this.onlyofficeViewer.getFile();
-        } else if (this.editor.mode === 'collaboraOnline' && this.onlyofficeViewer !== undefined) {
-            return this.onlyofficeViewer.getFile();
+        } else if (this.editor.mode === 'collaboraOnline' && this.collaboraOnlineViewer !== undefined) {
+            return this.collaboraOnlineViewer.getFile();
         } else {
             const objFile = JSON.parse(JSON.stringify(this.file));
             objFile.content = objFile.contentMode === 'route' ? null : objFile.content;
@@ -767,6 +767,15 @@ export class DocumentViewerComponent implements OnInit {
             };
             this.editInProgress = true;
 
+        } else if (this.editor.mode === 'collaboraOnline') {
+            this.editor.async = false;
+            this.editInProgress = true;
+            this.editor.options = {
+                objectType: 'resource',
+                objectId: this.resId,
+                objectMode: 'edition',
+                docUrl: `rest/wopi/files/`
+            };
         } else {
             this.editor.async = true;
             this.editor.options = {
@@ -799,12 +808,12 @@ export class DocumentViewerComponent implements OnInit {
         } else if (this.editor.mode === 'collaboraOnline') {
             this.editor.async = false;
             this.editor.options = {
-                objectType: 'resourceModification',
+                objectType: 'resource',
                 objectId: this.resId,
+                objectMode: 'edition',
                 docUrl: `rest/wopi/files/`
             };
             this.editInProgress = true;
-
         } else {
             this.editor.async = true;
             this.editor.options = {
@@ -849,7 +858,7 @@ export class DocumentViewerComponent implements OnInit {
         if (this.editor.mode === 'onlyoffice') {
             return this.onlyofficeViewer !== undefined;
         } else if (this.editor.mode === 'collaboraOnline') {
-            return this.onlyofficeViewer !== undefined;
+            return this.collaboraOnlineViewer !== undefined;
         } else {
             return this.editInProgress;
         }
@@ -1007,28 +1016,38 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     saveMainDocument() {
-        return new Promise((resolve, reject) => {
-            this.getFile().pipe(
-                map((data: any) => {
-                    const formatdatas = {
-                        encodedFile: data.content,
-                        format: data.format,
-                        resId: this.resId
-                    };
-                    return formatdatas;
-                }),
-                exhaustMap((data) => this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, data)),
-                tap(() => {
-                    this.closeEditor();
-                    this.loadRessource(this.resId);
-                    resolve(true);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    resolve(false);
-                    return of(false);
-                })
-            ).subscribe();
+        return new Promise((resolve) => {
+            if (this.headerService.user.preferences.documentEdition === 'collaboraonline') {
+                this.getFile() .pipe(
+                    tap((data: any) => {
+                        this.closeEditor();
+                        this.loadRessource(this.resId);
+                        resolve(true);
+                    })
+                ).subscribe();
+            } else {
+                this.getFile().pipe(
+                    map((data: any) => {
+                        const formatdatas = {
+                            encodedFile: data.content,
+                            format:      data.format,
+                            resId:       this.resId
+                        };
+                        return formatdatas;
+                    }),
+                    exhaustMap((data) => this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, data)),
+                    tap(() => {
+                        this.closeEditor();
+                        this.loadRessource(this.resId);
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
         });
     }
 

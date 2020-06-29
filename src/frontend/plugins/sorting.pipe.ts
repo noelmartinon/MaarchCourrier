@@ -11,7 +11,7 @@ export class SortPipe {
     ) { }
 
 
-    transform(array: Array<any>, args: string): Array<any> {
+    transform(array: Array<any>, args: string = ''): Array<any> {
         let normA = '';
         let normB = '';
 

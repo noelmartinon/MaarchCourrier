@@ -4,7 +4,6 @@ import { SharedModule } from '../app-common.module';
 
 import { CriteriaToolComponent } from '../adv-search/criteria-tool/criteria-tool.component';
 import { SearchAdvListComponent } from '../adv-search/list/search-adv-list.component';
-import { NoteModule } from '../notes/note.module';
 import { DocumentViewerModule } from '../viewer/document-viewer.module';
 
 import { ConfirmActionComponent } from './confirm-action/confirm-action.component';
@@ -44,7 +43,6 @@ import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresc
 @NgModule({
     imports: [
         SharedModule,
-        NoteModule,
         DocumentViewerModule
     ],
     declarations: [

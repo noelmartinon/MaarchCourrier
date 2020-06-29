@@ -88,7 +88,7 @@
 
                                         <div color="primary" [title]="element.creationDate | fullDate"
                                             style="flex:1;justify-content: flex-end;display: flex;font-size: 80%;">
-                                            {{element.creationDate | timeAgo : 'full' | ucfirst}}
+                                            {{element.creationDate}} {{element.creationDate | timeAgo : 'full'}}
                                         </div>
                                     </div>
                                 </mat-list-option>

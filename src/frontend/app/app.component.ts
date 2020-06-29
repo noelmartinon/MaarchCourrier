@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
         sanitizer: DomSanitizer,
         public appService: AppService,
         public headerService: HeaderService,
-        private authService: AuthService,
+        public authService: AuthService,
     ) {
         iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=onlyLogo'));
         iconReg.addSvgIcon('maarchLogoFull', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=logo'));

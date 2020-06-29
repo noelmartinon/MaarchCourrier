@@ -88,11 +88,18 @@
                             </button>
                         </div>
                     </mat-step>
-                    <mat-step optional>
-                        <ng-template matStepLabel>Serveur mail</ng-template>
-                        Bonjour
-                        <div>
-                            <button mat-button matStepperPrevious>Back</button>
+                    <mat-step [stepControl]="appMailserver.getFormGroup()" optional>
+                        <ng-template matStepLabel>{{lang.stepMailServer}}</ng-template>
+                        <div class="stepContainer">
+                            <div class="stepContent">
+                                <app-mailserver #appMailserver #stepContent (tiggerInstall)="endInstall()"></app-mailserver>
+                            </div>
+                            <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
+                                <mat-icon class="fa fa-arrow-left"></mat-icon>
+                            </button>
+                            <button mat-fab class="nextStepButton" color="accent" [disabled]="!appMailserver.isValidStep()" (click)="endInstall()">
+                                <mat-icon class="fas fa-check-double"></mat-icon>
+                            </button>
                         </div>
                     </mat-step>
                     <ng-template matStepperIcon="edit">

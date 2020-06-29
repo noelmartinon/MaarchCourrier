@@ -1,5 +1,5 @@
 <mat-list *ngIf="!loading">
-    <mat-form-field appearance="outline" *ngIf="adminMode && !linkedToMaarchParapheur">
+    <mat-form-field appearance="outline" *ngIf="adminMode">
         <input type="text" #searchAvisUserInput matInput placeholder="Ajouter des personnes" id="searchAvisUserInput"
             [formControl]="searchAvisUser" [matAutocomplete]="autoGroup">
         <mat-autocomplete #autoGroup="matAutocomplete" (optionSelected)="addItemToWorkflow($event.option.value)"

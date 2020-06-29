@@ -96,7 +96,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
-        private functionsService: FunctionsService
+        public functionsService: FunctionsService
     ) { }
 
     ngOnInit(): void {

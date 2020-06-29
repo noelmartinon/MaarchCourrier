@@ -18,7 +18,7 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
-                    <mat-tab-group [(selectedIndex)]="selectedTabIndex_1">
+                    <mat-tab-group>
                         <mat-tab label="{{lang.informations}}">
                             <form (ngSubmit)="onSubmit()" #diffusionModelForm="ngForm">
                                 <mat-form-field>
