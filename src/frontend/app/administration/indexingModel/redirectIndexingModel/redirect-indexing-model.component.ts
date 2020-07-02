@@ -5,7 +5,6 @@ import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { HttpClient } from '@angular/common/http';
 import { SortPipe } from '../../../../plugins/sorting.pipe';
-import { AppService } from '../../../../service/app.service';
 import { NotificationService } from '../../../../service/notification/notification.service';
 
 @Component({
@@ -118,6 +117,8 @@ export class RedirectIndexingModelComponent implements OnInit {
             }),
             tap((data: any) => {
                 this.indexingModels = data;
+
+                this.sortPipe.transform(this.indexingModels, 'label');
 
                 this.modelIds = this.indexingModels.map(model => model.id);
             }),

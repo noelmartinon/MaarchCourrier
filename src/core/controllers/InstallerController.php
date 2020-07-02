@@ -17,6 +17,7 @@ namespace SrcCore\controllers;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\DatabasePDO;
@@ -32,6 +33,10 @@ class InstallerController
         $output = explode(':', $output[0]);
         $unoconv = !empty($output[1]);
 
+        exec('whereis wkhtmltopdf', $outputWk, $returnWk);
+        $outputWk = explode(':', $outputWk[0]);
+        $wkhtmlToPdf = !empty($outputWk[1]);
+
         exec('whereis netcat', $outputNetcat, $returnNetcat);
         $outputNetcat = explode(':', $outputNetcat[0]);
 
@@ -45,12 +50,11 @@ class InstallerController
         $fileinfo = @extension_loaded('fileinfo');
         $gd = @extension_loaded('gd');
         $imagick = @extension_loaded('imagick');
-        $imap = @extension_loaded('imap');
-        $xsl = @extension_loaded('xsl');
         $gettext = @extension_loaded('gettext');
-        $xmlrpc = @extension_loaded('xmlrpc');
         $curl = @extension_loaded('curl');
         $zip = @extension_loaded('zip');
+        $json = @extension_loaded('json');
+        $xml = @extension_loaded('xml');
 
         $writable = is_writable('.') && is_readable('.');
 
@@ -62,6 +66,7 @@ class InstallerController
             'phpVersion'        => $phpVersion,
             'phpVersionValid'   => $phpVersionValid,
             'unoconv'           => $unoconv,
+            'wkhtmlToPdf'           => $wkhtmlToPdf,
             'netcatOrNmap'      => $netcatOrNmap,
             'pdoPgsql'          => $pdoPgsql,
             'pgsql'             => $pgsql,
@@ -69,10 +74,9 @@ class InstallerController
             'fileinfo'          => $fileinfo,
             'gd'                => $gd,
             'imagick'           => $imagick,
-            'imap'              => $imap,
-            'xsl'               => $xsl,
+            'json'              => $json,
             'gettext'           => $gettext,
-            'xmlrpc'            => $xmlrpc,
+            'xml'               => $xml,
             'curl'              => $curl,
             'zip'               => $zip,
             'writable'          => $writable,
@@ -97,10 +101,11 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams password is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($queryParams['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is empty or not a string']);
+        } elseif (!Validator::length(2, 50)->validate($queryParams['name'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'QueryParams name length is not valid']);
         }
 
         $options = [
-            \PDO::ATTR_PERSISTENT   => false,
             \PDO::ATTR_ERRMODE      => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_CASE         => \PDO::CASE_NATURAL
         ];
@@ -178,6 +183,32 @@ class InstallerController
         return $response->withStatus(204);
     }
 
+    public function checkCustomName(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['customId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Queryparams customId is empty or not a string']);
+        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $queryParams['customId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Queryparams customId has unauthorized characters']);
+        }
+
+        if (is_dir("custom/{$queryParams['customId']}")) {
+            return $response->withStatus(400)->withJson(['errors' => "Custom already exists"]);
+        }
+
+        $customFile = CoreConfigModel::getJsonLoaded(['path' => 'custom/custom.json']);
+        if (!empty($customFile)) {
+            foreach ($customFile as $value) {
+                if ($value['id'] == $queryParams['customId']) {
+                    return $response->withStatus(400)->withJson(['errors' => "Custom already exists in custom.json"]);
+                }
+            }
+        }
+
+        return $response->withStatus(204);
+    }
+
     public function createCustom(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
@@ -215,7 +246,10 @@ class InstallerController
                 'lang'              => $body['lang'] ?? 'fr',
                 'applicationName'   => $body['applicationName'] ?? $body['customId'],
                 'cookieTime'        => 10080,
-                'timezone'          => 'Europe/Paris'
+                'timezone'          => 'Europe/Paris',
+                'maarchDirectory'   => realpath('.') . '/',
+                'customID'          => $body['customId'],
+                'maarchUrl'         => ''
             ],
             'database'  => []
         ];
@@ -245,8 +279,8 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name is empty or not a string']);
-        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['name'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body name has unauthorized characters']);
+        } elseif (!Validator::length(2, 50)->validate($body['name'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body name length is not valid']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
@@ -255,38 +289,37 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Custom does not exist']);
         }
 
-        $connection = "host={$body['server']} port={$body['port']} user={$body['user']} password={$body['password']} dbname={$body['name']}";
-        $connected = @pg_connect($connection);
-        if ($connected) {
-            $result = @pg_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
-            $row = pg_fetch_row($result);
-            if (!empty($row)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Given database has tables']);
-            }
-            pg_close();
-        } else {
-            $connection = "host={$body['server']} port={$body['port']} user={$body['user']} password={$body['password']} dbname=postgres";
-            if (!@pg_connect($connection)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Database connection failed']);
-            }
-
-            $result = @pg_query("CREATE DATABASE \"{$body['name']}\" WITH TEMPLATE template0 ENCODING = 'UTF8'");
-            if (!$result) {
-                return $response->withStatus(400)->withJson(['errors' => 'Database creation failed']);
-            }
-
-            @pg_query("ALTER DATABASE '{$body['name']}' SET DateStyle =iso, dmy");
-            pg_close();
-        }
-
         $options = [
-            \PDO::ATTR_PERSISTENT   => true,
             \PDO::ATTR_ERRMODE      => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_CASE         => \PDO::CASE_NATURAL
         ];
 
-        $dsn = "pgsql:host={$body['server']};port={$body['port']};dbname={$body['name']}";
-        $db = new \PDO($dsn, $body['user'], $body['password'], $options);
+        $connection = "host={$body['server']} port={$body['port']} user={$body['user']} password={$body['password']} dbname={$body['name']}";
+        $connected = @pg_connect($connection);
+        if ($connected) {
+            pg_close();
+            $dsn = "pgsql:host={$body['server']};port={$body['port']};dbname={$body['name']}";
+            $db = new \PDO($dsn, $body['user'], $body['password'], $options);
+
+            $query = $db->query("SELECT table_name FROM information_schema.tables WHERE table_schema not in ('pg_catalog', 'information_schema')");
+            $row = $query->fetch(\PDO::FETCH_ASSOC);
+            if (!empty($row)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Given database has tables']);
+            }
+        } else {
+            $dsn = "pgsql:host={$body['server']};port={$body['port']};dbname=postgres";
+            try {
+                $db = new \PDO($dsn, $body['user'], $body['password'], $options);
+            } catch (\PDOException $PDOException) {
+                return $response->withStatus(400)->withJson(['errors' => 'Database connection failed']);
+            }
+
+            $db->query("CREATE DATABASE \"{$body['name']}\" WITH TEMPLATE template0 ENCODING = 'UTF8'");
+            $db->query("ALTER DATABASE \"{$body['name']}\" SET DateStyle =iso, dmy");
+
+            $dsn = "pgsql:host={$body['server']};port={$body['port']};dbname={$body['name']}";
+            $db = new \PDO($dsn, $body['user'], $body['password'], $options);
+        }
 
         if (!is_file('sql/structure.sql')) {
             return $response->withStatus(400)->withJson(['errors' => 'File sql/structure.sql does not exist']);
@@ -401,8 +434,14 @@ class InstallerController
     {
         $body = $request->getParsedBody();
 
-        if (!Validator::stringType()->notEmpty()->validate($body['bodyLoginPath']) && empty($body['encodedBodyLogin'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body bodyLogin is empty']);
+        if (!Validator::stringType()->notEmpty()->validate($body['bodyLoginBackground'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body bodyLoginBackground is empty']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['logo'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body logo is empty']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['loginMessage'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body loginMessage is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['homeMessage'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body homeMessage is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
@@ -411,25 +450,115 @@ class InstallerController
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
         }
 
-        if (!empty($body['bodyLoginPath'])) {
-            if (!is_file("dist/assets/{$body['bodyLoginPath']}")) {
-                return $response->withStatus(400)->withJson(['errors' => 'Body bodyLogin does not exist']);
+        mkdir("custom/{$body['customId']}/img", 0755, true);
+        if (strpos($body['bodyLoginBackground'], 'data:image/jpeg;base64,') === false) {
+            if (!is_file("dist/{$body['bodyLoginBackground']}")) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body bodyLoginBackground does not exist']);
             }
-            if ($body['bodyLoginPath'] != 'bodylogin.jpg') {
-                copy("dist/assets/{$body['bodyLoginPath']}", "custom/{$body['customId']}/img/bodylogin.jpg");
-            }
+            copy("dist/{$body['bodyLoginBackground']}", "custom/{$body['customId']}/img/bodylogin.jpg");
         } else {
-            //TODO check jpg
             $tmpPath = CoreConfigModel::getTmpPath();
             $tmpFileName = $tmpPath . 'installer_body_' . rand() . '_file.jpg';
-            file_put_contents($tmpFileName, base64_decode($body['encodedBodyLogin']));
+            $file = base64_decode($body['bodyLoginBackground']);
+            file_put_contents($tmpFileName, $file);
+
+            $size = strlen($file);
             $imageSizes = getimagesize($tmpFileName);
             if ($imageSizes[0] < 1920 || $imageSizes[1] < 1080) {
                 return $response->withStatus(400)->withJson(['errors' => 'BodyLogin image is not wide enough']);
+            } elseif ($size > 10000000) {
+                return $response->withStatus(400)->withJson(['errors' => 'BodyLogin size is not allowed']);
             }
             copy($tmpFileName, "custom/{$body['customId']}/img/bodylogin.jpg");
         }
 
+        if (strpos($body['logo'], 'data:image/svg+xml;base64,') !== false) {
+            $tmpPath = CoreConfigModel::getTmpPath();
+            $tmpFileName = $tmpPath . 'installer_logo_' . rand() . '_file.svg';
+            $file = base64_decode($body['logo']);
+            file_put_contents($tmpFileName, $file);
+
+            $size = strlen($file);
+            if ($size > 5000000) {
+                return $response->withStatus(400)->withJson(['errors' => 'Logo size is not allowed']);
+            }
+            copy($tmpFileName, "custom/{$body['customId']}/img/logo.svg");
+        }
+
+        DatabasePDO::reset();
+        new DatabasePDO(['customId' => $body['customId']]);
+        DatabaseModel::update([
+            'table'     => 'parameters',
+            'set'       => ['param_value_string' => $body['loginMessage']],
+            'where'     => ['id = ?'],
+            'data'      => ['loginpage_message']
+        ]);
+        DatabaseModel::update([
+            'table'     => 'parameters',
+            'set'       => ['param_value_string' => $body['homeMessage']],
+            'where'     => ['id = ?'],
+            'data'      => ['homepage_message']
+        ]);
+
         return $response->withStatus(204);
+    }
+
+    public function updateAdministrator(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
+        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
+        } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
+            return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['email']) || !filter_var($body['email'], FILTER_VALIDATE_EMAIL)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body email is empty, not a string or not a valid email']);
+        }
+
+        DatabasePDO::reset();
+        new DatabasePDO(['customId' => $body['customId']]);
+        DatabaseModel::update([
+            'table'     => 'users',
+            'set'       => [
+                'password'  => AuthenticationModel::getPasswordHash($body['password']),
+                'mail'      => $body['email']
+            ],
+            'where'     => ['user_id = ?'],
+            'data'      => ['superadmin']
+        ]);
+        DatabaseModel::update([
+            'table'     => 'users',
+            'set'       => [
+                'mail'      => $body['email']
+            ],
+            'where'     => ['mail = ?'],
+            'data'      => ['support@maarch.fr']
+        ]);
+
+        return $response->withStatus(204);
+    }
+
+    public function terminateInstaller(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
+        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
+        } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
+            return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
+        }
+
+        unlink("custom/{$body['customId']}/initializing.lck");
+
+        $url = UrlController::getCoreUrl();
+        $url .= $body['customId'] . '/dist/index.html';
+
+        return $response->withJson(['url' => $url]);
     }
 }

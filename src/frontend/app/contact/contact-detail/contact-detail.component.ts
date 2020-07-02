@@ -174,18 +174,27 @@ export class ContactDetailComponent implements OnInit {
     }
 
     setContactInfo(identifier: string, value: string) {
-        if (identifier === 'customFields') {
-            this.contact[identifier].push(value);
-        } else {
-            this.contact[identifier] = value;
+        if (!this.functionsService.empty(value)) {
+            if (identifier === 'customFields') {
+                this.contact[identifier].push(value);
+            } else {
+                this.contact[identifier] = value;
+            }
         }
     }
 
     isNewValue(identifier: any) {
-        const isCustomField = typeof identifier === 'object';
+        const isCustomField = typeof identifier === 'object' && identifier !== 'civility';
 
+        if (identifier === 'civility') {
+            console.log(this.contact[identifier]);
+            console.log(this.contactClone[identifier]);
+
+        }
         if (isCustomField) {
             return this.contactClone['customFields'].filter((custom: any) => custom.label === identifier.value.label).length === 0;
+        } else if (identifier === 'civility') {
+            return JSON.stringify(this.contact[identifier]) !== JSON.stringify(this.contactClone[identifier]);
         } else {
             return this.contact[identifier] !== this.contactClone[identifier];
         }

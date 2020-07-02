@@ -326,6 +326,10 @@ export class BasketAdministrationComponent implements OnInit {
                 });
         }
     }
+
+    updateGroupInfo(group: any, ev: any) {
+        group = ev;
+    }
 }
 
 @Component({

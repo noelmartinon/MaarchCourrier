@@ -313,10 +313,13 @@ $app->get('/installer/prerequisites', \SrcCore\controllers\InstallerController::
 $app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerController::class . ':checkDatabaseConnection');
 $app->get('/installer/sqlDataFiles', \SrcCore\controllers\InstallerController::class . ':getSQLDataFiles');
 $app->get('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':checkDocservers');
+$app->get('/installer/custom', \SrcCore\controllers\InstallerController::class . ':checkCustomName');
 $app->post('/installer/custom', \SrcCore\controllers\InstallerController::class . ':createCustom');
 $app->post('/installer/database', \SrcCore\controllers\InstallerController::class . ':createDatabase');
 $app->post('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':createDocservers');
 $app->post('/installer/customization', \SrcCore\controllers\InstallerController::class . ':createCustomization');
+$app->put('/installer/administrator', \SrcCore\controllers\InstallerController::class . ':updateAdministrator');
+$app->delete('/installer/lock', \SrcCore\controllers\InstallerController::class . ':terminateInstaller');
 
 //TODO REWORK
 $app->get('/dev/lang', \SrcCore\controllers\CoreController::class . ':getAvailableCoreLanguages');
@@ -597,5 +600,6 @@ $app->get('/wopi/files/{id}', \ContentManagement\controllers\CollaboraOnlineCont
 $app->post('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveFile');
 $app->post('/collaboraOnline/configuration', \ContentManagement\controllers\CollaboraOnlineController::class . ':getConfiguration');
 $app->get('/collaboraOnline/available', \ContentManagement\controllers\CollaboraOnlineController::class . ':isAvailable');
+$app->post('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':getTmpFile');
 
 $app->run();

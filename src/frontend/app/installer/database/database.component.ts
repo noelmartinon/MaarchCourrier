@@ -146,7 +146,10 @@ export class DatabaseComponent implements OnInit {
                 name: this.stepFormGroup.controls['dbNameCtrl'].value,
                 data: this.stepFormGroup.controls['dbSampleCtrl'].value
             },
-            route: '../rest/installer/database',
+            route : {
+                method : 'POST',
+                url : '../rest/installer/database'
+            },
             description: this.lang.stepDatabaseActionDesc,
             installPriority: 2
         }];

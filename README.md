@@ -36,7 +36,7 @@ Documentation : https://docs.maarch.org/
 
 ###  Recommandations pour le php.ini
 
-error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT  
+error_reporting = E_ALL & ~E_NOTICE
 display_errors = On
 
 ## Le coin des developpeurs

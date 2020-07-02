@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from './translate.component';
@@ -15,6 +15,7 @@ import { HeaderService } from '../service/header.service';
 import { AppService } from '../service/app.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { of } from 'rxjs/internal/observable/of';
+import { DocumentViewerComponent } from './viewer/document-viewer.component';
 
 declare var $: any;
 
@@ -22,7 +23,7 @@ declare var $: any;
     templateUrl: 'signature-book.component.html',
     styleUrls: ['signature-book.component.scss'],
 })
-export class SignatureBookComponent implements OnInit {
+export class SignatureBookComponent implements OnInit, OnDestroy {
 
     resId: number;
     basketId: number;
@@ -89,6 +90,7 @@ export class SignatureBookComponent implements OnInit {
     ];
 
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
 
     constructor(
         public http: HttpClient,
@@ -194,7 +196,7 @@ export class SignatureBookComponent implements OnInit {
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
                 catchError((err: any) => {
-                    if (err.status == 403) {
+                    if (err.status === 403) {
                         clearInterval(this.currentResourceLock);
                     }
                     this.notify.handleErrors(err);
@@ -263,6 +265,7 @@ export class SignatureBookComponent implements OnInit {
             this.rightViewerLink = '';
         }
         this.rightSelectedThumbnail = index;
+        this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment');
     }
 
     changeLeftViewer(index: number) {
@@ -339,13 +342,12 @@ export class SignatureBookComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.signatureBook.documents = data;
                 });
-
         } else {
             this.http.get('../rest/signatureBook/' + this.resId + '/attachments')
                 .subscribe((data: any) => {
-                    var i = 0;
+                    let i = 0;
                     if (mode === 'add') {
-                        var found = false;
+                        let found = false;
                         data.forEach((elem: any, index: number) => {
                             if (!found && (!this.signatureBook.attachments[index] || elem.res_id != this.signatureBook.attachments[index].res_id)) {
                                 i = index;
@@ -353,7 +355,7 @@ export class SignatureBookComponent implements OnInit {
                             }
                         });
                     } else if (mode === 'edit') {
-                        var id = this.signatureBook.attachments[this.rightSelectedThumbnail].res_id;
+                        const id = this.signatureBook.attachments[this.rightSelectedThumbnail].res_id;
                         data.forEach((elem: any, index: number) => {
                             if (elem.res_id == id) {
                                 i = index;
@@ -374,10 +376,11 @@ export class SignatureBookComponent implements OnInit {
 
     delAttachment(attachment: any) {
         if (attachment.canDelete) {
+            let r = false;
             if (this.signatureBook.attachments.length <= 1) {
-                var r = confirm('Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?');
+                r = confirm('Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?');
             } else {
-                var r = confirm('Voulez-vous vraiment supprimer la pièce jointe ?');
+                r = confirm('Voulez-vous vraiment supprimer la pièce jointe ?');
             }
             if (r) {
                 this.http.delete('../rest/attachments/' + attachment.res_id).pipe(
@@ -396,21 +399,23 @@ export class SignatureBookComponent implements OnInit {
     signFile(attachment: any, signature: any) {
         if (!this.loadingSign && this.signatureBook.canSign) {
             this.loadingSign = true;
-            var route = attachment.isResource ? '../rest/resources/' + attachment.res_id + '/sign' : '../rest/attachments/' + attachment.res_id + '/sign';
+            const route = attachment.isResource ? '../rest/resources/' + attachment.res_id + '/sign' : '../rest/attachments/' + attachment.res_id + '/sign';
             this.http.put(route, { 'signatureId': signature.id })
                 .subscribe((data: any) => {
                     if (!attachment.isResource) {
+                        this.appDocumentViewer.loadRessource(data.id, 'attachment');
                         this.rightViewerLink = '../rest/attachments/' + data.id + '/content';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'SIGN';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = data.new_id;
                     } else {
+                        this.appDocumentViewer.loadRessource(attachment.res_id, 'mainDocument');
                         this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
                         this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'SIGN';
                     }
                     this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
-                    var allSigned = true;
+                    let allSigned = true;
                     this.signatureBook.attachments.forEach((value: any) => {
-                        if (value.sign && value.status != 'SIGN') {
+                        if (value.sign && value.status !== 'SIGN') {
                             allSigned = false;
                         }
                     });
@@ -431,6 +436,7 @@ export class SignatureBookComponent implements OnInit {
         if (attachment.isResource) {
             this.http.put('../rest/resources/' + attachment.res_id + '/unsign', {})
                 .subscribe(() => {
+                    this.appDocumentViewer.loadRessource(attachment.res_id, 'maintDocument');
                     this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
 
@@ -447,6 +453,7 @@ export class SignatureBookComponent implements OnInit {
         } else {
             this.http.put('../rest/attachments/' + attachment.res_id + '/unsign', {})
                 .subscribe(() => {
+                    this.appDocumentViewer.loadRessource(attachment.res_id, 'attachment');
                     this.rightViewerLink = '../rest/attachments/' + attachment.res_id + '/content';
                     this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
@@ -467,7 +474,7 @@ export class SignatureBookComponent implements OnInit {
     }
 
     backToBasket() {
-        let path = '/basketList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId;
+        const path = '/basketList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId;
         this.http.put('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/unlock', { resources: [this.resId] })
             .subscribe((data: any) => {
                 this.router.navigate([path]);
@@ -490,7 +497,7 @@ export class SignatureBookComponent implements OnInit {
                 if (data.countLockedResources > 0) {
                     alert(data.countLockedResources + ' ' + this.lang.warnLockRes + '.');
                 } else {
-                    let path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
+                    const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
                     this.router.navigate([path]);
                 }
             }, (err: any) => {
@@ -555,18 +562,22 @@ export class SignatureBookComponent implements OnInit {
 
     showAttachment(attachment: any) {
         if (attachment.canModify && attachment.status !== 'SIGN') {
-            this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'attachment-modal-container', disableClose: true, data: { resId: attachment.res_id } });
+            if (attachment.isResource) {
+                this.appDocumentViewer.editResource();
+            } else {
+                this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'attachment-modal-container', disableClose: true, data: { resId: attachment.res_id } });
 
-            this.dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'success'),
-                tap(() => {
-                    this.refreshAttachments('edit');
-                }),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+                this.dialogRef.afterClosed().pipe(
+                    filter((data: string) => data === 'success'),
+                    tap(() => {
+                        this.refreshAttachments('edit');
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
         }
     }
 

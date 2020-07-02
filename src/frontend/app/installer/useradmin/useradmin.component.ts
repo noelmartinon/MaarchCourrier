@@ -4,6 +4,7 @@ import { NotificationService } from '../../../service/notification/notification.
 import { LANG } from '../../translate.component';
 import { tap } from 'rxjs/internal/operators/tap';
 import { InstallerService } from '../installer.service';
+import { StepAction } from '../types';
 
 @Component({
     selector: 'app-useradmin',
@@ -27,7 +28,7 @@ export class UseradminComponent implements OnInit {
         const valLogin: ValidatorFn[] = [Validators.pattern(/^[\w.@-]*$/), Validators.required];
 
         this.stepFormGroup = this._formBuilder.group({
-            login: ['superadmin', valLogin],
+            login: [{ value: 'superadmin', disabled: true }, valLogin],
             password: ['', Validators.required],
             passwordConfirm: ['', Validators.required],
             email: ['dev@maarch.org', Validators.required],
@@ -75,19 +76,21 @@ export class UseradminComponent implements OnInit {
         return this.stepFormGroup;
     }
 
-    getInfoToInstall(): any[] {
-        return [];
-        /*return {
+    getInfoToInstall(): StepAction[] {
+        return [{
             idStep : 'userAdmin',
             body : {
                 login: this.stepFormGroup.controls['login'].value,
                 password: this.stepFormGroup.controls['password'].value,
                 email: this.stepFormGroup.controls['email'].value,
             },
-            route : '/installer/useradmin',
+            route : {
+                method : 'PUT',
+                url : '../rest/installer/administrator'
+            },
             description: this.lang.stepUserAdminActionDesc,
             installPriority: 3
-        };*/
+        }];
     }
 
     launchInstall() {

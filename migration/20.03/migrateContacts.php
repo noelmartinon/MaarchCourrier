@@ -592,6 +592,9 @@ function migrateResletterbox_Users($args = [])
             $login = $value['dest_user_id'];
             $mode = 'recipient';
         }
+        if (empty($login)) {
+            continue;
+        }
         $user = \User\models\UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
         if (empty($user)) {
             $user = $args['firstManId'];

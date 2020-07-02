@@ -16,6 +16,10 @@ export class WelcomeComponent implements OnInit {
 
     ngOnInit(): void { }
 
+    initStep() {
+        return false;
+    }
+
     getInfoToInstall(): any[] {
         return [];
         /*return {

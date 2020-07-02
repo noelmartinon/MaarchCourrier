@@ -20,12 +20,12 @@
             <mat-card-title *ngIf="!functionsService.empty(contact.firstname) || !functionsService.empty(contact.lastname)"
                 [title]="contact.civility.label + ' ' + contact.firstname + ' ' + contact.lastname">
                 <sup style="color: #666;"
-                    *ngIf="!functionsService.empty(contact.civility)">{{contact.civility.abbreviation}}&nbsp;</sup>{{contact.firstname}}
+                    *ngIf="!functionsService.empty(contact.civility)" [class.newData]="isNewValue('civility')">{{contact.civility.abbreviation}}&nbsp;</sup>{{contact.firstname}}
                 {{contact.lastname}}
             </mat-card-title>
-            <mat-card-title *ngIf="functionsService.empty(contact.firstname) && functionsService.empty(contact.lastname)" [title]="contact.company">
+            <mat-card-title *ngIf="functionsService.empty(contact.firstname) && functionsService.empty(contact.lastname)" [class.newData]="isNewValue('company')" [title]="contact.company">
                 {{contact.company}}</mat-card-title>
-            <mat-card-subtitle [title]="contact.function" *ngIf="!functionsService.empty(contact.function)">
+            <mat-card-subtitle [class.newData]="isNewValue('function')" [title]="contact.function" *ngIf="!functionsService.empty(contact.function)">
                 {{contact.function}}&nbsp;
             </mat-card-subtitle>
             <i class="contact-filling fa fa-circle"

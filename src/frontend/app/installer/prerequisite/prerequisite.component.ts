@@ -55,6 +55,10 @@ export class PrerequisiteComponent implements OnInit {
                 required: true
             },
             {
+                label: 'wkhtmlToPdf',
+                required: true
+            },
+            {
                 label: 'imagick',
                 required: true
             },
@@ -73,15 +77,11 @@ export class PrerequisiteComponent implements OnInit {
                 required: true
             },
             {
-                label: 'imap',
-                required: true
-            },
-            {
                 label: 'mbstring',
                 required: true
             },
             {
-                label: 'xsl',
+                label: 'json',
                 required: true
             },
             {
@@ -89,7 +89,7 @@ export class PrerequisiteComponent implements OnInit {
                 required: true
             },
             {
-                label: 'xmlrpc',
+                label: 'xml',
                 required: true
             },
         ],

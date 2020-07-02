@@ -47,11 +47,11 @@
                 </mat-card>
                 <mat-card *ngFor="let background of backgroundList" (click)="stepFormGroup.controls['bodyLoginBackground'].setValue(background.url)"
                     style="opacity: 0.3;" class="backgroundItem"
-                    [class.selected]="background.filename === stepFormGroup.controls['bodyLoginBackground'].value"
+                    [class.selected]="background.url === stepFormGroup.controls['bodyLoginBackground'].value"
                     [style.background]="'url('+background.url+')'">
                 </mat-card>
                 <mat-card style="opacity: 0.3;display: flex;align-items: center;justify-content: center;" class="backgroundItem" [class.readonly]="readonlyState" (click)="uploadFile.click()">
-                    <input type="file" name="files[]" #uploadFile (change)="uploadTrigger($event, 'bg')" accept="image/jpg" style="display: none;">
+                    <input type="file" name="files[]" #uploadFile (change)="uploadTrigger($event, 'bg')" accept="image/jpeg" style="display: none;">
                     <i class="fa fa-plus" style="font-size: 30px;color: #666;"></i>
                 </mat-card>
             </div>

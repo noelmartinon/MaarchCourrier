@@ -103,7 +103,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     }
 
     closeEditor() {
-        if (this.headerService.sideNavLeft !== null) {
+        if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
             this.headerService.sideNavLeft.open();
         }
         $('iframe[name=\'frameEditor\']').css('position', 'initial');

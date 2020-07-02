@@ -78,7 +78,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         private sortPipe: SortPipe,
-        private functionsService: FunctionsService
+        public functionsService: FunctionsService
     ) {
 
     }

@@ -378,6 +378,11 @@ DO $$ BEGIN
     END IF;
 END$$;
 
+UPDATE res_letterbox SET exp_user_id = NULL WHERE exp_user_id = '0';
+UPDATE res_letterbox SET exp_contact_id = NULL WHERE exp_contact_id = 0;
+UPDATE res_letterbox SET dest_user_id = NULL WHERE dest_user_id = '0';
+UPDATE res_letterbox SET dest_contact_id = NULL WHERE dest_contact_id = 0;
+
 DO $$ BEGIN
     IF (SELECT count(attname) FROM pg_attribute WHERE attrelid = (SELECT oid FROM pg_class WHERE relname = 'res_letterbox') AND attname = 'external_signatory_book_id') = 1 THEN
       UPDATE res_letterbox SET external_id = jsonb_set(external_id, '{signatureBookId}', external_signatory_book_id::text::jsonb) WHERE external_signatory_book_id IS NOT NULL;

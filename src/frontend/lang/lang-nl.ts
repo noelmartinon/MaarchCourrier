@@ -1778,7 +1778,7 @@ export const LANG_NL = {
     "install_shortOpenTag": "Paramètre short_open_tags (php.ini)__TO_TRANSLATE",
     "install_shortOpenTag_desc": "short_open_tags = On__TO_TRANSLATE",
     "install_errorReporting": "Paramètre error_reporting (php.ini)__TO_TRANSLATE",
-    "install_errorReporting_desc": "error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT__TO_TRANSLATE",
+    "install_errorReporting_desc": "error_reporting = E_ALL & ~E_NOTICE",
     "install_netcatOrNmap": "netcat / nmap__TO_TRANSLATE",
     "install_netcatOrNmap_desc": "Utilitaire permettant d'ouvrir des connexions réseau (netcat / nmap)__TO_TRANSLATE",
     "general": "Générale__TO_TRANSLATE",

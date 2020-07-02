@@ -253,19 +253,21 @@ class DocserverController
         ];
     }
 
-    public static function createPathOnDocServer(array $aArgs)
+    public static function createPathOnDocServer(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['path']);
-        ValidatorModel::stringType($aArgs, ['path']);
+        ValidatorModel::notEmpty($args, ['path']);
+        ValidatorModel::stringType($args, ['path']);
 
-        if (!is_dir($aArgs['path'])) {
-            return ['errors' => '[createPathOnDocServer] Path does not exist ' . $aArgs['path']];
+        if (!is_dir($args['path'])) {
+            return ['errors' => '[createPathOnDocServer] Path does not exist : ' . $args['path']];
+        } elseif (!is_readable($args['path']) || !is_writable($args['path'])) {
+            return ['errors' => '[createPathOnDocServer] Path is not readable or writable : ' . $args['path']];
         }
 
         error_reporting(0);
         umask(0022);
 
-        $yearPath = $aArgs['path'] . date('Y') . '/';
+        $yearPath = $args['path'] . date('Y') . '/';
         if (!is_dir($yearPath)) {
             mkdir($yearPath, 0770);
             if (DIRECTORY_SEPARATOR == '/' && !empty($GLOBALS['apacheUserAndGroup'])) {

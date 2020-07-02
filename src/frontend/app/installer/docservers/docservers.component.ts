@@ -75,7 +75,10 @@ export class DocserversComponent implements OnInit {
             body: {
                 path: this.stepFormGroup.controls['docserversPath'].value,
             },
-            route: '../rest/installer/docservers',
+            route : {
+                method : 'POST',
+                url : '../rest/installer/docservers'
+            },
             description: this.lang.stepDocserversActionDesc,
             installPriority: 3
         }];

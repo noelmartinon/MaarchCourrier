@@ -1769,7 +1769,7 @@ export const LANG_EN = {
     "docserver": "Docserver",
     "applicationName": "Application name",
     "install_errorReporting": "error_reporting parameter (php.ini)",
-    "install_errorReporting_desc": "error_reporting = E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT",
+    "install_errorReporting_desc": "error_reporting = E_ALL & ~E_NOTICE",
     "install_netcatOrNmap": "netcat / nmap",
     "install_netcatOrNmap_desc": "Utility for opening network connections (netcat / nmap)",
     "general": "General",

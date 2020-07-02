@@ -1,18 +1,20 @@
 .step {
     opacity: 0.5;
     transition: all 0.2s;
-    .stepLabel{
+
+    .stepLabel {
         transition: all 0.2s;
     }
 }
 
 .currentStep {
     opacity: 1;
-    .stepLabel{
+
+    .stepLabel {
         font-size: 150%;
         transition: all 0.2s;
     }
-    
+
     transition: all 0.2s;
 }
 
@@ -24,7 +26,7 @@
     box-shadow: none;
 }
 
-.mat-expansion-panel-body {
+.launch-action {
     display: flex;
     flex-direction: column;
 }

@@ -8,7 +8,7 @@ import {HeaderService} from '../../service/header.service';
 import {Subject} from 'rxjs/internal/Subject';
 import {of} from 'rxjs/internal/observable/of';
 import {DomSanitizer} from '@angular/platform-browser';
-// import { NotificationService } from '../../service/notification/notification.service.js';
+import { NotificationService } from '../../service/notification/notification.service';
 
 declare var $: any;
 
@@ -33,14 +33,9 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     @Output() triggerModifiedDocument = new EventEmitter<string>();
 
     editorConfig: any;
-    docEditor: any;
     key: string = '';
-    documentLoaded: boolean = false;
-    canUpdateDocument: boolean = false;
     isSaving: boolean = false;
     fullscreenMode: boolean = false;
-
-    tmpFilename: string = '';
 
     allowedExtension: string[] = [
         'doc',
@@ -63,6 +58,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     dialogRef: MatDialogRef<any>;
 
     editorUrl: any = '';
+    token: any = '';
 
     @ViewChild('collaboraFrame', { static: false }) collaboraFrame: any;
 
@@ -77,7 +73,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         } else if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === false && this.isSaving) {
             console.log('got message = doc is not modified -> finished saving');
             this.triggerAfterUpdatedDoc.emit();
-            this.eventAction.next(true);
+            this.getTmpFile();
         } else if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === true) {
             console.log('got message = doc is modified');
             this.triggerModifiedDocument.emit();
@@ -92,7 +88,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     constructor(
         public http: HttpClient,
         public dialog: MatDialog,
-        // private notify: NotificationService,
+        private notify: NotificationService,
         private sanitizer: DomSanitizer,
         public headerService: HeaderService) { }
 
@@ -124,7 +120,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         this.triggerCloseEditor.emit();
     }
 
-    getDocument() {
+    saveDocument() {
         this.isSaving = true;
 
         const message = {
@@ -156,7 +152,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         if (this.isAllowedEditExtension(this.file.format)) {
             return true;
         } else {
-            // this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format + '</b> ' + this.lang.onlyofficeEditDenied2);
+            this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format + '</b> ' + this.lang.onlyofficeEditDenied2);
             this.triggerCloseEditor.emit();
             return false;
         }
@@ -180,7 +176,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                         }
                     }),
                     catchError((err) => {
-                        // this.notify.error(`${this.lang[err.error.lang]}`);
+                        this.notify.error(`${this.lang[err.error.lang]}`);
                         this.triggerCloseEditor.emit();
                         return of(false);
                     }),
@@ -189,24 +185,23 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         });
     }
 
-    getMergedFileTemplate() {
-        return new Promise((resolve, reject) => {
-            this.http.post(`../${this.params.docUrl}`, { objectId: this.params.objectId, objectType: this.params.objectType, format: this.file.format, onlyOfficeKey: this.key, data: this.params.dataToMerge }).pipe(
+    getTmpFile() {
+        return new Promise((resolve) => {
+            this.http.post('../rest/collaboraOnline/file', {token: this.token, data: this.params.dataToMerge}).pipe(
                 tap((data: any) => {
-                    this.tmpFilename = data.filename;
-
                     this.file = {
                         name: this.key,
-                        format: data.filename.split('.').pop(),
+                        format: data.format,
                         type: null,
                         contentMode: 'base64',
-                        content: null,
+                        content: data.content,
                         src: null
                     };
+                    this.eventAction.next(this.file);
                     resolve(true);
                 }),
                 catchError((err) => {
-                    // this.notify.handleErrors(err);
+                    this.notify.handleErrors(err);
                     this.triggerCloseEditor.emit();
                     return of(false);
                 }),
@@ -233,16 +228,12 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             this.http.post('../rest/collaboraOnline/configuration', { resId: this.params.objectId, type: this.params.objectType, mode: this.params.objectMode}).pipe(
                 tap((data: any) => {
                     this.editorUrl = data.url;
-                    // this.editorUrl = this.sanitizer.sanitize(SecurityContext.RESOURCE_URL, this.editorUrl);
                     this.editorUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.editorUrl);
-                    console.log('editorUrl = ' + this.editorUrl);
-                    // if (data !== null) {
-                        // this.editorConfig.token = data;
-                    // }
+                    this.token = data.token;
                     resolve(true);
                 }),
                 catchError((err) => {
-                    // this.notify.handleErrors(err);
+                    this.notify.handleErrors(err);
                     this.triggerCloseEditor.emit();
                     return of(false);
                 }),
@@ -250,13 +241,9 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         });
     }
 
-    isLocked() {
-        return this.isSaving;
-    }
-
     getFile() {
         // return this.file;
-        this.getDocument();
+        this.saveDocument();
         return this.eventAction.asObservable();
     }
 

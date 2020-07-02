@@ -197,9 +197,9 @@ class CurlModel
         ValidatorModel::notEmpty($args, ['url', 'method']);
         ValidatorModel::stringType($args, ['url', 'method']);
         ValidatorModel::arrayType($args, ['headers', 'queryParams', 'basicAuth', 'bearerAuth']);
-        ValidatorModel::boolType($args, ['jsonResponse']);
+        ValidatorModel::boolType($args, ['isXml']);
 
-        $args['ixXml'] = $args['isXml'] ?? false;
+        $args['isXml'] = $args['isXml'] ?? false;
 
         $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false];
 
@@ -273,7 +273,7 @@ class CurlModel
             ]);
         }
 
-        if ($args['ixXml']) {
+        if ($args['isXml']) {
             $response = simplexml_load_string($response);
         } else {
             $response = json_decode($response, true);

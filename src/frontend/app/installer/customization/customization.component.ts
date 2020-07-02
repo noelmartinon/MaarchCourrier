@@ -6,9 +6,10 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { environment } from '../../../environments/environment';
 import { ScanPipe } from 'ngx-pipes';
-import { debounceTime, filter, tap } from 'rxjs/operators';
+import { debounceTime, filter, tap, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { InstallerService } from '../installer.service';
+import { of } from 'rxjs/internal/observable/of';
 
 declare var tinymce: any;
 
@@ -41,7 +42,7 @@ export class CustomizationComponent implements OnInit {
             appName: [`Maarch Courrier ${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}`, Validators.required],
             loginMessage: [`<span style="color:#24b0ed"><strong>Découvrez votre application via</strong></span>&nbsp;<a title="le guide de visite" href="https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guu/home.html" target="_blank"><span style="color:#f99830;"><strong>le guide de visite en ligne</strong></span></a>`],
             homeMessage: ['<p>D&eacute;couvrez <strong>Maarch Courrier 20.10</strong> avec <a title="notre guide de visite" href="https://docs.maarch.org/" target="_blank"><span style="color:#f99830;"><strong>notre guide de visite en ligne</strong></span></a>.</p>'],
-            bodyLoginBackground: ['bodylogin.jpg'],
+            bodyLoginBackground: ['assets/bodylogin.jpg'],
             uploadedLogo: ['../rest/images?image=logo'],
         });
         this.backgroundList = Array.from({ length: 16 }).map((_, i) => {
@@ -53,18 +54,16 @@ export class CustomizationComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.checkCustomExist();
         this.stepFormGroup.controls['customId'].valueChanges.pipe(
             tap(() => {
-                if (this.stepFormGroup.controls['customId'].errors !== null) {
-                    const errors = Object.keys(this.stepFormGroup.controls['customId']?.errors).length > 0 ? { ...this.stepFormGroup.controls['customId'].errors} : null;
-                    this.stepFormGroup.controls['customId'].setErrors(errors);
-                }
+                this.stepFormGroup.controls['firstCtrl'].setValue('');
             }),
             debounceTime(500),
             filter((value: any) => value.length > 2),
+            filter(() => this.stepFormGroup.controls['customId'].errors === null || this.stepFormGroup.controls['customId'].errors.pattern === undefined),
             tap(() => {
-                this.notify.error('TO DO WAIT BACK ../rest/installer/customExist');
-                // this.checkCustomExist();
+                this.checkCustomExist();
             }),
             ).subscribe();
     }
@@ -86,17 +85,24 @@ export class CustomizationComponent implements OnInit {
     }
 
     checkCustomExist() {
-        this.http.get('../rest/installer/customExist', { params: { 'search': this.stepFormGroup.controls['customId'].value } }).pipe(
+        this.http.get('../rest/installer/custom', { observe: 'response', params: { 'customId': this.stepFormGroup.controls['customId'].value } }).pipe(
             tap((response: any) => {
-                if (!response) {
-                    // this.stepFormGroup.controls['customId'].setErrors({ ...this.stepFormGroup.controls['customId'].errors, customExist: true });
-                    // this.stepFormGroup.controls['customId'].markAsTouched();
-                } else {
+                if (this.stepFormGroup.controls['customId'].errors !== null) {
                     const error = this.stepFormGroup.controls['customId'].errors;
                     delete error.customExist;
-                    // this.stepFormGroup.controls['customId'].setErrors(error);
-                    // this.stepFormGroup.controls['customId'].markAsTouched();
+                } else {
+                    this.stepFormGroup.controls['firstCtrl'].setValue('success');
                 }
+            }),
+            catchError((err: any) => {
+                const regex = /^Custom already exists/g;
+                if (err.error.errors.match(regex) !== null) {
+                    this.stepFormGroup.controls['customId'].setErrors({ ...this.stepFormGroup.controls['customId'].errors, customExist: true });
+                    this.stepFormGroup.controls['customId'].markAsTouched();
+                } else {
+                    this.notify.handleSoftErrors(err);
+                }
+                return of(false);
             })
         ).subscribe();
     }
@@ -144,19 +150,25 @@ export class CustomizationComponent implements OnInit {
                     applicationName: this.stepFormGroup.controls['appName'].value,
                 },
                 description: this.lang.stepInstanceActionDesc,
-                route: '../rest/installer/custom',
+                route : {
+                    method : 'POST',
+                    url : '../rest/installer/custom'
+                },
                 installPriority: 1
             },
             {
                 idStep : 'customization',
                 body: {
-                    loginMessage: this.stepFormGroup.controls['loginMessage'].value,
-                    homeMessage: this.stepFormGroup.controls['homeMessage'].value,
-                    bodyLogin: this.stepFormGroup.controls['bodyLoginBackground'].value,
+                    loginMessage: tinymce.get('loginMessage').getContent(),
+                    homeMessage: tinymce.get('homeMessage').getContent(),
+                    bodyLoginBackground: this.stepFormGroup.controls['bodyLoginBackground'].value,
                     logo: this.stepFormGroup.controls['uploadedLogo'].value,
                 },
                 description: this.lang.stepCustomizationActionDesc,
-                route: '../rest/installer/customization',
+                route : {
+                    method : 'POST',
+                    url : '../rest/installer/customization'
+                },
                 installPriority: 3
             }
         ];
