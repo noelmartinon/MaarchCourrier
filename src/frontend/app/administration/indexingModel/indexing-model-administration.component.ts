@@ -7,15 +7,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError, finalize, exhaustMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { IndexingFormComponent } from '../../indexation/indexing-form/indexing-form.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { of } from 'rxjs';
 
 declare function $j(selector: any): any;
 
 @Component({
-    templateUrl: "indexing-model-administration.component.html",
+    templateUrl: 'indexing-model-administration.component.html',
     styleUrls: [
         'indexing-model-administration.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -48,7 +48,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
 
     creationMode: boolean = true;
 
-    categoriesList: any [];
+    categoriesList: any[];
 
     constructor(
         public http: HttpClient,
@@ -64,7 +64,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.params.subscribe((params) => {
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] === 'undefined') {
                 this.creationMode = true;
 
                 this.headerService.setHeader(this.lang.indexingModelCreation);
@@ -72,12 +72,12 @@ export class IndexingModelAdministrationComponent implements OnInit {
                 this.http.get('../../rest/categories').pipe(
                     tap((data: any) => {
                         this.categoriesList = data.categories;
-                        
+
                     }),
                     tap((data: any) => {
                         this.loading = false;
                         setTimeout(() => {
-                            this.indexingForm.changeCategory(this.indexingModel.category); 
+                            this.indexingForm.changeCategory(this.indexingModel.category);
                         }, 0);
                     }),
                     catchError((err: any) => {
@@ -90,7 +90,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
             } else {
                 this.creationMode = false;
 
-                this.http.get("../../rest/indexingModels/" + params['id']).pipe(
+                this.http.get('../../rest/indexingModels/' + params['id']).pipe(
                     tap((data: any) => {
                         this.indexingModel = data.indexingModel;
 
@@ -116,19 +116,19 @@ export class IndexingModelAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        let fields = this.indexingForm.getDatas();
+        const fields = this.indexingForm.getDatas();
         fields.forEach((element, key) => {
+            fields[key].default_value = ['string', 'integer', 'date'].indexOf(fields[key].type) > -1 && fields[key].SQLMode ? null : fields[key].default_value;
             delete fields[key].event;
             delete fields[key].label;
             delete fields[key].system;
             delete fields[key].type;
             delete fields[key].values;
         });
-
         this.indexingModel.fields = fields;
 
         if (this.creationMode) {
-            this.http.post("../../rest/indexingModels", this.indexingModel).pipe(
+            this.http.post('../../rest/indexingModels', this.indexingModel).pipe(
                 tap((data: any) => {
                     this.indexingForm.setModification();
                     this.setModification();
@@ -142,7 +142,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.put("../../rest/indexingModels/" + this.indexingModel.id, this.indexingModel).pipe(
+            this.http.put('../../rest/indexingModels/' + this.indexingModel.id, this.indexingModel).pipe(
                 tap((data: any) => {
                     this.indexingForm.setModification();
                     this.setModification();

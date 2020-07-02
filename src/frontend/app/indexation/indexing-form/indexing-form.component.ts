@@ -233,11 +233,13 @@ export class IndexingFormComponent implements OnInit {
                     this.availableCustomFields = data.customFields.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
-                        info.default_value = null;
+                        info.SQLMode = info.SQLMode;
+
+                        info.default_value = ['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values) ? info.values[0].key : null;
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
                             return {
-                                id: custVal,
-                                label: custVal
+                                id: custVal.key,
+                                label: custVal.label
                             }
                         }) : info.values;
                         return info;
@@ -756,7 +758,7 @@ export class IndexingFormComponent implements OnInit {
 
         this.http.get(`../../rest/indexingModels/${indexModelId}`).pipe(
             tap(async (data: any) => {
-                this.indexingFormId =  data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
+                this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
@@ -782,8 +784,10 @@ export class IndexingFormComponent implements OnInit {
 
                         if (indexFound > -1) {
                             field.label = this.availableCustomFields[indexFound].label;
+                            field.default_value = !this.functions.empty(field.default_value) ? field.default_value : this.availableCustomFields[indexFound].default_value;
                             field.values = this.availableCustomFields[indexFound].values;
                             field.type = this.availableCustomFields[indexFound].type;
+                            field.SQLMode = this.availableCustomFields[indexFound].SQLMode;
                             this.availableCustomFields.splice(indexFound, 1);
                             fieldExist = true;
                         }
@@ -832,7 +836,14 @@ export class IndexingFormComponent implements OnInit {
 
     initValidator(field: any) {
         let valArr: ValidatorFn[] = [];
-        this.arrFormControl[field.identifier] = new FormControl({ value: field.default_value, disabled: (field.today && this.adminMode) ? true : false });
+
+        let disabledState: boolean = false;
+
+        if (this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || (field.today && this.adminMode))) {
+            disabledState = true;
+        }
+
+        this.arrFormControl[field.identifier] = new FormControl({ value: field.default_value, disabled: disabledState });
 
         if (field.type === 'integer') {
             valArr.push(this.regexValidator(new RegExp('[+-]?([0-9]*[.])?[0-9]+'), { 'floatNumber': '' }));
@@ -1034,5 +1045,9 @@ export class IndexingFormComponent implements OnInit {
         if (!this.functions.empty(this.appDiffusionsList)) {
             this.appDiffusionsList.loadListModel(value);
         }
+    }
+
+    getCheckboxListLabel(selectedItemId: any, items: any) {
+        return items.filter((item: any) => item.id === selectedItemId)[0].label;
     }
 }

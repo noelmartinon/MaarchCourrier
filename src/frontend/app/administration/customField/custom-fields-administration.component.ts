@@ -10,6 +10,7 @@ import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operato
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
+import { FunctionsService } from '../../../service/functions.service';
 
 declare function $j(selector: any): any;
 
@@ -65,8 +66,10 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     incrementCreation: number = 1;
 
-    sampleIncrement: number[] = [1,2,3,4];
+    sampleIncrement: number[] = [1, 2, 3, 4];
 
+    SQLMode: boolean = false;
+    availaibleTables: any = {};
 
     dialogRef: MatDialogRef<any>;
 
@@ -76,24 +79,31 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
-        private sortPipe: SortPipe
+        private sortPipe: SortPipe,
+        public functionsService: FunctionsService
     ) {
 
     }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFieldsAdmin);
-        
-        this.http.get("../../rest/customFields").pipe(
+
+        this.getTables();
+
+        this.http.get('../../rest/customFields?admin=true').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
-                    element.values = element.values.map((info: any) => {
-                        return {
-                            label: info
-                        }
-                    });
-
+                    if (this.functionsService.empty(element.values.key)) {
+                        element.SQLMode = false;
+                        element.values = Object.keys(element.values).map((key: any) => {
+                            return {
+                                label: element.values[key]
+                            };
+                        });
+                    } else {
+                        element.SQLMode = true;
+                    }
                 });
                 return data;
             }),
@@ -122,11 +132,11 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     label: this.lang.newField + ' ' + this.incrementCreation,
                     type: customFieldType.type,
                     values: []
-                }
+                };
             }),
             exhaustMap((data) => this.http.post('../../rest/customFields', newCustomField)),
             tap((data: any) => {
-                newCustomField.id = data.customFieldId
+                newCustomField.id = data.customFieldId;
                 this.customFields.push(newCustomField);
                 this.notify.success(this.lang.customFieldAdded);
                 this.incrementCreation++;
@@ -169,17 +179,26 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     updateCustomField(customField: any, indexCustom: number) {
 
-        customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) == i);
-
-        // TO FIX DATA BINDING SIMPLE ARRAY VALUES
         const customFieldToUpdate = { ...customField };
-        
-        customFieldToUpdate.values = customField.values.map((data: any) => data.label)
 
-        const alreadyExists = this.customFields.filter(customField => customField.label == customFieldToUpdate.label );
-        if (alreadyExists.length > 1) {
-            this.notify.handleErrors(this.lang.customFieldAlreadyExists);
-            return of(false);
+        if (!customField.SQLMode) {
+            customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
+
+            // TO FIX DATA BINDING SIMPLE ARRAY VALUES
+            customFieldToUpdate.values = customField.values.map((data: any) => data.label);
+            const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
+            if (alreadyExists.length > 1) {
+                this.notify.handleErrors(this.lang.customFieldAlreadyExists);
+                return of(false);
+            }
+        } else {
+            if (['string', 'integer', 'date'].indexOf(customField.type) > -1) {
+                customField.values.label = [{
+                    column: customField.values.key,
+                    delimiterEnd: '',
+                    delimiterStart: ''
+                }];
+            }
         }
 
         this.http.put('../../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
@@ -199,10 +218,63 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     isModified(customField: any, indexCustomField: number) {
-        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '') {
+        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode) {
             return true;
         } else {
             return false;
+        }
+    }
+
+    switchSQLMode(custom: any) {
+        custom.SQLMode = !custom.SQLMode;
+        if (custom.SQLMode) {
+            custom.values = {
+                key: 'id',
+                label:  [{
+                    column: 'id',
+                    delimiterEnd: '',
+                    delimiterStart: ''
+                }],
+                table: 'users',
+                clause: '1=1'
+            };
+        } else {
+            custom.values = [];
+        }
+    }
+
+    getTables() {
+        this.http.get('../../rest/customFieldsWhiteList').pipe(
+            tap((data: any) => {
+                data.allowedTables.forEach((table: any) => {
+                    this.availaibleTables[table.name] = table.columns;
+                });
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    addColumnLabel(field: any, column: any) {
+        field.push({
+            delimiterStart: '',
+            delimiterEnd: '',
+            column: column
+
+        });
+    }
+
+    removeColumnLabel(field: any, index: number) {
+        field.splice(index, 1);
+    }
+
+    isValidField(field: any) {
+        if (field.SQLMode) {
+            return !this.functionsService.empty(field.values.key) && !this.functionsService.empty(field.values.label) && !this.functionsService.empty(field.values.table) && !this.functionsService.empty(field.values.clause)
+        } else {
+            return true;
         }
     }
 }

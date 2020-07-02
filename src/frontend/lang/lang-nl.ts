@@ -1692,4 +1692,9 @@ export const LANG_NL = {
     "openThesaurus": "Open the thesaurus", // _TO_TRANSLATE
     "bddModeCustomFieldMsg": "This field use database values (see the custom's configration in custom fields administration)", // _TO_TRANSLATE
     "updateIndexingFieldWarning": "Warning:if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?__TO_TRANSLATE",
+    "addColumn": "Ajouter une colonne__TO_TRANSLATE",  // _TO_TRANSLATE
+    "database": "Database__TO_TRANSLATE",
+    "targetLabel": "Target label__TO_TRANSLATE",
+    "targetTable": "Target table__TO_TRANSLATE",
+    "targetIdentifier": "Target identifier__TO_TRANSLATE",
 };
