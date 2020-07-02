@@ -1710,4 +1710,5 @@ export const LANG_FR = {
     "workingDays":                                 "jour(s) ouvré(s)",
     "yes":                                         "Oui",
     "zipcode":                                     "Code postal",
+    "updateIndexingFieldWarning": "Attention si vous supprimez un champ du modèle, ce champ sera réinitialisé pour <b>TOUS</b> les courriers associés au modèle. Voulez-vous continuer ?",
 };

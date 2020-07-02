@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-import { MatDialog } from '@angular/material/dialog';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -12,6 +12,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { FormControl, Validators, FormGroup, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FunctionsService } from '../../../service/functions.service';
+import {ConfirmComponent} from "../../../plugins/modal/confirm.component";
 
 @Component({
     selector: 'app-indexing-form',
@@ -179,6 +180,8 @@ export class IndexingFormComponent implements OnInit {
 
     currentResourceValues: any = null;
 
+    dialogRef: MatDialogRef<any>;
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -276,14 +279,25 @@ export class IndexingFormComponent implements OnInit {
     }
 
     removeItem(arrTarget: string, item: any, index: number) {
-        item.mandatory = false;
-        if (item.identifier.indexOf('indexingCustomField') > -1) {
-            this.availableCustomFields.push(item);
-            this[arrTarget].splice(index, 1);
-        } else {
-            this.availableFields.push(item);
-            this[arrTarget].splice(index, 1);
-        }
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.indexingModelModification, msg: this.lang.updateIndexingFieldWarning } });
+
+        this.dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            tap(() => {
+                item.mandatory = false;
+                if (item.identifier.indexOf('indexingCustomField') > -1) {
+                    this.availableCustomFields.push(item);
+                    this[arrTarget].splice(index, 1);
+                } else {
+                    this.availableFields.push(item);
+                    this[arrTarget].splice(index, 1);
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     getDatas(withDiffusionList = true) {

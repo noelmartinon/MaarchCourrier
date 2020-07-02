@@ -1708,4 +1708,5 @@ export const LANG_EN = {
     "workingDays":                                 "Working days",
     "yes":                                         "Yes",
     "zipcode":                                     "Zip code",
+    "updateIndexingFieldWarning": "Warning:if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?",
 };
