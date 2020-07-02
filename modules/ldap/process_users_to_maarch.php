@@ -110,8 +110,8 @@ function infoBalise($description, $balise)
         /*Function qui va insérer l'utilisateur dans la table des users. Si l'utilisateur n'est pas présent, on lui done le mot de passe de maarch*/
         function insertUser($user_id, $firstname, $lastname, $phone, $mail, $db)
         {
-            $qry = $db->prepare("INSERT into users (user_id, password, firstname, lastname, phone, mail, enabled, status,loginmode) values (?,?,?,?,?,?,?,?,?)");
-            $qry->execute(array($user_id,'65d1d802c2c5e7e9035c5cef3cfc0902b6d0b591bfa85977055290736bbfcdd7e19cb7cfc9f980d0c815bbf7fe329a4efd8da880515ba520b22c0aa3a96514cc',$firstname,$lastname,$phone,$mail,'Y','OK','standard'));
+            $qry = $db->prepare("INSERT into users (user_id, password, firstname, lastname, phone, mail, status,loginmode) values (?,?,?,?,?,?,?,?)");
+            $qry->execute(array($user_id,'$2y$10$C.QSslBKD3yNMfRPuZfcaubFwPKiCkqqOUyAdOr5FSGKPaePwuEjG',$firstname,$lastname,$phone,$mail,'OK','standard'));
             $result = $qry->fetchAll();
             if (!$result) {
                 echo "/!\ L'utilisateur $user_id n'a pas ete insere !\n";
