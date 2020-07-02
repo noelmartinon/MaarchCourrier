@@ -104,4 +104,32 @@ class CustomFieldModel
 
         return true;
     }
+
+    public static function getValuesSQL(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['key', 'label', 'table', 'clause']);
+        ValidatorModel::stringType($args, ['key', 'table', 'clause']);
+        ValidatorModel::arrayType($args, ['label']);
+
+        $select = array_column($args['label'], 'column');
+        $select[] = $args['key'];
+        $rawValues = DatabaseModel::select([
+            'select'    => $select,
+            'table'     => [$args['table']],
+            'where'     => [$args['clause']],
+        ]);
+
+        $values = [];
+        foreach ($rawValues as $rawValue) {
+            $label = '';
+            foreach ($args['label'] as $value) {
+                $label .= $value['delimiterStart'];
+                $label .= $rawValue[$value['column']];
+                $label .= $value['delimiterEnd'];
+            }
+            $values[] = ['key' => $rawValue[$args['key']], 'label' => $label];
+        }
+
+        return $values;
+    }
 }

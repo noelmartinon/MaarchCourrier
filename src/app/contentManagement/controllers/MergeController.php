@@ -16,6 +16,7 @@ namespace ContentManagement\controllers;
 
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
+use CustomField\models\CustomFieldModel;
 use Doctype\models\DoctypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
@@ -26,6 +27,8 @@ use Resource\models\ResourceContactModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
+use Template\controllers\DatasourceController;
+use Template\models\TemplateModel;
 use User\models\UserModel;
 
 include_once('vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.php');
@@ -273,7 +276,35 @@ class MergeController
         //CustomFields
         if (!empty($args['resId'])) {
             $customs = !empty($resource['custom_fields']) ? json_decode($resource['custom_fields'], true) : [];
+        } else {
+            $customs = !empty($args['customFields']) ? $args['customFields'] : [];
+        }
+
+        $customFieldsIds = array_keys($customs);
+        if (!empty($customFieldsIds)) {
+            $customFields = CustomFieldModel::get([
+                'select' => ['id', 'values', 'type'],
+                'where'  => ['id in (?)'],
+                'data'   => [$customFieldsIds]
+            ]);
+            $customFieldsValues = array_column($customFields, 'values', 'id');
+            $customFieldsTypes = array_column($customFields, 'type', 'id');
+
             foreach ($customs as $customId => $custom) {
+                $rawValues = json_decode($customFieldsValues[$customId], true);
+
+                if (!empty($rawValues['table']) && in_array($customFieldsTypes[$customId], ['radio', 'select', 'checkbox'])) {
+                    $rawValues = CustomFieldModel::getValuesSQL($rawValues);
+                    $rawValues = array_column($rawValues, 'label', 'key');
+                    if (is_array($custom)) {
+                        foreach ($custom as $key => $value) {
+                            $custom[$key] = $rawValues[$value];
+                        }
+                    } else {
+                        $custom = $rawValues[$custom];
+                    }
+                }
+
                 if (is_array($custom)) {
                     if (is_array($custom[0])) { //Custom BAN
                         $resource['customField_' . $customId] = "{$custom[0]['addressNumber']} {$custom[0]['addressStreet']} {$custom[0]['addressTown']} ({$custom[0]['addressPostcode']})";
@@ -282,20 +313,6 @@ class MergeController
                     }
                 } else {
                     $resource['customField_' . $customId] = $custom;
-                }
-            }
-        } else {
-            if (!empty($args['customFields'])) {
-                foreach ($args['customFields'] as $key => $customField) {
-                    if (is_array($customField)) {
-                        if (is_array($customField[0])) { //Custom BAN
-                            $resource['customField_' . $key] = "{$customField[0]['addressNumber']} {$customField[0]['addressStreet']} {$customField[0]['addressTown']} ({$customField[0]['addressPostcode']})";
-                        } else {
-                            $resource['customField_' . $key] = implode("\n", $customField);
-                        }
-                    } else {
-                        $resource['customField_' . $key] = $customField;
-                    }
                 }
             }
         }

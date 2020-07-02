@@ -250,6 +250,28 @@ class CoreConfigModel
         return $xmlfile;
     }
 
+    public static function getJsonLoaded(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['path']);
+        ValidatorModel::stringType($args, ['path']);
+
+        $customId = CoreConfigModel::getCustomId();
+
+        if (!empty($customId) && is_file("custom/{$customId}/{$args['path']}")) {
+            $path = "custom/{$customId}/{$args['path']}";
+        } else {
+            $path = $args['path'];
+        }
+
+        $file = null;
+        if (file_exists($path)) {
+            $file = file_get_contents($path);
+            $file = json_decode($file, true);
+        }
+
+        return $file;
+    }
+
     public static function initAngularStructure()
     {
         $lang = CoreConfigModel::getLanguage();
@@ -356,5 +378,15 @@ class CoreConfigModel
         }
 
         return $keycloakConfig;
+    }
+
+    public static function getColumns(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['table']);
+        ValidatorModel::stringType($args, ['table']);
+
+        $columns = DatabaseModel::getColumns(['table' => $args['table']]);
+
+        return $columns;
     }
 }

@@ -1712,6 +1712,9 @@ export const LANG_EN = {
     "workflowModels":                              "Public workflow models",
     "workingDays":                                 "Working days",
     "yes":                                         "Yes",
+    "invalidClause": "Invalid clause",
+    "invalidColumnType": "One of selected columns does not match type",
+    "forbiddenDelimiterType": "Delimiters are forbidden for this type",
     "zipcode":                                     "Zip code",
     "updateIndexingFieldWarning": "Warning:if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?",
 };

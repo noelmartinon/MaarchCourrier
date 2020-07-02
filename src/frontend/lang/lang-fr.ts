@@ -1714,6 +1714,9 @@ export const LANG_FR = {
     "workflowModels":                              "Modèles de circuits publics",
     "workingDays":                                 "jour(s) ouvré(s)",
     "yes":                                         "Oui",
+    "invalidClause": "Clause non valide",
+    "invalidColumnType": "Une des colonnes selectionnées ne correspond pas au type choisi",
+    "forbiddenDelimiterType": "Les délimiteurs sont interdits pour ce type",
     "zipcode":                                     "Code postal",
     "updateIndexingFieldWarning": "Attention si vous supprimez un champ du modèle, ce champ sera réinitialisé pour <b>TOUS</b> les courriers associés au modèle. Voulez-vous continuer ?",
 };

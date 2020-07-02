@@ -318,15 +318,27 @@ class DatabaseModel
     }
 
     /**
-     * Database Copy from Array
-     *
-     * @return bool
+     * Database Select column_name
+     * @param array $args
      * @throws \Exception
+     *
+     * @return array
      */
-    public static function pgsqlCopyFromArray(array $args)
+    public static function getColumns(array $args)
     {
-        $db = new DatabasePDO();
+        ValidatorModel::notEmpty($args, ['table']);
+        ValidatorModel::stringType($args, ['table']);
 
-        return $db->pgsqlCopyFromArray($args['table'], $args['rows'], $args['delimiter'], $args['nullAs'], $args['fields']);
+        $query = "SELECT column_name, data_type FROM information_schema.columns WHERE table_name = ?";
+
+        $db = new DatabasePDO();
+        $stmt = $db->query($query, [$args['table']]);
+
+        $rowset = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $rowset[] = $row;
+        }
+
+        return $rowset;
     }
 }
