@@ -541,7 +541,7 @@ INSERT INTO usergroups_services SELECT group_id, 'graphics_reports' FROM usergro
 TRUNCATE TABLE user_signatures;
 INSERT INTO user_signatures (user_id, signature_label, signature_path, signature_file_name) SELECT user_id, '', signature_path, signature_file_name FROM users WHERE signature_path is not null and signature_file_name is not null;
 
-UPDATE parameters SET param_value_int = '1706', param_value_string = '17.06.20' WHERE id = 'database_version';
+UPDATE parameters SET param_value_int = '1706', param_value_string = '17.06.21' WHERE id = 'database_version';
 
 /** ADD NEW COLUMN FOR ORDER RES IN BASKETS **/
 ALTER TABLE baskets DROP COLUMN IF EXISTS basket_res_order;
