@@ -610,6 +610,66 @@ class ResourceListController
         return $response->withStatus(204);
     }
 
+    public function areLocked(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Data resources is empty or not an array']);
+        }
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $basket = BasketModel::getById(['id' => $args['basketId'], 'select' => ['basket_clause']]);
+        $user   = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
+
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $resources = ResModel::getOnView([
+            'select'    => ['res_id', 'locker_user_id', 'locker_time'],
+            'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
+            'data'      => [$body['resources']]
+        ]);
+
+        $resourcesInBasket = array_column($resources, 'res_id');
+        if (!empty(array_diff($body['resources'], $resourcesInBasket))) {
+            return $response->withStatus(403)->withJson(['errors' => 'Resources out of perimeter']);
+        }
+
+        $locked = 0;
+        $resourcesToLock = [];
+        $lockersId = [];
+        foreach ($resources as $resource) {
+            $lock = true;
+            if (empty($resource['locker_user_id'] || empty($resource['locker_time']))) {
+                $lock = false;
+            } elseif ($resource['locker_user_id'] == $GLOBALS['id']) {
+                $lock = false;
+            } elseif (strtotime($resource['locker_time']) < time()) {
+                $lock = false;
+            }
+
+            if (!$lock) {
+                $resourcesToLock[] = $resource['res_id'];
+            } else {
+                $lockersId[] = $resource['locker_user_id'];
+                ++$locked;
+            }
+        }
+
+        $lockers = [];
+        if (!empty($lockersId)) {
+            $lockersId = array_unique($lockersId);
+            foreach ($lockersId as $lockerId) {
+                $lockers[] = UserModel::getLabelledUserById(['id' => $lockerId]);
+            }
+        }
+
+        return $response->withJson(['countLockedResources' => $locked, 'lockers' => $lockers, 'resourcesToProcess' => $resourcesToLock]);
+    }
+
     public static function listControl(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['groupId', 'userId', 'basketId', 'currentUserId']);
