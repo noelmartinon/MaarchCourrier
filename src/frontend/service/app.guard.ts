@@ -66,9 +66,9 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
     constructor() { }
 
     async canDeactivate(component: ProcessComponent): Promise<boolean> {
-        if (!component.isActionEnded() && !component.detailMode) {
+        /* if (!component.isActionEnded() && !component.detailMode) {
             component.unlockResource();
-        }
+        }*/
 
         if ((component.isToolModified() && !component.isModalOpen()) || (component.appDocumentViewer !== undefined && component.appDocumentViewer.isEditingTemplate())) {
             if (confirm(component.lang.saveModifiedData)) {

@@ -5,7 +5,6 @@ import { NotificationService } from '../notification.service';
 import { HeaderService } from '../../service/header.service';
 import { AppService } from '../../service/app.service';
 import { tap, catchError, filter, map, exhaustMap } from 'rxjs/operators';
-import { of, Subject } from 'rxjs';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material';
 import { AlertComponent } from '../../plugins/modal/alert.component';
@@ -16,12 +15,12 @@ import { EcplOnlyofficeViewerComponent } from '../../plugins/onlyoffice-api-js/o
 import { FunctionsService } from '../../service/functions.service';
 import { DocumentViewerModalComponent } from './modal/document-viewer-modal.component';
 import { PrivilegeService } from '../../service/privileges.service';
-import { VisaWorkflowModalComponent } from "../visa/modal/visa-workflow-modal.component";
-
+import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
+import { of, Subject } from 'rxjs';
 
 @Component({
     selector: 'app-document-viewer',
-    templateUrl: "document-viewer.component.html",
+    templateUrl: 'document-viewer.component.html',
     styleUrls: [
         'document-viewer.component.scss',
         '../indexation/indexing-form/indexing-form.component.scss',
@@ -34,50 +33,55 @@ export class DocumentViewerComponent implements OnInit {
     /**
      * document name stored in server (in tmp folder)
      */
-    @Input('tmpFilename') tmpFilename: string;
+    @Input() tmpFilename: string;
 
     /**
      * base64 of document  (@format is required!)
      */
-    @Input('base64') base64: any = null;
-    @Input('format') format: string = null;
+    @Input() base64: any = null;
+    @Input() format: string = null;
 
     /**
      * Target of resource (document or attachment)
      */
-    @Input('mode') mode: 'mainDocument' | 'attachment' = 'mainDocument';
+    @Input() mode: 'mainDocument' | 'attachment' = 'mainDocument';
 
     /**
      * Resource of document or attachment (based on @mode)
      */
-    @Input('resId') resId: number = null;
+    @Input() resId: number = null;
 
 
     /**
      * Resource of document link to attachment (@mode = 'attachment' required!)
      */
-    @Input('resIdMaster') resIdMaster: number = null;
+    @Input() resIdMaster: number = null;
 
     /**
      * Can manage document ? (create, delete, update)
      */
-    @Input('editMode') editMode: boolean = false;
+    @Input() editMode: boolean = false;
+
+    /**
+     * Hide tool document viewer
+     */
+    @Input() hideTools: boolean = false;
 
     /**
      * Title of new tab when open document in external tab
      */
-    @Input('title') title: string = '';
+    @Input() title: string = '';
 
 
     /**
      * To load specific attachment type in template list (to create document)
      */
-    @Input('attachType') attachType: string = null;
+    @Input() attachType: string = null;
 
     /**
      * Event emitter
      */
-    @Output('triggerEvent') triggerEvent = new EventEmitter<string>();
+    @Output() triggerEvent = new EventEmitter<string>();
 
     lang: any = LANG;
 
@@ -157,7 +161,7 @@ export class DocumentViewerComponent implements OnInit {
                         extension: '.' + ext.extension.toLowerCase(),
                         mimeType: ext.mimeType,
                         canConvert: ext.canConvert
-                    }
+                    };
                 });
                 this.allowedExtensions = this.sortPipe.transform(this.allowedExtensions, 'extension');
 
@@ -186,7 +190,7 @@ export class DocumentViewerComponent implements OnInit {
 
         if (!this.functions.empty(this.base64)) {
             this.loadFileFromBase64();
-        } else if (this.tmpFilename != '' && this.tmpFilename !== undefined) {
+        } else if (this.tmpFilename !== '' && this.tmpFilename !== undefined) {
             this.http.get('../../rest/convertedFile/' + this.tmpFilename).pipe(
                 tap((data: any) => {
                     this.file = {
@@ -260,7 +264,7 @@ export class DocumentViewerComponent implements OnInit {
         if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
             this.initUpload();
 
-            var reader = new FileReader();
+            const reader = new FileReader();
             this.file.name = fileInput.target.files[0].name;
             this.file.type = fileInput.target.files[0].type;
             this.file.format = this.file.name.split('.').pop();
@@ -297,7 +301,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     getBase64Document(buffer: ArrayBuffer) {
-        let TYPED_ARRAY = new Uint8Array(buffer);
+        const TYPED_ARRAY = new Uint8Array(buffer);
         const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => {
             return data + String.fromCharCode(byte);
         }, '');
@@ -306,10 +310,10 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     base64ToArrayBuffer(base64: string) {
-        var binary_string = window.atob(base64);
-        var len = binary_string.length;
-        var bytes = new Uint8Array(len);
-        for (var i = 0; i < len; i++) {
+        const binary_string = window.atob(base64);
+        const len = binary_string.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
             bytes[i] = binary_string.charCodeAt(i);
         }
         return bytes.buffer;
@@ -355,13 +359,13 @@ export class DocumentViewerComponent implements OnInit {
             );
         } else {
             this.noConvertedFound = true;
-            this.loading = false
+            this.loading = false;
         }
 
     }
 
     upload(data: any) {
-        let uploadURL = `../../rest/convertedFile`;
+        const uploadURL = `../../rest/convertedFile`;
 
         return this.http.post<any>(uploadURL, data, {
             reportProgress: true,
@@ -444,7 +448,7 @@ export class DocumentViewerComponent implements OnInit {
                     content: null,
                     src: null
                 };
-                this.docToUploadValue = "";
+                this.docToUploadValue = '';
                 this.triggerEvent.emit('cleanFile');
             }),
             catchError((err: any) => {
@@ -521,7 +525,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     downloadOriginalFile() {
-        let downloadLink = document.createElement('a');
+        const downloadLink = document.createElement('a');
         if (this.file.contentMode === 'base64') {
             downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
         } else {
@@ -544,7 +548,9 @@ export class DocumentViewerComponent implements OnInit {
         newWindow.document.title = this.title;
     }
 
-    async loadRessource(resId: any, target: string = 'mainDocument') {
+    async loadRessource(resId: any, target: any = 'mainDocument') {
+        this.resId = resId;
+        this.mode = target;
         this.loading = true;
         if (target === 'attachment') {
             this.requestWithLoader(`../../rest/attachments/${resId}/content?mode=base64`).subscribe(
@@ -653,7 +659,7 @@ export class DocumentViewerComponent implements OnInit {
 
     editTemplate(templateId: number) {
         let confirmMsg = '';
-        if (this.mode == 'attachment') {
+        if (this.mode === 'attachment') {
             confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmThird;
         } else {
             confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmSecond;
@@ -670,7 +676,7 @@ export class DocumentViewerComponent implements OnInit {
             tap(() => {
 
                 this.triggerEvent.emit();
-                const template = this.listTemplates.filter(template => template.id === templateId)[0];
+                const template = this.listTemplates.filter(templateItem => templateItem.id === templateId)[0];
 
                 this.file.format = template.extension;
 
@@ -753,7 +759,6 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     editMainDocument() {
-
         if (this.editor.mode === 'onlyoffice') {
             this.editor.async = false;
             this.editor.options = {
@@ -812,7 +817,7 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     loadTemplatesByResId(resId: number, attachType: string) {
-        let arrValues: any[] = [];
+        const arrValues: any[] = [];
         let arrTypes: any = [];
         this.listTemplates = [];
         this.http.get('../../rest/attachmentsTypes').pipe(
@@ -865,8 +870,8 @@ export class DocumentViewerComponent implements OnInit {
 
     loadTemplates() {
         if (this.listTemplates.length === 0) {
-            let arrValues: any[] = [];
-            if (this.mode == 'mainDocument') {
+            const arrValues: any[] = [];
+            if (this.mode === 'mainDocument') {
                 this.http.get('../../rest/currentUser/templates?target=indexingFile').pipe(
                     tap((data: any) => {
                         this.listTemplates = data.templates;
@@ -960,13 +965,13 @@ export class DocumentViewerComponent implements OnInit {
     }
 
     saveMainDocument() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.getFile().pipe(
                 map((data: any) => {
                     const formatdatas = {
                         encodedFile: data.content,
-                        format: data.format,
-                        resId: this.resId
+                        format:      data.format,
+                        resId:       this.resId
                     };
                     return formatdatas;
                 }),

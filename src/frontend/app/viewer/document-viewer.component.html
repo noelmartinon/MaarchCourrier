@@ -42,7 +42,7 @@
         <input type="file" #docToUpload [ngModel]="docToUploadValue" name="files[]" (change)="uploadTrigger($event)" style="display:none;">
         <div style="display: block;width:100%;" appUploadFileDragDrop (onFileDropped)="dndUploadFile($event)"
             [disabled]="!editMode">
-            <div *ngIf="!loading && file.content !== null" class="viewer-tools">
+            <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
                 <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="lang.downloadOriginalFile">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
@@ -124,7 +124,7 @@
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
 <button mat-raised-button 
-    *ngIf="!isDocModified && mode === 'mainDocument' && resId !== null && !functions.empty(file.subinfos) && file.subinfos.signedDocVersions && (privilegeService.hasCurrentUserPrivilege('sign_document') || this.headerService.user.id == file.creatorId)" 
+    *ngIf="(!isDocModified && mode === 'mainDocument' && resId !== null && !functions.empty(file.subinfos) && file.subinfos.signedDocVersions && (privilegeService.hasCurrentUserPrivilege('sign_document') || this.headerService.user.id == file.creatorId)) && !hideTools" 
     color="warn"
     [title]="lang.unsign" style="position: fixed;z-index: 1;bottom: 100px;right: 150px;"
     (click)="unsignMainDocument()">
