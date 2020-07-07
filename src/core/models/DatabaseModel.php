@@ -318,6 +318,20 @@ class DatabaseModel
     }
 
     /**
+     * Database Exec Function
+     * @param string $query
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public static function exec(string $query)
+    {
+        $db = new DatabasePDO();
+
+        return $db->exec($query);
+    }
+
+    /**
      * Database Select column_name
      * @param array $args
      * @throws \Exception
