@@ -87,7 +87,6 @@ class SignatureBookController
         $datas['hasWorkflow']           = ((int)$listInstances[0]['count'] > 0);
         $datas['listinstance']          = ListInstanceModel::getCurrentStepByResId(['resId' => $resId]);
         $datas['canSign']               = PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $GLOBALS['id']]);
-        $datas['canUpdateDocument']     = SignatureBookController::isResourceInSignatureBook(['resId' => $resId, 'userId' => $GLOBALS['id'], 'canUpdateDocument' => true]);
         $datas['isCurrentWorkflowUser'] = $datas['listinstance']['item_id'] == $GLOBALS['userId'];
 
         return $response->withJson($datas);
@@ -304,6 +303,9 @@ class SignatureBookController
             $attachments[0]['title'] = $attachments[0]['subject'];
             $attachments[0]['sign'] = true;
             $attachments[0]['viewerLink'] = "../../rest/resources/{$args['resId']}/content?".rand();
+
+            $attachments[0]['canModify'] = SignatureBookController::isResourceInSignatureBook(['resId' => $args['resId'], 'userId' => $args['userId'], 'canUpdateDocument' => true]);
+            $attachments[0]['canDelete'] = false;
 
             $isSigned = AdrModel::getDocuments([
                 'select'    => [1],
