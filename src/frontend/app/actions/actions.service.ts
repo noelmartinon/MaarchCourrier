@@ -46,6 +46,7 @@ export class ActionsService {
 
     currentResourceLock: any = null;
     lockMode: boolean = true;
+    actionEnded: boolean = false;
 
     currentAction: any = null;
     currentUserId: number = null;
@@ -140,6 +141,7 @@ export class ActionsService {
 
     async launchAction(action: any, userId: number, groupId: number, basketId: number, resIds: number[], datas: any, lockRes: boolean = true) {
         if (this.setActionInformations(action, userId, groupId, basketId, resIds)) {
+            this.actionEnded = false;
             this.loading = true;
             this.lockMode = lockRes;
             this.setResourceInformations(datas);
@@ -207,10 +209,8 @@ export class ActionsService {
     }
 
     lockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
-        console.log(`Verouillage des documents ${resIds}`);
 
         this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
-            tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -219,7 +219,6 @@ export class ActionsService {
 
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
-                tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
                 catchError((err: any) => {
                     if (err.status === 403) {
                         clearInterval(this.currentResourceLock);
@@ -233,7 +232,6 @@ export class ActionsService {
 
     unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
         if (resIds.length > 0) {
-            console.debug(`Unlock ressource : ${resIds}`);
             this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -245,7 +243,6 @@ export class ActionsService {
 
     stopRefreshResourceLock() {
         if (this.currentResourceLock !== null) {
-            console.debug('Cycle lock cancel');
             clearInterval(this.currentResourceLock);
         }
     }
@@ -277,6 +274,7 @@ export class ActionsService {
 
         this.notify.success(this.lang.action + ' : "' + this.currentAction.label + '" ' + this.lang.done);
 
+        this.actionEnded = true;
         this.eventAction.next(resIds);
     }
 

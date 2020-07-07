@@ -469,15 +469,17 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     async changeLocation(resId: number, origin: string) {
-        const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
+        if (resId !== this.resId) {
+            const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
 
-        if (data === true) {
-            this.actionService.stopRefreshResourceLock();
-            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
-            const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
-            this.router.navigate([path]);
-        } else {
-            this.backToBasket();
+            if (data === true) {
+                this.actionService.stopRefreshResourceLock();
+                this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
+                this.router.navigate([path]);
+            } else {
+                this.backToBasket();
+            }
         }
     }
 
@@ -563,7 +565,10 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.actionService.stopRefreshResourceLock();
-        this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+
+        if (!this.actionService.actionEnded) {
+            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+        }
 
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();

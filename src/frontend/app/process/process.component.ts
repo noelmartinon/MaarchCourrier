@@ -657,7 +657,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         if (!this.detailMode) {
             this.actionService.stopRefreshResourceLock();
-            this.actionService.unlockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
+            if (!this.actionService.actionEnded) {
+                this.actionService.unlockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
+            }
         }
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();
