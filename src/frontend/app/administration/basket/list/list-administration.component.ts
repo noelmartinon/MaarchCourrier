@@ -214,6 +214,7 @@ export class ListAdministrationComponent implements OnInit {
         defaultTab: null,
         canUpdate: false,
         canUpdateModel: false,
+        canUpdateDocument: false,
     };
     selectedProcessToolClone: string = null;
 
@@ -245,6 +246,8 @@ export class ListAdministrationComponent implements OnInit {
             this.selectedProcessTool.defaultTab = this.basketGroup.list_event_data === null ? 'dashboard' : this.basketGroup.list_event_data.defaultTab;
             this.selectedProcessTool.canUpdate = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdate;
             this.selectedProcessTool.canUpdateModel = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateModel;
+        } else if (this.basketGroup.list_event === 'signatureBookAction') {
+            this.selectedProcessTool.canUpdateDocument = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateDocument;
         }
 
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
@@ -387,7 +390,7 @@ export class ListAdministrationComponent implements OnInit {
                 defaultTab: 'dashboard'
             };
         } else {
-            this.selectedProcessTool = null;
+            this.selectedProcessTool = {};
         }
     }
 

@@ -25,6 +25,14 @@
         <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateModel" [disabled]="!selectedProcessTool.canUpdate">{{lang.canUpdateIndexingModel}}</mat-slide-toggle>
     </div> 
 </div>
+<div class="formType ratio-2 col-sm-12" *ngIf="selectedListEvent === 'signatureBookAction'">
+    <div class="formType-title">
+        {{lang.options}}
+    </div>
+    <div style="padding: 10px;">
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateDocument">{{lang.canUpdateResourcesInSignatureBook}}</mat-slide-toggle>
+    </div>
+</div>
 <hr />
 <mat-toolbar class="editorTool">
     <span>

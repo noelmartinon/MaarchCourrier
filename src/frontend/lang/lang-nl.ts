@@ -1700,4 +1700,5 @@ export const LANG_NL = {
     "targetLabel": "Target label__TO_TRANSLATE",
     "targetTable": "Target table__TO_TRANSLATE",
     "targetIdentifier": "Target identifier__TO_TRANSLATE",
+    "canUpdateResourcesInSignatureBook": "Can modify the main document included in the signature book__TO_TRANSLATE",
 };
