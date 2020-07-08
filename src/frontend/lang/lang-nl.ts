@@ -1701,5 +1701,5 @@ export const LANG_NL = {
     "targetTable": "Target table__TO_TRANSLATE",
     "targetIdentifier": "Target identifier__TO_TRANSLATE",
     "canUpdateResourcesInSignatureBook": "Can modify the main document included in the signature book__TO_TRANSLATE",
-    "includeFolderPerimeter": "Consulter les courriers hors périmètre dans les dossiers__TO_TRANSLATE",
+    "includeFolderPerimeter": "Consulter les courriers hors périmètre dans les dossiers et courriers suivis__TO_TRANSLATE",
 };

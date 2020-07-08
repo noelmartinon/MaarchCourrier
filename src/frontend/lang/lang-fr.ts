@@ -766,7 +766,7 @@ export const LANG_FR = {
     "in":                                          "dans",
     "inactive":                                    "Inactif",
     "inactives":                                   "Inactif(s)",
-    "includeFolderPerimeter":                      "Consulter les courriers hors périmètre dans les dossiers",
+    "includeFolderPerimeter":                      "Consulter les courriers hors périmètre dans les dossiers et courriers suivis",
     "incoming":                                    "Courrier arrivée",
     "incompleteAddressForPostal":                  "Adresse incomplète pour envoi postal",
     "indexation":                                  "Enregistrement de courrier",
