@@ -17,7 +17,7 @@ switch ($request) {
 
         $select = 'SELECT distinct us.*';
         $from = ' FROM listinstance li JOIN users us ON li.item_id = us.user_id';
-        $where = " WHERE li.coll_id = 'letterbox_coll' AND li.item_mode = 'sign' "
+        $where = " WHERE AND li.item_mode = 'sign' "
             .'and process_date IS NULL ';
 
         $arrayPDO = array(':recordid' => $event->record_id);
@@ -25,7 +25,7 @@ switch ($request) {
             case 'notes':
                 $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $from .= ' JOIN res_letterbox lb ON lb.res_id = notes.identifier';
-                $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id'
+                $where .= ' AND notes.id = :recordid AND li.item_id != (SELECT user_id FROM users WHERE id = notes.user_id)'
                     .' AND ('
                         .' notes.id not in (SELECT DISTINCT note_id FROM note_entities) '
                         .' OR us.user_id IN (SELECT ue.user_id FROM note_entities ne JOIN '
@@ -83,14 +83,14 @@ switch ($request) {
     case 'res_id':
         $select = 'SELECT li.res_id';
         $from = ' FROM listinstance li';
-        $where = " WHERE li.coll_id = 'letterbox_coll'   ";
+        $where = " WHERE (1=1)   ";
 
         $arrayPDO = array(':recordid' => $event->record_id);
         switch ($event->table_name) {
             case 'notes':
                 $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $from .= ' JOIN res_letterbox lb ON lb.res_id = notes.identifier';
-                $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id';
+                $where .= ' AND notes.id = :recordid AND li.item_id != (SELECT user_id FROM users WHERE id = notes.user_id)';
                 if ($notification->diffusion_properties != '') {
                     $status_tab = explode(',', $notification->diffusion_properties);
                     // $status_str=implode("','",$status_tab);

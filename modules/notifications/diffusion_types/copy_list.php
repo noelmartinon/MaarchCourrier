@@ -19,7 +19,7 @@ switch ($request) {
         $select = 'SELECT distinct us.*';
         $from = ' FROM listinstance li '
             .' JOIN users us ON li.item_id = us.user_id';
-        $where = " WHERE li.coll_id = 'letterbox_coll'   AND li.item_mode = 'cc'"
+        $where = " WHERE li.item_mode = 'cc'"
             ." AND item_type='user_id'";
 
         $arrayPDO = array(':recordid' => $event->record_id);
@@ -27,7 +27,7 @@ switch ($request) {
         switch ($event->table_name) {
             case 'notes':
                 $from .= ' JOIN notes ON notes.identifier = li.res_id';
-                $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id'
+                $where .= ' AND notes.id = :recordid AND li.item_id != (SELECT user_id FROM users WHERE id = notes.user_id)'
                     .' AND ('
                         .' notes.id not in (SELECT DISTINCT note_id FROM note_entities) '
                         .' OR us.user_id IN (SELECT ue.user_id FROM note_entities ne JOIN users_entities ue ON ne.item_id = ue.entity_id WHERE ne.note_id = :recordid)'
@@ -66,13 +66,13 @@ switch ($request) {
         $from = ' FROM listinstance li '
             .' LEFT JOIN users_entities ue ON li.item_id = ue.entity_id '
             .' JOIN users us ON ue.user_id = us.user_id';
-        $where = " WHERE li.coll_id = 'letterbox_coll'   AND li.item_mode = 'cc'"
+        $where = " WHERE li.item_mode = 'cc'"
             ." AND item_type='entity_id'";
 
         switch ($event->table_name) {
             case 'notes':
                 $from .= ' JOIN notes ON notes.identifier = li.res_id';
-                $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id'
+                $where .= ' AND notes.id = :recordid AND li.item_id != (SELECT user_id FROM users WHERE id = notes.user_id)'
                     .' AND ('
                         .' notes.id not in (SELECT DISTINCT note_id FROM note_entities) '
                         .' OR us.user_id IN (SELECT ue.user_id FROM note_entities ne JOIN users_entities ue ON ne.item_id = ue.entity_id WHERE ne.note_id = :recordid)'
@@ -112,12 +112,12 @@ switch ($request) {
         $arrayPDO = array(':recordid' => $event->record_id);
         $select = 'SELECT li.res_id';
         $from = ' FROM listinstance li';
-        $where = " WHERE li.coll_id = 'letterbox_coll'   ";
+        $where = " WHERE (1=1) ";
 
         switch ($event->table_name) {
             case 'notes':
                 $from .= ' JOIN notes ON notes.identifier = li.res_id';
-                $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id';
+                $where .= ' AND notes.id = :recordid AND li.item_id != (SELECT user_id FROM users WHERE id = notes.user_id)';
                 break;
 
             case 'res_letterbox':

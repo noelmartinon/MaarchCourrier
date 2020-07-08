@@ -40,14 +40,14 @@ switch ($request) {
     case 'res_id':
         $select = 'SELECT li.res_id';
         $from = ' FROM listinstance li';
-        $where = " WHERE li.coll_id = 'letterbox_coll'   ";
+        $where = " WHERE (1=1) ";
 
         $arrayPDO = array(':recordid' => $event->record_id);
         switch ($event->table_name) {
             case 'notes':
                 $from .= ' JOIN notes ON notes.identifier = li.res_id';
                 $from .= ' JOIN res_letterbox lb ON lb.res_id = notes.identifier';
-                $where .= ' AND notes.id = :recordid AND li.item_id != notes.user_id';
+                $where .= ' AND notes.id = :recordid AND li.item_id != (SELECT user_id FROM users WHERE id = notes.user_id)';
                 if ($notification->diffusion_properties != '') {
                     $status_tab = explode(',', $notification->diffusion_properties);
                     // $status_str=implode("','",$status_tab);
