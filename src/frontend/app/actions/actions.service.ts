@@ -261,9 +261,13 @@ export class ActionsService {
     }
 
     unlockResourceAfterActionModal(resIds: any) {
-        if (this.functions.empty(resIds) && this.lockMode) {
+        if (this.lockMode) {
             this.stopRefreshResourceLock();
-            this.unlockResource();
+
+            // Cancel action modal
+            if (this.functions.empty(resIds)) {
+                this.unlockResource();
+            }
         }
     }
 
