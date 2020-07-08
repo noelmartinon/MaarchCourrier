@@ -642,6 +642,13 @@ UPDATE usergroups_services SET parameters = (
     )
 WHERE service_id = 'admin_users';
 
+UPDATE groupbasket SET list_event_data = '{"canUpdateDocument":true}'
+WHERE list_event = 'signatureBookAction' AND group_id in (
+    select distinct(group_id)
+    from usergroups_services
+    where service_id = 'manage_attachments'
+);
+
 DELETE FROM usergroups_services WHERE service_id = 'view_personal_data' or service_id = 'manage_personal_data';
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'view_personal_data'
