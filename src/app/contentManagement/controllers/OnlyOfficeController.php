@@ -24,8 +24,10 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\CurlModel;
 use Template\models\TemplateModel;
 
 class OnlyOfficeController
@@ -294,5 +296,121 @@ class OnlyOfficeController
         }
 
         return $response->withJson(['isAvailable' => $isAvailable]);
+    }
+
+    public static function canConvert()
+    {
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
+            return false;
+        } elseif (empty($loadedXml->onlyoffice->server_uri)) {
+            return false;
+        } elseif (empty($loadedXml->onlyoffice->server_port)) {
+            return false;
+        }
+
+        $uri  = (string)$loadedXml->onlyoffice->server_uri;
+        $port = (string)$loadedXml->onlyoffice->server_port;
+
+        $isAvailable = DocumentEditorController::isAvailable(['uri' => $uri, 'port' => $port]);
+
+        if (!empty($isAvailable['errors'])) {
+            return false;
+        }
+
+        return $isAvailable;
+    }
+
+    public static function convert(array $args)
+    {
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
+            return ['errors' => 'Onlyoffice is not enabled', 'lang' => 'onlyOfficeNotEnabled'];
+        } elseif (empty($loadedXml->onlyoffice->server_uri)) {
+            return ['errors' => 'Onlyoffice server_uri is empty', 'lang' => 'uriIsEmpty'];
+        } elseif (empty($loadedXml->onlyoffice->server_port)) {
+            return ['errors' => 'Onlyoffice server_port is empty', 'lang' => 'portIsEmpty'];
+        }
+
+        $uri  = (string)$loadedXml->onlyoffice->server_uri;
+        $port = (string)$loadedXml->onlyoffice->server_port;
+
+        $tmpPath = CoreConfigModel::getTmpPath();
+        $docInfo = pathinfo($args['fullFilename']);
+
+        $payload = [
+            'userId'       => $GLOBALS['id'],
+            'fullFilename' => $args['fullFilename']
+        ];
+
+        $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
+
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        if (empty($file['config']['maarchUrl'])) {
+            return ['errors' => 'Cannot convert with OnlyOffice : maarchUrl not set in config.json'];
+        }
+        $coreUrl = $file['config']['maarchUrl'];
+        $docUrl = $coreUrl . 'rest/onlyOffice/content?token=' . $jwt;
+
+        $response = CurlModel::execSimple([
+            'url'     => $uri . ':' . $port . '/ConvertService.ashx',
+            'headers' => ['accept: application/json'],
+            'method'  => 'POST',
+            'body'    => json_encode([
+                'async'      => false,
+                'filetype'   => $docInfo['extension'],
+                'key'        => CoreConfigModel::uniqueId(),
+                'outputtype' => 'pdf',
+                'title'      => $docInfo['filename'] . 'pdf',
+                'url'        => $docUrl
+            ])
+        ]);
+
+        if ($response['code'] != 200) {
+            return ['errors' => 'OnlyOffice conversion failed '];
+        }
+        if (!empty($response['response']['error'])) {
+            return ['errors' => 'OnlyOffice conversion failed : ' . $response['response']['error']];
+        }
+
+        $convertedFile = file_get_contents($response['response']['fileUrl']);
+
+        if ($convertedFile === false) {
+            return ['errors' => 'Cannot get converted document'];
+        }
+
+        $filename = $tmpPath . $docInfo['filename'] . '.pdf';
+        $saveTmp = file_put_contents($filename, $convertedFile);
+        if ($saveTmp == false) {
+            return ['errors' => 'Cannot save converted document'];
+        }
+
+        return true;
+    }
+
+    public function getTmpFile(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        try {
+            $jwt = JWT::decode($queryParams['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
+        } catch (\Exception $e) {
+            return $response->withStatus(401)->withJson(['errors' => 'Token is invalid']);
+        }
+
+        CoreController::setGlobals(['userId' => $jwt->userId]);
+
+        $fileContent = file_get_contents($jwt->fullFilename);
+        if ($fileContent === false) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
+        }
+
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
+        $pathInfo = pathinfo($jwt->fullFilename);
+
+        $response->write($fileContent);
+        $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.{$pathInfo['extension']}");
+        return $response->withHeader('Content-Type', $mimeType);
     }
 }

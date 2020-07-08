@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../app/translate.component';
 import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
@@ -38,7 +38,7 @@ import { ReconcileActionComponent } from './reconciliation-action/reconcile-acti
 import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
 
 @Injectable()
-export class ActionsService {
+export class ActionsService implements OnDestroy {
 
     lang: any = LANG;
 
@@ -46,6 +46,7 @@ export class ActionsService {
 
     currentResourceLock: any = null;
     lockMode: boolean = true;
+    actionEnded: boolean = false;
 
     currentAction: any = null;
     currentUserId: number = null;
@@ -136,8 +137,7 @@ export class ActionsService {
             this.loading = true;
             try {
                 this[action.component]();
-            }
-            catch (error) {
+            } catch (error) {
                 console.log(error);
                 console.log(action.component);
                 alert(this.lang.actionNotExist);
@@ -145,41 +145,33 @@ export class ActionsService {
         }
     }
 
-    launchAction(action: any, userId: number, groupId: number, basketId: number, resIds: number[], datas: any, lockRes: boolean = true) {
+    async launchAction(action: any, userId: number, groupId: number, basketId: number, resIds: number[], datas: any, lockRes: boolean = true) {
         if (this.setActionInformations(action, userId, groupId, basketId, resIds)) {
+            this.actionEnded = false;
             this.loading = true;
             this.lockMode = lockRes;
             this.setResourceInformations(datas);
+
             if (this.lockMode) {
-                if (action.component == 'viewDoc' || action.component == 'documentDetails') {
-                    this[action.component](action.data);
-                } else {
-                    this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
-                        tap((data: any) => {
-                            if (this.canExecuteAction(data.countLockedResources, data.lockers, resIds)) {
-                                try {
-                                    this.currentResIds = data.resourcesToProcess;
-                                    this.lockResource();
-                                    this[action.component](action.data);
-                                }
-                                catch (error) {
-                                    console.log(error);
-                                    console.log(action);
-                                    alert(this.lang.actionNotExist);
-                                }
-                            }
-                        }),
-                        catchError((err: any) => {
-                            this.notify.handleErrors(err);
-                            return of(false);
-                        })
-                    ).subscribe();
+                const res: any = await this.canExecuteAction(resIds);
+                if (res === true) {
+                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument'].indexOf(action.component) > -1) {
+                        this[action.component](action.data);
+                    } else {
+                        try {
+                            this.lockResource();
+                            this[action.component](action.data);
+                        } catch (error) {
+                            console.log(error);
+                            console.log(action);
+                            alert(this.lang.actionNotExist);
+                        }
+                    }
                 }
             } else {
                 try {
                     this[action.component]();
-                }
-                catch (error) {
+                } catch (error) {
                     console.log(error);
                     console.log(action);
                     alert(this.lang.actionNotExist);
@@ -188,29 +180,56 @@ export class ActionsService {
         }
     }
 
-    canExecuteAction(numberOflockedResIds: number, usersWholocked: any[], resIds: number[]) {
-        let msgWarn = this.lang.warnLockRes + ' : ' + usersWholocked.join(', ');
+    canExecuteAction(resIds: number[], userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId) {
+        return new Promise((resolve) => {
+            this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/locked`, { resources: resIds }).pipe(
+                tap((data: any) => {
+                    let msgWarn = this.lang.warnLockRes + ' : ' + data.lockers.join(', ');
 
-        if (numberOflockedResIds != resIds.length) {
-            msgWarn += this.lang.warnLockRes2 + '.';
-        }
+                    if (data.countLockedResources != resIds.length) {
+                        msgWarn += this.lang.warnLockRes2 + '.';
+                    }
 
-        if (numberOflockedResIds > 0) {
-            alert(numberOflockedResIds + ' ' + msgWarn);
-        }
+                    if (data.countLockedResources > 0) {
+                        alert(data.countLockedResources + ' ' + msgWarn);
+                    }
 
-        if (numberOflockedResIds != resIds.length) {
-            return true;
-        } else {
-            return false;
-        }
+                    if (data.countLockedResources != resIds.length) {
+                        this.currentResIds = data.resourcesToProcess;
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                }),
+                // tap((data: any) => resolve(data)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
-    lockResource() {
+    hasLockResources() {
+        return !this.functions.empty(this.currentResourceLock);
+    }
+
+    lockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
+        console.debug(`Lock resources : ${resIds}`);
+
+        this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
+            tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+
         this.currentResourceLock = setInterval(() => {
-            this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: this.currentResIds }).pipe(
+            this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
+                tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
                 catchError((err: any) => {
-                    if (err.status == 403) {
+                    if (err.status === 403) {
                         clearInterval(this.currentResourceLock);
                     }
                     this.notify.handleErrors(err);
@@ -220,9 +239,10 @@ export class ActionsService {
         }, 50000);
     }
 
-    unlockResource() {
-        if (this.currentResIds.length > 0) {
-            this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/unlock`, { resources: this.currentResIds }).pipe(
+    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
+        if (resIds.length > 0) {
+            console.debug(`Unlock resources : ${resIds}`);
+            this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
                     return of(false);
@@ -233,6 +253,7 @@ export class ActionsService {
 
     stopRefreshResourceLock() {
         if (this.currentResourceLock !== null) {
+            console.debug('Cycle lock cancel');
             clearInterval(this.currentResourceLock);
         }
     }
@@ -247,13 +268,17 @@ export class ActionsService {
             basketId: this.currentBasketId,
             indexActionRoute: this.indexActionRoute,
             processActionRoute: this.processActionRoute
-        }
+        };
     }
 
     unlockResourceAfterActionModal(resIds: any) {
-        this.stopRefreshResourceLock();
-        if (this.functions.empty(resIds) && this.lockMode) {
-            this.unlockResource();
+        if (this.lockMode) {
+            this.stopRefreshResourceLock();
+
+            // Cancel action modal
+            if (this.functions.empty(resIds)) {
+                this.unlockResource();
+            }
         }
     }
 
@@ -264,6 +289,7 @@ export class ActionsService {
 
         this.notify.success(this.lang.action + ' : "' + this.currentAction.label + '" ' + this.lang.done);
 
+        this.actionEnded = true;
         this.eventAction.next(resIds);
     }
 
@@ -666,7 +692,7 @@ export class ActionsService {
 
 
     noConfirmAction(options: any = null) {
-        let dataActionToSend = this.setDatasActionToSend();
+        const dataActionToSend = this.setDatasActionToSend();
         if (dataActionToSend.resIds.length === 0) {
             this.http.post('../rest/resources', dataActionToSend.resource).pipe(
                 tap((data: any) => {
@@ -699,8 +725,6 @@ export class ActionsService {
     }
 
     processDocument(options: any = null) {
-        this.stopRefreshResourceLock();
-        this.unlockResource();
         this.router.navigate([`/process/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/resId/${this.currentResIds}`]);
     }
 

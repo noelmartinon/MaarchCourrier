@@ -37,7 +37,7 @@ class AuthenticationController
         'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers', 'GET/installer/custom',
         'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
         'PUT/installer/administrator', 'DELETE/installer/lock',
-        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents',
+        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content',
     ];
 
     public function getInformations(Request $request, Response $response)

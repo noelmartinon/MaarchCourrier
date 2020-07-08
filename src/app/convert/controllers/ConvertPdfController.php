@@ -15,6 +15,7 @@
 namespace Convert\controllers;
 
 use Attachment\models\AttachmentModel;
+use ContentManagement\controllers\OnlyOfficeController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
@@ -39,10 +40,19 @@ class ConvertPdfController
     
             exec('export DISPLAY=:0 && '.$command.' 2>&1', $output, $return);
         } else {
-            ConvertPdfController::addBom($aArgs['fullFilename']);
-            $command = "timeout 30 unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
-    
-            exec('export HOME=' . $tmpPath . ' && '.$command.' 2>&1', $output, $return);
+            if (OnlyOfficeController::canConvert()) {
+                $output = [];
+                $return = 0;
+                $converted = OnlyOfficeController::convert(['fullFilename' => $aArgs['fullFilename']]);
+                if (!empty($converted['errors'])) {
+                    $output = [$converted['errors']];
+                }
+            } else {
+                ConvertPdfController::addBom($aArgs['fullFilename']);
+                $command = "timeout 30 unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
+
+                exec('export HOME=' . $tmpPath . ' && ' . $command . ' 2>&1', $output, $return);
+            }
         }
 
         return ['output' => $output, 'return' => $return];

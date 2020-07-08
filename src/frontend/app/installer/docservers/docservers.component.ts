@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { LANG } from '../../translate.component';
@@ -23,8 +23,10 @@ export class DocserversComponent implements OnInit {
         public http: HttpClient,
         private installerService: InstallerService
     ) {
+        const valPath: ValidatorFn[] = [Validators.pattern(/^[^\'\<\>\|\*\:\?]+$/), Validators.required];
+
         this.stepFormGroup = this._formBuilder.group({
-            docserversPath: ['/opt/maarch/docservers/', Validators.required],
+            docserversPath: ['/opt/maarch/docservers/', valPath],
             stateStep: ['', Validators.required],
         });
 
@@ -38,7 +40,11 @@ export class DocserversComponent implements OnInit {
 
 
     isValidStep() {
-        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid || this.installerService.isStepAlreadyLaunched('docserver');
+        if (this.installerService.isStepAlreadyLaunched('docserver')) {
+            return true;
+        } else {
+            return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid;
+        }
     }
 
     initStep() {
@@ -48,7 +54,7 @@ export class DocserversComponent implements OnInit {
     }
 
     getFormGroup() {
-        return this.stepFormGroup;
+        return this.installerService.isStepAlreadyLaunched('docserver') ? true : this.stepFormGroup;
     }
 
     checkAvailability() {

@@ -22,6 +22,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "core-js": "^3.6.5",
+    "ngx-joyride": "^2.2.11",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {

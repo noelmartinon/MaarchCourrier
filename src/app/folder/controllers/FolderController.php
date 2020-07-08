@@ -21,6 +21,7 @@ use Folder\models\EntityFolderModel;
 use Folder\models\FolderModel;
 use Folder\models\ResourceFolderModel;
 use Folder\models\UserPinnedFolderModel;
+use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use Resource\controllers\ResController;
 use Resource\controllers\ResourceListController;
@@ -745,6 +746,15 @@ class FolderController
                     'trackedMails'  => $followedResources,
                     'listDisplay'   => ['folders']
                 ]);
+
+                $folderPrivilege = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $GLOBALS['id']]);
+                foreach ($formattedResources as $key => $formattedResource) {
+                    if ($folderPrivilege) {
+                        $formattedResources[$key]['allowed'] = true;
+                    } else {
+                        $formattedResources[$key]['allowed'] = ResController::hasRightByResId(['resId' => [$formattedResource['resId']], 'userId' => $GLOBALS['id']]);
+                    }
+                }
             }
 
             $count = count($rawResources);
@@ -834,15 +844,17 @@ class FolderController
             return $response->withJson(['countResources' => count($foldersResources)]);
         }
 
-        if (!ResController::hasRightByResId(['resId' => $resourcesToUnclassify, 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Resources out of perimeter']);
+        $folder = FolderModel::getById(['select' => ['label', 'public', 'user_id'], 'id' => $args['id']]);
+        if ($folder['public'] || $folder['user_id'] != $GLOBALS['id']) {
+            if (!ResController::hasRightByResId(['resId' => $resourcesToUnclassify, 'userId' => $GLOBALS['id']])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Resources out of perimeter']);
+            }
         }
 
         foreach ($resourcesToUnclassify as $value) {
             ResourceFolderModel::delete(['where' => ['folder_id = ?', 'res_id = ?'], 'data' => [$args['id'], $value]]);
         }
 
-        $folders             = FolderModel::getById(['select' => ['label'], 'id' => $args['id']]);
         $resourcesInfo       = ResModel::get(['select' => ['alt_identifier'], 'where' => ['res_id in (?)'], 'data' => [$resourcesToUnclassify]]);
         $resourcesIdentifier = array_column($resourcesInfo, 'alt_identifier');
 
@@ -851,7 +863,7 @@ class FolderController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $resource,
                 'eventType' => 'UP',
-                'info'      => _REMOVED_TO_FOLDER . " \"" . $folders['label'] . "\"",
+                'info'      => _REMOVED_TO_FOLDER . " \"" . $folder['label'] . "\"",
                 'moduleId'  => 'resource',
                 'eventId'   => 'resourceModification',
             ]);
@@ -861,7 +873,7 @@ class FolderController
             'tableName' => 'resources_folders',
             'recordId'  => $args['id'],
             'eventType' => 'DEL',
-            'info'      => _FOLDER_RESOURCES_REMOVED . " : " . implode(", ", $resourcesIdentifier) . " " . _FOLDER_TO_FOLDER . " \"" . $folders['label'] . "\"",
+            'info'      => _FOLDER_RESOURCES_REMOVED . " : " . implode(", ", $resourcesIdentifier) . " " . _FOLDER_TO_FOLDER . " \"" . $folder['label'] . "\"",
             'moduleId'  => 'folder',
             'eventId'   => 'folderResourceRemoved',
         ]);

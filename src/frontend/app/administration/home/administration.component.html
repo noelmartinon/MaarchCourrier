@@ -5,7 +5,7 @@
                 <div class="bg-head-title-label">
                     <header-left></header-left>
                 </div>
-                <div class="bg-head-title-tool">
+                <div class="bg-head-title-tool" stepNumber="1" joyrideStep="firstStep" title="demoTour" text="Hi, Welcome to demo tour">
                     <header-right></header-right>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                 </mat-form-field>
                 <div
                     style="margin: 20px;display: grid;grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));gap: 20px;padding:20px;padding-top:0px;margin-top:0px;">
-                    <button mat-button *ngFor="let administration of filteredAdministrations | async | sortBy : 'label'"
+                    <button [joyrideStep]="administration.id" mat-button *ngFor="let administration of filteredAdministrations | async | sortBy : 'label'"
                         [title]="administration.comment" style="font-size:20px;height:80px;"
                         (click)="goToSpecifiedAdministration(administration)">
                         <div style="display: flex;align-items: center;">

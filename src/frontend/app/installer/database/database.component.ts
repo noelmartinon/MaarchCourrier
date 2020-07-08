@@ -120,7 +120,11 @@ export class DatabaseComponent implements OnInit {
     }
 
     isValidStep() {
-        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid || this.installerService.isStepAlreadyLaunched('database');
+        if (this.installerService.isStepAlreadyLaunched('database')) {
+            return true;
+        } else {
+            return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid;
+        }
     }
 
     isEmptyConnInfo() {
@@ -132,7 +136,7 @@ export class DatabaseComponent implements OnInit {
     }
 
     getFormGroup() {
-        return this.stepFormGroup;
+        return this.installerService.isStepAlreadyLaunched('database') ? true : this.stepFormGroup;
     }
 
     getInfoToInstall(): StepAction[] {

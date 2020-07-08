@@ -19,6 +19,7 @@ use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Firebase\JWT\JWT;
+use Group\controllers\PrivilegeController;
 use Resource\controllers\ResController;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
@@ -30,7 +31,10 @@ use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\ValidatorModel;
+use Template\controllers\TemplateController;
+use Template\models\TemplateAssociationModel;
 use Template\models\TemplateModel;
+use User\models\UserEntityModel;
 use User\models\UserModel;
 
 class CollaboraOnlineController
@@ -49,18 +53,23 @@ class CollaboraOnlineController
         }
 
         $document = CollaboraOnlineController::getDocument([
-            'id'   => $args['id'],
-            'type' => $tokenCheckResult['type'],
-            'mode' => $tokenCheckResult['mode']
+            'id'     => $args['id'],
+            'type'   => $tokenCheckResult['type'],
+            'mode'   => $tokenCheckResult['mode'],
+            'format' => $tokenCheckResult['format']
         ]);
 
         if (!empty($document['errors'])) {
             return $response->withStatus($document['code'])->withJson(['errors' => $document['errors']]);
         }
 
-        $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
-        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        if (!empty($document['docserver_id'])) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+            }
+        } else {
+            $docserver['path_template'] = '';
         }
 
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
@@ -94,6 +103,10 @@ class CollaboraOnlineController
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
 
+        if ($tokenCheckResult['mode'] == 'encoded') {
+            unlink($document['path'] . $document['filename']);
+        }
+
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.{$pathInfo['extension']}");
         return $response->withHeader('Content-Type', $mimeType);
@@ -113,9 +126,10 @@ class CollaboraOnlineController
         }
 
         $document = CollaboraOnlineController::getDocument([
-            'id'   => $args['id'],
-            'type' => $tokenCheckResult['type'],
-            'mode' => $tokenCheckResult['mode']
+            'id'     => $args['id'],
+            'type'   => $tokenCheckResult['type'],
+            'mode'   => $tokenCheckResult['mode'],
+            'format' => $tokenCheckResult['format']
         ]);
 
         if (!empty($document['errors'])) {
@@ -123,6 +137,7 @@ class CollaboraOnlineController
         }
 
         $modificationDate = new \DateTime($document['modification_date']);
+        $modificationDate->setTimezone(new \DateTimeZone('UTC'));
         $modificationDate = $modificationDate->format(\DateTime::ISO8601);
 
         return $response->withJson([
@@ -165,9 +180,10 @@ class CollaboraOnlineController
         }
 
         $document = CollaboraOnlineController::getDocument([
-            'id'   => $args['id'],
-            'type' => $tokenCheckResult['type'],
-            'mode' => $tokenCheckResult['mode']
+            'id'     => $args['id'],
+            'type'   => $tokenCheckResult['type'],
+            'mode'   => $tokenCheckResult['mode'],
+            'format' => $tokenCheckResult['format']
         ]);
 
         if (!empty($document['errors'])) {
@@ -202,11 +218,11 @@ class CollaboraOnlineController
         }
 
         $document = CollaboraOnlineController::getDocument([
-            'id'   => $tokenCheckResult['resId'],
-            'type' => $tokenCheckResult['type'],
-            'mode' => $tokenCheckResult['mode']
+            'id'     => $tokenCheckResult['resId'],
+            'type'   => $tokenCheckResult['type'],
+            'mode'   => $tokenCheckResult['mode'],
+            'format' => $tokenCheckResult['format']
         ]);
-
         if (!empty($document['errors'])) {
             return $response->withStatus($document['code'])->withJson(['errors' => $document['errors']]);
         }
@@ -235,6 +251,8 @@ class CollaboraOnlineController
 
             $content = base64_encode($fileContent);
         }
+
+        unlink($pathToDocument);
 
         return $response->withJson(['content' => $content, 'format' => $extension]);
     }
@@ -267,7 +285,7 @@ class CollaboraOnlineController
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
 
         if (empty($loadedXml) || empty($loadedXml->collaboraonline->enabled) || $loadedXml->collaboraonline->enabled == 'false' || empty($loadedXml->collaboraonline->server_uri)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Collabora Online server is disabled']);
+            return $response->withStatus(400)->withJson(['errors' => 'Collabora Online is not enabled', 'lang' => 'collaboraOnlineNotEnabled']);
         }
 
         $body = $request->getParsedBody();
@@ -280,15 +298,15 @@ class CollaboraOnlineController
         if (!Validator::stringType()->notEmpty()->validate($body['mode'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body mode is empty or not a string']);
         }
-
-        if (!ResController::hasRightByResId(['resId' => [$body['resId']], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        if (!empty($body['format']) && !Validator::stringType()->validate($body['format'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body format is not a string']);
         }
 
         $document = CollaboraOnlineController::getDocument([
-            'id'   => $body['resId'],
-            'type' => $body['type'],
-            'mode' => $body['mode']
+            'id'     => $body['resId'],
+            'type'   => $body['type'],
+            'mode'   => $body['mode'],
+            'format' => $body['format']
         ]);
 
         if (!empty($document['errors'])) {
@@ -298,6 +316,19 @@ class CollaboraOnlineController
         $extension = pathinfo($document['filename'], PATHINFO_EXTENSION);
 
         $url = (string)$loadedXml->collaboraonline->server_uri . ':' . (string)$loadedXml->collaboraonline->server_port;
+
+        $coreUrl = str_replace('rest/', '', UrlController::getCoreUrl());
+        $serverSsl = filter_var((string)$loadedXml->collaboraonline->server_ssl, FILTER_VALIDATE_BOOLEAN);
+        if (!empty($serverSsl)) {
+            if (strpos($coreUrl, 'https') === false) {
+                return $response->withStatus(400)->withJson(['errors' => 'Collabora Online cannot be configured to use SSL if Maarch Courrier is not using SSL']);
+            }
+            $url = 'https://' . $url;
+        } else {
+            if (strpos($coreUrl, 'https') !== false) {
+                return $response->withStatus(400)->withJson(['errors' => 'Collabora Online has to be configured to use SSL if Maarch Courrier is using SSL']);
+            }
+        }
 
         $discovery = CurlModel::execSimple([
             'url'    => $url . '/hosting/discovery',
@@ -317,22 +348,64 @@ class CollaboraOnlineController
             }
         }
 
-        $coreUrl = str_replace('rest/', '', UrlController::getCoreUrl());
+        if (empty($urlSrc)) {
+            return $response->withStatus(400)->withJson(['errors' => 'File cannot be edited with Collabora Online', 'lang' => 'collaboraOnlineEditDenied']);
+        }
 
-        $jwt = null;
         $payload = [
             'userId' => $GLOBALS['id'],
             'resId'  => $body['resId'],
             'type'   => $body['type'],
-            'mode'   => $body['mode']
+            'mode'   => $body['mode'],
+            'format' => $extension
         ];
 
         $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
 
-        // TODO check if ssl
         $urlIFrame = $urlSrc . 'WOPISrc=' . $coreUrl . 'rest/wopi/files/' . $body['resId'] . '&access_token=' . $jwt . '&NotWOPIButIframe=true';
 
-        return $response->withJson(['url' => $urlIFrame, 'token' => $jwt]);
+        if (!empty($loadedXml->collaboraonline->editor_language)) {
+            $urlIFrame .= '&lang=' . (string)$loadedXml->collaboraonline->editor_language;
+        }
+
+        return $response->withJson(['url' => $urlIFrame, 'token' => $jwt, 'coreUrl' => $coreUrl]);
+    }
+
+    public function saveTmpEncodedDocument(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
+            return ['code' => 403, 'errors' => 'Service forbidden'];
+        }
+
+        if (!Validator::stringType()->notEmpty()->validate($body['content'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body content is empty or not a string']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['format'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body format is empty or not a string']);
+        }
+        if (!Validator::intVal()->notEmpty()->validate($body['key'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body key is empty or not an integer']);
+        }
+
+        $fileContent = base64_decode($body['content']);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
+        if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType]) || !in_array($mimeType, TemplateController::AUTHORIZED_MIMETYPES)) {
+            return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE . ' : '.$mimeType]);
+        }
+
+        $tmpPath = CoreConfigModel::getTmpPath();
+        $filename = "collabora_encoded_{$GLOBALS['id']}_{$body['key']}.${body['format']}";
+        $fileContent = base64_decode($body['content']);
+
+        $put = file_put_contents($tmpPath . $filename, $fileContent);
+        if ($put === false) {
+            return $response->withStatus(400)->withJson(['errors' => 'File put contents failed']);
+        }
+
+        return $response->withStatus(204);
     }
 
     private static function checkToken(array $args)
@@ -357,29 +430,68 @@ class CollaboraOnlineController
 
         CoreController::setGlobals(['userId' => $jwt->userId]);
 
-        if ($jwt->type != 'resource' && $jwt->type != 'attachment') {
-            return ['code' => 501, 'errors' => 'WIP - only resources and attachments can be edited for now'];
-        }
-
         return [
-            'type'  => $jwt->type,
-            'mode'  => $jwt->mode,
-            'resId' => $jwt->resId
+            'type'   => $jwt->type,
+            'mode'   => $jwt->mode,
+            'resId'  => $jwt->resId,
+            'format' => $jwt->format
         ];
     }
 
     private static function getDocument(array $args)
     {
         ValidatorModel::notEmpty($args, ['id', 'type', 'mode']);
-        ValidatorModel::stringType($args, ['type', 'mode']);
+        ValidatorModel::stringType($args, ['type', 'mode', 'format']);
         ValidatorModel::intVal($args, ['id']);
 
-        if ($args['type'] == 'resource' && $args['mode'] == 'edition') {
+        if ($args['mode'] == 'creation' && ($args['type'] == 'resource' || $args['type'] == 'attachment')) {
+            $document = TemplateModel::getById(['select' => ['template_file_name', 'template_target', 'template_path', 'template_file_name'], 'id' => $args['id']]);
+            if (empty($document)) {
+                return ['code' => 400, 'errors' => 'Document does not exist'];
+            }
+
+            $templateAssociation = TemplateAssociationModel::get([
+                'select' => ['value_field'],
+                'where'  => ['template_id = ?'],
+                'data'   => [$args['id']]
+            ]);
+            $templateAssociation = array_column($templateAssociation, 'value_field');
+
+            $userEntities = UserEntityModel::get([
+                'select' => ['entity_id'],
+                'where'  => ['user_id = ?'],
+                'data'   => [$GLOBALS['id']]
+            ]);
+            $userEntities = array_column($userEntities, 'entity_id');
+
+            $inPerimeter = false;
+            foreach ($userEntities as $userEntity) {
+                if (in_array($userEntity, $templateAssociation)) {
+                    $inPerimeter = true;
+                    break;
+                }
+            }
+
+            if (!$inPerimeter) {
+                return ['code' => 400, 'errors' => 'Template is out of perimeter'];
+            }
+
+            $templateTarget = $args['type'] == 'resource' ? 'indexingFile' : 'attachments';
+            if ($document['template_target'] != $templateTarget) {
+                return ['code' => 400, 'errors' => 'Template is not for resource creation'];
+            }
+            $document['filename'] = $document['template_file_name'];
+            $document['docserver_id'] = 'TEMPLATES';
+            $document['path'] = $document['template_path'];
+
+            $document['modification_date'] = new \DateTime('now');
+            $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
+        } else if ($args['type'] == 'resource' && $args['mode'] == 'edition') {
             if (!ResController::hasRightByResId(['resId' => [$args['id']], 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Document out of perimeter'];
             }
 
-            $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'version', 'fingerprint'], 'resId' => $args['id']]);
+            $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'version', 'fingerprint', 'modification_date'], 'resId' => $args['id']]);
 
             // If the document has a signed version, it cannot be edited
             $convertedDocument = AdrModel::getDocuments([
@@ -391,26 +503,12 @@ class CollaboraOnlineController
             if (!empty($convertedDocument[0])) {
                 return ['code' => 400, 'errors' => 'Document was signed : it cannot be edited'];
             }
-        } else if ($args['type'] == 'resource' && $args['mode'] == 'creation') {
-            $document = TemplateModel::getById(['select' => ['template_file_name', 'template_target', 'template_path', 'template_file_name'], 'id' => $args['id']]);
-            if (empty($document)) {
-                return ['code' => 400, 'errors' => 'Document does not exist'];
-            }
-            // TODO check template perimeter
-            if ($document['template_target'] != 'indexingFile') {
-                return ['code' => 400, 'errors' => 'Template is not for resource creation'];
-            }
-            $document['filename'] = $document['template_file_name'];
-            $document['docserver_id'] = 'TEMPLATES';
-            $document['path'] = $document['template_path'];
-            $document['filename'] = $document['template_file_name'];
-
-            $document['modification_date'] = new \DateTime();
-            $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-
         } else if ($args['type'] == 'attachment' && $args['mode'] == 'edition') {
-            $document = AttachmentModel::getById(['select' => ['res_id_master', 'filename', 'filesize', 'modification_date', 'docserver_id', 'path', 'fingerprint'], 'id' => $args['id']]);
-            if (empty($document)) {
+            $document = AttachmentModel::getById([
+                'select' => ['res_id_master', 'filename', 'filesize', 'modification_date', 'docserver_id', 'path', 'fingerprint', 'status'],
+                'id' => $args['id']
+            ]);
+            if (empty($document) || in_array($document['status'], ['DEL', 'OBS'])) {
                 return ['code' => 400, 'errors' => 'Document does not exist'];
             }
 
@@ -418,36 +516,38 @@ class CollaboraOnlineController
                 return ['code' => 403, 'errors' => 'Document out of perimeter'];
             }
 
-            // TODO check if editing last version
-            // TODO check if last version is signed
-            // If the document has a signed version, it cannot be edited
-//            $convertedDocument = AdrModel::getAttachments([
-//                'select' => ['docserver_id', 'path', 'filename', 'fingerprint'],
-//                'where'  => ['res_id = ?', 'type = ?'],
-//                'data'   => [$args['resId'], 'SIGN'],
-//                'limit'  => 1
-//            ]);
-//            if (!empty($convertedDocument[0])) {
-//                return $response->withStatus(400)->withJson(['errors' => 'Document was signed : it cannot be edited']);
-//            }
-        }  else if ($args['type'] == 'attachment' && $args['mode'] == 'creation') {
-            $document = TemplateModel::getById(['select' => ['template_file_name', 'template_target', 'template_path'], 'id' => $args['id']]);
+            if ($document['status'] == 'SIGN') {
+                return ['code' => 400, 'errors' => 'Document was signed : it cannot be edited'];
+            }
+        } else if ($args['type'] == 'template' && $args['mode'] == 'edition') {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
+                return ['code' => 403, 'errors' => 'Service forbidden'];
+            }
+
+            $document = TemplateModel::getById(['select' => ['template_file_name', 'template_target', 'template_path', 'template_file_name'], 'id' => $args['id']]);
             if (empty($document)) {
                 return ['code' => 400, 'errors' => 'Document does not exist'];
             }
 
-            if ($document['template_target'] != 'attachments') {
-                return ['code' => 400, 'errors' => 'Template is not for attachments creation'];
-            }
             $document['filename'] = $document['template_file_name'];
             $document['docserver_id'] = 'TEMPLATES';
             $document['path'] = $document['template_path'];
 
-            $document['modification_date'] = new \DateTime();
+            $document['modification_date'] = new \DateTime('now');
+            $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
+        } else if ($args['type'] == 'template' && $args['mode'] == 'encoded') {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
+                return ['code' => 403, 'errors' => 'Service forbidden'];
+            }
+
+            $document['filename'] = "collabora_encoded_{$GLOBALS['id']}_{$args['id']}.{$args['format']}";
+            $document['docserver_id'] = '';
+            $document['path'] = CoreConfigModel::getTmpPath();
+
+            $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
         } else {
-            // TODO create + edit templates
-            return ['code' => 501, 'errors' => 'WIP'];
+            return ['code' => 400, 'errors' => 'Not a valid document type'];
         }
 
         if (empty($document['filename'])) {

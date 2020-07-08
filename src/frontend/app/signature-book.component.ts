@@ -109,7 +109,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
         // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(message => {
-            clearInterval(this.currentResourceLock);
             this.processAfterAction();
         });
     }
@@ -124,7 +123,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             this.userId = params['userId'];
 
             this.signatureBook.resList = []; // This line is added because of manage action behaviour (processAfterAction is called twice)
-            this.lockResource();
+
+            this.actionService.lockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+
             this.http.get('../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + this.resId)
                 .subscribe((data: any) => {
                     if (data.error) {
@@ -183,38 +184,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
                 });
         });
-    }
-
-    lockResource() {
-        this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-
-        this.currentResourceLock = setInterval(() => {
-            this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/lock`, { resources: [this.resId] }).pipe(
-                catchError((err: any) => {
-                    if (err.status === 403) {
-                        clearInterval(this.currentResourceLock);
-                    }
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }, 50000);
-    }
-
-    unlockResource() {
-        clearInterval(this.currentResourceLock);
-
-        this.http.put(`../rest/resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/unlock`, { resources: [this.resId] }).pipe(
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
     }
 
     loadActions() {
@@ -475,12 +444,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     backToBasket() {
         const path = '/basketList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId;
-        this.http.put('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/unlock', { resources: [this.resId] })
-            .subscribe((data: any) => {
-                this.router.navigate([path]);
-            }, (err: any) => {
-                this.router.navigate([path]);
-            });
+        this.router.navigate([path]);
     }
 
     backToDetails() {
@@ -488,21 +452,21 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             .subscribe((data: any) => {
                 this.router.navigate([`/resources/${this.resId}`]);
             }, (err: any) => { });
-
     }
 
-    changeLocation(resId: number, origin: string) {
-        this.http.put('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/lock', { resources: [resId] })
-            .subscribe((data: any) => {
-                if (data.countLockedResources > 0) {
-                    alert(data.countLockedResources + ' ' + this.lang.warnLockRes + '.');
-                } else {
-                    const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
-                    this.router.navigate([path]);
-                }
-            }, (err: any) => {
-                this.notify.handleErrors(err);
-            });
+    async changeLocation(resId: number, origin: string) {
+        if (resId !== this.resId) {
+            const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
+
+            if (data === true) {
+                this.actionService.stopRefreshResourceLock();
+                this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
+                this.router.navigate([path]);
+            } else {
+                this.backToBasket();
+            }
+        }
     }
 
     validForm() {
@@ -602,8 +566,10 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.currentResourceLock) {
-            this.unlockResource();
+        this.actionService.stopRefreshResourceLock();
+
+        if (!this.actionService.actionEnded) {
+            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
         }
 
         // unsubscribe to ensure no memory leaks

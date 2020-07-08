@@ -19,6 +19,7 @@ use Group\controllers\PrivilegeController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\DatabaseModel;
 
 class VersionUpdateController
 {
@@ -36,12 +37,11 @@ class VersionUpdateController
         }
 
         $applicationVersion = CoreConfigModel::getApplicationVersion();
-
         if (empty($applicationVersion)) {
-            return $response->withStatus(400)->withJson(['errors' => "Can't load xml applicationVersion"]);
-        } else {
-            $currentVersion = $applicationVersion;
+            return $response->withStatus(400)->withJson(['errors' => "Can't load package.json"]);
         }
+
+        $currentVersion = $applicationVersion;
 
         $versions = explode('.', $currentVersion);
         $currentVersionBranch = "{$versions[0]}.{$versions[1]}";
@@ -120,10 +120,10 @@ class VersionUpdateController
         $applicationVersion = CoreConfigModel::getApplicationVersion();
 
         if (empty($applicationVersion)) {
-            return $response->withStatus(400)->withJson(['errors' => "Can't load xml applicationVersion"]);
-        } else {
-            $currentVersion = $applicationVersion;
+            return $response->withStatus(400)->withJson(['errors' => "Can't load package.json"]);
         }
+
+        $currentVersion = $applicationVersion;
 
         $versions = explode('.', $currentVersion);
         $currentVersionBranch = "{$versions[0]}.{$versions[1]}";
@@ -156,6 +156,24 @@ class VersionUpdateController
 
         if (!empty($output)) {
             return $response->withStatus(400)->withJson(['errors' => 'Some files are modified. Can not update application', 'lang' => 'canNotUpdateApplication']);
+        }
+
+        $minorVersions = explode('.', $minorVersion);
+        $currentVersionTag = (int)$currentVersionTag;
+        $currentVersionTag++;
+        $sqlFiles = [];
+        while ($currentVersionTag <= (int)$minorVersions[2]) {
+            if (is_file("migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$currentVersionTag}.sql")) {
+                $sqlFiles[] = "migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$currentVersionTag}.sql";
+            }
+            $currentVersionTag++;
+        }
+
+        if (!empty($sqlFiles)) {
+            foreach ($sqlFiles as $sqlFile) {
+                $fileContent = file_get_contents($sqlFile);
+                DatabaseModel::exec($fileContent);
+            }
         }
 
         $output = [];

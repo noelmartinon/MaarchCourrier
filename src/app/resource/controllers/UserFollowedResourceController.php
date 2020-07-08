@@ -58,10 +58,6 @@ class UserFollowedResourceController
     {
         $body = $request->getParsedBody();
 
-        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
-        }
-
         $nbUnFollowed = 0;
 
         foreach ($body['resources'] as $resId) {
@@ -157,6 +153,15 @@ class UserFollowedResourceController
                     'trackedMails'  => $followedResources,
                     'listDisplay'   => ['folders']
                 ]);
+                
+                $folderPrivilege = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $GLOBALS['id']]);
+                foreach ($formattedResources as $key => $formattedResource) {
+                    if ($folderPrivilege) {
+                        $formattedResources[$key]['allowed'] = true;
+                    } else {
+                        $formattedResources[$key]['allowed'] = ResController::hasRightByResId(['resId' => [$formattedResource['resId']], 'userId' => $GLOBALS['id']]);
+                    }
+                }
             }
 
             $count = count($rawResources);

@@ -586,6 +586,10 @@ FROM usergroups_services WHERE group_id IN (
     WHERE service_id = 'sendmail' AND group_id not in (SELECT group_id FROM usergroups_services WHERE service_id = 'manage_numeric_package')
 );
 
+DELETE FROM usergroups_services WHERE service_id = 'include_folder_perimeter';
+
+INSERT INTO usergroups_services (group_id, service_id)
+SELECT distinct(group_id), 'include_folder_perimeter' FROM usergroups_services;
 
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_indexing'
@@ -637,6 +641,13 @@ UPDATE usergroups_services SET parameters = (
     ) || ']}' AS jsonb)
     )
 WHERE service_id = 'admin_users';
+
+UPDATE groupbasket SET list_event_data = '{"canUpdateDocument":true}'
+WHERE list_event = 'signatureBookAction' AND group_id in (
+    select distinct(group_id)
+    from usergroups_services
+    where service_id = 'manage_attachments'
+);
 
 DELETE FROM usergroups_services WHERE service_id = 'view_personal_data' or service_id = 'manage_personal_data';
 INSERT INTO usergroups_services (group_id, service_id)

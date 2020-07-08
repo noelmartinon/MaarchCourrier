@@ -17,6 +17,7 @@ namespace Convert\scripts;
 require 'vendor/autoload.php';
 
 use Attachment\models\AttachmentModel;
+use ContentManagement\controllers\OnlyOfficeController;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -98,9 +99,19 @@ class ConvertPdfScript
         copy($pathToDocument, "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
 
         if (strtolower($docInfo['extension']) != 'pdf') {
-            ConvertPdfController::addBom("{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
-            $command = "timeout 30 unoconv -f pdf " . escapeshellarg("{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
-            exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
+
+            $fullFilename = "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}";
+            if (OnlyOfficeController::canConvert()) {
+                $output = [];
+                $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename]);
+                if (!empty($converted['errors'])) {
+                    $output = [$converted['errors']];
+                }
+            } else {
+                ConvertPdfController::addBom($fullFilename);
+                $command = "timeout 30 unoconv -f pdf " . escapeshellarg($fullFilename);
+                exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
+            }
 
             if (!file_exists($tmpPath.$fileNameOnTmp.'.pdf')) {
                 return ['errors' => 'Conversion failed ! '. implode(" ", $output)];
@@ -149,6 +160,8 @@ class ConvertPdfScript
 
         DatabasePDO::reset();
         new DatabasePDO(['customId' => $args['customId']]);
+
+        $GLOBALS['customId'] = $args['customId'];
 
         $isConverted = ConvertPdfScript::convert($args);
 

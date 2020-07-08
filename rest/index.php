@@ -175,6 +175,7 @@ $app->post('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeCo
 $app->get('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getMergedFile');
 $app->get('/onlyOffice/encodedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getEncodedFileFromUrl');
 $app->get('/onlyOffice/available', \ContentManagement\controllers\OnlyOfficeController::class . ':isAvailable');
+$app->get('/onlyOffice/content', \ContentManagement\controllers\OnlyOfficeController::class . ':getTmpFile');
 $app->post('/onlyOfficeCallback', function (\Slim\Http\Request $request, \Slim\Http\Response $response) {
     return $response->withJson(['error' => 0]);
 });
@@ -423,6 +424,7 @@ $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/fil
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/exports', \Resource\controllers\ExportController::class . ':updateExport');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/summarySheets', \Resource\controllers\SummarySheetController::class . ':createList');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}', \Resource\controllers\ResourceListController::class . ':setAction');
+$app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/locked', \Resource\controllers\ResourceListController::class . ':areLocked');
 $app->get('/resourcesList/exportTemplate', \Resource\controllers\ExportController::class . ':getExportTemplates');
 $app->put('/resourcesList/integrations', \Resource\controllers\ResController::class . ':setInIntegrations');
 
@@ -601,5 +603,6 @@ $app->post('/wopi/files/{id}/contents', \ContentManagement\controllers\Collabora
 $app->post('/collaboraOnline/configuration', \ContentManagement\controllers\CollaboraOnlineController::class . ':getConfiguration');
 $app->get('/collaboraOnline/available', \ContentManagement\controllers\CollaboraOnlineController::class . ':isAvailable');
 $app->post('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':getTmpFile');
+$app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveTmpEncodedDocument');
 
 $app->run();

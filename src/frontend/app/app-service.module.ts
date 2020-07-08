@@ -16,23 +16,23 @@ import { SortPipe } from '../plugins/sorting.pipe';
         NgStringPipesModule
     ],
     declarations: [
-        TimeAgoPipe,
-        TimeLimitPipe,
-        FilterListPipe,
-        FullDatePipe,
-        SafeHtmlPipe,
-        SecureUrlPipe,
-        SortPipe
-    ],
-    exports: [
-        NgStringPipesModule,
-        TimeAgoPipe,
-        TimeLimitPipe,
         FilterListPipe,
         FullDatePipe,
         SafeHtmlPipe,
         SecureUrlPipe,
         SortPipe,
+        TimeAgoPipe,
+        TimeLimitPipe,
+    ],
+    exports: [
+        NgStringPipesModule,
+        FilterListPipe,
+        FullDatePipe,
+        SafeHtmlPipe,
+        SecureUrlPipe,
+        SortPipe,
+        TimeAgoPipe,
+        TimeLimitPipe,
     ],
     entryComponents: [
     ],

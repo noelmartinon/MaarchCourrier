@@ -301,6 +301,9 @@ class SignatureBookController
             $attachments[0]['sign'] = true;
             $attachments[0]['viewerLink'] = "../rest/resources/{$args['resId']}/content?".rand();
 
+            $attachments[0]['canModify'] = SignatureBookController::isResourceInSignatureBook(['resId' => $args['resId'], 'userId' => $args['userId'], 'canUpdateDocument' => true]);
+            $attachments[0]['canDelete'] = false;
+
             $isSigned = AdrModel::getDocuments([
                 'select'    => [1],
                 'where'     => ['res_id = ?', 'type = ?'],
@@ -688,7 +691,14 @@ class SignatureBookController
             $groups = GroupModel::get(['select' => ['group_id'], 'where' => ['id in (?)'], 'data' => [$groups]]);
             $groups = array_column($groups, 'group_id');
 
-            $baskets = GroupBasketModel::get(['select' => ['basket_id'], 'where' => ['group_id in (?)', 'list_event = ?'], 'data' => [$groups, 'signatureBookAction']]);
+            $where = ['group_id in (?)', 'list_event = ?'];
+            $data = [$groups, 'signatureBookAction'];
+            if (!empty($args['canUpdateDocument'])) {
+                $where[] = "list_event_data->>'canUpdateDocument' = ?";
+                $data[] = 'true';
+            }
+
+            $baskets = GroupBasketModel::get(['select' => ['basket_id'], 'where' => $where, 'data' => $data]);
             $baskets = array_column($baskets, 'basket_id');
             if (!empty($baskets)) {
                 $clauses = BasketModel::get(['select' => ['basket_clause'], 'where' => ['basket_id in (?)'], 'data' => [$baskets]]);
@@ -705,7 +715,14 @@ class SignatureBookController
 
         $assignedBaskets = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $currentUser['id']]);
         foreach ($assignedBaskets as $basket) {
-            $hasSB = GroupBasketModel::get(['select' => [1], 'where' => ['basket_id = ?', 'group_id = ?', 'list_event = ?'], 'data' => [$basket['basket_id'], $basket['oldGroupId'], 'signatureBookAction']]);
+            $where = ['basket_id = ?', 'group_id = ?', 'list_event = ?'];
+            $data = [$basket['basket_id'], $basket['oldGroupId'], 'signatureBookAction'];
+            if (!empty($args['canUpdateDocument'])) {
+                $where[] = "list_event_data->>'canUpdateDocument' = ?";
+                $data[] = 'true';
+            }
+
+            $hasSB = GroupBasketModel::get(['select' => [1], 'where' => $where, 'data' => $data]);
             if (!empty($hasSB)) {
                 $basketOwner = UserModel::getById(['id' => $basket['owner_user_id'], 'select' => ['user_id']]);
                 $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $basketOwner['user_id']]);

@@ -4,6 +4,11 @@ import { enableProdMode } from '@angular/core';
 import 'hammerjs';
 
 import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
 
-enableProdMode();
+if (environment.production) {
+    window.console.debug = function() {};
+    enableProdMode();
+}
+
 platformBrowserDynamic().bootstrapModule(AppModule);

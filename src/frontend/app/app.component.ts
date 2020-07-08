@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
@@ -26,10 +26,14 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
         { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults }
     ],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
     debugMode: boolean = false;
     @ViewChild('snavLeft', { static: true }) snavLeft: MatSidenav;
 
+    @HostListener('window:resize', ['$event'])
+    onResize() {
+        this.appService.setScreenWidth(window.innerWidth);
+    }
     constructor(
         public http: HttpClient,
         public langService: LangService,
@@ -53,5 +57,9 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         this.headerService.hideSideBar = true;
         this.headerService.sideNavLeft = this.snavLeft;
+    }
+
+    ngAfterViewInit(): void {
+        this.appService.setScreenWidth(window.innerWidth);
     }
 }

@@ -190,7 +190,6 @@ export class MailserverComponent implements OnInit {
     }
 
     getInfoToInstall(): StepAction[] {
-        this.notify.error('TO DO : WAIT BACK route : ../rest/installer/mailserver');
         return [];
         /* return [{
             idStep : 'mailserver',

@@ -464,6 +464,12 @@ export class PrivilegeService {
             'comment': this.lang.managePersonalData,
             'unit': 'confidentialityAndSecurity'
         },
+        {
+            'id': 'include_folder_perimeter',
+            'label': this.lang.includeFolderPerimeter,
+            'comment': this.lang.includeFolderPerimeter,
+            'unit': 'application'
+        },
     ];
 
     private menus: menu[] = [

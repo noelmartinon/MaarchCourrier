@@ -32,7 +32,7 @@ export class AppGuard implements CanActivate {
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-        const urlArr = state.url.replace(/^\/+|\/+$/g, '').split('/')
+        const urlArr = state.url.replace(/^\/+|\/+$/g, '').split('/');
 
         console.log('== ROUTE GUARD ==');
         this.headerService.resetSideNavSelection();
@@ -185,6 +185,7 @@ export class AppGuard implements CanActivate {
                         if (err.error.errors === 'User must change his password') {
                             return this.router.navigate(['/password-modification']);
                         } else {
+                            this.authService.logout();
                             return of(false);
                         }
                     })
@@ -201,9 +202,9 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
     constructor() { }
 
     async canDeactivate(component: ProcessComponent, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Promise<boolean> {
-        if (nextState.url != '/login' && !component.isActionEnded() && !component.detailMode) {
-            component.unlockResource();
-        }
+        /* if (nextState.url !== '/login' && !component.isActionEnded() && !component.detailMode) {
+            component.actionService.unlockResource(component.currentUserId, component.currentGroupId, component.currentBasketId, [component.currentResourceInformations.resId]);
+        }*/
 
         if ((component.isToolModified() && !component.isModalOpen()) || (component.appDocumentViewer !== undefined && component.appDocumentViewer.isEditingTemplate())) {
             if (confirm(component.lang.saveModifiedData)) {

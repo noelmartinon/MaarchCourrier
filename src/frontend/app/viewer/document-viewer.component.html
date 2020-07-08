@@ -117,6 +117,9 @@
     <app-collabora-online-viewer #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
         [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
         (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></app-collabora-online-viewer>
+    <div *ngIf="collaboraOnlineViewer.isSaving" class="example-loading-shade">
+        <mat-spinner style="margin:auto;"></mat-spinner>
+    </div>
 </ng-container>
 <button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null" color="accent"
     [title]="lang.saveModifications" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"

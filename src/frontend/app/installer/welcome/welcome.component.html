@@ -1,49 +1,37 @@
 <div class="stepContent">
-    <h2 class="stepContentTitle">Bienvenue sur Maarch Courrier 20.10!</h2>
+    <h2 class="stepContentTitle">{{lang.welcomeApp | scan : [appVersion]}} !</h2>
     <div style="text-align: center;">
         <mat-icon class="maarchLogoFull" svgIcon="maarchLogoFull"></mat-icon>
     </div>
-    <mat-form-field appearance="outline" floatLabel="never">
-        <mat-label>Choisissez la langue de l'application : </mat-label>
-        <mat-select>
-            <mat-option *ngFor="let lang of langs" [value]="lang">
-                {{lang}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+    <form [formGroup]="stepFormGroup" style="width: 850px;margin: auto;">
+        <mat-form-field appearance="outline" floatLabel="never">
+            <mat-label>{{lang.chooseAppLanguage}} : </mat-label>
+            <mat-select formControlName="lang" required>
+                <mat-option *ngFor="let language of langs" [value]="language">
+                    {{lang[language + 'Full']}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+    <mat-divider></mat-divider>
+    <mat-list>
+        <div mat-subheader>{{lang.installDescription}} :
+        </div>
+        <mat-list-item *ngFor="let step of steps">
+            <mat-icon mat-list-icon color="primary" [class]="step.icon"></mat-icon>
+            <div mat-line>{{step.desc}}</div>
+        </mat-list-item>
+    </mat-list>
     <mat-divider></mat-divider>
     <p>
-        Cet assistant va vous guider pas à pas dans l'installation de Maarch Courrier notamment :
+        {{lang.externalInfoSite}} :
     </p>
-    <ul>
-        <li>
-            Contrôle des pré-requis
-        </li>
-        <li>
-            Création de la base de données
-        </li>
-        <li>
-            Import d'un jeu de données
-        </li>
-        <li>
-            Création des docservers
-        </li>
-        <li>
-            Paramétrage des batchs
-        </li>
-    </ul>
-    <mat-divider></mat-divider>
-    <p>
-        Pour tout renseignements, rendez vous sur :
-    </p>
-    <a mat-raised-button href="https://community.maarch.org/" target="_blank">
+    <a mat-raised-button color="primary" href="https://community.maarch.org/" target="_blank">
         community.maarch.org
     </a>
-    ou
-    <a mat-raised-button href="http://www.maarch.com" target="_blank">
+    {{lang.or}}
+    <a mat-raised-button color="primary" href="http://www.maarch.com" target="_blank">
         www.maarch.com
     </a>
-    <p style="font-style: italic;padding-top: 30px;text-align: right;">
-        <b>Maarch Courrier</b> est sous <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" class="link">Licence publique générale GNU</a>
-    </p>
+    <p style="font-style: italic;padding-top: 30px;text-align: right;" [innerHTML]="lang.maarchLicenceInstall"></p>
 </div>

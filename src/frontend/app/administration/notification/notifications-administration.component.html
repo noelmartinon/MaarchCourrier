@@ -8,7 +8,7 @@
                     {{lang.add}}
                 </p>
             </a>
-            <a mat-list-item (click)="loadCron();snav2.toggle();">
+            <a mat-list-item (click)="loadCron();snav2.toggle();" (next)="loadCron();snav2.toggle()" joyrideStep="notifTour" [text]="'Cliquez ici pour plannifier une tâche éxistante. Plannifions <b>Notification de bannettes</b>'">
                 <mat-icon color="primary" mat-list-icon class="fa fa-clock"></mat-icon>
                 <p mat-line>
                     {{lang.toSchedule}}
@@ -94,8 +94,8 @@
         </div>
     </mat-sidenav-content>
     <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        fixedTopGap="56" position='end' [opened]="appService.getViewMode() ? false : false">
-        <mat-list>
+        fixedTopGap="56" position='end' [opened]="appService.getViewMode() ? false : false"  (next)="paramCron()" stepPosition="center" joyrideStep="notifTour2">
+        <mat-list  (next)="saveCron()" joyrideStep="notifTour3">
             <h3 mat-subheader>{{lang.notificationSchedule}}</h3>
             <form class="form-horizontal" #notifForm="ngForm" style="overflow:hidden;">
                 <div class="form-group" style="padding-left:15px;padding-right:15px;">
@@ -172,7 +172,7 @@
         <div class="alert alert-info" role="alert" style="margin:15px;">
             {{lang.NotificationScheduleInfo}}
         </div>
-        <mat-list>
+        <mat-list joyrideStep="notifTour4">
             <h3 mat-subheader>{{lang.activeCron}}</h3>
             <mat-chip-list #chipList class="mat-chip-list-stacked">
                 <span *ngFor="let notif of crontab;let i = index">

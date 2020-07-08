@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LANG } from '../../translate.component';
@@ -12,12 +12,13 @@ import { startWith, map, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { FunctionsService } from '../../../service/functions.service';
+import { FeatureTourService } from '../../../service/featureTour.service';
 
 @Component({
     templateUrl: 'administration.component.html',
     styleUrls: ['administration.component.scss']
 })
-export class AdministrationComponent implements OnInit {
+export class AdministrationComponent implements OnInit, AfterViewInit {
 
     lang: any = LANG;
     loading: boolean = false;
@@ -44,7 +45,9 @@ export class AdministrationComponent implements OnInit {
         private privilegeService: PrivilegeService,
         private latinisePipe: LatinisePipe,
         private notify: NotificationService,
-        private functionService: FunctionsService) { }
+        private functionService: FunctionsService,
+        private featureTourService: FeatureTourService
+    ) { }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration);
@@ -78,6 +81,12 @@ export class AdministrationComponent implements OnInit {
         setTimeout(() => {
             this.searchServiceInput.nativeElement.focus();
         }, 0);
+    }
+
+    ngAfterViewInit(): void {
+        if (this.headerService.user.userId === 'superadmin') {
+            this.featureTourService.init();
+        }
     }
 
     goToSpecifiedAdministration(service: any): void {

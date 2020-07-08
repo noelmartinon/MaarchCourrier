@@ -146,6 +146,22 @@ class DatabasePDO
         return $query;
     }
 
+    public function exec(string $query)
+    {
+        try {
+            self::$pdo->exec($query);
+        } catch (\PDOException $PDOException) {
+            $file = fopen('queries_error.log', 'a');
+            fwrite($file, '[' . date('Y-m-d H:i:s') . '] ' . $query . PHP_EOL);
+            fwrite($file, '[' . date('Y-m-d H:i:s') . "] [{$PDOException->getMessage()}]" . PHP_EOL);
+            fclose($file);
+
+            throw new \Exception($PDOException->getMessage());
+        }
+
+        return true;
+    }
+
     public function setLimit(array $args)
     {
         ValidatorModel::notEmpty($args, ['limit']);

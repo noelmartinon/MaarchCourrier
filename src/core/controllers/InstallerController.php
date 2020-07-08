@@ -101,7 +101,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams password is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($queryParams['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is empty or not a string']);
-        } elseif (!Validator::length(2, 50)->validate($queryParams['name'])) {
+        } elseif (!Validator::length(1, 50)->validate($queryParams['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name length is not valid']);
         }
 
@@ -279,7 +279,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name is empty or not a string']);
-        } elseif (!Validator::length(2, 50)->validate($body['name'])) {
+        } elseif (!Validator::length(1, 50)->validate($body['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name length is not valid']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
@@ -372,6 +372,8 @@ class InstallerController
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
         } elseif (!is_file("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json")) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom does not exist']);
+        } elseif (strpbrk($body['path'], '"\'<>|*:?') !== false || strpos($body['path'], '//') !== false) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body path is not valid']);
         }
 
         $body['path'] = rtrim($body['path'], '/');
@@ -438,10 +440,6 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body bodyLoginBackground is empty']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['logo'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body logo is empty']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['loginMessage'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body loginMessage is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['homeMessage'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body homeMessage is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
@@ -459,6 +457,7 @@ class InstallerController
         } else {
             $tmpPath = CoreConfigModel::getTmpPath();
             $tmpFileName = $tmpPath . 'installer_body_' . rand() . '_file.jpg';
+            $body['bodyLoginBackground'] = str_replace('data:image/jpeg;base64,', '', $body['bodyLoginBackground']);
             $file = base64_decode($body['bodyLoginBackground']);
             file_put_contents($tmpFileName, $file);
 
@@ -475,6 +474,7 @@ class InstallerController
         if (strpos($body['logo'], 'data:image/svg+xml;base64,') !== false) {
             $tmpPath = CoreConfigModel::getTmpPath();
             $tmpFileName = $tmpPath . 'installer_logo_' . rand() . '_file.svg';
+            $body['logo'] = str_replace('data:image/svg+xml;base64,', '', $body['logo']);
             $file = base64_decode($body['logo']);
             file_put_contents($tmpFileName, $file);
 
@@ -489,13 +489,13 @@ class InstallerController
         new DatabasePDO(['customId' => $body['customId']]);
         DatabaseModel::update([
             'table'     => 'parameters',
-            'set'       => ['param_value_string' => $body['loginMessage']],
+            'set'       => ['param_value_string' => $body['loginMessage'] ?? ''],
             'where'     => ['id = ?'],
             'data'      => ['loginpage_message']
         ]);
         DatabaseModel::update([
             'table'     => 'parameters',
-            'set'       => ['param_value_string' => $body['homeMessage']],
+            'set'       => ['param_value_string' => $body['homeMessage'] ?? ''],
             'where'     => ['id = ?'],
             'data'      => ['homepage_message']
         ]);

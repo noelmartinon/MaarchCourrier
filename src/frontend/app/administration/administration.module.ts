@@ -4,6 +4,7 @@ import { SharedModule } from '../app-common.module';
 
 import { AdministrationRoutingModule } from './administration-routing.module';
 // import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { JoyrideModule } from 'ngx-joyride';
 import { DocumentViewerModule } from '../viewer/document-viewer.module';
 
 
@@ -67,6 +68,7 @@ import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent
     imports: [
         SharedModule,
         // NgxChartsModule,
+        JoyrideModule.forChild(),
         DocumentFormModule,
         AdministrationRoutingModule,
         DocumentViewerModule

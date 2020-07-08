@@ -206,4 +206,26 @@ export class NotificationsAdministrationComponent implements OnInit {
                 this.notify.error(err.error.errors);
             });
     }
+
+    /* FEATURE TOUR */
+
+    onNext() {
+        console.log('next');
+        this.sidenavRight.open();
+        return false;
+    }
+
+    paramCron() {
+        const notifBasket = this.authorizedNotification.filter((notif: any) => notif.path.indexOf('_BASKETS.sh') > -1)[0];
+        this.newCron = {
+            'm': '0',
+            'h': '8',
+            'dom': '*',
+            'dow': '*',
+            'mon': '*',
+            'cmd': notifBasket.path,
+            'description': notifBasket.description,
+            'state': 'normal'
+        };
+    }
 }

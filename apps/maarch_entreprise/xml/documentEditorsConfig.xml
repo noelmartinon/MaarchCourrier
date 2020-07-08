@@ -15,5 +15,6 @@
         <server_uri>collaboraonline.maarchcourrier.com</server_uri>
         <server_port>9980</server_port>
         <server_ssl>false</server_ssl>
+        <editor_language>fr-FR</editor_language>
     </collaboraonline>
 </ROOT>

@@ -39,7 +39,7 @@
             </mat-select>
         </mat-form-field>
         <div style="text-align:center;">
-            <button mat-raised-button type="button" color="primary" (click)="checkConnection()" [disabled]="isEmptyConnInfo()">
+            <button mat-raised-button type="button" color="primary" (click)="checkConnection()" [disabled]="isEmptyConnInfo() || stepFormGroup.controls['dbHostCtrl'].disabled">
                 {{lang.checkInformations}}
             </button>
         </div>

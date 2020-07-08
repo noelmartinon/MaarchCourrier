@@ -10,6 +10,7 @@ use Group\models\PrivilegeModel;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
+use SignatureBook\controllers\SignatureBookController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
@@ -274,7 +275,10 @@ class PrivilegeController
             return ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $args['userId']]);
         }
 
-        return PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdateData' => true]);
+        $canUpdateInProcess = PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdate' => true]);
+        $canUpdateInSignatureBook = SignatureBookController::isResourceInSignatureBook(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdateDocument' => true]);
+
+        return $canUpdateInProcess || $canUpdateInSignatureBook;
     }
 
     public static function isResourceInProcess(array $args)

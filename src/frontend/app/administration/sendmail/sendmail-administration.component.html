@@ -2,7 +2,7 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader>{{lang.actions}}</h3>
-            <a mat-list-item (click)="snav2.toggle();">
+            <a mat-list-item (click)="snav2.toggle();" joyrideStep="emailTour2">
                 <mat-icon color="primary" mat-list-icon class="fas fa-signal"></mat-icon>
                 <p mat-line>
                     {{lang.checkSendmail}}
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
-            <div class="container-content">
+            <div class="container-content" joyrideStep="emailTour">
                 <div *ngIf="loading" style="display:flex;height:100%;">
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>

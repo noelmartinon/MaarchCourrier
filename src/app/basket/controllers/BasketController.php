@@ -498,6 +498,10 @@ class BasketController
                 'canUpdateModel'    => !empty($data['list_event_data']['canUpdateModel']),
                 'defaultTab'        => $data['list_event_data']['defaultTab'] ?? 'dashboard'
             ];
+        } elseif ($data['list_event'] == 'signatureBookAction') {
+            $listEventData = [
+                'canUpdateDocument' => !empty($data['list_event_data']['canUpdateDocument']),
+            ];
         }
 
         GroupBasketModel::update([

@@ -5,27 +5,19 @@ import { Injectable } from '@angular/core';
 })
 export class AppService {
 
-    private _mobileQueryListener: () => void;
-    mobileQuery: MediaQueryList;
+    screenWidth: number = 0;
 
-    currentUser: any;
-
-    constructor() {
-        /*this.mobileQuery = media.matchMedia('(max-width: 768px)');
-        this._mobileQueryListener = () => changeDetectorRef.detectChanges();
-        this.mobileQuery.addListener(this._mobileQueryListener);*/
-    }
+    constructor() { }
 
     getViewMode() {
-        return false;
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true;
         } else {
-            return this.mobileQuery.matches;
+            return this.screenWidth <= 768;
         }
     }
 
-    /*ngOnDestroy(): void {
-        this.mobileQuery.removeListener(this._mobileQueryListener);
-    }*/
+    setScreenWidth(width: number) {
+        this.screenWidth = width;
+    }
 }

@@ -46,8 +46,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
     detailMode: boolean = false;
     isMailing: boolean = false;
 
-    currentResourceLock: any = null;
-
     actionsList: any[] = [];
     currentUserId: number = null;
     currentBasketId: number = null;
@@ -201,7 +199,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
         // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(message => {
             this.actionEnded = true;
-            clearInterval(this.currentResourceLock);
             this.router.navigate([`/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`]);
         });
     }
@@ -254,7 +251,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         await this.checkAccesDocument(this.currentResourceInformations.resId);
 
-        this.lockResource();
+        this.actionService.lockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
+
         this.loadBadges();
         this.loadResource();
 
@@ -525,38 +523,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
         }
     }
 
-    lockResource() {
-        this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-
-        this.currentResourceLock = setInterval(() => {
-            this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/lock`, { resources: [this.currentResourceInformations.resId] }).pipe(
-                catchError((err: any) => {
-                    if (err.status === 403) {
-                        clearInterval(this.currentResourceLock);
-                    }
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }, 50000);
-    }
-
-    unlockResource() {
-        clearInterval(this.currentResourceLock);
-
-        this.http.put(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/unlock`, { resources: [this.currentResourceInformations.resId] }).pipe(
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-    }
-
     onSubmit() {
         if (this.currentTool === 'info' || this.isModalOpen('info')) {
             this.processAction();
@@ -689,8 +655,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.currentResourceLock) {
-            this.unlockResource();
+        if (!this.detailMode) {
+            this.actionService.stopRefreshResourceLock();
+            if (!this.actionService.actionEnded) {
+                this.actionService.unlockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
+            }
         }
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();

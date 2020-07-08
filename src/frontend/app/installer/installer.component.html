@@ -83,12 +83,12 @@
                             <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
                                 <mat-icon class="fa fa-arrow-left"></mat-icon>
                             </button>
-                            <button mat-fab matStepperNext class="nextStepButton" color="primary" [disabled]="!appUseradmin.isValidStep()">
-                                <mat-icon class="fa fa-arrow-right"></mat-icon>
+                            <button mat-fab class="nextStepButton" color="accent" [disabled]="!appUseradmin.isValidStep()" (click)="endInstall()">
+                                <mat-icon class="fas fa-check-double"></mat-icon>
                             </button>
                         </div>
                     </mat-step>
-                    <mat-step [stepControl]="appMailserver.getFormGroup()" optional>
+                    <!--<mat-step [stepControl]="appMailserver.getFormGroup()" optional>
                         <ng-template matStepLabel>{{lang.stepMailServer}}</ng-template>
                         <div class="stepContainer">
                             <div class="stepContent">
@@ -97,11 +97,9 @@
                             <button mat-fab matStepperPrevious class="previousStepButton" color="primary">
                                 <mat-icon class="fa fa-arrow-left"></mat-icon>
                             </button>
-                            <button mat-fab class="nextStepButton" color="accent" [disabled]="!appMailserver.isValidStep()" (click)="endInstall()">
-                                <mat-icon class="fas fa-check-double"></mat-icon>
-                            </button>
+                            
                         </div>
-                    </mat-step>
+                    </mat-step>-->
                     <ng-template matStepperIcon="edit">
                         <mat-icon class="fa fa-check stepIcon"></mat-icon>
                     </ng-template>
