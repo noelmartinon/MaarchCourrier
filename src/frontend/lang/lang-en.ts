@@ -764,6 +764,7 @@ export const LANG_EN = {
     "in":                                          "in",
     "inactive":                                    "Inactive",
     "inactives":                                   "Inactive(s)",
+    "includeFolderPerimeter":                      "Access out-of-scope mails in folders",
     "incoming":                                    "Incoming",
     "incompleteAddressForPostal":                  "Incomplete address for postal mailing",
     "indexation":                                  "Mail indexation",
