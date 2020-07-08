@@ -1028,17 +1028,27 @@ class ResController extends ResourceControlController
             return $args['resources'];
         }
 
-        $whereClause = '(res_id in (select res_id from users_followed_resources where user_id = ?))';
+        $folder = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $args['userId']]);
 
-        $entities = UserModel::getEntitiesByLogin(['login' => $user['user_id'], 'select' => ['id']]);
-        $entities = array_column($entities, 'id');
-        if (empty($entities)) {
-            $entities = [0];
+        $data = [$args['resources']];
+        if ($folder) {
+            $whereClause = '(res_id in (select res_id from users_followed_resources where user_id = ?))';
+            $data[] = $args['userId'];
+
+            $entities = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['entities.id']]);
+            $entities = array_column($entities, 'id');
+            if (empty($entities)) {
+                $entities = [0];
+            }
+
+            $foldersClause = 'res_id in (select res_id from folders LEFT JOIN entities_folders ON folders.id = entities_folders.folder_id LEFT JOIN resources_folders ON folders.id = resources_folders.folder_id ';
+            $foldersClause .= "WHERE entities_folders.entity_id in (?) OR folders.user_id = ? OR keyword = 'ALL_ENTITIES')";
+            $whereClause .= " OR ({$foldersClause})";
+            $data[] = $entities;
+            $data[] = $args['userId'];
+        } else {
+            $whereClause = '1=0';
         }
-
-        $foldersClause = 'res_id in (select res_id from folders LEFT JOIN entities_folders ON folders.id = entities_folders.folder_id LEFT JOIN resources_folders ON folders.id = resources_folders.folder_id ';
-        $foldersClause .= "WHERE entities_folders.entity_id in (?) OR folders.user_id = ? OR keyword = 'ALL_ENTITIES')";
-        $whereClause .= " OR ({$foldersClause})";
 
         $groups = UserModel::getGroupsByLogin(['login' => $user['user_id'], 'select' => ['where_clause']]);
         $groupsClause = '';
@@ -1082,7 +1092,7 @@ class ResController extends ResourceControlController
         }
 
         try {
-            $res = ResModel::getOnView(['select' => ['res_id'], 'where' => ['res_id in (?)', "({$whereClause})"], 'data' => [$args['resources'], $args['userId'], $entities, $args['userId']]]);
+            $res = ResModel::getOnView(['select' => ['res_id'], 'where' => ['res_id in (?)', "({$whereClause})"], 'data' => $data]);
             return array_column($res, 'res_id');
         } catch (\Exception $e) {
             return [];

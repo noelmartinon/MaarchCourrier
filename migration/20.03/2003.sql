@@ -586,6 +586,10 @@ FROM usergroups_services WHERE group_id IN (
     WHERE service_id = 'sendmail' AND group_id not in (SELECT group_id FROM usergroups_services WHERE service_id = 'manage_numeric_package')
 );
 
+DELETE FROM usergroups_services WHERE service_id = 'include_folder_perimeter';
+
+INSERT INTO usergroups_services (group_id, service_id)
+SELECT distinct(group_id), 'include_folder_perimeter' FROM usergroups_services;
 
 INSERT INTO usergroups_services (group_id, service_id)
 SELECT distinct(group_id), 'update_diffusion_indexing'
