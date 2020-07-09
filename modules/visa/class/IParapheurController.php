@@ -233,12 +233,23 @@ class IParapheurController
                     return false;
                 }
 
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                try {
+                    if (is_bool($curlReturn['response']) === true) {
+                        echo "error" . PHP_EOL;
+                        var_dump($aArgs['config']);
+                        var_dump($noVersion);
+                        var_dump($curlReturn);
+                        break;
+                    }
+                    $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                } catch (Exception $e) {
+                    echo 'Exception : ',  $e->getMessage(), "\n";
+                }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     // TODO gestion d'une potentielle erreur
                     echo 'retrieveSignedMails noVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
-                    return false;
+                    break;
                 } else {
                     $noteContent = '';
                     foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
@@ -286,16 +297,27 @@ class IParapheurController
 
                 if (!empty($curlReturn['response'])) {
                     // TODO gestin d'une erreur
-                    echo $curlReturn['error'];
+                    echo 'error : ' . $curlReturn['error'];
                     return false;
                 }
 
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                try {
+                    if (is_bool($curlReturn['response']) === true) {
+                        echo "error" . PHP_EOL;
+                        var_dump($aArgs['config']);
+                        var_dump($noVersion);
+                        var_dump($curlReturn);
+                        break;
+                    }
+                    $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                } catch (Exception $e) {
+                    echo 'Exception : ',  $e->getMessage(), "\n";
+                }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     // TODO gestion d'une potentielle erreur
                     echo 'retrieveSignedMails isVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
-                    return false;
+                    break;
                 } else {
                     $noteContent = '';
                     foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
