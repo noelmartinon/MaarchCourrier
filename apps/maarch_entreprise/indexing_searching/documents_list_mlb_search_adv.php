@@ -296,19 +296,25 @@ if ($mode == 'normal') {
     if (isset($_SESSION['searching']['comp_query']) && trim($_SESSION['searching']['comp_query']) != '') {
         $where_clause = $sec->get_where_clause_from_coll_id($_SESSION['collection_id_choice']);
 
-        $whereFolders = 'res_id in (select res_id from resources_folders, folders, entities_folders ';
-        $whereFolders .= 'where folders.id = entities_folders.folder_id AND folders.id = resources_folders.folder_id AND (user_id = :userSerialId OR entity_id in (:userEntitiesId)))';
         $user = \User\models\UserModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['id']]);
-        $entities = \User\models\UserModel::getEntitiesByLogin(['login' => $_SESSION['user']['UserId']]);
-        $entities = array_column($entities, 'id');
+        $whereFolders = '1=0';
+        $whereFollowed = '1=0';
+        if (\Group\controllers\PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $user['id']])) {
+            $whereFollowed = 'res_id in (select res_id from users_followed_resources where user_id = :userSerialId)';
 
-        $arrayPDO[':userSerialId'] = $user['id'];
-        $arrayPDO[':userEntitiesId'] = $entities;
+            $whereFolders = 'res_id in (select res_id from resources_folders, folders, entities_folders ';
+            $whereFolders .= 'where folders.id = entities_folders.folder_id AND folders.id = resources_folders.folder_id AND (user_id = :userSerialId OR entity_id in (:userEntitiesId)))';
+            $entities = \User\models\UserModel::getEntitiesByLogin(['login' => $_SESSION['user']['UserId']]);
+            $entities = array_column($entities, 'id');
+
+            $arrayPDO[':userSerialId'] = $user['id'];
+            $arrayPDO[':userEntitiesId'] = $entities;
+        }
         if (count($where_tab) != 0) {
             $where = implode(' and ', $where_tab);
-            $where_request = '('.$where.') and (('.$where_clause.') or ('.$_SESSION['searching']['comp_query'].") OR ({$whereFolders}))";
+            $where_request = '('.$where.') and (('.$where_clause.') or ('.$_SESSION['searching']['comp_query'].") OR ({$whereFolders}) OR ({$whereFollowed}))";
         } else {
-            $where_request = '('.$where_clause.' or '.$_SESSION['searching']['comp_query']. " OR ({$whereFolders}))";
+            $where_request = '('.$where_clause.' or '.$_SESSION['searching']['comp_query']. " OR ({$whereFolders}) OR ({$whereFollowed}))";
         }
 
         $add_security = false;

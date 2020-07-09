@@ -1028,10 +1028,8 @@ class ResController extends ResourceControlController
             return $args['resources'];
         }
 
-        $folder = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $args['userId']]);
-
         $data = [$args['resources']];
-        if ($folder) {
+        if (PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $args['userId']])) {
             $whereClause = '(res_id in (select res_id from users_followed_resources where user_id = ?))';
             $data[] = $args['userId'];
 
