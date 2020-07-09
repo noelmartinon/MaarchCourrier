@@ -158,6 +158,7 @@ export class ActionsService {
                         } catch (error) {
                             console.log(error);
                             console.log(action);
+                            this.unlockResourceAfterActionModal([]);
                             alert(this.lang.actionNotExist);
                         }
                     }
