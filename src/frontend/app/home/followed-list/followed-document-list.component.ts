@@ -1,18 +1,15 @@
-import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
-import {merge, Observable, of as observableOf, Subject, Subscription} from 'rxjs';
 import { NotificationService } from '../../notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { startWith, switchMap, map, catchError, takeUntil, tap, exhaustMap, filter } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderService } from '../../../service/header.service';
-
 import { Overlay } from '@angular/cdk/overlay';
 import { PanelListComponent } from '../../list/panel/panel-list.component';
 import { AppService } from '../../../service/app.service';
@@ -20,18 +17,18 @@ import { BasketHomeComponent } from '../../basket/basket-home.component';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { FollowedActionListComponent } from '../followed-action-list/followed-action-list.component';
 import { FiltersListService } from '../../../service/filtersList.service';
-import {MenuShortcutComponent} from "../../menu/menu-shortcut.component";
+import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
 import { FoldersService } from '../../folder/folders.service';
-
+import {merge, Observable, Subject, Subscription, of} from 'rxjs';
 
 declare function $j(selector: any): any;
 
 @Component({
-    templateUrl: "followed-document-list.component.html",
+    templateUrl: 'followed-document-list.component.html',
     styleUrls: ['followed-document-list.component.scss'],
     providers: [NotificationService, AppService]
 })
-export class FollowedDocumentListComponent implements OnInit {
+export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
     lang: any = LANG;
 
@@ -182,7 +179,7 @@ export class FollowedDocumentListComponent implements OnInit {
                     return this.resultListDatabase!.getRepoIssues(
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters(), this.paginator.pageSize);
                 }),
-                map(data => {
+                map((data: any) => {
                     // Flip flag to show that loading has finished.
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
@@ -194,21 +191,21 @@ export class FollowedDocumentListComponent implements OnInit {
                     this.notify.handleErrors(err);
                     this.router.navigate(['/home']);
                     this.isLoadingResults = false;
-                    return observableOf([]);
+                    return of(false);
                 })
             ).subscribe(data => this.data = data);
     }
 
     goTo(row: any) {
         this.filtersListService.filterMode = false;
-        if (this.docUrl == '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
+        if (this.docUrl === '../../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
             this.sidenavRight.close();
         } else {
             this.docUrl = '../../rest/resources/' + row.resId + '/content';
             this.currentChrono = row.chrono;
             this.innerHtml = this.sanitizer.bypassSecurityTrustHtml(
-                "<iframe style='height:100%;width:100%;' src='" + this.docUrl + "' class='embed-responsive-item'>" +
-                "</iframe>");
+                '<iframe style=\'height:100%;width:100%;\' src=\'' + this.docUrl + '\' class=\'embed-responsive-item\'>' +
+                '</iframe>');
             this.sidenavRight.open();
         }
     }
@@ -222,13 +219,13 @@ export class FollowedDocumentListComponent implements OnInit {
     }
 
     togglePanel(mode: string, row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         row.checked = true;
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
 
-        if (this.currentResource.resId == row.resId && this.sidenavRight.opened && this.currentMode == mode) {
+        if (this.currentResource.resId === row.resId && this.sidenavRight.opened && this.currentMode === mode) {
             this.sidenavRight.close();
         } else {
             this.currentMode = mode;
@@ -262,22 +259,22 @@ export class FollowedDocumentListComponent implements OnInit {
         if (row.hasDocument) {
             this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
             $j('#viewThumbnail').show();
-            $j('#listContent').css({"overflow": "hidden"});
+            $j('#listContent').css({'overflow': 'hidden'});
         }
     }
 
     closeThumbnail() {
         $j('#viewThumbnail').hide();
-        $j('#listContent').css({ "overflow": "auto" });
+        $j('#listContent').css({ 'overflow': 'auto' });
     }
 
     processPostData(data: any) {
         data.resources.forEach((element: any) => {
             // Process main datas
             Object.keys(element).forEach((key) => {
-                if (key == 'statusImage' && element[key] == null) {
+                if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
-                } else if ((element[key] == null || element[key] == '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'folders'].indexOf(key) === -1) {
+                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'folders'].indexOf(key) === -1) {
                     element[key] = this.lang.undefined;
                 }
             });
@@ -295,7 +292,7 @@ export class FollowedDocumentListComponent implements OnInit {
                 row.checked = true;
             }
         } else {
-            let index = this.selectedRes.indexOf(row.resId);
+            const index = this.selectedRes.indexOf(row.resId);
             this.selectedRes.splice(index, 1);
             row.checked = false;
         }
@@ -316,16 +313,16 @@ export class FollowedDocumentListComponent implements OnInit {
     }
 
     selectSpecificRes(row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
 
         this.toggleAllRes(thisDeselect);
         this.toggleRes(thisSelect, row);
     }
 
     open({ x, y }: MouseEvent, row: any) {
-        let thisSelect = { checked: true };
-        let thisDeselect = { checked: false };
+        const thisSelect = { checked: true };
+        const thisDeselect = { checked: false };
         if (row.checked === false) {
             row.checked = true;
             this.toggleAllRes(thisDeselect);
@@ -346,10 +343,14 @@ export class FollowedDocumentListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../../rest/resources/unfollow' , { body: { resources: [row.resId] } })),
+            exhaustMap(() => this.http.request('DELETE', '../../rest/resources/unfollow', { body: { resources: [row.resId] } })),
             tap((data: any) => {
                 this.headerService.nbResourcesFollowed--;
                 this.initResultList();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }
@@ -372,7 +373,7 @@ export class ResultListHttpDao {
     getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number): Observable<BasketList> {
         this.filtersListService.updateListsPropertiesPage(page);
         this.filtersListService.updateListsPropertiesPageSize(pageSize);
-        let offset = page * pageSize;
+        const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}${filters}`;
 
         return this.http.get<BasketList>(requestUrl);

@@ -538,6 +538,7 @@ export const LANG_EN = {
     "documentOutOfPerimeter":                      "This document is out of your perimeter",
     "documents":                                   "document(s)",
     "documentSignedMsg":                           "The document has been signed, you cannot edit this document",
+    "documentsOutOfPerimeter":                     "Some documents are out of your perimeter",
     "documentTypeAdded":                           "Document type added",
     "documentTypeDeleted":                         "Document type deleted",
     "documentTypeReplacement":                     "Document type replacement",

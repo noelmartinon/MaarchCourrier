@@ -540,6 +540,7 @@ export const LANG_FR = {
     "documentOutOfPerimeter":                      "Ce document est en dehors de votre périmètre",
     "documents":                                   "document(s)",
     "documentSignedMsg":                           "Le document a été signé, vous ne pouvez pas editer ce document",
+    "documentsOutOfPerimeter":                     "Certains documents sont en dehors de votre périmètre",
     "documentTypeAdded":                           "Type de courrier ajouté",
     "documentTypeDeleted":                         "Type de courrier supprimé",
     "documentTypeReplacement":                     "Remplacement du type de courrier",

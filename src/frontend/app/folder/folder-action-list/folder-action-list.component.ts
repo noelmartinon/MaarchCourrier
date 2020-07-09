@@ -7,13 +7,14 @@ import { MatMenuTrigger } from '@angular/material/menu';
 
 import { Router } from '@angular/router';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { filter, exhaustMap, tap, map } from 'rxjs/operators';
+import { filter, exhaustMap, tap, map, catchError } from 'rxjs/operators';
 import { HeaderService } from '../../../service/header.service';
 import { FoldersService } from '../folders.service';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
     selector: 'app-folder-action-list',
-    templateUrl: "folder-action-list.component.html",
+    templateUrl: 'folder-action-list.component.html',
     styleUrls: ['folder-action-list.component.scss'],
     providers: [NotificationService],
 })
@@ -39,25 +40,25 @@ export class FolderActionListComponent implements OnInit {
         list: []
     };
 
-    @Input('selectedRes') selectedRes: any;
-    @Input('totalRes') totalRes: number;
-    @Input('contextMode') contextMode: boolean;
-    @Input('currentFolderInfo') currentFolderInfo: any;
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
+    @Input() contextMode: boolean;
+    @Input() currentFolderInfo: any;
 
-    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
-    @Output('refreshPanelFolders') refreshPanelFolders = new EventEmitter<string>();
+    @Output() refreshEvent = new EventEmitter<string>();
+    @Output() refreshPanelFolders = new EventEmitter<string>();
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialog: MatDialog, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialog: MatDialog,
         private router: Router,
         private headerService: HeaderService,
         private foldersService: FoldersService
-        ) { }
+    ) { }
 
     dialogRef: MatDialogRef<any>;
-    
+
     ngOnInit(): void { }
 
     open(x: number, y: number, row: any) {
@@ -77,7 +78,7 @@ export class FolderActionListComponent implements OnInit {
     }
 
     refreshFolders() {
-        this.refreshPanelFolders.emit();  
+        this.refreshPanelFolders.emit();
     }
 
     refreshDaoAfterAction() {
@@ -95,6 +96,10 @@ export class FolderActionListComponent implements OnInit {
                 this.refreshFolders();
                 this.foldersService.getPinnedFolders();
                 this.refreshDaoAfterAction();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }
@@ -104,6 +109,10 @@ export class FolderActionListComponent implements OnInit {
             tap((data: any) => {
                 this.basketList.groups = data.groupsBaskets.filter((x: any, i: any, a: any) => x && a.map((info: any) => info.groupId).indexOf(x.groupId) === i);
                 this.basketList.list = data.groupsBaskets;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }
@@ -127,6 +136,10 @@ export class FolderActionListComponent implements OnInit {
                 this.notify.success(this.lang.removedFromFolder);
                 this.headerService.nbResourcesFollowed -= data.unFollowed;
                 this.refreshDaoAfterAction();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }
