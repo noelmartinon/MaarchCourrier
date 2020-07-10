@@ -17,10 +17,11 @@ namespace ContentManagement\controllers;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\ValidatorModel;
 
 class DocumentEditorController
 {
-    const DOCUMENT_EDITION_METHODS = ['java', 'onlyoffice'];
+    const DOCUMENT_EDITION_METHODS = ['java', 'onlyoffice', 'collaboraonline'];
 
     public static function get(Request $request, Response $response)
     {
@@ -41,5 +42,20 @@ class DocumentEditorController
         }
 
         return $allowedMethods;
+    }
+
+    public static function isAvailable(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['uri', 'port']);
+        ValidatorModel::stringType($args, ['uri', 'port']);
+
+        $aUri = explode("/", $args['uri']);
+        $exec = shell_exec("nc -vz -w 5 {$aUri[0]} {$args['port']} 2>&1");
+
+        if (strpos($exec, 'not found') !== false) {
+            return ['errors' => 'Netcat command not found', 'lang' => 'preRequisiteMissing'];
+        }
+
+        return strpos($exec, 'succeeded!') !== false || strpos($exec, 'open') !== false || strpos($exec, 'Connected') !== false;
     }
 }

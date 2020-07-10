@@ -4,7 +4,7 @@ import { LANG } from '../translate.component';
 import { NotificationService } from '../notification.service';
 import { HeaderService } from '../../service/header.service';
 import { AppService } from '../../service/app.service';
-import { tap, catchError, filter, map, exhaustMap } from 'rxjs/operators';
+import {tap, catchError, filter, map, exhaustMap, take} from 'rxjs/operators';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material';
 import { AlertComponent } from '../../plugins/modal/alert.component';
@@ -17,6 +17,7 @@ import { DocumentViewerModalComponent } from './modal/document-viewer-modal.comp
 import { PrivilegeService } from '../../service/privileges.service';
 import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
 import { of, Subject } from 'rxjs';
+import {CollaboraOnlineViewerComponent} from '../../plugins/collabora-online/collabora-online-viewer.component';
 
 @Component({
     selector: 'app-document-viewer',
@@ -135,6 +136,7 @@ export class DocumentViewerComponent implements OnInit {
 
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     docToUploadValue: any;
 
@@ -468,6 +470,8 @@ export class DocumentViewerComponent implements OnInit {
     getFile() {
         if (this.editor.mode === 'onlyoffice' && this.onlyofficeViewer !== undefined) {
             return this.onlyofficeViewer.getFile();
+        } else if (this.editor.mode === 'collaboraOnline' && this.collaboraOnlineViewer !== undefined) {
+            return this.collaboraOnlineViewer.getFile();
         } else {
             const objFile = JSON.parse(JSON.stringify(this.file));
             objFile.content = objFile.contentMode === 'route' ? null : objFile.content;
@@ -482,6 +486,13 @@ export class DocumentViewerComponent implements OnInit {
                 resolve(this.getBase64Document(this.file.src));
             } else {
                 this.getFile().pipe(
+                    take(1),
+                    tap((data: any) => {
+                        if (this.editor.mode === 'collaboraOnline' && this.collaboraOnlineViewer !== undefined) {
+                            this.collaboraOnlineViewer.isSaving = false;
+                        }
+                       return data;
+                    }),
                     exhaustMap((data: any) => this.http.post(`../../rest/convertedFile`, { name: `${data.name}.${data.format}`, base64: `${data.content}` })),
                     tap((data: any) => {
                         resolve(data.encodedResource);
@@ -691,6 +702,16 @@ export class DocumentViewerComponent implements OnInit {
                     };
                     this.editInProgress = true;
 
+                } else if (this.editor.mode === 'collaboraOnline') {
+                    const mode = this.mode === 'attachment' ? 'attachment' : 'resource';
+                    this.editor.async = false;
+                    this.editInProgress = true;
+                    this.editor.options = {
+                        objectType: mode,
+                        objectId: template.id,
+                        objectMode: 'creation',
+                        dataToMerge: this.resourceDatas
+                    };
                 } else {
                     this.editor.async = true;
                     this.editor.options = {
@@ -739,6 +760,15 @@ export class DocumentViewerComponent implements OnInit {
             };
             this.editInProgress = true;
 
+        } else if (this.editor.mode === 'collaboraOnline') {
+            this.editor.async = false;
+            this.editInProgress = true;
+            this.editor.options = {
+                objectType: 'attachment',
+                objectId: this.resId,
+                objectMode: 'edition',
+                dataToMerge: this.resourceDatas
+            };
         } else {
             this.editor.async = true;
             this.editor.options = {
@@ -768,6 +798,15 @@ export class DocumentViewerComponent implements OnInit {
             };
             this.editInProgress = true;
 
+        } else if (this.editor.mode === 'collaboraOnline') {
+            this.editor.async = false;
+            this.editor.options = {
+                objectType: 'resource',
+                objectId: this.resId,
+                objectMode: 'edition',
+                dataToMerge: this.resourceDatas
+            };
+            this.editInProgress = true;
         } else {
             this.editor.async = true;
             this.editor.options = {
@@ -811,6 +850,8 @@ export class DocumentViewerComponent implements OnInit {
     isEditingTemplate() {
         if (this.editor.mode === 'onlyoffice') {
             return this.onlyofficeViewer !== undefined;
+        } else if (this.editor.mode === 'collaboraOnline') {
+            return this.collaboraOnlineViewer !== undefined;
         } else {
             return this.editInProgress;
         }
@@ -960,6 +1001,9 @@ export class DocumentViewerComponent implements OnInit {
             this.editor.async = true;
         } else if (this.headerService.user.preferences.documentEdition === 'onlyoffice') {
             this.editor.mode = 'onlyoffice';
+            this.editor.async = false;
+        } else if (this.headerService.user.preferences.documentEdition === 'collaboraonline') {
+            this.editor.mode = 'collaboraOnline';
             this.editor.async = false;
         }
     }

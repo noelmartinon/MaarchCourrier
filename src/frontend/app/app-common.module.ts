@@ -77,6 +77,7 @@ import { VisaWorkflowComponent } from './visa/visa-workflow.component';
 import { AvisWorkflowComponent } from './avis/avis-workflow.component';
 import { ContactResourceComponent } from './contact/contact-resource/contact-resource.component';
 import { ContactDetailComponent } from './contact/contact-detail/contact-detail.component';
+import {CollaboraOnlineViewerComponent} from '../plugins/collabora-online/collabora-online-viewer.component';
 
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -139,6 +140,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         AvisWorkflowComponent,
         ContactResourceComponent,
         ContactDetailComponent,
+        CollaboraOnlineViewerComponent
     ],
     exports: [
         CommonModule,
@@ -188,6 +190,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         AvisWorkflowComponent,
         ContactResourceComponent,
         ContactDetailComponent,
+        CollaboraOnlineViewerComponent
     ],
     providers: [
         HeaderService,

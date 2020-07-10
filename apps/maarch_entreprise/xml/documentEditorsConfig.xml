@@ -10,4 +10,10 @@
         <server_ssl>false</server_ssl>
         <server_secret></server_secret>
     </onlyoffice>
+    <collaboraonline>
+        <enabled>false</enabled>
+        <server_uri>collaboraonline.maarchcourrier.com</server_uri>
+        <server_port>9980</server_port>
+        <server_ssl>false</server_ssl>
+    </collaboraonline>
 </ROOT>

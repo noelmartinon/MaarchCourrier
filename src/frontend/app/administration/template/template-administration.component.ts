@@ -396,8 +396,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             }
 
             this.launchJavaEditor(editorOptions);
-        } else if (this.headerService.user.preferences.documentEdition === 'onlyoffice') {
-            this.launchOOEditor(editorOptions);
+        } else if (this.headerService.user.preferences.documentEdition !== 'java') {
+            this.launchIntegratedEditor(editorOptions, this.headerService.user.preferences.documentEdition);
         }
     }
 
@@ -414,7 +414,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         ).subscribe();
     }
 
-    launchOOEditor(params: any) {
+    launchIntegratedEditor(params: any, editor: string) {
         this.dialogRef = this.dialog.open(
             TemplateFileEditorModalComponent,
             {
@@ -425,7 +425,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 data: {
                     title: this.template.template_style,
                     editorOptions: params,
-                    file: { format: params.extension }
+                    file: { format: params.extension },
+                    editorType: editor
                 }
             }
         );

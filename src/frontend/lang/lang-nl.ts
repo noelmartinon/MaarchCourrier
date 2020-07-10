@@ -1703,4 +1703,11 @@ export const LANG_NL = {
     "canUpdateResourcesInSignatureBook": "Can modify the main document included in the signature book__TO_TRANSLATE",
     "includeFolderPerimeter": "Consulter les courriers hors périmètre dans les dossiers et courriers suivis__TO_TRANSLATE",
     "documentsOutOfPerimeter": "Certains documents sont en dehors de votre périmètre__TO_TRANSLATE",
+    "collaboraOnlineNotEnabled": "The Collabora Online server is not enabled in documentEditorsConfig.xml", // _TO_TRANSLATE
+    "checkCollaboraOnlineServer": "Connecting to the Collabora Online server", // _TO_TRANSLATE
+    "errorCollaboraOnline1": "Cannot launch Collabora Online, you are using a local address", // _TO_TRANSLATE
+    "errorCollaboraOnline2": "Cannot launch Collabora Online. Check if the Collabora Online server is available", // _TO_TRANSLATE
+    "collaboraOnlineEditDenied": "This document cannot be edited with Collabora Online", // _TO_TRANSLATE
+    "collaboraOnlineEditDenied2": "cannot be edited with Collabora Online", // _TO_TRANSLATE
+    "documentEditor_collaboraonline": "Open Collabora Online directly inside Maarch Courrier", // _TO_TRANSLATE
 };

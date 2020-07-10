@@ -46,7 +46,8 @@ class TemplateController
         'application/vnd.openxmlformats-officedocument.presentationml‌.slideshow',
         'application/vnd.oasis.opendocument.text',
         'application/vnd.oasis.opendocument.presentation',
-        'application/vnd.oasis.opendocument.spreadsheet'
+        'application/vnd.oasis.opendocument.spreadsheet',
+        'application/octet-stream'
     ];
 
     public function get(Request $request, Response $response)

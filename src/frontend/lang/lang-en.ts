@@ -1720,4 +1720,11 @@ export const LANG_EN = {
     "workingDays":                                 "Working days",
     "yes":                                         "Yes",
     "zipcode":                                     "Zip code",
+    "collaboraOnlineNotEnabled": "The Collabora Online server is not enabled in documentEditorsConfig.xml",
+    "checkCollaboraOnlineServer": "Connecting to the Collabora Online server",
+    "errorCollaboraOnline1": "Cannot launch Collabora Online, you are using a local address",
+    "errorCollaboraOnline2": "Cannot launch Collabora Online. Check if the Collabora Online server is available",
+    "collaboraOnlineEditDenied": "This document cannot be edited with Collabora Online",
+    "collaboraOnlineEditDenied2": "cannot be edited with Collabora Online",
+    "documentEditor_collaboraonline": "Open Collabora Online directly inside Maarch Courrier",
 };

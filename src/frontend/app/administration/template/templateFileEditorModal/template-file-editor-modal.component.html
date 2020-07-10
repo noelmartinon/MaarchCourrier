@@ -1,13 +1,16 @@
 <div class="mat-dialog-content-container">
     <mat-dialog-content style="padding: 0px;">
-        <onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [hideCloseEditor]="true"
-            [params]="editorOptions" [file]="file" [editMode]="true" (triggerAfterUpdatedDoc)="close()"
-            (triggerCloseEditor)="dialogRef.close('');"></onlyoffice-viewer>
+        <onlyoffice-viewer *ngIf="editorType === 'onlyoffice'" #onlyofficeViewer style="height:100%;width:100%;" [hideCloseEditor]="true"
+                           [params]="editorOptions" [file]="file" [editMode]="true" (triggerAfterUpdatedDoc)="close()"
+                           (triggerCloseEditor)="dialogRef.close('');" (triggerModifiedDocument)="documentIsModified = true"></onlyoffice-viewer>
+        <app-collabora-online-viewer *ngIf="editorType === 'collaboraonline'" #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editorOptions" [file]="file"
+                                     [editMode]="true" (triggerAfterUpdatedDoc)="close()"
+                                     (triggerCloseEditor)="dialogRef.close('');" (triggerModifiedDocument)="documentIsModified = true"></app-collabora-online-viewer>
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary"
-            (click)="close()">{{lang.validate}}</button>
+            (click)="close()" [disabled]="!documentIsModified">{{lang.validate}}</button>
         <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
     </div>
 </div>

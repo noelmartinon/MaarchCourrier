@@ -1722,4 +1722,11 @@ export const LANG_FR = {
     "workingDays":                                 "jour(s) ouvré(s)",
     "yes":                                         "Oui",
     "zipcode":                                     "Code postal",
+    "collaboraOnlineNotEnabled": "Le serveur Collabora Online n'est pas activé dans documentEditorsConfig.xml",
+    "checkCollaboraOnlineServer": "Communication avec le serveur Collabora Online",
+    "errorCollaboraOnline1": "Impossible de lancer Collabora Online, vous utilisez une adresse locale",
+    "errorCollaboraOnline2": "Impossible de lancer Collabora Online. Veuillez vérifier la disponibilité du serveur",
+    "collaboraOnlineEditDenied": "Ce document ne peut pas être édité avec Collabora Online",
+    "collaboraOnlineEditDenied2": "ne peut pas être édité avec Collabora Online",
+    "documentEditor_collaboraonline": "Ouvre la suite Collabora Online directement dans l'application Maarch Courrier",
 };

@@ -197,6 +197,9 @@ class CurlModel
         ValidatorModel::notEmpty($args, ['url', 'method']);
         ValidatorModel::stringType($args, ['url', 'method']);
         ValidatorModel::arrayType($args, ['headers', 'queryParams', 'basicAuth', 'bearerAuth']);
+        ValidatorModel::boolType($args, ['isXml']);
+
+        $args['isXml'] = $args['isXml'] ?? false;
 
         $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false];
 
@@ -270,7 +273,13 @@ class CurlModel
             ]);
         }
 
-        return ['code' => $code, 'headers' => $headers, 'response' => json_decode($response, true), 'errors' => $errors];
+        if ($args['isXml']) {
+            $response = simplexml_load_string($response);
+        } else {
+            $response = json_decode($response, true);
+        }
+
+        return ['code' => $code, 'headers' => $headers, 'response' => $response, 'errors' => $errors];
     }
 
     private static function createMultipartFormData(array $args)
