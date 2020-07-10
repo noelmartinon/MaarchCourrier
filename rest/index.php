@@ -30,7 +30,8 @@ $app = new \Slim\App(['settings' => ['displayErrorDetails' => true, 'determineRo
 //Authentication
 $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, callable $next) {
     $routesWithoutAuthentication = ['GET/jnlp/{jnlpUniqueId}', 'POST/password', 'PUT/password', 'GET/passwordRules', 'GET/onlyOffice/mergedFile',
-                                    'POST/onlyOfficeCallback', 'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents'];
+                                    'POST/onlyOfficeCallback', 'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents',
+                                    'GET/onlyOffice/content'];
     $route = $request->getAttribute('route');
     $currentMethod = empty($route) ? '' : $route->getMethods()[0];
     $currentRoute = empty($route) ? '' : $route->getPattern();
@@ -171,6 +172,7 @@ $app->post('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeCo
 $app->get('/onlyOffice/mergedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getMergedFile');
 $app->get('/onlyOffice/encodedFile', \ContentManagement\controllers\OnlyOfficeController::class . ':getEncodedFileFromUrl');
 $app->get('/onlyOffice/available', \ContentManagement\controllers\OnlyOfficeController::class . ':isAvailable');
+$app->get('/onlyOffice/content', \ContentManagement\controllers\OnlyOfficeController::class . ':getTmpFile');
 $app->post('/onlyOfficeCallback', function (\Slim\Http\Request $request, \Slim\Http\Response $response) {
     return $response->withJson(['error' => 0]);
 });

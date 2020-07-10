@@ -33,6 +33,7 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\CoreController;
+use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -826,7 +827,10 @@ class AttachmentController
                 }
                 $customId = CoreConfigModel::getCustomId();
                 $customId = empty($customId) ? 'null' : $customId;
-                exec("php src/app/convert/scripts/ConvertPdfScript.php --customId {$customId} --resId {$id} --type attachment --userId {$GLOBALS['id']} > /dev/null &");
+
+                $coreUrl = str_replace('rest/', '', UrlController::getCoreUrl());
+
+                exec("php src/app/convert/scripts/ConvertPdfScript.php --customId {$customId} --resId {$id} --type attachment --userId {$GLOBALS['id']} --coreUrl {$coreUrl} > /dev/null &");
             }
         }
 

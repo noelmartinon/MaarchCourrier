@@ -25,6 +25,12 @@ class CoreConfigModel
             return $customId;
         }
 
+        // Use for script
+        if (!empty($GLOBALS['customId'])) {
+            $customId = $GLOBALS['customId'];
+            return $customId;
+        }
+
         if (!file_exists('custom/custom.xml') || empty($_SERVER['SCRIPT_NAME']) || empty($_SERVER['SERVER_ADDR'])) {
             $customId = '';
             return $customId;

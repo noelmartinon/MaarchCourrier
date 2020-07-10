@@ -17,6 +17,7 @@ namespace Convert\scripts;
 require 'vendor/autoload.php';
 
 use Attachment\models\AttachmentModel;
+use ContentManagement\controllers\OnlyOfficeController;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -51,13 +52,17 @@ class ConvertPdfScript
         if ($cmd > 0) {
             $userId = $args[$cmd+1];
         }
+        $cmd = array_search('--coreUrl', $args);
+        if ($cmd > 0) {
+            $coreUrl = $args[$cmd+1];
+        }
 
         if (empty($resId) || empty($type) || empty($userId)) {
             echo 'Missing arguments';
             exit();
         }
 
-        return ['customId' => $customId, 'resId' => $resId, 'type' => $type, 'userId' => $userId];
+        return ['customId' => $customId, 'resId' => $resId, 'type' => $type, 'userId' => $userId, 'coreUrl' => $coreUrl];
     }
 
     public static function convert(array $args)
@@ -98,9 +103,19 @@ class ConvertPdfScript
         copy($pathToDocument, "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
 
         if (strtolower($docInfo['extension']) != 'pdf') {
-            ConvertPdfController::addBom("{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
-            $command = "timeout 30 unoconv -f pdf " . escapeshellarg("{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
-            exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
+
+            $fullFilename = "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}";
+            $converted = false;
+            $output = [];
+            if (OnlyOfficeController::canConvert(['url' => $args['coreUrl']])) {
+                $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename, 'url' => $args['coreUrl'], 'userId' => $args['userId']]);
+                $converted = empty($converted['errors']);
+            }
+            if (!$converted){
+                ConvertPdfController::addBom($fullFilename);
+                $command = "timeout 30 unoconv -f pdf " . escapeshellarg($fullFilename);
+                exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
+            }
 
             if (!file_exists($tmpPath.$fileNameOnTmp.'.pdf')) {
                 return ['errors' => 'Conversion failed ! '. implode(" ", $output)];
@@ -149,6 +164,8 @@ class ConvertPdfScript
 
         DatabasePDO::reset();
         new DatabasePDO(['customId' => $args['customId']]);
+
+        $GLOBALS['customId'] = $args['customId'];
 
         $isConverted = ConvertPdfScript::convert($args);
 
