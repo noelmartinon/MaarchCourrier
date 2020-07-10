@@ -283,7 +283,14 @@ class IParapheurController
                     return ['error' => $curlReturn['error']];
                 }
 
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                try {
+                    if (is_bool($curlReturn['response']) === true) {
+                        return ['error' => 'Curl response is a boolean'];
+                    }
+                    $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                } catch (Exception $e) {
+                    return ['error' => 'Exception : ' . $e->getMessage()];
+                }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     return ['error' => 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
