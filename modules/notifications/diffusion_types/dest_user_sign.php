@@ -17,7 +17,7 @@ switch ($request) {
 
         $select = 'SELECT distinct us.*';
         $from = ' FROM listinstance li JOIN users us ON li.item_id = us.user_id';
-        $where = " WHERE AND li.item_mode = 'sign' "
+        $where = " WHERE li.item_mode = 'sign' "
             .'and process_date IS NULL ';
 
         $arrayPDO = array(':recordid' => $event->record_id);
