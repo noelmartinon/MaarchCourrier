@@ -1710,4 +1710,6 @@ export const LANG_NL = {
     "collaboraOnlineEditDenied": "This document cannot be edited with Collabora Online", // _TO_TRANSLATE
     "collaboraOnlineEditDenied2": "cannot be edited with Collabora Online", // _TO_TRANSLATE
     "documentEditor_collaboraonline": "Open Collabora Online directly inside Maarch Courrier", // _TO_TRANSLATE
+    "updateKO": "Mise à jour échouée !__TO_TRANSLATE",
+    "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>.__TO_TRANSLATE",
 };
