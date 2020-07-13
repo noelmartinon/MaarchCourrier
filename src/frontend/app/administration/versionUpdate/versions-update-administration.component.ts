@@ -75,7 +75,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
             }),
             exhaustMap(() => this.http.put('../../rest/versionsUpdate', {})),
             tap(() => {
-                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateOk, msg: '' } });
+                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateOk, msg: this.lang.saveInDocserversInfo } });
             }),
             exhaustMap(() => this.dialogRef.afterClosed()),
             tap(() => {
@@ -83,6 +83,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
                 window.location.reload(true);
             }),
             catchError(err => {
+                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateKO, msg: this.lang.saveInDocserversInfo } });
                 this.notify.handleErrors(err);
                 return of(false);
             }),
