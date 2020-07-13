@@ -152,7 +152,11 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                 this.params.objectType = 'template';
             }
 
-            if (typeof this.params.objectId === 'string' && this.params.objectType === 'encodedResource') {
+            this.params.objectPath = undefined;
+            if (typeof this.params.objectId === 'string' && this.params.objectType === 'template') {
+                this.params.objectPath = this.params.objectId;
+                this.params.objectId = this.key;
+            } else if (typeof this.params.objectId === 'string' && this.params.objectType === 'encodedResource') {
                 this.params.content = this.params.objectId;
                 this.params.objectId = this.key;
                 this.params.objectMode = 'encoded';
@@ -277,7 +281,8 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                 resId: this.params.objectId,
                 type: this.params.objectType,
                 mode: this.params.objectMode,
-                format: this.file.format
+                format: this.file.format,
+                path: this.params.objectPath
             }).pipe(
                 tap((data: any) => {
                     this.editorUrl = data.url;

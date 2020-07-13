@@ -340,12 +340,16 @@ class CollaboraOnlineController
         if (!empty($body['format']) && !Validator::stringType()->validate($body['format'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body format is not a string']);
         }
+        if (!empty($body['path']) && !Validator::stringType()->validate($body['path'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body path is not a string']);
+        }
 
         $document = CollaboraOnlineController::getDocument([
             'id'     => $body['resId'],
             'type'   => $body['type'],
             'mode'   => $body['mode'],
-            'format' => $body['format']
+            'format' => $body['format'],
+            'path'   => $body['path']
         ]);
 
         if (!empty($document['errors'])) {
@@ -483,7 +487,7 @@ class CollaboraOnlineController
     private static function getDocument(array $args)
     {
         ValidatorModel::notEmpty($args, ['id', 'type', 'mode']);
-        ValidatorModel::stringType($args, ['type', 'mode', 'format']);
+        ValidatorModel::stringType($args, ['type', 'mode', 'format', 'path']);
         ValidatorModel::intVal($args, ['id']);
 
         if ($args['mode'] == 'creation' && ($args['type'] == 'resource' || $args['type'] == 'attachment')) {
@@ -585,6 +589,37 @@ class CollaboraOnlineController
             $document['filename'] = "collabora_encoded_{$GLOBALS['id']}_{$args['id']}.{$args['format']}";
             $document['docserver_id'] = '';
             $document['path'] = CoreConfigModel::getTmpPath();
+
+            $document['modification_date'] = new \DateTime('now');
+            $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
+        } else if ($args['type'] == 'template' && $args['mode'] == 'creation') {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
+                return ['code' => 403, 'errors' => 'Service forbidden'];
+            }
+
+            $document['filename'] = "collabora_template_{$GLOBALS['id']}_{$args['id']}.{$args['format']}";
+            $document['docserver_id'] = '';
+            $document['path'] = CoreConfigModel::getTmpPath();
+
+            if (!file_exists($document['path'] . $document['filename'])) {
+                if (empty($args['path'])) {
+                    return ['code' => 400, 'errors' => 'Argument path is missing'];
+                }
+
+                if (!file_exists($args['path'])) {
+                    return ['code' => 400, 'errors' => 'Document does not exists'];
+                }
+
+                $fileContent = file_get_contents($args['path']);
+                if ($fileContent === false) {
+                    return ['code' => 400, 'errors' => 'Document does not exists'];
+                }
+
+                $result = file_put_contents($document['path'] . $document['filename'], $fileContent);
+                if ($result === false) {
+                    return ['code' => 400, 'errors' => 'Document does not exists'];
+                }
+            }
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
