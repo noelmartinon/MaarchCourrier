@@ -474,7 +474,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
             if (data === true) {
                 this.actionService.stopRefreshResourceLock();
-                this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                if (!this.actionService.actionEnded) { 
+                    this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                }
                 const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;
                 this.router.navigate([path]);
             } else {
