@@ -606,6 +606,16 @@ class CollaboraOnlineController
                     return ['code' => 400, 'errors' => 'Argument path is missing'];
                 }
 
+                $customId = CoreConfigModel::getCustomId();
+                if (!empty($customId) && is_dir("custom/{$customId}/modules/templates/templates/styles/")) {
+                    $stylesPath = "custom/{$customId}/modules/templates/templates/styles/";
+                } else {
+                    $stylesPath = 'modules/templates/templates/styles/';
+                }
+                if (strpos($args['path'], $stylesPath) !== 0 || substr_count($args['path'], '.') != 1) {
+                    return ['code' => 400, 'errors' => 'Template path is not valid'];
+                }
+
                 if (!file_exists($args['path'])) {
                     return ['code' => 400, 'errors' => 'Document does not exists'];
                 }

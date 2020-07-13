@@ -68,7 +68,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         // console.log(e);
         const response = JSON.parse(e.data);
         // EVENT TO CONSTANTLY UPDATE CURRENT DOCUMENT
-        // console.log('isSaving = ' + this.isSaving);
         if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === false) {
             this.isModified = false;
         }
