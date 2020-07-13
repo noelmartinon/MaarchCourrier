@@ -299,7 +299,7 @@ if ($mode == 'normal') {
         $user = \User\models\UserModel::getByLogin(['login' => $_SESSION['user']['UserId'], 'select' => ['id']]);
         $whereFolders = '1=0';
         $whereFollowed = '1=0';
-        if (\Group\controllers\PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $user['id']])) {
+        if (\Group\controllers\PrivilegeController::hasPrivilege(['privilegeId' => 'include_folders_and_followed_resources_perimeter', 'userId' => $user['id']])) {
             $whereFollowed = 'res_id in (select res_id from users_followed_resources where user_id = :userSerialId)';
 
             $whereFolders = 'res_id in (select res_id from resources_folders, folders, entities_folders ';

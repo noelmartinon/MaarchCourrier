@@ -215,8 +215,16 @@ class VersionUpdateController
 
             $actualTime = date("dmY-His");
             $tablesToSave = '';
-            foreach (self::BACKUP_TABLES as $table) {
-                $tablesToSave .= ' -t ' . $table;
+            foreach ($args['sqlFiles'] as $sqlFile) {
+                $fileContent = file_get_contents($sqlFile);
+                $explodedFile = explode("\n", $fileContent);
+                $explodedFile[7] =  str_replace('--', '', $explodedFile[7]);
+                $explodedLine = explode('|', $explodedFile[7]);
+                foreach ($explodedLine as $table) {
+                    if (!empty($table)) {
+                        $tablesToSave .= ' -t ' . trim($table);
+                    }
+                }
             }
 
             $execReturn = exec("pg_dump -d \"{$databaseName}\" {$tablesToSave} -a > \"{$directoryPath}/migration/backupDB_maarchcourrier_{$actualTime}.sql\"", $output, $intReturn);

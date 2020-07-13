@@ -55,6 +55,7 @@ class Database extends functions
     {
         $args = func_get_args();
         if (count($args) < 1 || empty($args[0])) {
+            $_SESSION['config']['databases'] = [];
             if (isset($_SESSION['config']['databaseserver'])) {
                 $this->server = $_SESSION['config']['databaseserver'];
             }

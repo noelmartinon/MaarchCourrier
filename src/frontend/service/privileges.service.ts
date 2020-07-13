@@ -475,7 +475,7 @@ export class PrivilegeService {
             'unit': 'confidentialityAndSecurity'
         },
         {
-            'id': 'include_folder_perimeter',
+            'id': 'include_folders_and_followed_resources_perimeter',
             'label': this.lang.includeFolderPerimeter,
             'comment': this.lang.includeFolderPerimeter,
             'unit': 'application'
