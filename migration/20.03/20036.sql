@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
---usergroups_services|groupbasket
+--DATABASE_BACKUP|usergroups_services|groupbasket
 
 DELETE FROM usergroups_services WHERE service_id = 'include_folders_and_followed_resources_perimeter';
 

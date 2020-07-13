@@ -218,11 +218,18 @@ class VersionUpdateController
             foreach ($args['sqlFiles'] as $sqlFile) {
                 $fileContent = file_get_contents($sqlFile);
                 $explodedFile = explode("\n", $fileContent);
-                $explodedFile[7] =  str_replace('--', '', $explodedFile[7]);
-                $explodedLine = explode('|', $explodedFile[7]);
-                foreach ($explodedLine as $table) {
-                    if (!empty($table)) {
-                        $tablesToSave .= ' -t ' . trim($table);
+                foreach ($explodedFile as $key => $line) {
+                    if (strpos($line, '--DATABASE_BACKUP') !== false) {
+                        $lineNb = $key;
+                    }
+                }
+                if (isset($lineNb)) {
+                    $explodedLine = explode('|', $explodedFile[$lineNb]);
+                    array_shift($explodedLine);
+                    foreach ($explodedLine as $table) {
+                        if (!empty($table)) {
+                            $tablesToSave .= ' -t ' . trim($table);
+                        }
                     }
                 }
             }
