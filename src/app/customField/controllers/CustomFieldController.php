@@ -259,7 +259,7 @@ class CustomFieldController
             $columns = CoreConfigModel::getColumns(['table' => $table]);
             $columns = array_column($columns, 'column_name');
             foreach ($columns as $key => $column) {
-                if (stripos($column, 'password') !== false || stripos($column, 'token') !== false) {
+                if (stripos($column, 'password') !== false || stripos($column, 'token') !== false || stripos($column, 'cookie') !== false) {
                     unset($columns[$key]);
                 }
             }
