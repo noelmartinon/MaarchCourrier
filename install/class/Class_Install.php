@@ -150,7 +150,7 @@ class Install extends functions
 
     public function isPhpVersion()
     {
-        if (version_compare(PHP_VERSION, '7.1') < 0) {
+        if (version_compare(PHP_VERSION, '7.2') < 0) {
             return false;
             exit;
         }
