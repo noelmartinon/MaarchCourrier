@@ -25,8 +25,6 @@ use SrcCore\models\ValidatorModel;
 
 class VersionUpdateController
 {
-    const BACKUP_TABLES = ['usergroups_services', 'groupbasket'];
-
     public function get(Request $request, Response $response)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_update_control', 'userId' => $GLOBALS['id']])) {
@@ -211,7 +209,11 @@ class VersionUpdateController
 
         if (!empty($args['sqlFiles'])) {
             $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
-            $databaseName = (string)$loadedXml->CONFIG->databasename[0];
+            $server = (string)$loadedXml->CONFIG->databaseserver[0];
+            $port = (string)$loadedXml->CONFIG->databaseserverport[0];
+            $name = (string)$loadedXml->CONFIG->databasename[0];
+            $user = (string)$loadedXml->CONFIG->databaseuser[0];
+            $password = (string)$loadedXml->CONFIG->databasepassword[0];
 
             $actualTime = date("dmY-His");
             $tablesToSave = '';
@@ -234,7 +236,7 @@ class VersionUpdateController
                 }
             }
 
-            $execReturn = exec("pg_dump -d \"{$databaseName}\" {$tablesToSave} -a > \"{$directoryPath}/migration/backupDB_maarchcourrier_{$actualTime}.sql\"", $output, $intReturn);
+            $execReturn = exec("pg_dump --dbname=\"postgresql://{$user}:{$password}@{$server}:{$port}/{$name}\" {$tablesToSave} -a > \"{$directoryPath}/migration/backupDB_maarchcourrier_{$actualTime}.sql\"", $output, $intReturn);
             if (!empty($execReturn)) {
                 return ['errors' => 'Pg dump failed : ' . $execReturn];
             }
