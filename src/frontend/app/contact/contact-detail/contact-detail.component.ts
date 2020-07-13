@@ -186,11 +186,6 @@ export class ContactDetailComponent implements OnInit {
     isNewValue(identifier: any) {
         const isCustomField = typeof identifier === 'object' && identifier !== 'civility';
 
-        if (identifier === 'civility') {
-            console.log(this.contact[identifier]);
-            console.log(this.contactClone[identifier]);
-
-        }
         if (isCustomField) {
             return this.contactClone['customFields'].filter((custom: any) => custom.label === identifier.value.label).length === 0;
         } else if (identifier === 'civility') {
