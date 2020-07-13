@@ -7,13 +7,14 @@ import { MatMenuTrigger } from '@angular/material/menu';
 
 import { Router } from '@angular/router';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { filter, exhaustMap, tap, map } from 'rxjs/operators';
+import { filter, exhaustMap, tap, map, catchError } from 'rxjs/operators';
 import { HeaderService } from '../../../service/header.service';
-import {MenuShortcutComponent} from "../../menu/menu-shortcut.component";
+import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
     selector: 'app-followed-action-list',
-    templateUrl: "followed-action-list.component.html",
+    templateUrl: 'followed-action-list.component.html',
     styleUrls: ['followed-action-list.component.scss'],
 })
 export class FollowedActionListComponent implements OnInit {
@@ -39,15 +40,15 @@ export class FollowedActionListComponent implements OnInit {
         list: []
     };
 
-    @Input('selectedRes') selectedRes: any;
-    @Input('totalRes') totalRes: number;
-    @Input('contextMode') contextMode: boolean;
-    @Input('currentFolderInfo') currentFolderInfo: any;
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
+    @Input() contextMode: boolean;
+    @Input() currentFolderInfo: any;
 
-    @Input('menuShortcut') menuShortcut: MenuShortcutComponent;
+    @Input() menuShortcut: MenuShortcutComponent;
 
-    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
-    @Output('refreshPanelFolders') refreshPanelFolders = new EventEmitter<string>();
+    @Output() refreshEvent = new EventEmitter<string>();
+    @Output() refreshPanelFolders = new EventEmitter<string>();
 
     constructor(
         public http: HttpClient,
@@ -55,7 +56,7 @@ export class FollowedActionListComponent implements OnInit {
         public dialog: MatDialog,
         private router: Router,
         private headerService: HeaderService,
-        ) { }
+    ) { }
 
     dialogRef: MatDialogRef<any>;
 
@@ -78,7 +79,7 @@ export class FollowedActionListComponent implements OnInit {
     }
 
     refreshFolders() {
-        this.refreshPanelFolders.emit();  
+        this.refreshPanelFolders.emit();
     }
 
     refreshDaoAfterAction() {
@@ -90,11 +91,15 @@ export class FollowedActionListComponent implements OnInit {
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow' , { body: { resources: this.selectedRes } })),
+            exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: this.selectedRes } })),
             tap((data: any) => {
                 this.notify.success(this.lang.removedFromFolder);
                 this.headerService.nbResourcesFollowed -= data.unFollowed;
                 this.refreshDaoAfterAction();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }
@@ -104,6 +109,10 @@ export class FollowedActionListComponent implements OnInit {
             tap((data: any) => {
                 this.basketList.groups = data.groupsBaskets.filter((x: any, i: any, a: any) => x && a.map((info: any) => info.groupId).indexOf(x.groupId) === i);
                 this.basketList.list = data.groupsBaskets;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }

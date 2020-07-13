@@ -103,6 +103,8 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is empty or not a string']);
         } elseif (!Validator::length(1, 50)->validate($queryParams['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name length is not valid']);
+        } elseif (strpbrk($queryParams['name'], '";') !== false) {
+            return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is not valid']);
         }
 
         $options = [
@@ -159,9 +161,12 @@ class InstallerController
 
         if (!Validator::stringType()->notEmpty()->validate($queryParams['path'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Queryparams path is empty or not a string']);
+        } elseif (strpbrk($queryParams['path'], '"\'<>|*:?') !== false) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body path is not valid']);
         }
 
         $path = urldecode($queryParams['path']);
+        $path = preg_replace('/\/{2,}/', '/', $path);
         $path = rtrim($path, '/');
 
         $multiplesPaths = explode('/', $path);
@@ -281,6 +286,8 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body name is empty or not a string']);
         } elseif (!Validator::length(1, 50)->validate($body['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name length is not valid']);
+        } elseif (strpbrk($body['name'], '";') !== false) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body name is not valid']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
@@ -372,10 +379,11 @@ class InstallerController
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
         } elseif (!is_file("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json")) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom does not exist']);
-        } elseif (strpbrk($body['path'], '"\'<>|*:?') !== false || strpos($body['path'], '//') !== false) {
+        } elseif (strpbrk($body['path'], '"\'<>|*:?') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'Body path is not valid']);
         }
 
+        $body['path'] = preg_replace('/\/{2,}/', '/', $body['path']);
         $body['path'] = rtrim($body['path'], '/');
 
         if (!is_dir($body['path'])) {

@@ -747,7 +747,7 @@ class FolderController
                     'listDisplay'   => ['folders']
                 ]);
 
-                $folderPrivilege = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $GLOBALS['id']]);
+                $folderPrivilege = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folders_and_followed_resources_perimeter', 'userId' => $GLOBALS['id']]);
                 foreach ($formattedResources as $key => $formattedResource) {
                     if ($folderPrivilege) {
                         $formattedResources[$key]['allowed'] = true;

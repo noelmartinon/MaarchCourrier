@@ -6,13 +6,10 @@
 --                                                                          --
 -- *************************************************************************--
 
-DELETE FROM usergroups_services WHERE service_id = 'include_folder_perimeter';
+DELETE FROM usergroups_services WHERE service_id = 'include_folders_and_followed_resources_perimeter';
 
 INSERT INTO usergroups_services (group_id, service_id)
-SELECT distinct(group_id), 'include_folder_perimeter' FROM usergroups_services;
-
-INSERT INTO groupbasket (group_id, service_id)
-SELECT distinct(group_id) FROM usergroups_services where service_id = 'manage_attachments';
+SELECT distinct(group_id), 'include_folders_and_followed_resources_perimeter' FROM usergroups_services;
 
 UPDATE groupbasket SET list_event_data = '{"canUpdateDocument":true}'
 WHERE list_event = 'signatureBookAction' AND group_id in (

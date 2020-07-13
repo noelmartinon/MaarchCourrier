@@ -28,11 +28,12 @@ use SrcCore\controllers\CoreController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
+use SrcCore\models\ValidatorModel;
 use Template\models\TemplateModel;
 
 class OnlyOfficeController
 {
-    public static function getConfiguration(Request $request, Response $response)
+    public function getConfiguration(Request $request, Response $response)
     {
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
 
@@ -53,7 +54,7 @@ class OnlyOfficeController
         return $response->withJson($configurations);
     }
 
-    public static function getToken(Request $request, Response $response)
+    public function getToken(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
         if (!Validator::notEmpty()->validate($body['config'])) {
@@ -80,7 +81,7 @@ class OnlyOfficeController
         return $response->withJson($jwt);
     }
 
-    public static function saveMergedFile(Request $request, Response $response)
+    public function saveMergedFile(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
 
@@ -213,7 +214,7 @@ class OnlyOfficeController
         return $response->withJson(['filename' => $halfFilename]);
     }
 
-    public static function getMergedFile(Request $request, Response $response)
+    public function getMergedFile(Request $request, Response $response)
     {
         $queryParams = $request->getQueryParams();
 
@@ -242,7 +243,7 @@ class OnlyOfficeController
         return $response->withHeader('Content-Type', $mimeType);
     }
 
-    public static function getEncodedFileFromUrl(Request $request, Response $response)
+    public function getEncodedFileFromUrl(Request $request, Response $response)
     {
         $queryParams = $request->getQueryParams();
 
@@ -275,7 +276,7 @@ class OnlyOfficeController
         return $response->withJson(['encodedFile' => base64_encode($fileContent)]);
     }
 
-    public static function isAvailable(Request $request, Response $response)
+    public function isAvailable(Request $request, Response $response)
     {
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
         if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
@@ -298,8 +299,11 @@ class OnlyOfficeController
         return $response->withJson(['isAvailable' => $isAvailable]);
     }
 
-    public static function canConvert()
+    public static function canConvert(array $args)
     {
+        ValidatorModel::notEmpty($args, ['url']);
+        ValidatorModel::stringType($args, ['url']);
+
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
         if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
             return false;
@@ -318,11 +322,23 @@ class OnlyOfficeController
             return false;
         }
 
-        return $isAvailable;
+        if (!$isAvailable) {
+            return false;
+        }
+
+        if (strpos($args['url'], 'localhost') !== false || strpos($args['url'], '127.0.0.1') !== false ) {
+            return false;
+        }
+
+        return true;
     }
 
     public static function convert(array $args)
     {
+        ValidatorModel::notEmpty($args, ['url', 'fullFilename', 'userId']);
+        ValidatorModel::stringType($args, ['url', 'fullFilename']);
+        ValidatorModel::intVal($args, ['userId']);
+
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
         if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
             return ['errors' => 'Onlyoffice is not enabled', 'lang' => 'onlyOfficeNotEnabled'];
@@ -339,18 +355,13 @@ class OnlyOfficeController
         $docInfo = pathinfo($args['fullFilename']);
 
         $payload = [
-            'userId'       => $GLOBALS['id'],
+            'userId'       => $args['userId'],
             'fullFilename' => $args['fullFilename']
         ];
 
         $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
 
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-        if (empty($file['config']['maarchUrl'])) {
-            return ['errors' => 'Cannot convert with OnlyOffice : maarchUrl not set in config.json'];
-        }
-        $coreUrl = $file['config']['maarchUrl'];
-        $docUrl = $coreUrl . 'rest/onlyOffice/content?token=' . $jwt;
+        $docUrl = $args['url'] . 'rest/onlyOffice/content?token=' . $jwt;
 
         $response = CurlModel::execSimple([
             'url'     => $uri . ':' . $port . '/ConvertService.ashx',

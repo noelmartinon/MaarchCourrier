@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
+import { FeatureTourService } from '../../service/featureTour.service';
 
 declare var $: any;
 
@@ -45,7 +46,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        private router: Router
+        private router: Router,
+        private featureTourService: FeatureTourService
     ) {
         (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
@@ -70,6 +72,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+        if (this.headerService.user.userId === 'superadmin') {
+            this.featureTourService.init();
+        }
         this.http.get('../rest/home/lastRessources')
             .subscribe((data: any) => {
                 setTimeout(() => {

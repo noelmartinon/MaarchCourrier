@@ -52,13 +52,17 @@ class ConvertPdfScript
         if ($cmd > 0) {
             $userId = $args[$cmd+1];
         }
+        $cmd = array_search('--coreUrl', $args);
+        if ($cmd > 0) {
+            $coreUrl = $args[$cmd+1];
+        }
 
         if (empty($resId) || empty($type) || empty($userId)) {
             echo 'Missing arguments';
             exit();
         }
 
-        return ['customId' => $customId, 'resId' => $resId, 'type' => $type, 'userId' => $userId];
+        return ['customId' => $customId, 'resId' => $resId, 'type' => $type, 'userId' => $userId, 'coreUrl' => $coreUrl];
     }
 
     public static function convert(array $args)
@@ -101,13 +105,13 @@ class ConvertPdfScript
         if (strtolower($docInfo['extension']) != 'pdf') {
 
             $fullFilename = "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}";
-            if (OnlyOfficeController::canConvert()) {
-                $output = [];
-                $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename]);
-                if (!empty($converted['errors'])) {
-                    $output = [$converted['errors']];
-                }
-            } else {
+            $converted = false;
+            $output = [];
+            if (OnlyOfficeController::canConvert(['url' => $args['coreUrl']])) {
+                $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename, 'url' => $args['coreUrl'], 'userId' => $args['userId']]);
+                $converted = empty($converted['errors']);
+            }
+            if (!$converted) {
                 ConvertPdfController::addBom($fullFilename);
                 $command = "timeout 30 unoconv -f pdf " . escapeshellarg($fullFilename);
                 exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);

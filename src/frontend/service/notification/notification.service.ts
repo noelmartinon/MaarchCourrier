@@ -56,8 +56,10 @@ export class NotificationService {
                 if (err.error.errors !== undefined) {
                     if (err.error.lang !== undefined) {
                         this.error(this.lang[err.error.lang]);
-                    } else if (err.error.errors == 'Document out of perimeter' || err.error.errors == 'Resource out of perimeter' || err.error.errors == 'Resources out of perimeter') {
+                    } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
                         this.error(this.lang.documentOutOfPerimeter);
+                    } else if (err.error.errors === 'Resources out of perimeter') {
+                        this.error(this.lang.documentsOutOfPerimeter);
                     } else {
                         this.error(err.error.errors, err.url);
                     }
@@ -83,8 +85,10 @@ export class NotificationService {
             if (err.error.errors !== undefined) {
                 if (err.error.lang !== undefined) {
                     this.error(this.lang[err.error.lang]);
-                } else if (err.error.errors == 'Document out of perimeter' || err.error.errors == 'Resource out of perimeter' || err.error.errors == 'Resources out of perimeter') {
+                } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
                     this.error(this.lang.documentOutOfPerimeter);
+                } else if (err.error.errors === 'Resources out of perimeter') {
+                    this.error(this.lang.documentsOutOfPerimeter);
                 } else {
                     this.error(err.error.errors, err.url);
                 }

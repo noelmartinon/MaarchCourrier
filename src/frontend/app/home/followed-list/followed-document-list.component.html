@@ -99,7 +99,11 @@
                                         [class.undefined]="row.subject == lang.undefined"
                                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                                     <span class="main-info-action">
-                                        <button mat-icon-button title="{{lang.notes}}"
+                                        <div *ngIf="!row.allowed" color="warn">
+                                            {{lang.documentOutOfPerimeter}}
+                                        </div>
+                                        <ng-container *ngIf="row.allowed">
+                                            <button mat-icon-button title="{{lang.notes}}"
                                             (click)="$event.stopPropagation();togglePanel('note',row)"
                                             [class.noData]="row.countNotes == 0">
                                             <mat-icon matBadgeHidden="{{row.countNotes == 0}}" fontSet="fas"
@@ -130,6 +134,7 @@
                                                 (click)="$event.stopPropagation();goToDetail(row);">
                                             <mat-icon fontSet="fas" fontIcon="fa-info-circle fa-2x"></mat-icon>
                                         </button>
+                                        </ng-container>  
                                     </span>
                                 </div>
                                 <div *ngIf="row.folders !== undefined && row.folders.length > 0" class="folder-info">
@@ -139,7 +144,7 @@
                         </ng-container>
                         <tr mat-row *matRowDef="let row; columns: displayedColumnsBasket;"
                             (contextmenu)="open($event,row);" (click)="open($event,row);" class="rowData"
-                            style="cursor: pointer;" [class.locked]="row.isLocked == true" cdkDrag
+                            style="cursor: pointer;" [class.locked]="row.isLocked == true" cdkDrag [cdkDragDisabled]="!row.allowed"
                             (cdkDragStarted)="selectSpecificRes(row);" [cdkDragData]="row">
                             <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
                             <div class="dragPreview" *cdkDragPreview><i class="fas fa-envelope-open-text fa-2x"></i>

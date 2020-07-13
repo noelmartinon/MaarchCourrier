@@ -2,7 +2,7 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader *ngIf="!creationMode">{{lang.actions}}</h3>
-            <a mat-list-item (click)="createScript()" *ngIf="!creationMode && !loading && !notification.scriptcreated">
+            <a mat-list-item (click)="createScript()" *ngIf="!creationMode && !loading && !notification.scriptcreated" joyrideStep="createScriptTour" (next)="createScript()">
                 <mat-icon color="primary" mat-list-icon class="fa fa-terminal"></mat-icon>
                 <p mat-line>
                     {{lang.createScriptNotification}}

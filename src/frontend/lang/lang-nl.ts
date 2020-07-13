@@ -1866,5 +1866,12 @@ export const LANG_NL = {
     "notifTour3Title": "Période de la tâche__TO_TRANSLATE",
     "notifTour3Description": "Vous pouvez choisir différentes périodes pour paramétrer votre tâche__TO_TRANSLATE",
     "notifTour4Title": "Liste des tâches__TO_TRANSLATE",
-    "notifTour4Description": "La liste de vos tâches actives apparaissent ici__TO_TRANSLATE"
+    "notifTour4Description": "La liste de vos tâches actives apparaissent ici__TO_TRANSLATE",
+    "documentsOutOfPerimeter": "Certains documents sont en dehors de votre périmètre__TO_TRANSLATE",
+    "welcomeTourTitle": "Bienvenue__TO_TRANSLATE",
+    "welcomeTourDescription": "Nous allons vous montrer certains points de configuration : <ul><li>Paraméter un <b color=\"primary\">serveur de mail</b></li><li>Configurer votre première <b color=\"primary\">notification</b></li></ul><br/>Pour commencer, cliquez sur <img style=\"width:32px;\" src=\"assets/admin_button.png\"/>__TO_TRANSLATE",
+    "createScriptTourTitle": "Créer le script__TO_TRANSLATE",
+    "createScriptTourDescription": "Avant de planifier la tâche, nous devons créer le script.__TO_TRANSLATE",
+    "updateKO": "Mise à jour échouée !__TO_TRANSLATE",
+    "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>.__TO_TRANSLATE"
 };

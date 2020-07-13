@@ -8,7 +8,7 @@
                     {{lang.add}}
                 </p>
             </a>
-            <a mat-list-item (click)="loadCron();snav2.toggle();" (next)="loadCron();snav2.toggle()" joyrideStep="notifTour" [text]="'Cliquez ici pour plannifier une tâche éxistante. Plannifions <b>Notification de bannettes</b>'">
+            <a mat-list-item (click)="loadCron();snav2.toggle();" (next)="snav2.open();paramCron();" joyrideStep="notifTour">
                 <mat-icon color="primary" mat-list-icon class="fa fa-clock"></mat-icon>
                 <p mat-line>
                     {{lang.toSchedule}}
@@ -84,7 +84,7 @@
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"
                             routerLink="/administration/notifications/{{row.notification_sid}}" style="cursor:pointer;"
-                            matTooltip="{{lang.view}}"></mat-row>
+                            matTooltip="{{lang.view}}" [joyrideStep]="row.notification_id + '_Tour'"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
@@ -94,7 +94,7 @@
         </div>
     </mat-sidenav-content>
     <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        fixedTopGap="56" position='end' [opened]="appService.getViewMode() ? false : false"  (next)="paramCron()" stepPosition="center" joyrideStep="notifTour2">
+        fixedTopGap="56" position='end' [opened]="appService.getViewMode() ? false : false"  (next)="paramCron()">
         <mat-list  (next)="saveCron()" joyrideStep="notifTour3">
             <h3 mat-subheader>{{lang.notificationSchedule}}</h3>
             <form class="form-horizontal" #notifForm="ngForm" style="overflow:hidden;">

@@ -123,6 +123,7 @@ export class RedirectActionComponent implements OnInit {
                 ).subscribe();
             } else {
                 this.currentEntity = this.entities.filter((entity: any) => entity.state.selected)[0];
+                resolve(true);
             }
         });
     }

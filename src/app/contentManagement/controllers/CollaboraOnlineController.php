@@ -364,8 +364,11 @@ class CollaboraOnlineController
 
         $urlIFrame = $urlSrc . 'WOPISrc=' . $coreUrl . 'rest/wopi/files/' . $body['resId'] . '&access_token=' . $jwt . '&NotWOPIButIframe=true';
 
-        if (!empty($loadedXml->collaboraonline->editor_language)) {
-            $urlIFrame .= '&lang=' . (string)$loadedXml->collaboraonline->editor_language;
+        $appLanguage = CoreConfigModel::getLanguage();
+        if ($appLanguage == 'fr') {
+            $urlIFrame .= '&lang=fr-FR';
+        } elseif ($appLanguage == 'nl') {
+            $urlIFrame .= '&lang=nl-NL';
         }
 
         return $response->withJson(['url' => $urlIFrame, 'token' => $jwt, 'coreUrl' => $coreUrl]);
@@ -397,7 +400,7 @@ class CollaboraOnlineController
         }
 
         $tmpPath = CoreConfigModel::getTmpPath();
-        $filename = "collabora_encoded_{$GLOBALS['id']}_{$body['key']}.${body['format']}";
+        $filename = "collabora_encoded_{$GLOBALS['id']}_{$body['key']}.{$body['format']}";
         $fileContent = base64_decode($body['content']);
 
         $put = file_put_contents($tmpPath . $filename, $fileContent);

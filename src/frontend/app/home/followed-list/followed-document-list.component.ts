@@ -348,6 +348,10 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 this.headerService.nbResourcesFollowed--;
                 this.initResultList();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -32,12 +32,14 @@ export class DatabaseComponent implements OnInit {
         private functionsService: FunctionsService,
         private installerService: InstallerService
     ) {
+        const valDbName: ValidatorFn[] = [Validators.pattern(/^[^\;\"]+$/), Validators.required];
+
         this.stepFormGroup = this._formBuilder.group({
             dbHostCtrl: ['localhost', Validators.required],
             dbLoginCtrl: ['', Validators.required],
             dbPortCtrl: ['5432', Validators.required],
             dbPasswordCtrl: ['', Validators.required],
-            dbNameCtrl: ['', Validators.required],
+            dbNameCtrl: ['', valDbName],
             dbSampleCtrl: ['data_fr', Validators.required],
             stateStep: ['', Validators.required]
         });

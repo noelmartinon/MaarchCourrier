@@ -164,6 +164,7 @@ export class ActionsService implements OnDestroy {
                         } catch (error) {
                             console.log(error);
                             console.log(action);
+                            this.unlockResourceAfterActionModal([]);
                             alert(this.lang.actionNotExist);
                         }
                     }

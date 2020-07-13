@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class AppService {
 
-    screenWidth: number = 0;
+    screenWidth: number = 1920;
 
     constructor() { }
 

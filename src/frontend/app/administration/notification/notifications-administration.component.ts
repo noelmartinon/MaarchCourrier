@@ -9,6 +9,10 @@ import { NotificationService } from '../../../service/notification/notification.
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
+import { tap } from 'rxjs/internal/operators/tap';
+import { catchError } from 'rxjs/internal/operators/catchError';
+import { of } from 'rxjs/internal/observable/of';
+import { finalize } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'notifications-administration.component.html'
@@ -110,68 +114,71 @@ export class NotificationsAdministrationComponent implements OnInit {
     }
 
     loadCron() {
+        return new Promise((resolve) => {
+            this.hours = [{ label: this.lang.eachHour, value: '*' }];
+            this.minutes = [{ label: this.lang.eachMinute, value: '*' }];
 
-        this.hours = [{ label: this.lang.eachHour, value: '*' }];
-        this.minutes = [{ label: this.lang.eachMinute, value: '*' }];
+            this.months = [
+                { label: this.lang.eachMonth, value: '*' },
+                { label: this.lang.january, value: '1' },
+                { label: this.lang.february, value: '2' },
+                { label: this.lang.march, value: '3' },
+                { label: this.lang.april, value: '4' },
+                { label: this.lang.may, value: '5' },
+                { label: this.lang.june, value: '6' },
+                { label: this.lang.july, value: '7' },
+                { label: this.lang.august, value: '8' },
+                { label: this.lang.september, value: '9' },
+                { label: this.lang.october, value: '10' },
+                { label: this.lang.november, value: '11' },
+                { label: this.lang.december, value: '12' }
+            ];
 
-        this.months = [
-            { label: this.lang.eachMonth, value: '*' },
-            { label: this.lang.january, value: '1' },
-            { label: this.lang.february, value: '2' },
-            { label: this.lang.march, value: '3' },
-            { label: this.lang.april, value: '4' },
-            { label: this.lang.may, value: '5' },
-            { label: this.lang.june, value: '6' },
-            { label: this.lang.july, value: '7' },
-            { label: this.lang.august, value: '8' },
-            { label: this.lang.september, value: '9' },
-            { label: this.lang.october, value: '10' },
-            { label: this.lang.november, value: '11' },
-            { label: this.lang.december, value: '12' }
-        ];
+            this.dom = [{ label: this.lang.notUsed, value: '*' }];
 
-        this.dom = [{ label: this.lang.notUsed, value: '*' }];
+            this.dow = [
+                { label: this.lang.eachDay, value: '*' },
+                { label: this.lang.monday, value: '1' },
+                { label: this.lang.tuesday, value: '2' },
+                { label: this.lang.wednesday, value: '3' },
+                { label: this.lang.thursday, value: '4' },
+                { label: this.lang.friday, value: '5' },
+                { label: this.lang.saturday, value: '6' },
+                { label: this.lang.sunday, value: '7' }
+            ];
 
-        this.dow = [
-            { label: this.lang.eachDay, value: '*' },
-            { label: this.lang.monday, value: '1' },
-            { label: this.lang.tuesday, value: '2' },
-            { label: this.lang.wednesday, value: '3' },
-            { label: this.lang.thursday, value: '4' },
-            { label: this.lang.friday, value: '5' },
-            { label: this.lang.saturday, value: '6' },
-            { label: this.lang.sunday, value: '7' }
-        ];
+            this.newCron = {
+                'm': '',
+                'h': '',
+                'dom': '',
+                'mon': '',
+                'cmd': '',
+                'state': 'normal'
+            };
 
-        this.newCron = {
-            'm': '',
-            'h': '',
-            'dom': '',
-            'mon': '',
-            'cmd': '',
-            'state': 'normal'
-        };
+            for (let it = 0; it <= 23; it++) {
+                this.hours.push({ label: it, value: String(it) });
+            }
 
-        for (let it = 0; it <= 23; it++) {
-            this.hours.push({ label: it, value: String(it) });
-        }
+            for (let it = 0; it <= 59; it++) {
+                this.minutes.push({ label: it, value: String(it) });
+            }
 
-        for (let it = 0; it <= 59; it++) {
-            this.minutes.push({ label: it, value: String(it) });
-        }
-
-        for (let it = 1; it <= 31; it++) {
-            this.dom.push({ label: it, value: String(it) });
-        }
-
-        this.http.get('../rest/notifications/schedule')
-            .subscribe((data: any) => {
-                this.crontab = data.crontab;
-                this.authorizedNotification = data.authorizedNotification;
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-
+            for (let it = 1; it <= 31; it++) {
+                this.dom.push({ label: it, value: String(it) });
+            }
+            this.http.get('../rest/notifications/schedule').pipe(
+                tap((data: any) => {
+                    this.crontab = data.crontab;
+                    this.authorizedNotification = data.authorizedNotification;
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     saveCron() {
@@ -215,7 +222,8 @@ export class NotificationsAdministrationComponent implements OnInit {
         return false;
     }
 
-    paramCron() {
+    async paramCron() {
+        await this.loadCron();
         const notifBasket = this.authorizedNotification.filter((notif: any) => notif.path.indexOf('_BASKETS.sh') > -1)[0];
         this.newCron = {
             'm': '0',

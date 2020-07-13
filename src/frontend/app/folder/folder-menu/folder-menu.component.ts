@@ -13,7 +13,7 @@ import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     selector: 'folder-menu',
-    templateUrl: "folder-menu.component.html",
+    templateUrl: 'folder-menu.component.html',
     styleUrls: ['folder-menu.component.scss'],
 })
 export class FolderMenuComponent implements OnInit {
@@ -55,8 +55,8 @@ export class FolderMenuComponent implements OnInit {
             }),
             filter(value => value.length > 2),
             tap(() => this.loading = true),
-            //distinctUntilChanged(),
-            switchMap(data => this.http.get('../rest/autocomplete/folders', { params: { "search": data } })),
+            // distinctUntilChanged(),
+            switchMap(data => this.http.get('../rest/autocomplete/folders', { params: { 'search': data } })),
             tap((data: any) => {
                 this.pinnedFolder = false;
                 this.foldersList = data.map(
@@ -85,7 +85,7 @@ export class FolderMenuComponent implements OnInit {
 
     getFolders() {
         this.loading = true;
-        this.http.get("../rest/pinnedFolders").pipe(
+        this.http.get('../rest/pinnedFolders').pipe(
             map((data: any) => data.folders),
             tap((data: any) => {
                 this.foldersList = data;
@@ -125,6 +125,10 @@ export class FolderMenuComponent implements OnInit {
                 this.foldersService.getPinnedFolders();
                 this.refreshList.emit();
                 this.refreshFolders.emit();
+            }),
+            catchError((err) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }

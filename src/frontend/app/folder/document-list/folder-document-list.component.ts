@@ -391,22 +391,27 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
     toggleMailTracking(row: any) {
         if (!row.mailTracking) {
             this.http.post('../rest/resources/follow', { resources: [row.resId] }).pipe(
-                tap(() => this.headerService.nbResourcesFollowed++),
+                tap(() => {
+                    this.headerService.nbResourcesFollowed++;
+                    row.mailTracking = !row.mailTracking;
+                }),
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();
         } else {
             this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: [row.resId] } }).pipe(
-                tap(() => this.headerService.nbResourcesFollowed--),
+                tap(() => {
+                    this.headerService.nbResourcesFollowed--;
+                    row.mailTracking = !row.mailTracking;
+                }),
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();
         }
-        row.mailTracking = !row.mailTracking;
     }
 
     viewDocument(row: any) {

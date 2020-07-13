@@ -542,6 +542,7 @@ export const LANG_EN = {
     "documentEditor_java": "Open your default document editor in a new window",
     "documentEditor_onlyoffice": "Open OnlyOffice directly inside Maarch Courrier",
     "documentOutOfPerimeter": "This document is out of your perimeter",
+    "documentsOutOfPerimeter": "Some documents are out of your perimeter",
     "documentSignedMsg": "The document has been signed, you cannot edit this document",
     "documentTypeAdded": "Document type added",
     "documentTypeDeleted": "Document type deleted",
@@ -1854,5 +1855,11 @@ export const LANG_EN = {
     "notifTour3Title": "Task period",
     "notifTour3Description": "You can choose different periods to configure your task.",
     "notifTour4Title": "To do-list",
-    "notifTour4Description": "The list of your active tasks appears here."
+    "notifTour4Description": "The list of your active tasks appears here.",
+    "welcomeTourTitle": "welcome",
+    "welcomeTourDescription": "We will show you some configuration points : <ul><li>Configure a <b color=\"primary\">mail server</b></li><li>Configure your first <b color=\"primary\">notification</b></li></ul><br/>To begin, click on <img style=\"width: 32px;\" src=\"assets/admin_button.png\" />",
+    "createScriptTourTitle": "Create the script",
+    "createScriptTourDescription": "Before scheduling the task, we need to create the script.",
+    "updateKO": "Update failed !",
+    "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>."
 };

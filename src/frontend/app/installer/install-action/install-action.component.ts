@@ -91,6 +91,10 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
         });
     }
 
+    isInstallBegin() {
+        return this.steps.filter(step => step.state === '').length !== this.steps.length;
+    }
+
     isInstallComplete() {
         return this.steps.filter(step => step.state === '').length === 0;
     }

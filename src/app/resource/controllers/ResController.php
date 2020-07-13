@@ -1017,7 +1017,7 @@ class ResController extends ResourceControlController
             return $args['resources'];
         }
 
-        $folder = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folder_perimeter', 'userId' => $args['userId']]);
+        $folder = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folders_and_followed_resources_perimeter', 'userId' => $args['userId']]);
 
         $data = [$args['resources']];
         if ($folder) {
