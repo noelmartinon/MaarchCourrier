@@ -61,16 +61,17 @@ while ($state <> 'END') {
             $email->html_body = str_replace("\'", "'", $email->html_body);
             $email->html_body = str_replace("''", "'", $email->html_body);
 
+            if (((string)$mailerParams->type) == 'smtp') {
+                if (empty($email->sender) && !empty((string)$mailerParams->mailfrom)) {
+                    $email->sender = (string)$mailerParams->mailfrom;
+                }
 
-            if (empty($email->sender) && !empty((string)$mailerParams->mailfrom)) {
-                $email->sender = (string)$mailerParams->mailfrom;
-            }
-
-            if (substr($email->sender, 0, 1) != '<') {
-                $email->sender = '<' . $email->sender;
-            }
-            if (substr($email->sender, -1) != '>') {
-                $email->sender .= '>';
+                if (substr($email->sender, 0, 1) != '<') {
+                    $email->sender = '<' . $email->sender;
+                }
+                if (substr($email->sender, -1) != '>') {
+                    $email->sender .= '>';
+                }
             }
 
             $GLOBALS['mailer']->setReturnPath($email->sender);
