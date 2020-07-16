@@ -219,7 +219,7 @@ class ResController
                 'recordId'  => $document['res_id'],
                 'eventType' => 'UP',
                 'info'      => $data['historyMessage'],
-                'moduleId'  => 'apps',
+                'moduleId'  => 'res',
                 'eventId'   => 'resup',
             ]);
         }
@@ -289,7 +289,7 @@ class ResController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if ($document['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -338,6 +338,22 @@ class ResController
                     $position = count($rawPosition) == 4 ? $rawPosition : $position;
                 }
 
+                $libDir = CoreConfigModel::getLibrariesDirectory();
+                if (!empty($libDir) && is_file($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php')) {
+                    require_once ($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
+
+                    $flattenedFile = CoreConfigModel::getTmpPath() . "tmp_file_{$GLOBALS['id']}_" .rand(). "_watermark.pdf";
+                    $writer = new \SetaPDF_Core_Writer_File($flattenedFile);
+                    $document = \SetaPDF_Core_Document::loadByFilename($pathToDocument, $writer);
+
+                    $formFiller = new \SetaPDF_FormFiller($document);
+                    $fields = $formFiller->getFields();
+                    $fields->flatten();
+                    $document->save()->finish();
+
+                    $pathToDocument = $flattenedFile;
+                }
+
                 try {
                     $pdf = new Fpdi('P', 'pt');
                     $nbPages = $pdf->setSourceFile($pathToDocument);
@@ -356,6 +372,10 @@ class ResController
                     $fileContent = $pdf->Output('', 'S');
                 } catch (\Exception $e) {
                     $fileContent = null;
+                }
+
+                if (!empty($flattenedFile) && is_file($flattenedFile)) {
+                    unlink($flattenedFile);
                 }
             }
         }
@@ -397,7 +417,7 @@ class ResController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename'], 'resId' => $aArgs['resId']]);
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'fingerprint'], 'resId' => $aArgs['resId']]);
         $extDocument = ResModel::getExtById(['select' => ['category_id', 'alt_identifier'], 'resId' => $aArgs['resId']]);
         if (empty($document) || empty($extDocument)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
@@ -430,7 +450,17 @@ class ResController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if (empty($document['fingerprint'])) {
+            if ($extDocument['category_id'] == 'outgoing') {
+                $realAttachmentId = empty($attachment[0]['res_id']) ? $attachment[0]['res_id_version'] : $attachment[0]['res_id'];
+                AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$realAttachmentId], 'isVersion' => !empty($attachment[0]['res_id_version'])]);
+            } else {
+                ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$aArgs['resId']]]);
+            }
+            $document['fingerprint'] = $fingerprint;
+        }
+
+        if ($document['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 

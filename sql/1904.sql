@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '19.04.14' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '19.04.15' WHERE id = 'database_version';
 
 DELETE FROM parameters WHERE id = 'QrCodePrefix';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('QrCodePrefix', 'Si activé (1), ajoute "Maarch_" dans le contenu des QrCode générés. (Utilisable avec MaarchCapture >= 1.4)', 0);
@@ -327,6 +327,7 @@ DO $$ BEGIN
   END IF;
 END$$;
 
+
 /* USERS */
 ALTER TABLE users DROP COLUMN IF EXISTS reset_token;
 ALTER TABLE users ADD COLUMN reset_token text;
@@ -359,7 +360,15 @@ FROM usergroups_services WHERE group_id IN (
 DELETE FROM parameters WHERE id = 'siret';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('siret', 'Numéro SIRET de l''entreprise', '12345678901234');
 
+
+DELETE FROM groupbasket where group_id in (select group_id from usergroups where enabled = 'N');
+DELETE FROM groupbasket_redirect where group_id in (select group_id from usergroups where enabled = 'N');
+DELETE FROM usergroup_content where group_id in (select group_id from usergroups where enabled = 'N');
+DELETE FROM usergroups_reports where group_id in (select group_id from usergroups where enabled = 'N');
+DELETE FROM usergroups_services where group_id in (select group_id from usergroups where enabled = 'N');
+
 DELETE FROM usergroups WHERE enabled = 'N';
+
 
 /* RE-CREATE VIEW*/
 CREATE OR REPLACE VIEW res_view_letterbox AS

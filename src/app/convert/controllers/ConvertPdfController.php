@@ -14,11 +14,12 @@
 
 namespace Convert\controllers;
 
-
 use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
+use Docserver\models\DocserverTypeModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
@@ -135,7 +136,7 @@ class ConvertPdfController
             ]);
         }
 
-        return ['docserver_id' => $storeResult['docserver_id'], 'path' => $storeResult['destination_dir'], 'filename' => $storeResult['file_destination_name']];
+        return ['docserver_id' => $storeResult['docserver_id'], 'path' => $storeResult['destination_dir'], 'filename' => $storeResult['file_destination_name'], 'fingerprint' => $storeResult['fingerPrint']];
     }
 
     public static function convertFromEncodedResource(array $aArgs)
@@ -170,13 +171,30 @@ class ConvertPdfController
         ValidatorModel::boolType($aArgs, ['isVersion']);
 
         $convertedDocument = AdrModel::getConvertedDocumentById([
-            'select'    => ['docserver_id','path', 'filename', 'fingerprint'],
+            'select'    => ['id', 'docserver_id','path', 'filename', 'fingerprint'],
             'resId'     => $aArgs['resId'],
             'collId'    => $aArgs['collId'],
             'type'      => 'PDF',
             'isVersion' => $aArgs['isVersion']
         ]);
-        
+        if (!empty($convertedDocument) && empty($convertedDocument['fingerprint'])) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+            if (is_file($pathToDocument)) {
+                $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+                if ($aArgs['collId'] == 'letterbox_coll') {
+                    AdrModel::updateDocumentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                } else if ($aArgs['isVersion']) {
+                    AdrModel::updateAttachmentVersionAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                } else {
+                    AdrModel::updateAttachmentAdr(['set' => ['fingerprint' => $fingerprint], 'where' => ['id = ?'], 'data' => [$convertedDocument['id']]]);
+                }
+
+                $convertedDocument['fingerprint'] = $fingerprint;
+            }
+        }
+
         if (empty($convertedDocument)) {
             $convertedDocument = ConvertPdfController::convert([
                 'resId'     => $aArgs['resId'],
@@ -188,7 +206,7 @@ class ConvertPdfController
         return $convertedDocument;
     }
 
-    private static function canConvert(array $args)
+    public static function canConvert(array $args)
     {
         ValidatorModel::notEmpty($args, ['extension']);
         ValidatorModel::stringType($args, ['extension']);
@@ -206,7 +224,8 @@ class ConvertPdfController
         return $canConvert;
     }
 
-    public static function addBom($filePath) {
+    public static function addBom($filePath)
+    {
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
         if (strtolower($extension) == strtolower('txt')) {
             $content = file_get_contents($filePath);

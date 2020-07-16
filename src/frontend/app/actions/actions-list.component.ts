@@ -419,6 +419,19 @@ export class ActionsListComponent implements OnInit {
         });
     }
 
+    noConfirmAction() {
+
+        this.http.put('../../rest/resourcesList/users/' + this.currentBasketInfo.ownerId + '/groups/' + this.currentBasketInfo.groupId + '/baskets/' + this.currentBasketInfo.basketId + '/actions/' + this.currentAction.id, { resources: this.arrRes })
+        .subscribe((data: any) => {
+            this.endAction();
+            this.loading = false;
+        }, (err: any) => {
+            this.notify.handleErrors(err);
+            this.loading = false;
+        });
+
+    }
+
     // CALL GENERIC ACTION V1
     v1Action() {
         location.hash = "";

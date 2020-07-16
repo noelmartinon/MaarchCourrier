@@ -280,7 +280,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::getOnView([
-            'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename'],
+            'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename', 'fingerprint'],
             'where'     => ['res_id = ? or res_id_version = ?', 'res_id_master = ?', 'status not in (?)'],
             'data'      => [$aArgs['resId'], $aArgs['resId'], $aArgs['resIdMaster'], ['DEL']],
             'limit'     => 1
@@ -309,14 +309,13 @@ class AttachmentController
         }
 
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
-
         if (!file_exists($pathToDocument)) {
             return $response->withStatus(404)->withJson(['errors' => 'Attachment not found on docserver']);
         }
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
-        $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        $fingerprint   = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+        if ($document['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -418,7 +417,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::getOnView([
-            'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename'],
+            'select'    => ['res_id', 'res_id_version', 'docserver_id', 'path', 'filename', 'fingerprint'],
             'where'     => ['res_id = ? or res_id_version = ?', 'res_id_master = ?', 'status not in (?)'],
             'data'      => [$args['id'], $args['id'], $args['resId'], ['DEL']],
             'limit'     => 1
@@ -448,7 +447,12 @@ class AttachmentController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
+        if (empty($document['fingerprint'])) {
+            AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']], 'isVersion' => !empty($attachmentTodisplay['res_id_version'])]);
+            $document['fingerprint'] = $fingerprint;
+        }
+
+        if ($document['fingerprint'] != $fingerprint) {
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
@@ -456,7 +460,7 @@ class AttachmentController
             $fileContent = file_get_contents($pathToDocument);
         }
         if ($fileContent === false) {
-            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+            return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
@@ -492,7 +496,7 @@ class AttachmentController
         ValidatorModel::boolType($aArgs, ['original']);
         ValidatorModel::boolType($aArgs, ['isVersion']);
 
-        $document = AttachmentModel::getById(['select' => ['docserver_id', 'path', 'filename', 'title'], 'id' => $aArgs['id'], 'isVersion' => $aArgs['isVersion']]);
+        $document = AttachmentModel::getById(['select' => ['docserver_id', 'path', 'filename', 'title', 'fingerprint'], 'id' => $aArgs['id'], 'isVersion' => $aArgs['isVersion']]);
 
         if (empty($aArgs['original'])) {
             $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['id'], 'collId' => 'attachments_coll', 'isVersion' => $aArgs['isVersion']]);
@@ -517,15 +521,18 @@ class AttachmentController
 
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
         $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if (!empty($document['fingerprint']) && $document['fingerprint'] != $fingerprint) {
-            ['errors' => 'Fingerprints do not match'];
+        if (empty($convertedDocument) && empty($document['fingerprint'])) {
+            AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$aArgs['id']], 'isVersion' => $aArgs['isVersion']]);
+            $document['fingerprint'] = $fingerprint;
+        }
+        if ($document['fingerprint'] != $fingerprint) {
+            return ['errors' => 'Fingerprints do not match'];
         }
 
         $fileContent = file_get_contents($pathToDocument);
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
-
 
         $encodedDocument = base64_encode($fileContent);
 
