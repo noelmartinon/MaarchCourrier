@@ -16,6 +16,7 @@
 namespace ExternalSignatoryBook\controllers;
 
 use Attachment\models\AttachmentModel;
+use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Entity\models\ListInstanceModel;
@@ -82,9 +83,9 @@ class IParapheurController
         ]);
 
         if (!empty($annexes['letterbox'][0]['docserver_id'])) {
-            $adrInfo        = AdrModel::getConvertedDocumentById(['resId' => $annexes['letterbox'][0]['res_id'], 'collId' => 'letterbox_coll', 'type' => 'PDF']);
-            $letterboxPath  = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
-            $annexes['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
+            $adrMainInfo = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resIdMaster'], 'collId' => 'letterbox_coll']);
+            $letterboxPath = DocserverModel::getByDocserverId(['docserverId' => $adrMainInfo['docserver_id'], 'select' => ['path_template']]);
+            $annexes['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
         }
 
         $attachments = AttachmentModel::get([
@@ -171,10 +172,13 @@ class IParapheurController
     public static function uploadFile($aArgs)
     {
         $dossierId = $aArgs['dossierId'];
-        $adrInfo   = AdrModel::getConvertedDocumentById(['resId' => $aArgs['resId'], 'collId' => $aArgs['collId'], 'type' => 'PDF']);
 
+        $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => $aArgs['collId']]);
+        if (empty($adrInfo['docserver_id']) || strtolower(pathinfo($adrInfo['filename'], PATHINFO_EXTENSION)) != 'pdf') {
+            return ['error' => 'Document ' . $aArgs['resIdMaster'] . ' is not converted in pdf'];
+        }
         $attachmentPath     = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
-        $attachmentFilePath = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
+        $attachmentFilePath = $attachmentPath['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
         $dossierTitre       = 'Projet courrier numéro ' . $aArgs['resId'];
 
         $mainResource = ResModel::getById(['resId' => $aArgs['resIdMaster'], 'select' => ['process_limit_date']]);
