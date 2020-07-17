@@ -367,7 +367,7 @@ class OnlyOfficeController
             'filetype'   => $docInfo['extension'],
             'key'        => CoreConfigModel::uniqueId(),
             'outputtype' => 'pdf',
-            'title'      => $docInfo['filename'] . 'pdf',
+            'title'      => $docInfo['filename'],
             'url'        => $docUrl
         ];
 
@@ -446,7 +446,9 @@ class OnlyOfficeController
             return ['errors' => 'Cannot save converted document'];
         }
 
-        $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o tmp.pdf {$filename} 2>&1; cp tmp.pdf {$filename}; rm tmp.pdf";
+
+        $tmpFilename = "/tmp/tmp_{$GLOBALS['id']}_" . rand() . ".pdf";
+        $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o {$tmpFilename} {$filename} 2>&1; mv {$tmpFilename} {$filename}";
         exec($command, $output, $return);
         if (!empty($output)) {
             return ['errors' => implode(",", $output)];
