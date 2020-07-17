@@ -109,9 +109,8 @@ class ConvertPdfScript
             $output = [];
             if (OnlyOfficeController::canConvert(['url' => $args['coreUrl']])) {
                 $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename, 'url' => $args['coreUrl'], 'userId' => $args['userId']]);
-                $converted = empty($converted['errors']);
 
-                if ($converted) {
+                if (empty($converted['errors'])) {
                     LogsController::add([
                         'isTech'    => true,
                         'moduleId'  => 'convert',
@@ -133,7 +132,7 @@ class ConvertPdfScript
                     ]);
                 }
             }
-            if (!$converted){
+            if (!empty($converted['errors'])){
                 ConvertPdfController::addBom($fullFilename);
                 $command = "timeout 30 unoconv -f pdf " . escapeshellarg($fullFilename);
                 exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
