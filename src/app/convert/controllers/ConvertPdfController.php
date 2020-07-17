@@ -25,6 +25,7 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\LogsController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
@@ -45,7 +46,26 @@ class ConvertPdfController
             if (OnlyOfficeController::canConvert(['url' => $url])) {
                 $converted = OnlyOfficeController::convert(['fullFilename' => $aArgs['fullFilename'], 'url' => $url, 'userId' => $GLOBALS['id']]);
                 if (empty($converted['errors'])) {
+                    LogsController::add([
+                        'isTech'    => true,
+                        'moduleId'  => 'convert',
+                        'level'     => 'DEBUG',
+                        'tableName' => '',
+                        'recordId'  => '',
+                        'eventType' => "Convert Pdf with Only Office success",
+                        'eventId'   => "document : {$aArgs['fullFilename']}"
+                    ]);
                     return ['output' => [], 'return' => 0];
+                } else {
+                    LogsController::add([
+                        'isTech'    => true,
+                        'moduleId'  => 'convert',
+                        'level'     => 'ERROR',
+                        'tableName' => '',
+                        'recordId'  => '',
+                        'eventType' => "Convert Pdf with Only Office failed",
+                        'eventId'   => "{$converted['errors']}, document : {$aArgs['fullFilename']}"
+                    ]);
                 }
             }
 

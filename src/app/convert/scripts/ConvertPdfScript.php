@@ -110,6 +110,29 @@ class ConvertPdfScript
             if (OnlyOfficeController::canConvert(['url' => $args['coreUrl']])) {
                 $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename, 'url' => $args['coreUrl'], 'userId' => $args['userId']]);
                 $converted = empty($converted['errors']);
+
+                if (empty($converted['errors'])) {
+                    LogsController::add([
+                        'isTech'    => true,
+                        'moduleId'  => 'convert',
+                        'level'     => 'DEBUG',
+                        'tableName' => '',
+                        'recordId'  => '',
+                        'eventType' => "Convert Pdf with Only Office success",
+                        'eventId'   => "document : {$fullFilename}"
+                    ]);
+                    return ['output' => [], 'return' => 0];
+                } else {
+                    LogsController::add([
+                        'isTech'    => true,
+                        'moduleId'  => 'convert',
+                        'level'     => 'ERROR',
+                        'tableName' => '',
+                        'recordId'  => '',
+                        'eventType' => "Convert Pdf with Only Office failed",
+                        'eventId'   => "{$converted['errors']}, document : {$fullFilename}"
+                    ]);
+                }
             }
             if (!$converted){
                 ConvertPdfController::addBom($fullFilename);
