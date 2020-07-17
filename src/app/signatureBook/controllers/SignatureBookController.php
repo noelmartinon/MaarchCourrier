@@ -252,6 +252,8 @@ class SignatureBookController
             $attachments[$key]['attachment_type'] = $attachmentTypes[$value['attachment_type']]['label'];
             $attachments[$key]['icon']            = $attachmentTypes[$value['attachment_type']]['icon'];
             $attachments[$key]['sign']            = $attachmentTypes[$value['attachment_type']]['sign'];
+            $attachments[$key]['signed']          = $value['status'] == 'SIGN';
+            $attachments[$key]['viewerId']        = $viewerId;
 
             if ($value['status'] == 'SIGN') {
                 $attachments[$key]['viewerLink'] = "../../rest/attachments/{$viewerId}/content?".rand();
