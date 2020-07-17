@@ -447,7 +447,7 @@ class OnlyOfficeController
         }
 
 
-        $tmpFilename = "/tmp/tmp_{$GLOBALS['id']}_" . rand() . ".pdf";
+        $tmpFilename =  $tmpPath . "tmp_{$GLOBALS['id']}_" . rand() . ".pdf";
         $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o {$tmpFilename} {$filename} 2>&1; mv {$tmpFilename} {$filename}";
         exec($command, $output, $return);
         if (!empty($output)) {
