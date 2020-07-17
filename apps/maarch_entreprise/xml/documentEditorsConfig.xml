@@ -9,6 +9,7 @@
         <server_port>80</server_port>
         <server_ssl>false</server_ssl>
         <server_secret></server_secret>
+        <server_authorization_header>Authorization</server_authorization_header>
     </onlyoffice>
     <collaboraonline>
         <enabled>false</enabled>

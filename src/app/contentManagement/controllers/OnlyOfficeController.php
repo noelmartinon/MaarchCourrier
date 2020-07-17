@@ -362,22 +362,73 @@ class OnlyOfficeController
 
         $docUrl = $args['url'] . 'rest/onlyOffice/content?token=' . $jwt;
 
+        $body = [
+            'async'      => false,
+            'filetype'   => $docInfo['extension'],
+            'key'        => CoreConfigModel::uniqueId(),
+            'outputtype' => 'pdf',
+            'title'      => $docInfo['filename'] . 'pdf',
+            'url'        => $docUrl
+        ];
+
+        $serverSecret = (string)$loadedXml->onlyoffice->server_secret;
+        $serverAuthorizationHeader = (string)$loadedXml->onlyoffice->server_authorization_header;
+        $serverSsl = filter_var((string)$loadedXml->onlyoffice->server_ssl, FILTER_VALIDATE_BOOLEAN);
+
+        $uri = explode("/", $uri);
+        $domain = $uri[0];
+        $path = array_slice($uri, 1);
+        $path = implode("/", $path);
+
+        if (!empty($serverSsl)) {
+            $convertUrl = 'https://';
+        } else {
+            $convertUrl = 'http://';
+        }
+
+        $convertUrl .= $domain;
+
+        if ($port != 80) {
+            $convertUrl .= ":{$port}";
+        }
+
+        if (!empty($path)) {
+            $convertUrl .= '/' . $path;
+        }
+
+        if (substr($convertUrl, -1) != '/') {
+            $convertUrl .= '/';
+        }
+        $convertUrl .= 'ConvertService.ashx';
+
+        $headers = [
+            'Accept: application/json',
+            'Content-Type: application/json'
+        ];
+
+        if (!empty($serverSecret)) {
+            $header = [
+                "alg" => "HS256",
+                "typ" => "JWT"
+            ];
+
+            $tokenOnlyOffice = JWT::encode($body, $serverSecret, 'HS256', null, $header);
+
+            $authorizationHeader = empty($serverAuthorizationHeader) ? 'Authorization' : $serverAuthorizationHeader;
+            $authorizationHeader .= ': Bearer ' . $tokenOnlyOffice;
+
+            $headers[] =  $authorizationHeader;
+        }
+
         $response = CurlModel::execSimple([
-            'url'     => $uri . ':' . $port . '/ConvertService.ashx',
-            'headers' => ['accept: application/json'],
+            'url'     => $convertUrl,
+            'headers' => $headers,
             'method'  => 'POST',
-            'body'    => json_encode([
-                'async'      => false,
-                'filetype'   => $docInfo['extension'],
-                'key'        => CoreConfigModel::uniqueId(),
-                'outputtype' => 'pdf',
-                'title'      => $docInfo['filename'] . 'pdf',
-                'url'        => $docUrl
-            ])
+            'body'    => json_encode($body)
         ]);
 
         if ($response['code'] != 200) {
-            return ['errors' => 'OnlyOffice conversion failed '];
+            return ['errors' => 'OnlyOffice conversion failed'];
         }
         if (!empty($response['response']['error'])) {
             return ['errors' => 'OnlyOffice conversion failed : ' . $response['response']['error']];
