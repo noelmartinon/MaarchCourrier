@@ -111,7 +111,7 @@ class ConvertPdfScript
                 $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename, 'url' => $args['coreUrl'], 'userId' => $args['userId']]);
                 $converted = empty($converted['errors']);
 
-                if (empty($converted['errors'])) {
+                if ($converted) {
                     LogsController::add([
                         'isTech'    => true,
                         'moduleId'  => 'convert',
@@ -121,7 +121,6 @@ class ConvertPdfScript
                         'eventType' => "Convert Pdf with Only Office success",
                         'eventId'   => "document : {$fullFilename}"
                     ]);
-                    return ['output' => [], 'return' => 0];
                 } else {
                     LogsController::add([
                         'isTech'    => true,
