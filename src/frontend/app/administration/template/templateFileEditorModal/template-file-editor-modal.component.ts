@@ -19,7 +19,7 @@ export class TemplateFileEditorModalComponent implements OnInit {
     editorType: any = null;
     documentIsModified: boolean = false;
 
-    @ViewChild('onlyofficeViewer', { static: true }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
     @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     constructor(public dialogRef: MatDialogRef<TemplateFileEditorModalComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
