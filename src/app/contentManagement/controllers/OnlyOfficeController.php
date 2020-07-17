@@ -446,6 +446,12 @@ class OnlyOfficeController
             return ['errors' => 'Cannot save converted document'];
         }
 
+        $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o tmp.pdf {$filename} 2>&1; cp tmp.pdf {$filename}; rm tmp.pdf";
+        exec($command, $output, $return);
+        if (!empty($output)) {
+            return ['errors' => implode(",", $output)];
+        }
+
         return true;
     }
 
