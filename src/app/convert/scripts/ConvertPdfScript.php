@@ -131,8 +131,9 @@ class ConvertPdfScript
                         'eventId'   => "{$converted['errors']}, document : {$fullFilename}"
                     ]);
                 }
+                $converted = empty($converted['errors']);
             }
-            if (!empty($converted['errors'])){
+            if (!$converted){
                 ConvertPdfController::addBom($fullFilename);
                 $command = "timeout 30 unoconv -f pdf " . escapeshellarg($fullFilename);
                 exec('export HOME=' . $tmpPath . ' && '.$command, $output, $return);
