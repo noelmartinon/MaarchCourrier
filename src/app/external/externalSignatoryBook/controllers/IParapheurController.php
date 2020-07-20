@@ -112,7 +112,7 @@ class IParapheurController
             $collId    = 'attachments_coll';
             $dossierId = $resId . '_' . rand(0001, 9999);
 
-            $curlReturn = IParapheurController::uploadFile([
+            $response = IParapheurController::uploadFile([
                 'resId'        => $resId,
                 'collId'       => $collId,
                 'resIdMaster'  => $aArgs['resIdMaster'],
@@ -122,13 +122,8 @@ class IParapheurController
                 'dossierId'    => $dossierId
             ]);
 
-            if (!empty($curlReturn['error'])) {
-                return ['error' => $curlReturn['error']];
-            }
-            $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->CreerDossierResponse[0];
-
-            if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode'] || $curlReturn['infos']['http_code'] >= 500) {
-                return ['error' => '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
+            if (!empty($response['error'])) {
+                return $response;
             } else {
                 $attachmentToFreeze[$collId][$resId] = $dossierId;
             }
@@ -144,7 +139,7 @@ class IParapheurController
                 $dossierId = $resId . '_' . rand(0001, 9999);
                 unset($annexes['letterbox']);
     
-                $curlReturn = IParapheurController::uploadFile([
+                $response = IParapheurController::uploadFile([
                     'resId'        => $resId,
                     'collId'       => $collId,
                     'resIdMaster'  => $aArgs['resIdMaster'],
@@ -154,13 +149,8 @@ class IParapheurController
                     'dossierId'    => $dossierId
                 ]);
     
-                if (!empty($curlReturn['error'])) {
-                    return ['error' => $curlReturn['error']];
-                }
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->CreerDossierResponse[0];
-    
-                if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode'] || $curlReturn['infos']['http_code'] >= 500) {
-                    return ['error' => '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
+                if (!empty($response['error'])) {
+                    return $response;
                 } else {
                     $attachmentToFreeze[$collId][$resId] = $dossierId;
                 }
@@ -239,7 +229,17 @@ class IParapheurController
 
         $curlReturn = IParapheurController::returnCurl($xmlPostString, $aArgs['config']);
 
-        return $curlReturn;
+        if (!empty($curlReturn['error'])) {
+            return ['error' => $curlReturn['error']];
+        }
+        $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->CreerDossierResponse[0];
+
+        if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode'] || $curlReturn['infos']['http_code'] >= 500) {
+            return ['error' => '[' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
+        }
+
+        IParapheurController::processVisaWorkflow(['res_id_master' => $aArgs['resIdMaster'], 'processSignatory' => false]);
+        return ['success' => $dossierId];
     }
 
     public static function download($aArgs)
@@ -317,7 +317,7 @@ class IParapheurController
                             $aArgs['idsToRetrieve'][$version][$resId]->encodedFile = $response['b64FileContent'];
                             $aArgs['idsToRetrieve'][$version][$resId]->noteContent = $noteContent;
                             if ($status == $aArgs['config']['data']['signState']) {
-                                IParapheurController::processVisaWorkflow(['res_id_master' => $value->res_id_master, 'res_id' => $value->res_id]);
+                                IParapheurController::processVisaWorkflow(['res_id_master' => $value->res_id_master, 'res_id' => $value->res_id, 'processSignatory' => true]);
                                 break;
                             }
                         } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
@@ -343,7 +343,7 @@ class IParapheurController
         $resIdMaster = $aArgs['res_id_master'] ?? $aArgs['res_id'];
 
         $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$resIdMaster, 'FRZ']]);
-        if (count($attachments) < 2) {
+        if ((count($attachments) < 2 && $aArgs['processSignatory']) || !$aArgs['processSignatory']) {
             $visaWorkflow = ListInstanceModel::get([
                 'select'  => ['listinstance_id', 'requested_signature'],
                 'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
@@ -353,12 +353,14 @@ class IParapheurController
     
             if (!empty($visaWorkflow)) {
                 foreach ($visaWorkflow as $listInstance) {
-                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
-                    // Stop to the first signatory user
                     if ($listInstance['requested_signature']) {
-                        ListInstanceModel::update(['set' => ['signatory' => 'true'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        // Stop to the first signatory user
+                        if ($aArgs['processSignatory']) {
+                            ListInstanceModel::update(['set' => ['signatory' => 'true', 'process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        }
                         break;
                     }
+                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
                 }
             }
         }
