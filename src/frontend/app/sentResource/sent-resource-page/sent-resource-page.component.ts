@@ -494,7 +494,7 @@ export class SentResourcePageComponent implements OnInit {
                         } else {
                             this.emailAttachTool[element].list = data[element].map((item: any) => {
                                 if (item.attachInMail) {
-                                    this.toggleAttachMail(item, element, 'original');
+                                    this.toggleAttachMail(item, element, item.status === 'SIGN' ? 'pdf' : 'original');
                                 }
                                 return {
                                     ...item,
@@ -705,7 +705,7 @@ export class SentResourcePageComponent implements OnInit {
         }
     }
 
-    toggleAttachMail(item: any, type: string, mode: string) {
+    toggleAttachMail(item: any, type: string, mode: 'original' | 'pdf') {
         if (type === 'document') {
             if (this.emailAttach.document.isLinked === false) {
                 this.emailAttach.document.isLinked = true;
