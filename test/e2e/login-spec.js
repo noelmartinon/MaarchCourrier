@@ -16,6 +16,13 @@ describe('Login to app', function() {
         browser.takeScreenshot().then(function (png) {
             ScreenshotReporter(png, 'test/e2e/screenshots/login_to_app_' + browser.browserName);
         });
+        var alertComponent = element(by.id('alertComponentClose'));
+        alertComponent.isPresent().then(function(result) {
+            if (result) {
+                element(by.id('alertComponentClose')).click();
+                browser.sleep(500);
+            }
+        });
         element(by.id('login')).sendKeys('bblier');
         browser.sleep(500);
         element(by.id('password')).sendKeys('maarch');

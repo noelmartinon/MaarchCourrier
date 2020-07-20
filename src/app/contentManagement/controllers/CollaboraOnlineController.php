@@ -232,6 +232,10 @@ class CollaboraOnlineController
         $tmpPath = CoreConfigModel::getTmpPath();
         $pathToDocument = $tmpPath . $filename;
 
+        if (!file_exists($pathToDocument)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
+        }
+
         if ($tokenCheckResult['mode'] == 'creation' && ($tokenCheckResult['type'] == 'resource' || $tokenCheckResult['type'] == 'attachment')) {
             $dataToMerge = ['userId' => $GLOBALS['id']];
             if (!empty($body['data']) && is_array($body['data'])) {
@@ -252,9 +256,42 @@ class CollaboraOnlineController
             $content = base64_encode($fileContent);
         }
 
-        unlink($pathToDocument);
-
         return $response->withJson(['content' => $content, 'format' => $extension]);
+    }
+
+    public function deleteTmpFile(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['token'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query token is empty or not a string']);
+        }
+
+        $tokenCheckResult = CollaboraOnlineController::checkToken(['token' => $queryParams['token']]);
+        if (!empty($tokenCheckResult['errors'])) {
+            return $response->withStatus($tokenCheckResult['code'])->withJson(['errors' => $tokenCheckResult['errors']]);
+        }
+
+        $document = CollaboraOnlineController::getDocument([
+            'id'     => $tokenCheckResult['resId'],
+            'type'   => $tokenCheckResult['type'],
+            'mode'   => $tokenCheckResult['mode'],
+            'format' => $tokenCheckResult['format']
+        ]);
+        if (!empty($document['errors'])) {
+            return $response->withStatus($document['code'])->withJson(['errors' => $document['errors']]);
+        }
+
+        $extension = pathinfo($document['filename'], PATHINFO_EXTENSION);
+        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$tokenCheckResult['mode']}_{$tokenCheckResult['resId']}.{$extension}";
+        $tmpPath = CoreConfigModel::getTmpPath();
+        $pathToDocument = $tmpPath . $filename;
+
+        if (file_exists($pathToDocument)) {
+            unlink($pathToDocument);
+        }
+
+        return $response->withStatus(204);
     }
 
     public static function isAvailable(Request $request, Response $response)
@@ -301,12 +338,16 @@ class CollaboraOnlineController
         if (!empty($body['format']) && !Validator::stringType()->validate($body['format'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body format is not a string']);
         }
+        if (!empty($body['path']) && !Validator::stringType()->validate($body['path'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body path is not a string']);
+        }
 
         $document = CollaboraOnlineController::getDocument([
             'id'     => $body['resId'],
             'type'   => $body['type'],
             'mode'   => $body['mode'],
-            'format' => $body['format']
+            'format' => $body['format'],
+            'path'   => $body['path']
         ]);
 
         if (!empty($document['errors'])) {
@@ -444,7 +485,7 @@ class CollaboraOnlineController
     private static function getDocument(array $args)
     {
         ValidatorModel::notEmpty($args, ['id', 'type', 'mode']);
-        ValidatorModel::stringType($args, ['type', 'mode', 'format']);
+        ValidatorModel::stringType($args, ['type', 'mode', 'format', 'path']);
         ValidatorModel::intVal($args, ['id']);
 
         if ($args['mode'] == 'creation' && ($args['type'] == 'resource' || $args['type'] == 'attachment')) {
@@ -546,6 +587,47 @@ class CollaboraOnlineController
             $document['filename'] = "collabora_encoded_{$GLOBALS['id']}_{$args['id']}.{$args['format']}";
             $document['docserver_id'] = '';
             $document['path'] = CoreConfigModel::getTmpPath();
+
+            $document['modification_date'] = new \DateTime('now');
+            $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
+        } else if ($args['type'] == 'template' && $args['mode'] == 'creation') {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
+                return ['code' => 403, 'errors' => 'Service forbidden'];
+            }
+
+            $document['filename'] = "collabora_template_{$GLOBALS['id']}_{$args['id']}.{$args['format']}";
+            $document['docserver_id'] = '';
+            $document['path'] = CoreConfigModel::getTmpPath();
+
+            if (!file_exists($document['path'] . $document['filename'])) {
+                if (empty($args['path'])) {
+                    return ['code' => 400, 'errors' => 'Argument path is missing'];
+                }
+
+                $customId = CoreConfigModel::getCustomId();
+                if (!empty($customId) && is_dir("custom/{$customId}/modules/templates/templates/styles/")) {
+                    $stylesPath = "custom/{$customId}/modules/templates/templates/styles/";
+                } else {
+                    $stylesPath = 'modules/templates/templates/styles/';
+                }
+                if (strpos($args['path'], $stylesPath) !== 0 || substr_count($args['path'], '.') != 1) {
+                    return ['code' => 400, 'errors' => 'Template path is not valid'];
+                }
+
+                if (!file_exists($args['path'])) {
+                    return ['code' => 400, 'errors' => 'Document does not exists'];
+                }
+
+                $fileContent = file_get_contents($args['path']);
+                if ($fileContent === false) {
+                    return ['code' => 400, 'errors' => 'Document does not exists'];
+                }
+
+                $result = file_put_contents($document['path'] . $document['filename'], $fileContent);
+                if ($result === false) {
+                    return ['code' => 400, 'errors' => 'Document does not exists'];
+                }
+            }
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);

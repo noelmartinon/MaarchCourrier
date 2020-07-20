@@ -769,7 +769,7 @@ class ResControllerTest extends TestCase
         $response     = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => 'wrong format']);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Route resId is not an integer',  $responseBody['errors']);
+        $this->assertSame('Route resId is not an integer', $responseBody['errors']);
 
         // Errors from ResourceControlControllers->controlUpdateResource
         $body = [];
@@ -1243,7 +1243,7 @@ class ResControllerTest extends TestCase
         $response     = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
         $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Service forbidden',  $responseBody['errors']);
+        $this->assertSame('Service forbidden', $responseBody['errors']);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -1358,6 +1358,7 @@ class ResControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $response     = $resController->getThumbnailContent($request, new \Slim\Http\Response(), ['resId' => self::$id]);
+
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
 
@@ -2155,37 +2156,37 @@ class ResControllerTest extends TestCase
     {
         $size = '1K';
         $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
-        $this->assertSame(1024, $byteSize );
+        $this->assertSame(1024, $byteSize);
 
         $size = '1M';
         $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
-        $this->assertSame(1048576, $byteSize );
+        $this->assertSame(1048576, $byteSize);
 
         $size = '1G';
         $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
-        $this->assertSame(1073741824, $byteSize );
+        $this->assertSame(1073741824, $byteSize);
 
         $size = 1;
         $byteSize = \Resource\controllers\StoreController::getBytesSizeFromPhpIni(['size' => $size]);
-        $this->assertSame(1, $byteSize );
+        $this->assertSame(1, $byteSize);
     }
 
     public function testGetFormattedSizeFromBytes()
     {
         $size = 1073741824 + 1;
         $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
-        $this->assertSame(round($size / 1073741824) . ' Go', $formatted );
+        $this->assertSame(round($size / 1073741824) . ' Go', $formatted);
 
         $size = 1048576 + 1;
         $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
-        $this->assertSame(round($size / 1048576) . ' Mo', $formatted );
+        $this->assertSame(round($size / 1048576) . ' Mo', $formatted);
 
         $size = 1024 + 1;
         $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
-        $this->assertSame(round($size / 1024) . ' Ko', $formatted );
+        $this->assertSame(round($size / 1024) . ' Ko', $formatted);
 
         $size = 1;
         $formatted = \Resource\controllers\StoreController::getFormattedSizeFromBytes(['size' => $size]);
-        $this->assertSame('1 o', $formatted );
+        $this->assertSame('1 o', $formatted);
     }
 }

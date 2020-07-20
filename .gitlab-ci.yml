@@ -40,6 +40,7 @@ before_script:
   - sed 's/127.0.0.1/postgres/' apps/maarch_entreprise/xml/config.json.default > apps/maarch_entreprise/xml/config.json
   - cp modules/visa/xml/remoteSignatoryBooks.xml.default modules/visa/xml/remoteSignatoryBooks.xml
   - apt-get install -yqq openjdk-11-jdk > /dev/null
+  - sed -i 's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
 
 job_e2e:
  image: php:7.4-apache

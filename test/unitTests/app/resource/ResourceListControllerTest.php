@@ -393,15 +393,7 @@ class ResourceListControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
         $response     = $resListController->lock($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2 ]);
-        $this->assertSame(200, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertSame(0, $responseBody['countLockedResources']);
-        $this->assertIsArray($responseBody['lockers']);
-        $this->assertEmpty($responseBody['lockers']);
-        $this->assertIsArray($responseBody['resourcesToProcess']);
-        $this->assertNotEmpty($responseBody['resourcesToProcess']);
-        $this->assertSame($GLOBALS['resources'][1], $responseBody['resourcesToProcess'][0]);
+        $this->assertSame(204, $response->getStatusCode());
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

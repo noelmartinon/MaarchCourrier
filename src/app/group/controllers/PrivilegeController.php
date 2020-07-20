@@ -275,7 +275,7 @@ class PrivilegeController
             return ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $args['userId']]);
         }
 
-        $canUpdateInProcess = PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdate' => true]);
+        $canUpdateInProcess = PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdateData' => true]);
         $canUpdateInSignatureBook = SignatureBookController::isResourceInSignatureBook(['userId' => $args['userId'], 'resId' => $args['resId'], 'canUpdateDocument' => true]);
 
         return $canUpdateInProcess || $canUpdateInSignatureBook;

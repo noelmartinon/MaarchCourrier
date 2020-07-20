@@ -137,8 +137,15 @@ foreach ($customFields as $customField) {
         $arr_tmp = array();
         array_push($arr_tmp, array('VALUE' => '', 'LABEL' => _CHOOSE.'...'));
         $customValues = json_decode($customField['values'], true);
-        foreach ($customValues as $customValue) {
-            array_push($arr_tmp, array('VALUE' => $customValue, 'LABEL' => $customValue));
+        if (!empty($customValues['table'])) {
+            $customValues = \CustomField\models\CustomFieldModel::getValuesSQL($customValues);
+            foreach ($customValues as $customInfo) {
+                array_push($arr_tmp, array('VALUE' => $customInfo['key'], 'LABEL' => $customInfo['label']));
+            }
+        } else {
+            foreach ($customValues as $customValue) {
+                array_push($arr_tmp, array('VALUE' => $customValue, 'LABEL' => $customValue));
+            }
         }
         $arr_tmp2 = array('label' => $customField['label'], 'type' => 'select_simple', 'param' => array('field_label' => $customField['label'], 'default_label' => '', 'options' => $arr_tmp));
     } elseif ($customField['type'] == 'date') {

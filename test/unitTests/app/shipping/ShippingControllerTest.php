@@ -391,8 +391,7 @@ class ShippingTemplateControllerTest extends TestCase
             'userId'            => $GLOBALS['id'],
             'documentId'        => self::$resId,
             'documentType'      => 'resource',
-            'options'           => json_encode(
-                [
+            'options'           => json_encode([
                 'shaping'    => ['color', 'duplexPrinting', 'addressPage'],
                 'sendMode'   => 'fast'
             ]),

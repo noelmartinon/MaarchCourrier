@@ -208,6 +208,8 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'se
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'avis_documents');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'export_seda_view');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'include_folders_and_followed_resources_perimeter');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('WEBSERVICE', 'include_folders_and_followed_resources_perimeter');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('MAARCHTOGEC', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('MAARCHTOGEC', 'manage_numeric_package');
 
 -- Create DOCTYPES

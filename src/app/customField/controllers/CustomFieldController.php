@@ -44,7 +44,11 @@ class CustomFieldController
             if (empty($queryParams['admin']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_custom_fields', 'userId' => $GLOBALS['id']])) {
                 if (!empty($customFields[$key]['values']['table'])) {
                     $customFields[$key]['values'] = CustomFieldModel::getValuesSQL($customFields[$key]['values']);
-                    if ($customField['type'] == 'string') {
+                    if (in_array($customField['type'], ['select', 'radio', 'checkbox'])) {
+                        foreach ($customFields[$key]['values'] as $iKey => $sValue) {
+                            $customFields[$key]['values'][$iKey]['key'] = (string)$sValue['key'];
+                        }
+                    } elseif ($customField['type'] == 'string') {
                         $customFields[$key]['values'][0]['key'] = (string)$customFields[$key]['values'][0]['key'];
                     } elseif ($customField['type'] == 'integer') {
                         $customFields[$key]['values'][0]['key'] = (int)$customFields[$key]['values'][0]['key'];

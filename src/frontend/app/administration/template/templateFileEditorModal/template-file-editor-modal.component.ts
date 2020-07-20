@@ -17,14 +17,14 @@ export class TemplateFileEditorModalComponent implements OnInit {
     editorOptions: any = null;
     file: any = null;
     editorType: any = null;
+    documentIsModified: boolean = false;
 
-    @ViewChild('onlyofficeViewer', { static: true }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
     @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     constructor(public dialogRef: MatDialogRef<TemplateFileEditorModalComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void {
-        console.log(this.data);
         this.editorOptions = this.data.editorOptions;
         this.file = this.data.file;
         this.editorType = this.data.editorType;

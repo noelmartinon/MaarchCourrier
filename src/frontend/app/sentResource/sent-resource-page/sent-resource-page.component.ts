@@ -440,7 +440,7 @@ export class SentResourcePageComponent implements OnInit {
     setDefaultInfo() {
         this.emailsubject = `[${this.resourceData.chrono}] ${this.resourceData.subject}`;
         this.emailsubject = this.emailsubject.substring(0, 70);
-        this.currentSender = this.availableSenders[0];
+        this.currentSender = this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id).length > 0 ? this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id)[0] : this.availableSenders[0];
         if (!this.functions.empty(this.resourceData.senders)) {
             this.resourceData.senders.forEach((sender: any) => {
                 this.setSender(sender.id);
@@ -496,7 +496,7 @@ export class SentResourcePageComponent implements OnInit {
                         } else {
                             this.emailAttachTool[element].list = data[element].map((item: any) => {
                                 if (item.attachInMail) {
-                                    this.toggleAttachMail(item, element, 'original');
+                                    this.toggleAttachMail(item, element, item.status === 'SIGN' ? 'pdf' : 'original');
                                 }
                                 return {
                                     ...item,
@@ -707,7 +707,7 @@ export class SentResourcePageComponent implements OnInit {
         }
     }
 
-    toggleAttachMail(item: any, type: string, mode: string) {
+    toggleAttachMail(item: any, type: string, mode: 'original' | 'pdf') {
         if (type === 'document') {
             if (this.emailAttach.document.isLinked === false) {
                 this.emailAttach.document.isLinked = true;

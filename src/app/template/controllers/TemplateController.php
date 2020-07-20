@@ -28,7 +28,6 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use Template\models\TemplateAssociationModel;
 use Template\models\TemplateModel;
@@ -46,7 +45,8 @@ class TemplateController
         'application/vnd.openxmlformats-officedocument.presentationml‌.slideshow',
         'application/vnd.oasis.opendocument.text',
         'application/vnd.oasis.opendocument.presentation',
-        'application/vnd.oasis.opendocument.spreadsheet'
+        'application/vnd.oasis.opendocument.spreadsheet',
+        'application/octet-stream'
     ];
 
     public function get(Request $request, Response $response)

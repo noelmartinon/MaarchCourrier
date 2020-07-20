@@ -4,7 +4,7 @@ import { LANG } from '../translate.component';
 import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { AppService } from '../../service/app.service';
-import { tap, catchError, filter, map, exhaustMap } from 'rxjs/operators';
+import {tap, catchError, filter, map, exhaustMap, take} from 'rxjs/operators';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AlertComponent } from '../../plugins/modal/alert.component';
@@ -493,6 +493,13 @@ export class DocumentViewerComponent implements OnInit {
                 resolve(this.getBase64Document(this.file.src));
             } else {
                 this.getFile().pipe(
+                    take(1),
+                    tap((data: any) => {
+                        if (this.editor.mode === 'collaboraOnline' && this.collaboraOnlineViewer !== undefined) {
+                            this.collaboraOnlineViewer.isSaving = false;
+                        }
+                        return data;
+                    }),
                     exhaustMap((data: any) => this.http.post(`../rest/convertedFile`, { name: `${data.name}.${data.format}`, base64: `${data.content}` })),
                     tap((data: any) => {
                         resolve(data.encodedResource);

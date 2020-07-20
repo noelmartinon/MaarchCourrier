@@ -29,7 +29,7 @@ export class UseradminComponent implements OnInit {
         const valEmail: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/), Validators.required];
 
         this.stepFormGroup = this._formBuilder.group({
-            login: [{ value: 'superadmin', disabled: true }, valLogin],
+            login: ['superadmin', valLogin],
             password: ['', Validators.required],
             passwordConfirm: ['', Validators.required],
             email: ['dev@maarch.org', valEmail],

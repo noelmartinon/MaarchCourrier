@@ -16,6 +16,7 @@
 namespace ExternalSignatoryBook\controllers;
 
 use Attachment\models\AttachmentModel;
+use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -143,8 +144,9 @@ class FastParapheurController
         ]);
 
         if (!empty($annexes['letterbox'][0]['docserver_id'])) {
-            $letterboxPath = DocserverModel::getByDocserverId(['docserverId' => $annexes['letterbox'][0]['docserver_id'], 'select' => ['path_template']]);
-            $annexes['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $annexes['letterbox'][0]['path']) . $annexes['letterbox'][0]['filename'];
+            $adrMainInfo = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resIdMaster'], 'collId' => 'letterbox_coll']);
+            $letterboxPath = DocserverModel::getByDocserverId(['docserverId' => $adrMainInfo['docserver_id'], 'select' => ['path_template']]);
+            $annexes['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
         }
 
         $attachments = AttachmentModel::get([
@@ -241,9 +243,12 @@ class FastParapheurController
 
     public static function uploadFile($aArgs)
     {
-        $adrInfo = AdrModel::getConvertedDocumentById(['resId' => $aArgs['resId'], 'collId' => $aArgs['collId'], 'type' => 'PDF']);
+        $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => $aArgs['collId']]);
+        if (empty($adrInfo['docserver_id']) || strtolower(pathinfo($adrInfo['filename'], PATHINFO_EXTENSION)) != 'pdf') {
+            return ['error' => 'Document ' . $aArgs['resIdMaster'] . ' is not converted in pdf'];
+        }
         $attachmentPath     =  DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
-        $attachmentFilePath = $attachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];
+        $attachmentFilePath = $attachmentPath['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
         $attachmentFileName = 'projet_courrier_' . $aArgs['resIdMaster'] . '_' . rand(0001, 9999) . '.pdf';
 
         $zip         = new \ZipArchive();

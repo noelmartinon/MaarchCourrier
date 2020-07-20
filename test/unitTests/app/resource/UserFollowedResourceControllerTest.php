@@ -149,8 +149,7 @@ class UserFollowedResourceControllerTest extends TestCase
         $response     = $usersFollowedResourcesController->unFollow($fullRequest, new \Slim\Http\Response());
         $responseBody = json_decode((string)$response->getBody());
 
-        $this->assertSame(403, $response->getStatusCode());
-        $this->assertSame('Document out of perimeter', $responseBody->errors);
+        $this->assertSame(0, $responseBody->unFollowed);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

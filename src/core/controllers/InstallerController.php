@@ -103,7 +103,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is empty or not a string']);
         } elseif (!Validator::length(1, 50)->validate($queryParams['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name length is not valid']);
-        } elseif (strpbrk($queryParams['name'], '";') !== false) {
+        } elseif (strpbrk($queryParams['name'], '"; ') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is not valid']);
         }
 
@@ -286,7 +286,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body name is empty or not a string']);
         } elseif (!Validator::length(1, 50)->validate($body['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name length is not valid']);
-        } elseif (strpbrk($body['name'], '";') !== false) {
+        } elseif (strpbrk($body['name'], '"; ') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name is not valid']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
@@ -565,6 +565,19 @@ class InstallerController
         unlink("custom/{$body['customId']}/initializing.lck");
 
         $url = UrlController::getCoreUrl();
+
+        $explodedUrl = explode('/', rtrim($url, '/'));
+        $lastPart = $explodedUrl[count($explodedUrl) - 1];
+        $jsonFile = file_get_contents('custom/custom.json');
+        if (!empty($jsonFile)) {
+            $jsonFile = json_decode($jsonFile, true);
+            foreach ($jsonFile as $value) {
+                if (!empty($value['path']) && $value['path'] == $lastPart) {
+                    $url = str_replace("/{$lastPart}", '', $url);
+                }
+            }
+        }
+
         $url .= $body['customId'] . '/dist/index.html';
 
         return $response->withJson(['url' => $url]);

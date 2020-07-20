@@ -517,7 +517,6 @@ class ResourceListController
             return $response->withStatus(403)->withJson(['errors' => 'Resources out of perimeter']);
         }
 
-        $locked = 0;
         $resourcesToLock = [];
         $lockersId = [];
         foreach ($resources as $resource) {
@@ -534,7 +533,6 @@ class ResourceListController
                 $resourcesToLock[] = $resource['res_id'];
             } else {
                 $lockersId[] = $resource['locker_user_id'];
-                ++$locked;
             }
         }
 
@@ -546,15 +544,7 @@ class ResourceListController
             ]);
         }
 
-        $lockers = [];
-        if (!empty($lockersId)) {
-            $lockersId = array_unique($lockersId);
-            foreach ($lockersId as $lockerId) {
-                $lockers[] = UserModel::getLabelledUserById(['id' => $lockerId]);
-            }
-        }
-
-        return $response->withJson(['countLockedResources' => $locked, 'lockers' => $lockers, 'resourcesToProcess' => $resourcesToLock]);
+        return $response->withStatus(204);
     }
 
     public function unlock(Request $request, Response $response, array $aArgs)
