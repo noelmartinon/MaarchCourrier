@@ -14,7 +14,7 @@ foreach ($customs as $custom) {
     $workingDays = 1;
     $xmlfile = null;
     $path = "custom/{$custom}/apps/maarch_entreprise/xml/features.xml";
-    if (file_exists($path)) {
+    if (is_file($path)) {
         $xmlfile = simplexml_load_file($path);
 
         if ($xmlfile) {
@@ -35,6 +35,9 @@ foreach ($customs as $custom) {
             $migrated++;
         }
     }
+
+    \SrcCore\models\DatabasePDO::reset();
+    new \SrcCore\models\DatabasePDO(['customId' => $custom]);
 
     \Parameter\models\ParameterModel::delete(['id' => 'workingDays']);
     \Parameter\models\ParameterModel::create([
