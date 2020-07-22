@@ -186,7 +186,7 @@
                                     <i class="fas fa-check fieldFull" *ngIf="!adminMode && arrFormControl['diffusionList'].valid && !isEmptyField(field)"></i>
                                 </div>
                             </div>
-                            <app-diffusions-list #appDiffusionsList [resId]="resId" [entityId]="arrFormControl[field.identifier].value" [diffFormControl]="arrFormControl['diffusionList']" [allowedEntities]="field.allowedEntities" [target]="'indexation'" (triggerEvent)="changeDestination($event,field.allowedEntities)">
+                            <app-diffusions-list #appDiffusionsList [resId]="resId" [entityId]="arrFormControl[field.identifier].value" [diffFormControl]="arrFormControl['diffusionList']" [allowedEntities]="field.allowedEntities" [target]="'indexation'" [categoryId]="currentCategory" (triggerEvent)="changeDestination($event,field.allowedEntities)">
                             </app-diffusions-list>
                             <mat-divider></mat-divider>
                         </div>
