@@ -824,11 +824,9 @@ class TemplateControllerTest extends TestCase
         $this->assertSame("success", $responseBody->success);
 
         //Delete entity
-        \SrcCore\models\DatabaseModel::delete([
-            'table' => 'users_entities',
-            'where' => ['user_id = ?', 'entity_id = ?'],
-            'data'  => [19, 'TST_AR']
-        ]);
+        \User\models\UserEntityModel::deleteUserEntity(['id' => $GLOBALS['id'], 'entityId' => 'TST_AR']);
+        \User\models\UserEntityModel::deleteUserEntity(['id' => 19, 'entityId' => 'TST_AR']);
+
         $entityController = new \Entity\controllers\EntityController();
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'DELETE']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);

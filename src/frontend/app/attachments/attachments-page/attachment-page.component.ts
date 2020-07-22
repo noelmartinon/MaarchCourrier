@@ -99,7 +99,9 @@ export class AttachmentPageComponent implements OnInit {
                 tap((data: any) => {
                     let contact: any = null;
 
-                    if ((this.privilegeService.hasCurrentUserPrivilege('manage_attachments') || this.headerService.user.id === data.typist) && data.status !== 'SIGN' && data.status !== 'FRZ') {
+                    if (!this.functions.empty(this.data.editMode)) {
+                        this.editMode = this.data.editMode;
+                    } else if ((this.privilegeService.hasCurrentUserPrivilege('manage_attachments') || this.headerService.user.id === data.typist) && data.status !== 'SIGN' && data.status !== 'FRZ') {
                         this.editMode = true;
                     }
 

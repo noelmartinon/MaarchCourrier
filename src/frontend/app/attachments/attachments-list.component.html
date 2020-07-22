@@ -22,7 +22,7 @@
             <div class="layout" *ngIf="attachment.hideMainInfo" [@myAnimation] (click)="showAttachment(attachment)">
                 <button mat-raised-button color="primary"
                     (click)="$event.stopPropagation();showAttachment(attachment)">{{lang.viewResource}}</button>
-                <button mat-raised-button color="warn" *ngIf="attachment.status!=='SIGN' && attachment.status!=='FRZ'"
+                <button mat-raised-button color="warn" *ngIf="attachment.status!=='SIGN' && attachment.status!=='FRZ' && canModify"
                     (click)="$event.stopPropagation();deleteAttachment(attachment)"
                     [disabled]="!attachment.canDelete">{{lang.deleteResource}}</button>
             </div>

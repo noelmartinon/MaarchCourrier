@@ -12,6 +12,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\ValidatorModel;
+use User\controllers\UserController;
 use User\models\UserEntityModel;
 use User\models\UserGroupModel;
 use User\models\UserModel;
@@ -158,15 +159,15 @@ class GroupController
 
         $group['privileges']         = PrivilegeModel::getPrivilegesByGroupId(['groupId' => $args['id']]);
 
-        if ($GLOBALS['login'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $allowedUsers = UserModel::get([
                 'select'    => ['id'],
-                'where'     => ['user_id != ?', 'status != ?'],
-                'data'      => ['superadmin', 'DEL']
+                'where'     => ['status != ?'],
+                'data'      => ['DEL']
             ]);
             $allowedUsers = array_column($allowedUsers, 'id');
         } else {
-            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
             $allowedUsers = [];
             if (!empty($entities)) {
                 $allowedUsers = UserEntityModel::getWithUsers([

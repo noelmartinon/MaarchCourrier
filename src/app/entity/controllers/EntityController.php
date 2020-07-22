@@ -30,6 +30,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\PasswordModel;
 use Template\models\TemplateAssociationModel;
+use User\controllers\UserController;
 use User\models\UserEntityModel;
 use User\models\UserModel;
 use \Template\models\TemplateModel;
@@ -183,7 +184,7 @@ class EntityController
             'eventId'   => 'entityCreation',
         ]);
 
-        if (empty($body['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
+        if (empty($body['parent_entity_id'])) {
             $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);
             $pEntity = 'N';
             if (empty($primaryEntity)) {
@@ -257,7 +258,7 @@ class EntityController
             'eventId'   => 'entityModification',
         ]);
 
-        if (empty($body['parent_entity_id']) && $GLOBALS['login'] != 'superadmin') {
+        if (empty($body['parent_entity_id'])) {
             $hasEntity = UserEntityModel::get(['select' => [1], 'where' => ['user_id = ?', 'entity_id = ?'], 'data' => [$GLOBALS['id'], $aArgs['id']]]);
             if (empty($hasEntity)) {
                 $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => [1]]);

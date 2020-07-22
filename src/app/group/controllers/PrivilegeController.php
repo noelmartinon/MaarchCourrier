@@ -16,6 +16,7 @@ use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
+use User\controllers\UserController;
 use User\models\UserGroupModel;
 use User\models\UserModel;
 
@@ -150,11 +151,7 @@ class PrivilegeController
         ValidatorModel::stringType($args, ['privilegeId']);
         ValidatorModel::intVal($args, ['userId']);
 
-        $user = UserModel::getById([
-            'select'    => ['user_id'],
-            'id'        => $args['userId']
-        ]);
-        if ($user['user_id'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $args['userId']])) {
             return true;
         }
 
@@ -178,11 +175,7 @@ class PrivilegeController
         ValidatorModel::notEmpty($args, ['userId']);
         ValidatorModel::intVal($args, ['userId']);
 
-        $user = UserModel::getById([
-            'select'    => ['user_id'],
-            'id'        => $args['userId']
-        ]);
-        if ($user['user_id'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $args['userId']])) {
             return ['ALL_PRIVILEGES'];
         }
 
@@ -221,11 +214,7 @@ class PrivilegeController
         ValidatorModel::notEmpty($args, ['userId', 'groupId']);
         ValidatorModel::intVal($args, ['userId', 'groupId']);
 
-        $user = UserModel::getById([
-            'select'    => ['user_id'],
-            'id'        => $args['userId']
-        ]);
-        if ($user['user_id'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $args['userId']])) {
             return true;
         }
 

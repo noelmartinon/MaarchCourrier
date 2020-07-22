@@ -225,7 +225,8 @@
                         [hideTools]="true"
                         [mode]="signatureBook.attachments[rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment'"
                         [resId]="signatureBook.attachments[rightSelectedThumbnail].res_id"
-                        [title]="signatureBook.attachments[rightSelectedThumbnail].identifier">
+                        [title]="signatureBook.attachments[rightSelectedThumbnail].identifier"
+                        [inSignatureBook]="true">
                     </app-document-viewer>
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted"
                         [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
@@ -275,7 +276,7 @@
                     </div>
                 </div>
                 <app-attachments-list *ngIf="showAttachmentPanel" #appAttachmentsList [resId]="resId"
-                    [target]="'process'" (reloadBadgeAttachments)="refreshAttachments()"
+                    [target]="'process'" [canModify]="canUpdateDocument" (reloadBadgeAttachments)="refreshAttachments()"
                     (afterActionAttachment)="refreshAttachments()">
                 </app-attachments-list>
             </div>
@@ -317,12 +318,12 @@
                     <i class="fa fa-plus" style="position:absolute;"></i>
                 </div>
                 <div *ngIf="signatureBook.attachments[rightSelectedThumbnail]">
-                    <div [ngClass]="{'visaDisabledButton': !signatureBook.attachments[rightSelectedThumbnail].canModify || signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN'}"
+                    <div [ngClass]="{'visaDisabledButton': !canUpdateDocument || signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN'}"
                         title="{{lang.updateAtt}}" class="visaPjUp"
                         (click)="showAttachment(signatureBook.attachments[rightSelectedThumbnail])">
                         <i class="fa fa-edit fa-2x"></i>
                     </div>
-                    <div [ngClass]="{'visaDisabledButton': !signatureBook.attachments[rightSelectedThumbnail].canDelete}"
+                    <div [ngClass]="{'visaDisabledButton': !canUpdateDocument}"
                         title="{{lang.deleteAtt}}" class="visaPjDel"
                         (click)="delAttachment(signatureBook.attachments[rightSelectedThumbnail])">
                         <i class="fa fa-trash-alt fa-2x"></i>

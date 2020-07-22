@@ -505,6 +505,8 @@ class EntityControllerTest extends TestCase
         $response     = $entityController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(200, $response->getStatusCode());
 
+        \User\models\UserEntityModel::deleteUserEntity(['id' => $GLOBALS['id'], 'entityId' => 'R2-D2']);
+
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $entityController->reassignEntity($request, new \Slim\Http\Response(), ['id' => 'R2-D2', 'newEntityId' => 'TEST-ENTITY123']);

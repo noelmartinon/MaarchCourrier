@@ -47,6 +47,7 @@ use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\PasswordModel;
+use SrcCore\models\ValidatorModel;
 use Template\models\TemplateModel;
 use User\models\UserBasketPreferenceModel;
 use User\models\UserEmailSignatureModel;
@@ -65,20 +66,20 @@ class UserController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        if ($GLOBALS['login'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $users = UserModel::get([
-                'select'    => ['id', 'user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode'],
-                'where'     => ['user_id != ?', 'status != ?'],
-                'data'      => ['superadmin', 'DEL']
+                'select'    => ['id', 'user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode', 'mode'],
+                'where'     => ['status != ?'],
+                'data'      => ['DEL']
             ]);
         } else {
-            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
             $users = [];
             if (!empty($entities)) {
                 $users = UserEntityModel::getWithUsers([
-                    'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode'],
-                    'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
-                    'data'      => [$entities, 'DEL']
+                    'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode', 'mode'],
+                    'where'     => ['users_entities.entity_id in (?)', 'status != ?', 'mode not in (?)'],
+                    'data'      => [$entities, 'DEL', ['root_visible', 'root_invisible']]
                 ]);
             }
             $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode']]);
@@ -88,8 +89,8 @@ class UserController
         $quota = [];
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         if (!empty($userQuota['param_value_int'])) {
-            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'user_id <> ?'], 'data' => ['OK','superadmin']]);
-            $inactiveUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'user_id <> ?'], 'data' => ['SPD','superadmin']]);
+            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['OK']]);
+            $inactiveUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['SPD']]);
             $quota = ['actives' => $activeUser[0]['count'], 'inactives' => $inactiveUser[0]['count'], 'userQuota' => $userQuota['param_value_int']];
         }
 
@@ -113,7 +114,7 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'loginmode', 'external_id']]);
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'loginmode', 'mode', 'external_id']]);
         $user['external_id']        = json_decode($user['external_id'], true);
 
         if ($GLOBALS['id'] == $aArgs['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
@@ -126,7 +127,7 @@ class UserController
         }
 
         $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
-        $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['id']]);
+        $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['id'], 'administratorId' => $GLOBALS['id']]);
         $user['entities']           = UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['allEntities']        = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['login']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
@@ -214,7 +215,7 @@ class UserController
 
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         if (!empty($userQuota['param_value_int'])) {
-            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'user_id <> ?'], 'data' => ['OK', 'superadmin']]);
+            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['OK']]);
             if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
                 NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => $GLOBALS['id'], 'info' => _QUOTA_EXCEEDED]);
             }
@@ -242,7 +243,7 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $data = $request->getParams();
+        $data = $request->getParsedBody();
 
         $check = Validator::stringType()->notEmpty()->validate($data['firstname']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['lastname']);
@@ -269,6 +270,12 @@ class UserController
         if (!empty($data['status']) && $data['status'] == 'OK') {
             $set['status'] = 'OK';
         }
+        if (!empty($data['mode']) && in_array($data['mode'], ['root_visible', 'root_invisible'])) {
+            if (!UserController::isRoot(['id' => $GLOBALS['id']])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+            }
+            $set['mode'] = $data['mode'];
+        }
 
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         $user = [];
@@ -284,7 +291,7 @@ class UserController
 
         if (!empty($userQuota['param_value_int'])) {
             if ($user['status'] == 'SPD' && $data['status'] == 'OK') {
-                $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'user_id != ?'], 'data' => ['OK', 'superadmin']]);
+                $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['OK']]);
                 if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
                     NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => $GLOBALS['id'], 'info' => _QUOTA_EXCEEDED]);
                 }
@@ -333,7 +340,7 @@ class UserController
             'where'     => ['item_id = ?', 'type = ?', 'item_mode = ?', 'item_type = ?', 'entity_id is not null'],
             'data'      => [$aArgs['id'], 'diffusionList', 'dest', 'user']
         ]);
-        $allEntities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
+        $allEntities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
         if (!empty($allEntities)) {
             $allEntities = EntityModel::get(['select' => ['id'], 'where' => ['entity_id in (?)'], 'data' => [$allEntities]]);
             $allEntities = array_column($allEntities, 'id');
@@ -498,7 +505,7 @@ class UserController
 
     public function getProfile(Request $request, Response $response)
     {
-        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'status']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'status', 'mode']]);
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['preferences']        = json_decode($user['preferences'], true);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
@@ -516,7 +523,7 @@ class UserController
         $user['nbFollowedResources'] = $userFollowed[0]['nb'];
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
-        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS) && $user['user_id'] != 'superadmin') {
+        if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS)) {
             $user['canModifyPassword'] = false;
         }
 
@@ -1579,18 +1586,22 @@ class UserController
             return ['status' => 400, 'error' => 'id must be an integer'];
         }
 
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['user_id']]);
-        if (empty($user['user_id'])) {
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'mode']]);
+        if (empty($user['id'])) {
             return ['status' => 400, 'error' => 'User not found'];
         }
 
-        if (empty($args['himself']) || $GLOBALS['login'] != $user['user_id']) {
+        if (empty($args['himself']) || $GLOBALS['id'] != $user['id']) {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']])) {
                 return ['status' => 403, 'error' => 'Service forbidden'];
             }
-            if ($GLOBALS['login'] != 'superadmin') {
+            $isRoot = UserController::isRoot(['id' => $GLOBALS['id']]);
+            if (!$isRoot) {
+                if ($user['mode'] == 'root_invisible') {
+                    return ['status' => 403, 'error' => 'Service forbidden'];
+                }
                 $users = [];
-                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
+                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
                 if (!empty($entities)) {
                     $users = UserEntityModel::getWithUsers([
                         'select'    => ['users.id'],
@@ -1610,7 +1621,7 @@ class UserController
                     return ['status' => 403, 'error' => 'UserId out of perimeter'];
                 }
             }
-        } elseif ($args['delete'] && $GLOBALS['login'] == $user['user_id']) {
+        } elseif ($args['delete'] && $GLOBALS['id'] == $user['id']) {
             return ['status' => 403, 'error' => 'Can not delete yourself'];
         }
 
@@ -1762,5 +1773,17 @@ class UserController
         ];
 
         return $response->withJson(['emailSignature' => $signature]);
+    }
+
+    public static function isRoot(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['id']);
+        ValidatorModel::intVal($args, ['id']);
+
+        $user = UserModel::getById(['select' => ['mode'], 'id' => $args['id']]);
+
+        $isRoot = ($user['mode'] == 'root_visible' || $user['mode'] == 'root_invisible');
+
+        return $isRoot;
     }
 }

@@ -206,6 +206,8 @@ CREATE TABLE usergroups_services
 )
 WITH (OIDS=FALSE);
 
+CREATE TYPE users_modes AS ENUM ('standard', 'rest', 'root_visible', 'root_invisible');
+
 CREATE TABLE users
 (
   id serial NOT NULL,
@@ -220,6 +222,7 @@ CREATE TABLE users
   status character varying(10) NOT NULL DEFAULT 'OK'::character varying,
   password_modification_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
   loginmode character varying(50) DEFAULT NULL::character varying,
+  mode users_modes NOT NULL DEFAULT 'standard',
   refresh_token jsonb NOT NULL DEFAULT '[]',
   reset_token text,
   failed_authentication INTEGER DEFAULT 0,
@@ -779,7 +782,6 @@ CREATE TABLE contacts_groups
   description character varying(255) NOT NULL,
   public boolean NOT NULL,
   owner integer NOT NULL,
-  entity_owner character varying(32) NOT NULL,
   CONSTRAINT contacts_groups_pkey PRIMARY KEY (id),
   CONSTRAINT contacts_groups_key UNIQUE (label, owner)
 )

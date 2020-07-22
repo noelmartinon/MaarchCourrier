@@ -68,13 +68,12 @@ abstract class UserEntityModelAbstract
     {
         ValidatorModel::arrayType($aArgs, ['select']);
 
-        $excludedUsers = ['superadmin'];
         $aUsersEntities = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users', 'users_entities'],
             'left_join' => ['users.id = users_entities.user_id'],
-            'where'     => ['users_entities IS NULL', 'users.user_id not in (?)', 'status != ?'],
-            'data'      => [$excludedUsers, 'DEL']
+            'where'     => ['users_entities IS NULL', 'status != ?', 'mode not in (?)'],
+            'data'      => ['DEL', ['root_visible', 'root_invisible']]
         ]);
 
         return $aUsersEntities;

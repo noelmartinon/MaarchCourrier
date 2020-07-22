@@ -1,10 +1,19 @@
 <div *ngIf="loading" style="display:block;padding: 10px;">{{lang.checkOnlyofficeServer}}...</div>
-<button *ngIf="!hideCloseEditor" class="onlyofficeButton_fullscreen" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
+<button *ngIf="!hideCloseEditor && !hideButtons" class="onlyofficeButton_fullscreen" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
     [title]="lang.closeEditor" (click)="quit()">
     <mat-icon class="fa fa-times" style="height:auto;"></mat-icon>
 </button>
-<button mat-mini-fab class="onlyofficeButton_close" [class.fullScreen]="fullscreenMode" color="default"
+<button *ngIf="!hideButtons" mat-mini-fab class="onlyofficeButton_close" [class.fullScreen]="fullscreenMode" color="default"
     [title]="fullscreenMode ? lang.closeFullscreen : lang.openFullscreen" (click)="openFullscreen()">
     <mat-icon class="fas" [class.fa-expand]="!fullscreenMode" [class.fa-compress]="fullscreenMode" style="height:auto;"></mat-icon>
 </button>
+<button *ngIf="!hideButtons" class="onlyofficeButton_hide" [class.fullScreen]="fullscreenMode" mat-mini-fab color="default"
+        [title]="lang.closeEditor" (click)="hideButtons = !hideButtons">
+    <mat-icon class="fa fa-arrow-right" style="height:auto;"></mat-icon>
+</button>
+<button *ngIf="hideButtons" class="onlyofficeButton_show" [class.fullScreen]="fullscreenMode" mat-mini-fab color="default"
+        [title]="lang.closeEditor" (click)="hideButtons = !hideButtons">
+    <mat-icon class="fa fa-arrow-left" style="height:auto;"></mat-icon>
+</button>
+
 <div id="placeholder"></div>

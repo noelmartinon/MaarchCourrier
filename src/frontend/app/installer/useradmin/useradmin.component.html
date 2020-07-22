@@ -9,6 +9,14 @@
             <input matInput formControlName="login">
         </mat-form-field>
         <mat-form-field appearance="outline">
+            <mat-label>{{lang.firstname}}</mat-label>
+            <input matInput formControlName="firstname">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>{{lang.lastname}}</mat-label>
+            <input matInput formControlName="lastname">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
             <mat-label>{{lang.password}}</mat-label>
             <input [type]="hide ? 'password' : 'text'" matInput formControlName="password">
             <button mat-icon-button matSuffix color="primary" (click)="hide = !hide">

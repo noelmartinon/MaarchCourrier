@@ -76,7 +76,7 @@ class TemplateController
         foreach ($rawLinkedEntities as $rawLinkedEntity) {
             $linkedEntities[] = $rawLinkedEntity['value_field'];
         }
-        $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => 'superadmin']);
+        $entities = EntityModel::getAllowedEntitiesByUserId(['root' => true]);
         foreach ($entities as $key => $entity) {
             $entities[$key]['state']['selected'] = false;
             if (in_array($entity['id'], $linkedEntities)) {
@@ -375,7 +375,7 @@ class TemplateController
             }
         }
 
-        $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => 'superadmin']);
+        $entities = EntityModel::getAllowedEntitiesByUserId(['root' => true]);
         foreach ($entities as $key => $entity) {
             $entities[$key]['state']['selected'] = false;
         }

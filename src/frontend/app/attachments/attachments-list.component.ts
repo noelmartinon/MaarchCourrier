@@ -53,11 +53,12 @@ export class AttachmentsListComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    @Input('injectDatas') injectDatas: any;
-    @Input('resId') resId: number = null;
-    @Input('target') target: string = 'panel';
-    @Input('autoOpenCreation') autoOpenCreation: boolean = false;
-    @Output('reloadBadgeAttachments') reloadBadgeAttachments = new EventEmitter<string>();
+    @Input() injectDatas: any;
+    @Input() resId: number = null;
+    @Input() target: string = 'panel';
+    @Input() autoOpenCreation: boolean = false;
+    @Input() canModify: boolean = false;
+    @Output() reloadBadgeAttachments = new EventEmitter<string>();
 
     @Output() afterActionAttachment = new EventEmitter<string>();
 
@@ -175,7 +176,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     showAttachment(attachment: any) {
-        this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'attachment-modal-container', disableClose: true, data: { resId: attachment.resId } });
+        this.dialogRef = this.dialog.open(AttachmentPageComponent, { height: '99vh', width: this.appService.getViewMode() ? '99vw' : '90vw', maxWidth: this.appService.getViewMode() ? '99vw' : '90vw', panelClass: 'attachment-modal-container', disableClose: true, data: { resId: attachment.resId, editMode : this.canModify } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),

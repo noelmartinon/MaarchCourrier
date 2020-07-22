@@ -19,6 +19,7 @@ use Group\controllers\PrivilegeController;
 use Group\models\GroupModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use User\controllers\UserController;
 use User\models\UserEntityModel;
 use User\models\UserModel;
 
@@ -29,14 +30,14 @@ class AdministrationController
         $count = [];
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']])) {
-            if ($GLOBALS['login'] == 'superadmin') {
+            if (UserController::isRoot(['id' => $GLOBALS['id']])) {
                 $users = UserModel::get([
                     'select'    => [1],
                     'where'     => ['status != ?'],
                     'data'      => ['DEL']
                 ]);
             } else {
-                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
+                $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
                 $users = [];
                 if (!empty($entities)) {
                     $users = UserEntityModel::getWithUsers([

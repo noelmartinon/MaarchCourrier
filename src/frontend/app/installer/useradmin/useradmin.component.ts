@@ -30,6 +30,8 @@ export class UseradminComponent implements OnInit {
 
         this.stepFormGroup = this._formBuilder.group({
             login: ['superadmin', valLogin],
+            firstname: ['Admin', Validators.required],
+            lastname: ['SUPER', Validators.required],
             password: ['', Validators.required],
             passwordConfirm: ['', Validators.required],
             email: ['dev@maarch.org', valEmail],
@@ -82,6 +84,8 @@ export class UseradminComponent implements OnInit {
             idStep : 'userAdmin',
             body : {
                 login: this.stepFormGroup.controls['login'].value,
+                firstname: this.stepFormGroup.controls['firstname'].value,
+                lastname: this.stepFormGroup.controls['lastname'].value,
                 password: this.stepFormGroup.controls['password'].value,
                 email: this.stepFormGroup.controls['email'].value,
             },

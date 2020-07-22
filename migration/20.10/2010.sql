@@ -27,6 +27,14 @@ ALTER TABLE users DROP COLUMN IF EXISTS cookie_key;
 ALTER TABLE users DROP COLUMN IF EXISTS cookie_date;
 ALTER TABLE users DROP COLUMN IF EXISTS refresh_token;
 ALTER TABLE users ADD COLUMN refresh_token jsonb NOT NULL DEFAULT '[]';
+DROP TYPE IF EXISTS users_modes;
+CREATE TYPE users_modes AS ENUM ('standard', 'rest', 'root_visible', 'root_invisible');
+ALTER TABLE users DROP COLUMN IF EXISTS mode;
+ALTER TABLE users ADD COLUMN mode users_modes NOT NULL DEFAULT 'standard';
+UPDATE users set mode = 'root_invisible' WHERE user_id = 'superadmin';
+
+/* CONTACTS GROUPS */
+ALTER TABLE contacts_groups DROP COLUMN IF EXISTS entity_owner;
 
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'notif_event_stack' and column_name = 'user_id' and data_type != 'integer') THEN

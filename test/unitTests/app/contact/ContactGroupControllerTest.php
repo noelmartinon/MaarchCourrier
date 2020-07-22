@@ -77,7 +77,6 @@ class ContactGroupControllerTest extends TestCase
         $this->assertSame('Groupe de petition', $responseBody->contactsGroup->description);
         $this->assertSame(false, $responseBody->contactsGroup->public);
         $this->assertSame($user['id'], $responseBody->contactsGroup->owner);
-        $this->assertSame('superadmin', $responseBody->contactsGroup->entity_owner);
         $this->assertIsString($responseBody->contactsGroup->labelledOwner);
         $this->assertIsArray($responseBody->contactsGroup->contacts);
 
@@ -161,7 +160,6 @@ class ContactGroupControllerTest extends TestCase
         $this->assertSame('Groupe petition updated', $responseBody->contactsGroup->label);
         $this->assertSame('Groupe de petition updated', $responseBody->contactsGroup->description);
         $this->assertSame(true, $responseBody->contactsGroup->public);
-        $this->assertSame('superadmin', $responseBody->contactsGroup->entity_owner);
         $this->assertIsString($responseBody->contactsGroup->labelledOwner);
         $this->assertIsArray($responseBody->contactsGroup->contacts);
 
@@ -308,7 +306,6 @@ class ContactGroupControllerTest extends TestCase
         $user = \User\models\UserModel::getByLogin(['select' => ['id'], 'login' => 'superadmin']);
         $this->assertSame(self::$id, $responseBody->contactsGroup->id);
         $this->assertSame($user['id'], $responseBody->contactsGroup->owner);
-        $this->assertSame('superadmin', $responseBody->contactsGroup->entity_owner);
         $this->assertIsString($responseBody->contactsGroup->labelledOwner);
         $this->assertIsArray($responseBody->contactsGroup->contacts);
         $this->assertEmpty($responseBody->contactsGroup->contacts);

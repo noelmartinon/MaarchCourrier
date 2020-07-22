@@ -71,7 +71,8 @@ while ($state <> 'END') {
                     continue;
                 }
                 Bt_writeLog(['level' => 'INFO', 'message' => "Document type id is #" . $myDoc['type_id']]);
-                $user = \User\models\UserModel::getByLogin(['login' => 'superadmin', 'select' => ['id']]);
+                $users = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
+                $user = $users[0];
 
                 // Alert 1 = limit - n days
                 if ($myDoc['flag_alarm1'] != 'Y' && $myDoc['flag_alarm2'] != 'Y') {

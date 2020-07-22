@@ -53,8 +53,8 @@ abstract class ContactGroupModelAbstract
 
     public static function create(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['label', 'description', 'public', 'owner', 'entity_owner']);
-        ValidatorModel::stringType($aArgs, ['label', 'description', 'public', 'entity_owner']);
+        ValidatorModel::notEmpty($aArgs, ['label', 'description', 'public', 'owner']);
+        ValidatorModel::stringType($aArgs, ['label', 'description', 'public']);
         ValidatorModel::intVal($aArgs, ['owner']);
 
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'contacts_groups_id_seq']);
@@ -65,8 +65,7 @@ abstract class ContactGroupModelAbstract
                 'label'         => $aArgs['label'],
                 'description'   => $aArgs['description'],
                 'public'        => $aArgs['public'],
-                'owner'         => $aArgs['owner'],
-                'entity_owner'  => $aArgs['entity_owner'],
+                'owner'         => $aArgs['owner']
             ]
         ]);
 

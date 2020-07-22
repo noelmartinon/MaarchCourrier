@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { AlertComponent } from '../../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '../../service/functions.service';
+import { HeaderService } from '../../service/header.service';
 
 @Component({
     selector: 'app-diffusions-list',
@@ -45,6 +46,11 @@ export class DiffusionsListComponent implements OnInit {
      * Entity identifier to load listModel of entity (Incompatible with resId)
      */
     @Input('entityId') entityId: any = null;
+
+    /**
+     * Category identifier to specify the context to load listModel
+     */
+    @Input() categoryId: any = null;
 
     /**
      * For manage current loaded list
@@ -85,24 +91,24 @@ export class DiffusionsListComponent implements OnInit {
         private notify: NotificationService,
         private renderer: Renderer2,
         public dialog: MatDialog,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private headerService: HeaderService
     ) { }
 
     async ngOnInit(): Promise<void> {
 
         await this.initRoles();
-
         if (this.resId !== null && this.resId != 0 && this.target !== 'redirect') {
             this.loadListinstance(this.resId);
         } else if ((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) {
-            this.loadListModel(this.entityId);
+            this.loadListModel(this.entityId, false, this.categoryId === 'outgoing');
         }
         this.loading = false;
     }
 
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
-            //moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+            // moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
         } else if (event.container.id != 'dest') {
             transferArrayItem(event.previousContainer.data,
                 event.container.data,
@@ -119,18 +125,34 @@ export class DiffusionsListComponent implements OnInit {
         return true;
     }
 
-    async loadListModel(entityId: number, destResource: boolean = false) {
+    async loadListModel(entityId: number, destResource: boolean = false, destCurrentUser: boolean = false) {
         this.loading = true;
         this.currentEntityId = entityId;
         this.userDestList = [];
 
         const listTemplates: any = await this.getListModel(entityId);
         this.removeAllItems();
-
         if (listTemplates.length > 0) {
             listTemplates[0].forEach((element: any) => {
                 this.diffList[element.item_mode].items.push(element);
             });
+        }
+
+        // CASE IF CURRENT USER IS DEST (IN OUTGOING CATEGORY CASE)
+        if (destCurrentUser && this.headerService.user.entities[0].id === entityId) {
+            this.diffList['dest'].items = [
+                {
+                    item_mode: 'dest',
+                    item_type: 'user',
+                    itemSerialId: this.headerService.user.id,
+                    itemId: '',
+                    itemLabel: `${this.headerService.user.firstname} ${this.headerService.user.lastname}`,
+                    itemSubLabel: this.headerService.user.entities[0].entity_label,
+                    difflist_type: 'entity_id',
+                    process_date: null,
+                    process_comment: null,
+                }
+            ];
         }
         if (this.resId !== null) {
             const listInstance: any = await this.getListinstance(this.resId);

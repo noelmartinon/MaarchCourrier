@@ -30,6 +30,7 @@ use SrcCore\controllers\AutoCompleteController;
 use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\DatabaseModel;
 use Status\models\StatusModel;
+use User\controllers\UserController;
 use User\models\UserModel;
 
 class SearchController
@@ -38,7 +39,7 @@ class SearchController
     {
         $queryParams = $request->getQueryParams();
 
-        if ($GLOBALS['login'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $whereClause = '1=1';
             $dataClause = [];
         } else {

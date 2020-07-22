@@ -64,8 +64,6 @@ class FullTextScript
         if (array_search('--userId', $args) > 0) {
             $cmd = array_search('--userId', $args);
             $userId = $args[$cmd+1];
-        } else {
-            $userId = 'superadmin';
         }
         
         if (array_search('--mode', $args) > 0) {
@@ -73,10 +71,12 @@ class FullTextScript
             $mode = $args[$cmd+1];
         }
 
-        if (empty($mode)) {
-            FullTextScript::index(['customId' => $customId, 'resId' => $resId, 'collId' => $collId, 'userId' => $userId]);
-        } else {
-            FullTextScript::reindex(['customId' => $customId, 'collId' => $collId, 'userId' => $userId]);
+        if (!empty($userId)) {
+            if (empty($mode)) {
+                FullTextScript::index(['customId' => $customId, 'resId' => $resId, 'collId' => $collId, 'userId' => $userId]);
+            } else {
+                FullTextScript::reindex(['customId' => $customId, 'collId' => $collId, 'userId' => $userId]);
+            }
         }
     }
 

@@ -135,14 +135,13 @@ trait ExternalSignatoryBookTrait
                     'where'   => ['res_id = ?'],
                     'data'    => [$args['resId']]
                 ]);
-            } else {
-                if (!empty($attachmentToFreeze['attachments_coll'])) {
-                    foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
-                        AttachmentModel::freezeAttachment([
-                            'resId' => $resId,
-                            'externalId' => $externalId
-                        ]);
-                    }
+            }
+            if (!empty($attachmentToFreeze['attachments_coll'])) {
+                foreach ($attachmentToFreeze['attachments_coll'] as $resId => $externalId) {
+                    AttachmentModel::freezeAttachment([
+                        'resId' => $resId,
+                        'externalId' => $externalId
+                    ]);
                 }
             }
         }

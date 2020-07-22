@@ -17,6 +17,7 @@ namespace Group\models;
 use Group\controllers\PrivilegeController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
+use User\controllers\UserController;
 use User\models\UserModel;
 
 abstract class GroupModelAbstract
@@ -187,20 +188,20 @@ abstract class GroupModelAbstract
         return $users;
     }
 
-    public static function getAvailableGroupsByUserId(array $aArgs = [])
+    public static function getAvailableGroupsByUserId(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::intVal($aArgs, ['userId']);
+        ValidatorModel::notEmpty($aArgs, ['userId', 'administratorId']);
+        ValidatorModel::intVal($aArgs, ['userId', 'administratorId']);
 
         $rawUserGroups = UserModel::getGroupsByUser(['id' => $aArgs['userId']]);
         $userGroups = array_column($rawUserGroups, 'group_id');
 
         $allGroups = GroupModel::get(['select' => ['group_id', 'group_desc'], 'orderBy' => ['group_desc']]);
 
-        if ($GLOBALS['login'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $aArgs['administratorId']])) {
             $assignableGroups = GroupModel::get(['select' => ['group_id'], 'orderBy' => ['group_desc']]);
         } else {
-            $assignableGroups = PrivilegeController::getAssignableGroups(['userId' => $GLOBALS['id']]);
+            $assignableGroups = PrivilegeController::getAssignableGroups(['userId' => $aArgs['administratorId']]);
         }
         $assignableGroups = array_column($assignableGroups, 'group_id');
 

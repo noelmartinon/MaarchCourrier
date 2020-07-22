@@ -17,6 +17,7 @@ namespace Entity\models;
 use SrcCore\models\ValidatorModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
+use User\controllers\UserController;
 use User\models\UserModel;
 
 abstract class EntityModelAbstract
@@ -258,14 +259,14 @@ abstract class EntityModelAbstract
         return $aReturn;
     }
 
-    public static function getAllEntitiesByUserId(array $aArgs)
+    public static function getAllEntitiesByUserId(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::notEmpty($args, ['userId']);
+        ValidatorModel::intVal($args, ['userId']);
 
         $entities = [];
 
-        if ($aArgs['userId'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $args['userId']])) {
             $rawEntities = EntityModel::get(['select' => ['entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y']]);
             foreach ($rawEntities as $value) {
                 $entities[] = $value['entity_id'];
@@ -273,8 +274,7 @@ abstract class EntityModelAbstract
             return $entities;
         }
 
-        $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
-        $aReturn = UserModel::getEntitiesById(['id' => $user['id'], 'select' => ['users_entities.entity_id']]);
+        $aReturn = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['users_entities.entity_id']]);
         foreach ($aReturn as $value) {
             $entities = array_merge($entities, EntityModel::getEntityChildren(['entityId' => $value['entity_id']]));
         }
@@ -287,14 +287,16 @@ abstract class EntityModelAbstract
         ValidatorModel::notEmpty($aArgs, ['userId', 'administratorUserId']);
         ValidatorModel::stringType($aArgs, ['userId', 'administratorUserId']);
 
-        if ($aArgs['administratorUserId'] == 'superadmin') {
+        $administrator = UserModel::getByLogin(['login' => $aArgs['administratorUserId'], 'select' => ['id']]);
+
+        if (UserController::isRoot(['id' => $administrator['id']])) {
             $rawEntitiesAllowedForAdministrator = EntityModel::get(['select' => ['entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y'], 'orderBy' => ['entity_label']]);
             $entitiesAllowedForAdministrator = [];
             foreach ($rawEntitiesAllowedForAdministrator as $value) {
                 $entitiesAllowedForAdministrator[] = $value['entity_id'];
             }
         } else {
-            $entitiesAllowedForAdministrator = EntityModel::getAllEntitiesByUserId(['userId' => $aArgs['administratorUserId']]);
+            $entitiesAllowedForAdministrator = EntityModel::getAllEntitiesByUserId(['userId' => $administrator['id']]);
         }
 
         $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
@@ -331,14 +333,18 @@ abstract class EntityModelAbstract
 
     public static function getAllowedEntitiesByUserId(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        if (empty($aArgs['root'])) {
+            ValidatorModel::notEmpty($aArgs, ['userId']);
+            ValidatorModel::stringType($aArgs, ['userId']);
 
-        if ($aArgs['userId'] == 'superadmin') {
+            $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
+        }
+
+        if (!empty($aArgs['root']) || UserController::isRoot(['id' => $user['id']])) {
             $rawEntitiesAllowed = EntityModel::get(['select' => ['entity_id'], 'where' => ['enabled = ?'], 'data' => ['Y'], 'orderBy' => ['entity_label']]);
             $entitiesAllowed = array_column($rawEntitiesAllowed, 'entity_id');
         } else {
-            $entitiesAllowed = EntityModel::getAllEntitiesByUserId(['userId' => $aArgs['userId']]);
+            $entitiesAllowed = EntityModel::getAllEntitiesByUserId(['userId' => $user['id']]);
         }
 
         $allEntities = EntityModel::get([

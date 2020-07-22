@@ -54,6 +54,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     showSignaturesPanel: boolean = false;
     loading: boolean = false;
     loadingSign: boolean = false;
+    canUpdateDocument: boolean = false;
 
     subscription: Subscription;
     currentResourceLock: any = null;
@@ -125,6 +126,16 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             this.signatureBook.resList = []; // This line is added because of manage action behaviour (processAfterAction is called twice)
 
             this.actionService.lockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+
+            this.http.get(`../rest/resources/${this.resId}/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/processingData`).pipe(
+                tap((data: any) => {
+                    this.canUpdateDocument = data.listEventData.canUpdateDocument;
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
 
             this.http.get('../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + this.resId)
                 .subscribe((data: any) => {
@@ -344,7 +355,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     delAttachment(attachment: any) {
-        if (attachment.canDelete) {
+        if (this.canUpdateDocument) {
             let r = false;
             if (this.signatureBook.attachments.length <= 1) {
                 r = confirm('Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?');
@@ -527,7 +538,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     showAttachment(attachment: any) {
-        if (attachment.canModify && attachment.status !== 'SIGN') {
+        if (this.canUpdateDocument && attachment.status !== 'SIGN') {
             if (attachment.isResource) {
                 this.appDocumentViewer.editResource();
             } else {

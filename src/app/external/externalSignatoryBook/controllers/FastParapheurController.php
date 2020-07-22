@@ -79,7 +79,7 @@ class FastParapheurController
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
                     $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
                     $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $response['b64FileContent'];
-                    FastParapheurController::processVisaWorkflow(['res_id_master' => $value['res_id_master'], 'res_id' => $value['res_id']]);
+                    FastParapheurController::processVisaWorkflow(['res_id_master' => $value['res_id_master'], 'res_id' => $value['res_id'], 'processSignatory' => true]);
                     break;
                 } elseif ($state == $aArgs['config']['data']['refusedState']) {
                     $res = DatabaseModel::select([
@@ -108,7 +108,7 @@ class FastParapheurController
         $resIdMaster = $aArgs['res_id_master'] ?? $aArgs['res_id'];
 
         $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$resIdMaster, 'FRZ']]);
-        if (count($attachments) < 2) {
+        if ((count($attachments) < 2 && $aArgs['processSignatory']) || !$aArgs['processSignatory']) {
             $visaWorkflow = ListInstanceModel::get([
                 'select'  => ['listinstance_id', 'requested_signature'],
                 'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
@@ -118,12 +118,14 @@ class FastParapheurController
     
             if (!empty($visaWorkflow)) {
                 foreach ($visaWorkflow as $listInstance) {
-                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
-                    // Stop to the first signatory user
                     if ($listInstance['requested_signature']) {
-                        ListInstanceModel::update(['set' => ['signatory' => 'true'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        // Stop to the first signatory user
+                        if ($aArgs['processSignatory']) {
+                            ListInstanceModel::update(['set' => ['signatory' => 'true', 'process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        }
                         break;
                     }
+                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
                 }
             }
         }
@@ -180,7 +182,7 @@ class FastParapheurController
             $resId  = $attachment['res_id'];
             $collId = 'attachments_coll';
             
-            $curlReturn = FastParapheurController::uploadFile([
+            $response = FastParapheurController::uploadFile([
                 'resId'        => $resId,
                 'collId'       => $collId,
                 'resIdMaster'  => $aArgs['resIdMaster'],
@@ -191,16 +193,10 @@ class FastParapheurController
                 'config'       => $aArgs['config']
             ]);
 
-            if ($curlReturn['infos']['http_code'] == 404) {
-                return ['error' => 'Erreur 404 : ' . $curlReturn['raw']];
-            } elseif (!empty($curlReturn['error'])) {
-                return ['error' => $curlReturn['error']];
-            } elseif (!empty($curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0])) {
-                $error = (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
-                return ['error' => $error];
+            if (!empty($response['error'])) {
+                return $response;
             } else {
-                $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
-                $attachmentToFreeze[$collId][$resId] = (string) $documentId;
+                $attachmentToFreeze[$collId][$resId] = $response['success'];
             }
         }
 
@@ -213,7 +209,7 @@ class FastParapheurController
                 $collId = 'letterbox_coll';
                 unset($annexes['letterbox']);
     
-                $curlReturn = FastParapheurController::uploadFile([
+                $response = FastParapheurController::uploadFile([
                     'resId'        => $resId,
                     'collId'       => $collId,
                     'resIdMaster'  => $aArgs['resIdMaster'],
@@ -223,17 +219,11 @@ class FastParapheurController
                     'subscriberId' => $subscriberId,
                     'config'       => $aArgs['config']
                 ]);
-    
-                if ($curlReturn['infos']['http_code'] == 404) {
-                    return ['error' => 'Erreur 404 : ' . $curlReturn['raw']];
-                } elseif (!empty($curlReturn['error'])) {
-                    return ['error' => $curlReturn['error']];
-                } elseif (!empty($curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0])) {
-                    $error = (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
-                    return ['error' => $error];
+
+                if (!empty($response['error'])) {
+                    return $response;
                 } else {
-                    $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
-                    $attachmentToFreeze[$collId][$resId] = (string) $documentId;
+                    $attachmentToFreeze[$collId][$resId] = $response['success'];
                 }
             }
         }
@@ -307,7 +297,18 @@ class FastParapheurController
             ]
         ]);
 
-        return $curlReturn;
+        if ($curlReturn['infos']['http_code'] == 404) {
+            return ['error' => 'Erreur 404 : ' . $curlReturn['raw']];
+        } elseif (!empty($curlReturn['error'])) {
+            return ['error' => $curlReturn['error']];
+        } elseif (!empty($curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0])) {
+            $error = (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+            return ['error' => $error];
+        }
+
+        IParapheurController::processVisaWorkflow(['res_id_master' => $aArgs['resIdMaster'], 'processSignatory' => false]);
+        $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
+        return ['success' => (string)$documentId];
     }
 
     public static function download($aArgs)

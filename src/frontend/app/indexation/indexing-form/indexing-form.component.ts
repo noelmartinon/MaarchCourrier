@@ -466,7 +466,15 @@ export class IndexingFormComponent implements OnInit {
                 tap((data: any) => {
                     if (this.adminMode) {
                         let title = '';
-                        elem.values = data.entities.map((entity: any) => {
+                        elem.values = [
+                            {
+                                id: '#myPrimaryEntity',
+                                title: this.lang.myPrimaryEntity,
+                                label: `<i class="fa fa-hashtag"></i>&nbsp;${this.lang.myPrimaryEntity}`,
+                                disabled: false
+                            }
+                        ];
+                        elem.values = elem.values.concat(data.entities.map((entity: any) => {
                             title = entity.entity_label;
 
                             for (let index = 0; index < entity.level; index++) {
@@ -477,15 +485,18 @@ export class IndexingFormComponent implements OnInit {
                                 title: title,
                                 label: entity.entity_label,
                                 disabled: false
-                            }
-                        });
-
+                            };
+                        }));
                     } else {
                         let title = '';
-
-                        let defaultVal = data.entities.filter((entity: any) => entity.enabled === true && entity.id === elem.default_value);
-                        elem.default_value = defaultVal.length > 0 ? defaultVal[0].id : null;
-                        this.arrFormControl[elem.identifier].setValue(defaultVal.length > 0 ? defaultVal[0].id : '');
+                        if (elem.default_value === '#myPrimaryEntity') {
+                            elem.default_value = this.headerService.user.entities[0].id;
+                            this.arrFormControl[elem.identifier].setValue(elem.default_value);
+                        } else {
+                            const defaultVal = data.entities.filter((entity: any) => entity.enabled === true && entity.id === elem.default_value);
+                            elem.default_value = defaultVal.length > 0 ? defaultVal[0].id : null;
+                            this.arrFormControl[elem.identifier].setValue(defaultVal.length > 0 ? defaultVal[0].id : '');
+                        }
                         elem.values = data.entities.map((entity: any) => {
                             title = entity.entity_label;
 

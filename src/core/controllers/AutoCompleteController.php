@@ -29,6 +29,7 @@ use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
 use Status\models\StatusModel;
 use Tag\models\TagModel;
+use User\controllers\UserController;
 use User\models\UserModel;
 use Folder\models\FolderModel;
 use Folder\controllers\FolderController;
@@ -47,16 +48,14 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $excludedUsers = ['superadmin'];
-
         $fields = ['firstname', 'lastname'];
         $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
 
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $data['search'],
             'fields'        => $fields,
-            'where'         => ['status not in (?)', 'user_id not in (?)'],
-            'data'          => [['DEL', 'SPD'], $excludedUsers],
+            'where'         => ['status not in (?)', 'mode not in (?)'],
+            'data'          => [['DEL', 'SPD'], ['root_invisible']],
             'fieldsNumber'  => 2,
         ]);
 
@@ -219,8 +218,8 @@ class AutoCompleteController
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
-                'where'         => ['status not in (?)', 'user_id not in (?)'],
-                'data'          => [['DEL', 'SPD'], ['superadmin']],
+                'where'         => ['status not in (?)', 'mode not in (?)'],
+                'data'          => [['DEL', 'SPD'], ['root_invisible']],
                 'fieldsNumber'  => $nbFields,
             ]);
 
@@ -344,10 +343,8 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $excludedUsers = ['superadmin'];
-
-        if ($GLOBALS['login'] != 'superadmin') {
-            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['login']]);
+        if (!UserController::isRoot(['id' => $GLOBALS['id']])) {
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
 
             $fields = ['users.firstname', 'users.lastname'];
             $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
@@ -381,10 +378,10 @@ class AutoCompleteController
                     'fields'        => $fields,
                     'where'         => [
                         'users_entities IS NULL',
-                        'users.user_id not in (?)',
+                        'users.mode not in (?)',
                         'users.status not in (?)'
                     ],
-                    'data'          => [$excludedUsers, ['DEL', 'SPD']],
+                    'data'          => [['root_invisible'], ['DEL', 'SPD']],
                     'fieldsNumber'  => 2,
                 ]);
 
@@ -403,8 +400,8 @@ class AutoCompleteController
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $data['search'],
                 'fields'        => '(firstname ilike ? OR lastname ilike ?)',
-                'where'         => ['status not in (?)', 'user_id not in (?)'],
-                'data'          => [['DEL', 'SPD'], $excludedUsers],
+                'where'         => ['status not in (?)'],
+                'data'          => [['DEL', 'SPD']],
                 'fieldsNumber'  => 2,
             ]);
 
@@ -444,10 +441,10 @@ class AutoCompleteController
             'usergroups.id = usergroup_content.group_id',
             'usergroup_content.user_id = users.id',
             'usergroups_services.service_id in (?)',
-            'users.user_id not in (?)',
+            'users.mode not in (?)',
             'users.status not in (?)'
         ];
-        $requestData['data'] = [$services, ['superadmin'], ['DEL', 'SPD']];
+        $requestData['data'] = [$services, ['root_invisible'], ['DEL', 'SPD']];
 
         if (!empty($queryParams['search'])) {
             $fields = ['users.firstname', 'users.lastname'];

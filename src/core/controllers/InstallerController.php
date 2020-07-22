@@ -14,6 +14,7 @@
 
 namespace SrcCore\controllers;
 
+use ContentManagement\controllers\DocumentEditorController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -21,6 +22,7 @@ use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\DatabasePDO;
+use User\models\UserModel;
 
 class InstallerController
 {
@@ -103,7 +105,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is empty or not a string']);
         } elseif (!Validator::length(1, 50)->validate($queryParams['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name length is not valid']);
-        } elseif (strpbrk($queryParams['name'], '"; ') !== false) {
+        } elseif (strpbrk($queryParams['name'], '"; \\') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'QueryParams name is not valid']);
         }
 
@@ -286,7 +288,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body name is empty or not a string']);
         } elseif (!Validator::length(1, 50)->validate($body['name'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name length is not valid']);
-        } elseif (strpbrk($body['name'], '"; ') !== false) {
+        } elseif (strpbrk($body['name'], '"; \\') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'Body name is not valid']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
@@ -521,6 +523,12 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['login']) && preg_match("/^[\w.@-]*$/", $body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['firstname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body firstname is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['lastname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body lastname is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['email']) || !filter_var($body['email'], FILTER_VALIDATE_EMAIL)) {
@@ -529,15 +537,18 @@ class InstallerController
 
         DatabasePDO::reset();
         new DatabasePDO(['customId' => $body['customId']]);
-        DatabaseModel::update([
-            'table'     => 'users',
-            'set'       => [
-                'password'  => AuthenticationModel::getPasswordHash($body['password']),
-                'mail'      => $body['email']
-            ],
-            'where'     => ['user_id = ?'],
-            'data'      => ['superadmin']
+
+        UserModel::create([
+            'user' => [
+                'userId'        => $body['login'],
+                'firstname'     => $body['firstname'],
+                'lastname'      => $body['lastname'],
+                'mail'          => $body['email'],
+                'preferences'   => json_encode(['documentEdition' => 'java']),
+                'password'      => $body['password']
+            ]
         ]);
+
         DatabaseModel::update([
             'table'     => 'users',
             'set'       => [
@@ -568,12 +579,14 @@ class InstallerController
 
         $explodedUrl = explode('/', rtrim($url, '/'));
         $lastPart = $explodedUrl[count($explodedUrl) - 1];
-        $jsonFile = file_get_contents('custom/custom.json');
-        if (!empty($jsonFile)) {
-            $jsonFile = json_decode($jsonFile, true);
-            foreach ($jsonFile as $value) {
-                if (!empty($value['path']) && $value['path'] == $lastPart) {
-                    $url = str_replace("/{$lastPart}", '', $url);
+        if (is_file('custom/custom.json')) {
+            $jsonFile = file_get_contents('custom/custom.json');
+            if (!empty($jsonFile)) {
+                $jsonFile = json_decode($jsonFile, true);
+                foreach ($jsonFile as $value) {
+                    if (!empty($value['path']) && $value['path'] == $lastPart) {
+                        $url = str_replace("/{$lastPart}", '', $url);
+                    }
                 }
             }
         }

@@ -50,6 +50,7 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use Status\models\StatusModel;
 use Tag\models\ResourceTagModel;
+use User\controllers\UserController;
 use User\models\UserModel;
 
 class ResController extends ResourceControlController
@@ -1013,7 +1014,7 @@ class ResController extends ResourceControlController
 
 
         $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-        if ($user['user_id'] == 'superadmin') {
+        if (UserController::isRoot(['id' => $args['userId']])) {
             return $args['resources'];
         }
 
@@ -1233,7 +1234,7 @@ class ResController extends ResourceControlController
         }
 
         $where = [$data['clause']];
-        if ($GLOBALS['login'] != 'superadmin') {
+        if (!UserController::isRoot(['id' => $GLOBALS['id']])) {
             $groupsClause = GroupController::getGroupsClause(['userId' => $GLOBALS['login']]);
             if (empty($groupsClause)) {
                 return $response->withStatus(400)->withJson(['errors' => 'User has no groups']);

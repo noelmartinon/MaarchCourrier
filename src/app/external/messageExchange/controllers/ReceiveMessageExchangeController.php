@@ -239,9 +239,9 @@ class ReceiveMessageExchangeController
         }
 
         $dataValue = [];
-        $user      = UserModel::getByLogin(['login' => 'superadmin', 'select' => ['id']]);
+        $users = UserModel::get(['select' => ['id'], 'where' => ['mode in (?)'], 'data' => [['root_visible', 'root_invisible']], 'limit' => 1]);
         $entityId  = EntityModel::getByEntityId(['entityId' => $destination[0]['entity_id'], 'select' => ['id']]);
-        $dataValue['typist']           = $user['id'];
+        $dataValue['typist']           = $users[0]['id'];
         $dataValue['doctype']          = $defaultConfig['type_id'];
         $dataValue['subject']          = str_replace("[CAPTUREM2M]", "", $mainDocumentMetaData->Title[0]);
         $dataValue['documentDate']     = $mainDocumentMetaData->CreatedDate;
@@ -384,12 +384,13 @@ class ReceiveMessageExchangeController
                 $filename             = $BinaryDataObjectInfo->Attachment->filename;
                 $fileFormat           = substr($filename, strrpos($filename, '.') + 1);
 
-                $user = UserModel::getByLogin(['login' => 'superadmin', 'select' => ['id']]);
+                $users = UserModel::get(['select' => ['id'], 'where' => ['mode in (?)'], 'data' => [['root_visible', 'root_invisible']], 'limit' => 1]);
+
                 $allDatas = [
                     'title'        => $attachmentContent->Title[0],
                     'encodedFile'  => $BinaryDataObjectInfo->Attachment->value,
                     'format'       => $fileFormat,
-                    'typist'       => $user['id'],
+                    'typist'       => $users[0]['id'],
                     'resIdMaster'  => $resIdMaster,
                     'type'         => $defaultConfig['attachment_type']
                 ];
