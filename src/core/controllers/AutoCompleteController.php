@@ -60,6 +60,10 @@ class AutoCompleteController
             'fieldsNumber'  => 2,
         ]);
 
+        if (!empty($data['hideRestUsers'])) {
+            $requestData['where'][] = "loginMode != 'restMode'";
+        }
+
         $users = UserModel::get([
             'select'    => ['id', 'user_id', 'firstname', 'lastname'],
             'where'     => $requestData['where'],
