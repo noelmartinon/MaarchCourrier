@@ -443,7 +443,9 @@ class XParaphController
                     }
                     unlink($tmpPath . $tmpName);
 
-                    $aArgs['idsToRetrieve'][$version][$resId]['log'] = $log;
+                    $aArgs['idsToRetrieve'][$version][$resId]['log']       = $log;
+                    $aArgs['idsToRetrieve'][$version][$resId]['logFormat'] = 'xml';
+                    $aArgs['idsToRetrieve'][$version][$resId]['logTitle']  = '[xParaph Log]';
                 } elseif ($state['id'] == 'validateSignature' || $state['id'] == 'validateOnlyVisa') {
                     $processedFile = XParaphController::getFile(['config' => $aArgs['config'], 'depotId' => $value['external_id'], 'userGeneric' => $userGeneric, 'depotLogin' => $xParaphDepot['login']]);
                     if (!empty($processedFile['errors'])) {
@@ -476,7 +478,9 @@ class XParaphController
                     if ($state['id'] == 'validateOnlyVisa') {
                         $aArgs['idsToRetrieve'][$version][$resId]['onlyVisa'] = true;
                     }
-                    $aArgs['idsToRetrieve'][$version][$resId]['log'] = $log;
+                    $aArgs['idsToRetrieve'][$version][$resId]['log']       = $log;
+                    $aArgs['idsToRetrieve'][$version][$resId]['logFormat'] = 'xml';
+                    $aArgs['idsToRetrieve'][$version][$resId]['logTitle']  = '[xParaph Log]';
                 } else {
                     unset($aArgs['idsToRetrieve'][$version][$resId]);
                 }

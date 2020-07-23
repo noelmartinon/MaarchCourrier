@@ -502,11 +502,17 @@ class MaarchParapheurController
             $state = MaarchParapheurController::getState(['workflow' => $documentWorkflow]);
             
             if (in_array($state['status'], ['validated', 'refused'])) {
-                $signedDocument = MaarchParapheurController::getDocument(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+                $signedDocument = MaarchParapheurController::getDocument(['config' => $aArgs['config'], 'documentId' => $value['external_id'], 'eSignDocument' => ($state['status'] == 'validated')]);
                 $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
                 $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $signedDocument['encodedDocument'];
                 if ($state['status'] == 'validated' && in_array($state['mode'], ['sign', 'visa'])) {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
+                    $signedProofDocument = MaarchParapheurController::getDocumentProof(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+                    if (!empty($signedProofDocument['encodedProofDocument'])) {
+                        $aArgs['idsToRetrieve'][$version][$resId]['log']       = $signedProofDocument['encodedProofDocument'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['logFormat'] = 'pdf';
+                        $aArgs['idsToRetrieve'][$version][$resId]['logTitle']  = '[Faisceau de preuve]';
+                    }
                 } elseif ($state['status'] == 'refused' && in_array($state['mode'], ['sign', 'visa'])) {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
                 } elseif ($state['status'] == 'validated' && $state['mode'] == 'note') {
@@ -561,7 +567,19 @@ class MaarchParapheurController
     public static function getDocument(array $aArgs)
     {
         $response = CurlModel::exec([
-            'url'      => rtrim($aArgs['config']['data']['url'], '/') . '/rest/documents/'.$aArgs['documentId'].'/content',
+            'url'      => rtrim($aArgs['config']['data']['url'], '/') . '/rest/documents/'.$aArgs['documentId'].'/content?eSignDocument='.$aArgs['eSignDocument'],
+            'user'     => $aArgs['config']['data']['userId'],
+            'password' => $aArgs['config']['data']['password'],
+            'method'   => 'GET'
+        ]);
+
+        return $response;
+    }
+
+    public static function getDocumentProof(array $aArgs)
+    {
+        $response = CurlModel::exec([
+            'url'      => rtrim($aArgs['config']['data']['url'], '/') . '/rest/documents/'.$aArgs['documentId'].'/proof',
             'user'     => $aArgs['config']['data']['userId'],
             'password' => $aArgs['config']['data']['password'],
             'method'   => 'GET'
