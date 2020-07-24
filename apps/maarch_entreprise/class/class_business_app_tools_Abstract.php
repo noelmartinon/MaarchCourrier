@@ -552,7 +552,8 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['maarch_entreprise']['database_version'] = "none";
         } else {
             $vbg = $stmt->fetchObject();
-            $_SESSION['maarch_entreprise']['database_version'] = $vbg->param_value_string;
+            $versions = explode('.', $vbg->param_value_string);
+            $_SESSION['maarch_entreprise']['database_version'] = "{$versions[0]}.{$versions[1]}";
         }
         //If this two parameters is not find, this is the end of this function
         if ($_SESSION['maarch_entreprise']['xml_versionbase'] <> 'none' ) {

@@ -196,6 +196,11 @@ if (!empty($_SESSION['error'])) {
                         \SrcCore\models\AuthenticationModel::setCookieAuth(['userId' => $login]);
                         \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
                         $user = \User\models\UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+                        $control = \VersionUpdate\controllers\VersionUpdateController::executeSQLAtConnection();
+                        if (!empty($control['errors'])) {
+                            $_SESSION['error'] = $control['errors'];
+                        }
+
                         header(
                             'location: ' . $_SESSION['config']['businessappurl']
                             . $res['url']
@@ -258,6 +263,10 @@ if (!empty($_SESSION['error'])) {
                     $_SESSION['user'] = $res['user'];
                     if ($res['error'] == '') {
                         \SrcCore\models\AuthenticationModel::setCookieAuth(['userId' => $login]);
+                        $control = \VersionUpdate\controllers\VersionUpdateController::executeSQLAtConnection();
+                        if (!empty($control['errors'])) {
+                            $_SESSION['error'] = $control['errors'];
+                        }
                     } else {
                         $_SESSION['error'] = $res['error'];
                     }
@@ -298,6 +307,10 @@ if (!empty($_SESSION['error'])) {
         if (empty($res['error'])) {
             \SrcCore\models\AuthenticationModel::setCookieAuth(['userId' => $login]);
             \SrcCore\models\AuthenticationModel::resetFailedAuthentication(['userId' => $login]);
+            $control = \VersionUpdate\controllers\VersionUpdateController::executeSQLAtConnection();
+            if (!empty($control['errors'])) {
+                $_SESSION['error'] = $control['errors'];
+            }
         } else {
             $_SESSION['error'] = $res['error'];
         }
