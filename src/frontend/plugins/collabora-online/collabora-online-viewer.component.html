@@ -1,12 +1,17 @@
 <div *ngIf="loading" style="display:block;padding: 10px;">{{lang.checkCollaboraOnlineServer}}...</div>
-<button *ngIf="!hideCloseEditor" class="collaboraOnlineButton_fullscreen" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
+<button *ngIf="!hideCloseEditor" class="collaboraOnlineButton_fullscreen" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
     [title]="lang.closeEditor" (click)="quit()">
     <mat-icon class="fa fa-times" style="height:auto;"></mat-icon>
 </button>
-<button mat-mini-fab class="collaboraOnlineButton_close" [class.fullScreen]="fullscreenMode" color="default"
+<button mat-mini-fab class="collaboraOnlineButton_close" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" color="default"
     [title]="fullscreenMode ? lang.closeFullscreen : lang.openFullscreen" (click)="openFullscreen()">
     <mat-icon class="fas" [class.fa-expand]="!fullscreenMode" [class.fa-compress]="fullscreenMode" style="height:auto;"></mat-icon>
 </button>
+<button class="collaboraOnlineButton_hide" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="default"
+        [title]="lang.closeEditor" (click)="hideButtons = !hideButtons">
+    <mat-icon class="fa fa-arrow-right" style="height:auto;"></mat-icon>
+</button>
+
 <iframe #collaboraFrame *ngIf="editorUrl !== ''" [src]="editorUrl" id="collabora" width="100%" height="100%" name="frameEditor">
 
 </iframe>

@@ -1712,4 +1712,6 @@ export const LANG_NL = {
     "documentEditor_collaboraonline": "Open Collabora Online directly inside Maarch Courrier", // _TO_TRANSLATE
     "updateKO": "Mise à jour échouée !__TO_TRANSLATE",
     "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>.__TO_TRANSLATE",
+    "hideTool": "Cacher la barre d'outils", // _TO_TRANSLATE
+    "showTool": "Afficher la barre d'outils" // _TO_TRANSLATE
 };

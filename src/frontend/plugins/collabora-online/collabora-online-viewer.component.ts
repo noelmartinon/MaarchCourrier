@@ -37,6 +37,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     isSaving: boolean = false;
     isModified: boolean = false;
     fullscreenMode: boolean = false;
+    hideButtons: boolean = false;
 
     allowedExtension: string[] = [
         'doc',
@@ -72,8 +73,10 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             this.isModified = false;
         }
         if (response.MessageId === 'Action_Save_Resp' && response.Values.success === true && !this.isModified) {
-            this.triggerAfterUpdatedDoc.emit();
-            this.getTmpFile();
+            setTimeout(() => {
+                this.triggerAfterUpdatedDoc.emit();
+                this.getTmpFile();
+            }, 500);
         } else if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === false && this.isSaving) {
             // Collabora sends 'Action_Save_Resp' when it starts saving the document, then sends Doc_ModifiedStatus with Modified = false when it is done saving
             this.triggerAfterUpdatedDoc.emit();
@@ -106,7 +109,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     }
 
     closeEditor() {
-        if (this.headerService.sideNavLeft !== null) {
+        if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
             this.headerService.sideNavLeft.open();
         }
         $j('iframe[name=\'frameEditor\']').css('position', 'initial');
@@ -146,20 +149,14 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         if (this.canLaunchCollaboraOnline()) {
             await this.checkServerStatus();
 
-            if (this.params.objectType === 'templateModification' || this.params.objectType === 'templateCreation') {
-                this.params.objectMode = this.params.objectType === 'templateModification' ? 'edition' : 'creation';
-                this.params.objectType = 'template';
-            }
-
             this.params.objectPath = undefined;
-            if (typeof this.params.objectId === 'string' && this.params.objectType === 'template') {
+            if (typeof this.params.objectId === 'string' &&  (this.params.objectType === 'templateModification' || this.params.objectType === 'templateCreation')) {
                 this.params.objectPath = this.params.objectId;
                 this.params.objectId = this.key;
             } else if (typeof this.params.objectId === 'string' && this.params.objectType === 'encodedResource') {
                 this.params.content = this.params.objectId;
                 this.params.objectId = this.key;
-                this.params.objectMode = 'encoded';
-                this.params.objectType = 'template';
+                this.params.objectType = 'templateEncoded';
 
                 await this.saveEncodedFile();
             }
@@ -207,7 +204,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     getTmpFile() {
         return new Promise((resolve) => {
-            this.http.post('../../rest/collaboraOnline/file', {token: this.token, data: this.params.dataToMerge}).pipe(
+            this.http.post('../../rest/collaboraOnline/file', {token: this.token}).pipe(
                 tap((data: any) => {
                     this.file = {
                         name: this.key,
@@ -279,9 +276,10 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             this.http.post('../../rest/collaboraOnline/configuration', {
                 resId: this.params.objectId,
                 type: this.params.objectType,
-                mode: this.params.objectMode,
                 format: this.file.format,
-                path: this.params.objectPath
+                path: this.params.objectPath,
+                data: this.params.dataToMerge,
+                lang: this.lang.langISO
             }).pipe(
                 tap((data: any) => {
                     this.editorUrl = data.url;
@@ -312,13 +310,13 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         $j('iframe[name=\'frameEditor\']').css('left', '0px');
 
         if (!this.fullscreenMode) {
-            if (this.headerService.sideNavLeft !== null) {
+            if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
                 this.headerService.sideNavLeft.close();
             }
             $j('iframe[name=\'frameEditor\']').css('position', 'fixed');
             $j('iframe[name=\'frameEditor\']').css('z-index', '2');
         } else {
-            if (this.headerService.sideNavLeft !== null) {
+            if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
                 this.headerService.sideNavLeft.open();
             }
             $j('iframe[name=\'frameEditor\']').css('position', 'initial');

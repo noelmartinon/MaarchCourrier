@@ -1729,4 +1729,6 @@ export const LANG_EN = {
     "workingDays":                                 "Working days",
     "yes":                                         "Yes",
     "zipcode":                                     "Zip code",
+    "hideTool": "Hide toolbar",
+    "showTool": "Show toolbar"
 };

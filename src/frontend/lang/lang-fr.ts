@@ -1731,4 +1731,6 @@ export const LANG_FR = {
     "workingDays":                                 "jour(s) ouvré(s)",
     "yes":                                         "Oui",
     "zipcode":                                     "Code postal",
+    "hideTool": "Cacher la barre d'outils",
+    "showTool": "Afficher la barre d'outils"
 };

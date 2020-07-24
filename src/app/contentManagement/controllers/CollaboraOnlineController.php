@@ -55,7 +55,6 @@ class CollaboraOnlineController
         $document = CollaboraOnlineController::getDocument([
             'id'     => $args['id'],
             'type'   => $tokenCheckResult['type'],
-            'mode'   => $tokenCheckResult['mode'],
             'format' => $tokenCheckResult['format']
         ]);
 
@@ -77,14 +76,14 @@ class CollaboraOnlineController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-        if ($tokenCheckResult['mode'] == 'edition' && ($tokenCheckResult['type'] == 'resource' || $tokenCheckResult['type'] == 'attachment')) {
+        if ($tokenCheckResult['type'] == 'resourceModification' || $tokenCheckResult['type'] == 'attachmentModification') {
             $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
             $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
 
-            if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'resource') {
+            if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'resourceModification') {
                 ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
                 $document['fingerprint'] = $fingerprint;
-            } else if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'attachment') {
+            } else if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'attachmentModification') {
                 AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
                 $document['fingerprint'] = $fingerprint;
             }
@@ -94,16 +93,33 @@ class CollaboraOnlineController
             }
         }
 
-        $fileContent = file_get_contents($pathToDocument);
-        if ($fileContent === false) {
-            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+        if ($tokenCheckResult['type'] == 'resourceCreation' || $tokenCheckResult['type'] == 'attachmentCreation') {
+            $dataToMerge = ['userId' => $GLOBALS['id']];
+            if (!empty($tokenCheckResult['data']) && is_array($tokenCheckResult['data'])) {
+                $dataToMerge = array_merge($dataToMerge, $tokenCheckResult['data']);
+            }
+
+            $mergedDocument = MergeController::mergeDocument([
+                'path' => $pathToDocument,
+                'data' => $dataToMerge
+            ]);
+            $content = $mergedDocument['encodedDocument'];
+            $fileContent = base64_decode($content);
+        } else {
+            $fileContent = file_get_contents($pathToDocument);
+            if ($fileContent === false) {
+                return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
+            }
+
+            $content = base64_encode($fileContent);
+            $fileContent = base64_decode($content);
         }
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
 
-        if ($tokenCheckResult['mode'] == 'encoded') {
+        if ($tokenCheckResult['type'] == 'templateEncoded') {
             unlink($document['path'] . $document['filename']);
         }
 
@@ -128,7 +144,6 @@ class CollaboraOnlineController
         $document = CollaboraOnlineController::getDocument([
             'id'     => $args['id'],
             'type'   => $tokenCheckResult['type'],
-            'mode'   => $tokenCheckResult['mode'],
             'format' => $tokenCheckResult['format']
         ]);
 
@@ -182,7 +197,6 @@ class CollaboraOnlineController
         $document = CollaboraOnlineController::getDocument([
             'id'     => $args['id'],
             'type'   => $tokenCheckResult['type'],
-            'mode'   => $tokenCheckResult['mode'],
             'format' => $tokenCheckResult['format']
         ]);
 
@@ -194,7 +208,7 @@ class CollaboraOnlineController
 
         $extension = pathinfo($document['filename'], PATHINFO_EXTENSION);
         $tmpPath = CoreConfigModel::getTmpPath();
-        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$tokenCheckResult['mode']}_{$args['id']}.{$extension}";
+        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$args['id']}.{$extension}";
 
         $put = file_put_contents($tmpPath . $filename, $fileContent);
         if ($put === false) {
@@ -220,7 +234,6 @@ class CollaboraOnlineController
         $document = CollaboraOnlineController::getDocument([
             'id'     => $tokenCheckResult['resId'],
             'type'   => $tokenCheckResult['type'],
-            'mode'   => $tokenCheckResult['mode'],
             'format' => $tokenCheckResult['format']
         ]);
         if (!empty($document['errors'])) {
@@ -228,35 +241,20 @@ class CollaboraOnlineController
         }
 
         $extension = pathinfo($document['filename'], PATHINFO_EXTENSION);
-        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$tokenCheckResult['mode']}_{$tokenCheckResult['resId']}.{$extension}";
+        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$tokenCheckResult['resId']}.{$extension}";
         $tmpPath = CoreConfigModel::getTmpPath();
         $pathToDocument = $tmpPath . $filename;
 
-        if ($tokenCheckResult['mode'] == 'creation' && ($tokenCheckResult['type'] == 'resource' || $tokenCheckResult['type'] == 'attachment')) {
-            if (!file_exists($pathToDocument)) {
-                return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
-            }
-            $dataToMerge = ['userId' => $GLOBALS['id']];
-            if (!empty($body['data']) && is_array($body['data'])) {
-                $dataToMerge = array_merge($dataToMerge, $body['data']);
-            }
-
-            $mergedDocument = MergeController::mergeDocument([
-                'path' => $pathToDocument,
-                'data' => $dataToMerge
-            ]);
-            $content = $mergedDocument['encodedDocument'];
-        } else {
-            if (!file_exists($pathToDocument)) {
-                return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
-            }
-            $fileContent = file_get_contents($pathToDocument);
-            if ($fileContent === false) {
-                return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
-            }
-
-            $content = base64_encode($fileContent);
+        if (!file_exists($pathToDocument)) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
         }
+
+        $fileContent = file_get_contents($pathToDocument);
+        if ($fileContent === false) {
+            return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
+        }
+
+        $content = base64_encode($fileContent);
 
         return $response->withJson(['content' => $content, 'format' => $extension]);
     }
@@ -277,7 +275,6 @@ class CollaboraOnlineController
         $document = CollaboraOnlineController::getDocument([
             'id'     => $tokenCheckResult['resId'],
             'type'   => $tokenCheckResult['type'],
-            'mode'   => $tokenCheckResult['mode'],
             'format' => $tokenCheckResult['format']
         ]);
         if (!empty($document['errors'])) {
@@ -285,7 +282,7 @@ class CollaboraOnlineController
         }
 
         $extension = pathinfo($document['filename'], PATHINFO_EXTENSION);
-        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$tokenCheckResult['mode']}_{$tokenCheckResult['resId']}.{$extension}";
+        $filename = "collabora_{$GLOBALS['id']}_{$tokenCheckResult['type']}_{$tokenCheckResult['resId']}.{$extension}";
         $tmpPath = CoreConfigModel::getTmpPath();
         $pathToDocument = $tmpPath . $filename;
 
@@ -334,20 +331,22 @@ class CollaboraOnlineController
         if (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not a string']);
         }
-        if (!Validator::stringType()->notEmpty()->validate($body['mode'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body mode is empty or not a string']);
-        }
         if (!empty($body['format']) && !Validator::stringType()->validate($body['format'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body format is not a string']);
         }
         if (!empty($body['path']) && !Validator::stringType()->validate($body['path'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body path is not a string']);
         }
+        if (!empty($body['data']) && !Validator::arrayType()->validate($body['data'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body data is not a string']);
+        }
+        if (!empty($body['lang']) && !Validator::stringType()->validate($body['lang'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body lang is not a string']);
+        }
 
         $document = CollaboraOnlineController::getDocument([
             'id'     => $body['resId'],
             'type'   => $body['type'],
-            'mode'   => $body['mode'],
             'format' => $body['format'],
             'path'   => $body['path']
         ]);
@@ -395,12 +394,17 @@ class CollaboraOnlineController
             return $response->withStatus(400)->withJson(['errors' => 'File cannot be edited with Collabora Online', 'lang' => 'collaboraOnlineEditDenied']);
         }
 
+        $dataToMerge = ['userId' => $GLOBALS['id']];
+        if (!empty($body['data']) && is_array($body['data'])) {
+            $dataToMerge = array_merge($dataToMerge, $body['data']);
+        }
+
         $payload = [
             'userId' => $GLOBALS['userId'],
             'resId'  => $body['resId'],
             'type'   => $body['type'],
-            'mode'   => $body['mode'],
-            'format' => $extension
+            'format' => $extension,
+            'data'   => json_encode($dataToMerge)
         ];
 
         $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
@@ -466,7 +470,7 @@ class CollaboraOnlineController
             return ['code' => 401, 'errors' => 'Collabora Online access token is invalid'];
         }
 
-        if (empty($jwt->resId) || empty($jwt->userId) || empty($jwt->type) || empty($jwt->mode)) {
+        if (empty($jwt->resId) || empty($jwt->userId) || empty($jwt->type)) {
             return ['code' => 401, 'errors' => 'Collabora Online access token is invalid'];
         }
 
@@ -478,19 +482,19 @@ class CollaboraOnlineController
 
         return [
             'type'   => $jwt->type,
-            'mode'   => $jwt->mode,
             'resId'  => $jwt->resId,
-            'format' => $jwt->format
+            'format' => $jwt->format,
+            'data'   => json_decode($jwt->data, true)
         ];
     }
 
     private static function getDocument(array $args)
     {
-        ValidatorModel::notEmpty($args, ['id', 'type', 'mode']);
-        ValidatorModel::stringType($args, ['type', 'mode', 'format', 'path']);
+        ValidatorModel::notEmpty($args, ['id', 'type']);
+        ValidatorModel::stringType($args, ['type', 'format', 'path']);
         ValidatorModel::intVal($args, ['id']);
 
-        if ($args['mode'] == 'creation' && ($args['type'] == 'resource' || $args['type'] == 'attachment')) {
+        if ($args['type'] == 'resourceCreation' || $args['type'] == 'attachmentCreation') {
             $document = TemplateModel::getById(['select' => ['template_file_name', 'template_target', 'template_path', 'template_file_name'], 'id' => $args['id']]);
             if (empty($document)) {
                 return ['code' => 400, 'errors' => 'Document does not exist'];
@@ -522,7 +526,7 @@ class CollaboraOnlineController
                 return ['code' => 400, 'errors' => 'Template is out of perimeter'];
             }
 
-            $templateTarget = $args['type'] == 'resource' ? 'indexingFile' : 'attachments';
+            $templateTarget = $args['type'] == 'resourceCreation' ? 'indexingFile' : 'attachments';
             if ($document['template_target'] != $templateTarget) {
                 return ['code' => 400, 'errors' => 'Template is not for resource creation'];
             }
@@ -532,7 +536,7 @@ class CollaboraOnlineController
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-        } else if ($args['type'] == 'resource' && $args['mode'] == 'edition') {
+        } else if ($args['type'] == 'resourceModification') {
             if (!ResController::hasRightByResId(['resId' => [$args['id']], 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Document out of perimeter'];
             }
@@ -549,7 +553,7 @@ class CollaboraOnlineController
             if (!empty($convertedDocument[0])) {
                 return ['code' => 400, 'errors' => 'Document was signed : it cannot be edited'];
             }
-        } else if ($args['type'] == 'attachment' && $args['mode'] == 'edition') {
+        } else if ($args['type'] == 'attachmentModification') {
             $document = AttachmentModel::getById([
                 'select' => ['res_id_master', 'filename', 'filesize', 'modification_date', 'docserver_id', 'path', 'fingerprint', 'status'],
                 'id' => $args['id']
@@ -565,7 +569,7 @@ class CollaboraOnlineController
             if ($document['status'] == 'SIGN') {
                 return ['code' => 400, 'errors' => 'Document was signed : it cannot be edited'];
             }
-        } else if ($args['type'] == 'template' && $args['mode'] == 'edition') {
+        } else if ($args['type'] == 'templateModification') {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Service forbidden'];
             }
@@ -581,7 +585,7 @@ class CollaboraOnlineController
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-        } else if ($args['type'] == 'template' && $args['mode'] == 'encoded') {
+        } else if ($args['type'] == 'templateEncoded') {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Service forbidden'];
             }
@@ -592,7 +596,7 @@ class CollaboraOnlineController
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-        } else if ($args['type'] == 'template' && $args['mode'] == 'creation') {
+        } else if ($args['type'] == 'templateCreation') {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Service forbidden'];
             }

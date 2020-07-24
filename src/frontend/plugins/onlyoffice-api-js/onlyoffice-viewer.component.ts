@@ -49,6 +49,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     canUpdateDocument: boolean = false;
     isSaving: boolean = false;
     fullscreenMode: boolean = false;
+    hideButtons: boolean = false;
 
     tmpFilename: string = '';
 
@@ -103,7 +104,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     }
 
     closeEditor() {
-        if (this.headerService.sideNavLeft !== null) {
+        if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
             this.headerService.sideNavLeft.open();
         }
         $j('iframe[name=\'frameEditor\']').css('position', 'initial');
@@ -351,13 +352,13 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
         $j('iframe[name=\'frameEditor\']').css('left', '0px');
 
         if (!this.fullscreenMode) {
-            if (this.headerService.sideNavLeft !== null) {
+            if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
                 this.headerService.sideNavLeft.close();
             }
             $j('iframe[name=\'frameEditor\']').css('position', 'fixed');
             $j('iframe[name=\'frameEditor\']').css('z-index', '2');
         } else {
-            if (this.headerService.sideNavLeft !== null) {
+            if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
                 this.headerService.sideNavLeft.open();
             }
             $j('iframe[name=\'frameEditor\']').css('position', 'initial');
