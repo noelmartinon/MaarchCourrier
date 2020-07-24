@@ -123,7 +123,7 @@ export class UserAdministrationComponent implements OnInit {
         private zone: NgZone,
         private notify: NotificationService,
         public dialog: MatDialog,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         private _formBuilder: FormBuilder,
         public appService: AppService,
         private privilegeService: PrivilegeService,
