@@ -41,12 +41,12 @@ class AdministrationController
                 $users = [];
                 if (!empty($entities)) {
                     $users = UserEntityModel::getWithUsers([
-                        'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode'],
+                        'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail'],
                         'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
                         'data'      => [$entities, 'DEL']
                     ]);
                 }
-                $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode']]);
+                $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail']]);
                 $users = array_merge($users, $usersNoEntities);
             }
             $count['users'] = count($users);

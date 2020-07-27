@@ -72,8 +72,8 @@ abstract class UserEntityModelAbstract
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['users', 'users_entities'],
             'left_join' => ['users.id = users_entities.user_id'],
-            'where'     => ['users_entities IS NULL', 'status != ?', 'mode not in (?)'],
-            'data'      => ['DEL', ['root_visible', 'root_invisible']]
+            'where'     => ['users_entities IS NULL', 'status != ?'],
+            'data'      => ['DEL']
         ]);
 
         return $aUsersEntities;

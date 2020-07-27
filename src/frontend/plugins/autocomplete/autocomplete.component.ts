@@ -25,33 +25,31 @@ export class PluginAutocomplete implements OnInit {
     type = {
         user: 'fa-user',
         entity: 'fa-sitemap'
-    }
+    };
 
     /**
      * Can be used for real input or discret input filter
      * @default default
-     * 
      * @param default
      * @param small
      */
-    @Input('size') size: string;
+    @Input() size: string;
 
     /**
      * If false, input auto empty when trigger a value
      */
-    @Input('singleMode') singleMode: boolean;
+    @Input() singleMode: boolean;
 
     /**
      * Appearance of input
      * @default legacy
-     * 
      * @param legacy
      * @param outline
      */
-    @Input('appearance') appearance: string;
+    @Input() appearance: string;
 
 
-    @Input('required') required: boolean;
+    @Input() required: boolean;
 
     /**
      * Datas of options in autocomplete. Incompatible with @routeDatas
@@ -81,7 +79,7 @@ export class PluginAutocomplete implements OnInit {
     /**
      * Key of sub info in display (ex : $data[0] = {id: 1, label: 'Jean Dupond', entity: 'Pôle social'}; subInfoKey => entity)
      */
-    @Input('subInfoKey') subInfoKey: string;
+    @Input() subInfoKey: string;
 
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
@@ -91,7 +89,7 @@ export class PluginAutocomplete implements OnInit {
     /**
      * Route used for set values / adding / deleting item in BDD (DataModel must return id and label)
      */
-    @Input('manageDatas') manageDatas: string;
+    @Input() manageDatas: string;
 
     /**
      * Catch external event after select an element in autocomplete
@@ -148,7 +146,7 @@ export class PluginAutocomplete implements OnInit {
             .pipe(
                 debounceTime(300),
                 filter(value => value.length > 2),
-                //distinctUntilChanged(),
+                // distinctUntilChanged(),
                 tap(() => this.loading = true),
                 switchMap((data: any) => this.getDatas(data)),
                 tap((data: any) => {
@@ -169,15 +167,15 @@ export class PluginAutocomplete implements OnInit {
     }
 
     getDatas(data: string) {
-        let arrayObs: any = [];
-        let test: any = [];
+        const arrayObs: any = [];
+        const test: any = [];
         this.routeDatas.forEach(element => {
-            arrayObs.push(this.http.get('..' + element, { params: { "search": data } }));
+            arrayObs.push(this.http.get('..' + element, { params: { 'search': data } }));
         });
 
         return forkJoin(arrayObs).pipe(
-            map(data => {
-                data.forEach((element: any) => {
+            map(items => {
+                items.forEach((element: any) => {
                     element.forEach((element2: any) => {
                         test.push(element2);
                     });
@@ -252,7 +250,7 @@ export class PluginAutocomplete implements OnInit {
     }
 
     removeItem(index: number) {
-        let arrValue = this.controlAutocomplete.value;
+        const arrValue = this.controlAutocomplete.value;
         arrValue.splice(index, 1);
         this.controlAutocomplete.setValue(arrValue);
     }
@@ -282,7 +280,7 @@ export class PluginAutocomplete implements OnInit {
             ).subscribe();
         }
     }
-    
+
     getValue() {
         return this.myControl.value;
     }

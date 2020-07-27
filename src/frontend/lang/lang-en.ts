@@ -1573,7 +1573,7 @@ export const LANG_EN = {
     "updateDiffusionWhileIndexing": "Update all parts of diffusion list when indexing.",
     "updateDiffusionWhileProcess": "Update all parts of diffusion list when processing.",
     "updateInProgress": "Update in progress ...",
-    "updateInfo": "This action cannot be undone! Do not make any actions during process and make sure no users are connected.",
+    "updateInfo": "This action cannot be undone and will update all instances of the application! Do not make any actions during process and make sure no users are connected.",
     "updateOk": "Update successful !",
     "updateStatus": "Mail status modification",
     "updateStatusInformationsChrono": "When typing the CHRONO of a mail, you will update its status. The document will be present in the basket depending of the status you have chosen.",
@@ -1861,5 +1861,14 @@ export const LANG_EN = {
     "createScriptTourTitle": "Create the script",
     "createScriptTourDescription": "Before scheduling the task, we need to create the script.",
     "updateKO": "Update failed !",
-    "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>."
+    "saveInDocserversInfo": "Update history saved in docserver <b>migration</b>.",
+    "root_visible": "Administrator",
+    "root_invisible": "Administrator (invisible)",
+    "standard": "Default",
+    "accountType": "Account type",
+    "beginInstall": "Start installation",
+    "hideTool": "Hide toolbar",
+    "showTool": "Show toolbar",
+    "rest": "Webservice account",
+    "mustSuperadmin": "You must be an administrator yourself to define administrators."
 };

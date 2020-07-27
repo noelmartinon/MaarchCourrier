@@ -140,8 +140,8 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
 
-        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['loginmode']]);
-        if (!empty($body['email']) && $currentUser['loginmode'] == 'restMode') {
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mode']]);
+        if (!empty($body['email']) && $currentUser['mode'] == 'rest') {
             $contact = ContactModel::get(['select' => ['id'], 'where' => ['email = ?'], 'data' => [$body['email']]]);
             if (!empty($contact[0]['id'])) {
                 return $response->withJson(['id' => $contact[0]['id']]);
@@ -1306,14 +1306,14 @@ class ContactController
                     'notes'              => null,
                     'creator'            => null,
                     'creatorLabel'       => null,
-                    'enabled'            => null,
+                    'enabled'            => $user['status'] != 'SPD',
                     'creationDate'       => null,
                     'modificationDate'   => null,
                     'customFields'       => null,
                     'externalId'         => null
                 ];
             } elseif ($resourceContact['type'] == 'entity') {
-                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email']]);
+                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email', 'enabled']]);
 
                 $contact = [
                     'type'               => 'entity',
@@ -1335,7 +1335,7 @@ class ContactController
                     'notes'              => null,
                     'creator'            => null,
                     'creatorLabel'       => null,
-                    'enabled'            => null,
+                    'enabled'            => $entity['enabled'] == 'Y',
                     'creationDate'       => null,
                     'modificationDate'   => null,
                     'customFields'       => null,

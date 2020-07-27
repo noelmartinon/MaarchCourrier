@@ -74,7 +74,7 @@ export class UsersAdministrationComponent implements OnInit {
                 this.data = data['users'];
                 this.data.forEach(element => {
                     element.statusLabel = this.lang['user' + element.status];
-                    if (element.loginmode === 'restMode') {
+                    if (element.mode === 'rest') {
                         this.webserviceAccounts.push(element);
                     } else {
                         this.noWebserviceAccounts.push(element);

@@ -68,6 +68,7 @@ export class HeaderService {
                 .pipe(
                     map((data: any) => {
                         this.user = {
+                            mode: data.mode,
                             id: data.id,
                             userId: data.user_id,
                             firstname: data.firstname,

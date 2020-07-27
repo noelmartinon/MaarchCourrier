@@ -26,7 +26,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
-    @Input() inSignatureBook: boolean = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
@@ -109,7 +108,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     }
 
     closeEditor() {
-        if (this.headerService.sideNavLeft !== null) {
+        if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
             this.headerService.sideNavLeft.open();
         }
         $('iframe[name=\'frameEditor\']').css('position', 'initial');
@@ -315,7 +314,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             iframe.css('position', 'fixed');
             iframe.css('z-index', '2');
         } else {
-            if (this.headerService.sideNavLeft !== null && !this.inSignatureBook) {
+            if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
                 this.headerService.sideNavLeft.open();
             }
             iframe.css('position', 'initial');

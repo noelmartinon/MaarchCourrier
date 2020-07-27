@@ -3,6 +3,7 @@
     position: absolute;
     top: 12px;
     z-index: 3;
+    transition: all 0.5s;
 }
 
 .collaboraOnlineButton {
@@ -27,4 +28,11 @@
 .fullScreenEditor {
     top: 0px;
     left: 0px;
+}
+
+.buttonsHide {
+    top: -15px;
+    right: -15px;
+    transform: rotate(125deg);
+    transition: all 0.5s;
 }

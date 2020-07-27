@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
@@ -24,6 +24,8 @@ export class DatabaseComponent implements OnInit {
     dbExist: boolean = false;
 
     dataFiles: string[] = [];
+
+    @Output() nextStep = new EventEmitter<string>();
 
     constructor(
         public http: HttpClient,
@@ -103,6 +105,7 @@ export class DatabaseComponent implements OnInit {
                 this.dbExist = data.status === 200;
                 this.notify.success(this.lang.rightInformations);
                 this.stepFormGroup.controls['stateStep'].setValue('success');
+                this.nextStep.emit();
             }),
             catchError((err: any) => {
                 this.dbExist = false;

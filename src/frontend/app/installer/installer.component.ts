@@ -34,6 +34,7 @@ export class InstallerComponent implements OnInit, AfterViewInit {
     lang: any = LANG;
 
     @ViewChildren('stepContent') stepContent: any;
+    @ViewChild('stepper', { static: true }) stepper: MatStepper;
 
     constructor(
         private http: HttpClient,
@@ -69,6 +70,10 @@ export class InstallerComponent implements OnInit, AfterViewInit {
 
     initStep(ev: any) {
         this.stepContent.toArray()[ev.selectedIndex].initStep();
+    }
+
+    nextStep() {
+        this.stepper.next();
     }
 
     endInstall() {

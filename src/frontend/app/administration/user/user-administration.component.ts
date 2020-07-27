@@ -34,7 +34,9 @@ export class UserAdministrationComponent implements OnInit {
     serialId: number;
     userId: string;
     mode: string = '';
-    user: any = {};
+    user: any = {
+        mode : 'standard'
+    };
     _search: string = '';
     creationMode: boolean;
 
@@ -87,6 +89,25 @@ export class UserAdministrationComponent implements OnInit {
     canViewPersonalDatas: boolean = false;
     canManagePersonalDatas: boolean = false;
 
+    adminModes: any[] = [
+        {
+            id: 'standard',
+            label : this.lang.standard
+        },
+        {
+            id: 'root_visible',
+            label : this.lang.root_visible
+        },
+        {
+            id: 'root_invisible',
+            label : this.lang.root_invisible
+        },
+        {
+            id: 'rest',
+            label : this.lang.rest
+        }
+    ];
+
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
@@ -119,7 +140,7 @@ export class UserAdministrationComponent implements OnInit {
         private zone: NgZone,
         private notify: NotificationService,
         public dialog: MatDialog,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         private _formBuilder: FormBuilder,
         public appService: AppService,
         private privilegeService: PrivilegeService,
@@ -131,7 +152,6 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     ngOnInit(): void {
-
         this.loading = true;
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
@@ -897,9 +917,9 @@ export class UserAdministrationComponent implements OnInit {
 
     setUserModeLogin(event: any) {
         if (event.checked) {
-            this.user.loginmode = 'restMode';
+            this.user.mode = 'rest';
         } else {
-            this.user.loginmode = 'standard';
+            this.user.mode = 'standard';
         }
     }
 

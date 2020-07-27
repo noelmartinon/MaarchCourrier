@@ -49,6 +49,7 @@ export class AppGuard implements CanActivate {
                     .pipe(
                         map((data: any) => {
                             this.headerService.user = {
+                                mode: data.mode,
                                 id: data.id,
                                 status: data.status,
                                 userId: data.user_id,
@@ -151,6 +152,7 @@ export class AppGuard implements CanActivate {
                     exhaustMap(() => this.http.get('../rest/currentUser/profile')),
                     map((dataUser: any) => {
                         this.headerService.user = {
+                            mode: dataUser.mode,
                             id: dataUser.id,
                             status: dataUser.status,
                             userId: dataUser.user_id,

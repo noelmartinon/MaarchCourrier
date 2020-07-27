@@ -209,21 +209,26 @@
                                     </div>
                                 </div>
                                 <mat-accordion>
-                                    <mat-expansion-panel>
+                                    <mat-expansion-panel [expanded]="creationMode">
                                         <mat-expansion-panel-header>
                                             <mat-panel-title style="color: rgba(0,0,0,0.54);">
                                                 {{lang.otherInformations}}
                                             </mat-panel-title>
                                         </mat-expansion-panel-header>
-                                        <div class="form-group">
-                                            <div class="col-sm-12">
-                                                <mat-checkbox color="primary"
-                                                    matTooltip="{{lang.webserviceAccountDesc}}" name="loginmode"
-                                                    (change)="setUserModeLogin($event)"
-                                                    [checked]="user.loginmode == 'restMode'">
-                                                    {{lang.webserviceAccount}}
-                                                </mat-checkbox>
-                                            </div>
+                                        <div>
+                                            <mat-form-field>
+                                                <mat-label>{{lang.accountType}}</mat-label>
+                                                <mat-select [(ngModel)]="user.mode" id="accountType" name="accountType"
+                                                    required [disabled]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(user.mode) > -1">
+                                                    <ng-container *ngFor="let mode of adminModes | sortBy : 'label'">
+                                                        <mat-option [value]="mode.id"
+                                                            [disabled]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1"
+                                                            [title]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1 ? lang.mustSuperadmin : ''">
+                                                            {{mode.label}}
+                                                        </mat-option>
+                                                    </ng-container>
+                                                </mat-select>
+                                            </mat-form-field>
                                         </div>
                                     </mat-expansion-panel>
                                 </mat-accordion>
@@ -485,8 +490,10 @@
                                                 {{element.event_date | date : "dd/MM/y HH:mm"}}</mat-cell>
                                         </ng-container>
                                         <ng-container matColumnDef="record_id">
-                                            <mat-header-cell *matHeaderCellDef style="flex:1;">{{lang.technicalId}}</mat-header-cell>
-                                            <mat-cell *matCellDef="let element" style="flex:1;">{{element.record_id}}</mat-cell>
+                                            <mat-header-cell *matHeaderCellDef style="flex:1;">{{lang.technicalId}}
+                                            </mat-header-cell>
+                                            <mat-cell *matCellDef="let element" style="flex:1;">{{element.record_id}}
+                                            </mat-cell>
                                         </ng-container>
                                         <ng-container matColumnDef="info">
                                             <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">

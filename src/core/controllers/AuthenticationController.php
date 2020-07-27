@@ -27,6 +27,7 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
+use VersionUpdate\controllers\VersionUpdateController;
 
 class AuthenticationController
 {
@@ -89,9 +90,9 @@ class AuthenticationController
         if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
             if (AuthenticationModel::authentication(['login' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
                 $loginMethod = CoreConfigModel::getLoggingMethod();
-                $user = UserModel::getByLogin(['select' => ['id', 'loginmode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
+                $user = UserModel::getByLogin(['select' => ['id', 'mode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
                 if ($loginMethod['id'] != 'standard') {
-                    if ($user['loginmode'] == 'restMode') {
+                    if ($user['mode'] == 'rest') {
                         $userId = $user['id'];
                     }
                 } else {
@@ -137,9 +138,9 @@ class AuthenticationController
         ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::stringType($args, ['currentRoute']);
 
-        $user = UserModel::getById(['select' => ['status', 'password_modification_date', 'loginmode'], 'id' => $args['userId']]);
+        $user = UserModel::getById(['select' => ['status', 'password_modification_date', 'mode'], 'id' => $args['userId']]);
 
-        if ($user['loginmode'] == 'restMode') {
+        if ($user['mode'] == 'rest') {
             return ['isRouteAvailable' => true];
         }
 
@@ -236,8 +237,8 @@ class AuthenticationController
             }
         }
 
-        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'loginmode', 'refresh_token', 'user_id']]);
-        if (empty($user) || $user['loginmode'] == 'restMode') {
+        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'mode', 'refresh_token', 'user_id']]);
+        if (empty($user) || $user['mode'] == 'rest') {
             return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
         }
 
@@ -276,6 +277,11 @@ class AuthenticationController
             'moduleId'  => 'authentication',
             'eventId'   => 'login'
         ]);
+
+        $control = VersionUpdateController::executeSQLAtConnection();
+        if (!empty($control['errors'])) {
+            return $response->withJson(['SQLUpdate' => $control['errors']]);
+        }
 
         return $response->withStatus(204);
     }

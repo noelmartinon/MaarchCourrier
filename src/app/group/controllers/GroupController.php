@@ -156,24 +156,18 @@ class GroupController
         $group['baskets']           = GroupBasketModel::getBasketsByGroupId(['select' => ['baskets.basket_id', 'baskets.basket_name', 'baskets.basket_desc'], 'groupId' => $group['group_id']]);
         $group['canAdminUsers']     = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']]);
         $group['canAdminBaskets']   = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_baskets', 'userId' => $GLOBALS['id']]);
+        $group['privileges']        = PrivilegeModel::getPrivilegesByGroupId(['groupId' => $args['id']]);
 
-        $group['privileges']         = PrivilegeModel::getPrivilegesByGroupId(['groupId' => $args['id']]);
-
-        if (UserController::isRoot(['id' => $GLOBALS['id']])) {
-            $allowedUsers = UserModel::get([
-                'select'    => ['id'],
-                'where'     => ['status != ?'],
-                'data'      => ['DEL']
-            ]);
-            $allowedUsers = array_column($allowedUsers, 'id');
-        } else {
+        $allowedUsers = [];
+        $isRoot = UserController::isRoot(['id' => $GLOBALS['id']]);
+        if (!$isRoot) {
+            $users = array_column($group['users'], 'id');
             $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
-            $allowedUsers = [];
-            if (!empty($entities)) {
+            if (!empty($entities) && !empty($users)) {
                 $allowedUsers = UserEntityModel::getWithUsers([
                     'select'    => ['DISTINCT users.id'],
-                    'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
-                    'data'      => [$entities, 'DEL']
+                    'where'     => ['users_entities.entity_id in (?)', 'status != ?', 'users.id in (?)'],
+                    'data'      => [$entities, 'DEL', $users]
                 ]);
             }
             $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id']]);
@@ -182,7 +176,7 @@ class GroupController
         }
 
         foreach ($group['users'] as $key => $user) {
-            $group['users'][$key]['allowed'] = in_array($user['id'], $allowedUsers);
+            $group['users'][$key]['allowed'] = $isRoot ?: in_array($user['id'], $allowedUsers);
         }
 
         return $response->withJson(['group' => $group]);

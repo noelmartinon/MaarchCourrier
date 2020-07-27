@@ -5,6 +5,9 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
+--DATABASE_BACKUP|usergroups_services|groupbasket
+
+UPDATE parameters SET param_value_string = '20.03.6' WHERE id = 'database_version';
 
 DELETE FROM usergroups_services WHERE service_id = 'include_folders_and_followed_resources_perimeter';
 

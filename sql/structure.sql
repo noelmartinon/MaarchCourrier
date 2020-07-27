@@ -221,7 +221,6 @@ CREATE TABLE users
   preferences jsonb NOT NULL DEFAULT '{"documentEdition" : "java"}',
   status character varying(10) NOT NULL DEFAULT 'OK'::character varying,
   password_modification_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-  loginmode character varying(50) DEFAULT NULL::character varying,
   mode users_modes NOT NULL DEFAULT 'standard',
   refresh_token jsonb NOT NULL DEFAULT '[]',
   reset_token text,

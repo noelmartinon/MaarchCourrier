@@ -38,8 +38,8 @@ class ResourceControlController
 {
     protected static function controlResource(array $args)
     {
-        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['loginmode']]);
-        $isWebServiceUser = $currentUser['loginmode'] == 'restMode';
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mode']]);
+        $isWebServiceUser = $currentUser['mode'] == 'rest';
 
         $body = $args['body'];
 

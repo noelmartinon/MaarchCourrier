@@ -224,9 +224,8 @@
                         style="height:100%;width:100%;" [editMode]="true"
                         [hideTools]="true"
                         [mode]="signatureBook.attachments[rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment'"
-                        [resId]="signatureBook.attachments[rightSelectedThumbnail].res_id"
-                        [title]="signatureBook.attachments[rightSelectedThumbnail].identifier"
-                        [inSignatureBook]="true">
+                        [resId]="signatureBook.attachments[rightSelectedThumbnail].signed ? signatureBook.attachments[rightSelectedThumbnail].viewerId : signatureBook.attachments[rightSelectedThumbnail].res_id"
+                        [title]="signatureBook.attachments[rightSelectedThumbnail].identifier">
                     </app-document-viewer>
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted"
                         [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">

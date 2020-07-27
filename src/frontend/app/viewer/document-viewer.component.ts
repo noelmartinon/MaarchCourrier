@@ -84,11 +84,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Output() triggerEvent = new EventEmitter<string>();
 
-    /**
-     * true if viewer in signature book
-     */
-    @Input() inSignatureBook: boolean = false;
-
     lang: any = LANG;
 
     loading: boolean = true;

@@ -84,26 +84,28 @@ class UserModel
     {
         ValidatorModel::notEmpty($args, ['user']);
         ValidatorModel::notEmpty($args['user'], ['userId', 'firstname', 'lastname']);
-        ValidatorModel::stringType($args['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'phone', 'loginmode', 'preferences']);
+        ValidatorModel::stringType($args['user'], ['userId', 'firstname', 'lastname', 'mail', 'initials', 'phone', 'preferences', 'password']);
 
-        $password = AuthenticationModel::generatePassword();
+        if (empty($args['user']['password'])) {
+            $args['user']['password'] = AuthenticationModel::generatePassword();
+        }
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'users_id_seq']);
 
         DatabaseModel::insert([
             'table'         => 'users',
             'columnsValues' => [
-                'id'                            => $nextSequenceId,
-                'user_id'                       => strtolower($args['user']['userId']),
-                'firstname'                     => $args['user']['firstname'],
-                'lastname'                      => $args['user']['lastname'],
-                'mail'                          => $args['user']['mail'],
-                'phone'                         => $args['user']['phone'],
-                'initials'                      => $args['user']['initials'],
-                'status'                        => 'OK',
-                'preferences'                   => $args['user']['preferences'],
-                'loginmode'                     => empty($args['user']['loginmode']) ? 'standard' : $args['user']['loginmode'],
-                'password'                      => AuthenticationModel::getPasswordHash($password),
-                'password_modification_date'    => 'CURRENT_TIMESTAMP'
+                'id'                         => $nextSequenceId,
+                'user_id'                    => strtolower($args['user']['userId']),
+                'firstname'                  => $args['user']['firstname'],
+                'lastname'                   => $args['user']['lastname'],
+                'mail'                       => $args['user']['mail'],
+                'phone'                      => $args['user']['phone'],
+                'initials'                   => $args['user']['initials'],
+                'status'                     => 'OK',
+                'preferences'                => $args['user']['preferences'],
+                'mode'                       => empty($args['user']['mode']) ? 'standard' : $args['user']['mode'],
+                'password'                   => AuthenticationModel::getPasswordHash($args['user']['password']),
+                'password_modification_date' => 'CURRENT_TIMESTAMP'
             ]
         ]);
 

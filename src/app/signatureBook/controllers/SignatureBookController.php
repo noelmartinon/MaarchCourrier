@@ -201,8 +201,6 @@ class SignatureBookController
             $realId         = $value['res_id'];
             $viewerId       = $realId;
             $viewerNoSignId = $realId;
-            $pathToFind     = $value['path'] . str_replace(strrchr($value['filename'], '.'), '.pdf', $value['filename']);
-            $isConverted    = false;
 
             foreach ($attachments as $tmpKey => $tmpValue) {
                 if ($value['status'] == 'SIGN' && $tmpValue['attachment_type'] == 'signed_response' && !empty($tmpValue['origin'])) {
@@ -249,6 +247,8 @@ class SignatureBookController
             $attachments[$key]['attachment_type'] = $attachmentTypes[$value['attachment_type']]['label'];
             $attachments[$key]['icon']            = $attachmentTypes[$value['attachment_type']]['icon'];
             $attachments[$key]['sign']            = $attachmentTypes[$value['attachment_type']]['sign'];
+            $attachments[$key]['signed']          = $value['status'] == 'SIGN';
+            $attachments[$key]['viewerId']        = $viewerId;
 
             if ($value['status'] == 'SIGN') {
                 $attachments[$key]['viewerLink'] = "../rest/attachments/{$viewerId}/content?".rand();

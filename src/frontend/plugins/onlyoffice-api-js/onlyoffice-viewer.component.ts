@@ -37,7 +37,6 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     @Input() file: any = {};
     @Input() params: any = {};
     @Input() hideCloseEditor: any = false;
-    @Input() inSignatureBook: boolean = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
@@ -359,7 +358,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             $('iframe[name=\'frameEditor\']').css('position', 'fixed');
             $('iframe[name=\'frameEditor\']').css('z-index', '2');
         } else {
-            if (this.headerService.sideNavLeft !== null && !this.inSignatureBook) {
+            if (this.headerService.sideNavLeft !== null && !this.headerService.hideSideBar) {
                 this.headerService.sideNavLeft.open();
             }
             $('iframe[name=\'frameEditor\']').css('position', 'initial');

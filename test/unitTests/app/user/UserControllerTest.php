@@ -44,8 +44,8 @@ class UserControllerTest extends TestCase
             $this->assertIsString($value['status']);
             $this->assertNotNull($value['mail']);
             $this->assertIsString($value['mail']);
-            $this->assertNotNull($value['loginmode']);
-            $this->assertIsString($value['loginmode']);
+            $this->assertNotNull($value['mode']);
+            $this->assertIsString($value['mode']);
         }
 
         $GLOBALS['login'] = 'bblier';
@@ -72,8 +72,8 @@ class UserControllerTest extends TestCase
             $this->assertIsString($value['status']);
             $this->assertNotNull($value['mail']);
             $this->assertIsString($value['mail']);
-            $this->assertNotNull($value['loginmode']);
-            $this->assertIsString($value['loginmode']);
+            $this->assertNotNull($value['mode']);
+            $this->assertIsString($value['mode']);
         }
 
         // Fail
@@ -290,7 +290,7 @@ class UserControllerTest extends TestCase
         $response     = $userController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Bad Request', $responseBody['errors']);
+        $this->assertSame('Body phone is not correct', $responseBody['errors']);
     }
 
     public function testAddGroup()

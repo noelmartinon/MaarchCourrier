@@ -245,7 +245,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             this.rightViewerLink = '';
         }
         this.rightSelectedThumbnail = index;
-        this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment');
+        this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment');
     }
 
     changeLeftViewer(index: number) {
@@ -387,6 +387,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                         this.rightViewerLink = '../rest/attachments/' + data.id + '/content';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'SIGN';
                         this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = data.new_id;
+                        this.signatureBook.attachments[this.rightSelectedThumbnail].signed = true;
+                        this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId = data.id;
                     } else {
                         this.appDocumentViewer.loadRessource(attachment.res_id, 'mainDocument');
                         this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
@@ -438,6 +440,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
                     this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
                     this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = attachment.res_id;
+                    this.signatureBook.attachments[this.rightSelectedThumbnail].signed = false;
+                    this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId = attachment.res_id;
                     if (this.signatureBook.resList.length > 0) {
                         this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
                     }
@@ -450,7 +454,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
                 });
         }
-
     }
 
     backToBasket() {

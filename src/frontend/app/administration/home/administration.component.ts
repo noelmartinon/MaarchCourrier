@@ -84,7 +84,7 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        if (this.headerService.user.mode === 'root' || this.headerService.user.mode === 'invisible_root') {
+        if (this.headerService.user.mode === 'root_visible' || this.headerService.user.mode === 'root_invisible') {
             this.featureTourService.init();
         }
     }

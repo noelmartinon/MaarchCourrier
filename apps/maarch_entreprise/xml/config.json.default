@@ -17,5 +17,14 @@
             "user": "maarch",
             "password": "maarch"
         }
-    ]
+    ],
+    "signatureBook": {
+        "userWS": "superadmin",
+        "passwordWS": "superadmin",
+        "validatedStatus": "EENV",
+        "validatedStatusOnlyVisa": "EENV",
+        "refusedStatus": "REJ_SIGN",
+        "validatedStatusAnnot": "COU",
+        "refusedStatusAnnot": "RET"
+    }
 }

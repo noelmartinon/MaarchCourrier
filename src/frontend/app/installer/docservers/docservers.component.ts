@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -16,6 +16,8 @@ import { InstallerService } from '../installer.service';
 export class DocserversComponent implements OnInit {
     lang: any = LANG;
     stepFormGroup: FormGroup;
+
+    @Output() nextStep = new EventEmitter<string>();
 
     constructor(
         private _formBuilder: FormBuilder,
@@ -66,6 +68,7 @@ export class DocserversComponent implements OnInit {
             tap((data: any) => {
                 this.notify.success(this.lang.rightInformations);
                 this.stepFormGroup.controls['stateStep'].setValue('success');
+                this.nextStep.emit();
             }),
             catchError((err: any) => {
                 this.notify.error(this.lang.pathUnreacheable);

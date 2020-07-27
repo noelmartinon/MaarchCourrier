@@ -588,7 +588,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 };
             })
         };
-        if (!this.appVisaWorkflow.isValidWorkflow()) {
+        if (!this.appVisaWorkflow.isValidWorkflow() && !this.functions.empty(newDiffList.items)) {
             this.notify.error(this.appVisaWorkflow.getError());
         } else {
             if (this.functions.empty(newDiffList.items)) {

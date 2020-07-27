@@ -306,7 +306,7 @@ class FastParapheurController
             return ['error' => $error];
         }
 
-        IParapheurController::processVisaWorkflow(['res_id_master' => $aArgs['resIdMaster'], 'processSignatory' => false]);
+        FastParapheurController::processVisaWorkflow(['res_id_master' => $aArgs['resIdMaster'], 'processSignatory' => false]);
         $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
         return ['success' => (string)$documentId];
     }

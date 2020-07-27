@@ -1090,7 +1090,7 @@ export const LANG_NL = {
     "ok": "Ok__TO_TRANSLATE",
     "updateOk": "Update successfull !__TO_TRANSLATE",
     "updateInProgress": "Update in progress ...__TO_TRANSLATE",
-    "updateInfo": "This action cannot be undone! Do not make any actions during process.__TO_TRANSLATE",
+    "updateInfo": "This action cannot be undone and will update all instances of the application! Do not make any actions during process.__TO_TRANSLATE",
     "isAvailable": "is available__TO_TRANSLATE",
     "updateWarn": "Update is not possible.<br/>These files are modified : <br/>__TO_TRANSLATE",
     "chooseValue": "Choose a value__TO_TRANSLATE",
@@ -1873,5 +1873,14 @@ export const LANG_NL = {
     "createScriptTourTitle": "Créer le script__TO_TRANSLATE",
     "createScriptTourDescription": "Avant de planifier la tâche, nous devons créer le script.__TO_TRANSLATE",
     "updateKO": "Mise à jour échouée !__TO_TRANSLATE",
-    "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>.__TO_TRANSLATE"
+    "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>.__TO_TRANSLATE",
+    "root_visible": "Administrateur__TO_TRANSLATE",
+    "root_invisible": "Administrateur (invisible)__TO_TRANSLATE",
+    "standard": "Standard__TO_TRANSLATE",
+    "accountType": "Type de compte__TO_TRANSLATE",
+    "beginInstall": "Commencer l'installation__TO_TRANSLATE",
+    "hideTool": "Cacher la barre d'outils__TO_TRANSLATE",
+    "showTool": "Afficher la barre d'outils__TO_TRANSLATE",
+    "rest": "Compte de webservice__TO_TRANSLATE",
+    "mustSuperadmin": "Vous devez être vous-même administrateur pour définir des administrateurs__TO_TRANSLATE"
 };

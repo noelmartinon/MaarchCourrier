@@ -34,7 +34,7 @@ export class UseradminComponent implements OnInit {
             lastname: ['SUPER', Validators.required],
             password: ['', Validators.required],
             passwordConfirm: ['', Validators.required],
-            email: ['dev@maarch.org', valEmail],
+            email: ['yourEmail@domain.com', valEmail],
         });
     }
 

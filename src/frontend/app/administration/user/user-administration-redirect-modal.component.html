@@ -23,7 +23,7 @@
                     </mat-radio-button>
                 </mat-radio-group>
                 <plugin-autocomplete *ngIf="this.processMode == 'reaffect'" [labelPlaceholder]="lang.userReplacement"
-                    [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users']"
+                    [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users?hideRestUsers=true']"
                     [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                     (triggerEvent)="setRedirectUser($event)" singleMode required></plugin-autocomplete>
 

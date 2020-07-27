@@ -68,7 +68,7 @@ class UserController
 
         if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $users = UserModel::get([
-                'select'    => ['id', 'user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode', 'mode'],
+                'select'    => ['id', 'user_id', 'firstname', 'lastname', 'status', 'mail', 'mode'],
                 'where'     => ['status != ?'],
                 'data'      => ['DEL']
             ]);
@@ -77,20 +77,20 @@ class UserController
             $users = [];
             if (!empty($entities)) {
                 $users = UserEntityModel::getWithUsers([
-                    'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode', 'mode'],
-                    'where'     => ['users_entities.entity_id in (?)', 'status != ?', 'mode not in (?)'],
-                    'data'      => [$entities, 'DEL', ['root_visible', 'root_invisible']]
+                    'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'mode'],
+                    'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
+                    'data'      => [$entities, 'DEL']
                 ]);
             }
-            $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'loginmode']]);
+            $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'status', 'mail', 'mode']]);
             $users = array_merge($users, $usersNoEntities);
         }
 
         $quota = [];
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         if (!empty($userQuota['param_value_int'])) {
-            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['OK']]);
-            $inactiveUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['SPD']]);
+            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'mode != ?'], 'data' => ['OK', 'root_invisible']]);
+            $inactiveUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'mode != ?'], 'data' => ['SPD', 'root_invisible']]);
             $quota = ['actives' => $activeUser[0]['count'], 'inactives' => $inactiveUser[0]['count'], 'userQuota' => $userQuota['param_value_int']];
         }
 
@@ -99,10 +99,12 @@ class UserController
 
     public function getById(Request $request, Response $response, array $args)
     {
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname', 'status']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
+        $user['enabled'] = $user['status'] != 'SPD';
+        unset($user['status']);
 
         return $response->withJson($user);
     }
@@ -114,7 +116,7 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'loginmode', 'mode', 'external_id']]);
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'mode', 'external_id']]);
         $user['external_id']        = json_decode($user['external_id'], true);
 
         if ($GLOBALS['id'] == $aArgs['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
@@ -138,16 +140,16 @@ class UserController
         $user['canSendActivationNotification']  = false;
         $user['canCreateMaarchParapheurUser']   = false;
 
-        if ($user['loginmode'] == 'restMode') {
+        if ($user['mode'] == 'rest') {
             $user['canModifyPassword'] = true;
         }
         $loggingMethod = CoreConfigModel::getLoggingMethod();
-        if ($user['loginmode'] != 'restMode' && $loggingMethod['id'] == 'standard') {
+        if ($user['mode'] != 'rest' && $loggingMethod['id'] == 'standard') {
             $user['canSendActivationNotification'] = true;
         }
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
-        if ((string)$loadedXml->signatoryBookEnabled == 'maarchParapheur' && $user['loginmode'] != 'restMode' && empty($user['external_id']['maarchParapheur'])) {
+        if ((string)$loadedXml->signatoryBookEnabled == 'maarchParapheur' && $user['mode'] != 'rest' && empty($user['external_id']['maarchParapheur'])) {
             $user['canCreateMaarchParapheurUser'] = true;
         }
 
@@ -199,9 +201,13 @@ class UserController
             $data['phone'] = null;
         }
 
-        $logingModes = ['standard', 'restMode'];
-        if (!in_array($data['loginmode'], $logingModes)) {
-            $data['loginmode'] = 'standard';
+        $modes = ['standard', 'rest', 'root_visible', 'root_invisible'];
+        if (empty($data['mode']) || !in_array($data['mode'], $modes)) {
+            $data['mode'] = 'standard';
+        }
+
+        if (in_array($data['mode'], ['root_visible', 'root_invisible']) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
         $preferences = ['documentEdition' => 'java'];
@@ -215,7 +221,7 @@ class UserController
 
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         if (!empty($userQuota['param_value_int'])) {
-            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['OK']]);
+            $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'mode != ?'], 'data' => ['OK', 'root_invisible']]);
             if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
                 NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => $GLOBALS['id'], 'info' => _QUOTA_EXCEEDED]);
             }
@@ -243,45 +249,42 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $data = $request->getParsedBody();
+        $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->notEmpty()->validate($data['firstname']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['lastname']);
-        $check = $check && (empty($data['mail']) || filter_var($data['mail'], FILTER_VALIDATE_EMAIL));
-        if (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-            $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone']));
+        if (!Validator::stringType()->notEmpty()->validate($body['firstname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body firstname is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['lastname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body lastname is empty or not a string']);
+        } elseif (!empty($body['mail']) && !filter_var($body['mail'], FILTER_VALIDATE_EMAIL)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body mail is not correct']);
+        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']]) && !empty($body['phone']) && !preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body phone is not correct']);
         }
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
-        }
+
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['status', 'mode']]);
 
         $set = [
-            'firstname' => $data['firstname'],
-            'lastname'  => $data['lastname'],
-            'mail'      => $data['mail'],
-            'initials'  => $data['initials'],
-            'loginmode' => empty($data['loginmode']) ? 'standard' : $data['loginmode'],
+            'firstname' => $body['firstname'],
+            'lastname'  => $body['lastname'],
+            'mail'      => $body['mail'],
+            'initials'  => $body['initials'],
         ];
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-            $set['phone'] = $data['phone'];
+            $set['phone'] = $body['phone'];
         }
 
-        if (!empty($data['status']) && $data['status'] == 'OK') {
+        if (!empty($body['status']) && $body['status'] == 'OK') {
             $set['status'] = 'OK';
         }
-        if (!empty($data['mode']) && in_array($data['mode'], ['root_visible', 'root_invisible'])) {
-            if (!UserController::isRoot(['id' => $GLOBALS['id']])) {
+        if (!empty($body['mode']) && $user['mode'] != $body['mode']) {
+            if ((in_array($body['mode'], ['root_visible', 'root_invisible']) || in_array($user['mode'], ['root_visible', 'root_invisible'])) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
             }
-            $set['mode'] = $data['mode'];
+            $set['mode'] = $body['mode'];
         }
 
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
-        $user = [];
-        if (!empty($userQuota['param_value_int'])) {
-            $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['status']]);
-        }
 
         UserModel::update([
             'set'   => $set,
@@ -290,8 +293,8 @@ class UserController
         ]);
 
         if (!empty($userQuota['param_value_int'])) {
-            if ($user['status'] == 'SPD' && $data['status'] == 'OK') {
-                $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?'], 'data' => ['OK']]);
+            if ($user['status'] == 'SPD' && $body['status'] == 'OK') {
+                $activeUser = UserModel::get(['select' => ['count(1)'], 'where' => ['status = ?', 'mode != ?'], 'data' => ['OK', 'root_invisible']]);
                 if ($activeUser[0]['count'] > $userQuota['param_value_int']) {
                     NotificationsEventsController::fillEventStack(['eventId' => 'user_quota', 'tableName' => 'users', 'recordId' => 'quota_exceed', 'userId' => $GLOBALS['id'], 'info' => _QUOTA_EXCEEDED]);
                 }
@@ -303,7 +306,7 @@ class UserController
             'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
-            'info'         => _USER_UPDATED . " {$data['firstname']} {$data['lastname']}"
+            'info'         => _USER_UPDATED . " {$body['firstname']} {$body['lastname']}"
         ]);
 
         return $response->withStatus(204);
@@ -315,8 +318,6 @@ class UserController
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
-
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
 
         $isListInstanceDeletable = true;
         $isListTemplateDeletable = true;
@@ -444,7 +445,10 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id', 'mode']]);
+        if (in_array($user['mode'], ['root_visible', 'root_invisible']) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
 
         $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => [1], 'userId' => $aArgs['id'], 'itemMode' => 'dest']);
         if (!empty($listInstances)) {
@@ -633,8 +637,8 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id', 'loginmode']]);
-        if ($user['loginmode'] != 'restMode' && $user['user_id'] != $GLOBALS['login']) {
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id', 'mode']]);
+        if ($user['mode'] != 'rest' && $user['user_id'] != $GLOBALS['login']) {
             return $response->withStatus(403)->withJson(['errors' => 'Not allowed']);
         }
 
@@ -1586,7 +1590,7 @@ class UserController
             return ['status' => 400, 'error' => 'id must be an integer'];
         }
 
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'mode']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id']]);
         if (empty($user['id'])) {
             return ['status' => 400, 'error' => 'User not found'];
         }
@@ -1597,9 +1601,6 @@ class UserController
             }
             $isRoot = UserController::isRoot(['id' => $GLOBALS['id']]);
             if (!$isRoot) {
-                if ($user['mode'] == 'root_invisible') {
-                    return ['status' => 403, 'error' => 'Service forbidden'];
-                }
                 $users = [];
                 $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
                 if (!empty($entities)) {
