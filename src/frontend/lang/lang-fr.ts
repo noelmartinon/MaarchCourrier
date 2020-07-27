@@ -1633,7 +1633,7 @@ export const LANG_FR = {
     "updateDiffusionWhileIndexing":                "Pouvoir modifier toutes les parties de la liste de diffusion lors de l'enregistrement d'un courrier.",
     "updateDiffusionWhileProcess":                 "Pouvoir modifier toutes les parties de la liste de diffusion lors du traitement d'un courrier.",
     "updateIndexingFieldWarning":                  "Attention si vous supprimez un champ du modèle, ce champ sera réinitialisé pour <b>TOUS</b> les courriers associés au modèle. Voulez-vous continuer ?",
-    "updateInfo":                                  "Cette action est irréversible ! Il est préférable de ne pas faire d'actions durant le processus et qu'aucun utilisateur ne soit connecté.",
+    "updateInfo":                                  "Cette action est irréversible et mettra à jour l'ensemble des instances présentes sur l'application ! Il est préférable de ne pas faire d'actions durant le processus et qu'aucun utilisateur ne soit connecté.",
     "updateInProgress":                            "Mise à jour en cours ...",
     "updateKO":                                    "Mise à jour échouée !",
     "updateOk":                                    "Mise à jour effectuée avec succès !",

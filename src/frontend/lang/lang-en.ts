@@ -1631,7 +1631,7 @@ export const LANG_EN = {
     "updateDiffusionWhileIndexing":                "Update all parts of diffusion list when indexing.",
     "updateDiffusionWhileProcess":                 "Update all parts of diffusion list when processing.",
     "updateIndexingFieldWarning":                  "Warning:if you remove a field from the model, this field will be reset for <b>ALL</b> resources linked to this model. Do you want to continue ?",
-    "updateInfo":                                  "This action cannot be undone! Do not make any actions during process and make sure no users are connected.",
+    "updateInfo":                                  "This action cannot be undone and will update all instances of the application! Do not make any actions during process and make sure no users are connected.",
     "updateInProgress":                            "Update in progress ...",
     "updateKO":                                    "Update failed !",
     "updateOk":                                    "Update successful !",
