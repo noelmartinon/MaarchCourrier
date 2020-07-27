@@ -99,6 +99,7 @@ export class ContactDetailComponent implements OnInit {
                         customFields: [],
                         firstname: data.firstname,
                         lastname: data.lastname,
+                        enabled: data.enabled
                     };
                     this.contactClone = JSON.parse(JSON.stringify(this.contact));
                 }),
@@ -117,6 +118,7 @@ export class ContactDetailComponent implements OnInit {
                         fillingRate: this.contactService.formatFillingObject(null),
                         customFields: [],
                         lastname: data.short_label,
+                        enabled: data.enabled === 'Y'
                     };
                     this.contactClone = JSON.parse(JSON.stringify(this.contact));
                 }),

@@ -97,10 +97,12 @@ class UserController
 
     public function getById(Request $request, Response $response, array $args)
     {
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname', 'status']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
+        $user['enabled'] = $user['status'] != 'SPD';
+        unset($user['status']);
 
         return $response->withJson($user);
     }

@@ -1379,14 +1379,14 @@ class ContactController
                     'notes'              => null,
                     'creator'            => null,
                     'creatorLabel'       => null,
-                    'enabled'            => null,
+                    'enabled'            => $user['status'] != 'SPD',
                     'creationDate'       => null,
                     'modificationDate'   => null,
                     'customFields'       => null,
                     'externalId'         => null
                 ];
             } elseif ($resourceContact['type'] == 'entity') {
-                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email']]);
+                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email', 'enabled']]);
 
                 $contact = [
                     'type'               => 'entity',
@@ -1408,7 +1408,7 @@ class ContactController
                     'notes'              => null,
                     'creator'            => null,
                     'creatorLabel'       => null,
-                    'enabled'            => null,
+                    'enabled'            => $entity['enabled'] == 'Y',
                     'creationDate'       => null,
                     'modificationDate'   => null,
                     'customFields'       => null,
