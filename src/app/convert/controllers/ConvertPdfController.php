@@ -43,7 +43,7 @@ class ConvertPdfController
             exec('export DISPLAY=:0 && '.$command.' 2>&1', $output, $return);
         } else {
             $url = str_replace('rest/', '', UrlController::getCoreUrl());
-            if (OnlyOfficeController::canConvert(['url' => $url])) {
+            if (OnlyOfficeController::canConvert(['url' => $url, 'fullFilename' => $aArgs['fullFilename']])) {
                 $converted = OnlyOfficeController::convert(['fullFilename' => $aArgs['fullFilename'], 'url' => $url, 'userId' => $GLOBALS['id']]);
                 if (empty($converted['errors'])) {
                     LogsController::add([
