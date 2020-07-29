@@ -1,6 +1,6 @@
 <ng-container *ngIf="!loading">
     <plugin-autocomplete *ngIf="adminMode && canUpdateRoles()" #test [labelPlaceholder]="lang.addUserOrEntity"
-        [routeDatas]="['/rest/autocomplete/users?hideRestUsers=true','/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
+        [routeDatas]="['/rest/autocomplete/users','/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
         [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="addElem($event)" appearance="ouline"></plugin-autocomplete>
     <div *ngIf="isEmptyList() && !loading" style="text-align:center;font-size:24px;font-weight:bold;opacity:0.3;">
         {{lang.noDiffusionList}}

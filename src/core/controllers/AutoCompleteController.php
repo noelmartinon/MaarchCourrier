@@ -55,14 +55,10 @@ class AutoCompleteController
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $data['search'],
             'fields'        => $fields,
-            'where'         => ['status not in (?)', 'user_id not in (?)'],
-            'data'          => [['DEL', 'SPD'], $excludedUsers],
+            'where'         => ['status not in (?)', 'user_id not in (?)', 'loginmode != ?'],
+            'data'          => [['DEL', 'SPD'], $excludedUsers, 'restMode'],
             'fieldsNumber'  => 2,
         ]);
-
-        if (!empty($data['hideRestUsers'])) {
-            $requestData['where'][] = "loginMode != 'restMode'";
-        }
 
         $users = UserModel::get([
             'select'    => ['id', 'user_id', 'firstname', 'lastname'],
@@ -223,8 +219,8 @@ class AutoCompleteController
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
-                'where'         => ['status not in (?)', 'user_id not in (?)'],
-                'data'          => [['DEL', 'SPD'], ['superadmin']],
+                'where'         => ['status not in (?)', 'user_id not in (?)', 'loginmode != ?'],
+                'data'          => [['DEL', 'SPD'], ['superadmin'], 'restMode'],
                 'fieldsNumber'  => $nbFields,
             ]);
 
@@ -449,7 +445,8 @@ class AutoCompleteController
             'usergroup_content.user_id = users.id',
             'usergroups_services.service_id in (?)',
             'users.user_id not in (?)',
-            'users.status not in (?)'
+            'users.status not in (?)',
+            "users.loginmode != 'restMode'"
         ];
         $requestData['data'] = [$services, ['superadmin'], ['DEL', 'SPD']];
 
