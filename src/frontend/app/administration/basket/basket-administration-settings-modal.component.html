@@ -6,12 +6,12 @@
         <form #settingGroupsBasket="ngForm">
             <div class="container-fluid">
                 <div class="col-md-6">
-                    <mat-checkbox [disabled]="data.action.default_action_list == true" id="usedInActionPage"
+                    <mat-checkbox id="usedInActionPage"
                         name="usedInActionPage" color="primary" [(ngModel)]="data.action.used_in_action_page">
                         {{lang.usedInActionPage}}</mat-checkbox>
                 </div>
                 <div class="col-md-6">
-                    <mat-checkbox [disabled]="data.action.default_action_list == true" id="usedInBasketlist"
+                    <mat-checkbox id="usedInBasketlist"
                         name="usedInBasketlist" color="primary" [(ngModel)]="data.action.used_in_basketlist">
                         {{lang.usedInBasketlist}}</mat-checkbox>
                 </div>
