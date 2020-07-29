@@ -1341,7 +1341,7 @@ class ResourceListController
                 return false;
             }
         }
-        $allAttachments = AttachmentModel::get(['select' => ['res_id'], 'where' => ['res_id_master = ?'], 'data' => [$args['resId']]]);
+        $allAttachments = AttachmentModel::get(['select' => ['res_id'], 'where' => ['res_id_master = ?', 'status != ?'], 'data' => [$args['resId'], 'DEL']]);
         $allAttachments = array_column($allAttachments, 'res_id');
         $convertedDocuments = [];
         if (!empty($allAttachments)) {

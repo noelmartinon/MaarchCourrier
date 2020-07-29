@@ -343,7 +343,7 @@ class FastParapheurController
             'select'    => ['user_id', 'business_id', 'entities.entity_label'],
             'table'     => ['listinstance', 'users_entities', 'entities'],
             'left_join' => ['item_id = user_id', 'users_entities.entity_id = entities.entity_id'],
-            'where'     => ['res_id = ?', 'item_mode = ?'],
+            'where'     => ['res_id = ?', 'item_mode = ?', 'process_date is null'],
             'data'      => [$aArgs['resIdMaster'], 'sign']
         ])[0];
         $redactor = DatabaseModel::select([
