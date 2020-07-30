@@ -694,7 +694,9 @@ export class IndexingFormComponent implements OnInit {
                                 if (elem.type === 'date' && !this.functions.empty(fieldValue)) {
                                     fieldValue = new Date(fieldValue);
                                 }
-                                this.arrFormControl[elem.identifier].setValue(fieldValue);
+                                if (!this.functions.empty(fieldValue)) {
+                                    this.arrFormControl[elem.identifier].setValue(fieldValue);
+                                }
                             } else if (!saveResourceState && elem.identifier === 'destination') {
                                 this.arrFormControl[elem.identifier].disable();
                                 this.arrFormControl[elem.identifier].setValidators([]);
@@ -785,6 +787,7 @@ export class IndexingFormComponent implements OnInit {
 
                         if (indexFound > -1) {
                             field.label = this.availableFields[indexFound].label;
+                            field.default_value = !this.functions.empty(field.default_value) ? field.default_value : this.availableFields[indexFound].default_value;
                             field.values = this.availableFields[indexFound].values;
                             field.type = this.availableFields[indexFound].type;
                             this.availableFields.splice(indexFound, 1);
@@ -807,6 +810,7 @@ export class IndexingFormComponent implements OnInit {
 
                         if (indexFound > -1) {
                             field.label = this.indexingModelsCore[indexFound].label;
+                            field.default_value = !this.functions.empty(field.default_value) ? field.default_value : this.indexingModelsCore[indexFound].default_value;
                             field.values = this.indexingModelsCore[indexFound].values;
                             field.type = this.indexingModelsCore[indexFound].type;
                             fieldExist = true;
