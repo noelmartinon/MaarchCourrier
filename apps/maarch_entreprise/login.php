@@ -116,6 +116,11 @@ if (
 
 echo '<div id="bodyloginCustom">';
 
+$control = \VersionUpdate\controllers\VersionUpdateController::executeSQLAtConnection();
+if (!empty($control['errors'])) {
+    $_SESSION['error'] = $control['errors'];
+}
+
 if (isset($_SESSION['error'])) {
     echo '<div class="error" id="main_error_popup" onclick="this.hide();">';
     echo $_SESSION['error'];
