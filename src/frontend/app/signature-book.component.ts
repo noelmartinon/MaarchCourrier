@@ -190,6 +190,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     }, 0);
                     this.loadBadges();
                     this.loadActions();
+                    if (this.appDocumentViewer !== undefined) {
+                        this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment');
+                    }
                 }, (err) => {
                     this.notify.error(err.error.errors);
                     setTimeout(() => {
