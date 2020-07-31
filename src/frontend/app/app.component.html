@@ -1,4 +1,4 @@
-<mat-sidenav-container class="maarch-container" autosize>
+<mat-sidenav-container *ngIf="!loading" class="maarch-container" autosize>
     <mat-sidenav #snavLeft class="panel-left" [mode]="appService.getViewMode() ? 'over' : 'side'"
         [fixedInViewport]="appService.getViewMode()" [opened]="appService.getViewMode() || headerService.hideSideBar ? false : true"
         autoFocus="false" style="overflow-x:hidden;" [class.sideBarForm]="headerService.sideBarForm && !appService.getViewMode()" [class.sideBarFormMobile]="appService.getViewMode() && headerService.sideBarForm" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">

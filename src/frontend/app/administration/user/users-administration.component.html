@@ -8,6 +8,12 @@
                     {{lang.add}}
                 </p>
             </a>
+            <a mat-list-item (click)="openUsersImportModal()">
+                <mat-icon color="primary" mat-list-icon class="fa fa-file"></mat-icon>
+                <p mat-line>
+                    Importer des utilisateurs
+                </p>
+            </a>
         </mat-nav-list>
         <mat-divider></mat-divider>
         <mat-divider *ngIf="quota.userQuota"></mat-divider>
@@ -95,17 +101,17 @@
                             <mat-header-cell *matHeaderCellDef>
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
-                                <button mat-icon-button color="primary" [disabled]="element.id===user.id"
+                                <button mat-icon-button color="primary" [disabled]="element.id===user.id || (['root_visible', 'root_invisible'].indexOf(element.mode) > -1 && headerService.user.mode === 'standard')"
                                     *ngIf="element.status != 'SPD'" matTooltip="{{lang.suspend}}"
                                     (click)="$event.stopPropagation();deleteUser(element, 'suspend')">
                                     <mat-icon class="fa fa-pause fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
                                 <button mat-icon-button color="accent" *ngIf="element.status == 'SPD'"
-                                    matTooltip="{{lang.authorize}}"
+                                    matTooltip="{{lang.authorize}}" [disabled]="['root_visible', 'root_invisible'].indexOf(element.mode) > -1 && headerService.user.mode === 'standard'"
                                     (click)="$event.stopPropagation();activateUser(element)">
                                     <mat-icon class="fa fa-check fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
-                                <button mat-icon-button color="warn" [disabled]="element.id===user.id || ['root_visible', 'root_invisible'].indexOf(row.mode) > -1"
+                                <button mat-icon-button color="warn" [disabled]="element.id===user.id || ['root_visible', 'root_invisible'].indexOf(element.mode) > -1"
                                     matTooltip="{{lang.delete}}" data-toggle="modal" data-target="#changeDiffListDest"
                                     (click)="$event.stopPropagation();deleteUser(element, 'delete')">
                                     <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>

@@ -82,7 +82,11 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
                     }),
                     catchError((err: any) => {
                         this.steps[index].state = 'KO';
-                        this.steps[index].msgErr = err.error.errors;
+                        if (err.error.lang !== undefined) {
+                            this.steps[index].msgErr = this.lang[err.error.lang];
+                        } else {
+                            this.steps[index].msgErr = err.error.errors;
+                        }
                         resolve(false);
                         return of(false);
                     })

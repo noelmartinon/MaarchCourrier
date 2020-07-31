@@ -221,13 +221,7 @@ export class BasketAdministrationComponent implements OnInit {
 
     setDefaultAction(group: any, action: any) {
         group.groupActions.forEach((tmpAction: any) => {
-            if (tmpAction.id === action.id) {
-                tmpAction.default_action_list = true;
-                tmpAction.used_in_action_page = true;
-                tmpAction.used_in_basketlist = true;
-            } else {
-                tmpAction.default_action_list = false;
-            }
+            tmpAction.default_action_list = tmpAction.id === action.id ? true : false;
         });
         this.addAction(group);
     }

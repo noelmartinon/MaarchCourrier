@@ -51,17 +51,11 @@ class AutoCompleteController
         $fields = ['firstname', 'lastname'];
         $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
 
-        $excludedModes = ['root_invisible'];
-
-        if (!empty($data['hideRestUsers'])) {
-            $excludedModes[] = 'rest';
-        }
-
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $data['search'],
             'fields'        => $fields,
             'where'         => ['status not in (?)', 'mode not in (?)'],
-            'data'          => [['DEL', 'SPD'], $excludedModes],
+            'data'          => [['DEL', 'SPD'], ['root_invisible', 'rest']],
             'fieldsNumber'  => 2,
         ]);
 
@@ -225,7 +219,7 @@ class AutoCompleteController
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
                 'where'         => ['status not in (?)', 'mode not in (?)'],
-                'data'          => [['DEL', 'SPD'], ['root_invisible']],
+                'data'          => [['DEL', 'SPD'], ['root_invisible', 'rest']],
                 'fieldsNumber'  => $nbFields,
             ]);
 
@@ -450,7 +444,7 @@ class AutoCompleteController
             'users.mode not in (?)',
             'users.status not in (?)'
         ];
-        $requestData['data'] = [$services, ['root_invisible'], ['DEL', 'SPD']];
+        $requestData['data'] = [$services, ['root_invisible', 'rest'], ['DEL', 'SPD']];
 
         if (!empty($queryParams['search'])) {
             $fields = ['users.firstname', 'users.lastname'];

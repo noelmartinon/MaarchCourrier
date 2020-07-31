@@ -61,7 +61,7 @@ class IParapheurController
         $signatory = DatabaseModel::select([
             'select'    => ['item_id'],
             'table'     => ['listinstance', ],
-            'where'     => ['res_id = ?', 'item_mode = ?'],
+            'where'     => ['res_id = ?', 'item_mode = ?', 'process_date is null'],
             'data'      => [$aArgs['resIdMaster'], 'sign']
         ])[0];
 

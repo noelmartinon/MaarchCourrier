@@ -12,7 +12,7 @@
                 <div *ngFor="let redirectModel of data.redirectListModels; index as i" id="{{redirectModel.object_id}}"
                     class="form-group">
                     <plugin-autocomplete [labelPlaceholder]="lang.newDest + ' : ' + redirectModel.title"
-                        [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users?hideRestUsers=true']"
+                        [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users']"
                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                         (triggerEvent)="setRedirectUserListModels(i, $event)" singleMode required></plugin-autocomplete>
                 </div>
@@ -33,9 +33,9 @@
             </ng-container>
             <ng-container *ngIf="!data.inDiffListDest && !data.isResDestUser">
                 <div class="alert" role="alert">
-                    <b *ngIf="data.userDestRedirect.mode == 'delete'">{{lang.delete}}
+                    <b *ngIf="data.userDestRedirect.actionMode == 'delete'">{{lang.delete}}
                         {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
-                    <b *ngIf="data.userDestRedirect.mode == 'suspend'">{{lang.suspend}}
+                    <b *ngIf="data.userDestRedirect.actionMode == 'suspend'">{{lang.suspend}}
                         {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
                 </div>
             </ng-container>
@@ -68,11 +68,11 @@
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <mat-dialog-actions>
-        <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.mode == 'delete' && data.isDeletable"
+        <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.actionMode == 'delete' && data.isDeletable"
             type="submit" class="btn btn-danger" (click)="dialogRef.close(this.data)"
             [disabled]="!sendFunction()">{{lang.delete}}
             {{lang.user}}</button>
-        <button mat-raised-button color="primary" *ngIf="data.userDestRedirect.mode == 'suspend' && data.isDeletable"
+        <button mat-raised-button color="primary" *ngIf="data.userDestRedirect.actionMode == 'suspend' && data.isDeletable"
             type="submit" (click)="dialogRef.close(this.data)" [disabled]="!sendFunction()">{{lang.suspend}}
             {{lang.user}}</button>
         <button mat-raised-button color="primary" *ngIf="!data.isDeletable" type="submit"

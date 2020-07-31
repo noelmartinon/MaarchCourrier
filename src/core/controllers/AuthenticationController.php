@@ -27,18 +27,17 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
-use VersionUpdate\controllers\VersionUpdateController;
 
 class AuthenticationController
 {
     const MAX_DURATION_TOKEN = 30; //Minutes
     const ROUTES_WITHOUT_AUTHENTICATION = [
-        'GET/authenticationInformations', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
+        'GET/authenticationInformations', 'PUT/versionsUpdateSQL', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
         'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers', 'GET/installer/custom',
         'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
         'PUT/installer/administrator', 'DELETE/installer/lock',
-        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content',
+        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}',
     ];
 
     public function getInformations(Request $request, Response $response)
@@ -277,11 +276,6 @@ class AuthenticationController
             'moduleId'  => 'authentication',
             'eventId'   => 'login'
         ]);
-
-        $control = VersionUpdateController::executeSQLAtConnection();
-        if (!empty($control['errors'])) {
-            return $response->withJson(['SQLUpdate' => $control['errors']]);
-        }
 
         return $response->withStatus(204);
     }

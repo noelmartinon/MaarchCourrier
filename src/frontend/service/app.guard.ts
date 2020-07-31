@@ -127,17 +127,7 @@ export class AppGuard implements CanActivate {
                             this.authService.setUrl(route.url.join('/'));
                             this.functionService.debug('', route.url.join('/'));
 
-                            if (this.authService.changeKey) {
-                                this.dialog.open(AlertComponent, {
-                                    panelClass: 'maarch-modal',
-                                    autoFocus: false,
-                                    disableClose: true,
-                                    data: {
-                                        mode: 'danger',
-                                        title: this.lang.warnPrivateKeyTitle,
-                                        msg: this.lang.warnPrivateKey
-                                    } });
-                            }
+                            this.authService.setEvent('authenticationInformations');
 
                             return tokenInfo;
                         } else {

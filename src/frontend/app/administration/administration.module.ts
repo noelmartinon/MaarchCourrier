@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../app-common.module';
 
+import { InternationalizationModule } from '../../service/translate/internationalization.module';
+
 import { AdministrationRoutingModule } from './administration-routing.module';
 // import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { JoyrideModule } from 'ngx-joyride';
@@ -62,12 +64,15 @@ import { VersionsUpdateAdministrationComponent } from './versionUpdate/versions-
 import { AdministrationComponent } from './home/administration.component';
 import { DocumentFormModule } from '../document-form.module';
 import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent } from './user/users-administration.component';
+import { UsersImportComponent } from './user/import/users-import.component';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @NgModule({
     imports: [
         SharedModule,
         // NgxChartsModule,
+        InternationalizationModule,
         JoyrideModule.forChild(),
         DocumentFormModule,
         AdministrationRoutingModule,
@@ -136,6 +141,7 @@ import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent
         AdministrationComponent,
         UsersAdministrationComponent,
         UsersAdministrationRedirectModalComponent,
+        UsersImportComponent
     ],
     entryComponents: [
         AccountLinkComponent,
@@ -151,6 +157,11 @@ import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent
         TemplateFileEditorModalComponent,
         UserAdministrationRedirectModalComponent,
         UsersAdministrationRedirectModalComponent,
+        UsersImportComponent
     ],
 })
-export class AdministrationModule { }
+export class AdministrationModule {
+    constructor(translate: TranslateService) {
+        translate.setDefaultLang('fr');
+      }
+}

@@ -14,11 +14,9 @@
 
 namespace SrcCore\controllers;
 
-use ContentManagement\controllers\DocumentEditorController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\DatabasePDO;
@@ -68,7 +66,7 @@ class InstallerController
             'phpVersion'        => $phpVersion,
             'phpVersionValid'   => $phpVersionValid,
             'unoconv'           => $unoconv,
-            'wkhtmlToPdf'           => $wkhtmlToPdf,
+            'wkhtmlToPdf'       => $wkhtmlToPdf,
             'netcatOrNmap'      => $netcatOrNmap,
             'pdoPgsql'          => $pdoPgsql,
             'pgsql'             => $pgsql,
@@ -538,7 +536,7 @@ class InstallerController
         DatabasePDO::reset();
         new DatabasePDO(['customId' => $body['customId']]);
 
-        $userAlreadyExists = UserModel::getByLogin(['login' => strtolower($body['login']), 'select' => 1]);
+        $userAlreadyExists = UserModel::getByLogin(['login' => strtolower($body['login']), 'select' => [1]]);
         if (!empty($userAlreadyExists)) {
             return $response->withStatus(400)->withJson(['errors' => 'User already exists', 'lang' => 'alreadyExist']);
         }

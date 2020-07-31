@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../app-common.module';
+import { InternationalizationModule } from '../../service/translate/internationalization.module';
 import { InstallerComponent } from './installer.component';
 import { InstallActionComponent } from './install-action/install-action.component';
 import { WelcomeComponent } from './welcome/welcome.component';
@@ -15,6 +16,7 @@ import { InstallerService } from './installer.service';
 @NgModule({
     imports: [
         SharedModule,
+        InternationalizationModule,
         InstallerRoutingModule
     ],
     declarations: [

@@ -23,7 +23,6 @@ use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Folder\controllers\FolderController;
 use Folder\models\FolderModel;
-use Resource\controllers\DepartmentController;
 use Resource\models\ExportTemplateModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceListModel;
@@ -32,6 +31,7 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
+use SrcCore\controllers\UrlController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -39,7 +39,6 @@ use Tag\models\ResourceTagModel;
 use Tag\models\TagModel;
 use User\models\UserModel;
 
-require_once 'core/class/Url.php';
 
 class ExportController
 {
@@ -234,7 +233,7 @@ class ExportController
                         $copies       = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $csvContent[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $csvContent[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", \Url::coreurl());
+                        $csvContent[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", UrlController::getCoreUrl());
                     } elseif ($value['value'] == 'getParentFolder') {
                         $csvContent[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {
@@ -346,7 +345,7 @@ class ExportController
                         $copies    = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $content[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", \Url::coreurl());
+                        $content[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", UrlController::getCoreUrl());
                     } elseif ($value['value'] == 'getParentFolder') {
                         $content[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {

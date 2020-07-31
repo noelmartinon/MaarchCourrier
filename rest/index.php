@@ -256,7 +256,7 @@ $app->get('/pinnedFolders', \Folder\controllers\FolderController::class . ':getP
 $app->post('/folders/{id}/pin', \Folder\controllers\FolderController::class . ':pinFolder');
 $app->delete('/folders/{id}/unpin', \Folder\controllers\FolderController::class . ':unpinFolder');
 
-// Git commit information
+// CommitInformation
 $app->get('/commitInformation', \SrcCore\controllers\CoreController::class . ':getGitCommitInformation');
 
 //Groups
@@ -325,6 +325,9 @@ $app->delete('/installer/lock', \SrcCore\controllers\InstallerController::class 
 //TODO REWORK
 $app->get('/dev/lang', \SrcCore\controllers\CoreController::class . ':getAvailableCoreLanguages');
 $app->put('/dev/lang', \SrcCore\controllers\CoreController::class . ':generateLang');
+
+//Languages
+$app->get('/languages/{lang}', \SrcCore\controllers\LanguageController::class . ':getByLang');
 
 //ListInstances
 $app->put('/listinstances', \Entity\controllers\ListInstanceController::class . ':update');
@@ -526,6 +529,8 @@ $app->post('/users/{id}/redirectedBaskets', \User\controllers\UserController::cl
 $app->delete('/users/{id}/redirectedBaskets', \User\controllers\UserController::class . ':deleteRedirectedBasket');
 $app->put('/users/{id}/baskets', \User\controllers\UserController::class . ':updateBasketsDisplay');
 $app->put('/users/{id}/accountActivationNotification', \User\controllers\UserController::class . ':sendAccountActivationNotification');
+$app->get('/exportUsers', \User\controllers\UserController::class . ':getExport');
+
 $app->post('/password', \User\controllers\UserController::class . ':forgotPassword');
 $app->put('/password', \User\controllers\UserController::class . ':passwordInitialization');
 
@@ -539,6 +544,7 @@ $app->get('/followedResources/filters', \Resource\controllers\UserFollowedResour
 //VersionsUpdate
 $app->get('/versionsUpdate', \VersionUpdate\controllers\VersionUpdateController::class . ':get');
 $app->put('/versionsUpdate', \VersionUpdate\controllers\VersionUpdateController::class . ':update');
+$app->put('/versionsUpdateSQL', \VersionUpdate\controllers\VersionUpdateController::class . ':updateSQLVersion');
 
 //CurrentUser
 $app->get('/currentUser/profile', \User\controllers\UserController::class . ':getProfile');

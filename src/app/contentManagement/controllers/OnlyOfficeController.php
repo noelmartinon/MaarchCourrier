@@ -24,7 +24,6 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\CoreController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
@@ -301,8 +300,8 @@ class OnlyOfficeController
 
     public static function canConvert(array $args)
     {
-        ValidatorModel::notEmpty($args, ['url']);
-        ValidatorModel::stringType($args, ['url']);
+        ValidatorModel::notEmpty($args, ['url', 'fullFilename']);
+        ValidatorModel::stringType($args, ['url', 'fullFilename']);
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
         if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
@@ -327,6 +326,17 @@ class OnlyOfficeController
         }
 
         if (strpos($args['url'], 'localhost') !== false || strpos($args['url'], '127.0.0.1') !== false ) {
+            return false;
+        }
+
+        $docInfo = pathinfo($args['fullFilename']);
+
+        // List of format convertible by OnlyOffice https://api.onlyoffice.com/editors/conversionapi
+        $convertibleExtensions = ['doc', 'docm', 'docx', 'dot', 'dotm', 'dotx', 'epub', 'fodt', 'html', 'mht', 'odt', 'ott', 'pdf', 'rtf', 'txt', 'xps',
+            'csv', 'fods', 'ods', 'ots', 'xls', 'xlsm', 'xlsx', 'xlt', 'xltm', 'xltx',
+            'fodp', 'odp', 'otp', 'pot', 'potm', 'potx', 'pps', 'ppsm', 'ppsx', 'ppt', 'pptm', 'pptx'];
+
+        if (!in_array($docInfo['extension'], $convertibleExtensions)) {
             return false;
         }
 

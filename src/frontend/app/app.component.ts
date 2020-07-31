@@ -9,6 +9,7 @@ import { LangService } from '../service/app-lang.service';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../service/auth.service';
 import { environment } from '../environments/environment';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom options the configure the tooltip's default show/hide delays. */
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
@@ -28,13 +29,15 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 })
 export class AppComponent implements OnInit, AfterViewInit {
     debugMode: boolean = false;
-    @ViewChild('snavLeft', { static: true }) snavLeft: MatSidenav;
+    loading: boolean = true;
+    @ViewChild('snavLeft', { static: false }) snavLeft: MatSidenav;
 
     @HostListener('window:resize', ['$event'])
     onResize() {
         this.appService.setScreenWidth(window.innerWidth);
     }
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public langService: LangService,
         iconReg: MatIconRegistry,
@@ -43,6 +46,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         public headerService: HeaderService,
         public authService: AuthService,
     ) {
+
+        translate.setDefaultLang('fr');
+
         iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=onlyLogo'));
         iconReg.addSvgIcon('maarchLogoFull', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=logo'));
         iconReg.addSvgIcon('maarchLogoWhite', sanitizer.bypassSecurityTrustResourceUrl('assets/logo_only_white.svg'));
@@ -54,9 +60,14 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
     }
 
-    ngOnInit() {
+    async ngOnInit() {
+        this.appService.checkAppSecurity();
+        await this.appService.applyMinorUpdate();
+        this.loading = false;
         this.headerService.hideSideBar = true;
-        this.headerService.sideNavLeft = this.snavLeft;
+        setTimeout(() => {
+            this.headerService.sideNavLeft = this.snavLeft;
+        }, 0);
     }
 
     ngAfterViewInit(): void {

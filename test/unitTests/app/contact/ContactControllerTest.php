@@ -859,7 +859,7 @@ class ContactControllerTest extends TestCase
         $this->assertEmpty($responseBody['contacts'][0]['communicationMeans']);
         $this->assertEmpty($responseBody['contacts'][0]['notes']);
         $this->assertEmpty($responseBody['contacts'][0]['creator']);
-        $this->assertEmpty($responseBody['contacts'][0]['enabled']);
+        $this->assertSame(true, $responseBody['contacts'][0]['enabled']);
         $this->assertEmpty($responseBody['contacts'][0]['customFields']);
         $this->assertEmpty($responseBody['contacts'][0]['externalId']);
         $this->assertEmpty($responseBody['contacts'][0]['fillingRate']);
@@ -882,7 +882,7 @@ class ContactControllerTest extends TestCase
         $this->assertEmpty($responseBody['contacts'][1]['communicationMeans']);
         $this->assertEmpty($responseBody['contacts'][1]['notes']);
         $this->assertEmpty($responseBody['contacts'][1]['creator']);
-        $this->assertEmpty($responseBody['contacts'][1]['enabled']);
+        $this->assertSame(true, $responseBody['contacts'][1]['enabled']);
         $this->assertEmpty($responseBody['contacts'][1]['customFields']);
         $this->assertEmpty($responseBody['contacts'][1]['externalId']);
         $this->assertEmpty($responseBody['contacts'][1]['fillingRate']);

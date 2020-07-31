@@ -107,7 +107,7 @@ class ConvertPdfScript
             $fullFilename = "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}";
             $converted = false;
             $output = [];
-            if (OnlyOfficeController::canConvert(['url' => $args['coreUrl']])) {
+            if (OnlyOfficeController::canConvert(['url' => $args['coreUrl'], 'fullFilename' => $fullFilename])) {
                 $converted = OnlyOfficeController::convert(['fullFilename' => $fullFilename, 'url' => $args['coreUrl'], 'userId' => $args['userId']]);
 
                 if (empty($converted['errors'])) {

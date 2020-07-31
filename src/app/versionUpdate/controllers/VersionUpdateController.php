@@ -96,20 +96,12 @@ class VersionUpdateController
 
         exec('git status --porcelain --untracked-files=no 2>&1', $output);
 
-        $multiCustom = false;
-        if (is_file('custom/custom.json')) {
-            $jsonFile = file_get_contents('custom/custom.json');
-            $jsonFile = json_decode($jsonFile, true);
-            $multiCustom = count($jsonFile) > 1;
-        }
-
         return $response->withJson([
             'lastAvailableMinorVersion' => $lastAvailableMinorVersion,
             'lastAvailableMajorVersion' => $lastAvailableMajorVersion,
             'currentVersion'            => $currentVersion,
             'canUpdate'                 => empty($output),
-            'diffOutput'                => $output,
-            'multiCustom'               => $multiCustom
+            'diffOutput'                => $output
         ]);
     }
 
@@ -193,7 +185,7 @@ class VersionUpdateController
             $jsonFile = json_decode($jsonFile, true);
 
             foreach ($jsonFile as $custom) {
-                if ($custom['id'] != $currentCustomId) {
+                if ($custom['id'] != $currentCustomId && is_dir("custom/{$custom['id']}")) {
                     DatabasePDO::reset();
                     new DatabasePDO(['customId' => $custom['id']]);
 
@@ -275,7 +267,7 @@ class VersionUpdateController
         return ['directoryPath' => "{$directoryPath}/migration"];
     }
 
-    public static function executeSQLAtConnection()
+    public function updateSQLVersion(Request $request, Response $response)
     {
         $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'database_version']);
 
@@ -291,7 +283,7 @@ class VersionUpdateController
         while ($minorVersion <= $currentVersion) {
             if (is_file("migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$minorVersion}.sql")) {
                 if (!is_readable("migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$minorVersion}.sql")) {
-                    return ['errors' => "File migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$minorVersion}.sql is not readable"];
+                    return $response->withStatus(400)->withJson(['errors' => "File migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$minorVersion}.sql is not readable"]);
                 }
                 $sqlFiles[] = "migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$minorVersion}.sql";
             }
@@ -301,10 +293,11 @@ class VersionUpdateController
         if (!empty($sqlFiles)) {
             $control = VersionUpdateController::executeSQLUpdate(['sqlFiles' => $sqlFiles]);
             if (!empty($control['errors'])) {
-                return ['errors' => $control['errors']];
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
             }
+            return $response->withJson(['success' => 'Database has been updated']);
         }
 
-        return true;
+        return $response->withStatus(204);
     }
 }

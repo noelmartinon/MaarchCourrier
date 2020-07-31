@@ -43,6 +43,11 @@
                     </div>
                     <mat-table #table [dataSource]="dataSource" matSort matSortActive="template_label"
                         matSortDirection="asc">
+                        <ng-container matColumnDef="template_id">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.technicalId}}
+                            </mat-header-cell>
+                            <mat-cell *matCellDef="let element" style="flex:1;"> {{element.template_id}} </mat-cell>
+                        </ng-container>
                         <ng-container matColumnDef="template_label">
                             <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.templateName}}
                             </mat-header-cell>

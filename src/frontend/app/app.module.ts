@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { InternationalizationModule } from '../service/translate/internationalization.module';
 
 import { JoyrideModule } from 'ngx-joyride';
 
@@ -67,6 +68,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         BrowserModule,
         BrowserAnimationsModule,
         HttpClientModule,
+        InternationalizationModule,
         JoyrideModule.forRoot(),
         SharedModule,
         AppRoutingModule,

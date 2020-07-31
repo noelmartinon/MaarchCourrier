@@ -21,6 +21,8 @@
   "author": "Maarch",
   "license": "GPL-3.0",
   "dependencies": {
+    "@ngx-translate/core": "^13.0.0",
+    "@ngx-translate/http-loader": "^6.0.0",
     "core-js": "^3.6.5",
     "ngx-joyride": "^2.2.11",
     "zone.js": "~0.10.2"

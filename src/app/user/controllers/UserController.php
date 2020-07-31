@@ -394,7 +394,10 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id']]);
+        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id', 'mode']]);
+        if (in_array($user['mode'], ['root_visible', 'root_invisible']) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
 
         $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => [1], 'userId' => $aArgs['id'], 'itemMode' => 'dest']);
         if (!empty($listInstances)) {
@@ -1582,6 +1585,61 @@ class UserController
         AuthenticationController::sendAccountActivationNotification(['userId' => $args['id'], 'userEmail' => $user['mail']]);
 
         return $response->withStatus(204);
+    }
+
+    public function getExport(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        if (UserController::isRoot(['id' => $GLOBALS['id']])) {
+            $users = UserModel::get([
+                'select'    => ['id', 'user_id', 'firstname', 'lastname', 'mail', 'phone'],
+                'where'     => ['status != ?'],
+                'data'      => ['DEL']
+            ]);
+        } else {
+            $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
+            $users = [];
+            if (!empty($entities)) {
+                $users = UserEntityModel::getWithUsers([
+                    'select'    => ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'mail', 'phone'],
+                    'where'     => ['users_entities.entity_id in (?)', 'status != ?'],
+                    'data'      => [$entities, 'DEL']
+                ]);
+            }
+            $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => ['id', 'users.user_id', 'firstname', 'lastname', 'mail', 'phone']]);
+            $users = array_merge($users, $usersNoEntities);
+        }
+
+        $delimiter = ',';
+        $queryParams = $request->getQueryParams();
+        if (!empty($queryParams['delimiter'])) {
+            $queryParams['delimiter'] = urldecode($queryParams['delimiter']);
+            if (in_array($queryParams['delimiter'], [',', ';', 'TAB'])) {
+                $delimiter = ($queryParams['delimiter'] == 'TAB' ? "\t" : $queryParams['delimiter']);
+            }
+        }
+
+        $file = fopen('php://temp', 'w');
+
+        $csvHead = ['id', 'user_id', 'firstname', 'lastname', 'mail', 'phone'];
+        fputcsv($file, $csvHead, $delimiter);
+
+        foreach ($users as $user) {
+            $csvContent = [$user['id'], $user['user_id'], utf8_decode($user['firstname']), utf8_decode($user['lastname']), utf8_decode($user['mail']), $user['phone']];
+            fputcsv($file, $csvContent, $delimiter);
+        }
+
+        rewind($file);
+
+        $response->write(stream_get_contents($file));
+        $response = $response->withAddedHeader('Content-Disposition', 'attachment; filename=export_maarch.csv');
+        $contentType = 'application/vnd.ms-excel';
+        fclose($file);
+
+        return $response->withHeader('Content-Type', $contentType);
     }
 
     public function hasUsersRights(array $args)

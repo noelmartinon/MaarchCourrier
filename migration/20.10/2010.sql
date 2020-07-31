@@ -32,8 +32,14 @@ CREATE TYPE users_modes AS ENUM ('standard', 'rest', 'root_visible', 'root_invis
 ALTER TABLE users DROP COLUMN IF EXISTS mode;
 ALTER TABLE users ADD COLUMN mode users_modes NOT NULL DEFAULT 'standard';
 UPDATE users set mode = 'root_invisible' WHERE user_id = 'superadmin';
-UPDATE users set mode = 'rest' WHERE loginmode = 'restMode';
-ALTER TABLE users DROP COLUMN IF EXISTS loginmode;
+
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'users' and column_name = 'loginmode') THEN
+        UPDATE users set mode = 'rest' WHERE loginmode = 'restMode';
+        ALTER TABLE users DROP COLUMN IF EXISTS loginmode;
+    END IF;
+END$$;
+
 
 /* CONTACTS GROUPS */
 ALTER TABLE contacts_groups DROP COLUMN IF EXISTS entity_owner;

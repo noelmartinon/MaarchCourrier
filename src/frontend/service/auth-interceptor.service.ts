@@ -32,6 +32,10 @@ export class AuthInterceptor implements HttpInterceptor {
         {
             route: '../rest/passwordRules',
             method : ['GET']
+        },
+        {
+            route: '../rest/languages',
+            method : ['GET']
         }
     ];
     byPassHandleErrors: any[] = [

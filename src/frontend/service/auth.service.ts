@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { LocalStorageService } from './local-storage.service';
 import { NotificationService } from './notification/notification.service';
 import { HeaderService } from './header.service';
+import { Subject } from 'rxjs/internal/Subject';
+import { Observable } from 'rxjs/internal/Observable';
 
 @Injectable({
     providedIn: 'root'
@@ -11,14 +13,23 @@ import { HeaderService } from './header.service';
 export class AuthService {
 
     authMode: string = 'default';
-    changeKey: boolean = false;
+    changeKey: boolean = null;
     user: any = {};
+    private eventAction = new Subject<any>();
 
     constructor(public http: HttpClient,
         private router: Router,
         private headerService: HeaderService,
         private notify: NotificationService,
         private localStorage: LocalStorageService) { }
+
+    catchEvent(): Observable<any> {
+        return this.eventAction.asObservable();
+    }
+
+    setEvent(content: any) {
+        return this.eventAction.next(content);
+    }
 
     getToken() {
         return this.localStorage.get('MaarchCourrierToken');
@@ -78,7 +89,7 @@ export class AuthService {
     }
 
     async logout(cleanUrl: boolean = true) {
-        if ( this.getToken() !== null && cleanUrl) {
+        if (this.getToken() !== null && cleanUrl) {
             this.cleanUrl(JSON.parse(atob(this.getToken().split('.')[1])).user.id);
         }
         this.headerService.setUser();
@@ -96,7 +107,7 @@ export class AuthService {
     }
 
     updateUserInfo(token: string) {
-        const currentPicture  = this.user.picture;
+        const currentPicture = this.user.picture;
 
         this.user = JSON.parse(atob(token.split('.')[1])).user;
 
@@ -106,9 +117,9 @@ export class AuthService {
     updateUserInfoWithTokenRefresh() {
         this.http.get('../rest/authenticate/token', {
             params: {
-              refreshToken: this.getRefreshToken()
+                refreshToken: this.getRefreshToken()
             }
-          }).subscribe({
+        }).subscribe({
             next: (data: any) => {
                 this.setToken(data.token);
 
