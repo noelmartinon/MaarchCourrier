@@ -357,7 +357,8 @@ class EntityController
 
         GroupModel::update([
             'postSet'   => ['indexation_parameters' => "jsonb_set(indexation_parameters, '{entities}', (indexation_parameters->'entities') - '{$entity['id']}')"],
-            'where'     => ['1=1']
+            'where'     => ["indexation_parameters->'entities' @> ?"],
+            'data'      => ['"'.$entity['id'].'"']
         ]);
 
         EntityModel::delete(['where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
@@ -456,7 +457,8 @@ class EntityController
         //GroupIndexing
         GroupModel::update([
             'postSet'   => ['indexation_parameters' => "jsonb_set(indexation_parameters, '{entities}', (indexation_parameters->'entities') - '{$dyingEntity['id']}')"],
-            'where'     => ['1=1']
+            'where'     => ["indexation_parameters->'entities' @> ?"],
+            'data'      => ['"'.$dyingEntity['id'].'"']
         ]);
 
 

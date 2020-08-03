@@ -111,17 +111,25 @@ class ContactCustomFieldController
         if (in_array($field['type'], ['select', 'checkbox', 'radio'])) {
             $values = json_decode($field['values'], true);
             foreach ($values as $key => $value) {
-                if (!empty($body['values'][$key]) && $body['values'][$key] != $value) {
-                    ContactModel::update([
-                        'postSet'   => ['custom_fields' => "jsonb_insert(custom_fields, '{{$args['id']}, 0}', '\"{$body['values'][$key]}\"')"],
-                        'where'     => ["custom_fields->'{$args['id']}' @> ?"],
-                        'data'      => ["\"{$value}\""]
-                    ]);
-                    ContactModel::update([
-                        'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', (custom_fields->'{$args['id']}') - '{$value}')"],
-                        'where'     => ['1 = ?'],
-                        'data'      => [1]
-                    ]);
+                if (!empty($body['values'][$key]) && !in_array($value, $body['values'])) {
+                    if ($field['type'] == 'checkbox') {
+                        ContactModel::update([
+                            'postSet'   => ['custom_fields' => "jsonb_insert(custom_fields, '{{$args['id']}, 0}', '\"".pg_escape_string($body['values'][$key])."\"')"],
+                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
+                            'data'      => ["\"{$value}\""]
+                        ]);
+                        ContactModel::update([
+                            'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', (custom_fields->'{$args['id']}') - '".pg_escape_string($value)."')"],
+                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
+                            'data'      => ["\"{$value}\""]
+                        ]);
+                    } else {
+                        ContactModel::update([
+                            'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', '\"".pg_escape_string($body['values'][$key])."\"')"],
+                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
+                            'data'      => ["\"{$value}\""]
+                        ]);
+                    }
                 }
             }
         }
