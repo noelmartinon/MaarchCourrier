@@ -31,17 +31,20 @@ class IndexingModelControllerTest extends TestCase
                 [
                     'identifier'    => 'subject',
                     'mandatory'     => true,
+                    'enabled'       => true,
                     'default_value' => 'tika',
                     'unit'          => 'mail'
                 ], [
                     'identifier'    => 'doctype',
                     'mandatory'     => true,
+                    'enabled'       => false,
                     'default_value' => 'type_test',
                     'unit'          => 'mail'
                 ],
                 [
                     'identifier'    => 'name',
                     'mandatory'     => true,
+                    ''       => true,
                     'default_value' => 'massala',
                     'unit'          => 'contact'
                 ]
@@ -70,12 +73,15 @@ class IndexingModelControllerTest extends TestCase
         $this->assertSame(false, $responseBody->indexingModel->private);
         $this->assertSame('subject', $responseBody->indexingModel->fields[0]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[0]->mandatory);
+        $this->assertSame(true, $responseBody->indexingModel->fields[0]->enabled);
         $this->assertSame('tika', $responseBody->indexingModel->fields[0]->default_value);
         $this->assertSame('doctype', $responseBody->indexingModel->fields[1]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[1]->mandatory);
+        $this->assertSame(false, $responseBody->indexingModel->fields[1]->enabled);
         $this->assertSame('type_test', $responseBody->indexingModel->fields[1]->default_value);
         $this->assertSame('name', $responseBody->indexingModel->fields[2]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[2]->mandatory);
+        $this->assertSame(true, $responseBody->indexingModel->fields[2]->enabled);
         $this->assertSame('massala', $responseBody->indexingModel->fields[2]->default_value);
 
 
@@ -197,6 +203,7 @@ class IndexingModelControllerTest extends TestCase
         array_push($args['fields'], [
             'identifier'    => 'name',
             'mandatory'     => true,
+            'enabled'       => true,
             'default_value' => 'massala',
             'unit'          => 'contact'
         ]);
@@ -236,18 +243,21 @@ class IndexingModelControllerTest extends TestCase
                 [
                     'identifier'    => 'subject',
                     'mandatory'     => true,
+                    'enabled'       => true,
                     'default_value' => 'butter',
                     'unit'          => 'mail'
                 ],
                 [
                     'identifier'    => 'doctype',
                     'mandatory'     => true,
+                    'enabled'       => true,
                     'default_value' => 'type_test2',
                     'unit'          => 'mail'
                 ],
                 [
                     'identifier'    => 'siret',
                     'mandatory'     => false,
+                    'enabled'       => true,
                     'default_value' => 'chicken',
                     'unit'          => 'classement'
                 ]
@@ -273,16 +283,19 @@ class IndexingModelControllerTest extends TestCase
         $this->assertSame(false, $responseBody->indexingModel->private);
         $this->assertSame('subject', $responseBody->indexingModel->fields[0]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[0]->mandatory);
+        $this->assertSame(true, $responseBody->indexingModel->fields[0]->enabled);
         $this->assertSame('butter', $responseBody->indexingModel->fields[0]->default_value);
         $this->assertSame('mail', $responseBody->indexingModel->fields[0]->unit);
 
         $this->assertSame('doctype', $responseBody->indexingModel->fields[1]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[1]->mandatory);
+        $this->assertSame(true, $responseBody->indexingModel->fields[1]->enabled);
         $this->assertSame('type_test2', $responseBody->indexingModel->fields[1]->default_value);
         $this->assertSame('mail', $responseBody->indexingModel->fields[1]->unit);
 
         $this->assertSame('siret', $responseBody->indexingModel->fields[2]->identifier);
         $this->assertSame(false, $responseBody->indexingModel->fields[2]->mandatory);
+        $this->assertSame(true, $responseBody->indexingModel->fields[2]->enabled);
         $this->assertSame('chicken', $responseBody->indexingModel->fields[2]->default_value);
         $this->assertSame('classement', $responseBody->indexingModel->fields[2]->unit);
 
@@ -299,25 +312,28 @@ class IndexingModelControllerTest extends TestCase
         $foundSubject = false;
         $foundSiret = false;
         foreach ($responseBodyChild->indexingModel->fields as $field) {
-           if ($field->identifier == 'subject') {
+            if ($field->identifier == 'subject') {
                 $foundSubject = true;
 
                 $this->assertSame(true, $field->mandatory);
+                $this->assertSame(true, $field->enabled);
                 $this->assertSame('tika', $field->default_value);
                 $this->assertSame('mail', $field->unit);
-           } else if ($field->identifier == 'doctype') {
+            } elseif ($field->identifier == 'doctype') {
                 $foundDoctype = true;
 
                 $this->assertSame(true, $field->mandatory);
+                $this->assertSame(true, $field->enabled);
                 $this->assertSame('type_test', $field->default_value);
                 $this->assertSame('mail', $field->unit);
-           } else if ($field->identifier == 'siret') {
+            } elseif ($field->identifier == 'siret') {
                 $foundSiret = true;
 
                 $this->assertSame(false, $field->mandatory);
+                $this->assertSame(true, $field->enabled);
                 $this->assertSame('chicken', $field->default_value);
                 $this->assertSame('classement', $field->unit);
-           }
+            }
         }
 
         $this->assertSame(true, $foundSubject);

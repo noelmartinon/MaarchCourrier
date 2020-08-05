@@ -23,7 +23,7 @@ foreach ($customs as $custom) {
         $loadedXml = simplexml_load_file($path);
         
         if ($loadedXml) {
-		    $indexingModels = \IndexingModel\models\IndexingModelModel::get(['select'=> ['id']]);
+            $indexingModels = \IndexingModel\models\IndexingModelModel::get(['select'=> ['id']]);
             if (!empty($indexingModels)) {
                 $indexingModelsId = array_column($indexingModels, 'id');
             }
@@ -78,11 +78,15 @@ foreach ($customs as $custom) {
 
                 if (!empty($indexingModelsId)) {
                     foreach ($indexingModelsId as $indexingModelId) {
-                        \IndexingModel\models\IndexingModelFieldModel::create([
-                            'model_id'   => $indexingModelId,
-                            'identifier' => 'indexingCustomField_'.$fieldId,
-                            'mandatory'  => 'false',
-                            'unit'       => 'mail'
+                        \SrcCore\models\DatabaseModel::insert([
+                            'table'         => 'indexing_models_fields',
+                            'columnsValues' => [
+                                'model_id'      => $indexingModelId,
+                                'identifier'    => 'indexingCustomField_'.$fieldId,
+                                'mandatory'     => 'false',
+                                'default_value' => null,
+                                'unit'          => 'mail'
+                            ]
                         ]);
                     }
                 }

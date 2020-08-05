@@ -1865,5 +1865,7 @@ export const LANG_FR = {
     "hideTool": "Cacher la barre d'outils",
     "showTool": "Afficher la barre d'outils",
     "rest": "Compte de webservice",
-    "mustSuperadmin": "Vous devez être vous-même administrateur pour définir des administrateurs"
+    "mustSuperadmin": "Vous devez être vous-même administrateur pour définir des administrateurs",
+    "enableField": "Activer le champ",
+    "disableField": "Désactiver le champ"
 };

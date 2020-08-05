@@ -40,6 +40,9 @@ DO $$ BEGIN
     END IF;
 END$$;
 
+/*INDEXING_MODELS_FIELDS*/
+ALTER TABLE indexing_models_fields DROP COLUMN IF EXISTS enabled;
+ALTER TABLE indexing_models_fields ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT TRUE;
 
 /* CONTACTS GROUPS */
 ALTER TABLE contacts_groups DROP COLUMN IF EXISTS entity_owner;
@@ -176,6 +179,10 @@ END$$;
 UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
 UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
 UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
+
+/* TEMPLATES */
+ALTER TABLE templates DROP COLUMN IF EXISTS subject;
+ALTER TABLE templates ADD COLUMN subject character varying(255);
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

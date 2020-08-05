@@ -13,6 +13,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { TemplateFileEditorModalComponent } from './templateFileEditorModal/template-file-editor-modal.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
+import {TranslateService} from '@ngx-translate/core';
 
 declare var tinymce: any;
 
@@ -75,7 +76,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     datasourcesList: any;
     jnlpValue: any = {};
     extensionModels: any[] = [];
-    buttonFileName: any = this.lang.importFile;
+    buttonFileName: any = this.translate.instant('lang.importFile');
     lockFound: boolean = false;
     intervalLockFile: any;
 
@@ -96,7 +97,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
-        public functionsService: FunctionsService
+        public functionsService: FunctionsService,
+        private translate: TranslateService
     ) { }
 
     ngOnInit(): void {
@@ -105,7 +107,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
         this.route.params.subscribe(params => {
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.templateCreation);
+                this.headerService.setHeader(this.translate.instant('lang.templateCreation'));
 
                 this.creationMode = true;
 
@@ -128,6 +130,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             datasource: data.template.template_datasource,
                             target: data.template.template_target,
                             type: data.template.template_type,
+                            subject: data.template.subject,
                             file: {}
                         };
                         this.updateTemplateType();
@@ -149,7 +152,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             this.getViewTemplateContent();
                         }
 
-                        this.headerService.setHeader(this.lang.templateModification, this.template.template_label);
+                        this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);
                         this.loading = false;
                     });
             }
@@ -180,8 +183,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             tinymce.init({
                 selector: selectorId,
                 statusbar: false,
-                language: this.lang.langISO.replace('-', '_'),
-                language_url: `../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
+                language: this.translate.instant('lang.langISO').replace('-', '_'),
+                language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
                 height: '200',
                 plugins: [
                     'autoresize',
@@ -310,7 +313,10 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         const fileExtension = file.name.toLowerCase().split('.').pop();
 
         if (this.allowedExtensions.filter(ext => ext.toLowerCase() === fileExtension.toLowerCase()).length === 0) {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.notAllowedExtension + ' !', msg: this.lang.file + ' : <b>' + file.name + '</b>, ' + this.lang.type + ' : <b>' + file.type + '</b><br/><br/><u>' + this.lang.allowedExtensions + '</u> : <br/>' + this.allowedExtensions.filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: {
+                title: this.translate.instant('lang.notAllowedExtension') + ' !',
+                msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + this.allowedExtensions.filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ')
+            } });
             return false;
         } else {
             return true;
@@ -385,7 +391,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                     }
                 }
                 if (this.functionsService.empty(editorOptions.objectId)) {
-                    alert(this.lang.canNotEditImportedDocumentWhenJava);
+                    alert(this.translate.instant('lang.canNotEditImportedDocumentWhenJava'));
                     return false;
                 }
             } else {
@@ -494,12 +500,12 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     duplicateTemplate() {
         if (!this.lockFound && this.template.target !== 'acknowledgementReceipt') {
-            const r = confirm(this.lang.confirmDuplicate);
+            const r = confirm(this.translate.instant('lang.confirmDuplicate'));
 
             if (r) {
                 this.http.post('../rest/templates/' + this.template.id + '/duplicate', { 'id': this.template.id })
                     .subscribe((data: any) => {
-                        this.notify.success(this.lang.templateDuplicated);
+                        this.notify.success(this.translate.instant('lang.templateDuplicated'));
                         this.router.navigate(['/administration/templates/' + data.id]);
                     }, (err) => {
                         this.notify.error(err.error.errors);
@@ -533,7 +539,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             this.dialog.open(TemplateAdministrationCheckEntitiesModalComponent, this.config);
                         } else {
                             this.router.navigate(['/administration/templates']);
-                            this.notify.success(this.lang.templateAdded);
+                            this.notify.success(this.translate.instant('lang.templateAdded'));
                         }
                     }),
                     catchError((err: any) => {
@@ -555,7 +561,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             this.dialogRef = this.dialog.open(TemplateAdministrationCheckEntitiesModalComponent, this.config);
                         } else {
                             this.router.navigate(['/administration/templates']);
-                            this.notify.success(this.lang.templateUpdated);
+                            this.notify.success(this.translate.instant('lang.templateUpdated'));
                         }
                     }),
                     catchError((err: any) => {
@@ -576,11 +582,11 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     isValidTemplate() {
         if (this.template.target === 'acknowledgementReceipt' && this.functionsService.empty(this.template.file.paper.name) && this.functionsService.empty(this.template.file.electronic.content)) {
-            alert(this.lang.mustCompleteAR);
+            alert(this.translate.instant('lang.mustCompleteAR'));
             return false;
 
         } else if (this.template.target !== 'acknowledgementReceipt' && this.template.type === 'OFFICE' && this.functionsService.empty(this.template.file.name)) {
-            alert(this.lang.editModelFirst);
+            alert(this.translate.instant('lang.editModelFirst'));
             return false;
         } else {
             return true;
@@ -665,7 +671,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         } else {
             tinymce.remove('textarea');
             if (this.template.template_file_name == null && this.template.template_style == null) {
-                this.buttonFileName = this.lang.importFile;
+                this.buttonFileName = this.translate.instant('lang.importFile');
             }
         }
     }

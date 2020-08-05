@@ -159,6 +159,13 @@ class TemplateController
             $template['template_file_name'] = $storeResult['file_destination_name'];
         }
 
+        if (!empty($body['subject'])) {
+            if (!Validator::stringType()->validate($body['subject']) && !Validator::length(1, 255)->validate($body['subject'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body subject is too long or not a string']);
+            }
+            $template['subject'] = $body['subject'];
+        }
+
         $id = TemplateModel::create($template);
         if (!empty($body['entities']) && is_array($body['entities'])) {
             foreach ($body['entities'] as $entity) {
@@ -234,6 +241,13 @@ class TemplateController
 
             $template['template_path'] = $storeResult['destination_dir'];
             $template['template_file_name'] = $storeResult['file_destination_name'];
+        }
+
+        if (!empty($body['subject'])) {
+            if (!Validator::stringType()->validate($body['subject']) && !Validator::length(1, 255)->validate($body['subject'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body subject is too long or not a string']);
+            }
+            $template['subject'] = $body['subject'];
         }
 
         TemplateAssociationModel::delete(['where' => ['template_id = ?'], 'data' => [$aArgs['id']]]);
@@ -462,7 +476,7 @@ class TemplateController
         $data = [$entities, 'HTML', 'sendmail'];
 
         $templates = TemplateModel::getWithAssociation([
-            'select'    => ['DISTINCT(templates.template_id)', 'templates.template_label'],
+            'select'    => ['DISTINCT(templates.template_id)', 'templates.template_label', 'templates.subject'],
             'where'     => $where,
             'data'      => $data,
             'orderBy'   => ['templates.template_label']
@@ -470,8 +484,9 @@ class TemplateController
 
         foreach ($templates as $key => $template) {
             $templates[$key] = [
-                'id'                => $template['template_id'],
-                'label'             => $template['template_label']
+                'id'      => $template['template_id'],
+                'label'   => $template['template_label'],
+                'subject' => $template['subject']
             ];
         }
 
@@ -491,7 +506,7 @@ class TemplateController
         }
 
         $templates = TemplateModel::getWithAssociation([
-            'select'  => ['DISTINCT(templates.template_id)', 'templates.template_content'],
+            'select'  => ['DISTINCT(templates.template_id)', 'templates.template_content', 'templates.subject'],
             'where'   => ['(templates_association.value_field in (?) OR templates_association.template_id IS NULL)', 'templates.template_type = ?', 'templates.template_target = ?', 'templates.template_id = ?'],
             'data'    => [$entities, 'HTML', 'sendmail', $args['id']],
             'orderBy' => ['templates.template_id']
@@ -519,9 +534,14 @@ class TemplateController
             'content' => $template['template_content'],
             'data'    => $dataToMerge
         ]);
-        $fileContent = base64_decode($mergedDocument['encodedDocument']);
+        $mergedDocument = base64_decode($mergedDocument['encodedDocument']);
+        $mergedSubject = MergeController::mergeDocument([
+            'content' => $template['subject'],
+            'data'    => $dataToMerge
+        ]);
+        $mergedSubject = base64_decode($mergedSubject['encodedDocument']);
 
-        return $response->withJson(['mergedDocument' => $fileContent]);
+        return $response->withJson(['mergedDocument' => $mergedDocument, 'mergedSubject' => $mergedSubject]);
     }
 
     private static function controlCreateTemplate(array $aArgs)

@@ -496,6 +496,8 @@ $app->get('/administration/templates/new', \Template\controllers\TemplateControl
 $app->post('/templates/{id}/mergeEmail', \Template\controllers\TemplateController::class . ':mergeEmailTemplate');
 
 //Users
+$app->put('/users/export', \User\controllers\UserController::class . ':getExport');
+$app->put('/users/import', \User\controllers\UserController::class . ':setImport');
 $app->get('/users', \User\controllers\UserController::class . ':get');
 $app->post('/users', \User\controllers\UserController::class . ':create');
 $app->get('/users/{id}', \User\controllers\UserController::class . ':getById');
@@ -529,7 +531,6 @@ $app->post('/users/{id}/redirectedBaskets', \User\controllers\UserController::cl
 $app->delete('/users/{id}/redirectedBaskets', \User\controllers\UserController::class . ':deleteRedirectedBasket');
 $app->put('/users/{id}/baskets', \User\controllers\UserController::class . ':updateBasketsDisplay');
 $app->put('/users/{id}/accountActivationNotification', \User\controllers\UserController::class . ':sendAccountActivationNotification');
-$app->get('/exportUsers', \User\controllers\UserController::class . ':getExport');
 
 $app->post('/password', \User\controllers\UserController::class . ':forgotPassword');
 $app->put('/password', \User\controllers\UserController::class . ':passwordInitialization');

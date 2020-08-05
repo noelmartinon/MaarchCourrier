@@ -318,7 +318,7 @@
                 </div>
                 <div *ngIf="signatureBook.attachments[rightSelectedThumbnail]">
                     <div [ngClass]="{'visaDisabledButton': !canUpdateDocument || signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN'}"
-                        title="{{lang.updateAtt}}" class="visaPjUp"
+                        title="{{lang.editDocument}}" class="visaPjUp"
                         (click)="showAttachment(signatureBook.attachments[rightSelectedThumbnail])">
                         <i class="fa fa-edit fa-2x"></i>
                     </div>

@@ -234,7 +234,8 @@ class ActionController
         if (!in_array($body['component'], GroupController::INDEXING_ACTIONS)) {
             GroupModel::update([
                 'postSet'   => ['indexation_parameters' => "jsonb_set(indexation_parameters, '{actions}', (indexation_parameters->'actions') - '{$args['id']}')"],
-                'where'     => ['1=1']
+                'where'     => ["indexation_parameters->'actions' @> ?"],
+                'data'      => ['"'.$args['id'].'"']
             ]);
         }
 
@@ -269,7 +270,8 @@ class ActionController
 
         GroupModel::update([
             'postSet'   => ['indexation_parameters' => "jsonb_set(indexation_parameters, '{actions}', (indexation_parameters->'actions') - '{$args['id']}')"],
-            'where'     => ['1=1']
+            'where'     => ["indexation_parameters->'actions' @> ?"],
+            'data'      => ['"'.$args['id'].'"']
         ]);
 
         HistoryController::add([

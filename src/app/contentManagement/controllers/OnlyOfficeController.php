@@ -32,6 +32,11 @@ use Template\models\TemplateModel;
 
 class OnlyOfficeController
 {
+    // List of format convertible by OnlyOffice https://api.onlyoffice.com/editors/conversionapi
+    const CONVERTIBLE_EXTENSIONS = ['doc', 'docm', 'docx', 'dot', 'dotm', 'dotx', 'epub', 'fodt', 'html', 'mht', 'odt', 'ott', 'rtf', 'txt', 'xps',
+        'csv', 'fods', 'ods', 'ots', 'xls', 'xlsm', 'xlsx', 'xlt', 'xltm', 'xltx',
+        'fodp', 'odp', 'otp', 'pot', 'potm', 'potx', 'pps', 'ppsm', 'ppsx', 'ppt', 'pptm', 'pptx'];
+
     public function getConfiguration(Request $request, Response $response)
     {
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
@@ -331,12 +336,7 @@ class OnlyOfficeController
 
         $docInfo = pathinfo($args['fullFilename']);
 
-        // List of format convertible by OnlyOffice https://api.onlyoffice.com/editors/conversionapi
-        $convertibleExtensions = ['doc', 'docm', 'docx', 'dot', 'dotm', 'dotx', 'epub', 'fodt', 'html', 'mht', 'odt', 'ott', 'pdf', 'rtf', 'txt', 'xps',
-            'csv', 'fods', 'ods', 'ots', 'xls', 'xlsm', 'xlsx', 'xlt', 'xltm', 'xltx',
-            'fodp', 'odp', 'otp', 'pot', 'potm', 'potx', 'pps', 'ppsm', 'ppsx', 'ppt', 'pptm', 'pptx'];
-
-        if (!in_array($docInfo['extension'], $convertibleExtensions)) {
+        if (!in_array($docInfo['extension'], OnlyOfficeController::CONVERTIBLE_EXTENSIONS)) {
             return false;
         }
 

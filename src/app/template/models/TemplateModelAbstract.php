@@ -96,17 +96,18 @@ abstract class TemplateModelAbstract
         DatabaseModel::insert([
             'table'         => 'templates',
             'columnsValues' => [
-                'template_id'               => $nextSequenceId,
-                'template_label'            => $args['template_label'],
-                'template_comment'          => $args['template_comment'],
-                'template_content'          => $args['template_content'],
-                'template_type'             => $args['template_type'],
-                'template_style'            => $args['template_style'],
-                'template_datasource'       => $args['template_datasource'],
-                'template_target'           => $args['template_target'],
-                'template_attachment_type'  => $args['template_attachment_type'],
-                'template_path'             => $args['template_path'],
-                'template_file_name'        => $args['template_file_name'],
+                'template_id'              => $nextSequenceId,
+                'template_label'           => $args['template_label'],
+                'template_comment'         => $args['template_comment'],
+                'template_content'         => $args['template_content'],
+                'template_type'            => $args['template_type'],
+                'template_style'           => $args['template_style'],
+                'template_datasource'      => $args['template_datasource'],
+                'template_target'          => $args['template_target'],
+                'template_attachment_type' => $args['template_attachment_type'],
+                'template_path'            => $args['template_path'],
+                'template_file_name'       => $args['template_file_name'],
+                'subject'                  => $args['subject']
             ]
         ]);
 

@@ -76,7 +76,7 @@ class IndexingModelController
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
         }
 
-        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
         foreach ($fields as $key => $value) {
             $fields[$key]['default_value'] = json_decode($value['default_value'], true);
         }
@@ -134,7 +134,7 @@ class IndexingModelController
             }
             $master = $body['master'];
 
-            $fieldsMaster = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit'], 'where' => ['model_id = ?'], 'data' => [$body['master']]]);
+            $fieldsMaster = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled'], 'where' => ['model_id = ?'], 'data' => [$body['master']]]);
             foreach ($fieldsMaster as $key => $value) {
                 $fieldsMaster[$key]['default_value'] = json_decode($value['default_value'], true);
             }
@@ -148,6 +148,9 @@ class IndexingModelController
                 $found = false;
                 foreach ($body['fields'] as $value) {
                     if ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit']) {
+                        if (!$field['enabled']) {
+                            $value = $field;
+                        }
                         array_push($arrayTmp, $value);
                         $found = true;
                         break;
@@ -196,6 +199,7 @@ class IndexingModelController
                 'model_id'      => $modelId,
                 'identifier'    => $field['identifier'],
                 'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
+                'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                 'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                 'unit'          => $field['unit']
             ]);
@@ -283,7 +287,7 @@ class IndexingModelController
         if (!empty($childrenModels)) {
             // Update children models of master
             foreach ($childrenModels as $child) {
-                $childFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit'], 'where' => ['model_id = ?'], 'data' => [$child['id']]]);
+                $childFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled'], 'where' => ['model_id = ?'], 'data' => [$child['id']]]);
                 foreach ($childFields as $key => $value) {
                     $childFields[$key]['default_value'] = json_decode($value['default_value'], true);
                 }
@@ -293,7 +297,7 @@ class IndexingModelController
                 foreach ($body['fields'] as $field) {
                     $found = false;
                     foreach ($childFields as $value) {
-                        if ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit']) {
+                        if ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit'] && $value['enabled'] == $field['enabled']) {
                             $fieldsToKeep[] = $value;
                             $found = true;
                         }
@@ -322,6 +326,7 @@ class IndexingModelController
                         'model_id'      => $child['id'],
                         'identifier'    => $field['identifier'],
                         'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
+                        'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                         'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                         'unit'          => $field['unit']
                     ]);
@@ -381,6 +386,7 @@ class IndexingModelController
                 'model_id'      => $args['id'],
                 'identifier'    => $field['identifier'],
                 'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
+                'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                 'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                 'unit'          => $field['unit']
             ]);

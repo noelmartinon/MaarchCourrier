@@ -11,7 +11,7 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <mat-form-field>
-            <span matPrefix class="attachLabel">{{lang.senderShort}}&nbsp;:&nbsp;</span>
+            <span matPrefix class="attachLabel">{{'lang.senderShort' | translate}}&nbsp;:&nbsp;</span>
             <input *ngIf="!canManageMail()" matInput [value]="currentSender.email" readonly>
             <mat-select *ngIf="canManageMail()" [compareWith]="this.compareSenders" [(ngModel)]="currentSender">
                 <mat-option *ngFor="let email of availableSenders | sortBy: 'label'" [value]="email">
@@ -19,13 +19,13 @@
                 </mat-option>
             </mat-select>
             <button mat-button color="primary" matSuffix [disabled]="!canManageMail()" [class.activeButton]="showCopies"
-                (click)="$event.stopPropagation();showCopies = !showCopies">{{lang.copieShort}}</button>
+                (click)="$event.stopPropagation();showCopies = !showCopies">{{'lang.copieShort' | translate}}</button>
             <button mat-button color="primary" matSuffix [disabled]="!canManageMail()"
                 [class.activeButton]="showInvisibleCopies"
-                (click)="$event.stopPropagation();showInvisibleCopies = !showInvisibleCopies">{{lang.invisibleCopyShort}}</button>
+                (click)="$event.stopPropagation();showInvisibleCopies = !showInvisibleCopies">{{'lang.invisibleCopyShort' | translate}}</button>
         </mat-form-field>
         <mat-form-field>
-            <span matPrefix class="attachLabel">{{lang.recipientShort}}&nbsp;:&nbsp;</span>
+            <span matPrefix class="attachLabel">{{'lang.recipientShort' | translate}}&nbsp;:&nbsp;</span>
             <mat-chip-list id="recipients-list" #recipientsList cdkDropList
                 [cdkDropListConnectedTo]="['copies-list','invcopies-list']" [cdkDropListData]="recipients"
                 (cdkDropListDropped)="drop($event)">
@@ -50,7 +50,7 @@
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field *ngIf="showCopies">
-            <span matPrefix class="attachLabel">{{lang.copieShort}}&nbsp;:&nbsp;</span>
+            <span matPrefix class="attachLabel">{{'lang.copieShort' | translate}}&nbsp;:&nbsp;</span>
             <mat-chip-list id="copies-list" #copiesList cdkDropList
                 [cdkDropListConnectedTo]="['recipients-list','invcopies-list']" [cdkDropListData]="copies"
                 (cdkDropListDropped)="drop($event)">
@@ -74,7 +74,7 @@
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field *ngIf="showInvisibleCopies">
-            <span matPrefix class="attachLabel">{{lang.invisibleCopyShort}}&nbsp;:&nbsp;</span>
+            <span matPrefix class="attachLabel">{{'lang.invisibleCopyShort' | translate}}&nbsp;:&nbsp;</span>
             <mat-chip-list id="invcopies-list" #invCopiesList cdkDropList
                 [cdkDropListConnectedTo]="['recipients-list','copies-list']" [cdkDropListData]="invisibleCopies"
                 (cdkDropListDropped)="drop($event)">
@@ -100,7 +100,7 @@
         </mat-form-field>
         <mat-form-field floatLabel="never">
             <input matInput [placeholder]="lang.object" [readonly]="!canManageMail()" [(ngModel)]="emailsubject"
-                maxlength="70">
+                maxlength="255">
             <button mat-icon-button matSuffix *ngFor="let keyVal of emailAttachTool | keyvalue"
                 [disabled]="!canManageMail() || (emailAttachTool[keyVal.key].list.length === 0)"
                 [title]="emailAttachTool[keyVal.key].title"
@@ -139,7 +139,7 @@
                                             </div>
                                             <div class="attachLabel" style="font-size: 10px;">
                                                 {{attach.typeLabel}}<span *ngIf="attach.status === 'SIGN'"
-                                                    style="color:green">&nbsp;({{lang.signed | lowercase}})</span>
+                                                    style="color:green">&nbsp;({{'lang.signed' | translate | lowercase}})</span>
                                             </div>
                                         </span>
                                     </div>
@@ -205,17 +205,17 @@
         </button>
         <mat-menu #emailActionMenu="matMenu" [class]="'attachListMenu'">
             <button mat-menu-item (click)="switchEditionMode()" *ngIf="htmlMode">
-                {{lang.switchInPlainText}}
+                {{'lang.switchInPlainText' | translate}}
             </button>
             <button mat-menu-item (click)="switchEditionMode()" *ngIf="!htmlMode">
-                {{lang.switchInHtml}}
+                {{'lang.switchInHtml' | translate}}
             </button>
         </mat-menu>
         <button mat-raised-button color="primary"
             *ngIf="canManageMail() && privilegeService.hasCurrentUserPrivilege('sendmail')" (click)="onSubmit()"
-            [disabled]="recipients.length === 0">{{lang.send}}</button>
+            [disabled]="recipients.length === 0 || emailsubject.length > 256">{{'lang.send' | translate}}</button>
         <button mat-raised-button color="warn" (click)="deleteEmail()"
             *ngIf="data.emailId && data.emailType === 'email'"
-            [disabled]="headerService.user.id !== emailCreatorId">{{lang.delete}}</button>
+            [disabled]="headerService.user.id !== emailCreatorId">{{'lang.delete' | translate}}</button>
     </div>
 </div>

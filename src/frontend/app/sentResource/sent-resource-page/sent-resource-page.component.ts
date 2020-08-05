@@ -16,6 +16,7 @@ import { PrivilegeService } from '../../../service/privileges.service';
 import { HeaderService } from '../../../service/header.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import {TranslateService} from '@ngx-translate/core';
 
 declare var $: any;
 declare var tinymce: any;
@@ -65,17 +66,17 @@ export class SentResourcePageComponent implements OnInit {
     emailAttachTool: any = {
         document: {
             icon: 'fa fa-file',
-            title: this.lang.attachMainDocument,
+            title: this.translate.instant('lang.attachMainDocument'),
             list: []
         },
         notes: {
             icon: 'fas fa-pen-square',
-            title: this.lang.attachNote,
+            title: this.translate.instant('lang.attachNote'),
             list: []
         },
         attachments: {
             icon: 'fa fa-paperclip',
-            title: this.lang.attachAttachment,
+            title: this.translate.instant('lang.attachAttachment'),
             list: []
         },
     };
@@ -98,7 +99,8 @@ export class SentResourcePageComponent implements OnInit {
         public functions: FunctionsService,
         private contactService: ContactService,
         public privilegeService: PrivilegeService,
-        public headerService: HeaderService
+        public headerService: HeaderService,
+        private translate: TranslateService
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -152,8 +154,8 @@ export class SentResourcePageComponent implements OnInit {
             readonly: this.emailStatus === 'SENT',
             height: '400',
             suffix: '.min',
-            language: this.lang.langISO.replace('-', '_'),
-            language_url: `../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
+            language: this.translate.instant('lang.langISO').replace('-', '_'),
+            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
             menubar: false,
             statusbar: false,
             plugins: [
@@ -255,6 +257,10 @@ export class SentResourcePageComponent implements OnInit {
                 }
                 if (!this.htmlMode) {
                     tinymce.get('emailSignature').setContent(tinymce.get('emailSignature').getContent({ format: 'text' }));
+                }
+
+                if (!this.functions.empty(data.mergedSubject)) {
+                    this.emailsubject = data.mergedSubject;
                 }
             }),
             catchError((err) => {
@@ -389,8 +395,8 @@ export class SentResourcePageComponent implements OnInit {
                         email: data.acknowledgementReceipt.userLabel
                     };
                     this.recipients = [{
-                        label: !this.functions.empty(data.acknowledgementReceipt.contact) ? this.contactService.formatContact(data.acknowledgementReceipt.contact) : this.lang.contactDeleted,
-                        email: !this.functions.empty(data.acknowledgementReceipt.contact.email) ? data.acknowledgementReceipt.contact.email : this.lang.withoutEmail
+                        label: !this.functions.empty(data.acknowledgementReceipt.contact) ? this.contactService.formatContact(data.acknowledgementReceipt.contact) : this.translate.instant('lang.contactDeleted'),
+                        email: !this.functions.empty(data.acknowledgementReceipt.contact.email) ? data.acknowledgementReceipt.contact.email : this.translate.instant('lang.withoutEmail')
                     }];
 
                     this.emailStatus = 'SENT';
@@ -400,10 +406,10 @@ export class SentResourcePageComponent implements OnInit {
                     this.pdfMode = data.format === 'pdf';
 
                     if (this.pdfMode) {
-                        this.emailsubject = this.lang.ARPaper;
+                        this.emailsubject = this.translate.instant('lang.ARPaper');
                         this.emailContent = data.encodedDocument;
                     } else {
-                        this.emailsubject = this.lang.ARelectronic;
+                        this.emailsubject = this.translate.instant('lang.ARelectronic');
                         this.emailContent = this.b64DecodeUnicode(data.encodedDocument);
                     }
                     resolve(true);
@@ -593,10 +599,10 @@ export class SentResourcePageComponent implements OnInit {
         this.emailStatus = 'WAITING';
         if (this.data.emailId === null) {
             if (!this.isAllEmailRightFormat()) {
-                this.notify.error(this.lang.badEmailsFormat);
+                this.notify.error(this.translate.instant('lang.badEmailsFormat'));
             } else {
                 if (this.emailsubject === '') {
-                    const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.warnEmptySubject } });
+                    const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.warnEmptySubject') } });
 
                     dialogRef.afterClosed().pipe(
                         filter((data: string) => data === 'ok'),
@@ -617,9 +623,9 @@ export class SentResourcePageComponent implements OnInit {
         this.http.post(`../rest/emails`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
-                    // this.notify.success(this.lang.draftSaved);
+                    // this.notify.success(this.translate.instant('lang.draftSaved'));
                 } else {
-                    this.notify.success(`${this.lang.sendingEmail}...`);
+                    this.notify.success(`${this.translate.instant('lang.sendingEmail')}...`);
                 }
 
                 if (closeModal) {
@@ -639,13 +645,13 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     deleteEmail() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete(`../rest/emails/${this.data.emailId}`)),
             tap(() => {
-                this.notify.success(this.lang.emailDeleted);
+                this.notify.success(this.translate.instant('lang.emailDeleted'));
                 this.closeModal('success');
             }),
             catchError((err) => {
@@ -659,9 +665,9 @@ export class SentResourcePageComponent implements OnInit {
         this.http.put(`../rest/emails/${this.data.emailId}`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
-                    // this.notify.success(this.lang.draftUpdated);
+                    // this.notify.success(this.translate.instant('lang.draftUpdated'));
                 } else {
-                    this.notify.success(`${this.lang.sendingEmail}...`);
+                    this.notify.success(`${this.translate.instant('lang.sendingEmail')}...`);
                 }
 
                 if (closeModal) {
@@ -742,7 +748,7 @@ export class SentResourcePageComponent implements OnInit {
             $('.tox-editor-header').show();
             tinymce.get('emailSignature').setContent(tinymce.get('emailSignature').getContent());
         } else {
-            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.switchInPlainText, msg: this.lang.confirmSwitchInPlanText } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.switchInPlainText'), msg: this.translate.instant('lang.confirmSwitchInPlanText') } });
             dialogRef.afterClosed().pipe(
                 tap((data: string) => {
                     if (data === 'ok') {

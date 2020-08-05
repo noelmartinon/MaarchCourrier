@@ -174,8 +174,8 @@ class CustomFieldController
                         ]);
                         ResModel::update([
                             'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', (custom_fields->'{$args['id']}') - '{$value}')"],
-                            'where'     => ['1 = ?'],
-                            'data'      => [1]
+                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
+                            'data'      => ['"'.$value.'"']
                         ]);
                     }
                 }

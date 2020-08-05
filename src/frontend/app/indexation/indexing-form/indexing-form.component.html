@@ -32,19 +32,26 @@
                                 <i *ngIf="adminMode" [title]="lang.move" class="fas fa-bars fa-2x" color="primary"
                                     style="cursor: move" cdkDragHandle></i>&nbsp;
                                 {{field.label}}
-                                <button *ngIf="adminMode && !field.system" mat-icon-button
+                                <button *ngIf="adminMode" mat-icon-button
                                     [matMenuTriggerFor]="fieldActions">
                                     <mat-icon class="fa fa-ellipsis-v" color="secondary"></mat-icon>
                                 </button>
                                 <mat-menu #fieldActions="matMenu">
-                                    <button mat-menu-item (click)="field.mandatory = !field.mandatory">
+                                    <button mat-menu-item (click)="field.mandatory = !field.mandatory" *ngIf="!field.system">
                                         <span *ngIf="!field.mandatory">{{lang.mandatoryField}}</span>
                                         <span *ngIf="field.mandatory">{{lang.optionalField}}</span>
                                     </button>
-                                    <mat-divider></mat-divider>
-                                    <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)">
+                                    <mat-divider *ngIf="!field.system"></mat-divider>
+                                    <button mat-menu-item *ngIf="!field.enabled" (click)="enableField(field, true)">
+                                        <span>{{lang.enableField}}</span>
+                                    </button>
+                                    <button mat-menu-item *ngIf="field.enabled" (click)="enableField(field, false)">
+                                        <span>{{lang.disableField}}</span>
+                                    </button>
+                                    <mat-divider *ngIf="!field.system"></mat-divider>
+                                    <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)" *ngIf="!field.system">
                                         <mat-icon class="fa fa-trash" color="warn"></mat-icon>
-                                        <span>{{lang.delete}}</span>
+                                        <span>{{lang.delete}} {{field.enabled}} {{arrFormControl[field.identifier].enabled}} {{isAlwaysDisabledField(field)}}</span>
                                     </button>
                                 </mat-menu>
                             </div>
@@ -209,7 +216,7 @@
                             <div style="padding: 10px;font-size: 16px;color: #135F7F;letter-spacing: 2px;font-weight: bold;display: flex;
                                 align-items: center;">
                                 <div style="display: flex;flex: 1;align-items: center;">
-                                    {{lang.diffusionList}} <button mat-icon-button  *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process'" color="primary"
+                                    {{lang.diffusionList}} <button mat-icon-button  *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process' && field.enabled" color="primary"
                                             (click)="appDiffusionsList.switchMode()" [title]="lang.modifyDiffusionList">
                                             <mat-icon class="fa fa-edit"></mat-icon>
                                         </button>

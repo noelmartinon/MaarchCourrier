@@ -34,18 +34,16 @@ class LanguageController
 
         $language = ['lang' => []];
 
-        if (is_file("src/frontend/lang/lang-{$args['language']}.json")) {
-            $file = file_get_contents("src/frontend/lang/lang-{$args['language']}.json");
+        if (is_file("src/lang/lang-{$args['language']}.json")) {
+            $file             = file_get_contents("src/lang/lang-{$args['language']}.json");
             $language['lang'] = json_decode($file, true);
         }
 
         $customId = CoreConfigModel::getCustomId();
-        if (is_file("custom/{$customId}/src/frontend/lang/lang-{$args['language']}.json")) {
-            $file = file_get_contents("custom/{$customId}/src/frontend/lang/lang-{$args['language']}.json");
-            $overloadedLanguage = json_decode($file, true);
-            foreach ($overloadedLanguage['lang'] as $key => $value) {
-                $language['lang'][$key] = $value;
-            }
+        if (is_file("custom/{$customId}/lang/lang-{$args['language']}.json")) {
+            $file               = file_get_contents("custom/{$customId}/lang/lang-{$args['language']}.json");
+            $overloadedLanguage = json_decode($file, true) ?? [];
+            $language['lang']   = array_merge($language['lang'], $overloadedLanguage);
         }
 
         if (empty($language['lang'])) {

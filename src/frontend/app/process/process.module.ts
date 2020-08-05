@@ -18,6 +18,7 @@ import { SentNumericPackagePageComponent } from '../sentResource/sent-numeric-pa
 import { ThesaurusModalComponent } from '../tag/indexing/thesaurus/thesaurus-modal.component';
 import { SelectIndexingModelComponent } from '../indexation/select-indexing-model/select-indexing-model.component';
 import { DocumentFormModule } from '../document-form.module';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
     imports: [
@@ -25,6 +26,7 @@ import { DocumentFormModule } from '../document-form.module';
         ActionsModule,
         ProcessRoutingModule,
         DocumentFormModule,
+        TranslateModule,
     ],
     declarations: [
         ProcessComponent,

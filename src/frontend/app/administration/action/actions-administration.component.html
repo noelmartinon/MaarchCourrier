@@ -32,8 +32,7 @@
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput (keyup)="applyFilter($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                <input matInput placeholder="{{lang.filterBy}}" [formControl]="adminService.getFilterField()">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -41,7 +40,7 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc">
+                    <mat-table #table [dataSource]="adminService.getDataSource()" [matSortActive]="adminService.getFilter('sort')" [matSortDirection]="adminService.getFilter('sortDirection')" matSort>
                         <ng-container matColumnDef="id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
                                 [class.hide-for-mobile]="appService.getViewMode()">{{lang.id}}</mat-header-cell>

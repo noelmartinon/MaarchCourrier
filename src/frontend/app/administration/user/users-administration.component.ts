@@ -1,10 +1,9 @@
-import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -12,6 +11,10 @@ import { FunctionsService } from '../../../service/functions.service';
 import { of } from 'rxjs/internal/observable/of';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { UsersImportComponent } from './import/users-import.component';
+import { UsersExportComponent } from './export/users-export.component';
+import { tap } from 'rxjs/internal/operators/tap';
+import { filter, startWith, switchMap } from 'rxjs/operators';
+import { AdministrationService } from '../administration.service';
 
 @Component({
     templateUrl: 'users-administration.component.html',
@@ -39,20 +42,11 @@ export class UsersAdministrationComponent implements OnInit {
     webserviceAccounts: any[] = [];
     noWebserviceAccounts: any[] = [];
 
-    dataSource = new MatTableDataSource(this.data);
     displayedColumns = ['id', 'user_id', 'lastname', 'firstname', 'status', 'mail', 'actions'];
-
+    filterColumns = ['id', 'user_id', 'lastname', 'firstname', 'mail'];
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['id', 'user_id', 'lastname', 'firstname', 'mail']);
-        };
-    }
 
     constructor(
         public http: HttpClient,
@@ -61,6 +55,7 @@ export class UsersAdministrationComponent implements OnInit {
         public headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef
     ) { }
 
@@ -71,9 +66,15 @@ export class UsersAdministrationComponent implements OnInit {
 
         this.user = this.headerService.user;
         this.loading = true;
+        this.getData();
+    }
 
-        this.http.get('../rest/users')
-            .subscribe((data: any) => {
+    getData() {
+        this.webserviceAccounts = [];
+        this.noWebserviceAccounts = [];
+        this.data = [];
+        this.http.get('../rest/users').pipe(
+            tap((data: any) => {
                 this.data = data['users'];
                 this.data.forEach(element => {
                     element.statusLabel = this.lang['user' + element.status];
@@ -90,21 +91,15 @@ export class UsersAdministrationComponent implements OnInit {
                 }
 
                 this.loading = false;
-                this.setDatasource();
-            }, (err) => {
-                this.notify.handleErrors(err);
-            });
-    }
-
-    setDatasource() {
-        setTimeout(() => {
-            this.dataSource = new MatTableDataSource(this.data);
-            this.dataSource.paginator = this.paginator;
-            this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
-            this.sort.active = 'user_id';
-            this.sort.direction = 'asc';
-            this.dataSource.sort = this.sort;
-        }, 0);
+                setTimeout(() => {
+                    this.adminService.setDataSource('admin_users', this.data, this.sort, this.paginator, this.filterColumns);
+                }, 0);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     activateUser(user: any) {
@@ -208,7 +203,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                                         this.data.splice(Number(i), 1);
                                                                     }
                                                                 }
-                                                                this.setDatasource();
+                                                                this.adminService.setDataSource('admin_users', this.data, this.sort, this.paginator, this.filterColumns);
 
                                                                 if (this.quota.userQuota && user.status !== 'SPD') {
                                                                     this.quota.actives--;
@@ -260,7 +255,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                             this.data.splice(Number(i), 1);
                                                         }
                                                     }
-                                                    this.setDatasource();
+                                                    this.adminService.setDataSource('admin_users', this.data, this.sort, this.paginator, this.filterColumns);
 
                                                     if (this.quota.userQuota && user.status === 'OK') {
                                                         this.quota.actives--;
@@ -311,7 +306,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                                 this.data.splice(Number(i), 1);
                                                             }
                                                         }
-                                                        this.setDatasource();
+                                                        this.adminService.setDataSource('admin_users', this.data, this.sort, this.paginator, this.filterColumns);
 
                                                         if (this.quota.userQuota && user.status === 'OK') {
                                                             this.quota.actives--;
@@ -358,7 +353,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                     this.data.splice(Number(i), 1);
                                                 }
                                             }
-                                            this.setDatasource();
+                                            this.adminService.setDataSource('admin_users', this.data, this.sort, this.paginator, this.filterColumns);
 
                                             if (this.quota.userQuota && user.status === 'OK') {
                                                 this.quota.actives--;
@@ -407,7 +402,7 @@ export class UsersAdministrationComponent implements OnInit {
         } else {
             this.data = this.noWebserviceAccounts;
         }
-        this.setDatasource();
+        this.adminService.setDataSource('admin_users', this.data, this.sort, this.paginator, this.filterColumns);
     }
 
     openUsersImportModal() {
@@ -418,12 +413,21 @@ export class UsersAdministrationComponent implements OnInit {
             panelClass: 'maarch-full-height-modal'
         });
 
-        /*dialogRef.afterClosed().pipe(
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => data === 'success'),
+            tap(() => {
+                this.getData();
+            }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
-        ).subscribe();*/
+        ).subscribe();
+    }
+
+    openUsersExportModal() {
+        this.dialog.open(UsersExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
+
     }
 
 }

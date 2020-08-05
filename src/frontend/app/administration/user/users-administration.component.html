@@ -8,8 +8,14 @@
                     {{lang.add}}
                 </p>
             </a>
+            <a mat-list-item (click)="openUsersExportModal()">
+                <mat-icon color="primary" mat-list-icon class="fas fa-file-export"></mat-icon>
+                <p mat-line>
+                    Exporter les utilisateurs
+                </p>
+            </a>
             <a mat-list-item (click)="openUsersImportModal()">
-                <mat-icon color="primary" mat-list-icon class="fa fa-file"></mat-icon>
+                <mat-icon color="primary" mat-list-icon class="fas fa-file-download"></mat-icon>
                 <p mat-line>
                     Importer des utilisateurs
                 </p>
@@ -46,8 +52,7 @@
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput (keyup)="applyFilter($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{lang.filterBy}}">
                                 <mat-button-toggle class="webserviceAccount" matSuffix
                                     (click)="$event.stopPropagation();toggleWebserviceAccount()"
                                     [checked]="this.withWebserviceAccount" title="{{lang.displayWebserviceAccount}}">
@@ -61,7 +66,7 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="user_id" matSortDirection="asc">
+                    <mat-table #table [dataSource]="adminService.getDataSource()" [matSortActive]="adminService.getFilter('sort')" [matSortDirection]="adminService.getFilter('sortDirection')" matSort>
                         <ng-container matColumnDef="id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
                                 [class.hide-for-mobile]="appService.getViewMode()">{{lang.technicalId}}

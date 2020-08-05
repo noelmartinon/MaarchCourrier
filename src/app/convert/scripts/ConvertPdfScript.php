@@ -103,7 +103,6 @@ class ConvertPdfScript
         copy($pathToDocument, "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}");
 
         if (strtolower($docInfo['extension']) != 'pdf') {
-
             $fullFilename = "{$tmpPath}{$fileNameOnTmp}.{$docInfo['extension']}";
             $converted = false;
             $output = [];

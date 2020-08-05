@@ -51,6 +51,7 @@ export class IndexingFormComponent implements OnInit {
             type: 'select',
             system: true,
             mandatory: true,
+            enabled: true,
             default_value: '',
             values: []
         },
@@ -61,6 +62,7 @@ export class IndexingFormComponent implements OnInit {
             type: 'string',
             system: true,
             mandatory: true,
+            enabled: true,
             default_value: '',
             values: []
         },
@@ -84,70 +86,80 @@ export class IndexingFormComponent implements OnInit {
             label: this.lang.getRecipients,
             type: 'autocomplete',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'priority',
             label: this.lang.priority,
             type: 'select',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'confidentiality',
             label: this.lang.confidential,
             type: 'radio',
             default_value: null,
-            values: [{ 'id': true, 'label': this.lang.yes }, { 'id': false, 'label': this.lang.no }]
+            values: [{ 'id': true, 'label': this.lang.yes }, { 'id': false, 'label': this.lang.no }],
+            enabled: true,
         },
         {
             identifier: 'initiator',
             label: this.lang.initiatorEntityAlt,
             type: 'select',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'departureDate',
             label: this.lang.departureDate,
             type: 'date',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'processLimitDate',
             label: this.lang.processLimitDate,
             type: 'date',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'tags',
             label: this.lang.tags,
             type: 'autocomplete',
             default_value: null,
-            values: ['/rest/autocomplete/tags', '/rest/tags']
+            values: ['/rest/autocomplete/tags', '/rest/tags'],
+            enabled: true,
         },
         {
             identifier: 'senders',
             label: this.lang.getSenders,
             type: 'autocomplete',
             default_value: null,
-            values: ['/rest/autocomplete/correspondents']
+            values: ['/rest/autocomplete/correspondents'],
+            enabled: true,
         },
         {
             identifier: 'destination',
             label: this.lang.destination,
             type: 'select',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'folders',
             label: this.lang.folders,
             type: 'autocomplete',
             default_value: null,
-            values: ['/rest/autocomplete/folders', '/rest/folders']
+            values: ['/rest/autocomplete/folders', '/rest/folders'],
+            enabled: true,
         },
         {
             identifier: 'documentDate',
@@ -155,7 +167,8 @@ export class IndexingFormComponent implements OnInit {
             unit: 'mail',
             type: 'date',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
         {
             identifier: 'arrivalDate',
@@ -163,7 +176,8 @@ export class IndexingFormComponent implements OnInit {
             unit: 'mail',
             type: 'date',
             default_value: null,
-            values: []
+            values: [],
+            enabled: true,
         },
     ];
     availableFieldsClone: any[] = [];
@@ -233,6 +247,7 @@ export class IndexingFormComponent implements OnInit {
                     this.availableCustomFields = data.customFields.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
+                        info.enabled = true;
                         info.SQLMode = info.SQLMode;
 
                         info.default_value = ['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values) ? info.values[0].key : null;
@@ -287,6 +302,7 @@ export class IndexingFormComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             tap(() => {
                 item.mandatory = false;
+                item.enabled = true;
                 if (item.identifier.indexOf('indexingCustomField') > -1) {
                     this.availableCustomFields.push(item);
                     this[arrTarget].splice(index, 1);
@@ -594,7 +610,7 @@ export class IndexingFormComponent implements OnInit {
                     });
                     elem.values = arrValues;
                     elem.event = 'calcLimitDate';
-                    if (elem.default_value !== null && !this.adminMode) {
+                    if (!this.functions.empty(elem.default_value) && !this.adminMode) {
                         this.calcLimitDate(elem, elem.default_value);
                     }
                     resolve(true);
@@ -849,13 +865,31 @@ export class IndexingFormComponent implements OnInit {
         ).subscribe();
     }
 
+    enableField(field: any, enable: boolean) {
+        if (enable) {
+            if (!this.isAlwaysDisabledField(field)) {
+                this.arrFormControl[field.identifier].enable();
+            }
+            field.enabled = true;
+        } else {
+            this.arrFormControl[field.identifier].disable();
+            field.enabled = false;
+        }
+    }
+
+    isAlwaysDisabledField(field: any) {
+        if (this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || field.today)) {
+            return true;
+        }
+        return false;
+    }
+
     initValidator(field: any) {
         let valArr: ValidatorFn[] = [];
 
-        let disabledState: boolean = false;
-
-        if (this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || (field.today && this.adminMode))) {
-            disabledState = true;
+        const disabledState = !field.enabled || this.isAlwaysDisabledField(field);
+        if (!disabledState) {
+            field.enabled = true;
         }
 
         this.arrFormControl[field.identifier] = new FormControl({ value: field.default_value, disabled: disabledState });

@@ -125,12 +125,15 @@ foreach ($customs as $custom) {
             }
         }
         foreach ($datasToImport as $id => $defaultValue) {
-            \IndexingModel\models\IndexingModelFieldModel::create([
-                'model_id'      => $modelId,
-                'identifier'    => $id,
-                'mandatory'     => $defaultValue['mandatory'],
-                'default_value' => $defaultValue['default_value'],
-                'unit'          => $defaultValue['unit']
+            \SrcCore\models\DatabaseModel::insert([
+                'table'         => 'indexing_models_fields',
+                'columnsValues' => [
+                    'model_id'      => $modelId,
+                    'identifier'    => $id,
+                    'mandatory'     => $defaultValue['mandatory'],
+                    'default_value' => $defaultValue['default_value'],
+                    'unit'          => $defaultValue['unit']
+                ]
             ]);
         }
         ++$migrated;

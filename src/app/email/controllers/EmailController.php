@@ -751,6 +751,10 @@ class EmailController
             return ['errors' => 'Data isHtml is not a boolean or empty', 'code' => 400];
         }
 
+        if (!empty($args['data']['object']) && !Validator::stringType()->length(1, 255)->validate($args['data']['object'])) {
+            return ['errors' => 'Data object is not a string or is more than 255 characters', 'code' => 400];
+        }
+
         if (!empty($args['data']['sender']['email'])) {
             $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
             $configuration = json_decode($configuration['value'], true);

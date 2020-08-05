@@ -62,11 +62,15 @@ foreach ($customs as $custom) {
                 ]);
 
                 if (!empty($indexingModels)) {
-                    \IndexingModel\models\IndexingModelFieldModel::create([
-                        'model_id'   => $modelId,
-                        'identifier' => 'indexingCustomField_'.$fieldId,
-                        'mandatory'  => 'false',
-                        'unit'       => 'mail'
+                    \SrcCore\models\DatabaseModel::insert([
+                        'table'         => 'indexing_models_fields',
+                        'columnsValues' => [
+                            'model_id'      => $modelId,
+                            'identifier'    => 'indexingCustomField_'.$fieldId,
+                            'mandatory'     => 'false',
+                            'default_value' => null,
+                            'unit'          => 'mail'
+                        ]
                     ]);
                 }
             }

@@ -16,6 +16,7 @@ import { MatDialogRef } from '@angular/material/dialog/dialog-ref';
 import { filter } from 'rxjs/internal/operators/filter';
 import { exhaustMap } from 'rxjs/internal/operators/exhaustMap';
 import { MatDialog } from '@angular/material/dialog';
+import { AdministrationService } from '../administration.service';
 
 @Component({
     templateUrl: 'alfresco-list-administration.component.html',
@@ -34,7 +35,8 @@ export class AlfrescoListAdministrationComponent implements OnInit {
     loading: boolean = false;
 
     displayedColumns = ['label', 'entitiesLabel', 'actions'];
-    dataSource: any;
+    filterColumns = ['label', 'entitiesLabel'];
+
     dialogRef: MatDialogRef<any>;
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -48,17 +50,9 @@ export class AlfrescoListAdministrationComponent implements OnInit {
         public appService: AppService,
         private dialog: MatDialog,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef
     ) { }
-
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template: any, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['label', 'entitiesLabel']);
-        };
-    }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.lang.administration + ' ' + this.lang.alfresco);
@@ -77,13 +71,10 @@ export class AlfrescoListAdministrationComponent implements OnInit {
         this.http.get('../rest/alfresco/accounts')
             .subscribe((data: any) => {
                 this.accounts = data.accounts;
-
-                setTimeout(() => {
-                    this.dataSource = new MatTableDataSource(this.accounts);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sort = this.sort;
-                }, 0);
                 this.loading = false;
+                setTimeout(() => {
+                    this.adminService.setDataSource('admin_alfresco', this.accounts, this.sort, this.paginator, this.filterColumns);
+                }, 0);
             });
     }
 
@@ -96,9 +87,9 @@ export class AlfrescoListAdministrationComponent implements OnInit {
             exhaustMap(() => this.http.delete('../rest/alfresco/accounts/' + id)),
             tap(() => {
                 this.accounts = this.accounts.filter((account: any) => account.id !== id);
-                this.dataSource = new MatTableDataSource(this.accounts);
-                this.dataSource.paginator = this.paginator;
-                this.dataSource.sort = this.sort;
+                setTimeout(() => {
+                    this.adminService.setDataSource('admin_alfresco', this.accounts, this.sort, this.paginator, this.filterColumns);
+                }, 0);
                 this.notify.success(this.lang.accountDeleted);
             }),
             catchError((err: any) => {

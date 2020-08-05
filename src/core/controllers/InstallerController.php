@@ -410,13 +410,21 @@ class InstallerController
         ];
 
         foreach ($docservers as $docserver) {
-            if (!@mkdir("{$body['path']}/{$body['customId']}/{$docserver}", 0755, true)) {
+            if (is_dir("{$body['path']}/{$body['customId']}/{$docserver}")) {
+                if (!is_readable("{$body['path']}/{$body['customId']}/{$docserver}") || !is_writable("{$body['path']}/{$body['customId']}/{$docserver}")) {
+                    return $response->withStatus(400)->withJson(['errors' => "Docserver {$body['path']}/{$body['customId']}/{$docserver} is not readable or writable"]);
+                }
+            } elseif (!@mkdir("{$body['path']}/{$body['customId']}/{$docserver}", 0755, true)) {
                 return $response->withStatus(400)->withJson(['errors' => "Docserver folder creation failed for path : {$body['path']}/{$body['customId']}/{$docserver}"]);
             }
         }
 
         $templatesPath = "{$body['path']}/{$body['customId']}/templates/0000";
-        if (!@mkdir($templatesPath, 0755, true)) {
+        if (is_dir($templatesPath)) {
+            if (!is_readable($templatesPath) || !is_writable($templatesPath)) {
+                return $response->withStatus(400)->withJson(['errors' => "Docserver {$templatesPath} is not readable or writable"]);
+            }
+        } elseif (!@mkdir($templatesPath, 0755, true)) {
             return $response->withJson(['success' => "Docservers created but templates folder creation failed"]);
         }
 

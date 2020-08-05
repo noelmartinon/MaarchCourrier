@@ -41,7 +41,7 @@ class ConvertPdfController
             $command = "wkhtmltopdf -B 10mm -L 10mm -R 10mm -T 10mm --load-error-handling ignore --load-media-error-handling ignore ".$aArgs['fullFilename']." ".$pdfFilepath;
     
             exec('export DISPLAY=:0 && '.$command.' 2>&1', $output, $return);
-        } else {
+        } elseif (strtolower($extension) != 'pdf') {
             $url = str_replace('rest/', '', UrlController::getCoreUrl());
             if (OnlyOfficeController::canConvert(['url' => $url, 'fullFilename' => $aArgs['fullFilename']])) {
                 $converted = OnlyOfficeController::convert(['fullFilename' => $aArgs['fullFilename'], 'url' => $url, 'userId' => $GLOBALS['id']]);
@@ -73,7 +73,6 @@ class ConvertPdfController
             $command = "timeout 30 unoconv -f pdf " . escapeshellarg($aArgs['fullFilename']);
 
             exec('export HOME=' . $tmpPath . ' && ' . $command . ' 2>&1', $output, $return);
-
         }
 
         return ['output' => $output, 'return' => $return];

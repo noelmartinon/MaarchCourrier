@@ -24,8 +24,8 @@
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^6.0.0",
     "core-js": "^3.6.5",
-    "ngx-joyride": "^2.2.11",
-    "zone.js": "~0.10.2"
+    "ngx-joyride": "^2.3.1",
+    "zone.js": "~0.10.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.901.9",
