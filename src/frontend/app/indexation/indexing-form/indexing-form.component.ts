@@ -180,6 +180,8 @@ export class IndexingFormComponent implements OnInit {
 
     currentResourceValues: any = null;
 
+    selfDest: boolean = false;
+
     dialogRef: MatDialogRef<any>;
 
     constructor(
@@ -490,9 +492,11 @@ export class IndexingFormComponent implements OnInit {
                     } else {
                         let title = '';
                         if (elem.default_value === '#myPrimaryEntity') {
+                            this.selfDest = this.currentCategory === 'outgoing';
                             elem.default_value = this.headerService.user.entities[0].id;
                             this.arrFormControl[elem.identifier].setValue(elem.default_value);
                         } else {
+                            this.selfDest = false;
                             const defaultVal = data.entities.filter((entity: any) => entity.enabled === true && entity.id === elem.default_value);
                             elem.default_value = defaultVal.length > 0 ? defaultVal[0].id : null;
                             this.arrFormControl[elem.identifier].setValue(defaultVal.length > 0 ? defaultVal[0].id : '');

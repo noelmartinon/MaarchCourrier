@@ -48,9 +48,9 @@ export class DiffusionsListComponent implements OnInit {
     @Input('entityId') entityId: any = null;
 
     /**
-     * Category identifier to specify the context to load listModel
+     * To specify the context to load listModel
      */
-    @Input() categoryId: any = null;
+    @Input() selfDest: boolean = false;
 
     /**
      * For manage current loaded list
@@ -101,7 +101,7 @@ export class DiffusionsListComponent implements OnInit {
         if (this.resId !== null && this.resId != 0 && this.target !== 'redirect') {
             this.loadListinstance(this.resId);
         } else if ((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) {
-            this.loadListModel(this.entityId, false, this.categoryId === 'outgoing');
+            this.loadListModel(this.entityId, false, this.selfDest);
         }
         this.loading = false;
     }
