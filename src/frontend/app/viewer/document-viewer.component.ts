@@ -617,6 +617,7 @@ export class DocumentViewerComponent implements OnInit {
                             this.file.contentView = `../../rest/resources/${resId}/content?mode=view`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                             this.loading = false;
+                            this.noFile = false;
                         }
                     },
                     (err: any) => {
