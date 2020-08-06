@@ -22,7 +22,6 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
-use SrcCore\models\DatabasePDO;
 use SrcCore\models\ValidatorModel;
 
 class VersionUpdateController
@@ -157,40 +156,9 @@ class VersionUpdateController
             return $response->withStatus(400)->withJson(['errors' => 'Some files are modified. Can not update application', 'lang' => 'canNotUpdateApplication']);
         }
 
-        $minorVersions = explode('.', $minorVersion);
-        $currentVersionTag = (int)$currentVersionTag;
-        $currentVersionTag++;
-        $sqlFiles = [];
-        while ($currentVersionTag <= (int)$minorVersions[2]) {
-            if (is_file("migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$currentVersionTag}.sql")) {
-                if (!is_readable("migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$currentVersionTag}.sql")) {
-                    return $response->withStatus(400)->withJson(['errors' => "File migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$currentVersionTag}.sql is not readable"]);
-                }
-                $sqlFiles[] = "migration/{$versions[0]}.{$versions[1]}/{$versions[0]}{$versions[1]}{$currentVersionTag}.sql";
-            }
-            $currentVersionTag++;
-        }
-
-        $control = VersionUpdateController::executeSQLUpdate(['sqlFiles' => $sqlFiles]);
+        $control = VersionUpdateController::executeSQLUpdate(['sqlFiles' => []]);
         if (!empty($control['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
-        }
-
-        $currentCustomId = CoreConfigModel::getCustomId();
-        if (is_file('custom/custom.xml')) {
-            $xmlFile = simplexml_load_file('custom/custom.xml');
-            foreach ($xmlFile->custom as $custom) {
-                $customId = (string)$custom->custom_id;
-                if ($customId != $currentCustomId && is_dir("custom/{$customId}")) {
-                    DatabasePDO::reset();
-                    new DatabasePDO(['customId' => $customId]);
-
-                    $controlCustom = VersionUpdateController::executeSQLUpdate(['sqlFiles' => $sqlFiles]);
-                    if (!empty($controlCustom['errors'])) {
-                        return $response->withStatus(400)->withJson(['errors' => "Error with custom {$customId} : " . $controlCustom['errors']]);
-                    }
-                }
-            }
         }
 
         $output = [];

@@ -76,6 +76,11 @@ class CoreController
             }
         }
 
+        $control = \VersionUpdate\controllers\VersionUpdateController::executeSQLAtConnection();
+        if (!empty($control['errors'])) {
+            $aInit['sqlUpdateErrors'] = $control['errors'];
+        }
+
         return $response->withJson($aInit);
     }
 
