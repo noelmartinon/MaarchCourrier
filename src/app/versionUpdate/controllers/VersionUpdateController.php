@@ -165,7 +165,9 @@ class VersionUpdateController
         exec('git fetch');
         exec("git checkout {$minorVersion} 2>&1", $output, $returnCode);
 
-        $log = "Application update from {$currentVersion} to {$minorVersion}\nCheckout response {$returnCode} => " . implode(' ', $output) . "\n";
+        $date = new \DateTime();
+        $date = $date->format('d-m-Y H:i');
+        $log = "[{$date}] Application update from {$currentVersion} to {$minorVersion}\nCheckout response {$returnCode} => " . implode(' ', $output) . "\n\n";
         file_put_contents("{$control['directoryPath']}/updateVersion.log", $log, FILE_APPEND);
 
         if ($returnCode != 0) {
