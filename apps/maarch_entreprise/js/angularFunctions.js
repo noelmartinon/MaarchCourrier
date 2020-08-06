@@ -17,7 +17,9 @@ function triggerAngular(locationToGo) {
         dataType: 'json',
         success: function (answer) {
             angularGlobals = answer;
-
+            if (answer['sqlUpdateErrors'] !== undefined) {
+                alert(answer['sqlUpdateErrors']);
+            }
             if (!alreadyLoaded) {
                 var head = document.getElementsByTagName('head')[0];
                 $j('body').css({'margin':'0','padding':'0'});
