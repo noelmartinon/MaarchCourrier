@@ -8,7 +8,7 @@
     <mat-icon class="fas" [class.fa-expand]="!fullscreenMode" [class.fa-compress]="fullscreenMode" style="height:auto;"></mat-icon>
 </button>
 <button class="collaboraOnlineButton_hide" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="default"
-        [title]="lang.closeEditor" (click)="hideButtons = !hideButtons">
+        [title]="hideButtons ? lang.showTool : lang.hideTool" (click)="hideButtons = !hideButtons">
     <mat-icon class="fa fa-arrow-right" style="height:auto;"></mat-icon>
 </button>
 

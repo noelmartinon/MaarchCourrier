@@ -154,7 +154,7 @@
                                 <div class="col-md-12" *ngIf="group.canAdminUsers" style="padding:5px;">
                                     <plugin-autocomplete [labelPlaceholder]="lang.linkUser"
                                                          [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users/administration']"
-                                                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'id'"
+                                                         [targetSearchKey]="'idToDisplay'"
                                                          (triggerEvent)="linkUser($event)"></plugin-autocomplete>
                                     <hr />
                                 </div>
