@@ -96,19 +96,12 @@ class VersionUpdateController
 
         exec('git status --porcelain --untracked-files=no 2>&1', $output);
 
-        $multiCustom = false;
-        if (is_file('custom/custom.xml')) {
-            $xmlFile = simplexml_load_file('custom/custom.xml');
-            $multiCustom = count($xmlFile->custom) > 1;
-        }
-
         return $response->withJson([
             'lastAvailableMinorVersion' => $lastAvailableMinorVersion,
             'lastAvailableMajorVersion' => $lastAvailableMajorVersion,
             'currentVersion'            => $currentVersion,
             'canUpdate'                 => empty($output),
-            'diffOutput'                => $output,
-            'multiCustom'               => $multiCustom
+            'diffOutput'                => $output
         ]);
     }
 
@@ -188,7 +181,7 @@ class VersionUpdateController
             $xmlFile = simplexml_load_file('custom/custom.xml');
             foreach ($xmlFile->custom as $custom) {
                 $customId = (string)$custom->custom_id;
-                if ($customId != $currentCustomId) {
+                if ($customId != $currentCustomId && is_dir("custom/{$customId}")) {
                     DatabasePDO::reset();
                     new DatabasePDO(['customId' => $customId]);
 
