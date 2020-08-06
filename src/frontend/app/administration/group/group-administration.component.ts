@@ -362,14 +362,15 @@ export class GroupAdministrationComponent implements OnInit {
             "groupId": this.group.group_id,
             "role": this.group.role
         };
-        this.http.post("../../rest/users/" + newUser.serialId + "/groups", groupReq)
+        this.http.post("../../rest/users/" + newUser.id + "/groups", groupReq)
             .subscribe(() => {
                 var displayName = newUser.idToDisplay.split(" ");
                 var user = {
                     id: newUser.id,
                     user_id: newUser.otherInfo,
                     firstname: displayName[0],
-                    lastname: displayName[1]
+                    lastname: displayName[1],
+                    allowed: true
                 };
                 this.group.users.push(user);
                 this.usersDataSource = new MatTableDataSource(this.group.users);
